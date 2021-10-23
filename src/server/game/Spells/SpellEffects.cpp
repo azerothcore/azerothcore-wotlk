@@ -2501,7 +2501,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                             if (properties->Category == SUMMON_CATEGORY_ALLY)
                             {
                                 summon->SetOwnerGUID(m_originalCaster->GetGUID());
-                                summon->setFaction(m_originalCaster->getFaction());
+                                summon->SetFaction(m_originalCaster->getFaction());
                             }
 
                             ExecuteLogEffectSummonObject(effIndex, summon);
@@ -2553,7 +2553,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             //if (!faction)
             uint32 faction = m_originalCaster->getFaction();
 
-            summon->setFaction(faction);
+            summon->SetFaction(faction);
             break;
     }
 
@@ -6264,7 +6264,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         }
 
         if (properties && properties->Category == SUMMON_CATEGORY_ALLY)
-            summon->setFaction(caster->getFaction());
+            summon->SetFaction(caster->getFaction());
 
         ExecuteLogEffectSummonObject(i, summon);
     }

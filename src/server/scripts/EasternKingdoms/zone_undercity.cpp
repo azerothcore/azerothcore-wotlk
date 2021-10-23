@@ -1616,7 +1616,7 @@ public:
                             {
                                 jaina->GetMotionMaster()->MoveFollow(me, 5, PET_FOLLOW_ANGLE);
                                 jaina->SetReactState(REACT_AGGRESSIVE);
-                                jaina->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                                jaina->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                             }
                             bStepping = false;
                             JumpToNextStep(0);
@@ -2464,7 +2464,7 @@ public:
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     if (!EnableAttack)
-                        summoned->setFaction(FACTION_FRIENDLY_TO_ALL);
+                        summoned->SetFaction(FACTION_FRIENDLY_TO_ALL);
                     summoned->AddThreat(me, 100.0f);
                     me->AddThreat(summoned, 100.0f);
                     summoned->AI()->AttackStart(me);
@@ -2568,7 +2568,7 @@ public:
                 sylvanas->GetMotionMaster()->Clear();
                 sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                 sylvanas->SetReactState(REACT_AGGRESSIVE);
-                sylvanas->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                sylvanas->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                 sylvanas->GetMotionMaster()->MoveFollow(me, 1, M_PI * 0.1f);
             }
         }
@@ -3142,7 +3142,7 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_CHEMIST_H, 1000.0f);
                                 if (!HostileEndList.empty())
                                     for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++)
-                                        (*itr)->setFaction(FACTION_HOSTILE);
+                                        (*itr)->SetFaction(FACTION_HOSTILE);
                                 SpawnWave(4);
                                 JumpToNextStep(10 * IN_MILLISECONDS);
                                 break;

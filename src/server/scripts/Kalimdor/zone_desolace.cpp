@@ -256,7 +256,7 @@ public:
             for (uint8 i = 0; i < MAX_CARAVAN_SUMMONS; ++i)
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summons[i]))
                 {
-                    summon->setFaction(faction);
+                    summon->SetFaction(faction);
                     if (remove)
                         summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                     else
@@ -266,7 +266,7 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             else
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-            me->setFaction(faction);
+            me->SetFaction(faction);
         }
 
         void WaypointReached(uint32 waypointId) override

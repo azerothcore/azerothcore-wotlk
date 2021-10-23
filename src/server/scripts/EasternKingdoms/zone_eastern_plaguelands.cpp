@@ -160,7 +160,7 @@ public:
             summons.Summon(creature);
             if (creature->GetEntry() == NPC_INJURED_PEASANT || creature->GetEntry() == NPC_PLAGUED_PEASANT)
             {
-                creature->setFaction(_faction);
+                creature->SetFaction(_faction);
                 if (!_spoken)
                 {
                     _spoken = true;

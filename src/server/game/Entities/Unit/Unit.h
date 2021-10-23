@@ -1596,7 +1596,7 @@ public:
 
     // faction template id
     [[nodiscard]] uint32 getFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
-    void setFaction(uint32 faction);
+    void SetFaction(uint32 faction);
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
 
     ReputationRank GetReactionTo(Unit const* target) const;

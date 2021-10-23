@@ -250,8 +250,7 @@ public:
 enum Cooshhooosh
 {
     SPELL_LIGHTNING_BOLT    = 9532,
-    QUEST_CRACK_SKULLS      = 10009,
-    FACTION_HOSTILE_CO      = 45
+    QUEST_CRACK_SKULLS      = 10009
 };
 
 class npc_cooshcoosh : public CreatureScript
@@ -273,7 +272,7 @@ public:
         {
             LightningBolt_Timer = 2000;
             if (me->getFaction() != m_uiNormFaction)
-                me->setFaction(m_uiNormFaction);
+                me->SetFaction(m_uiNormFaction);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -314,7 +313,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF)
         {
             CloseGossipMenuFor(player);
-            creature->setFaction(FACTION_HOSTILE_CO);
+            creature->SetFaction(FACTION_OGRE);
             creature->AI()->AttackStart(player);
         }
         return true;

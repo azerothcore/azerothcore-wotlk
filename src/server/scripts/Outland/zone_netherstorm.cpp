@@ -54,10 +54,7 @@ enum DeathblowToTheLegion
     DEATHBLOW_TO_THE_LEGION = 10409, // Quest ID
     TURNING_POINT           = 10507, // Quest ID
     SOCRETHAR_QUEST_CREDIT  = 35762, // Quest spell
-    SOCRETHAR_TP_STONE      = 29796,
-
-    EXODAR_FACTION          = 1806,
-    EXODAR_ENEMY_FACTION    = 90
+    SOCRETHAR_TP_STONE      = 29796
 };
 
 enum RoleplayActions
@@ -606,7 +603,7 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->setFaction(EXODAR_ENEMY_FACTION);
+            me->SetFaction(FACTION_DEMON);
             adyen   = nullptr;
             orelis  = nullptr;
             karja   = nullptr;
@@ -750,7 +747,7 @@ public:
                     case EVENT_FIGHT_ALDOR:
                         if (GetCreature(KAYLAAN_THE_LOST))
                         {
-                            kaylaan->setFaction(EXODAR_ENEMY_FACTION);
+                            kaylaan->SetFaction(FACTION_DEMON);
                             if (GetCreature(ADYEN_THE_LIGHTBRINGER))
                                 kaylaan->AI()->AttackStart(adyen);
                         }
@@ -758,7 +755,7 @@ public:
                     case EVENT_END_ALDOR_FIGHT:
                         if (GetCreature(KAYLAAN_THE_LOST))
                         {
-                            kaylaan->setFaction(EXODAR_FACTION);
+                            kaylaan->SetFaction(FACTION_DEMON);
                             kaylaan->GetMotionMaster()->MoveTargetedHome();
                             kaylaan->CombatStop();
                             kaylaan->ClearInCombat();
@@ -876,7 +873,7 @@ public:
                         break;
                     case EVENT_FINAL_FIGHT:
                         // Prepare Socrethar for encounter
-                        me->setFaction(EXODAR_ENEMY_FACTION);
+                        me->SetFaction(FACTION_DEMON);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                         me->SetReactState(REACT_AGGRESSIVE);
 
@@ -1150,7 +1147,7 @@ public:
                 {
                     summons.Summon(*itr);
                     (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    (*itr)->setFaction(250);
+                    (*itr)->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 }
                 cl.clear();
                 me->GetCreaturesWithEntryInRange(cl, 20.0f, NPC_PROTECTORATE_DEFENDER);
@@ -1158,10 +1155,10 @@ public:
                 {
                     summons.Summon(*itr);
                     (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    (*itr)->setFaction(250);
+                    (*itr)->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 }
 
-                me->setFaction(250);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 Talk(SAY_SAEED_0);
                 events.ScheduleEvent(EVENT_START_WALK, 3000);
             }
@@ -1824,7 +1821,7 @@ public:
     {
         if (quest->GetQuestId() == Q_ALMABTRIEB)
         {
-            creature->setFaction(113);
+            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             creature->AI()->Talk(SAY_BESSY_0);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
@@ -1992,7 +1989,7 @@ public:
         {
             if (npc_maxx_a_million_escortAI* pEscortAI = CAST_AI(npc_maxx_a_million_escort::npc_maxx_a_million_escortAI, creature->AI()))
             {
-                creature->setFaction(113);
+                creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                 pEscortAI->Start(false, false, player->GetGUID());
             }
         }

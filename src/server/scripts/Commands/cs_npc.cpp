@@ -591,7 +591,7 @@ public:
             return false;
         }
 
-        creature->setFaction(factionId);
+        creature->SetFaction(factionId);
 
         // Faction is set in creature_template - not inside creature
 
@@ -630,7 +630,7 @@ public:
 
         uint32 tempfaction = (uint32)atoi((char*)args);
 
-        creature->setFaction(tempfaction);
+        creature->SetFaction(tempfaction);
         return true;
     }
 

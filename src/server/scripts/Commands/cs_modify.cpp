@@ -375,7 +375,7 @@ public:
 
         handler->PSendSysMessage(LANG_YOU_CHANGE_FACTION, target->GetGUID().GetCounter(), factionid, flag, npcflag, dyflag);
 
-        target->setFaction(factionid);
+        target->SetFaction(factionid);
         target->SetUInt32Value(UNIT_FIELD_FLAGS, flag);
         target->SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
         target->SetUInt32Value(UNIT_DYNAMIC_FLAGS, dyflag);

@@ -130,7 +130,7 @@ public:
                 case 4:
                     me->Whisper("NOOOOOOOoooooooooo!", LANG_UNIVERSAL, summoner->ToPlayer());
                     me->SetLevel(summoner->getLevel());
-                    me->setFaction(14);
+                    me->SetFaction(FACTION_MONSTER);
                     if (me->GetExactDist(summoner) < 50.0f)
                     {
                         me->UpdatePosition(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), 0.0f, true);
@@ -154,8 +154,6 @@ public:
 enum Entries
 {
     NPC_APOTHECARY_HANES         = 23784,
-    FACTION_ESCORTEE_A           = 774,
-    FACTION_ESCORTEE_H           = 775,
     NPC_HANES_FIRE_TRIGGER       = 23968,
     QUEST_TRAIL_OF_FIRE          = 11241,
     SPELL_COSMETIC_LOW_POLY_FIRE = 56274,
@@ -171,7 +169,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
-            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }
         return true;
