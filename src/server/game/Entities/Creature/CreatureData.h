@@ -266,7 +266,7 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 struct CreatureData
 {
     CreatureData()  { }
-    uint32 id{0};                                              // entry in creature_template
+    uint32 id = 0;                                              // entry in creature_template
     uint16 mapid{0};
     uint32 phaseMask{0};
     uint32 displayid{0};
