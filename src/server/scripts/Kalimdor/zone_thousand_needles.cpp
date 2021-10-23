@@ -250,7 +250,7 @@ public:
 
     struct npc_pluckyAI : public ScriptedAI
     {
-        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->getFaction(); }
+        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->GetFaction(); }
 
         uint32 NormFaction;
         uint32 ResetTimer;
@@ -259,7 +259,7 @@ public:
         {
             ResetTimer = 120000;
 
-            if (me->getFaction() != NormFaction)
+            if (me->GetFaction() != NormFaction)
                 me->SetFaction(NormFaction);
 
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))

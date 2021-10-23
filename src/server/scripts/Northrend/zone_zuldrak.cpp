@@ -579,7 +579,7 @@ public:
                     break;
             }
 
-            if (me->getFaction() == FACTION_FRIENDLY || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
+            if (me->GetFaction() == FACTION_FRIENDLY || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                 return;
 
             if (!UpdateVictim())

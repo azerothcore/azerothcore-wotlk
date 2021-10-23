@@ -148,7 +148,7 @@ public:
             if( damage >= me->GetHealth() )
             {
                 damage = me->GetHealth() - 1;
-                if (me->getFaction() != FACTION_FRIENDLY)
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
@@ -296,7 +296,7 @@ public:
             {
                 damage = me->GetHealth() - 1;
 
-                if (me->getFaction() != FACTION_FRIENDLY)
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68574, true); // achievements
                     me->SetFaction(FACTION_FRIENDLY);

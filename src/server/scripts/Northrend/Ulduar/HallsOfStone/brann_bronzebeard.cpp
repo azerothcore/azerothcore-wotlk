@@ -341,7 +341,7 @@ public:
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             {
-                                me->SetFaction(i->GetSource()->getFaction());
+                                me->SetFaction(i->GetSource()->GetFaction());
                                 break;
                             }
 

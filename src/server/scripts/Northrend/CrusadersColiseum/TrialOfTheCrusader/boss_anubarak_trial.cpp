@@ -452,7 +452,7 @@ public:
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
             determinationTimer = urand(10000, 50000);
             despawnTimer = 0;
-            if (me->getFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
+            if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
                 if( Unit* target = me->SelectNearestTarget(250.0f) )
                 {
                     AttackStart(target);

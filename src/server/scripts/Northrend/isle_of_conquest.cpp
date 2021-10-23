@@ -45,7 +45,7 @@ public:
         {
             if (me->GetEntry() == NPC_KEEP_CANNON)
             {
-                faction = me->getFaction();
+                faction = me->GetFaction();
                 me->Respawn();
                 me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, nullptr, false);
                 me->RemoveVehicleKit();

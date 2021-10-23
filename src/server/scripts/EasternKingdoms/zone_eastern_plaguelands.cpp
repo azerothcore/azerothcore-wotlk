@@ -72,7 +72,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
         {
-            creature->AI()->SetData(player->getFaction(), 0);
+            creature->AI()->SetData(player->GetFaction(), 0);
             creature->AI()->SetGUID(player->GetGUID());
         }
 

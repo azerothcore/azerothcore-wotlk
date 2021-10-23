@@ -53,7 +53,7 @@ public:
             {
                 if (apply)
                 {
-                    me->SetFaction(who->getFaction());
+                    me->SetFaction(who->GetFaction());
                     me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
                     Start(false, true, who->GetGUID());
                 }

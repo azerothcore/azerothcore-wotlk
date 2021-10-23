@@ -136,13 +136,13 @@ public:
             {
                 summons.Summon(cr);
                 cr->CastSpell(cr, SPELL_TOMB_OF_THE_HEARTLESS, true);
-                cr->SetFaction(me->getFaction());
+                cr->SetFaction(me->GetFaction());
             }
             if ((cr = me->SummonCreature(NPC_ZEPIK, 5631.63f, 3794.36f, -92.24f, 3.45f)))
             {
                 summons.Summon(cr);
                 cr->CastSpell(cr, SPELL_TOMB_OF_THE_HEARTLESS, true);
-                cr->SetFaction(me->getFaction());
+                cr->SetFaction(me->GetFaction());
             }
         }
 
@@ -202,7 +202,7 @@ public:
                         {
                             minion->Say("Now you not catch us with back turned! Now we hurt you bad undead. BAD!", LANG_UNIVERSAL);
                             minion->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
-                            minion->SetFaction(me->GetVictim()->getFaction());
+                            minion->SetFaction(me->GetVictim()->GetFaction());
                             minion->AddThreat(me, 100000.0f);
                             minion->AI()->AttackStart(me);
                             minion->DespawnOrUnsummon(900000);

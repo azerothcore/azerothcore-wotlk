@@ -196,7 +196,7 @@ public:
     {
         npc_taskmaster_fizzuleAI(Creature* creature) : ScriptedAI(creature)
         {
-            factionNorm = creature->getFaction();
+            factionNorm = creature->GetFaction();
         }
 
         uint32 factionNorm;
@@ -262,7 +262,7 @@ public:
             {
                 if (FlareCount >= 2)
                 {
-                    if (me->getFaction() == FACTION_FRIENDLY_F)
+                    if (me->GetFaction() == FACTION_FRIENDLY_F)
                         return;
 
                     DoFriend();

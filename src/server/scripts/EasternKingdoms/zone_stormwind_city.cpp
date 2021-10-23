@@ -70,14 +70,14 @@ public:
     {
         npc_bartlebyAI(Creature* creature) : ScriptedAI(creature)
         {
-            m_uiNormalFaction = creature->getFaction();
+            m_uiNormalFaction = creature->GetFaction();
         }
 
         uint32 m_uiNormalFaction;
 
         void Reset() override
         {
-            if (me->getFaction() != m_uiNormalFaction)
+            if (me->GetFaction() != m_uiNormalFaction)
                 me->SetFaction(m_uiNormalFaction);
         }
 

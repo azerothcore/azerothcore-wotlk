@@ -2231,7 +2231,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
         if (info->m_createdBySpell)
             pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, info->m_createdBySpell);
         pet->SetCreatorGUID(player->GetGUID());
-        pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->getFaction());
+        pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->GetFaction());
 
         pet->setPowerType(POWER_MANA);
         pet->SetUInt32Value(UNIT_NPC_FLAGS, 0);

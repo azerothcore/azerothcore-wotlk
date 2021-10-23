@@ -430,7 +430,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             {
                                 if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate((*itr)->ToCreature()->GetEntry()))
                                 {
-                                    if ((*itr)->ToCreature()->getFaction() != ci->faction)
+                                    if ((*itr)->ToCreature()->GetFaction() != ci->faction)
                                     {
                                         (*itr)->ToCreature()->SetFaction(ci->faction);
                                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_FACTION: Creature entry %u (%s) set faction to %u",

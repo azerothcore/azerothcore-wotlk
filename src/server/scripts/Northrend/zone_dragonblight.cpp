@@ -330,7 +330,7 @@ public:
                     {
                         futureGUID = cr->GetGUID();
                         summoner->CastSpell(cr, SPELL_CLONE_CASTER, true);
-                        cr->SetFaction(summoner->getFaction());
+                        cr->SetFaction(summoner->GetFaction());
                         cr->SetReactState(REACT_AGGRESSIVE);
                     }
                 }
@@ -490,7 +490,7 @@ public:
         void Reset() override
         {
             if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
-                me->SetFaction(me->ToTempSummon()->GetSummonerUnit()->getFaction());
+                me->SetFaction(me->ToTempSummon()->GetSummonerUnit()->GetFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override

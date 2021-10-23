@@ -570,7 +570,7 @@ public:
     {
         npc_floonAI(Creature* creature) : ScriptedAI(creature)
         {
-            m_uiNormFaction = creature->getFaction();
+            m_uiNormFaction = creature->GetFaction();
         }
 
         uint32 m_uiNormFaction;
@@ -583,7 +583,7 @@ public:
             Silence_Timer = 2000;
             Frostbolt_Timer = 4000;
             FrostNova_Timer = 9000;
-            if (me->getFaction() != m_uiNormFaction)
+            if (me->GetFaction() != m_uiNormFaction)
                 me->SetFaction(m_uiNormFaction);
         }
 
