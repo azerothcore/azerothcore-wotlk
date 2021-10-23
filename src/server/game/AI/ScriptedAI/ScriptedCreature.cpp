@@ -622,15 +622,25 @@ void BossAI::SummonedCreatureDespawnAll()
 void BossAI::UpdateAI(uint32 diff)
 {
     if (!UpdateVictim())
+    {
         return;
+    }
 
     events.Update(diff);
 
     if (me->HasUnitState(UNIT_STATE_CASTING))
+    {
         return;
+    }
 
-    while (uint32 eventId = events.ExecuteEvent())
+    while (uint32 const eventId = events.ExecuteEvent())
+    {
         ExecuteEvent(eventId);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            return;
+        }
+    }
 
     DoMeleeAttackIfReady();
 }
