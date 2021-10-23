@@ -58,7 +58,7 @@ enum Events
     EVENT_VENOM_SPIT                = 9,
     EVENT_PARASITIC_SERPENT         = 10,
     EVENT_FRENZY                    = 11,
-    EVENT_POISON,
+    EVENT_POISON
 };
 
 enum Phases
