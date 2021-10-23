@@ -1070,10 +1070,14 @@ public:
         void Reset() override
         {
             if (_emoteState)
+            {
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, _emoteState);
+            }
 
             if (_npcFlags)
+            {
                 me->SetUInt32Value(UNIT_NPC_FLAGS, _npcFlags);
+            }
 
             Initialize();
             DoCast(SPELL_SHROUD_OF_THE_DEATH_CULTIST);
@@ -1086,7 +1090,9 @@ public:
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            {
                 me->SetFacingToObject(player);
+            }
             _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_1, 3000);
         }
 
@@ -1094,7 +1100,9 @@ public:
         {
             me->setFaction(FACTION_MONSTER);
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            {
                 AttackStart(player);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1119,7 +1127,9 @@ public:
                                 break;
                             case NPC_TOM_HEGGER:
                                 if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                                {
                                     Talk(SAY_HIDDEN_CULTIST_3, player);
+                                }
                                 _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_2, 5000);
                                 break;
                         }
@@ -1132,7 +1142,9 @@ public:
                             case NPC_SALTY_JOHN_THORPE:
                                 Talk(SAY_HIDDEN_CULTIST_4);
                                 if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                                {
                                     me->SetFacingToObject(player);
+                                }
                                 _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_3, 3000);
                                 break;
                             case NPC_GUARD_MITCHELLS:
@@ -1145,15 +1157,20 @@ public:
                     case EVENT_CULTIST_SCRIPT_3:
                     {
                         if (me->GetEntry() == NPC_SALTY_JOHN_THORPE)
+                        {
                             AttackPlayer();
+                        }
                         break;
                     }
                     default:
                         break;
                 }
             }
+
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             DoMeleeAttackIfReady();
         }
