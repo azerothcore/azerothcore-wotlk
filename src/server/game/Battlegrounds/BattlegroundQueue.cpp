@@ -1161,10 +1161,10 @@ void BattlegroundQueue::SendExitMessageArenaQueue(GroupQueueInfo* ginfo)
         sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
 }
 
-void BattlegroundQueue::SetQueueAnnouncementTimer(uint32 bracketId, int32 timer)
+void BattlegroundQueue::SetQueueAnnouncementTimer(uint32 bracketId, int32 timer, bool isCrossFactionBG /*= true*/)
 {
     _queueAnnouncementTimer[bracketId] = timer;
-    _queueAnnouncementCrossfactioned = true;
+    _queueAnnouncementCrossfactioned = isCrossFactionBG;
 }
 
 int32 BattlegroundQueue::GetQueueAnnouncementTimer(uint32 bracketId) const
