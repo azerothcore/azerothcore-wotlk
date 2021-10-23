@@ -4420,9 +4420,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                                     // Search enchant_amount
                                     for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                                     {
-                                        if (item_rand->enchant_id[k] == enchant_id)
+                                        if (item_rand->Enchantment[k] == enchant_id)
                                         {
-                                            basepoints = int32((item_rand->prefix[k] * item->GetItemSuffixFactor()) / 10000);
+                                            basepoints = int32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                             break;
                                         }
                                     }
@@ -4446,9 +4446,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                             {
-                                if (item_rand->enchant_id[k] == enchant_id)
+                                if (item_rand->Enchantment[k] == enchant_id)
                                 {
-                                    enchant_amount = uint32((item_rand->prefix[k] * item->GetItemSuffixFactor()) / 10000);
+                                    enchant_amount = uint32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                     break;
                                 }
                             }
@@ -4466,9 +4466,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                             {
-                                if (item_rand_suffix->enchant_id[k] == enchant_id)
+                                if (item_rand_suffix->Enchantment[k] == enchant_id)
                                 {
-                                    enchant_amount = uint32((item_rand_suffix->prefix[k] * item->GetItemSuffixFactor()) / 10000);
+                                    enchant_amount = uint32((item_rand_suffix->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                     break;
                                 }
                             }
@@ -6721,7 +6721,7 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
             continue;
         }
 
-        std::string name = *achievementEntry->name;
+        std::string name = achievementEntry->name[sObjectMgr->GetDBCLocaleIndex()];
 
         std::stringstream stream;
         stream << "|cffff7c0a|Hachievement:";
