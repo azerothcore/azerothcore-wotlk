@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -10,25 +23,31 @@
 #include "ScriptMgr.h"
 #include "World.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class spectator_commandscript : public CommandScript
 {
 public:
     spectator_commandscript() : CommandScript("spectator_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> spectatorCommandTable =
+        static ChatCommandTable spectatorCommandTable =
         {
-            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
-            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
-            { "spectate",       SEC_CONSOLE,        false, &HandleSpectatorSpectateCommand,                 "" },
-            { "watch",          SEC_CONSOLE,        false, &HandleSpectatorWatchCommand,                    "" },
-            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
-            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
+            { "version",        SEC_PLAYER,        false, &HandleSpectatorVersionCommand,                  "" },
+            { "reset",          SEC_PLAYER,        false, &HandleSpectatorResetCommand,                    "" },
+            { "spectate",       SEC_PLAYER,        false, &HandleSpectatorSpectateCommand,                 "" },
+            { "watch",          SEC_PLAYER,        false, &HandleSpectatorWatchCommand,                    "" },
+            { "leave",          SEC_PLAYER,        false, &HandleSpectatorLeaveCommand,                    "" },
+            { "",               SEC_PLAYER,        false, &HandleSpectatorCommand,                         "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
-            { "spect",          SEC_CONSOLE,        false, nullptr,                                         "", spectatorCommandTable }
+            { "spect",          SEC_PLAYER,        false, nullptr,                                         "", spectatorCommandTable }
         };
         return commandTable;
     }

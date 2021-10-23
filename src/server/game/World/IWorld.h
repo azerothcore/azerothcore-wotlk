@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_IWORLD_H
@@ -22,28 +35,22 @@ class WorldSession;
 class Player;
 
 /// Storage class for commands issued for delayed execution
-struct CliCommandHolder
+struct AC_GAME_API CliCommandHolder
 {
-    typedef void Print(void*, const char*);
-    typedef void CommandFinished(void*, bool success);
+    using Print = void(*)(void*, std::string_view);
+    using CommandFinished = void(*)(void*, bool success);
 
     void* m_callbackArg;
     char* m_command;
-    Print* m_print;
+    Print m_print;
+    CommandFinished m_commandFinished;
 
-    CommandFinished* m_commandFinished;
+    CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished);
+    ~CliCommandHolder();
 
-    CliCommandHolder(void* callbackArg, const char* command, Print* zprint, CommandFinished* commandFinished)
-            : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
-    {
-        // TODO: fix Codacy warning
-        //  "Does not handle strings that are not \0-terminated; if given one it may perform an over-read (it could cause a crash if unprotected) (CWE-126)."
-        size_t len = strlen(command) + 1;
-        m_command = new char[len];
-        memcpy(m_command, command, len);
-    }
-
-    ~CliCommandHolder() { delete[] m_command; }
+private:
+    CliCommandHolder(CliCommandHolder const& right) = delete;
+    CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
 typedef std::unordered_map<uint32, WorldSession*> SessionMap;
@@ -331,7 +338,6 @@ enum WorldIntConfigs
     CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION,
     CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS,
     CONFIG_LFG_OPTIONSMASK,
-    CONFIG_LFG_DUNGEON_FINDER_EXPANSION,
     CONFIG_MAX_INSTANCES_PER_HOUR,
     CONFIG_WINTERGRASP_PLR_MAX,
     CONFIG_WINTERGRASP_PLR_MIN,

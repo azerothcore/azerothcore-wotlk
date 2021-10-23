@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_QUEST_H
@@ -247,7 +258,7 @@ public:
     [[nodiscard]] std::string const& GetRequestItemsText() const { return RequestItemsText; }
     [[nodiscard]] std::string const& GetAreaDescription() const { return AreaDescription; }
     [[nodiscard]] std::string const& GetCompletedText() const { return CompletedText; }
-    [[nodiscard]] int32  GetRewOrReqMoney() const;
+    [[nodiscard]] int32  GetRewOrReqMoney(Player* player = nullptr) const;
     [[nodiscard]] uint32 GetRewHonorAddition() const { return RewardHonor; }
     [[nodiscard]] float GetRewHonorMultiplier() const { return RewardKillHonor; }
     [[nodiscard]] uint32 GetRewMoneyMaxLevel() const; // use in XP calculation at client
@@ -355,6 +366,7 @@ protected:
     uint32 RewardHonor;
     float RewardKillHonor;
     int32  RewardMoney;
+    uint32 RewardMoneyDifficulty;
     uint32 RewardBonusMoney;
     uint32 RewardDisplaySpell;
     int32  RewardSpell;

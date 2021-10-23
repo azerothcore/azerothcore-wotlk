@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Chat.h"
@@ -7,14 +20,20 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class cheat_commandscript : public CommandScript
 {
 public:
     cheat_commandscript() : CommandScript("cheat_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> cheatCommandTable =
+        static ChatCommandTable cheatCommandTable =
         {
             { "god",            SEC_GAMEMASTER,     false, &HandleGodModeCheatCommand,         "" },
             { "casttime",       SEC_GAMEMASTER,     false, &HandleCasttimeCheatCommand,        "" },
@@ -26,7 +45,7 @@ public:
             { "explore",        SEC_GAMEMASTER,     false, &HandleExploreCheatCommand,         "" },
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "cheat",          SEC_GAMEMASTER,     false, nullptr,                  "", cheatCommandTable },
         };
