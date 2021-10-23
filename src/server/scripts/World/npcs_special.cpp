@@ -2495,7 +2495,9 @@ public:
         void IsSummonedBy(Unit* summoner) override
         {
             if (summoner->GetTypeId() != TYPEID_PLAYER)
+            {
                 return;
+            }
 
             if (summoner->ToPlayer()->GetItemCount(ITEM_VENOMHIDE_BABY_TOOTH) >= 6)
             {
