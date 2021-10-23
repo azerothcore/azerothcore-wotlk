@@ -71,7 +71,7 @@ enum NPCs
 {
     NPC_PARASITIC_SERPENT           = 14884,
     NPC_RAZZASHI_COBRA    = 11373,
-    BOSS_VENOXIS          = 14507,
+    BOSS_VENOXIS          = 14507
 };
 
 class boss_venoxis : public CreatureScript
