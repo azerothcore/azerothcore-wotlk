@@ -13896,14 +13896,6 @@ Unit* Creature::SelectVictim()
     if (GetVehicle())
         return nullptr;
 
-    // search nearby enemies before evading
-    if (HasReactState(REACT_AGGRESSIVE))
-    {
-        target = SelectNearestTargetInAttackDistance(std::max<float>(m_CombatDistance, ATTACK_DISTANCE));
-        if (target && _CanDetectFeignDeathOf(target) && CanCreatureAttack(target))
-            return target;
-    }
-
     // pussywizard: not sure why it's here
     // pussywizard: can't evade when having invisibility aura with duration? o_O
     Unit::AuraEffectList const& iAuras = GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);

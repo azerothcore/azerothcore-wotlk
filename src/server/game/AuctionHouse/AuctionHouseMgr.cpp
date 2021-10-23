@@ -639,19 +639,19 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 // These are found in ItemRandomSuffix.dbc and ItemRandomProperties.dbc
                 //  even though the DBC name seems misleading
 
-                char* const* suffix = nullptr;
+                std::array<char const*, 16> const* suffix = nullptr;
 
                 if (propRefID < 0)
                 {
                     const ItemRandomSuffixEntry* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
                     if (itemRandEntry)
-                        suffix = itemRandEntry->nameSuffix;
+                        suffix = &itemRandEntry->Name;
                 }
                 else
                 {
                     const ItemRandomPropertiesEntry* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
                     if (itemRandEntry)
-                        suffix = itemRandEntry->nameSuffix;
+                        suffix = &itemRandEntry->Name;
                 }
 
                 // dbc local name
@@ -660,7 +660,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                     // Append the suffix (ie: of the Monkey) to the name using localization
                     // or default enUS if localization is invalid
                     name += ' ';
-                    name += suffix[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
+                    name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
                 }
             }
 

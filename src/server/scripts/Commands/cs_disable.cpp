@@ -32,14 +32,20 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class disable_commandscript : public CommandScript
 {
 public:
     disable_commandscript() : CommandScript("disable_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> removeDisableCommandTable =
+        static ChatCommandTable removeDisableCommandTable =
         {
             { "spell",                SEC_ADMINISTRATOR,    true, &HandleRemoveDisableSpellCommand,               "" },
             { "quest",                SEC_ADMINISTRATOR,    true, &HandleRemoveDisableQuestCommand,               "" },
@@ -48,7 +54,7 @@ public:
             { "outdoorpvp",           SEC_ADMINISTRATOR,    true, &HandleRemoveDisableOutdoorPvPCommand,          "" },
             { "vmap",                 SEC_ADMINISTRATOR,    true, &HandleRemoveDisableVmapCommand,                "" },
         };
-        static std::vector<ChatCommand> addDisableCommandTable =
+        static ChatCommandTable addDisableCommandTable =
         {
             { "spell",                SEC_ADMINISTRATOR,    true, &HandleAddDisableSpellCommand,                  "" },
             { "quest",                SEC_ADMINISTRATOR,    true, &HandleAddDisableQuestCommand,                  "" },
@@ -57,12 +63,12 @@ public:
             { "outdoorpvp",           SEC_ADMINISTRATOR,    true, &HandleAddDisableOutdoorPvPCommand,             "" },
             { "vmap",                 SEC_ADMINISTRATOR,    true, &HandleAddDisableVmapCommand,                   "" },
         };
-        static std::vector<ChatCommand> disableCommandTable =
+        static ChatCommandTable disableCommandTable =
         {
             { "add",    SEC_ADMINISTRATOR,  true, nullptr, "", addDisableCommandTable },
             { "remove", SEC_ADMINISTRATOR,  true, nullptr, "", removeDisableCommandTable },
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "disable", SEC_ADMINISTRATOR, false, nullptr, "", disableCommandTable },
         };
