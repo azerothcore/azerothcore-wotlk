@@ -267,7 +267,8 @@ public:
 
     void RemoveCorpse(bool setSpawnTime = true, bool skipVisibility = false);
 
-    void DespawnOrUnsummon(uint32 msTimeToDespawn = 0);
+    void DespawnOrUnsummon(Milliseconds msTimeToDespawn, Seconds forcedRespawnTimer);
+    void DespawnOrUnsummon(uint32 msTimeToDespawn = 0) { DespawnOrUnsummon(Milliseconds(msTimeToDespawn), 0s); };
     void DespawnOnEvade();
     void RespawnOnEvade();
 
@@ -438,7 +439,7 @@ protected:
     bool CanAlwaysSee(WorldObject const* obj) const override;
 
 private:
-    void ForcedDespawn(uint32 timeMSToDespawn = 0);
+    void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forcedRespawnTimer = 0s);
 
     [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;
 
@@ -483,11 +484,12 @@ private:
 class ForcedDespawnDelayEvent : public BasicEvent
 {
 public:
-    ForcedDespawnDelayEvent(Creature& owner) : BasicEvent(), m_owner(owner) { }
+    ForcedDespawnDelayEvent(Creature& owner, Seconds respawnTimer) : BasicEvent(), m_owner(owner), m_respawnTimer(respawnTimer) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 private:
     Creature& m_owner;
+    Seconds const m_respawnTimer;
 };
 
 #endif
