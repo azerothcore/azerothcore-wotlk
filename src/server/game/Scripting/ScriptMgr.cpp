@@ -908,6 +908,11 @@ bool ScriptMgr::CanSendCreaturLoot(Creature* creature, Player* player)
     return ret;
 }
 
+void ScriptMgr::OnBeforeLootMoney(Creature* creature, Player* player)
+{
+    FOREACH_SCRIPT(CreatureScript)->OnBeforeLootMoney(creature, player);
+}
+
 bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
 {
     ASSERT(player);

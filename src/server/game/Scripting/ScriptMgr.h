@@ -504,6 +504,14 @@ public:
      * @param player Player.
      */
     [[nodiscard]] virtual bool CanSendCreaturLoot(Creature* /*creature*/, Player* /*player*/) { return true; }
+
+    /**
+     * @brief This hook runs before loot money.
+     *
+     * @param creature Creature.
+     * @param player Player.
+     */
+    virtual void OnBeforeLootMoney(Creature* creature, Player* player) { }
 };
 
 class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
@@ -1561,6 +1569,7 @@ public: /* CreatureScript */
     CreatureAI* GetCreatureAI(Creature* creature);
     void OnCreatureUpdate(Creature* creature, uint32 diff);
     bool CanSendCreaturLoot(Creature* creature, Player* player);
+    void OnBeforeLootMoney(Creature* creature, Player* player);
 
 public: /* GameObjectScript */
     bool OnGossipHello(Player* player, GameObject* go);

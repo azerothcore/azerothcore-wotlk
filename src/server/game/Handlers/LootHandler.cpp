@@ -205,6 +205,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         }
         else
         {
+            sScriptMgr->OnBeforeLootMoney(GetPlayer()->GetMap()->GetCreature(player->GetLootGUID()), player);
+
             player->ModifyMoney(loot->gold);
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, loot->gold);
 
