@@ -1959,6 +1959,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", " ");
     sObjectMgr->InitializeSpellInfoPrecomputedData();
 
+    LOG_INFO("server.loading", "Initialize commands...");
+    Acore::ChatCommands::LoadCommandMap();
+
     ///- Initialize game time and timers
     LOG_INFO("server.loading", "Initialize game time and timers");
     LOG_INFO("server.loading", " ");
@@ -2775,7 +2778,7 @@ void World::UpdateSessions(uint32 diff)
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
-    CliCommandHolder::Print* zprint = nullptr;
+    CliCommandHolder::Print zprint = nullptr;
     void* callbackArg = nullptr;
     CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
@@ -3519,4 +3522,14 @@ void World::FinalizePlayerWorldSession(WorldSession* session)
     session->SendAddonsInfo();
     session->SendClientCacheVersion(cacheVersion);
     session->SendTutorialsData();
+}
+
+CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished)
+    : m_callbackArg(callbackArg), m_command(strdup(command)), m_print(zprint), m_commandFinished(commandFinished)
+{
+}
+
+CliCommandHolder::~CliCommandHolder()
+{
+    free(m_command);
 }
