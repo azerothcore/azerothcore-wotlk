@@ -353,7 +353,11 @@ void ProfessionUnlearnSpells(Player* player, uint32 type)
             player->removeSpell(36259, SPEC_MASK_ALL, false);                     // Lionheart Executioner
             break;
         case S_UNLEARN_DRAGON:                              // S_UNLEARN_DRAGON
+            player->removeSpell(10619, SPEC_MASK_ALL, false);                     // Dragonscale Gauntlets
+            player->removeSpell(10650, SPEC_MASK_ALL, false);                     // Dragonscale Breastplate
             player->removeSpell(36076, SPEC_MASK_ALL, false);                     // Dragonstrike Leggings
+            player->removeSpell(24655, SPEC_MASK_ALL, false);                     // Green Dragonscale Gauntlets
+            player->removeSpell(24654, SPEC_MASK_ALL, false);                     // Blue Dragonscale Leggings
             player->removeSpell(36079, SPEC_MASK_ALL, false);                     // Golden Dragonstrike Breastplate
             player->removeSpell(35576, SPEC_MASK_ALL, false);                     // Ebon Netherscale Belt
             player->removeSpell(35577, SPEC_MASK_ALL, false);                     // Ebon Netherscale Bracers
@@ -368,6 +372,8 @@ void ProfessionUnlearnSpells(Player* player, uint32 type)
             player->removeSpell(35590, SPEC_MASK_ALL, false);                     // Primalstrike Belt
             player->removeSpell(35591, SPEC_MASK_ALL, false);                     // Primalstrike Bracers
             player->removeSpell(35589, SPEC_MASK_ALL, false);                     // Primalstrike Vest
+            player->removeSpell(10630, SPEC_MASK_ALL, false);                     // Gauntlets of the Sea
+            player->removeSpell(10632, SPEC_MASK_ALL, false);                     // Helm of Fire
             break;
         case S_UNLEARN_TRIBAL:                              // S_UNLEARN_TRIBAL
             player->removeSpell(35585, SPEC_MASK_ALL, false);                     // Windhawk Hauberk
@@ -375,6 +381,8 @@ void ProfessionUnlearnSpells(Player* player, uint32 type)
             player->removeSpell(35588, SPEC_MASK_ALL, false);                     // Windhawk Bracers
             player->removeSpell(36075, SPEC_MASK_ALL, false);                     // Wildfeather Leggings
             player->removeSpell(36078, SPEC_MASK_ALL, false);                     // Living Crystal Breastplate
+            player->removeSpell(10621, SPEC_MASK_ALL, false);                     // Wolfshead Helm
+            player->removeSpell(10647, SPEC_MASK_ALL, false);                     // Feathered Breastplate
             break;
         case S_UNLEARN_SPELLFIRE:                           // S_UNLEARN_SPELLFIRE
             player->removeSpell(26752, SPEC_MASK_ALL, false);                     // Spellfire Belt
@@ -962,14 +970,16 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 250 && player->getLevel() > 49)
+        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() > 49)
         {
             switch (creature->GetEntry())
             {
                 case N_TRAINER_DRAGON1:                                      //Peter Galen
                 case N_TRAINER_DRAGON2:                                      //Thorkaf Dragoneye
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5145)))
+                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_DRAGON,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    }
                     if (player->HasSpell(S_DRAGON))
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
@@ -978,8 +988,10 @@ public:
                     break;
                 case N_TRAINER_ELEMENTAL1:                                      //Sarah Tanner
                 case N_TRAINER_ELEMENTAL2:                                      //Brumn Winterhoof
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5146)))
+                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_ELEMENTAL,   GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    }
                     if (player->HasSpell(S_ELEMENTAL))
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
@@ -988,8 +1000,10 @@ public:
                     break;
                 case N_TRAINER_TRIBAL1:                                      //Caryssia Moonhunter
                 case N_TRAINER_TRIBAL2:                                      //Se'Jib
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5148)))
+                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_TRIBAL,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    }
                     if (player->HasSpell(S_TRIBAL))
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
@@ -1072,19 +1086,19 @@ public:
             {
             case N_TRAINER_DRAGON1: // Peter Galen
             case N_TRAINER_DRAGON2: // Thorkaf Dragoneye
-                AddGossipItemFor(player, 0, GOSSIP_UNLEARN_DRAGON, GOSSIP_SENDER_CHECK, action, BOX_UNLEARN_LEATHER_SPEC, DoHighUnlearnCost(player), false);
+                AddGossipItemFor(player, 0, GOSSIP_UNLEARN_DRAGON, GOSSIP_SENDER_CHECK, action, BOX_UNLEARN_LEATHER_SPEC, DoMedUnlearnCost(player), false);
                 // unknown textID ()
                 SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
                 break;
             case N_TRAINER_ELEMENTAL1: // Sarah Tanner
             case N_TRAINER_ELEMENTAL2: // Brumn Winterhoof
-                AddGossipItemFor(player, 0, GOSSIP_UNLEARN_ELEMENTAL, GOSSIP_SENDER_CHECK, action, BOX_UNLEARN_LEATHER_SPEC, DoHighUnlearnCost(player), false);
+                AddGossipItemFor(player, 0, GOSSIP_UNLEARN_ELEMENTAL, GOSSIP_SENDER_CHECK, action, BOX_UNLEARN_LEATHER_SPEC, DoMedUnlearnCost(player), false);
                 // unknown textID ()
                 SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
                 break;
             case N_TRAINER_TRIBAL1: // Caryssia Moonhunter
             case N_TRAINER_TRIBAL2: // Se'Jib
-                AddGossipItemFor(player, 0, GOSSIP_UNLEARN_TRIBAL, GOSSIP_SENDER_CHECK, action, BOX_UNLEARN_LEATHER_SPEC, DoHighUnlearnCost(player), false);
+                AddGossipItemFor(player, 0, GOSSIP_UNLEARN_TRIBAL, GOSSIP_SENDER_CHECK, action, BOX_UNLEARN_LEATHER_SPEC, DoMedUnlearnCost(player), false);
                 // unknown textID ()
                 SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
                 break;
@@ -1322,7 +1336,7 @@ public:
         }
 
         //LEATHERWORKING SPEC
-        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 250 && player->getLevel() >= 49)
+        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() >= 49)
         {
             if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
             {
@@ -1358,15 +1372,15 @@ public:
                 break;
             //Unlearn Dragon
             case GOSSIP_ACTION_INFO_DEF + 5:
-                ProcessUnlearnAction(player, nullptr, S_LEARN_DRAGON, 0, NULL);
+                ProcessCastaction(player, nullptr, S_DRAGON, S_LEARN_DRAGON, 0);
                 break;
             //Unlearn Elemental
             case GOSSIP_ACTION_INFO_DEF + 6:
-                ProcessUnlearnAction(player, nullptr, S_LEARN_ELEMENTAL, 0, NULL);
+                ProcessCastaction(player, nullptr, S_ELEMENTAL, S_LEARN_ELEMENTAL, 0);
                 break;
             //Unlearn Tribal
             case GOSSIP_ACTION_INFO_DEF + 7:
-                ProcessUnlearnAction(player, nullptr, S_LEARN_TRIBAL, 0, NULL);
+                ProcessCastaction(player, nullptr, S_TRIBAL, S_LEARN_TRIBAL, 0);
                 break;
         }
     }
