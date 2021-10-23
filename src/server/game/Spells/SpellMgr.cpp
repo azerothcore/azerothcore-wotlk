@@ -3491,6 +3491,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
+    // Headless Horseman - Start Fire
+    ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 6; // 100 yards
+    });
+
     //They Must Burn Bomb Aura (self)
     ApplySpellFix({ 36350 }, [](SpellEntry* spellInfo)
     {
@@ -7367,6 +7373,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 5; // 40yd
     });
 
+    // 29519 - Silithyst
+    ApplySpellFix({ 29519 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_DECREASE_SPEED;
+        spellInfo->EffectBasePoints[EFFECT_0] = -25;
+    });
+
     // Ulduar: Kologarn Focused Eyebeam Summon Trigger
     ApplySpellFix({ 63342 }, [](SpellEntry* spellInfo)
     {
@@ -7384,6 +7397,12 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+    });
+
+    // Conflagration, Horseman's Cleave
+    ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
