@@ -117,6 +117,7 @@ public:
         {
             std::list<Creature*> cobraList;
             me->GetCreatureListWithEntryInGrid(cobraList, NPC_RAZZASHI_COBRA, 50.0f);
+
             if (!cobraList.empty())
             {
                 for (auto cobras : cobraList)
