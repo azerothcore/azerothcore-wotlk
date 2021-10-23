@@ -5447,8 +5447,42 @@ public:
     }
 };
 
+// 29519 - Silithyst
+class spell_silithyst : public SpellScriptLoader
+{
+public:
+    spell_silithyst() : SpellScriptLoader("spell_silithyst") {}
+
+    class spell_silithyst_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_silithyst_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetCaster()->SetPvP(true);
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetCaster()->SummonGameObject(181597, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10 * IN_MILLISECONDS * MINUTE);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_silithyst_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_silithyst_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_silithyst_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
+    new spell_silithyst();
     new spell_gen_5000_gold();
     new spell_gen_model_visible();
     new spell_the_flag_of_ownership();
