@@ -1320,7 +1320,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetOption<int32>("Warden.ClientResponseDelay", 600);
 
     // Dungeon finder
-    m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 3);
+    m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
 
     // Max instances per hour
     m_int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetOption<int32>("AccountInstancesPerHour", 5);
@@ -1706,6 +1706,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Quests Starters and Enders...");
     sObjectMgr->LoadQuestStartersAndEnders();                    // must be after quest load
 
+    LOG_INFO("server.loading", "Loading Quest Money Rewards...");
+    sObjectMgr->LoadQuestMoneyRewards();
+
     LOG_INFO("server.loading", "Loading Objects Pooling Data...");
     sPoolMgr->LoadFromDB();
 
@@ -1940,6 +1943,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
     LOG_INFO("server.loading", " ");
     sObjectMgr->InitializeSpellInfoPrecomputedData();
+
+    LOG_INFO("server.loading", "Initialize commands...");
+    Acore::ChatCommands::LoadCommandMap();
 
     ///- Initialize game time and timers
     LOG_INFO("server.loading", "Initialize game time and timers");
@@ -2757,7 +2763,7 @@ void World::UpdateSessions(uint32 diff)
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
-    CliCommandHolder::Print* zprint = nullptr;
+    CliCommandHolder::Print zprint = nullptr;
     void* callbackArg = nullptr;
     CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
@@ -3501,4 +3507,14 @@ void World::FinalizePlayerWorldSession(WorldSession* session)
     session->SendAddonsInfo();
     session->SendClientCacheVersion(cacheVersion);
     session->SendTutorialsData();
+}
+
+CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished)
+    : m_callbackArg(callbackArg), m_command(strdup(command)), m_print(zprint), m_commandFinished(commandFinished)
+{
+}
+
+CliCommandHolder::~CliCommandHolder()
+{
+    free(m_command);
 }

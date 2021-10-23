@@ -936,13 +936,18 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
         case TARGET_SELECT_CATEGORY_NEARBY:
         case TARGET_SELECT_CATEGORY_CONE:
         case TARGET_SELECT_CATEGORY_AREA:
+        {
             // targets for effect already selected
             if (effectMask & processedEffectMask)
+            {
                 return;
+            }
+
+            auto const& effects = GetSpellInfo()->Effects;
+
             // choose which targets we can select at once
             for (uint32 j = effIndex + 1; j < MAX_SPELL_EFFECTS; ++j)
             {
-                SpellEffectInfo const* effects = GetSpellInfo()->Effects;
                 if (effects[j].IsEffect() &&
                     effects[effIndex].TargetA.GetTarget() == effects[j].TargetA.GetTarget() &&
                     effects[effIndex].TargetB.GetTarget() == effects[j].TargetB.GetTarget() &&
@@ -955,6 +960,7 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
             }
             processedEffectMask |= effectMask;
             break;
+        }
         default:
             break;
     }
@@ -3397,6 +3403,11 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     LOG_DEBUG("spells.aura", "Spell::prepare: spell id %u source %u caster %d customCastFlags %u mask %u", m_spellInfo->Id, m_caster->GetEntry(), m_originalCaster ? m_originalCaster->GetEntry() : -1, _triggeredCastFlags, m_targets.GetTargetMask());
 
+    if (!(m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && !(m_spellInfo->Attributes & SPELL_ATTR0_ALLOW_WHILE_SITTING) && m_caster->IsSitState())
+    {
+        m_caster->SetStandState(UNIT_STAND_STATE_STAND);
+    }
+
     //Containers for channeled spells have to be set
     //TODO:Apply this to all casted spells if needed
     // Why check duration? 29350: channelled triggers channelled
@@ -4333,7 +4344,7 @@ void Spell::SendSpellStart()
 
     uint32 castFlags = CAST_FLAG_HAS_TRAJECTORY;
 
-    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_spellInfo->IsChanneled())
+    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && !m_spellInfo->IsChanneled())
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
@@ -4389,7 +4400,7 @@ void Spell::SendSpellGo()
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
     // triggered spells with spell visual != 0
-    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_spellInfo->IsChanneled())
+    if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_cast_count && !m_spellInfo->IsChanneled())
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
@@ -5893,10 +5904,21 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_RESURRECT_PET:
                 {
-                    Creature* pet = m_caster->GetGuardianPet();
-
-                    if (pet && pet->IsAlive())
-                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                    if (Creature* pet = m_caster->GetGuardianPet())
+                    {
+                        if (pet->IsAlive())
+                        {
+                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                        }
+                    }
+                    else if (Player* player = m_caster->ToPlayer())
+                    {
+                        SpellCastResult loadResult = Pet::TryLoadFromDB(player, false, MAX_PET_TYPE, true);
+                        if (loadResult != SPELL_CAST_OK)
+                        {
+                            return loadResult;
+                        }
+                    }
 
                     break;
                 }

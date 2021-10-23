@@ -424,7 +424,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
                 data << uint32(0);
         }
 
-        data << uint32(quest->GetRewOrReqMoney());
+        data << uint32(quest->GetRewOrReqMoney(_session->GetPlayer()));
         data << uint32(quest->XPValue(_session->GetPlayer()) * _session->GetPlayer()->GetQuestRate());
     }
 
@@ -506,7 +506,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     if (quest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
         data << uint32(0);                                  // Hide money rewarded
     else
-        data << uint32(quest->GetRewOrReqMoney());          // reward money (below max lvl)
+        data << uint32(quest->GetRewOrReqMoney(_session->GetPlayer())); // reward money (below max lvl)
 
     data << uint32(quest->GetRewMoneyMaxLevel());           // used in XP calculation at client
     data << uint32(quest->GetRewSpell());                   // reward spell, this spell will display (icon) (cast if RewSpellCast == 0)
@@ -650,7 +650,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
             data << uint32(0);
     }
 
-    data << uint32(quest->GetRewOrReqMoney());
+    data << uint32(quest->GetRewOrReqMoney(_session->GetPlayer()));
     data << uint32(quest->XPValue(_session->GetPlayer()) * _session->GetPlayer()->GetQuestRate());
 
     // rewarded honor points. Multiply with 10 to satisfy client

@@ -1610,7 +1610,7 @@ Creature* Battleground::GetBGCreature(uint32 type)
     return creature;
 }
 
-void Battleground::SpawnBGObject(uint32 type, uint32 respawntime)
+void Battleground::SpawnBGObject(uint32 type, uint32 respawntime, uint32 forceRespawnDelay)
 {
     if (Map* map = FindBgMap())
         if (GameObject* obj = map->GetGameObject(BgObjects[type]))
@@ -1622,6 +1622,11 @@ void Battleground::SpawnBGObject(uint32 type, uint32 respawntime)
                 obj->SetLootState(GO_READY);
             obj->SetRespawnTime(respawntime);
             map->AddToMap(obj);
+
+            if (forceRespawnDelay)
+            {
+                obj->SetRespawnDelay(forceRespawnDelay);
+            }
         }
 }
 
