@@ -39,7 +39,7 @@ enum Spells
     // used when swapping event-stages
     SPELL_VENOXIS_TRANSFORM         = 23849,    // 50% health - shapechange to cobra
     SPELL_FRENZY                    = 8269,      // 20% health - frenzy
-    SPELL_POISON = 24097,
+    SPELL_POISON = 24097
 };
 
 enum Events
