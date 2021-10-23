@@ -4520,13 +4520,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
     });
 
-    // Sunder Armor
-    ApplySpellFix({ 58567 }, [](SpellEntry* spellInfo)
-    {
-        // trigger, remove spellfamilyflags because of glyph of sunder armor
-        spellInfo->SpellFamilyFlags = flag96(0x0, 0x0, 0x0);
-    });
-
     // Sunder Armor - Old Ranks
     ApplySpellFix({ 7405, 8380, 11596, 11597, 25225, 47467 }, [](SpellEntry* spellInfo)
     {
