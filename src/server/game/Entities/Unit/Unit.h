@@ -2296,7 +2296,7 @@ public:
     void SetLastManaUse(uint32 spellCastTime) { m_lastManaUse = spellCastTime; }
     [[nodiscard]] bool IsUnderLastManaUseEffect() const;
 
-    void SetContestedPvP(Player* attackedPlayer = nullptr);
+    void SetContestedPvP(Player* attackedPlayer = nullptr, bool lookForNearContestedGuards = true);
 
     uint32 GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const;
     float CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffectType damagetype) const;

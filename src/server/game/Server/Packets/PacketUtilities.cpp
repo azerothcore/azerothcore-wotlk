@@ -16,7 +16,7 @@
  */
 
 #include "PacketUtilities.h"
-//#include "Hyperlinks.h"
+#include "Hyperlinks.h"
 #include "Errors.h"
 #include <utf8.h>
 #include <sstream>
@@ -41,13 +41,13 @@ bool WorldPackets::Strings::Utf8::Validate(std::string const& value)
     return true;
 }
 
-//bool WorldPackets::Strings::Hyperlinks::Validate(std::string const& value)
-//{
-//    if (!Acore::Hyperlinks::CheckAllLinks(value))
-//        throw InvalidHyperlinkException(value);
-//
-//    return true;
-//}
+bool WorldPackets::Strings::Hyperlinks::Validate(std::string const& value)
+{
+    if (!Acore::Hyperlinks::CheckAllLinks(value))
+        throw InvalidHyperlinkException(value);
+
+    return true;
+}
 
 bool WorldPackets::Strings::NoHyperlinks::Validate(std::string const& value)
 {
