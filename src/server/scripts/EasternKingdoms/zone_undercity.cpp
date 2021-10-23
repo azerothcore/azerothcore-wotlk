@@ -354,12 +354,6 @@ public:
     }
 };
 
-enum Factions
-{
-    FACTION_HOSTILE = 14,
-    FACTION_FRIENDLY_TO_ALL = 35
-};
-
 /*######
 ## ALLIANCE
 #######*/
@@ -2464,7 +2458,7 @@ public:
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     if (!EnableAttack)
-                        summoned->SetFaction(FACTION_FRIENDLY_TO_ALL);
+                        summoned->SetFaction(FACTION_FRIENDLY);
                     summoned->AddThreat(me, 100.0f);
                     me->AddThreat(summoned, 100.0f);
                     summoned->AI()->AttackStart(me);
@@ -3141,8 +3135,7 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_DOCTOR_H, 1000.0f);
                                 me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_CHEMIST_H, 1000.0f);
                                 if (!HostileEndList.empty())
-                                    for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++)
-                                        (*itr)->SetFaction(FACTION_HOSTILE);
+                                    for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++) (*itr)->SetFaction(FACTION_MONSTER);
                                 SpawnWave(4);
                                 JumpToNextStep(10 * IN_MILLISECONDS);
                                 break;
