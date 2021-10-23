@@ -2517,7 +2517,7 @@ public:
         {
             if (spell->Id == SPELL_SILITHID_EGG || spell->Id == SPELL_SILITHID_MEAT || spell->Id == SPELL_FRESH_DINOSAUR_MEAT)
             {
-                Talk(TALK_EMOTE_EAT, nullptr);
+                Talk(TALK_EMOTE_EAT);
             }
         }
     };
