@@ -894,6 +894,20 @@ void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
     tmpscript->OnUpdate(creature, diff);
 }
 
+bool ScriptMgr::CanSendCreaturLoot(Creature* creature, Player* player)
+{
+    ASSERT(creature);
+    ASSERT(player);
+
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(CreatureScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSendCreaturLoot(creature, player))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
 bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
 {
     ASSERT(player);
@@ -2661,6 +2675,17 @@ void ScriptMgr::OnSetServerSideVisibility(Player* player, ServerSideVisibilityTy
 void ScriptMgr::OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
 {
     FOREACH_SCRIPT(PlayerScript)->OnSetServerSideVisibilityDetect(player, type, sec);
+}
+
+bool ScriptMgr::CanSendErrorArleadyLooted(Player* player)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSendErrorArleadyLooted(player))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
 }
 
 void ScriptMgr::AnticheatSetSkipOnePacketForASH(Player* player, bool apply)

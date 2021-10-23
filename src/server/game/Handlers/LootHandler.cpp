@@ -84,16 +84,19 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     }
     else
     {
-        Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
-
-        bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
-        if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+        if (sScriptMgr->CanSendCreaturLoot(this, player))
         {
-            player->SendLootError(lguid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
-            return;
-        }
+            Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-        loot = &creature->loot;
+            bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+            if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+            {
+                player->SendLootError(lguid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
+                return;
+            }
+
+            loot = &creature->loot;
+        }
     }
 
     player->StoreLootItem(lootSlot, loot);

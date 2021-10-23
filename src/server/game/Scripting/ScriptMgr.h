@@ -496,6 +496,14 @@ public:
 
     // Called when a CreatureAI object is needed for the creature.
     virtual CreatureAI* GetAI(Creature* /*creature*/) const { return nullptr; }
+
+    /**
+     * @brief This hook runs before sending loot.
+     *
+     * @param creature Creature.
+     * @param player Player.
+     */
+    [[nodiscard]] virtual bool CanSendCreaturLoot(Creature* /*creature*/, Player* /*player*/) { return true; }
 };
 
 class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
@@ -1049,6 +1057,13 @@ public:
 
     virtual void OnSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
+    /**
+     * @brief This hook runs before SendLootRelease.
+     *
+     * @param player The Player.
+     */
+    [[nodiscard]] virtual bool CanSendErrorArleadyLooted(Player* /*player*/) { return true; }
+
     // Passive Anticheat System
     virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
     virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
@@ -1545,6 +1560,7 @@ public: /* CreatureScript */
     uint32 GetDialogStatus(Player* player, Creature* creature);
     CreatureAI* GetCreatureAI(Creature* creature);
     void OnCreatureUpdate(Creature* creature, uint32 diff);
+    bool CanSendCreaturLoot(Creature* creature, Player* player);
 
 public: /* GameObjectScript */
     bool OnGossipHello(Player* player, GameObject* go);
@@ -1745,6 +1761,7 @@ public: /* PlayerScript */
     bool CanInitTrade(Player* player, Player* target);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    bool CanSendErrorArleadyLooted(Player* player);
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
     void AnticheatSetUnderACKmount(Player* player);
