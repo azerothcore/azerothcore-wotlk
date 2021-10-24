@@ -2192,9 +2192,14 @@ void Creature::SendAIReaction(AiReaction reactionType)
     LOG_DEBUG("network", "WORLD: Sent SMSG_AI_REACTION, type %u.", reactionType);
 }
 
-void Creature::CallAssistance()
+void Creature::CallAssistance(Unit* target /*= nullptr*/)
 {
-    if (!m_AlreadyCallAssistance && GetVictim() && !IsPet() && !IsCharmed())
+    if (!target)
+    {
+        target = GetVictim();
+    }
+
+    if (!m_AlreadyCallAssistance && target && !IsPet() && !IsCharmed())
     {
         SetNoCallAssistance(true);
 
@@ -2204,13 +2209,13 @@ void Creature::CallAssistance()
         {
             std::list<Creature*> assistList;
 
-            Acore::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
+            Acore::AnyAssistCreatureInRangeCheck u_check(this, target, radius);
             Acore::CreatureListSearcher<Acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
             Cell::VisitGridObjects(this, searcher, radius);
 
             if (!assistList.empty())
             {
-                AssistDelayEvent* e = new AssistDelayEvent(GetVictim()->GetGUID(), this);
+                AssistDelayEvent* e = new AssistDelayEvent(target->GetGUID(), this);
                 while (!assistList.empty())
                 {
                     // Pushing guids because in delay can happen some creature gets despawned => invalid pointer
