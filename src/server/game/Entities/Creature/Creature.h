@@ -248,7 +248,7 @@ public:
 
     void DoFleeToGetAssistance();
     void CallForHelp(float fRadius);
-    void CallAssistance();
+    void CallAssistance(Unit* target = nullptr);
     void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
     void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
