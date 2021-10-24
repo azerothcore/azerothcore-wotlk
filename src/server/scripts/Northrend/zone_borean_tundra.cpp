@@ -505,18 +505,22 @@ public:
 };
 
 /*######
-## npc_beryl_sorcerer
+## Quest 11590: Abduction
 ######*/
 
+// NPC 25316: Beryl Sorcerer
 enum BerylSorcerer
 {
-    NPC_BERYL_SORCERER                  = 25316,
-    NPC_CAPTURED_BERLY_SORCERER         = 25474,
-    NPC_LIBRARIAN_DONATHAN              = 25262,
-
-    SPELL_ARCANE_CHAINS                 = 45611,
-    SPELL_COSMETIC_CHAINS               = 54324,
-    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF  = 45631
+    EVENT_FROSTBOLT                                = 1,
+    EVENT_ARCANE_CHAINS                            = 2,
+    NPC_LIBRARIAN_DONATHAN                         = 25262,
+    NPC_CAPTURED_BERLY_SORCERER                    = 25474,
+    SPELL_FROSTBOLT                                = 9672,
+    SPELL_ARCANE_CHAINS                            = 45611,
+    SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST       = 45625,
+    SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER = 45626,
+    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF             = 45631,
+    SPELL_ARCANE_CHAINS_CHANNEL_II                 = 45735
 };
 
 class npc_beryl_sorcerer : public CreatureScript
@@ -524,67 +528,192 @@ class npc_beryl_sorcerer : public CreatureScript
 public:
     npc_beryl_sorcerer() : CreatureScript("npc_beryl_sorcerer") { }
 
-    struct npc_beryl_sorcererAI : public FollowerAI
+struct npc_beryl_sorcererAI : public CreatureAI
     {
-        npc_beryl_sorcererAI(Creature* creature) : FollowerAI(creature) { }
+        npc_beryl_sorcererAI(Creature* creature) : CreatureAI(creature)
+        {
+            Initialize();
+        }
 
-        bool bEnslaved;
+        void Initialize()
+        {
+            _playerGUID.Clear();
+            _chainsCast = false;
+        }
 
         void Reset() override
         {
-            me->UpdateEntry(NPC_BERYL_SORCERER);
             me->SetReactState(REACT_AGGRESSIVE);
-            bEnslaved = false;
+            Initialize();
         }
 
         void EnterCombat(Unit* who) override
         {
             if (me->IsValidAttackTarget(who))
+            {
                 AttackStart(who);
+            }
+
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
         }
 
-        void SpellHit(Unit* pCaster, const SpellInfo* pSpell) override
+        void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
-            if (pSpell->Id == SPELL_ARCANE_CHAINS && pCaster->GetTypeId() == TYPEID_PLAYER && !HealthAbovePct(50) && !bEnslaved)
+            if (spell->Id == SPELL_ARCANE_CHAINS && !_chainsCast)
             {
-                EnterEvadeMode(); //We make sure that the npc is not attacking the player!
-                me->SetReactState(REACT_PASSIVE);
-                StartFollow(pCaster->ToPlayer(), 0, nullptr);
-                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, nullptr, false);
-                DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
-                me->DespawnOrUnsummon(45000);
+                if (Player* player = unit->ToPlayer())
+                {
+                    _playerGUID = player->GetGUID();
+                    _chainsCast = true;
+                    _events.ScheduleEvent(EVENT_ARCANE_CHAINS, 4000);
+                }
+            }
+        }
 
-                if (Player* player = pCaster->ToPlayer())
-                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+            {
+                return;
+            }
 
-                bEnslaved = true;
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_FROSTBOLT:
+                        DoCastVictim(SPELL_FROSTBOLT);
+                        _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
+                        break;
+                    case EVENT_ARCANE_CHAINS:
+                        if (me->HasAura(SPELL_ARCANE_CHAINS))
+                        {
+                            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                            {
+                                me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM));
+                                player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
+                                me->DisappearAndDie();
+                            }
+                        }
+                        break;
+                }
+            }
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap   _events;
+        ObjectGuid _playerGUID;
+        bool       _chainsCast;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_beryl_sorcererAI(creature);
+    }
+};
+
+// NPC 25474: Captured Beryl Sorcerer
+enum CapturedBerylSorcerer
+{
+    EVENT_ADD_ARCANE_CHAINS                        = 1,
+    EVENT_FOLLOW_PLAYER                            = 2
+};
+
+class npc_captured_beryl_sorcerer : public CreatureScript
+{
+public:
+    npc_captured_beryl_sorcerer() : CreatureScript("npc_captured_beryl_sorcerer") {}
+
+    struct npc_captured_beryl_sorcererAI : public FollowerAI
+    {
+        npc_captured_beryl_sorcererAI(Creature* creature) : FollowerAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0);
+        }
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_ADD_ARCANE_CHAINS:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
+                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
+                            _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1000);
+                        }
+                        break;
+                    case EVENT_FOLLOW_PLAYER:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
+                            StartFollow(summoner);
+                        }
+                        break;
+                }
             }
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             FollowerAI::MoveInLineOfSight(who);
 
             if (who->GetEntry() == NPC_LIBRARIAN_DONATHAN && me->IsWithinDistInMap(who, INTERACTION_DISTANCE))
             {
                 SetFollowComplete();
-                me->DisappearAndDie();
+                me->DespawnOrUnsummon();
             }
         }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
+    private:
+        EventMap _events;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_beryl_sorcererAI(creature);
+        return new npc_captured_beryl_sorcererAI(creature);
+    }
+};
+
+// Spell 45625: - Arcane Chains: Character Force Cast
+class spell_arcane_chains_character_force_cast : public SpellScriptLoader
+{
+public:
+    spell_arcane_chains_character_force_cast() : SpellScriptLoader("spell_arcane_chains_character_force_cast") {}
+
+    class spell_arcane_chains_character_force_cast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_arcane_chains_character_force_cast_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /* effIndex */)
+        {
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_arcane_chains_character_force_cast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_arcane_chains_character_force_cast_SpellScript();
     }
 };
 
@@ -1311,6 +1440,8 @@ void AddSC_borean_tundra()
     new npc_nerubar_victim();
     new npc_lurgglbr();
     new npc_beryl_sorcerer();
+    new npc_captured_beryl_sorcerer();
+    new spell_arcane_chains_character_force_cast();
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
     new npc_bonker_togglevolt();
