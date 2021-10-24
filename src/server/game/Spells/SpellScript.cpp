@@ -629,7 +629,7 @@ void SpellScript::CreateItem(uint32 effIndex, uint32 itemId)
 
 SpellInfo const* SpellScript::GetTriggeringSpell()
 {
-    return m_spell->m_triggeredByAuraSpell;
+    return m_spell->m_triggeredByAuraSpell.spellInfo;
 }
 
 void SpellScript::FinishCast(SpellCastResult result)
