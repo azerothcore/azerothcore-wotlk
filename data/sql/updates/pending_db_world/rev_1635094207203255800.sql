@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1635089372271640600');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1635094207203255800');
 
 DELETE FROM `gameobject_template` WHERE `entry` IN (4, 129, 12653, 103575, 128972, 141609, 160462, 160842, 175328, 175590, 176592, 176750, 177493, 177529, 178124, 178248, 178644, 178673, 178963, 179527, 179530, 179531, 180525, 181214, 181290, 181604, 181831, 181838, 181840, 181842, 181844, 183278, 183282, 184910, 184958, 185297, 185305, 185862, 186471, 188130, 188134, 188135, 188139, 188145, 188146, 188147, 190552, 190721, 191146, 194645, 195061, 195089, 195304, 196829, 202208, 202361, 203044, 203971, 204289, 204385, 204434, 204968, 205100, 205547, 205581, 206322, 207418, 208046, 208426, 208543, 208596, 208815, 209282, 209833, 209898, 210857, 210946, 212348, 213351, 215404, 215419, 244605);
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconName`, `castBarCaption`, `unk1`, `size`, `Data0`, `Data1`, `Data2`, `Data3`, `Data4`, `Data5`, `Data6`, `Data7`, `Data8`, `Data9`, `Data10`, `Data11`, `Data12`, `Data13`, `Data14`, `Data15`, `Data16`, `Data17`, `Data18`, `Data19`, `Data20`, `Data21`, `Data22`, `Data23`, `AIName`, `ScriptName`, `VerifiedBuild`) VALUES
@@ -84,3 +84,11 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconNa
 (215404, 6, 9941, 'Shroud of Mist', '', '', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 22566),
 (215419, 6, 0, 'Luck of the Lotus', '', '', '', 1, 0, 0, 0, 130653, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', -18019),
 (244605, 6, 9958, 'Underbelly Hoard Trap', '', '', '', 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 22566);
+
+DELETE FROM `gameobject_loot_template` WHERE `Entry` = 27240;
+INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(27240,33470,0,14,0,1,3,1,4,NULL),
+(27240,43851,0,15,0,1,2,1,1,NULL),
+(27240,43852,0,14,0,1,2,1,1,NULL),
+(27240,46368,0,47,0,1,1,1,1,NULL),
+(27240,46369,0,52,0,1,1,1,1,NULL);
