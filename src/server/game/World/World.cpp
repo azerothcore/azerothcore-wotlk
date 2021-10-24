@@ -1970,6 +1970,9 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_PINGDB].SetInterval(getIntConfig(CONFIG_DB_PING_INTERVAL)*MINUTE * IN_MILLISECONDS);  // Mysql ping time in minutes
 
+    // check realm population count (server controlled interval, don't configure this line of code)
+    m_timers[WUPDATE_PLAYER_POPULATION].SetInterval(2 * MINUTE * IN_MILLISECONDS);
+
     // our speed up
     m_timers[WUPDATE_5_SECS].SetInterval(5 * IN_MILLISECONDS);
 
@@ -2205,6 +2208,22 @@ void World::Update(uint32 diff)
             m_timers[i].Update(diff);
         else
             m_timers[i].SetCurrent(0);
+    }
+
+    ///- Update Realm Population
+    if (m_timers[WUPDATE_PLAYER_POPULATION].Passed())
+    {
+        m_timers[WUPDATE_PLAYER_POPULATION].Reset();
+
+        uint32 pLimit = GetPlayerAmountLimit();
+        if (pLimit > 0)
+        {
+            float population = GetActiveSessionCount();
+            population /= pLimit;
+
+            // update realm population when player logs in and/or logs out
+            LoginDatabase.PExecute("UPDATE realmlist SET population = %f WHERE id = %d", population, realm.Id.Realm);
+        }
     }
 
     // pussywizard: our speed up and functionality

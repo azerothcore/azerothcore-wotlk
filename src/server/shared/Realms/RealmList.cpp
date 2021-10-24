@@ -124,6 +124,9 @@ void RealmList::UpdateRealm(RealmHandle const& id, uint32 build, std::string con
     }
 
     realm.Port = port;
+
+    // Update existing realm population
+    UpdateRealmPopulation(id, flag, population);
 }
 
 void RealmList::UpdateRealms(boost::system::error_code const& error)
@@ -232,6 +235,43 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
     {
         _updateTimer->expires_from_now(boost::posix_time::seconds(_updateInterval));
         _updateTimer->async_wait(std::bind(&RealmList::UpdateRealms, this, std::placeholders::_1));
+    }
+}
+
+void RealmList::UpdateRealmPopulation(RealmHandle const& id, RealmFlags flag, float population)
+{
+    Realm& realm = _realms[id];
+
+    // don't update if realm(s) are offline or with version mismatch flags
+    if (flag != REALM_FLAG_OFFLINE || flag != REALM_FLAG_VERSION_MISMATCH)
+    {
+        // let the server handle realm flags, instead of database
+        if (population == 1.0f)
+        {
+            flag = REALM_FLAG_FULL;
+        }
+        else if (population >= 0.8f)
+        {
+            flag = REALM_FLAG_FULL;
+        }
+        else if (population >= 0.6f)
+        {
+            // this sets the population medium
+            flag = REALM_FLAG_NONE;
+            population = 0;
+        }
+        else if (population >= 0.2f)
+        {
+            flag = REALM_FLAG_NEW_PLAYERS;
+        }
+        else
+        {
+            flag = REALM_FLAG_RECOMMENDED;
+        }
+
+        realm.Id = id;
+        realm.Flags = flag;
+        realm.PopulationLevel = population;
     }
 }
 
