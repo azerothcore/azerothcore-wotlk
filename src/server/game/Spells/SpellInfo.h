@@ -236,7 +236,8 @@ private:
         SpellTargetCheckTypes SelectionCheckType; // defines selection criteria
         SpellTargetDirectionTypes DirectionType; // direction for cone and dest targets
     };
-    static StaticData _data[TOTAL_SPELL_TARGETS];
+
+    static std::array<StaticData, TOTAL_SPELL_TARGETS> _data;
 };
 
 class SpellEffectInfo
@@ -302,7 +303,8 @@ private:
         SpellEffectImplicitTargetTypes ImplicitTargetType; // defines what target can be added to effect target list if there's no valid target type provided for effect
         SpellTargetObjectTypes UsedTargetObjectType; // defines valid target object type for spell effect
     };
-    static StaticData _data[TOTAL_SPELL_EFFECTS];
+
+    static std::array<StaticData, TOTAL_SPELL_EFFECTS> _data;
 };
 
 class SpellInfo
@@ -360,18 +362,18 @@ public:
     SpellRangeEntry const* RangeEntry;
     float  Speed;
     uint32 StackAmount;
-    uint32 Totem[2];
-    int32  Reagent[MAX_SPELL_REAGENTS];
-    uint32 ReagentCount[MAX_SPELL_REAGENTS];
+    std::array<uint32, 2> Totem;
+    std::array<int32, MAX_SPELL_REAGENTS>  Reagent;
+    std::array<uint32, MAX_SPELL_REAGENTS> ReagentCount;
     int32  EquippedItemClass;
     int32  EquippedItemSubClassMask;
     int32  EquippedItemInventoryTypeMask;
-    uint32 TotemCategory[2];
-    uint32 SpellVisual[2];
+    std::array<uint32, 2> TotemCategory;
+    std::array<uint32, 2> SpellVisual;
     uint32 SpellIconID;
     uint32 ActiveIconID;
-    char* SpellName[16];
-    char* Rank[16];
+    std::array<char const*, 16> SpellName;
+    std::array<char const*, 16> Rank;
     uint32 MaxTargetLevel;
     uint32 MaxAffectedTargets;
     uint32 SpellFamilyName;
@@ -380,7 +382,7 @@ public:
     uint32 PreventionType;
     int32  AreaGroupId;
     uint32 SchoolMask;
-    SpellEffectInfo Effects[MAX_SPELL_EFFECTS];
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS> Effects;
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
 
