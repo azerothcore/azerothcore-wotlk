@@ -18,7 +18,7 @@
 /* ScriptData
 SDName: Npc_Professions
 SD%Complete: 80
-SDComment: Provides learn/unlearn/relearn-options for professions. Not supported: Unlearn engineering, re-learn engineering, re-learn leatherworking.
+SDComment: Provides learn/unlearn/relearn-options for professions. Not supported: Unlearn engineering, re-learn engineering.
 SDCategory: NPCs
 EndScriptData */
 
@@ -970,7 +970,7 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() > 49)
+        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() > 40)
         {
             switch (creature->GetEntry())
             {
@@ -1336,7 +1336,7 @@ public:
         }
 
         //LEATHERWORKING SPEC
-        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() >= 49)
+        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() >= 40)
         {
             if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
             {
@@ -1370,15 +1370,15 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 4:
                 ProcessUnlearnAction(player, nullptr, S_UNLEARN_GNOMISH, 0, DoHighUnlearnCost(player));
                 break;
-            //Unlearn Dragon
+            //Learn Dragon
             case GOSSIP_ACTION_INFO_DEF + 5:
                 ProcessCastaction(player, nullptr, S_DRAGON, S_LEARN_DRAGON, 0);
                 break;
-            //Unlearn Elemental
+            //Learn Elemental
             case GOSSIP_ACTION_INFO_DEF + 6:
                 ProcessCastaction(player, nullptr, S_ELEMENTAL, S_LEARN_ELEMENTAL, 0);
                 break;
-            //Unlearn Tribal
+            //Learn Tribal
             case GOSSIP_ACTION_INFO_DEF + 7:
                 ProcessCastaction(player, nullptr, S_TRIBAL, S_LEARN_TRIBAL, 0);
                 break;
