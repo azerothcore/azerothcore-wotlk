@@ -36,14 +36,20 @@
 #include "ScriptMgr.h"
 #include "TargetedMovementGenerator.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class mmaps_commandscript : public CommandScript
 {
 public:
     mmaps_commandscript() : CommandScript("mmaps_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> mmapCommandTable =
+        static ChatCommandTable mmapCommandTable =
         {
             { "loadedtiles", SEC_ADMINISTRATOR, false, &HandleMmapLoadedTilesCommand, "" },
             { "loc",         SEC_ADMINISTRATOR,         false, &HandleMmapLocCommand,         "" },
@@ -52,7 +58,7 @@ public:
             { "testarea",    SEC_ADMINISTRATOR,    false, &HandleMmapTestArea,           "" },
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "mmap", SEC_ADMINISTRATOR, true, nullptr, "", mmapCommandTable },
         };

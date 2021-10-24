@@ -36,14 +36,20 @@ void GetPlayerInfo(ChatHandler*  handler, Player* player)
                              lfg::GetRolesString(sLFGMgr->GetRoles(guid)).c_str(), sLFGMgr->GetComment(guid).c_str());
 }
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class lfg_commandscript : public CommandScript
 {
 public:
     lfg_commandscript() : CommandScript("lfg_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> lfgCommandTable =
+        static ChatCommandTable lfgCommandTable =
         {
             { "player",    SEC_MODERATOR,     false, &HandleLfgPlayerInfoCommand, "" },
             { "group",     SEC_MODERATOR,     false,  &HandleLfgGroupInfoCommand, "" },
@@ -52,7 +58,7 @@ public:
             { "options",   SEC_GAMEMASTER,    false,    &HandleLfgOptionsCommand, "" },
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             {  "lfg",   SEC_GAMEMASTER, false,                           nullptr, "", lfgCommandTable },
         };
