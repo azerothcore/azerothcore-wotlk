@@ -3491,6 +3491,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
+    // Spirit of Kirith
+    ApplySpellFix({ 10853 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 3; // 1min
+    });
+
     // Headless Horseman - Start Fire
     ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
     {
@@ -7371,6 +7377,13 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
     {
         spellInfo->RangeIndex = 5; // 40yd
+    });
+
+    // 29519 - Silithyst
+    ApplySpellFix({ 29519 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_DECREASE_SPEED;
+        spellInfo->EffectBasePoints[EFFECT_0] = -25;
     });
 
     // Ulduar: Kologarn Focused Eyebeam Summon Trigger

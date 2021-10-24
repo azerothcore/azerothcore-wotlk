@@ -29,14 +29,20 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class guild_commandscript : public CommandScript
 {
 public:
     guild_commandscript() : CommandScript("guild_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> guildCommandTable =
+        static ChatCommandTable guildCommandTable =
         {
             { "create",         SEC_GAMEMASTER,     true,  &HandleGuildCreateCommand,           "" },
             { "delete",         SEC_GAMEMASTER,     true,  &HandleGuildDeleteCommand,           "" },
@@ -45,7 +51,7 @@ public:
             { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" },
             { "info",           SEC_GAMEMASTER,     true,  &HandleGuildInfoCommand,             "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "guild",          SEC_GAMEMASTER,  true, nullptr,                                 "", guildCommandTable }
         };
@@ -182,21 +188,15 @@ public:
         return true;
     }
 
-    static bool HandleGuildRankCommand(ChatHandler* handler, char const* args)
+    static bool HandleGuildRankCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, uint8 rank)
     {
-        char* nameStr;
-        char* rankStr;
-        handler->extractOptFirstArg((char*)args, &nameStr, &rankStr);
-        if (!rankStr)
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!player)
             return false;
 
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string target_name;
-        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &target_name))
-            return false;
-
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
+        uint32 guildId = player->IsConnected() ? player->GetConnectedPlayer()->GetGuildId() : Player::GetGuildIdFromStorage(player->GetGUID().GetCounter());
         if (!guildId)
             return false;
 
@@ -204,8 +204,7 @@ public:
         if (!targetGuild)
             return false;
 
-        uint8 newRank = uint8(atoi(rankStr));
-        return targetGuild->ChangeMemberRank(targetGuid, newRank);
+        return targetGuild->ChangeMemberRank(player->GetGUID(), rank);
     }
 
     static bool HandleGuildInfoCommand(ChatHandler* handler, char const* args)

@@ -811,6 +811,7 @@ public:
     }
 
     void SetRespawnTime(int32 respawn);
+    void SetRespawnDelay(int32 respawn);
     void Respawn();
     [[nodiscard]] bool isSpawned() const
     {
