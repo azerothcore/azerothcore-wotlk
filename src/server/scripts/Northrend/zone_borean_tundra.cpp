@@ -80,7 +80,7 @@ public:
             owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
             owner->CastSpell(owner, SPELL_SUBDUED, true);
             GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
-            owner->setFaction(35);
+            owner->SetFaction(FACTION_FRIENDLY);
             owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
@@ -497,7 +497,7 @@ public:
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
 
-            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
             return true;
         }
         return false;
@@ -855,7 +855,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
-            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
