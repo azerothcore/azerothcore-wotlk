@@ -49,7 +49,7 @@ public:
         };
         static ChatCommandTable commandTable =
         {
-            { "tele", teleCommandTable }
+            { "teleport", teleCommandTable }
         };
         return commandTable;
     }
