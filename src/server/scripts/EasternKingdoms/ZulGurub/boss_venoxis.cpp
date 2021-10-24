@@ -306,7 +306,9 @@ public:
             events.ScheduleEvent(EVENT_POISON, 8 * IN_MILLISECONDS);
 
             if (Creature* Venoxis = GetVenoxis())
+            {
                 Venoxis->SetInCombatWithZone();
+            }
         }
 
         Creature* GetVenoxis()
