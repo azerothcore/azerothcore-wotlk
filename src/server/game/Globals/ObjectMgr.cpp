@@ -1896,7 +1896,7 @@ void ObjectMgr::LoadCreatures()
         data.unit_flags         = fields[20].GetUInt32();
         data.dynamicflags       = fields[21].GetUInt32();
         data.ScriptId           = GetScriptId(fields[22].GetString());
-        ;
+
         if (!data.ScriptId)
             data.ScriptId = cInfo->ScriptID;
 
