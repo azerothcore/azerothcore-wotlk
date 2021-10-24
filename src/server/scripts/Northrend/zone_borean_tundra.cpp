@@ -375,12 +375,7 @@ public:
 enum Lurgglbr
 {
     QUEST_ESCAPE_WINTERFIN_CAVERNS      = 11570,
-
     GO_CAGE                             = 187369,
-
-    FACTION_ESCORTEE_A                  = 774,
-    FACTION_ESCORTEE_H                  = 775,
-
     SAY_START_1                         = 0,
     SAY_START_2                         = 1,
     SAY_END_1                           = 2,
@@ -497,7 +492,7 @@ public:
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
 
-            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
         }
         return false;
@@ -855,7 +850,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
-            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
@@ -1173,8 +1168,7 @@ enum HiddenCultist
     SAY_HIDDEN_CULTIST_4              = 3,
     EVENT_CULTIST_SCRIPT_1            = 1,
     EVENT_CULTIST_SCRIPT_2            = 2,
-    EVENT_CULTIST_SCRIPT_3            = 3,
-    FACTION_MONSTER                   = 14
+    EVENT_CULTIST_SCRIPT_3            = 3
 };
 
 class npc_hidden_cultist : public CreatureScript
