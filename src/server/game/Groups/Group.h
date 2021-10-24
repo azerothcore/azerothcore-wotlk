@@ -208,7 +208,7 @@ public:
 
     // properties accessories
     bool IsFull() const;
-    bool isLFGGroup()  const;
+    bool isLFGGroup(bool restricted = false)  const;
     bool isRaidGroup() const;
     bool isBFGroup()   const;
     bool isBGGroup()   const;
@@ -242,7 +242,7 @@ public:
 
     uint8 GetMemberGroup(ObjectGuid guid) const;
 
-    void ConvertToLFG();
+    void ConvertToLFG(bool restricted = true);
     void ConvertToRaid();
 
     void SetBattlegroundGroup(Battleground* bg);
