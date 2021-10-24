@@ -1098,7 +1098,7 @@ public:
 
         void AttackPlayer()
         {
-            me->setFaction(FACTION_MONSTER);
+            me->SetFaction(FACTION_MONSTER);
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
             {
                 AttackStart(player);
