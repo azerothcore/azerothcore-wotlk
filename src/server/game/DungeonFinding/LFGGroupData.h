@@ -22,7 +22,6 @@
 
 namespace lfg
 {
-
     /**
         Stores all lfg data needed about a group.
     */
