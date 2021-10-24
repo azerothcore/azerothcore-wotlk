@@ -242,8 +242,8 @@ void RealmList::UpdateRealmPopulation(RealmHandle const& id, RealmFlags flag, fl
 {
     Realm& realm = _realms[id];
 
-    // don't update if realm(s) are offline or with version mismatch flags
-    if (flag != REALM_FLAG_OFFLINE || flag != REALM_FLAG_VERSION_MISMATCH)
+    // don't update if realm(s) are offline
+    if (flag != REALM_FLAG_OFFLINE)
     {
         // let the server handle realm flags, instead of database
         if (population == 1.0f)
