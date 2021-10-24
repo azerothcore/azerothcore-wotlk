@@ -34,20 +34,26 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include <fstream>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class debug_commandscript : public CommandScript
 {
 public:
     debug_commandscript() : CommandScript("debug_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> debugPlayCommandTable =
+        static ChatCommandTable debugPlayCommandTable =
         {
             { "cinematic",      SEC_MODERATOR,      false, &HandleDebugPlayCinematicCommand,   "" },
             { "movie",          SEC_MODERATOR,      false, &HandleDebugPlayMovieCommand,       "" },
             { "sound",          SEC_MODERATOR,      false, &HandleDebugPlaySoundCommand,       "" }
         };
-        static std::vector<ChatCommand> debugSendCommandTable =
+        static ChatCommandTable debugSendCommandTable =
         {
             { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "" },
             { "channelnotify",  SEC_ADMINISTRATOR,  false, &HandleDebugSendChannelNotifyCommand,  "" },
@@ -61,7 +67,7 @@ public:
             { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "" },
             { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "" }
         };
-        static std::vector<ChatCommand> debugCommandTable =
+        static ChatCommandTable debugCommandTable =
         {
             { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "" },
             { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "" },
@@ -91,7 +97,7 @@ public:
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
             { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "debug",          SEC_GAMEMASTER,      true,  nullptr,                           "", debugCommandTable },
             { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,                "", }
