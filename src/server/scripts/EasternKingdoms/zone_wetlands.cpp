@@ -157,54 +157,6 @@ public:
     }
 };
 
-enum MottledScreecherMisc
-{
-    TALK_CALL_FOR_HELP = 0,
-
-    NPC_MOTTLED_SCREECHER = 1021,
-};
-
-class npc_mottled_screecher : public CreatureScript
-{
-public:
-    npc_mottled_screecher() : CreatureScript("npc_mottled_screecher") {}
-
-    struct npc_mottled_screecherAI : public ScriptedAI
-    {
-        npc_mottled_screecherAI(Creature* creature) : ScriptedAI(creature) {}
-
-        bool damaged;
-
-        void Reset() override
-        {
-            damaged = false;
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-        {
-            if (me->HealthBelowPct(20) && !damaged)
-            {
-                damaged = true;
-                Talk(TALK_CALL_FOR_HELP);
-                std::list<Creature*> creatureList;
-                GetCreatureListWithEntryInGrid(creatureList, me, NPC_MOTTLED_SCREECHER, 20.0f);
-                for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-                {
-                    if (Creature* creature = *itr)
-                    {
-                        creature->AI()->AttackStart(me->GetVictim());
-                    }
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_mottled_screecherAI(creature);
-    }
-};
-
 /*######
 ## AddSC
 ######*/
@@ -213,5 +165,4 @@ void AddSC_wetlands()
 {
     new npc_tapoke_slim_jahn();
     new npc_mikhail();
-    new npc_mottled_screecher();
 }
