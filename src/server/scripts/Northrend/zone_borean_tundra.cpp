@@ -1672,7 +1672,7 @@ public:
                     // Thassarian say text 1 and move to location
                     Talk(SAY_THASSARIAN_1);
                     me->SetWalk(false);
-                    me->GetMotionMaster()->MovePoint(0, 3722.527f, 3567.2583f, 477.44086f); // *** Should run back to here after combat but is running back to last waypoint ***
+                    me->GetMotionMaster()->MovePoint(0, 3722.527f, 3567.2583f, 477.44086f); // *** ISSUE Not updating last OOC point to this location ***
                     _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_9, 9000);
                     break;
                 case EVENT_THASSARIAN_SCRIPT_9:
@@ -1855,7 +1855,7 @@ public:
                     break;
                 case EVENT_THASSARIAN_SCRIPT_29:
                     Cleanup();
-                    me->DespawnOrUnsummon(30000);
+                    me->DespawnOrUnsummon(30000); // *** ISSUE Should have 2 min respawn ***
                     break;
                 default:
                     break;
@@ -2042,7 +2042,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_DEFLECTION:
-                            DoCastSelf(SPELL_DEFLECTION);
+                            DoCastSelf(SPELL_DEFLECTION); // *** ISSUE Removing stun from General Arlos and Leryssa ***
                             _events.ScheduleEvent(EVENT_DEFLECTION, 10000, 20000);
                             break;
                         case EVENT_SOUL_BLAST:
