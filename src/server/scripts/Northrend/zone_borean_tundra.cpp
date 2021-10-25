@@ -1530,7 +1530,8 @@ public:
 
         void Reset() override
         {
-            me->RemoveStandFlags(UNIT_STAND_STATE_SIT);
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             Initialize();
@@ -1671,7 +1672,7 @@ public:
                     // Thassarian say text 1 and move to location
                     Talk(SAY_THASSARIAN_1);
                     me->SetWalk(false);
-                    me->GetMotionMaster()->MovePoint(0, 3722.527f, 3567.2583f, 477.44086f);
+                    me->GetMotionMaster()->MovePoint(0, 3722.527f, 3567.2583f, 477.44086f); // *** Should run back to here after combat but is running back to last waypoint ***
                     _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_9, 9000);
                     break;
                 case EVENT_THASSARIAN_SCRIPT_9:
@@ -1747,7 +1748,7 @@ public:
                     if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                     {
                         talbot->AI()->Talk(SAY_TALBOT_4);
-                        talbot->setFaction(FACTION_VALANAR_COMBAT);
+                        talbot->setFaction(FACTION_UNDEAD_SCOURGE_9);
                         talbot->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         talbot->SetReactState(REACT_AGGRESSIVE);
                         talbot->Attack(me, false);
