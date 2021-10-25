@@ -32,14 +32,20 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "StringConvert.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class modify_commandscript : public CommandScript
 {
 public:
     modify_commandscript() : CommandScript("modify_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> modifyspeedCommandTable =
+        static ChatCommandTable modifyspeedCommandTable =
         {
             { "fly",            SEC_GAMEMASTER,      false, &HandleModifyFlyCommand,           "" },
             { "all",            SEC_GAMEMASTER,      false, &HandleModifyASpeedCommand,        "" },
@@ -49,7 +55,7 @@ public:
             { "",               SEC_GAMEMASTER,      false, &HandleModifyASpeedCommand,        "" }
         };
 
-        static std::vector<ChatCommand> modifyCommandTable =
+        static ChatCommandTable modifyCommandTable =
         {
             { "hp",             SEC_GAMEMASTER,      false, &HandleModifyHPCommand,            "" },
             { "mana",           SEC_GAMEMASTER,      false, &HandleModifyManaCommand,          "" },
@@ -60,7 +66,7 @@ public:
             { "scale",          SEC_GAMEMASTER,      false, &HandleModifyScaleCommand,         "" },
             { "bit",            SEC_GAMEMASTER,      false, &HandleModifyBitCommand,           "" },
             { "faction",        SEC_ADMINISTRATOR,   false, &HandleModifyFactionCommand,       "" },
-            { "spell",          SEC_GAMEMASTER,      false, &HandleModifySpellCommand,         "" },
+            { "spell",          SEC_CONSOLE,         false, &HandleModifySpellCommand,         "" },
             { "talentpoints",   SEC_GAMEMASTER,      false, &HandleModifyTalentCommand,        "" },
             { "mount",          SEC_GAMEMASTER,      false, &HandleModifyMountCommand,         "" },
             { "honor",          SEC_GAMEMASTER,      false, &HandleModifyHonorCommand,         "" },
@@ -73,13 +79,13 @@ public:
             { "speed",          SEC_GAMEMASTER,      false, nullptr,                           "", modifyspeedCommandTable }
         };
 
-        static std::vector<ChatCommand> morphCommandTable =
+        static ChatCommandTable morphCommandTable =
         {
             { "reset",      SEC_MODERATOR,     false, &HandleMorphResetCommand, "" },
             { "target",     SEC_MODERATOR,     false, &HandleMorphTargetCommand, "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "morph",          SEC_MODERATOR,      false, nullptr,     "", morphCommandTable },
             { "modify",         SEC_GAMEMASTER,     false, nullptr,     "", modifyCommandTable }
