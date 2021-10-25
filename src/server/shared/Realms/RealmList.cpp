@@ -250,10 +250,6 @@ void RealmList::UpdateRealmPopulation(RealmHandle const& id, RealmFlags flag, fl
         {
             flag = REALM_FLAG_FULL;
         }
-        else if (population >= 0.8f)
-        {
-            flag = REALM_FLAG_FULL;
-        }
         else if (population >= 0.6f)
         {
             // this sets the population medium
