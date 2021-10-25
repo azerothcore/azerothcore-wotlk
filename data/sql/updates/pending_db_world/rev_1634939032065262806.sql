@@ -81,12 +81,8 @@ UPDATE `creature_template` SET `unit_flags`=768,`ScriptName`='' WHERE `entry`=26
 -- Condition for source Spell implicit target condition type Object entry guid
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=3 AND `SourceEntry`=50995 AND `SourceId`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 3, 50995, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Spell Empowered Blood Presence (effects 0 & 1) will hit the potential target of the spell if target is player any player.');
-
--- Condition for source Spell implicit target condition type Object entry guid
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=3 AND `SourceEntry`=50995 AND `SourceId`=0;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 3, 50995, 0, 1, 31, 0, 3, 26170, 0, 0, 0, 0, '', 'Spell Empowered Blood Presence (effects 0 & 1) will hit the potential target of the spell if target is player any player.');
+(13, 3, 50995, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Spell Empowered Blood Presence (effects 0 & 1) will hit the potential target of the spell if target is player any player.'),
+(13, 3, 50995, 0, 1, 31, 0, 3, 26170, 0, 0, 0, 0, '', 'Spell Empowered Blood Presence (effects 0 & 1) will hit the potential target of the spell if target is Thassarian.');
 
 -- Prince Valanar fix class and expansion and add missing loot 
 UPDATE `creature_template` SET `exp`=2, `unit_class`=8, `lootid`=28189,`mingold`=3000, `maxgold`=6500 WHERE `entry`=28189;
@@ -101,7 +97,8 @@ INSERT INTO `creature_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (28189, 33377, 0, 20, 0, 1, 1, 1, 1, 'Fur-lined-pants'),
 (28189, 33470, 0, 40, 0, 1, 2, 1, 3, 'Frostweave Cloth');
 
--- Thassarian add missing aura and remove script waypoints
+-- Thassarian add missing aura and remove script waypoints of any
 UPDATE `creature_template_addon` SET `auras`=50995 WHERE `entry`= 26170;
-
 DELETE FROM `script_waypoint` WHERE `entry`=26170;
+-- creature Thassarian kill does not give XP 
+UPDATE `creature_template` SET `flags_extra`=64 WHERE  `entry`=26170;

@@ -1464,8 +1464,8 @@ enum Thassarian
     EVENT_THASSARIAN_SCRIPT_27 = 27,
     EVENT_THASSARIAN_SCRIPT_28 = 28,
     EVENT_THASSARIAN_SCRIPT_29 = 29,
-    FACTION_VALANAR_COMBAT     = 1988,
     FACTION_UNDEAD_SCOURGE     = 974,
+    FACTION_UNDEAD_SCOURGE_9   = 1988,
     NPC_IMAGE_LICH_KING        = 26203,
     NPC_COUNSELOR_TALBOT       = 25301,
     NPC_PRINCE_VALANAR         = 28189,
@@ -1508,9 +1508,9 @@ class npc_thassarian : public CreatureScript
 public:
     npc_thassarian() : CreatureScript("npc_thassarian") {}
 
-    struct npc_thassarianAI : public npc_escortAI
+    struct npc_thassarianAI : public ScriptedAI
     {
-        npc_thassarianAI(Creature* creature) : npc_escortAI(creature)
+        npc_thassarianAI(Creature* creature) : ScriptedAI(creature)
         {
             Initialize();
         }
@@ -1530,7 +1530,6 @@ public:
 
         void Reset() override
         {
-            me->RestoreFaction();
             me->RemoveStandFlags(UNIT_STAND_STATE_SIT);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -1555,9 +1554,10 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId) override
+        // tc they use updateAI, while we have movementinform :)
+        void MovementInform(uint32 type, uint32 param) override
         {
-            if (waypointId == 3)
+            if (type == WAYPOINT_MOTION_TYPE && param == 2)
             {
                 me->SetWalk(false);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
@@ -1588,14 +1588,14 @@ public:
                 {
                 case EVENT_THASSARIAN_SCRIPT_1:
                     // Summon Arthas and Talbot
-                    if (Creature* arthas = me->SummonCreature(NPC_IMAGE_LICH_KING, 3729.4614f, 3520.386f, 473.4048f, 1.361f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
+                    if (Creature* arthas = me->SummonCreature(NPC_IMAGE_LICH_KING, 3729.4614f, 3520.386f, 473.4048f, 1.361f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000))
                     {
                         _arthasGUID = arthas->GetGUID();
                         arthas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         arthas->SetReactState(REACT_PASSIVE);
                         arthas->SetWalk(true);
                     }
-                    if (Creature* talbot = me->SummonCreature(NPC_COUNSELOR_TALBOT, 3748.7627f, 3614.0374f, 473.4048f, 4.5553f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
+                    if (Creature* talbot = me->SummonCreature(NPC_COUNSELOR_TALBOT, 3748.7627f, 3614.0374f, 473.4048f, 4.5553f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000))
                     {
                         _talbotGUID = talbot->GetGUID();
                         talbot->SetWalk(true);
@@ -1932,13 +1932,14 @@ class npc_general_arlos : public CreatureScript
 public:
     npc_general_arlos() : CreatureScript("npc_general_arlos") {}
 
-    struct npc_general_arlosAI : public npc_escortAI
+    struct npc_general_arlosAI : public ScriptedAI
     {
-        npc_general_arlosAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_general_arlosAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void WaypointReached(uint32 waypointId) override
+        // tc they use updateAI, while we have movementinform :)
+        void MovementInform(uint32 type, uint32 param) override
         {
-            if (waypointId == 3)
+            if (type == WAYPOINT_MOTION_TYPE && param == 2)
             {
                 me->AddUnitState(UNIT_STATE_STUNNED);
                 DoCastSelf(SPELL_STUN);
@@ -1965,13 +1966,14 @@ class npc_leryssa : public CreatureScript
 public:
     npc_leryssa() : CreatureScript("npc_leryssa") {}
 
-    struct npc_leryssaAI : public npc_escortAI
+    struct npc_leryssaAI : public ScriptedAI
     {
-        npc_leryssaAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_leryssaAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void WaypointReached(uint32 waypointId) override
+        // tc they use updateAI, while we have movementinform :)
+        void MovementInform(uint32 type, uint32 param) override
         {
-            if (waypointId == 3)
+            if (type == WAYPOINT_MOTION_TYPE && param == 2)
             {
                 me->SetOrientation(4.537856f);
                 me->AddUnitState(UNIT_STATE_STUNNED);
