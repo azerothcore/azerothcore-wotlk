@@ -3465,14 +3465,7 @@ class spell_gen_gryphon_wyvern_mount_check : public AuraScript
         if (!owner)
             return;
 
-        if (owner->IsMounted())
-        {
-            target->SetDisableGravity(true);
-        }
-        else
-        {
-            target->SetDisableGravity(false);
-        }
+        target->SetDisableGravity(owner->IsMounted());
     }
 
     void Register() override
