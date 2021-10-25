@@ -59,10 +59,7 @@ public:
             me->CastSpell(me, SPELL_UROK_SPAWN, true);
             BossAI::InitializeAI();
             Talk(SAY_SUMMON);
-            if (Unit* target = me->SelectNearestTarget(500))
-            {
-                me->AI()->AttackStart(target);
-            }
+            DoZoneInCombat(nullptr, 100.0f);
         }
 
         void EnterCombat(Unit* /*who*/) override
