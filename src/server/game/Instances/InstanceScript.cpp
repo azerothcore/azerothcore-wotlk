@@ -54,7 +54,7 @@ void InstanceScript::HandleGameObject(ObjectGuid GUID, bool open, GameObject* go
         go->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
     else
     {
-        LOG_DEBUG("scripts.ai", "TSCR: InstanceScript: HandleGameObject failed");
+        LOG_DEBUG("scripts.ai", "InstanceScript: HandleGameObject failed");
     }
 }
 
@@ -307,7 +307,7 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
     }
     else
     {
-        LOG_DEBUG("scripts.ai", "TSCR: DoUpdateWorldState attempt send data but no players in map.");
+        LOG_DEBUG("scripts.ai", "DoUpdateWorldState attempt send data but no players in map.");
     }
 }
 
