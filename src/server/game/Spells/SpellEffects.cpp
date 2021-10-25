@@ -1904,6 +1904,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
         if (Aura* aura = Aura::TryCreate(m_spellInfo, MAX_EFFECT_MASK, dynObj, caster, &m_spellValue->EffectBasePoints[0]))
         {
             m_spellAura = aura;
+            m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
             m_spellAura->_RegisterForTargets();
         }
         else
@@ -3379,17 +3380,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 // Devastate (player ones)
                 if (m_spellInfo->SpellFamilyFlags[1] & 0x40)
                 {
-                    // Player can apply only 58567 Sunder Armor effect.
-                    // Xinef: 7386 triggers 58567
-                    bool needCast = !unitTarget->HasAura(58567);
-                    if (needCast)
-                        m_caster->CastSpell(unitTarget, 7386, true);
+                    m_caster->CastSpell(unitTarget, 58567, true);
 
                     if (Aura* aur = unitTarget->GetAura(58567))
                     {
                         // 58388 - Glyph of Devastate dummy aura.
-                        if (int32 num = (needCast ? 0 : 1) + (m_caster->HasAura(58388) ? 1 : 0))
-                            aur->ModStackAmount(num);
+                        if (m_caster->HasAura(58388))
+                            aur->ModStackAmount(1);
+
                         spell_bonus += (aur->GetStackAmount() - 1) * CalculateSpellDamage(2, unitTarget);
                     }
                 }

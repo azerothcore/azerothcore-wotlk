@@ -17,12 +17,12 @@
 
 #include "LFG.h"
 #include "LFGGroupData.h"
+#include "World.h"
 
 namespace lfg
 {
-
     LfgGroupData::LfgGroupData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE),
-        m_Dungeon(0), m_KicksLeft(LFG_GROUP_MAX_KICKS)
+        m_Dungeon(0), m_KicksLeft(sWorld->getIntConfig(CONFIG_LFG_MAX_KICK_COUNT))
     { }
 
     LfgGroupData::~LfgGroupData()
@@ -39,7 +39,7 @@ namespace lfg
         {
             case LFG_STATE_NONE:
                 m_Dungeon = 0;
-                m_KicksLeft = LFG_GROUP_MAX_KICKS;
+                m_KicksLeft = sWorld->getIntConfig(CONFIG_LFG_MAX_KICK_COUNT);
                 [[fallthrough]];
             case LFG_STATE_FINISHED_DUNGEON:
             case LFG_STATE_DUNGEON:

@@ -63,7 +63,7 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "/home/youruser/azerothcore/data"
+#        Example:     "@prefix@\home\youruser\azerothcore\data"
 #        Default:     "."
 
 DataDir = "."
@@ -3569,6 +3569,22 @@ FFAPvPTimer = 30
 #                     0 - Disabled
 
 LootNeedBeforeGreedILvlRestriction = 70
+
+#
+#     LFG.MaxKickCount
+#        Description: Specify the maximum number of kicks allowed in LFG groups (max 3 kicks)
+#        Default:     2
+#                     0 - Disabled (kicks are never allowed)
+
+LFG.MaxKickCount = 2
+
+#
+#     LFG.KickPreventionTimer
+#        Description: Specify for how long players are prevented from being kicked after just joining LFG groups
+#        Default:     900 secs (15 minutes)
+#                     0 - Disabled
+
+LFG.KickPreventionTimer = 900
 
 #
 ###################################################################################################
