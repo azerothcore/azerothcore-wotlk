@@ -340,7 +340,11 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
             {
                 if (Aura* dungeonCooldownAura = kickTarget->GetAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
                 {
-                    SendPartyResult(PARTY_OP_UNINVITE, name, res, dungeonCooldownAura->GetDuration() / 1000);
+                    int32 elapsedTime = dungeonCooldownAura->GetMaxDuration() - dungeonCooldownAura->GetDuration();
+                    if (static_cast<int32>(sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER)) > elapsedTime)
+                    {
+                        SendPartyResult(PARTY_OP_UNINVITE, name, res, (sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER) - elapsedTime) / 1000);
+                    }
                 }
             }
         } else
