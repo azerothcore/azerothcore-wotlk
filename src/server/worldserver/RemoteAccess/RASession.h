@@ -40,13 +40,13 @@ public:
     unsigned short GetRemotePort() const { return _socket.remote_endpoint().port(); }
 
 private:
-    int Send(const char* data);
+    int Send(std::string_view data);
     std::string ReadString();
     bool CheckAccessLevel(const std::string& user);
     bool CheckPassword(const std::string& user, const std::string& pass);
     bool ProcessCommand(std::string& command);
 
-    static void CommandPrint(void* callbackArg, const char* text);
+    static void CommandPrint(void* callbackArg, std::string_view text);
     static void CommandFinished(void* callbackArg, bool);
 
     tcp::socket _socket;
