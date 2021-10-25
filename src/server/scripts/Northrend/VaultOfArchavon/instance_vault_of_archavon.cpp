@@ -81,7 +81,7 @@ public:
                             if (!PlayerList.isEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
-                                        player->MonsterTextEmote("This instance will reset in 15 minutes.", 0, true);
+                                        player->TextEmote("This instance will reset in 15 minutes.", nullptr, true);
                         }
                         else if (bf->GetTimer() <= (10 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() >= (9 * MINUTE * IN_MILLISECONDS))
                         {
@@ -105,7 +105,7 @@ public:
                             if (!PlayerList.isEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
-                                        player->MonsterTextEmote("This instance is about to reset. Prepare to be removed.", 0, true);
+                                        player->TextEmote("This instance is about to reset. Prepare to be removed.", nullptr, true);
                         }
                         else if (bf->GetTimer() <= MINUTE * IN_MILLISECONDS)
                         {
