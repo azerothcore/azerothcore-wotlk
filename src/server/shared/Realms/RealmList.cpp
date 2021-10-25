@@ -242,21 +242,20 @@ void RealmList::UpdateRealmPopulation(RealmHandle const& id, RealmFlags flag, fl
 {
     Realm& realm = _realms[id];
 
-    // don't update if realm(s) are offline
+    // don't update offline realm(s)
     if (flag != REALM_FLAG_OFFLINE)
     {
-        // let the server handle realm flags, instead of database
-        if (population == 1.0f)
+        // let server handle setting the flags
+        if (population == 1.0f) // float value shouldn't exceed value of 1
         {
             flag = REALM_FLAG_FULL;
         }
-        else if (population >= 0.6f)
+        else if (population >= 0.5f)
         {
-            // this sets the population medium
             flag = REALM_FLAG_NONE;
-            population = 0;
+            population = 0; // sets the population medium
         }
-        else if (population >= 0.2f)
+        else if (population >= 0.0002f) // float value based on a 5,000 player limit
         {
             flag = REALM_FLAG_NEW_PLAYERS;
         }
