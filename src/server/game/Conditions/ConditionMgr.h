@@ -253,9 +253,9 @@ public:
     ConditionList GetConditionReferences(uint32 refId);
 
     uint32 GetSearcherTypeMaskForConditionList(ConditionList const& conditions);
-    bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
-    bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
-    bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions) const;
+    bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions) const;
+    bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) const;
     [[nodiscard]] bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
     [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
     ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
@@ -270,7 +270,7 @@ private:
     bool addToGossipMenus(Condition* cond);
     bool addToGossipMenuItems(Condition* cond);
     bool addToSpellImplicitTargetConditions(Condition* cond);
-    bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) const;
 
     void Clean(); // free up resources
     std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)

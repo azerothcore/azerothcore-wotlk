@@ -105,7 +105,11 @@ public:
     ObjectGuid GetCasterGUID() const { return m_casterGuid; }
     Unit* GetCaster() const;
     WorldObject* GetOwner() const { return m_owner; }
-    Unit* GetUnitOwner() const { ASSERT(GetType() == UNIT_AURA_TYPE); return (Unit*)m_owner; }
+    Unit* GetUnitOwner() const
+    {
+        ASSERT(GetType() == UNIT_AURA_TYPE);
+        return (Unit*) m_owner->ToUnit();
+    }
     DynamicObject* GetDynobjOwner() const { ASSERT(GetType() == DYNOBJ_AURA_TYPE); return (DynamicObject*)m_owner; }
 
     AuraObjectType GetType() const;
