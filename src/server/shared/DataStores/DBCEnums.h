@@ -250,6 +250,14 @@ enum AreaFlags
     AREA_FLAG_NO_FLY_ZONE        = 0x20000000                 // Marks zones where you cannot fly
 };
 
+enum EnchantmentSlotMask
+{
+    ENCHANTMENT_CAN_SOULBOUND = 0x01,
+    ENCHANTMENT_UNK1          = 0x02,
+    ENCHANTMENT_UNK2          = 0x04,
+    ENCHANTMENT_UNK3          = 0x08
+};
+
 enum Difficulty
 {
     REGULAR_DIFFICULTY           = 0,
@@ -412,8 +420,8 @@ enum SummonPropFlags
     SUMMON_PROP_FLAG_UNK1            = 0x00000001,          // 75 spells in 3.0.3, something unfriendly
     SUMMON_PROP_FLAG_UNK2            = 0x00000002,          // 616 spells in 3.0.3, something friendly
     SUMMON_PROP_FLAG_UNK3            = 0x00000004,          // 22 spells in 3.0.3, no idea...
-    SUMMON_PROP_FLAG_UNK4            = 0x00000008,          // 49 spells in 3.0.3, some mounts
-    SUMMON_PROP_FLAG_UNK5            = 0x00000010,          // 25 spells in 3.0.3, quest related?
+    SUMMON_PROP_FLAG_DESPAWN_ON_SUMMONER_DEATH = 0x00000008, // 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_PERSONAL_SPAWN            = 0x00000010, // 25 spells in 3.0.3, quest related?
     SUMMON_PROP_FLAG_UNK6            = 0x00000020,          // 0 spells in 3.3.5, unused
     SUMMON_PROP_FLAG_UNK7            = 0x00000040,          // 12 spells in 3.0.3, no idea
     SUMMON_PROP_FLAG_UNK8            = 0x00000080,          // 4 spells in 3.0.3, no idea
