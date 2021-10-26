@@ -76,8 +76,8 @@ UPDATE `creature_template` SET `ScriptName`='npc_counselor_talbot' WHERE `entry`
 UPDATE `creature` SET `ScriptName`='npc_thassarian' WHERE `guid`=101136;
 UPDATE `creature` SET `ScriptName`='npc_thassarian2' WHERE `guid`=101303;
 
--- Image of the Lich King flags were wrong and script is not required
-UPDATE `creature_template` SET `unit_flags`=768,`ScriptName`='' WHERE `entry`=26203;
+-- Image of the Lich King flags were wrong
+UPDATE `creature_template` SET `unit_flags`=768 WHERE `entry`=26203;
 
 -- Condition for source Spell implicit target condition type Object entry guid
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=3 AND `SourceEntry`=50995 AND `SourceId`=0;
@@ -98,8 +98,6 @@ INSERT INTO `creature_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (28189, 33377, 0, 10, 0, 1, 1, 1, 1, 'Fur-lined-pants'),
 (28189, 33470, 0, 50, 0, 1, 2, 1, 3, 'Frostweave Cloth');
 
--- Thassarian remove script waypoints of any
-DELETE FROM `script_waypoint` WHERE `entry`=26170;
 -- creature Thassarian kill should not give XP 
 UPDATE `creature_template` SET `flags_extra`=64 WHERE  `entry`=26170;
 -- High Deathpriest Isidorus should constantly play beg emote
