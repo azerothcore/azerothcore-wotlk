@@ -26,7 +26,7 @@ enum Spells
     SPELL_INFERNO_DUMMY_EFFECT      = 19698, // Server side spell which inflicts damage
     SPELL_IGNITE_MANA               = 19659,
     SPELL_LIVING_BOMB               = 20475,
-    SPELL_ARMAGEDDON                = 20479,
+    SPELL_ARMAGEDDON                = 20478,
 };
 
 enum Events
