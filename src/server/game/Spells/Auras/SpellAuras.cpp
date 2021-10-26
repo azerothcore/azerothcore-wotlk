@@ -1050,12 +1050,12 @@ bool Aura::CanBeSaved() const
 {
     SpellInfo const* spellInfo = GetSpellInfo();
 
-    if (spellInfo->HasAttribute(SPELL_ATTR1_CU_FORCE_AURA_SAVING))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_FORCE_AURA_SAVING))
     {
         return true;
     }
 
-    if (spellInfo->HasAttribute(SPELL_ATTR1_CU_REJECT_AURA_SAVING))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_REJECT_AURA_SAVING))
     {
         return false;
     }
