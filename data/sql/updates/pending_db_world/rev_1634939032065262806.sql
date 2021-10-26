@@ -73,7 +73,8 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 UPDATE `creature_template` SET `ScriptName`='npc_general_arlos' WHERE `entry`=25250;
 UPDATE `creature_template` SET `ScriptName`='npc_leryssa' WHERE `entry`=25251;
 UPDATE `creature_template` SET `ScriptName`='npc_counselor_talbot' WHERE `entry`=25301;
-UPDATE `creature` SET `ScriptName`='npc_thassarian' WHERE `guid`=101303;
+UPDATE `creature` SET `ScriptName`='npc_thassarian' WHERE `guid`=101136;
+UPDATE `creature` SET `ScriptName`='npc_thassarian2' WHERE `guid`=101303;
 
 -- Image of the Lich King flags were wrong and script is not required
 UPDATE `creature_template` SET `unit_flags`=768,`ScriptName`='' WHERE `entry`=26203;
@@ -87,18 +88,24 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 -- Prince Valanar fix class and expansion and add missing loot 
 UPDATE `creature_template` SET `exp`=2, `unit_class`=8, `lootid`=28189,`mingold`=3000, `maxgold`=6500 WHERE `entry`=28189;
 
--- Prince Valanar loot
+-- Prince Valanar loot "Just an educated guess after watching several videos"
 DELETE FROM `creature_loot_template` WHERE `entry`=28189;
 INSERT INTO `creature_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`QuestRequired`,`LootMode`,`GroupId`,`MinCount`,`MaxCount`,`Comment`) VALUES 
-(28189, 33373, 0, 20, 0, 1, 1, 1, 1, 'Fur-lined-belt'),
-(28189, 33374, 0, 20, 0, 1, 1, 1, 1, 'Fur-lined-boots'),
-(28189, 33375, 0, 20, 0, 1, 1, 1, 1, 'Fur-lined-bracers'),
-(28189, 33376, 0, 20, 0, 1, 1, 1, 1, 'Fur-lined-gloves'),
-(28189, 33377, 0, 20, 0, 1, 1, 1, 1, 'Fur-lined-pants'),
-(28189, 33470, 0, 40, 0, 1, 2, 1, 3, 'Frostweave Cloth');
+(28189, 33373, 0, 10, 0, 1, 1, 1, 1, 'Fur-lined-belt'),
+(28189, 33374, 0, 10, 0, 1, 1, 1, 1, 'Fur-lined-boots'),
+(28189, 33375, 0, 10, 0, 1, 1, 1, 1, 'Fur-lined-bracers'),
+(28189, 33376, 0, 10, 0, 1, 1, 1, 1, 'Fur-lined-gloves'),
+(28189, 33377, 0, 10, 0, 1, 1, 1, 1, 'Fur-lined-pants'),
+(28189, 33470, 0, 50, 0, 1, 2, 1, 3, 'Frostweave Cloth');
 
--- Thassarian add missing aura and remove script waypoints of any
-UPDATE `creature_template_addon` SET `auras`=50995 WHERE `entry`= 26170;
+-- Thassarian remove script waypoints of any
 DELETE FROM `script_waypoint` WHERE `entry`=26170;
--- creature Thassarian kill does not give XP 
+-- creature Thassarian kill should not give XP 
 UPDATE `creature_template` SET `flags_extra`=64 WHERE  `entry`=26170;
+-- High Deathpriest Isidorus should constantly play beg emote
+UPDATE `creature_addon` SET `emote`=20 WHERE `guid`=101355;
+
+-- Condition for source Spell implicit target condition type Object entry guid
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=46685 AND `SourceId`=0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 46685, 0, 0, 31, 0, 3, 26173, 0, 0, 0, 0, '', 'Spell Borean Tundra - Quest - Thassarian Flay (effect 0) will hit the potential target of the spell if target is unit Tanathal.');

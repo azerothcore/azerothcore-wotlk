@@ -1464,15 +1464,19 @@ enum Thassarian
     EVENT_THASSARIAN_SCRIPT_27 = 27,
     EVENT_THASSARIAN_SCRIPT_28 = 28,
     EVENT_THASSARIAN_SCRIPT_29 = 29,
+    EVENT_THASSARIAN_CAST      = 30,
     FACTION_UNDEAD_SCOURGE     = 974,
+    FACTION_VALIANCE_EXPEDITION = 1974,
     FACTION_UNDEAD_SCOURGE_9   = 1988,
     NPC_IMAGE_LICH_KING        = 26203,
     NPC_COUNSELOR_TALBOT       = 25301,
     NPC_PRINCE_VALANAR         = 28189,
     NPC_GENERAL_ARLOS          = 25250,
     NPC_LERYSSA                = 25251,
+    SPELL_THASSARIAN_FLAY      = 46685,
     SPELL_TRANSFORM_VALANAR    = 46753,
     SPELL_STUN                 = 46957,
+    SPELL_BLOOD_PRESENCE       = 50995,
     SAY_THASSARIAN_1           = 0,
     SAY_THASSARIAN_2           = 1,
     SAY_THASSARIAN_3           = 2,
@@ -1510,7 +1514,47 @@ public:
 
     struct npc_thassarianAI : public ScriptedAI
     {
-        npc_thassarianAI(Creature* creature) : ScriptedAI(creature)
+        npc_thassarianAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_THASSARIAN_CAST:
+                    {
+                        DoCastSelf(SPELL_THASSARIAN_FLAY);
+                    }
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_thassarianAI(creature);
+    }
+};
+
+class npc_thassarian2 : public CreatureScript
+{
+public:
+    npc_thassarian2() : CreatureScript("npc_thassarian2") {}
+
+    struct npc_thassarian2AI : public ScriptedAI
+    {
+        npc_thassarian2AI(Creature* creature) : ScriptedAI(creature)
         {
             Initialize();
         }
@@ -1530,6 +1574,11 @@ public:
 
         void Reset() override
         {
+            if (!me->HasAura(SPELL_BLOOD_PRESENCE))
+            {
+                DoCastSelf(SPELL_BLOOD_PRESENCE);
+            }
+            me->setFaction(FACTION_VALIANCE_EXPEDITION);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -1673,7 +1722,7 @@ public:
                     Talk(SAY_THASSARIAN_1);
                     me->SetWalk(false);
                     me->GetMotionMaster()->MovePoint(0, 3722.527f, 3567.2583f, 477.44086f); // *** ISSUE Not updating last OOC point to this location ***
-                    _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_9, 9000);
+                    _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_9, 7000);
                     break;
                 case EVENT_THASSARIAN_SCRIPT_9:
                     // Thassarian say text 2
@@ -1923,7 +1972,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_thassarianAI(creature);
+        return new npc_thassarian2AI(creature);
     }
 };
 
@@ -2087,6 +2136,7 @@ void AddSC_borean_tundra()
     // Ours
     new spell_q11919_q11940_drake_hunt();
     new npc_thassarian();
+    new npc_thassarian2();
     new npc_general_arlos();
     new npc_leryssa();
     new npc_counselor_talbot();
