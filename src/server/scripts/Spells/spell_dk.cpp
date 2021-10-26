@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -574,8 +585,8 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
-            if (!spellInfo || !eventInfo.GetActionTarget())
+            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+            if (!spellInfo || !eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo())
                 return false;
 
             if (!roll_chance_f(eventInfo.GetActor()->GetUnitCriticalChance(BASE_ATTACK, eventInfo.GetActionTarget())))
@@ -649,7 +660,7 @@ public:
         void HandleProc(ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->IsTargetingArea())
+            if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
                 DropCharge();
         }
 
@@ -678,7 +689,7 @@ public:
         void HandleProc(ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if (eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetDamageInfo()->GetSpellInfo() || eventInfo.GetDamageInfo()->GetSpellInfo()->Dispel != DISPEL_DISEASE))
+            if (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DISPEL_DISEASE))
                 SetDuration(0);
         }
 
@@ -759,7 +770,7 @@ public:
             if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || eventInfo.GetActor()->GetTypeId() != TYPEID_PLAYER)
                 return false;
 
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return true;
 
@@ -804,7 +815,7 @@ public:
                 return;
 
             dancingRuneWeapon->SetOrientation(dancingRuneWeapon->GetAngle(target));
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
             {
                 // xinef: ugly hack
                 if (!procSpell->IsAffectingArea())
@@ -812,7 +823,7 @@ public:
                 dancingRuneWeapon->CastSpell(target, procSpell->Id, true, nullptr, aurEff, dancingRuneWeapon->GetGUID());
                 GetUnitOwner()->SetFloatValue(UNIT_FIELD_COMBATREACH, 0.01f);
             }
-            else
+            else if (eventInfo.GetDamageInfo())
             {
                 target = player->GetMeleeHitRedirectTarget(target);
                 CalcDamageInfo damageInfo;
@@ -851,7 +862,7 @@ public:
         void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             PreventDefaultAction();
-            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
+            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
             {
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID));
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_17_ENTRYID));
@@ -1294,7 +1305,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 bp = int32(eventInfo.GetDamageInfo()->GetDamage() * 1.5f);
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 bp = static_cast<int32>(damageInfo->GetDamage() * 1.5f);
             GetTarget()->CastCustomSpell(SPELL_DK_BLOOD_GORGED_HEAL, SPELLVALUE_BASE_POINT0, bp, _procTarget, true, nullptr, aurEff);
         }
 

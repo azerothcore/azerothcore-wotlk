@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -20,54 +31,61 @@ EndScriptData */
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class character_commandscript : public CommandScript
 {
 public:
     character_commandscript() : CommandScript("character_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> pdumpCommandTable =
+        static ChatCommandTable pdumpCommandTable =
         {
-            { "load",           SEC_ADMINISTRATOR,  true,  &HandlePDumpLoadCommand,                 "" },
-            { "write",          SEC_ADMINISTRATOR,  true,  &HandlePDumpWriteCommand,                "" }
+            { "load",           HandlePDumpLoadCommand,  SEC_ADMINISTRATOR, Console::Yes },
+            { "write",          HandlePDumpWriteCommand, SEC_ADMINISTRATOR, Console::Yes }
         };
 
-        static std::vector<ChatCommand> characterDeletedCommandTable =
+        static ChatCommandTable characterDeletedCommandTable =
         {
-            { "delete",        SEC_CONSOLE,         true,  &HandleCharacterDeletedDeleteCommand,  "" },
-            { "list",          SEC_ADMINISTRATOR,   true,  &HandleCharacterDeletedListCommand,    "" },
-            { "restore",       SEC_ADMINISTRATOR,   true,  &HandleCharacterDeletedRestoreCommand, "" },
-            { "purge",         SEC_CONSOLE,         true,  &HandleCharacterDeletedPurgeCommand,   "" },
+            { "delete",         HandleCharacterDeletedDeleteCommand,   SEC_CONSOLE,       Console::Yes },
+            { "list",           HandleCharacterDeletedListCommand,     SEC_ADMINISTRATOR, Console::Yes },
+            { "restore",        HandleCharacterDeletedRestoreCommand,  SEC_ADMINISTRATOR, Console::Yes },
+            { "purge",          HandleCharacterDeletedPurgeCommand,    SEC_CONSOLE,       Console::Yes }
         };
 
-        static std::vector<ChatCommand> characterCheckCommandTable =
+        static ChatCommandTable characterCheckCommandTable =
         {
-            { "bank",          SEC_GAMEMASTER,      false,  &HandleCharacterCheckBankCommand, "" },
-            { "bag",           SEC_GAMEMASTER,      false,  &HandleCharacterCheckBagCommand,  "" },
-            { "profession",    SEC_GAMEMASTER,      false,  &HandleCharacterCheckProfessionCommand, "" },
+            { "bank",          HandleCharacterCheckBankCommand,          SEC_GAMEMASTER, Console::Yes },
+            { "bag",           HandleCharacterCheckBagCommand,           SEC_GAMEMASTER, Console::Yes },
+            { "profession",    HandleCharacterCheckProfessionCommand,    SEC_GAMEMASTER, Console::Yes }
         };
 
-        static std::vector<ChatCommand> characterCommandTable =
+        static ChatCommandTable characterCommandTable =
         {
-            { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "" },
-            { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "" },
-            { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "" },
-            { "check",          SEC_GAMEMASTER,     false,  nullptr,                               "", characterCheckCommandTable },
-            { "erase",          SEC_CONSOLE,        true,  &HandleCharacterEraseCommand,           "" },
-            { "deleted",        SEC_ADMINISTRATOR,  true,  nullptr,                                "", characterDeletedCommandTable },
-            { "level",          SEC_GAMEMASTER,     true,  &HandleCharacterLevelCommand,           "" },
-            { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "" },
-            { "reputation",     SEC_GAMEMASTER,     true,  &HandleCharacterReputationCommand,      "" },
-            { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "" }
+            { "customize",      HandleCharacterCustomizeCommand,        SEC_GAMEMASTER, Console::Yes },
+            { "changefaction",  HandleCharacterChangeFactionCommand,    SEC_GAMEMASTER, Console::Yes },
+            { "changerace",     HandleCharacterChangeRaceCommand,       SEC_GAMEMASTER, Console::Yes },
+            { "check",          characterCheckCommandTable },
+            { "erase",          HandleCharacterEraseCommand,            SEC_CONSOLE,    Console::Yes },
+            { "deleted",        characterDeletedCommandTable },
+            { "level",          HandleCharacterLevelCommand,            SEC_GAMEMASTER, Console::Yes },
+            { "rename",         HandleCharacterRenameCommand,           SEC_GAMEMASTER, Console::Yes },
+            { "reputation",     HandleCharacterReputationCommand,       SEC_GAMEMASTER, Console::Yes },
+            { "titles",         HandleCharacterTitlesCommand,           SEC_GAMEMASTER, Console::Yes }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
-            { "character",      SEC_GAMEMASTER,     true,  nullptr,                                "", characterCommandTable },
-            { "levelup",        SEC_GAMEMASTER,     false, &HandleLevelUpCommand,                  "" },
-            { "pdump",          SEC_ADMINISTRATOR,  true,  nullptr,                                "", pdumpCommandTable }
+            { "character",      characterCommandTable },
+            { "levelup",        HandleLevelUpCommand, SEC_GAMEMASTER, Console::No },
+            { "pdump",          pdumpCommandTable }
         };
+
         return commandTable;
     }
 
@@ -211,7 +229,7 @@ public:
             return;
         }
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_RESTORE_DELETE_INFO);
+        auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_RESTORE_DELETE_INFO);
         stmt->setString(0, delInfo.name);
         stmt->setUInt32(1, delInfo.accountId);
         stmt->setUInt32(2, delInfo.lowGuid);
@@ -244,7 +262,7 @@ public:
         else
         {
             // Update level and reset XP, everything else will be updated at login
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
+            auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
             stmt->setUInt8(0, uint8(newLevel));
             stmt->setUInt32(1, playerGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -336,7 +354,7 @@ public:
             std::string oldNameLink = handler->playerLink(targetName);
             handler->PSendSysMessage(LANG_RENAME_PLAYER_GUID, oldNameLink.c_str(), targetGuid.GetCounter());
 
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
             stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -350,29 +368,15 @@ public:
         return true;
     }
 
-    static bool HandleCharacterLevelCommand(ChatHandler* handler, char const* args)
+    static bool HandleCharacterLevelCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, int16 newlevel)
     {
-        char* nameStr;
-        char* levelStr;
-        handler->extractOptFirstArg((char*)args, &nameStr, &levelStr);
-        if (!levelStr)
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!player)
             return false;
 
-        // exception opt second arg: .character level $name
-        if (isalpha(levelStr[0]))
-        {
-            nameStr = levelStr;
-            levelStr = nullptr;                                    // current level will used
-        }
-
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
-            return false;
-
-        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
-        int32 newlevel = levelStr ? atoi(levelStr) : oldlevel;
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : static_cast<uint8>(Player::GetLevelFromStorage(player->GetGUID().GetCounter()));
 
         if (newlevel < 1)
             return false;                                       // invalid level
@@ -380,12 +384,10 @@ public:
         if (newlevel > DEFAULT_MAX_LEVEL)                         // hardcoded maximum level
             newlevel = DEFAULT_MAX_LEVEL;
 
-        HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
-        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including player == nullptr
-        {
-            std::string nameLink = handler->playerLink(targetName);
-            handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
-        }
+        HandleCharacterLevel(player->GetConnectedPlayer(), player->GetGUID(), oldlevel, newlevel, handler);
+
+        if (!handler->GetSession() || (handler->GetSession()->GetPlayer() != player->GetConnectedPlayer()))      // including chr == NULL
+            handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, handler->playerLink(*player).c_str(), newlevel);
 
         return true;
     }
@@ -399,7 +401,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CUSTOMIZE));
         if (target)
         {
@@ -427,7 +429,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CHANGE_FACTION));
         if (target)
         {
@@ -454,7 +456,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CHANGE_RACE));
         if (target)
         {
@@ -734,28 +736,16 @@ public:
         return true;
     }
 
-    static bool HandleLevelUpCommand(ChatHandler* handler, char const* args)
+    static bool HandleLevelUpCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, int16 level)
     {
-        char* nameStr;
-        char* levelStr;
-        handler->extractOptFirstArg((char*)args, &nameStr, &levelStr);
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
 
-        // exception opt second arg: .character level $name
-        if (levelStr && isalpha(levelStr[0]))
-        {
-            nameStr = levelStr;
-            levelStr = nullptr;                                    // current level will used
-        }
-
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
+        if (!player)
             return false;
 
-        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
-        int32 addlevel = levelStr ? atoi(levelStr) : 1;
-        int32 newlevel = oldlevel + addlevel;
+        uint8 oldlevel = static_cast<uint8>(player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : Player::GetLevelFromStorage(player->GetGUID().GetCounter()));
+        int16 newlevel = static_cast<int16>(oldlevel) + level;
 
         if (newlevel < 1)
             newlevel = 1;
@@ -763,13 +753,10 @@ public:
         if (newlevel > STRONG_MAX_LEVEL)                         // hardcoded maximum level
             newlevel = STRONG_MAX_LEVEL;
 
-        HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
+        HandleCharacterLevel(player->GetConnectedPlayer(), player->GetGUID(), oldlevel, newlevel, handler);
 
-        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including chr == nullptr
-        {
-            std::string nameLink = handler->playerLink(targetName);
-            handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
-        }
+        if (!handler->GetSession() || (handler->GetSession()->GetPlayer() != player->GetConnectedPlayer()))      // including chr == NULL
+            handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, handler->playerLink(*player).c_str(), newlevel);
 
         return true;
     }

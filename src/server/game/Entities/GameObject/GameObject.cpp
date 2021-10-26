@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -42,6 +53,8 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_valuesCount = GAMEOBJECT_END;
     m_respawnTime = 0;
     m_respawnDelayTime = 300;
+    m_despawnDelay = 0;
+    m_despawnRespawnTime = 0s;
     m_lootState = GO_NOT_READY;
     m_spawnedByDefault = true;
     m_allowModifyDestructibleBuilding = true;
@@ -173,6 +186,12 @@ void GameObject::RemoveFromWorld()
 
         if (Transport* transport = GetTransport())
             transport->RemovePassenger(this, true);
+
+        // If linked trap exists, despawn it
+        if (GameObject* linkedTrap = GetLinkedTrap())
+        {
+            linkedTrap->Delete();
+        }
 
         WorldObject::RemoveFromWorld();
 
@@ -381,6 +400,19 @@ void GameObject::Update(uint32 diff)
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
         LOG_ERROR("entities.gameobject", "Could not initialize GameObjectAI");
+
+    if (m_despawnDelay)
+    {
+        if (m_despawnDelay > diff)
+        {
+            m_despawnDelay -= diff;
+        }
+        else
+        {
+            m_despawnDelay = 0;
+            DespawnOrUnsummon(0ms, m_despawnRespawnTime);
+        }
+    }
 
     switch (m_lootState)
     {
@@ -700,6 +732,12 @@ void GameObject::Update(uint32 diff)
             }
         case GO_JUST_DEACTIVATED:
             {
+                // If nearby linked trap exists, despawn it
+                if (GameObject* linkedTrap = GetLinkedTrap())
+                {
+                    linkedTrap->Delete();
+                }
+
                 //if Gameobject should cast spell, then this, but some GOs (type = 10) should be destroyed
                 if (GetGoType() == GAMEOBJECT_TYPE_GOOBER)
                 {
@@ -786,6 +824,47 @@ void GameObject::AddUniqueUse(Player* player)
 {
     AddUse();
     m_unique_users.insert(player->GetGUID());
+}
+
+void GameObject::DespawnOrUnsummon(Milliseconds delay, Seconds forceRespawnTime)
+{
+    if (delay > 0ms)
+    {
+        if (!m_despawnDelay || m_despawnDelay > delay.count())
+        {
+            m_despawnDelay = delay.count();
+            m_despawnRespawnTime = forceRespawnTime;
+        }
+    }
+    else
+    {
+        if (m_goData)
+        {
+            int32 const respawnDelay = (forceRespawnTime > 0s) ? forceRespawnTime.count() : m_goData->spawntimesecs;
+            SetRespawnTime(respawnDelay);
+        }
+
+       // Respawn is handled by the gameobject itself.
+       // If we delete it from world, it simply never respawns...
+       // Uncomment this and remove the following lines if dynamic spawn is implemented.
+       // Delete();
+        {
+            SetLootState(GO_JUST_DEACTIVATED);
+            SendObjectDeSpawnAnim(GetGUID());
+            SetGoState(GO_STATE_READY);
+
+            if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+            {
+                SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+            }
+
+            uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
+            if (poolid)
+            {
+                sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+            }
+        }
+    }
 }
 
 void GameObject::Delete()
@@ -1052,10 +1131,13 @@ Unit* GameObject::GetOwner() const
     return ObjectAccessor::GetUnit(*this, GetOwnerGUID());
 }
 
-void GameObject::SaveRespawnTime()
+void GameObject::SaveRespawnTime(uint32 forceDelay)
 {
-    if (m_goData && m_goData->dbData && m_respawnTime > time(nullptr) && m_spawnedByDefault)
-        GetMap()->SaveGORespawnTime(m_spawnId, m_respawnTime);
+    if (m_goData && m_goData->dbData && (forceDelay || m_respawnTime > time(nullptr)) && m_spawnedByDefault)
+    {
+        time_t respawnTime = forceDelay ? time(nullptr) + forceDelay : m_respawnTime;
+        GetMap()->SaveGORespawnTime(m_spawnId, respawnTime);
+    }
 }
 
 bool GameObject::IsNeverVisible() const
@@ -1107,6 +1189,21 @@ bool GameObject::IsInvisibleDueToDespawn() const
         return true;
 
     return false;
+}
+
+void GameObject::SetRespawnTime(int32 respawn)
+{
+    m_respawnTime = respawn > 0 ? time(nullptr) + respawn : 0;
+    SetRespawnDelay(respawn);
+    if (respawn && !m_spawnedByDefault)
+    {
+        UpdateObjectVisibility(true);
+    }
+}
+
+void GameObject::SetRespawnDelay(int32 respawn)
+{
+    m_respawnDelayTime = respawn > 0 ? respawn : 0;
 }
 
 void GameObject::Respawn()
@@ -1191,24 +1288,12 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     if (range < 1.0f)
         range = 5.0f;
 
-    // search nearest linked GO
-    GameObject* trapGO = nullptr;
-    {
-        // using original GO distance
-        CellCoord p(Acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-        Cell cell(p);
-
-        Acore::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
-        Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
-
-        TypeContainerVisitor<Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
-        cell.Visit(p, object_checker, *GetMap(), *target, range);
-    }
-
     // found correct GO
     // xinef: we should use the trap (checks for despawn type)
-    if (trapGO)
-        trapGO->Use(target); //trapGO->CastSpell(target, trapInfo->trap.spellId);
+    if (GameObject* trapGO = GetLinkedTrap())
+    {
+        trapGO->Use(target); // trapGO->CastSpell(target, trapInfo->trap.spellId);
+    }
 }
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
@@ -1480,7 +1565,23 @@ void GameObject::Use(Unit* user)
                     if (Battleground* bg = player->GetBattleground())
                         bg->EventPlayerUsedGO(player, this);
 
-                    player->KillCreditGO(info->entry, GetGUID());
+                    if (Group* group = player->GetGroup())
+                    {
+                        for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                        {
+                            if (Player* member = itr->GetSource())
+                            {
+                                if (member->IsAtGroupRewardDistance(this))
+                                {
+                                    member->KillCreditGO(info->entry, GetGUID());
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        player->KillCreditGO(info->entry, GetGUID());
+                    }
                 }
 
                 if (uint32 trapEntry = info->goober.linkedTrapId)
@@ -1989,6 +2090,14 @@ void GameObject::EventInform(uint32 eventId)
         m_zoneScript->ProcessEvent(this, eventId);
 }
 
+uint32 GameObject::GetScriptId() const
+{
+    if (GameObjectData const* gameObjectData = GetGOData())
+        return gameObjectData->ScriptId;
+
+    return GetGOInfo()->ScriptId;
+}
+
 // overwrite WorldObject function for proper name localization
 std::string const& GameObject::GetNameForLocaleIdx(LocaleConstant loc_idx) const
 {
@@ -2402,6 +2511,11 @@ bool GameObject::IsLootAllowedFor(Player const* player) const
         return false;                                           // if go doesnt have group bound it means it was solo killed by someone else
 
     return true;
+}
+
+GameObject* GameObject::GetLinkedTrap()
+{
+    return ObjectAccessor::GetGameObject(*this, m_linkedTrap);
 }
 
 void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const

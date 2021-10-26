@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -18,7 +29,7 @@
 #include "IPLocation.h"
 #include "Language.h"
 #include "LFG.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -30,14 +41,20 @@
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class misc_commandscript : public CommandScript
 {
 public:
     misc_commandscript() : CommandScript("misc_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> groupCommandTable =
+        static ChatCommandTable groupCommandTable =
         {
             { "leader",         SEC_GAMEMASTER,             false,  &HandleGroupLeaderCommand,          "" },
             { "disband",        SEC_GAMEMASTER,             false,  &HandleGroupDisbandCommand,         "" },
@@ -45,25 +62,25 @@ public:
             { "join",           SEC_GAMEMASTER,             false,  &HandleGroupJoinCommand,            "" },
             { "list",           SEC_GAMEMASTER,             false,  &HandleGroupListCommand,            "" }
         };
-        static std::vector<ChatCommand> petCommandTable =
+        static ChatCommandTable petCommandTable =
         {
             { "create",             SEC_GAMEMASTER,         false, &HandleCreatePetCommand,             "" },
             { "learn",              SEC_GAMEMASTER,         false, &HandlePetLearnCommand,              "" },
             { "unlearn",            SEC_GAMEMASTER,         false, &HandlePetUnlearnCommand,            "" }
         };
-        static std::vector<ChatCommand> sendCommandTable =
+        static ChatCommandTable sendCommandTable =
         {
             { "items",              SEC_GAMEMASTER,         true,  &HandleSendItemsCommand,             "" },
             { "mail",               SEC_GAMEMASTER,         true,  &HandleSendMailCommand,              "" },
             { "message",            SEC_ADMINISTRATOR,      true,  &HandleSendMessageCommand,           "" },
             { "money",              SEC_GAMEMASTER,         true,  &HandleSendMoneyCommand,             "" }
         };
-        static std::vector<ChatCommand> gearCommandTable =
+        static ChatCommandTable gearCommandTable =
         {
             { "repair",             SEC_GAMEMASTER,         false,  &HandleGearRepairCommand,              "" },
             { "stats",              SEC_PLAYER,             false,  &HandleGearStatsCommand,               "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "" },
             { "gps",                SEC_MODERATOR,          false, &HandleGPSCommand,                   "" },
@@ -883,7 +900,7 @@ public:
 
     static bool HandleCommandsCommand(ChatHandler* handler, char const* /*args*/)
     {
-        handler->ShowHelpForCommand(handler->getCommandTable(), "");
+        SendCommandHelpFor(*handler, "");
         return true;
     }
 
@@ -982,19 +999,12 @@ public:
         return true;
     }
 
-    static bool HandleHelpCommand(ChatHandler* handler, char const* args)
+    static bool HandleHelpCommand(ChatHandler* handler, Tail cmd)
     {
-        char const* cmd = strtok((char*)args, " ");
-        if (!cmd)
-        {
-            handler->ShowHelpForCommand(handler->getCommandTable(), "help");
-            handler->ShowHelpForCommand(handler->getCommandTable(), "");
-        }
-        else
-        {
-            if (!handler->ShowHelpForCommand(handler->getCommandTable(), cmd))
-                handler->SendSysMessage(LANG_NO_HELP_CMD);
-        }
+        Acore::ChatCommands::SendCommandHelpFor(*handler, cmd);
+
+        if (cmd.empty())
+            Acore::ChatCommands::SendCommandHelpFor(*handler, "help");
 
         return true;
     }
@@ -1366,7 +1376,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zone_id = player->GetZoneId();
 
-        GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), teamId);
+        GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(player, teamId);
 
         if (graveyard)
         {
@@ -2231,36 +2241,33 @@ public:
         return true;
     }
     // mute player for some times
-    static bool HandleMuteCommand(ChatHandler* handler, char const* args)
+    static bool HandleMuteCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, uint32 notSpeakTime, Tail muteReason)
     {
-        char* nameStr;
-        char* delayStr;
-        handler->extractOptFirstArg((char*)args, &nameStr, &delayStr);
-        if (!delayStr)
+        std::string muteReasonStr{ muteReason };
+
+        if (muteReason.empty())
+            muteReasonStr = handler->GetAcoreString(LANG_NO_REASON);
+
+        if (!player)
+            player = PlayerIdentifier::FromTarget(handler);
+
+        if (!player)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
+        }
 
-        char const* muteReason = strtok(nullptr, "\r");
-        std::string muteReasonStr = handler->GetAcoreString(LANG_NO_REASON);
-        if (muteReason != nullptr)
-            muteReasonStr = muteReason;
-
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
-            return false;
-
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
+        Player* target = player->GetConnectedPlayer();
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter());
 
         // find only player from same account if any
         if (!target)
             if (WorldSession* session = sWorld->FindSession(accountId))
                 target = session->GetPlayer();
 
-        uint32 notSpeakTime = uint32(atoi(delayStr));
-
         // must have strong lesser security level
-        if (handler->HasLowerSecurity (target, targetGuid, true))
+        if (handler->HasLowerSecurity(target, player->GetGUID(), true))
             return false;
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
@@ -2276,7 +2283,7 @@ public:
             int64 muteTime = time(nullptr) + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
             stmt->setInt64(0, muteTime);
-            std::string nameLink = handler->playerLink(targetName);
+            std::string nameLink = handler->playerLink(player->GetName());
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
                 sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
@@ -2286,21 +2293,22 @@ public:
         else
         {
             // Target is offline, mute will be in effect starting from the next login.
-            int32 muteTime = -int32(notSpeakTime * MINUTE);
-            stmt->setInt64(0, muteTime);
+            stmt->setInt32(0, -int32(notSpeakTime * MINUTE));
         }
 
         stmt->setString(1, muteReasonStr);
         stmt->setString(2, muteBy);
         stmt->setUInt32(3, accountId);
         LoginDatabase.Execute(stmt);
+
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
         stmt->setUInt32(0, accountId);
         stmt->setUInt32(1, notSpeakTime);
         stmt->setString(2, muteBy);
         stmt->setString(3, muteReasonStr);
         LoginDatabase.Execute(stmt);
-        std::string nameLink = handler->playerLink(targetName);
+
+        std::string nameLink = handler->playerLink(player->GetName());
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
             sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
@@ -2311,7 +2319,8 @@ public:
             HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->second->GetSession()->GetSecurity())
-                    ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+                    ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
+                        (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
         }
 
         return true;
@@ -2620,7 +2629,7 @@ public:
             return false;
 
         target->CombatStop();
-        target->getHostileRefManager().deleteReferences();
+        target->getHostileRefMgr().deleteReferences();
         return true;
     }
 
@@ -2680,8 +2689,10 @@ public:
         std::string subject = msgSubject;
         std::string text    = msgText;
 
-        // from console show not existed sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
+        ObjectGuid::LowType senderGuid;
+        // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
+        senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : targetGuid.GetCounter();
+        MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);
 
         //- TODO: Fix poor design
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -2778,8 +2789,10 @@ public:
             }
         }
 
-        // from console show not existed sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
+        ObjectGuid::LowType senderGuid;
+        // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
+        senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : receiverGuid.GetCounter();
+        MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);
 
         // fill mail
         MailDraft draft(subject, text);
@@ -3036,7 +3049,9 @@ public:
     static bool HandleFreezeCommand(ChatHandler* handler, char const* args)
     {
         std::string name;
+        Unit* target = handler->getSelectedUnit();
         Player* player;
+        constexpr int Freeze = 9454;
         char const* TargetName = strtok((char*)args, " "); // get entered name
         if (!TargetName) // if no name entered use target
         {
@@ -3054,12 +3069,6 @@ public:
             player = ObjectAccessor::FindPlayerByName(name);
         }
 
-        if (!player)
-        {
-            handler->SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
-            return true;
-        }
-
         if (player == handler->GetSession()->GetPlayer())
         {
             handler->SendSysMessage(LANG_COMMAND_FREEZE_ERROR);
@@ -3069,8 +3078,22 @@ public:
         if (player && (player != handler->GetSession()->GetPlayer()))
         {
             handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(9454))
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(Freeze))
                 Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, player, player);
+        }
+
+        if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (target->IsAlive())
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(Freeze))
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
         }
 
         return true;
@@ -3079,8 +3102,17 @@ public:
     static bool HandleUnFreezeCommand(ChatHandler* handler, char const* args)
     {
         std::string name;
+        Unit* target = handler->getSelectedUnit();
         Player* player;
+        constexpr int Freeze = 9454;
         char* targetName = strtok((char*)args, " "); // Get entered name
+
+        if (target->HasAura(Freeze))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
+            target->RemoveAurasDueToSpell(Freeze);
+            return true;
+        }
 
         if (targetName)
         {
@@ -3298,7 +3330,7 @@ public:
         }
 
         WorldPacket data(SMSG_PLAY_SOUND, 4);
-        data << uint32(soundId) << handler->GetSession()->GetPlayer()->GetGUID();
+        data << uint32(soundId);
         sWorld->SendGlobalMessage(&data);
 
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);
