@@ -250,14 +250,6 @@ enum AreaFlags
     AREA_FLAG_NO_FLY_ZONE        = 0x20000000                 // Marks zones where you cannot fly
 };
 
-enum EnchantmentSlotMask
-{
-    ENCHANTMENT_CAN_SOULBOUND = 0x01,
-    ENCHANTMENT_UNK1          = 0x02,
-    ENCHANTMENT_UNK2          = 0x04,
-    ENCHANTMENT_UNK3          = 0x08
-};
-
 enum Difficulty
 {
     REGULAR_DIFFICULTY           = 0,
