@@ -2730,7 +2730,7 @@ void SpellMgr::LoadSpellCustomAttr()
     uint32 const customAttrTime = getMSTime();
     uint32 count;
 
-    QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes, attributes1 FROM spell_custom_attr");
+    QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes FROM spell_custom_attr");
 
     if (!result)
     {
@@ -2744,7 +2744,6 @@ void SpellMgr::LoadSpellCustomAttr()
 
             uint32 const spellId = fields[0].GetUInt32();
             uint32 attributes = fields[1].GetUInt32();
-            uint32 attributes1 = fields[2].GetUInt32();
 
             SpellInfo* spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
@@ -2792,16 +2791,13 @@ void SpellMgr::LoadSpellCustomAttr()
                 }
             }
 
-            spellInfo->AttributesCu |= attributes;
-
-            // AttributesCu1 handling (should remain splitted checks)
-            if ((attributes1 & SPELL_ATTR1_CU_FORCE_AURA_SAVING) && (attributes1 & SPELL_ATTR1_CU_REJECT_AURA_SAVING))
+            if ((attributes & SPELL_ATTR1_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_REJECT_AURA_SAVING))
             {
                 LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u. Both attributes will get applied", spellId);
-                attributes1 &= ~SPELL_ATTR1_CU_FORCE_AURA_SAVING|SPELL_ATTR1_CU_REJECT_AURA_SAVING;
+                attributes &= ~(SPELL_ATTR1_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_REJECT_AURA_SAVING);
             }
 
-            spellInfo->AttributesCu1 |= attributes1;
+            spellInfo->AttributesCu |= attributes;
         }
         LOG_INFO("server.loading", ">> Loaded %u spell custom attributes from DB in %u ms", count, GetMSTimeDiffToNow(customAttrTime));
     }
