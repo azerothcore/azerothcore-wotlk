@@ -679,12 +679,6 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
             SendPacket(&data);
             return;
         }
-        else
-        {
-            LOG_ERROR("network", "Player tries to login again, AccountId = %d", GetAccountId());
-            KickPlayer("WorldSession::HandlePlayerLoginOpcode Another client logging in");
-            return;
-        }
     }
 
     if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
