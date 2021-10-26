@@ -3597,6 +3597,19 @@ enum ServerProcessTypes
     NUM_SERVER_PROCESS_TYPES
 };
 
+// Login Failure Reasons
+enum class LoginFailureReason : uint8
+{
+    Failed             = 0,
+    NoWorld            = 1,
+    DuplicateCharacter = 2,
+    NoInstances        = 3,
+    Disabled           = 4,
+    NoCharacter        = 5,
+    LockedForTransfer  = 6,
+    LockedByBilling    = 7
+};
+
 namespace Acore::Impl
 {
     struct AC_SHARED_API CurrentServerProcessHolder
