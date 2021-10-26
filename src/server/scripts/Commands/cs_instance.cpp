@@ -32,14 +32,20 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class instance_commandscript : public CommandScript
 {
 public:
     instance_commandscript() : CommandScript("instance_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> instanceCommandTable =
+        static ChatCommandTable instanceCommandTable =
         {
             { "listbinds",      SEC_MODERATOR,      false,  &HandleInstanceListBindsCommand,    "" },
             { "unbind",         SEC_GAMEMASTER,      false,  &HandleInstanceUnbindCommand,       "" },
@@ -49,7 +55,7 @@ public:
             { "getbossstate",   SEC_MODERATOR,      true,   &HandleInstanceGetBossStateCommand, "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "instance",       SEC_MODERATOR,      true,   nullptr,                            "", instanceCommandTable }
         };

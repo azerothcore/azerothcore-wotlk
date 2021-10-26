@@ -1411,6 +1411,21 @@ void World::LoadConfigSettings(bool reload)
     // Specifies if IP addresses can be logged to the database
     m_bool_configs[CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE] = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true);
 
+    // LFG group mechanics.
+    m_int_configs[CONFIG_LFG_MAX_KICK_COUNT] = sConfigMgr->GetOption<int32>("LFG.MaxKickCount", 2);
+    if (m_int_configs[CONFIG_LFG_MAX_KICK_COUNT] > 3)
+    {
+        m_int_configs[CONFIG_LFG_MAX_KICK_COUNT] = 3;
+        LOG_ERROR("server.loading", "LFG.MaxKickCount can't be higher than 3.");
+    }
+
+    m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] = sConfigMgr->GetOption<int32>("LFG.KickPreventionTimer", 15 * MINUTE * IN_MILLISECONDS) * IN_MILLISECONDS;
+    if (m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] > 15 * MINUTE * IN_MILLISECONDS)
+    {
+        m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] = 15 * MINUTE * IN_MILLISECONDS;
+        LOG_ERROR("server.loading", "LFG.KickPreventionTimer can't be higher than 15 minutes.");
+    }
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
@@ -1935,6 +1950,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
     LOG_INFO("server.loading", " ");
     sObjectMgr->InitializeSpellInfoPrecomputedData();
+
+    LOG_INFO("server.loading", "Initialize commands...");
+    Acore::ChatCommands::LoadCommandMap();
 
     ///- Initialize game time and timers
     LOG_INFO("server.loading", "Initialize game time and timers");
@@ -2752,7 +2770,7 @@ void World::UpdateSessions(uint32 diff)
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
-    CliCommandHolder::Print* zprint = nullptr;
+    CliCommandHolder::Print zprint = nullptr;
     void* callbackArg = nullptr;
     CliCommandHolder* command = nullptr;
     while (cliCmdQueue.next(command))
@@ -3496,4 +3514,14 @@ void World::FinalizePlayerWorldSession(WorldSession* session)
     session->SendAddonsInfo();
     session->SendClientCacheVersion(cacheVersion);
     session->SendTutorialsData();
+}
+
+CliCommandHolder::CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished)
+    : m_callbackArg(callbackArg), m_command(strdup(command)), m_print(zprint), m_commandFinished(commandFinished)
+{
+}
+
+CliCommandHolder::~CliCommandHolder()
+{
+    free(m_command);
 }

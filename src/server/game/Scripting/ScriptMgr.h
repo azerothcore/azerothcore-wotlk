@@ -41,7 +41,6 @@ class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
 class Channel;
-class ChatCommand;
 class Creature;
 class CreatureAI;
 class DynamicObject;
@@ -80,6 +79,11 @@ struct ItemTemplate;
 struct OutdoorPvPData;
 struct GroupQueueInfo;
 struct TargetInfo;
+
+namespace Acore::ChatCommands
+{
+    struct ChatCommandBuilder;
+}
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
@@ -579,7 +583,7 @@ protected:
 
 public:
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-    [[nodiscard]] virtual std::vector<ChatCommand> GetCommands() const = 0;
+    [[nodiscard]] virtual std::vector<Acore::ChatCommands::ChatCommandBuilder> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -1566,7 +1570,7 @@ public: /* OutdoorPvPScript */
     OutdoorPvP* CreateOutdoorPvP(OutdoorPvPData const* data);
 
 public: /* CommandScript */
-    std::vector<ChatCommand> GetChatCommands();
+    std::vector<Acore::ChatCommands::ChatCommandBuilder> GetChatCommands();
 
 public: /* WeatherScript */
     void OnWeatherChange(Weather* weather, WeatherState state, float grade);
