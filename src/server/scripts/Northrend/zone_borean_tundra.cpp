@@ -1727,6 +1727,7 @@ public:
                 case EVENT_THASSARIAN_SCRIPT_9:
                     // Thassarian say text 2
                     Talk(SAY_THASSARIAN_2);
+                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                     _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_10, 6000);
                     break;
                 case EVENT_THASSARIAN_SCRIPT_10:
