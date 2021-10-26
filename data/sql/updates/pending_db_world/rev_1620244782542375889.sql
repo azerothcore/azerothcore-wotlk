@@ -116,3 +116,8 @@ UPDATE `creature_template_addon` SET `auras`='12787 20553' WHERE  `entry`=11672;
 
 -- Added missing auras for Golemagg
 UPDATE `creature_template_addon` SET `auras`='13879 18943 20556' WHERE  `entry`=11988;
+
+-- spel "Attract Rager"(20544) condition
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=7 AND `SourceEntry`=20544 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=11672 AND `ConditionValue3`=0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 7, 20544, 0, 0, 31, 0, 3, 11672, 0, 0, 0, 0, '', 'Spell Attract Rager should target only Core Rager');

@@ -28,6 +28,7 @@ enum Spells
     SPELL_PYROBLAST             = 20228,
     SPELL_EARTHQUAKE            = 19798,
     SPELL_ENRAGE                = 19953,
+    SPELL_ATTRACK_RAGER         = 20544,
 
     // Core Rager
     SPELL_QUIET_SUICIDE         = 3617,     // Server side
@@ -110,6 +111,7 @@ public:
             if (!enraged && me->HealthBelowPctDamaged(10, damage))
             {
                 DoCastSelf(SPELL_ENRAGE, true);
+                DoCastSelf(SPELL_ATTRACK_RAGER, true);
                 DoCastAOE(SPELL_EARTHQUAKE, true);
                 earthquakeTimer = 5000;
                 enraged = true;
