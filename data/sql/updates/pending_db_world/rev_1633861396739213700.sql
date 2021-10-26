@@ -13,5 +13,4 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` 
 UPDATE `creature_template` SET `InhabitType` = 1 WHERE `entry` = 10506;
 
 -- add sound to emote
-UPDATE `broadcast_text` SET `SoundId` = 557 WHERE `ID` = 5788;
 UPDATE `creature_text` SET `Sound` = 557 WHERE `CreatureID` = 10506;
