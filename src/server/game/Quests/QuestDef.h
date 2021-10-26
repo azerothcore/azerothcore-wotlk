@@ -258,7 +258,7 @@ public:
     [[nodiscard]] std::string const& GetRequestItemsText() const { return RequestItemsText; }
     [[nodiscard]] std::string const& GetAreaDescription() const { return AreaDescription; }
     [[nodiscard]] std::string const& GetCompletedText() const { return CompletedText; }
-    [[nodiscard]] int32  GetRewOrReqMoney() const;
+    [[nodiscard]] int32  GetRewOrReqMoney(Player* player = nullptr) const;
     [[nodiscard]] uint32 GetRewHonorAddition() const { return RewardHonor; }
     [[nodiscard]] float GetRewHonorMultiplier() const { return RewardKillHonor; }
     [[nodiscard]] uint32 GetRewMoneyMaxLevel() const; // use in XP calculation at client
@@ -366,6 +366,7 @@ protected:
     uint32 RewardHonor;
     float RewardKillHonor;
     int32  RewardMoney;
+    uint32 RewardMoneyDifficulty;
     uint32 RewardBonusMoney;
     uint32 RewardDisplaySpell;
     int32  RewardSpell;
