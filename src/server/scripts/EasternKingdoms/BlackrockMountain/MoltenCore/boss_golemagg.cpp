@@ -28,7 +28,6 @@ enum Spells
     SPELL_PYROBLAST             = 20228,
     SPELL_EARTHQUAKE            = 19798,
     SPELL_ENRAGE                = 19953,
-    SPELL_GOLEMAGG_TRUST        = 20553,
 
     // Core Rager
     SPELL_QUIET_SUICIDE         = 3617,     // Server side
@@ -50,14 +49,14 @@ public:
     {
         boss_golemaggAI(Creature* creature) : BossAI(creature, DATA_GOLEMAGG),
             earthquakeTimer(0),
-            pyroblastTimer(7000),
+            pyroblastTimer(0),
             enraged(false)
         {}
 
         void Reset() override
         {
             earthquakeTimer = 0;
-            pyroblastTimer = 7000;
+            pyroblastTimer = urand(3000, 7000);
             enraged = false;
 
             _Reset();
@@ -103,7 +102,7 @@ public:
                 }
             }
 
-            pyroblastTimer = 7000;
+            pyroblastTimer = urand(3000, 7000);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -111,7 +110,8 @@ public:
             if (!enraged && me->HealthBelowPctDamaged(10, damage))
             {
                 DoCastSelf(SPELL_ENRAGE, true);
-                earthquakeTimer = 3000;
+                DoCastAOE(SPELL_EARTHQUAKE, true);
+                earthquakeTimer = 5000;
                 enraged = true;
             }
         }
@@ -129,13 +129,13 @@ public:
             if (!UpdateVictim())
                 return;
 
-            // Should not get impact by cast state
+            // Should not get impact by cast state (cast should always happen)
             if (earthquakeTimer)
             {
                 if (earthquakeTimer <= diff)
                 {
-                    DoCastAOE(SPELL_EARTHQUAKE);
-                    earthquakeTimer = 3000;
+                    DoCastAOE(SPELL_EARTHQUAKE, true);
+                    earthquakeTimer = 5000;
                 }
                 else
                 {
