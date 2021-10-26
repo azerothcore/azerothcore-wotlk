@@ -1419,6 +1419,21 @@ void World::LoadConfigSettings(bool reload)
     // Specifies if IP addresses can be logged to the database
     m_bool_configs[CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE] = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true);
 
+    // LFG group mechanics.
+    m_int_configs[CONFIG_LFG_MAX_KICK_COUNT] = sConfigMgr->GetOption<int32>("LFG.MaxKickCount", 2);
+    if (m_int_configs[CONFIG_LFG_MAX_KICK_COUNT] > 3)
+    {
+        m_int_configs[CONFIG_LFG_MAX_KICK_COUNT] = 3;
+        LOG_ERROR("server.loading", "LFG.MaxKickCount can't be higher than 3.");
+    }
+
+    m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] = sConfigMgr->GetOption<int32>("LFG.KickPreventionTimer", 15 * MINUTE * IN_MILLISECONDS) * IN_MILLISECONDS;
+    if (m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] > 15 * MINUTE * IN_MILLISECONDS)
+    {
+        m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] = 15 * MINUTE * IN_MILLISECONDS;
+        LOG_ERROR("server.loading", "LFG.KickPreventionTimer can't be higher than 15 minutes.");
+    }
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
