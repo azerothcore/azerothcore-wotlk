@@ -1360,20 +1360,31 @@ namespace Acore
         bool operator()(Unit* u)
         {
             if (i_obj == u)
+            {
                 return false;
+            }
 
             Player* player = nullptr;
             if (u->GetTypeId() == TYPEID_PLAYER)
+            {
                 player = u->ToPlayer();
+            }
+
             else if (u->IsPet() && u->GetOwner())
+            {
                 player = u->GetOwner()->ToPlayer();
+            }
 
             if (!player)
+            {
                 return false;
+            }
 
             Group* group = player->GetGroup();
             if (!group || !group->IsMember(i_obj->IsPet() ? i_obj->GetOwnerGUID() : i_obj->GetGUID()))
+            {
                 return false;
+            }
 
             if (u->IsAlive() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) && u->GetMaxHealth() - u->GetHealth() > i_hp)
             {
