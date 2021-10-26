@@ -3423,6 +3423,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->ManaPerSecond = 0;
     });
 
+    // The Green Tower passive aura
+    ApplySpellFix({ 18097 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = -1; // unlimited
+    });
+
     // Evergrove Druid Transform Crow
     ApplySpellFix({ 38776 }, [](SpellEntry* spellInfo)
     {
