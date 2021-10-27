@@ -3050,7 +3050,9 @@ public:
     static bool HandleFreezeCommand(ChatHandler* handler, char const* args)
     {
         std::string name;
+        Unit* target = handler->getSelectedUnit();
         Player* player;
+        constexpr int Freeze = 9454;
         char const* TargetName = strtok((char*)args, " "); // get entered name
         if (!TargetName) // if no name entered use target
         {
@@ -3068,12 +3070,6 @@ public:
             player = ObjectAccessor::FindPlayerByName(name);
         }
 
-        if (!player)
-        {
-            handler->SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
-            return true;
-        }
-
         if (player == handler->GetSession()->GetPlayer())
         {
             handler->SendSysMessage(LANG_COMMAND_FREEZE_ERROR);
@@ -3083,8 +3079,22 @@ public:
         if (player && (player != handler->GetSession()->GetPlayer()))
         {
             handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(9454))
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(Freeze))
                 Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, player, player);
+        }
+
+        if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (target->IsAlive())
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(Freeze))
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
         }
 
         return true;
@@ -3093,8 +3103,17 @@ public:
     static bool HandleUnFreezeCommand(ChatHandler* handler, char const* args)
     {
         std::string name;
+        Unit* target = handler->getSelectedUnit();
         Player* player;
+        constexpr int Freeze = 9454;
         char* targetName = strtok((char*)args, " "); // Get entered name
+
+        if (target->HasAura(Freeze))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
+            target->RemoveAurasDueToSpell(Freeze);
+            return true;
+        }
 
         if (targetName)
         {
