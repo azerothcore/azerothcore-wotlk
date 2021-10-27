@@ -104,7 +104,11 @@ public:
                         creature->DisappearAndDie();
                     break;
                 case NPC_WARCHIEF_REND_BLACKHAND:
-                    WarchiefRendBlackhand = creature->GetGUID();
+                    if (GetBossState(DATA_GYTH) != IN_PROGRESS)
+                    {
+                        WarchiefRendBlackhand = creature->GetGUID();
+                    }
+
                     if (GetBossState(DATA_GYTH) == DONE)
                         creature->DisappearAndDie();
                     break;
@@ -252,6 +256,13 @@ public:
                 case DATA_OVERLORD_WYRMTHALAK:
                 case DATA_PYROGAURD_EMBERSEER:
                 case DATA_WARCHIEF_REND_BLACKHAND:
+                    if (state == FAIL)
+                    {
+                        if (Creature* rend = instance->GetCreature(WarchiefRendBlackhand))
+                        {
+                            rend->SetRespawnDelay(10 * IN_MILLISECONDS);
+                        }
+                    }
                 case DATA_GYTH:
                 case DATA_THE_BEAST:
                 case DATA_GENERAL_DRAKKISATH:

@@ -419,7 +419,10 @@ public:
                             break;
                         case EVENT_TELEPORT_2:
                             me->NearTeleportTo(216.485f, -434.93f, 110.888f, -0.01225555f);
-                            me->SummonCreature(NPC_GYTH, 211.762f, -397.5885f, 111.1817f, 4.747295f);
+                            if (Creature* gyth = me->SummonCreature(NPC_GYTH, 211.762f, -397.5885f, 111.1817f, 4.747295f))
+                            {
+                                gyth->AI()->SetGUID(me->GetGUID(), DATA_WARCHIEF_REND_BLACKHAND);
+                            }
                             break;
                         case EVENT_WAVE_1:
                             SummonWave(Wave1, 4);

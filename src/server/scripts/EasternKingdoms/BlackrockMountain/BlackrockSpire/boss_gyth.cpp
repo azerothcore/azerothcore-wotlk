@@ -56,6 +56,7 @@ public:
         boss_gythAI(Creature* creature) : BossAI(creature, DATA_GYTH) { }
 
         bool SummonedRend;
+        ObjectGuid rendGUID;
 
         void Reset() override
         {
@@ -92,6 +93,24 @@ public:
                     break;
                 default:
                     break;
+            }
+        }
+
+        void EnterEvadeMode() override
+        {
+            if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WARCHIEF_REND_BLACKHAND)))
+            {
+                creature->Respawn(true);
+            }
+
+            BossAI::EnterEvadeMode();
+        }
+
+        void SetGUID(ObjectGuid guid, int32 index) override
+        {
+            if (index == DATA_WARCHIEF_REND_BLACKHAND)
+            {
+                rendGUID = guid;
             }
         }
 
