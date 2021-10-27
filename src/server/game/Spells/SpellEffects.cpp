@@ -1917,8 +1917,16 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
 
 void Spell::EffectEnergize(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET){
+        // Frost: Fixxing Spell 69399 and 70172 from gunship cannons generate power on shot and not on hit
+        // There are Possible more Vehicles with Energy idk
+         if (m_spellInfo->Id == 69399 && effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH  || m_spellInfo->Id == 70172 && effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH)
+        {
+            Powers power = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+            m_caster->EnergizeBySpell(m_caster, m_spellInfo->Id, damage, power);
+        }
         return;
+    }
 
     if (!unitTarget)
         return;
@@ -1942,6 +1950,9 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
     int level_diff = 0;
     switch (m_spellInfo->Id)
     {
+         case 69399: //Disables energy gain on hit for cannons on gunshipbattle icc
+         case 70172://Disables energy gain on hit for cannons on gunshipbattle icc
+            return; //Disables energy gain on hit for cannons on gunshipbattle icc
         case 9512:                                          // Restore Energy
             level_diff = m_caster->getLevel() - 40;
             level_multiplier = 2;
