@@ -256,7 +256,13 @@ void CreatureGroup::MemberEvaded(Creature* member)
 
         if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
         {
-            pMember->AI()->EnterEvadeMode();
+            if (pMember->IsAIEnabled)
+            {
+                if (CreatureAI* pMemberAI = pMember->AI())
+                {
+                    pMemberAI->EnterEvadeMode();
+                }
+            }
         }
     }
 }
