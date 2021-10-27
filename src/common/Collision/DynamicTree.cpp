@@ -148,7 +148,7 @@ struct DynamicTreeIntersectionCallback
 {
     bool did_hit;
     uint32 phase_mask;
-    GameObject* _go;
+    GameObject* _go = nullptr;
     DynamicTreeIntersectionCallback(uint32 phasemask) : did_hit(false), phase_mask(phasemask) { }
     bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirstHit)
     {
@@ -160,7 +160,6 @@ struct DynamicTreeIntersectionCallback
         return result;
     }
     bool didHit() const { return did_hit;}
-
 };
 
 struct DynamicTreeAreaInfoCallback
