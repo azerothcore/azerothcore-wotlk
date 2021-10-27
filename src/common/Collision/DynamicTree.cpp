@@ -159,6 +159,7 @@ struct DynamicTreeIntersectionCallback
         return result;
     }
     bool didHit() const { return did_hit;}
+    GameObject* _go;
 };
 
 struct DynamicTreeAreaInfoCallback
@@ -291,8 +292,9 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
     DynamicTreeIntersectionCallback callback(phasemask);
     impl->intersectZAllignedRay(r, callback, maxSearchDist);
 
-    if (callback.didHit())
+    if (dCallback)
     {
+        dCallback->go = callback._go;
         return v.z - maxSearchDist;
     }
     else
