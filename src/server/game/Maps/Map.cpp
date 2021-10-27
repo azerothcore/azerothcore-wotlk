@@ -176,7 +176,7 @@ void Map::LoadMap(int gx, int gy, bool reload)
             return;
 
         // load grid map for base map
-        m_parentMap->EnsureGridCreated(GridCoord(63 - gx, 63 - gy));
+        m_parentMap->EnsureGridCreated_i(GridCoord(63-gx, 63-gy));
 
         GridMaps[gx][gy] = m_parentMap->GridMaps[gx][gy];
         return;
@@ -1535,12 +1535,19 @@ uint16 GridMap::getArea(float x, float y) const
 {
     if (!_areaMap)
         return _gridArea;
-
-    x = 16 * (32 - x / SIZE_OF_GRIDS);
-    y = 16 * (32 - y / SIZE_OF_GRIDS);
-    int lx = (int)x & 15;
-    int ly = (int)y & 15;
-    return _areaMap[lx * 16 + ly];
+    // Correcting crash in blank lx and ly is not null, what goes out of range because it is not compiled in debug
+    try
+    {
+        x = 16 * (CENTER_GRID_ID - x / SIZE_OF_GRIDS);
+        y = 16 * (CENTER_GRID_ID - y / SIZE_OF_GRIDS);
+        int lx = static_cast<int>(x) & 15;
+        int ly = static_cast<int>(y) & 15;
+        return _areaMap[lx * 16 + ly];
+    }
+    catch (const std::exception&)
+    {
+        return _gridArea;
+    }
 }
 
 float GridMap::getHeightFromFlat(float /*x*/, float /*y*/) const
@@ -1976,7 +1983,7 @@ float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, fl
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, 50.0f);
+        float ground_z = GetHeight(phasemask, x, y, z, true);
         if (ground)
             *ground = ground_z;
 
@@ -2015,7 +2022,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
                 float dist = 10.0f;
                 bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase);
                 if (hit)
-                    if (GetHeight(phase, x, y, z, true, 30.0f) < (v.z - dist + 1.0f))
+                    if (GetHeight(phase, x, y, z, true) )
                         return staticTrans->ToTransport();
             }
 
@@ -2445,12 +2452,19 @@ bool Map::GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float 
     return result;
 }
 
-float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/, DynamicTreeCallback* dCallback /*= nullptr*/) const
 {
-    float h1, h2;
-    h1 = GetHeight(x, y, z, vmap, maxSearchDist);
-    h2 = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
-    return std::max<float>(h1, h2);
+    if (!this)
+    {
+        return VMAP_INVALID_HEIGHT_VALUE;
+    }
+    float vmapZ = GetHeight(x, y, z, vmap, maxSearchDist);
+    float goZ   = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask, dCallback);
+    if (vmapZ > goZ && dCallback)
+    {
+        dCallback->go = nullptr;
+        return std::max<float>(vmapZ, goZ);
+    }
 }
 
 bool Map::IsInWater(uint32 phaseMask, float x, float y, float pZ, float collisionHeight) const

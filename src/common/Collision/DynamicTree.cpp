@@ -284,7 +284,7 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
     return !callback.did_hit;
 }
 
-float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask) const
+float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask, DynamicTreeCallback* dCallback) const
 {
     G3D::Vector3 v(x, y, z);
     G3D::Ray r(v, G3D::Vector3(0, 0, -1));

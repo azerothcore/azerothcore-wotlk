@@ -33,6 +33,12 @@ namespace VMAP
 
 class GameObjectModel;
 struct DynTreeImpl;
+class GameObject;
+
+struct DynamicTreeCallback
+{
+    GameObject* go = nullptr;
+};
 
 class DynamicMapTree
 {
@@ -55,7 +61,7 @@ public:
                          const G3D::Vector3& pPos2, G3D::Vector3& pResultHitPos,
                          float pModifyDist) const;
 
-    [[nodiscard]] float getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask) const;
+    [[nodiscard]] float getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask, DynamicTreeCallback* dCallback = nullptr) const;
 
     void insert(const GameObjectModel&);
     void remove(const GameObjectModel&);
