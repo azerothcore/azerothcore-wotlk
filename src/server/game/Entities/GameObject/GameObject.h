@@ -503,6 +503,8 @@ struct GameObjectTemplate
     {
         switch (type)
         {
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.linkedTrap;
             case GAMEOBJECT_TYPE_CHEST:
                 return chest.linkedTrapId;
             case GAMEOBJECT_TYPE_SPELL_FOCUS:
@@ -709,6 +711,7 @@ struct GameObjectData
     float orientation{0.0f};
     G3D::Quat rotation;
     int32  spawntimesecs{0};
+    uint32 ScriptId;
     uint32 animprogress{0};
     GOState go_state{GO_STATE_ACTIVE};
     uint8 spawnMask{0};
@@ -808,11 +811,8 @@ public:
             return now;
     }
 
-    void SetRespawnTime(int32 respawn)
-    {
-        m_respawnTime = respawn > 0 ? time(nullptr) + respawn : 0;
-        m_respawnDelayTime = respawn > 0 ? respawn : 0;
-    }
+    void SetRespawnTime(int32 respawn);
+    void SetRespawnDelay(int32 respawn);
     void Respawn();
     [[nodiscard]] bool isSpawned() const
     {
@@ -824,6 +824,7 @@ public:
     void SetSpawnedByDefault(bool b) { m_spawnedByDefault = b; }
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
     void Refresh();
+    void DespawnOrUnsummon(Milliseconds delay = 0ms, Seconds forcedRespawnTime = 0s);
     void Delete();
     void GetFishLoot(Loot* loot, Player* loot_owner);
     void GetFishLootJunk(Loot* loot, Player* loot_owner);
@@ -870,7 +871,8 @@ public:
     [[nodiscard]] uint32 GetUseCount() const { return m_usetimes; }
     [[nodiscard]] uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
 
-    void SaveRespawnTime() override;
+    void SaveRespawnTime() override { SaveRespawnTime(0); }
+    void SaveRespawnTime(uint32 forceDelay);
 
     Loot        loot;
 
@@ -884,6 +886,9 @@ public:
     uint32 lootingGroupLowGUID;                         // used to find group which is looting
     void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
+
+    [[nodiscard]] GameObject* GetLinkedTrap();
+    void SetLinkedTrap(GameObject* linkedTrap) { m_linkedTrap = linkedTrap->GetGUID(); }
 
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id) const override;
@@ -929,7 +934,7 @@ public:
 
     void EventInform(uint32 eventId);
 
-    [[nodiscard]] virtual uint32 GetScriptId() const { return GetGOInfo()->ScriptId; }
+    [[nodiscard]] virtual uint32 GetScriptId() const;
     [[nodiscard]] GameObjectAI* AI() const { return m_AI; }
 
     [[nodiscard]] std::string GetAIName() const;
@@ -980,6 +985,8 @@ protected:
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
     uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
+    uint32      m_despawnDelay;
+    Seconds     m_despawnRespawnTime;                   // override respawn time after delayed despawn
     LootState   m_lootState;
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
@@ -1007,6 +1014,9 @@ protected:
     ObjectGuid::LowType m_lootRecipientGroup;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
     uint32 m_lootGenerationTime;
+
+    ObjectGuid m_linkedTrap;
+
 private:
     void CheckRitualList();
     void ClearRitualList();

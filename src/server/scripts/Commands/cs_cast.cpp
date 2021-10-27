@@ -29,14 +29,20 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class cast_commandscript : public CommandScript
 {
 public:
     cast_commandscript() : CommandScript("cast_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> castCommandTable =
+        static ChatCommandTable castCommandTable =
         {
             { "back",           SEC_GAMEMASTER,  false, &HandleCastBackCommand,              "" },
             { "dist",           SEC_GAMEMASTER,  false, &HandleCastDistCommand,              "" },
@@ -45,7 +51,7 @@ public:
             { "dest",           SEC_GAMEMASTER,  false, &HandleCastDestCommand,              "" },
             { "",               SEC_GAMEMASTER,  false, &HandleCastCommand,                  "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "cast",           SEC_GAMEMASTER,  false, nullptr,                                "", castCommandTable }
         };

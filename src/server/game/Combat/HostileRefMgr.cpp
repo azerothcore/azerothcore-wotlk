@@ -113,6 +113,8 @@ void HostileRefMgr::updateThreatTables()
 
 void HostileRefMgr::deleteReferences(bool removeFromMap /*= false*/)
 {
+    std::vector<Creature*> creaturesToEvade;
+
     HostileReference* ref = getFirst();
     while (ref)
     {
@@ -127,7 +129,7 @@ void HostileRefMgr::deleteReferences(bool removeFromMap /*= false*/)
                 {
                     if (Creature* creature = threatMgr->GetOwner()->ToCreature())
                     {
-                        creature->AI()->EnterEvadeMode();
+                        creaturesToEvade.push_back(creature);
                     }
                 }
             }
@@ -135,6 +137,11 @@ void HostileRefMgr::deleteReferences(bool removeFromMap /*= false*/)
 
         delete ref;
         ref = nextRef;
+    }
+
+    for (Creature* creature : creaturesToEvade)
+    {
+        creature->AI()->EnterEvadeMode();
     }
 }
 
@@ -221,8 +228,7 @@ void HostileRefMgr::UpdateVisibility(bool checkThreat)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1) &&
-                !ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
+        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1))
         {
             nextRef = ref->next();
             ref->removeReference();

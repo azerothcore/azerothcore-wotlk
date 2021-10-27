@@ -45,7 +45,7 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& l
 
 void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 {
-    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER))
+    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER | lfg::LFG_OPTION_ENABLE_SEASONAL_BOSSES))
     {
         recvData.rfinish();
         return;
@@ -205,7 +205,7 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
         if (quest)
         {
             data << uint8(done);
-            data << uint32(quest->GetRewOrReqMoney());
+            data << uint32(quest->GetRewOrReqMoney(GetPlayer()));
             data << uint32(quest->XPValue(GetPlayer()));
             data << uint32(0);
             data << uint32(0);
@@ -496,7 +496,7 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
     data << uint32(rewardData.sdungeonEntry);              // Dungeon Finished
     data << uint8(rewardData.done);
     data << uint32(1);
-    data << uint32(rewardData.quest->GetRewOrReqMoney());
+    data << uint32(rewardData.quest->GetRewOrReqMoney(GetPlayer()));
     data << uint32(rewardData.quest->XPValue(GetPlayer()));
     data << uint32(0);
     data << uint32(0);
