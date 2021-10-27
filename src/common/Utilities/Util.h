@@ -119,19 +119,20 @@ inline T RoundToInterval(T& num, T floor, T ceil)
 }
 
 // UTF8 handling
-bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr);
+AC_COMMON_API bool Utf8toWStr(std::string_view utf8str, std::wstring& wstr);
 
 // in wsize==max size of buffer, out wsize==real string size
-bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+AC_COMMON_API bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
 
-inline bool Utf8toWStr(const std::string& utf8str, wchar_t* wstr, size_t& wsize)
+inline bool Utf8toWStr(std::string_view utf8str, wchar_t* wstr, size_t& wsize)
 {
-    return Utf8toWStr(utf8str.c_str(), utf8str.size(), wstr, wsize);
+    return Utf8toWStr(utf8str.data(), utf8str.size(), wstr, wsize);
 }
 
-bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str);
+AC_COMMON_API bool WStrToUtf8(std::wstring_view wstr, std::string& utf8str);
+
 // size==real string size
-bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str);
+AC_COMMON_API bool WStrToUtf8(wchar_t const* wstr, size_t size, std::string& utf8str);
 
 // set string to "" if invalid utf8 sequence
 size_t utf8length(std::string& utf8str);
@@ -263,7 +264,7 @@ inline bool isNumericOrSpace(wchar_t wchar)
     return isNumeric(wchar) || wchar == L' ';
 }
 
-inline bool isBasicLatinString(const std::wstring& wstr, bool numericOrSpace)
+inline bool isBasicLatinString(std::wstring_view wstr, bool numericOrSpace)
 {
     for (wchar_t i : wstr)
         if (!isBasicLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -273,7 +274,7 @@ inline bool isBasicLatinString(const std::wstring& wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isExtendedLatinString(const std::wstring& wstr, bool numericOrSpace)
+inline bool isExtendedLatinString(std::wstring_view wstr, bool numericOrSpace)
 {
     for (wchar_t i : wstr)
         if (!isExtendedLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -283,7 +284,7 @@ inline bool isExtendedLatinString(const std::wstring& wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isCyrillicString(const std::wstring& wstr, bool numericOrSpace)
+inline bool isCyrillicString(std::wstring_view wstr, bool numericOrSpace)
 {
     for (wchar_t i : wstr)
         if (!isCyrillicCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -293,7 +294,7 @@ inline bool isCyrillicString(const std::wstring& wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isEastAsianString(const std::wstring& wstr, bool numericOrSpace)
+inline bool isEastAsianString(std::wstring_view wstr, bool numericOrSpace)
 {
     for (wchar_t i : wstr)
         if (!isEastAsianCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -302,6 +303,9 @@ inline bool isEastAsianString(const std::wstring& wstr, bool numericOrSpace)
         }
     return true;
 }
+
+inline char charToUpper(char c) { return std::toupper(c); }
+inline char charToLower(char c) { return std::tolower(c); }
 
 inline wchar_t wcharToUpper(wchar_t wchar)
 {
@@ -387,24 +391,22 @@ void wstrToLower(std::wstring& str);
 
 std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
 
-bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
-bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
-bool Utf8FitTo(const std::string& str, std::wstring const& search);
-void utf8printf(FILE* out, const char* str, ...);
-void vutf8printf(FILE* out, const char* str, va_list* ap);
-bool Utf8ToUpperOnlyLatin(std::string& utf8String);
+AC_COMMON_API bool utf8ToConsole(std::string_view utf8str, std::string& conStr);
+AC_COMMON_API bool consoleToUtf8(std::string_view conStr, std::string& utf8str);
+AC_COMMON_API bool Utf8FitTo(std::string_view str, std::wstring_view search);
+AC_COMMON_API void utf8printf(FILE* out, const char* str, ...);
+AC_COMMON_API void vutf8printf(FILE* out, const char* str, va_list* ap);
+AC_COMMON_API bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
 
 uint32 CreatePIDFile(const std::string& filename);
 uint32 GetPID();
 
-bool StringEqualI(std::string_view str1, std::string_view str2);
-
 namespace Acore::Impl
 {
-    std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
-    void HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse = false);
+    AC_COMMON_API std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
+    AC_COMMON_API void HexStrToByteArray(std::string_view str, uint8* out, size_t outlen, bool reverse = false);
 }
 
 template<typename Container>
@@ -414,29 +416,36 @@ std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
 }
 
 template<size_t Size>
-void HexStrToByteArray(std::string const& str, std::array<uint8, Size>& buf, bool reverse = false)
+void HexStrToByteArray(std::string_view str, std::array<uint8, Size>& buf, bool reverse = false)
 {
     Acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
 }
+
 template<size_t Size>
-std::array<uint8, Size> HexStrToByteArray(std::string const& str, bool reverse = false)
+std::array<uint8, Size> HexStrToByteArray(std::string_view str, bool reverse = false)
 {
     std::array<uint8, Size> arr;
     HexStrToByteArray(str, arr, reverse);
     return arr;
 }
 
-bool StringContainsStringI(std::string const& haystack, std::string const& needle);
+AC_COMMON_API bool StringEqualI(std::string_view str1, std::string_view str2);
+inline bool StringStartsWith(std::string_view haystack, std::string_view needle) { return (haystack.substr(0, needle.length()) == needle); }
+inline bool StringStartsWithI(std::string_view haystack, std::string_view needle) { return StringEqualI(haystack.substr(0, needle.length()), needle); }
+AC_COMMON_API bool StringContainsStringI(std::string_view haystack, std::string_view needle);
+
 template <typename T>
-inline bool ValueContainsStringI(std::pair<T, std::string> const& haystack, std::string const& needle)
+inline bool ValueContainsStringI(std::pair<T, std::string_view> const& haystack, std::string_view needle)
 {
     return StringContainsStringI(haystack.second, needle);
 }
-#endif
 
-//handler for operations on large flags
-#ifndef _FLAG96
-#define _FLAG96
+AC_COMMON_API bool StringCompareLessI(std::string_view a, std::string_view b);
+
+struct StringCompareLessI_T
+{
+    bool operator()(std::string_view a, std::string_view b) const { return StringCompareLessI(a, b); }
+};
 
 // simple class for not-modifyable list
 template <typename T>
@@ -984,10 +993,27 @@ private:
 };
 
 template<typename E>
-typename std::underlying_type<E>::type AsUnderlyingType(E enumValue)
+constexpr typename std::underlying_type<E>::type AsUnderlyingType(E enumValue)
 {
     static_assert(std::is_enum<E>::value, "AsUnderlyingType can only be used with enums");
     return static_cast<typename std::underlying_type<E>::type>(enumValue);
 }
+
+template<typename Ret, typename T1, typename... T>
+Ret* Coalesce(T1* first, T*... rest)
+{
+    if constexpr (sizeof...(T) > 0)
+        return (first ? static_cast<Ret*>(first) : Coalesce<Ret>(rest...));
+    else
+        return static_cast<Ret*>(first);
+}
+
+AC_COMMON_API std::string GetTypeName(std::type_info const&);
+
+template <typename T>
+std::string GetTypeName() { return GetTypeName(typeid(T)); }
+
+template <typename T>
+std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::type_info>, std::string> GetTypeName(T&& v) { return GetTypeName(typeid(v)); }
 
 #endif

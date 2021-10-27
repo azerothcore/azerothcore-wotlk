@@ -34,26 +34,32 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "Transport.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class gobject_commandscript : public CommandScript
 {
 public:
     gobject_commandscript() : CommandScript("gobject_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> gobjectAddCommandTable =
+        static ChatCommandTable gobjectAddCommandTable =
         {
             { "temp",           SEC_GAMEMASTER,        false, &HandleGameObjectAddTempCommand,   "" },
             { "",               SEC_ADMINISTRATOR,     false, &HandleGameObjectAddCommand,       "" }
         };
-        static std::vector<ChatCommand> gobjectSetCommandTable =
+        static ChatCommandTable gobjectSetCommandTable =
         {
             { "phase",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetPhaseCommand,  "" },
             { "state",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetStateCommand,  "" }
         };
-        static std::vector<ChatCommand> gobjectCommandTable =
+        static ChatCommandTable gobjectCommandTable =
         {
-            { "activate",       SEC_ADMINISTRATOR,     false, &HandleGameObjectActivateCommand,  "" },
+            { "activate",       SEC_GAMEMASTER,        false, &HandleGameObjectActivateCommand,  "" },
             { "delete",         SEC_ADMINISTRATOR,     false, &HandleGameObjectDeleteCommand,    "" },
             { "info",           SEC_MODERATOR,         false, &HandleGameObjectInfoCommand,      "" },
             { "move",           SEC_ADMINISTRATOR,     false, &HandleGameObjectMoveCommand,      "" },
@@ -63,7 +69,7 @@ public:
             { "add",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectAddCommandTable },
             { "set",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectSetCommandTable }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "gobject",        SEC_MODERATOR,     false, nullptr,                               "", gobjectCommandTable }
         };
