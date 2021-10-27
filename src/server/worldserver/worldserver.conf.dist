@@ -3699,6 +3699,7 @@ Logger.sql=4,Console Server
 #Logger.bg.reportpvpafk=4,Console Server
 #Logger.calendar=4,Console Server
 #Logger.chat.log=4,Console Server
+#Logger.chat.log.addon=4,Console Server
 #Logger.chat.system=4,Console Server
 #Logger.cheat=4,Console Server
 #Logger.commands.ra=4,Console Server
