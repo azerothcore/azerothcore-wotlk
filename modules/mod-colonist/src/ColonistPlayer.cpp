@@ -31,6 +31,12 @@ public:
         return true;
     }
 
+    void OnAchiComplete(Player* player, AchievementEntry const* /*achievement*/) override
+    {
+        if (sConfigMgr->GetOption<int>("MaxPlayerLevel", 80) <= 19 && isPioneer(player))
+            player->CompletedAchievement(sAchievementStore.LookupEntry(23465));
+    }
+
 private:
     bool isPioneer(Player *player)
     {
