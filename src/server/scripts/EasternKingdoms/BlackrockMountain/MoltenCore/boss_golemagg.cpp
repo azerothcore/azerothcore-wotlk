@@ -226,7 +226,6 @@ public:
             if (me->HealthBelowPctDamaged(50, damage))
             {
                 damage = 0;
-                DoCastSelf(SPELL_GOLEMAGG_TRUST, true);
                 DoCastSelf(SPELL_FULL_HEAL, true);
                 Talk(EMOTE_LOWHP);
             }

@@ -48,6 +48,7 @@ enum Events
     EVENT_DAMAGE_REFLECTION,
     EVENT_BLAST_WAVE,
     EVENT_TELEPORT,
+    EVENT_AEGIS_OF_RAGNAROS,
 
     EVENT_OUTRO_1,
     EVENT_OUTRO_2,
@@ -59,6 +60,10 @@ enum Misc
     GOSSIP_HELLO        = 4995,
     FACTION_FRIENDLY    = 35,
     SUMMON_GROUP_ADDS   = 1,
+
+    // Event phases
+    EVENT_NORMAL_COMBAT = 0x01,
+    EVENT_OUTRO_EVENT   = 0x02,
 };
 
 Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.0f};
@@ -81,8 +86,13 @@ public:
             summons.DespawnAll();
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
+                events.SetPhase(EVENT_NORMAL_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
                 me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
+            }
+            else
+            {
+                events.SetPhase(EVENT_OUTRO_EVENT);
             }
         }
 
@@ -103,10 +113,11 @@ public:
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000);
-            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
-            events.ScheduleEvent(EVENT_TELEPORT, 20000);
+            DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
+            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
+            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
+            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT, 20000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -133,6 +144,7 @@ public:
                 else if (!remainingAdds)
                 {
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
+                    events.CancelEventGroup(EVENT_NORMAL_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
                     me->setFaction(FACTION_FRIENDLY);
                     EnterEvadeMode();
@@ -155,7 +167,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
+            if (events.IsInPhase(EVENT_NORMAL_COMBAT))
             {
                 if (!UpdateVictim())
                 {
@@ -167,12 +179,6 @@ public:
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                 {
                     return;
-                }
-
-                // TODO: inspect this
-                if (HealthBelowPct(50))
-                {
-                    DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
                 }
 
                 while (uint32 const eventId = events.ExecuteEvent())
@@ -217,7 +223,7 @@ public:
 
                 DoMeleeAttackIfReady();
             }
-            else
+            else if (!events.Empty())
             {
                 events.Update(diff);
 
