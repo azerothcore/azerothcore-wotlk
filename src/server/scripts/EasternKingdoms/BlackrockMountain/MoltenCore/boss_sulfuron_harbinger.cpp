@@ -15,7 +15,6 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-
 enum Spells
 {
     // Sulfuron Harbringer
@@ -47,15 +46,11 @@ enum Events
 class boss_sulfuron : public CreatureScript
 {
 public:
-    boss_sulfuron() : CreatureScript("boss_sulfuron")
-    {
-    }
+    boss_sulfuron() : CreatureScript("boss_sulfuron") {}
 
     struct boss_sulfuronAI : public BossAI
     {
-        boss_sulfuronAI(Creature* creature) : BossAI(creature, DATA_SULFURON)
-        {
-        }
+        boss_sulfuronAI(Creature* creature) : BossAI(creature, DATA_SULFURON) {}
 
         void EnterCombat(Unit* /*victim*/) override
         {
@@ -104,7 +99,9 @@ public:
                         {
                             std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
                             if (!healers.empty())
+                            {
                                 DoCast(Acore::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
+                            }
 
                             DoCast(me, SPELL_INSPIRE);
                             events.ScheduleEvent(EVENT_INSPIRE, urand(20000, 26000));
@@ -146,13 +143,11 @@ public:
 class npc_flamewaker_priest : public CreatureScript
 {
 public:
-    npc_flamewaker_priest() : CreatureScript("npc_flamewaker_priest") { }
+    npc_flamewaker_priest() : CreatureScript("npc_flamewaker_priest") {}
 
     struct npc_flamewaker_priestAI : public ScriptedAI
     {
-        npc_flamewaker_priestAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_flamewaker_priestAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset() override
         {
