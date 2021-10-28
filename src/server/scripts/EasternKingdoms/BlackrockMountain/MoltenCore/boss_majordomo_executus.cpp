@@ -71,6 +71,9 @@ public:
     {
         boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS) {}
 
+        // Disabled events
+        void JustDied(Unit* /*killer*/) override {}
+
         void Reset() override
         {
             me->ResetLootMode();
@@ -81,6 +84,11 @@ public:
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
                 me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
             }
+        }
+
+        bool CanAIAttack(Unit const* /*target*/) const override
+        {
+            return instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE;
         }
 
         void KilledUnit(Unit* victim) override
@@ -99,13 +107,7 @@ public:
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000);
             events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
             events.ScheduleEvent(EVENT_TELEPORT, 20000);
-
-            // Call every flamewaker around him
-            me->CallForHelp(30);
         }
-
-        // Disabled events
-        void JustDied(Unit* /*killer*/) override {}
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
