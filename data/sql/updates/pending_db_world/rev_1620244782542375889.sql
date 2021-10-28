@@ -178,3 +178,11 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@leader, 56646, 0, 0, 3, 0, 0),
 (@leader, 56649, 0, 0, 3, 0, 0),
 (@leader, 56647, 0, 0, 3, 0, 0);
+
+-- Lucifron Flamewalkers
+-- These minions has formation data and they always follows Lucifron
+/* ERROR MSG:
+WaypointMovementGenerator::LoadPath: creature Flamewaker Protector (GUID Full: 0xf130002f5700006c Type: Creature Entry: 12119  Low: 108) doesn't have waypoint path id: 566060
+WaypointMovementGenerator::LoadPath: creature Flamewaker Protector (GUID Full: 0xf130002f5700006d Type: Creature Entry: 12119  Low: 109) doesn't have waypoint path id: 566070
+*/
+UPDATE `creature_addon` SET `path_id`='0' WHERE  `guid` IN (56606, 56607);
