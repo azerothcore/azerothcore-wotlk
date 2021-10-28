@@ -106,14 +106,6 @@ public:
             BossAI::EnterEvadeMode();
         }
 
-        void SetGUID(ObjectGuid guid, int32 index) override
-        {
-            if (index == DATA_WARCHIEF_REND_BLACKHAND)
-            {
-                rendGUID = guid;
-            }
-        }
-
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
