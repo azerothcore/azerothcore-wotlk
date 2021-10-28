@@ -11,9 +11,9 @@ SDComment: Adds NYI
 SDCategory: Molten Core
 EndScriptData */
 
-#include "molten_core.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "molten_core.h"
 
 enum Spells
 {

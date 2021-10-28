@@ -11,10 +11,10 @@ SDComment: Timers need to be confirmed, Golemagg's Trust need to be checked
 SDCategory: Molten Core
 EndScriptData */
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "molten_core.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
 #include "ObjectAccessor.h"
 
 enum Texts

@@ -11,11 +11,11 @@ SDComment: Adds NYI
 SDCategory: Molten Core
 EndScriptData */
 
-#include "Containers.h"
+#include "ScriptMgr.h"
 #include "molten_core.h"
+#include "Containers.h"
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum Texts
