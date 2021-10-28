@@ -1504,7 +1504,7 @@ enum Thassarian
     PATH_LERYSSA               = 1013034,
     DATA_ARLOS                 = 1,
     DATA_LERYSSA               = 2,
-    DATA_TALBOT                = 3,
+    DATA_TALBOT                = 3
 };
 
 class npc_thassarian : public CreatureScript
@@ -1604,7 +1604,6 @@ public:
             }
         }
 
-        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32 param) override
         {
             if (type == WAYPOINT_MOTION_TYPE && param == 2)
@@ -1988,7 +1987,6 @@ public:
     {
         npc_general_arlosAI(Creature* creature) : ScriptedAI(creature) {}
 
-        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32 param) override
         {
             if (type == WAYPOINT_MOTION_TYPE && param == 2)
@@ -2022,7 +2020,6 @@ public:
     {
         npc_leryssaAI(Creature* creature) : ScriptedAI(creature) {}
 
-        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32 param) override
         {
             if (type == WAYPOINT_MOTION_TYPE && param == 2)
