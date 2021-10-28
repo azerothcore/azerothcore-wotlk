@@ -168,14 +168,14 @@ public:
 
             // Called when a creature/gameobject is added to map or removed from map.
     // Insert/Remove objectguid to dynamic guid store
-    virtual void OnCreatureCreate(Creature* creature) override;
-    virtual void OnCreatureRemove(Creature* creature) override;
+    void OnCreatureCreate(Creature* creature) override;
+    void OnCreatureRemove(Creature* creature) override;
 
-    virtual void OnGameObjectCreate(GameObject* go) override;
-    virtual void OnGameObjectRemove(GameObject* go) override;
+    void OnGameObjectCreate(GameObject* go) override;
+    void OnGameObjectRemove(GameObject* go) override;
 
     ObjectGuid GetObjectGuid(uint32 type) const;
-    virtual ObjectGuid GetGuidData(uint32 type) const override;
+    ObjectGuid GetGuidData(uint32 type) const override;
 
     Creature* GetCreature(uint32 type);
     GameObject* GetGameObject(uint32 type);
