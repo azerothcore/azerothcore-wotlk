@@ -165,6 +165,14 @@ public:
             }
         }
 
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+        {
+            if (me->GetHealth() <= damage)
+            {
+                damage = 0;
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (events.IsInPhase(EVENT_NORMAL_COMBAT))
