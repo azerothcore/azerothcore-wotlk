@@ -12,11 +12,11 @@ SDCategory: Molten Core
 EndScriptData */
 
 #include "ScriptMgr.h"
-#include "molten_core.h"
 #include "Containers.h"
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "molten_core.h"
 
 enum Texts
 {
