@@ -1580,7 +1580,7 @@ public:
             }
             me->setFaction(FACTION_VALIANCE_EXPEDITION);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             Initialize();
