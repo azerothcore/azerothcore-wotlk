@@ -82,7 +82,7 @@ int m_ServiceStatus = -1;
 #define _ACORE_CORE_CONFIG "worldserver.conf"
 #endif
 
-#define WORLD_SLEEP_CONST 10
+#define WORLD_SLEEP_CONST 15
 
 class FreezeDetector
 {
