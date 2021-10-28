@@ -77,9 +77,10 @@ public:
             events.Reset();
             summons.DespawnAll();
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
+            {
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
-
-            me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
+                me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
+            }
         }
 
         void KilledUnit(Unit* victim) override
