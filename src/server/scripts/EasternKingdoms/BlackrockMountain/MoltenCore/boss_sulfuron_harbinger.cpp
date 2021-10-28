@@ -62,75 +62,58 @@ public:
             events.ScheduleEvent(EVENT_FLAMESPEAR, 2000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void ExecuteEvent(uint32 eventId) override
         {
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+                case EVENT_DARK_STRIKE:
                 {
-                    case EVENT_DARK_STRIKE:
-                    {
-                        DoCastSelf(SPELL_DARK_STRIKE);
-                        events.RepeatEvent(urand(4000, 7000));
-                        break;
-                    }
-                    case EVENT_DEMORALIZING_SHOUT:
-                    {
-                        DoCastVictim(SPELL_DEMORALIZING_SHOUT);
-                        events.RepeatEvent(urand(12000, 18000));
-                        break;
-                    }
-                    case EVENT_INSPIRE:
+                    DoCastSelf(SPELL_DARK_STRIKE);
+                    events.RepeatEvent(urand(4000, 7000));
+                    break;
+                }
+                case EVENT_DEMORALIZING_SHOUT:
+                {
+                    DoCastVictim(SPELL_DEMORALIZING_SHOUT);
+                    events.RepeatEvent(urand(12000, 18000));
+                    break;
+                }
+                case EVENT_INSPIRE:
+                {
+                    std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
+                    if (!healers.empty())
                     {
                         std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
                         if (!healers.empty())
                         {
-                            std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
-                            if (!healers.empty())
-                            {
-                                DoCast(Acore::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
-                            }
-
-                            DoCast(me, SPELL_INSPIRE);
-                            events.ScheduleEvent(EVENT_INSPIRE, urand(20000, 26000));
-                            break;
+                            DoCast(Acore::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
                         }
 
-                        DoCastSelf(SPELL_INSPIRE);
-                        events.RepeatEvent(urand(13000, 20000));
+                        DoCast(me, SPELL_INSPIRE);
+                        events.ScheduleEvent(EVENT_INSPIRE, urand(20000, 26000));
                         break;
                     }
-                    case EVENT_KNOCKDOWN:
+
+                    DoCastSelf(SPELL_INSPIRE);
+                    events.RepeatEvent(urand(13000, 20000));
+                    break;
+                }
+                case EVENT_KNOCKDOWN:
+                {
+                    DoCastVictim(SPELL_KNOCKDOWN);
+                    events.RepeatEvent(urand(10000, 20000));
+                    break;
+                }
+                case EVENT_FLAMESPEAR:
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                     {
-                        DoCastVictim(SPELL_KNOCKDOWN);
-                        events.RepeatEvent(urand(10000, 20000));
-                        break;
+                        DoCast(target, SPELL_FLAMESPEAR);
                     }
-                    case EVENT_FLAMESPEAR:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                        {
-                            DoCast(target, SPELL_FLAMESPEAR);
-                        }
-                        events.RepeatEvent(urand(12000, 16000));
-                        break;
-                    }
+                    events.RepeatEvent(urand(12000, 16000));
+                    break;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
     };
 

@@ -40,69 +40,47 @@ public:
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 5000));
         }
 
-        void UpdateAI(uint32 diff) override
+        void ExecuteEvent(uint32 eventId) override
         {
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+                case EVENT_GEHENNAS_CURSE:
                 {
-                    case EVENT_GEHENNAS_CURSE:
+                    DoCastVictim(SPELL_GEHENNAS_CURSE);
+                    events.RepeatEvent(urand(25000, 30000));
+                    break;
+                }
+                case EVENT_RAIN_OF_FIRE:
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                     {
-                        DoCastVictim(SPELL_GEHENNAS_CURSE);
-                        events.RepeatEvent(urand(25000, 30000));
-                        break;
+                        DoCast(target, SPELL_RAIN_OF_FIRE, true);
                     }
-                    case EVENT_RAIN_OF_FIRE:
+                    events.RepeatEvent(6000);
+                    break;
+                }
+                case EVENT_SHADOW_BOLT:
+                {
+                    if (urand(0, 1))
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
                         {
-                            DoCast(target, SPELL_RAIN_OF_FIRE, true);
-                        }
-                        events.RepeatEvent(6000);
-                        break;
-                    }
-                    case EVENT_SHADOW_BOLT:
-                    {
-                        if (urand(0, 1))
-                        {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
-                            {
-                                DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
-                            }
-                            else
-                            {
-                                DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
-                            }
+                            DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
                         }
                         else
                         {
                             DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
                         }
-
-                        events.RepeatEvent(5000);
-                        break;
                     }
-                }
+                    else
+                    {
+                        DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
+                    }
 
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                {
-                    return;
+                    events.RepeatEvent(5000);
+                    break;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
     };
 

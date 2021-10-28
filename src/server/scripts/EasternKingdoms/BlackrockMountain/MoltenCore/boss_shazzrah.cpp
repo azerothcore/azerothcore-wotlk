@@ -48,62 +48,45 @@ public:
             events.ScheduleEvent(EVENT_SHAZZRAH_GATE, 30000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void ExecuteEvent(uint32 eventId) override
         {
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+                case EVENT_ARCANE_EXPLOSION:
                 {
-                    case EVENT_ARCANE_EXPLOSION:
+                    DoCastVictim(SPELL_ARCANE_EXPLOSION);
+                    events.RepeatEvent(urand(4000, 5000));
+                    break;
+                }
+                case EVENT_SHAZZRAH_CURSE:
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
                     {
-                        DoCastVictim(SPELL_ARCANE_EXPLOSION);
-                        events.RepeatEvent(urand(4000, 5000));
-                        break;
+                        DoCast(target, SPELL_SHAZZRAH_CURSE);
                     }
-                    case EVENT_SHAZZRAH_CURSE:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
-                        {
-                            DoCast(target, SPELL_SHAZZRAH_CURSE);
-                        }
-                        events.RepeatEvent(urand(23000, 26000));
-                        break;
-                    }
-                    case EVENT_MAGIC_GROUNDING:
-                    {
-                        DoCastSelf(SPELL_MAGIC_GROUNDING);
-                        events.RepeatEvent(urand(7000, 9000));
-                        break;
-                    }
-                    case EVENT_COUNTERSPELL:
-                    {
-                        DoCastAOE(SPELL_COUNTERSPELL);
-                        events.RepeatEvent(urand(15000, 18000));
-                        break;
-                    }
-                    case EVENT_SHAZZRAH_GATE:
-                    {
-                        DoCastAOE(SPELL_SHAZZRAH_GATE_DUMMY);
-                        events.RescheduleEvent(EVENT_ARCANE_EXPLOSION, urand(3000, 6000));
-                        events.RepeatEvent(45000);
-                        break;
-                    }
+                    events.RepeatEvent(urand(23000, 26000));
+                    break;
+                }
+                case EVENT_MAGIC_GROUNDING:
+                {
+                    DoCastSelf(SPELL_MAGIC_GROUNDING);
+                    events.RepeatEvent(urand(7000, 9000));
+                    break;
+                }
+                case EVENT_COUNTERSPELL:
+                {
+                    DoCastAOE(SPELL_COUNTERSPELL);
+                    events.RepeatEvent(urand(15000, 18000));
+                    break;
+                }
+                case EVENT_SHAZZRAH_GATE:
+                {
+                    DoCastAOE(SPELL_SHAZZRAH_GATE_DUMMY);
+                    events.RescheduleEvent(EVENT_ARCANE_EXPLOSION, urand(3000, 6000));
+                    events.RepeatEvent(45000);
+                    break;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
     };
 

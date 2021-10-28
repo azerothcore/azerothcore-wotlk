@@ -45,9 +45,7 @@ constexpr float MELEE_TARGET_LOOKUP_DIST = 10.0f;
 class boss_magmadar : public CreatureScript
 {
 public:
-    boss_magmadar() : CreatureScript("boss_magmadar")
-    {
-    }
+    boss_magmadar() : CreatureScript("boss_magmadar") {}
 
     struct boss_magmadarAI : public BossAI
     {
@@ -62,71 +60,49 @@ public:
             events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 15000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void ExecuteEvent(uint32 eventId) override
         {
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+                case EVENT_FRENZY:
                 {
-                    case EVENT_FRENZY:
-                    {
-                        Talk(EMOTE_FRENZY);
-                        DoCastSelf(SPELL_FRENZY);
-                        events.RepeatEvent(urand(15000, 20000));
-                        break;
-                    }
-                    case EVENT_PANIC:
-                    {
-                        DoCastVictim(SPELL_PANIC);
-                        events.RepeatEvent(urand(31000, 38000));
-                        break;
-                    }
-                    case EVENT_LAVA_BOMB:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, MELEE_TARGET_LOOKUP_DIST, true))
-                        {
-                            DoCast(target, SPELL_LAVA_BOMB);
-                        }
-
-                        events.RepeatEvent(urand(12000, 15000));
-                        break;
-                    }
-                    case EVENT_LAVA_BOMB_RANGED:
-                    {
-                        std::list<Unit*> targets;
-                        SelectTargetList(targets, [this](Unit* target)
-                        {
-                            return target && target->GetTypeId() == TYPEID_PLAYER && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
-                        }, 1, SELECT_TARGET_RANDOM);
-
-                        if (!targets.empty())
-                        {
-                            DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
-                        }
-                        events.RepeatEvent(urand(12000, 15000));
-                        break;
-                    }
+                    Talk(EMOTE_FRENZY);
+                    DoCastSelf(SPELL_FRENZY);
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
                 }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
+                case EVENT_PANIC:
                 {
-                    return;
+                    DoCastVictim(SPELL_PANIC);
+                    events.RepeatEvent(urand(31000, 38000));
+                    break;
+                }
+                case EVENT_LAVA_BOMB:
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, MELEE_TARGET_LOOKUP_DIST, true))
+                    {
+                        DoCast(target, SPELL_LAVA_BOMB);
+                    }
+
+                    events.RepeatEvent(urand(12000, 15000));
+                    break;
+                }
+                case EVENT_LAVA_BOMB_RANGED:
+                {
+                    std::list<Unit*> targets;
+                    SelectTargetList(targets, [this](Unit* target)
+                    {
+                        return target && target->GetTypeId() == TYPEID_PLAYER && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
+                    }, 1, SELECT_TARGET_RANDOM);
+
+                    if (!targets.empty())
+                    {
+                        DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
+                    }
+                    events.RepeatEvent(urand(12000, 15000));
+                    break;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
     };
 
