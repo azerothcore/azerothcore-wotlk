@@ -1455,7 +1455,7 @@ public:
                 return true;
             }
 
-            LOG_DEBUG("scripts.ai", "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
+            LOG_DEBUG("scripts.ai", "npc_commander_dawnforge event already in progress, need to wait.");
             return false;
         }
 
