@@ -30,6 +30,7 @@
 #include "GuildMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -1088,6 +1089,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
         sScriptMgr->OnFirstLogin(pCurrChar);
     }
+
+    METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 }
 
 void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
