@@ -1,3 +1,19 @@
+-- DB update 2021_10_28_04 -> 2021_10_28_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_28_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_28_04 2021_10_28_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1634741438848895794'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634741438848895794');
 
 SET @SIMONE_MENUID := 5868;
@@ -26,3 +42,13 @@ UPDATE `creature_template` SET `gossip_menu_id` = @NELSON_MENUID WHERE (`entry` 
 
 -- Delete the unneeded/unused creature texts
 DELETE FROM `creature_text` WHERE `CreatureID` IN (14527, 14529, 14531, 14536);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_28_05' WHERE sql_rev = '1634741438848895794';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
