@@ -9715,7 +9715,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    if (creature && !IsControlledByPlayer())
+    if (creature && !(IsControllableGuardian() && IsControlledByPlayer()))
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);

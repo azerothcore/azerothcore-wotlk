@@ -56,12 +56,42 @@ void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= nullptr*/)
     sCreatureTextMgr->SendChat(me, id, whisperTarget);
 }
 
-void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRangeToNearestTarget /* = 50.0f*/)
+inline bool IsValidCombatTarget(Creature* source, Player* target)
+{
+    if (target->IsGameMaster())
+    {
+        return false;
+    }
+
+    if (!source->IsInWorld() || !target->IsInWorld())
+    {
+        return false;
+    }
+
+    if (!source->IsAlive() || !target->IsAlive())
+    {
+        return false;
+    }
+
+    if (!source->InSamePhase(target))
+    {
+        return false;
+    }
+
+    if (source->HasUnitState(UNIT_STATE_IN_FLIGHT) || target->HasUnitState(UNIT_STATE_IN_FLIGHT))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/)
 {
     if (!creature)
         creature = me;
 
-    if (!creature->CanHaveThreatList() || creature->IsInEvadeMode())
+    if (creature->IsInEvadeMode())
         return;
 
     Map* map = creature->GetMap();
@@ -71,31 +101,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
         return;
     }
 
-    if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
-    {
-        if (Unit* nearTarget = creature->SelectNearestTarget(maxRangeToNearestTarget))
-            creature->AI()->AttackStart(nearTarget);
-        else if (creature->IsSummon())
-        {
-            if (Unit* summoner = creature->ToTempSummon()->GetSummonerUnit())
-            {
-                Unit* target = summoner->getAttackerForHelper();
-                if (!target && summoner->CanHaveThreatList() && !summoner->getThreatMgr().isThreatListEmpty())
-                    target = summoner->getThreatMgr().getHostilTarget();
-                if (target && (creature->IsFriendlyTo(summoner) || creature->IsHostileTo(target)))
-                    creature->AI()->AttackStart(target);
-            }
-        }
-    }
-
-    if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
-    {
-        LOG_ERROR("entities.unit.ai", "DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
-        return;
-    }
-
     Map::PlayerList const& playerList = map->GetPlayers();
-
     if (playerList.isEmpty())
         return;
 
@@ -103,13 +109,16 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     {
         if (Player* player = itr->GetSource())
         {
-            if (player->IsGameMaster())
-                continue;
-
-            if (player->IsAlive())
+            if (!IsValidCombatTarget(creature, player))
             {
-                creature->SetInCombatWith(player);
-                player->SetInCombatWith(creature);
+                continue;
+            }
+
+            creature->SetInCombatWith(player);
+            player->SetInCombatWith(creature);
+
+            if (creature->CanHaveThreatList())
+            {
                 creature->AddThreat(player, 0.0f);
             }
 
