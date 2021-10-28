@@ -1905,7 +1905,7 @@ public:
                     break;
                 case EVENT_THASSARIAN_SCRIPT_29:
                     Cleanup();
-                    me->DespawnOrUnsummon(30000); // *** ISSUE Should have 2 min respawn ***
+                    me->DespawnOrUnsummon(30000ms, 120s);
                     break;
                 default:
                     break;
@@ -1923,6 +1923,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Cleanup();
+            me->DespawnOrUnsummon(1000ms, 120s);
         }
 
         void Cleanup()
