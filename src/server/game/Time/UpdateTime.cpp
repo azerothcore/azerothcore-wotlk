@@ -31,7 +31,6 @@ UpdateTime::UpdateTime()
     _maxUpdateTime = 0;
     _maxUpdateTimeOfLastTable = 0;
     _maxUpdateTimeOfCurrentTable = 0;
-    _recordedTime = 0;
 
     _updateTimeDataTable = { };
 }
@@ -98,44 +97,28 @@ void UpdateTime::UpdateWithDiff(uint32 diff)
 
 void UpdateTime::RecordUpdateTimeReset()
 {
-    _recordedTime = getMSTime();
-}
-
-void UpdateTime::_RecordUpdateTimeDuration(std::string const& text, uint32 minUpdateTime)
-{
-    uint32 thisTime = getMSTime();
-    uint32 diff = getMSTimeDiff(_recordedTime, thisTime);
-
-    if (diff > minUpdateTime)
-        FMT_LOG_DEBUG("time.update", "Recored Update Time of {}: {}ms.", text, diff);
-
-    _recordedTime = thisTime;
+    _recordedTime = GetTimeMS();
 }
 
 void WorldUpdateTime::LoadFromConfig()
 {
-    _recordUpdateTimeInverval = sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 60000);;
-    _recordUpdateTimeMin = sConfigMgr->GetOption<uint32>("MinRecordUpdateTimeDiff", 100);
+    _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 60000));
+    _recordUpdateTimeMin = Milliseconds(sConfigMgr->GetOption<uint32>("MinRecordUpdateTimeDiff", 100));
 }
 
-void WorldUpdateTime::SetRecordUpdateTimeInterval(uint32 t)
+void WorldUpdateTime::SetRecordUpdateTimeInterval(Milliseconds t)
 {
     _recordUpdateTimeInverval = t;
 }
 
-void WorldUpdateTime::RecordUpdateTime(uint32 gameTimeMs, uint32 diff, uint32 sessionCount)
+void WorldUpdateTime::RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uint32 sessionCount)
 {
-    if (_recordUpdateTimeInverval > 0 && diff > _recordUpdateTimeMin)
+    if (_recordUpdateTimeInverval > 0s && diff > _recordUpdateTimeMin.count())
     {
-        if (getMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
+        if (GetMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
         {
             FMT_LOG_INFO("time.update", "Update time diff: {}. Players online: {}.", GetAverageUpdateTime(), sessionCount);
             _lastRecordTime = gameTimeMs;
         }
     }
-}
-
-void WorldUpdateTime::RecordUpdateTimeDuration(std::string const& text)
-{
-    _RecordUpdateTimeDuration(text, _recordUpdateTimeMin);
 }

@@ -19,6 +19,7 @@
 #define __UPDATETIME_H
 
 #include "Define.h"
+#include "Duration.h"
 #include <array>
 #include <string>
 
@@ -42,8 +43,6 @@ public:
 protected:
     UpdateTime();
 
-    void _RecordUpdateTimeDuration(std::string const& text, uint32 minUpdateTime);
-
 private:
     DiffTableArray _updateTimeDataTable;
     uint32 _averageUpdateTime;
@@ -53,7 +52,7 @@ private:
     uint32 _maxUpdateTimeOfLastTable;
     uint32 _maxUpdateTimeOfCurrentTable;
 
-    uint32 _recordedTime;
+    Milliseconds _recordedTime;
 };
 
 class AC_GAME_API WorldUpdateTime : public UpdateTime
@@ -61,14 +60,14 @@ class AC_GAME_API WorldUpdateTime : public UpdateTime
 public:
     WorldUpdateTime() : UpdateTime(), _recordUpdateTimeInverval(0), _recordUpdateTimeMin(0), _lastRecordTime(0) { }
     void LoadFromConfig();
-    void SetRecordUpdateTimeInterval(uint32 t);
-    void RecordUpdateTime(uint32 gameTimeMs, uint32 diff, uint32 sessionCount);
+    void SetRecordUpdateTimeInterval(Milliseconds t);
+    void RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uint32 sessionCount);
     void RecordUpdateTimeDuration(std::string const& text);
 
 private:
-    uint32 _recordUpdateTimeInverval;
-    uint32 _recordUpdateTimeMin;
-    uint32 _lastRecordTime;
+    Milliseconds _recordUpdateTimeInverval;
+    Milliseconds _recordUpdateTimeMin;
+    Milliseconds _lastRecordTime;
 };
 
 AC_GAME_API extern WorldUpdateTime sWorldUpdateTime;
