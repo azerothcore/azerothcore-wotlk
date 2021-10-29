@@ -203,3 +203,10 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 
 -- Removed script for "Son of Flame"
 update `creature_template` set `ScriptName`='' where `entry`=12143;
+
+-- Garr linked respawn data
+-- set @garrGUID := (SELECT `guid` from `creature` WHERE `id` = 12101 AND `map`=409);
+SET @garrGUID := 56683;
+DELETE FROM `linked_respawn` WHERE `guid` IN (SELECT `guid` from `creature` WHERE `id` = 12101 AND `map`=409);
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`)
+SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` = 12101 AND `map`=409;
