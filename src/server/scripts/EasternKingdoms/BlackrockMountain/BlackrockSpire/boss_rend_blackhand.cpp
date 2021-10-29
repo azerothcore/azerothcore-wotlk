@@ -137,7 +137,7 @@ public:
 
         void SummonedCreatureDies(Creature* /*creature*/, Unit* /*killer*/) override
         {
-            if (!summons.HasCreatureAlive())
+            if (!summons.IsAnyCreatureAlive())
             {
                 events.ScheduleEvent(EVENT_WAVES_TEXT_1 + _currentWave, 5 * IN_MILLISECONDS);
             }
@@ -149,15 +149,11 @@ public:
 
             if (summon->GetEntry() == NPC_GYTH)
             {
-                summon->AI()->SetData(1, 1);
                 me->DespawnOrUnsummon();
                 return;
             }
 
-            if (Unit* target = SelectTargetFromPlayerList(100.0f))
-                summon->AI()->AttackStart(target);
-            else
-                Reset();
+            summon->AI()->DoZoneInCombat(nullptr, 100.0f);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -190,7 +186,7 @@ public:
 
         void SummonedCreatureDespawn(Creature* creature) override
         {
-            if (creature->IsAlive())
+            if (creature->IsAlive() && !summons.IsAnyCreatureInCombat())
             {
                 instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
             }

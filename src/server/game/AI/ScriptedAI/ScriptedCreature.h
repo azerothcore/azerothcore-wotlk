@@ -89,7 +89,8 @@ public:
     void Despawn(Creature const* summon) { storage_.remove(summon->GetGUID()); }
     void DespawnEntry(uint32 entry);
     void DespawnAll();
-    bool HasCreatureAlive() const;
+    bool IsAnyCreatureAlive() const;
+    bool IsAnyCreatureInCombat() const;
 
     template <typename T>
     void DespawnIf(T const& predicate)

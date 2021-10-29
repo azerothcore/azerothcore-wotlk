@@ -55,12 +55,9 @@ public:
     {
         boss_gythAI(Creature* creature) : BossAI(creature, DATA_GYTH) { }
 
-        bool SummonedRend;
-        ObjectGuid rendGUID;
-
         void Reset() override
         {
-            SummonedRend = false;
+            _summonedRend = false;
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
                 instance->SetBossState(DATA_GYTH, NOT_STARTED);
@@ -79,27 +76,15 @@ public:
             events.ScheduleEvent(EVENT_KNOCK_AWAY, urand(12000, 18000));
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetBossState(DATA_GYTH, DONE);
-        }
-
-        void SetData(uint32 /*type*/, uint32 data) override
-        {
-            switch (data)
-            {
-                case 1:
-                    events.ScheduleEvent(EVENT_SUMMONED_1, 1000);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         void EnterEvadeMode() override
         {
             instance->SetBossState(DATA_GYTH, FAIL);
             BossAI::EnterEvadeMode();
+        }
+
+        void IsSummonedBy(Unit* /*summoner*/) override
+        {
+            events.ScheduleEvent(EVENT_SUMMONED_1, 1000);
         }
 
         void JustSummoned(Creature* summon) override
@@ -110,11 +95,11 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!SummonedRend && HealthBelowPct(25))
+            if (!_summonedRend && HealthBelowPct(25))
             {
                 DoCast(me, SPELL_SUMMON_REND);
                 me->RemoveAura(SPELL_REND_MOUNTS);
-                SummonedRend = true;
+                _summonedRend = true;
             }
 
             if (!UpdateVictim())
@@ -171,6 +156,9 @@ public:
             }
             DoMeleeAttackIfReady();
         }
+
+        private:
+            bool _summonedRend;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
