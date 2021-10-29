@@ -28,8 +28,9 @@ Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
 
 MinionData const minionData[] =
 {
-    { NPC_FIRESWORN, DATA_GARR },
-    { NPC_FLAMEWALKER, DATA_GEHENNAS },
+    { NPC_FIRESWORN,                DATA_GARR },
+    { NPC_FLAMEWALKER,              DATA_GEHENNAS },
+    { NPC_FLAMEWALKER_PROTECTOR,    DATA_LUCIFRON },
     { 0, 0 } // END
 };
 
@@ -80,6 +81,7 @@ public:
                     break;
                 }
                 case NPC_FLAMEWALKER:
+                case NPC_FLAMEWALKER_PROTECTOR:
                 {
                     AddMinion(creature, true);
                     break;
@@ -98,6 +100,7 @@ public:
                     break;
                 }
                 case NPC_FLAMEWALKER:
+                case NPC_FLAMEWALKER_PROTECTOR:
                 {
                     AddMinion(creature, false);
                     break;

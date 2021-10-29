@@ -46,7 +46,6 @@ Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
 
 enum MCCreatures
 {
-    NPC_LUCIFRON                    = 12118,
     NPC_MAGMADAR                    = 11982,
     NPC_SHAZZRAH                    = 12264,
     NPC_BARON_GEDDON                = 12056,
@@ -68,6 +67,10 @@ enum MCCreatures
     // Golemagg
     NPC_GOLEMAGG_THE_INCINERATOR    = 11988,
     NPC_CORE_RAGER                  = 11672,
+
+    // Lucifron
+    NPC_LUCIFRON                    = 12118,
+    NPC_FLAMEWALKER_PROTECTOR       = 12119,
 };
 
 enum MCGameObjects
