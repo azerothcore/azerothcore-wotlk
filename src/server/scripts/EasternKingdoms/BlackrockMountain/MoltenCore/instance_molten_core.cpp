@@ -96,7 +96,6 @@ public:
                 case NPC_FIRESWORN:
                 {
                     AddMinion(creature, true);
-                    _garrMinionsGUIDs.insert(creature->GetGUID());
                     break;
                 }
                 case NPC_FLAMEWALKER:
@@ -115,7 +114,6 @@ public:
                 case NPC_FIRESWORN:
                 {
                     AddMinion(creature, false);
-                    _garrMinionsGUIDs.erase(creature->GetGUID());
                     break;
                 }
                 case NPC_FLAMEWALKER:
@@ -212,22 +210,6 @@ public:
             if (!InstanceScript::SetBossState(bossId, state))
             {
                 return false;
-            }
-
-            if (bossId == DATA_GARR && state == DONE)
-            {
-                if (!_garrMinionsGUIDs.empty())
-                {
-                    for (ObjectGuid const& guid : _garrMinionsGUIDs)
-                    {
-                        if (Creature* minion = instance->GetCreature(guid))
-                        {
-                            minion->DespawnOrUnsummon();
-                        }
-                    }
-
-                    _garrMinionsGUIDs.clear();
-                }
             }
 
             if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
@@ -348,8 +330,6 @@ public:
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;
         ObjectGuid _garrGUID;
-
-        GuidSet _garrMinionsGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
