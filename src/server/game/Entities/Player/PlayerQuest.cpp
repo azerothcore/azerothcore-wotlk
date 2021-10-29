@@ -1604,16 +1604,32 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
-        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) ||
-            (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
+        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
         {
-            if (quest->IsAutoComplete() && quest->IsRepeatable() && !quest->IsDailyOrWeekly())
-                result2 = DIALOG_STATUS_REWARD_REP;
+            if (quest->IsRepeatable() && quest->IsDailyOrWeekly())
+            {
+                if (quest->IsAutoComplete())
+                {
+                    result2 = DIALOG_STATUS_AVAILABLE_REP;
+                }
+                else
+                {
+                    result2 = DIALOG_STATUS_REWARD_REP;
+                }
+            }
+            else if (quest->IsAutoComplete())
+            {
+                result2 = DIALOG_STATUS_AVAILABLE;
+            }
             else
+            {
                 result2 = DIALOG_STATUS_REWARD;
+            }
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
+        {
             result2 = DIALOG_STATUS_INCOMPLETE;
+        }
 
         if (result2 > result)
             result = result2;
