@@ -16,6 +16,7 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "molten_core.h"
 
 enum Texts
@@ -29,7 +30,7 @@ enum Spells
     SPELL_ANTIMAGIC_PULSE               = 19492,
     SPELL_MAGMA_SHACKLES                = 19496,
     SPELL_ENRAGE                        = 19516,
-    //SPELL_SEPARATION_ANXIETY            = 23487,    // Aura cast on himself by Garr, if adds move out of range, they will cast spell 23492 on themselves
+    SPELL_SEPARATION_ANXIETY            = 23487,    // Aura cast on himself by Garr, if adds move out of range, they will cast spell 23492 on themselves (server side)
 
     // Fireworn
     SPELL_SEPARATION_ANXIETY_MINION     = 23492,
@@ -65,6 +66,7 @@ public:
         void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
+            DoCastSelf(SPELL_SEPARATION_ANXIETY, true);
             events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
             events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
             massEruptionTimer = 600000;
@@ -132,92 +134,52 @@ public:
     }
 };
 
-class npc_firesworn : public CreatureScript
+// 23487 Separation Anxiety (server side)
+class spell_garr_separation_nexiety : public SpellScriptLoader
 {
 public:
-    npc_firesworn() : CreatureScript("npc_firesworn") {}
+    spell_garr_separation_nexiety() : SpellScriptLoader("spell_garr_separation_nexiety") {}
 
-    struct npc_fireswornAI : public ScriptedAI
+    class spell_garr_separation_nexiety_AuraScript : public AuraScript
     {
-        npc_fireswornAI(Creature* creature) : ScriptedAI(creature),
-            instance(creature->GetInstanceScript()),
-            anxietyTimer(10000),
-            canErrupt(true)
+        PrepareAuraScript(spell_garr_separation_nexiety_AuraScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
         {
+            return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
         }
 
-        void EnterCombat(Unit* /*attacker*/) override {}
-
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+        void HandleAuraRemoval(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            if (canErrupt && damage >= me->GetHealth() && attacker->GetGUID() != me->GetGUID())
-            {
-                canErrupt = false;
-                DoCastAOE(SPELL_ERUPTION, true);
-                Unit::Kill(attacker, me);
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Creature* garr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GARR)))
-            {
-                garr->CastSpell(garr, SPELL_ENRAGE, true);
-            }
-        }
-
-        void SpellHit(Unit* /*caster*/, SpellInfo const* pSpell) override
-        {
-            if (pSpell->Id == SPELL_ERUPTION_TRIGGER)
-            {
-                canErrupt = false;
-                DoCastAOE(SPELL_MASSIVE_ERUPTION);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
+            AuraRemoveMode const removeMode = GetTargetApplication()->GetRemoveMode();
+            if (removeMode == AURA_REMOVE_BY_DEATH || removeMode == AURA_REMOVE_BY_DEFAULT)
             {
                 return;
             }
 
-            if (anxietyTimer <= diff)
+            if (Unit* target = GetTarget())
             {
-                if (!me->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
-                {
-                    if (Creature const* garr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GARR)))
-                    {
-                        if (me->IsWithinDist(garr, 45.0f))
-                        {
-                            DoCastSelf(SPELL_SEPARATION_ANXIETY_MINION);
-                        }
-                    }
-                }
-
-                anxietyTimer = 250;
+                target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION);
             }
-            else
-            {
-                anxietyTimer -= diff;
-            }
-
-            DoMeleeAttackIfReady();
         }
-    private:
-        InstanceScript const* instance;
-        uint32 anxietyTimer;
-        bool canErrupt;
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_garr_separation_nexiety_AuraScript::HandleAuraRemoval, EFFECT_0, SPELL_AURA_DUMMY, AuraEffectHandleModes::AURA_EFFECT_HANDLE_REAL);
+        }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    // Should return a fully valid AuraScript pointer.
+    AuraScript* GetAuraScript() const override
     {
-        return GetMoltenCoreAI<npc_fireswornAI>(creature);
+        return new spell_garr_separation_nexiety_AuraScript();
     }
 };
 
 void AddSC_boss_garr()
 {
     new boss_garr();
-    new npc_firesworn();
+
+    // Spells
+    spell_garr_separation_nexiety();
 }

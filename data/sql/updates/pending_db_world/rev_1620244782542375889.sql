@@ -186,3 +186,16 @@ WaypointMovementGenerator::LoadPath: creature Flamewaker Protector (GUID Full: 0
 WaypointMovementGenerator::LoadPath: creature Flamewaker Protector (GUID Full: 0xf130002f5700006d Type: Creature Entry: 12119  Low: 109) doesn't have waypoint path id: 566070
 */
 UPDATE `creature_addon` SET `path_id`='0' WHERE `guid` IN (56606, 56607);
+update `creature` set `MovementType`=0 where `guid` IN (56606, 56607);
+
+-- Gar Firesworn - removed its script because Separation Anexiety been implemented by aura script
+UPDATE `creature_template` SET `ScriptName`='' WHERE  `entry`=12099;
+
+-- Gar "Separation Anexiety"(23487, server side)
+DELETE FROM `spell_script_names` WHERE `spell_id`=23487 AND `ScriptName`='spell_garr_separation_nexiety';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(23487, 'spell_garr_separation_nexiety');
+
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=23487 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=12099 AND `ConditionValue3`=0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 23487, 0, 0, 31, 0, 3, 12099, 0, 0, 0, 0, '', 'Separation Anexiety (effect 0) - should target only Firesworn');
