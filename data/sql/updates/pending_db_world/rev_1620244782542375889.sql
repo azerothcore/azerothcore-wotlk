@@ -188,10 +188,10 @@ WaypointMovementGenerator::LoadPath: creature Flamewaker Protector (GUID Full: 0
 UPDATE `creature_addon` SET `path_id`='0' WHERE `guid` IN (56606, 56607);
 update `creature` set `MovementType`=0 where `guid` IN (56606, 56607);
 
--- Gar Firesworn - removed its script because Separation Anexiety been implemented by aura script
-UPDATE `creature_template` SET `ScriptName`='' WHERE  `entry`=12099;
+-- Garr's Firesworn
+UPDATE `creature_template` SET `ScriptName`='npc_garr_firesworn' WHERE `entry`=12099;
 
--- Gar "Separation Anexiety"(23487, server side)
+-- Garr's "Separation Anexiety"(23487, server side)
 UPDATE `spell_dbc` SET `EffectAura_1`=226, `EffectAuraPeriod_1`=1000 WHERE  `Id`=23487;
 DELETE FROM `spell_script_names` WHERE `spell_id`=23487 AND `ScriptName`='spell_garr_separation_nexiety';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
@@ -204,9 +204,31 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 -- Removed script for "Son of Flame"
 update `creature_template` set `ScriptName`='' where `entry`=12143;
 
--- Garr linked respawn data
+-- Garr's linked respawn data
 -- set @garrGUID := (SELECT `guid` from `creature` WHERE `id` = 12101 AND `map`=409);
 SET @garrGUID := 56683;
 DELETE FROM `linked_respawn` WHERE `guid` IN (SELECT `guid` from `creature` WHERE `id` = 12101 AND `map`=409);
 INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`)
 SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` = 12101 AND `map`=409;
+
+-- "19515 Frenzy (SERVERSIDE)" used by Garr's Firesworn
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=19515 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=1 AND `ConditionValue1`=3 AND `ConditionValue2`=12057 AND `ConditionValue3`=0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 19515, 0, 0, 31, 1, 3, 12057, 0, 0, 0, 0, '', 'Frenzy (SERVERSIDE) - should target only Garr');
+
+-- Allow casting while dead
+update `spell_dbc` set `attributesEx`=`attributesEx` | 0x00800000 where `id` = 19515;
+
+DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=19515 AND `spell_effect`=19516 AND `type`=1;
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
+(19515, 19516, 1, 'Frenzy - On Hit - Trigger Enrage');
+
+-- 20482 Firesworn Eruption Trigger (SERVERSIDE)
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=17 AND `SourceGroup`=0 AND `SourceEntry`=20482 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=1 AND `ConditionValue1`=3 AND `ConditionValue2`=12099 AND `ConditionValue3`=0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(17, 0, 20482, 0, 0, 31, 1, 3, 12099, 0, 0, 0, 0, '', 'spell "Firesworn Eruption Trigger" should target only Firesworn');
+
+-- 20482 Firesworn Eruption Trigger (SERVERSIDE)
+DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=20482 AND `spell_effect`=20483 AND `type`=1;
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
+(20482, 20483, 1, 'Firesworn Eruption Trigger - On Hit - Trigger Massive Eruption');

@@ -32,16 +32,16 @@ enum Texts
 enum Spells
 {
     // Garr
-    SPELL_ANTIMAGIC_PULSE               = 19492,
-    SPELL_MAGMA_SHACKLES                = 19496,
-    SPELL_ENRAGE                        = 19516,
+    SPELL_ANTIMAGIC_PULSE               = 19492,    // Dispels magic on nearby enemies, removing 1 beneficial spell
+    SPELL_MAGMA_SHACKLES                = 19496,    // Reduces the movement speed of nearby enemies by 60%
     SPELL_SEPARATION_ANXIETY            = 23487,    // Aura cast on himself by Garr, if adds move out of range, they will cast spell 23492 on themselves (server side)
 
     // Fireworn
-    SPELL_SEPARATION_ANXIETY_MINION     = 23492,
-    SPELL_ERUPTION                      = 19497,
-    SPELL_MASSIVE_ERUPTION              = 20483,
-    SPELL_ERUPTION_TRIGGER              = 20482,    // Removes banish auras and applied immunity to banish
+    SPELL_SEPARATION_ANXIETY_MINION     = 23492,    // Increases damage done by 300% and applied banish immunity
+    SPELL_ERUPTION                      = 19497,    // Deals fire aoe damage and knockbacks nearby enemies
+    SPELL_MASSIVE_ERUPTION              = 20483,    // Deals fire aoe damage, knockbacks nearby enemies and kills caster
+    SPELL_ERUPTION_TRIGGER              = 20482,    // Removes banish auras and applied immunity to banish (server side)
+    SPELL_ENRAGE_TRIGGER                = 19515,    // Server side. Triggers 19516 on hit
 };
 
 enum Events
@@ -58,7 +58,7 @@ public:
     struct boss_garrAI : public BossAI
     {
         boss_garrAI(Creature* creature) : BossAI(creature, DATA_GARR),
-            massEruptionTimer(600000)
+            massEruptionTimer(600000)   // 10 mins
         {
         }
 
@@ -84,6 +84,7 @@ public:
                 return;
             }
 
+            // This should always process
             if (massEruptionTimer <= diff)
             {
                 Talk(EMOTE_MASS_ERRUPTION, me);
@@ -139,6 +140,33 @@ public:
     }
 };
 
+class npc_garr_firesworn : public CreatureScript
+{
+public:
+    npc_garr_firesworn() : CreatureScript("npc_garr_firesworn") {}
+
+    struct npc_garr_fireswornAI : public ScriptedAI
+    {
+        npc_garr_fireswornAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void JustDied(Unit* killer) override
+        {
+            // Prevent double damage because Firesworn can kill himself with Massive Erruption
+            if (me != killer)
+            {
+                DoCastSelf(SPELL_ERUPTION, true);
+            }
+
+            DoCastAOE(SPELL_ENRAGE_TRIGGER, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetMoltenCoreAI<npc_garr_fireswornAI>(creature);
+    }
+};
+
 // 23487 Separation Anxiety (server side)
 class spell_garr_separation_nexiety : public SpellScriptLoader
 {
@@ -180,6 +208,7 @@ public:
 void AddSC_boss_garr()
 {
     new boss_garr();
+    new npc_garr_firesworn();
 
     // Spells
     new spell_garr_separation_nexiety();
