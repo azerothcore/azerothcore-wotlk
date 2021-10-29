@@ -18,6 +18,7 @@
 #include "MapTree.h"
 #include "Errors.h"
 #include "Log.h"
+#include "Metric.h"
 #include "ModelInstance.h"
 #include "VMapDefinitions.h"
 #include "VMapMgr2.h"
@@ -452,6 +453,10 @@ namespace VMAP
         {
             iLoadedTiles[packTileID(tileX, tileY)] = false;
         }
+
+        METRIC_EVENT("map_events", "LoadMapTile",
+            "Map: " + std::to_string(iMapID) + " TileX: " + std::to_string(tileX) + " TileY: " + std::to_string(tileY));
+
         return result;
     }
 
@@ -518,6 +523,9 @@ namespace VMAP
             }
         }
         iLoadedTiles.erase(tile);
+
+        METRIC_EVENT("map_events", "UnloadMapTile",
+            "Map: " + std::to_string(iMapID) + " TileX: " + std::to_string(tileX) + " TileY: " + std::to_string(tileY));
     }
 
     void StaticMapTree::GetModelInstances(ModelInstance*& models, uint32& count)

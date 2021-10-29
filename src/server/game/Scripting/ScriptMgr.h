@@ -41,7 +41,6 @@ class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
 class Channel;
-class ChatCommand;
 class Creature;
 class CreatureAI;
 class DynamicObject;
@@ -80,6 +79,11 @@ struct ItemTemplate;
 struct OutdoorPvPData;
 struct GroupQueueInfo;
 struct TargetInfo;
+
+namespace Acore::ChatCommands
+{
+    struct ChatCommandBuilder;
+}
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
@@ -579,7 +583,7 @@ protected:
 
 public:
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-    [[nodiscard]] virtual std::vector<ChatCommand> GetCommands() const = 0;
+    [[nodiscard]] virtual std::vector<Acore::ChatCommands::ChatCommandBuilder> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -729,6 +733,9 @@ public:
     // Called when a player kills another player
     virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
 
+    // Called when a player toggles pvp
+    virtual void OnPlayerPVPFlagChange(Player* /*player*/, bool /*state*/) { }
+
     // Called when a player kills a creature
     virtual void OnCreatureKill(Player* /*killer*/, Creature* /*killed*/) { }
 
@@ -840,6 +847,9 @@ public:
 
     // Called when a player is added to battleground
     virtual void OnAddToBattleground(Player* /*player*/, Battleground* /*bg*/) { }
+
+    // Called when a player queues a Random Dungeon using the RDF (Random Dungeon Finder)
+    virtual void OnQueueRandomDungeon(Player* /*player*/, uint32 & /*rDungeonId*/) { }
 
     // Called when a player is removed from battleground
     virtual void OnRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) { }
@@ -1560,7 +1570,7 @@ public: /* OutdoorPvPScript */
     OutdoorPvP* CreateOutdoorPvP(OutdoorPvPData const* data);
 
 public: /* CommandScript */
-    std::vector<ChatCommand> GetChatCommands();
+    std::vector<Acore::ChatCommands::ChatCommandBuilder> GetChatCommands();
 
 public: /* WeatherScript */
     void OnWeatherChange(Weather* weather, WeatherState state, float grade);
@@ -1609,6 +1619,7 @@ public: /* PlayerScript */
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
+    void OnPlayerPVPFlagChange(Player* player, bool state);
     void OnCreatureKill(Player* killer, Creature* killed);
     void OnCreatureKilledByPet(Player* petOwner, Creature* killed);
     void OnPlayerKilledByCreature(Creature* killer, Player* killed);
@@ -1646,6 +1657,7 @@ public: /* PlayerScript */
     bool OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit* target);
     void OnPlayerUpdateFaction(Player* player);
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
+    void OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
     void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
     bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);

@@ -67,6 +67,8 @@ option(WITHOUT_GIT         "Disable the GIT testing routines"                   
 option(ENABLE_VMAP_CHECKS  "Enable Checks relative to DisableMgr system on vmap"         1)
 option(WITH_DYNAMIC_LINKING "Enable dynamic library linking."                            0)
 option(WITH_STRICT_DATABASE_TYPE_CHECKS "Enable strict checking of database field value accessors" 0)
+option(WITHOUT_METRICS     "Disable metrics reporting (i.e. InfluxDB and Grafana)"       0)
+option(WITH_DETAILED_METRICS  "Enable detailed metrics reporting (i.e. time each session takes to update)" 0)
 
 IsDynamicLinkingRequired(WITH_DYNAMIC_LINKING_FORCED)
 IsDynamicLinkingModulesRequired(WITH_DYNAMIC_LINKING_FORCED)

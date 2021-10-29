@@ -55,9 +55,6 @@ enum DataTypes
     DATA_GO_BAR_DOOR                = 18,
     DATA_GO_CHALICE                 = 19,
 
-    DATA_GHOSTKILL                  = 20,
-    DATA_EVENSTARTER                = 21,
-
     DATA_GOLEM_DOOR_N               = 22,
     DATA_GOLEM_DOOR_S               = 23,
 
@@ -70,7 +67,16 @@ enum DataTypes
     DATA_OPEN_COFFER_DOORS          = 30,
 
     DATA_GOLEM_LORD_ARGELMACH_INIT  = 31,
-    DATA_GOLEM_LORD_ARGELMACH_ADDS  = 32
+    DATA_GOLEM_LORD_ARGELMACH_ADDS  = 32,
+
+    DATA_MAGMUS                     = 33,
+
+    DATA_COREN                      = 34
+};
+
+enum CreatureIds
+{
+    NPC_MAGMUS = 9938
 };
 
 template <class AI, class T>
