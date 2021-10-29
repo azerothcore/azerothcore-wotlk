@@ -146,7 +146,7 @@ public:
                 {
                     for (uint8 i = 0; i < MAX_MC_LINKED_BOSS_OBJ; ++i)
                     {
-                        if (!linkedBossObjData[i].circleId != go->GetEntry())
+                        if (linkedBossObjData[i].circleId != go->GetEntry())
                         {
                             continue;
                         }
