@@ -42,6 +42,11 @@ enum EventIds
     EVENT_UROK_DOOMHOWL_SPAWN_IN           = 8
 };
 
+enum Texts
+{
+    SAY_NEFARIUS_REND_WIPE                 = 11
+};
+
 class instance_blackrock_spire : public InstanceMapScript
 {
 public:
@@ -263,6 +268,11 @@ public:
                         if (Creature* rend = instance->GetCreature(WarchiefRendBlackhand))
                         {
                             rend->Respawn(true);
+                        }
+
+                        if (Creature* nefarius = instance->GetCreature(LordVictorNefarius))
+                        {
+                            nefarius->AI()->Talk(SAY_NEFARIUS_REND_WIPE);
                         }
                     }
                     break;
