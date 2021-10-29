@@ -299,6 +299,7 @@ public:
                 char const* name = target->getGender() == GENDER_MALE ? titleInfo->nameMale[loc] : titleInfo->nameFemale[loc];
                 if (!*name)
                     name = (target->getGender() == GENDER_MALE ? titleInfo->nameMale[sWorld->GetDefaultDbcLocale()] : titleInfo->nameFemale[sWorld->GetDefaultDbcLocale()]);
+
                 if (!*name)
                     continue;
 
