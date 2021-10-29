@@ -77,18 +77,19 @@ bool BattlefieldWG::SetupBattlefield()
     SetGraveyardNumber(BATTLEFIELD_WG_GRAVEYARD_MAX);
 
     // Load from db
-    if ((sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE) == 0) && (sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER) == 0)
-            && (sWorld->getWorldState(ClockWorldState[0]) == 0))
+    if ((sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE) == 0s) &&
+        (sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER) == 0s) &&
+        (sWorld->getWorldState(ClockWorldState[0]) == 0s))
     {
-        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, uint64(false));
-        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, uint64(urand(0, 1)));
-        sWorld->setWorldState(ClockWorldState[0], uint64(m_NoWarBattleTime));
+        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, 0s);
+        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, Seconds(urand(0, 1)));
+        sWorld->setWorldState(ClockWorldState[0], Seconds(m_NoWarBattleTime));
     }
 
-    m_isActive = bool(sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE));
-    m_DefenderTeam = TeamId(sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER));
+    m_isActive = bool(sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE).count());
+    m_DefenderTeam = TeamId(sWorld->getWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER).count());
 
-    m_Timer = sWorld->getWorldState(ClockWorldState[0]);
+    m_Timer = sWorld->getWorldState(ClockWorldState[0]).count();
     if (m_isActive)
     {
         m_isActive = false;
@@ -191,9 +192,9 @@ bool BattlefieldWG::Update(uint32 diff)
     bool m_return = Battlefield::Update(diff);
     if (m_saveTimer <= diff)
     {
-        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, m_isActive);
-        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, m_DefenderTeam);
-        sWorld->setWorldState(ClockWorldState[0], m_Timer);
+        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, Seconds(m_isActive));
+        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, Seconds(m_DefenderTeam));
+        sWorld->setWorldState(ClockWorldState[0], Seconds(m_Timer));
         m_saveTimer = 60 * IN_MILLISECONDS;
     }
     else

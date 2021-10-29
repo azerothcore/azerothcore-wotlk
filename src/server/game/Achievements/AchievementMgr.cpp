@@ -1005,13 +1005,13 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 }
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST_DAILY:
                 {
-                    time_t nextDailyResetTime = sWorld->GetNextDailyQuestsResetTime();
+                    Seconds nextDailyResetTime = sWorld->GetNextDailyQuestsResetTime();
                     CriteriaProgress* progress = GetCriteriaProgress(achievementCriteria);
 
                     if (!miscValue1) // Login case.
                     {
                         // reset if player missed one day.
-                        if (progress && progress->date < (nextDailyResetTime - 2 * DAY))
+                        if (progress && Seconds(progress->date) < (nextDailyResetTime - 2_days))
                             SetCriteriaProgress(achievementCriteria, 0, PROGRESS_SET);
                         continue;
                     }
@@ -1020,10 +1020,10 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     if (!progress)
                         // 1st time. Start count.
                         progressType = PROGRESS_SET;
-                    else if (progress->date < (nextDailyResetTime - 2 * DAY))
+                    else if (Seconds(progress->date) < (nextDailyResetTime - 2_days))
                         // last progress is older than 2 days. Player missed 1 day => Retart count.
                         progressType = PROGRESS_RESET;
-                    else if (progress->date < (nextDailyResetTime - DAY))
+                    else if (Seconds(progress->date) < (nextDailyResetTime - 1_days))
                         // last progress is between 1 and 2 days. => 1st time of the day.
                         progressType = PROGRESS_ACCUMULATE;
                     else

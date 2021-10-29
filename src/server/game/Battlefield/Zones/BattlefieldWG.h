@@ -1254,7 +1254,7 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        m_State = sWorld->getWorldState(m_WorldState);
+        m_State = sWorld->getWorldState(m_WorldState).count();
         if (gobj)
         {
             switch (m_State)
@@ -1436,7 +1436,7 @@ struct BfWGGameObjectBuilding
 
     void Save()
     {
-        sWorld->setWorldState(m_WorldState, m_State);
+        sWorld->setWorldState(m_WorldState, Seconds(m_State));
     }
 };
 
@@ -1510,7 +1510,7 @@ struct WGWorkshop
 
     void Save()
     {
-        sWorld->setWorldState(WorkshopsData[workshopId].worldstate, state);
+        sWorld->setWorldState(WorkshopsData[workshopId].worldstate, Seconds(state));
     }
 };
 

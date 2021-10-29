@@ -30,7 +30,7 @@ typedef std::chrono::system_clock::time_point SystemTimePoint;
 /// Makes std::chrono_literals globally available.
 using namespace std::chrono_literals;
 
-constexpr Hours operator""d(unsigned long long days)
+constexpr Hours operator""_days(unsigned long long days)
 {
     return Hours(days * 24h);
 }

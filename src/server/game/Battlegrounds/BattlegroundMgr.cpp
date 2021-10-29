@@ -145,11 +145,11 @@ void BattlegroundMgr::Update(uint32 diff)
     {
         if (m_AutoDistributionTimeChecker < diff)
         {
-            if (GameTime::GetGameTime().count() > m_NextAutoDistributionTime)
+            if (GameTime::GetGameTime() > m_NextAutoDistributionTime)
             {
                 sArenaTeamMgr->DistributeArenaPoints();
-                m_NextAutoDistributionTime = m_NextAutoDistributionTime + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
-                sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, uint64(m_NextAutoDistributionTime));
+                m_NextAutoDistributionTime = m_NextAutoDistributionTime + 1_days * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
+                sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime);
             }
             m_AutoDistributionTimeChecker = 600000; // 10 minutes check
         }
@@ -645,16 +645,21 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
     if (!sWorld->getBoolConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
         return;
 
-    time_t wstime = time_t(sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME));
-    time_t curtime = GameTime::GetGameTime().count();
+    Seconds wstime = sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME);
+    Seconds curtime = GameTime::GetGameTime();
+
     LOG_INFO("server.loading", "Initializing Automatic Arena Point Distribution");
+
     if (wstime < curtime)
     {
-        m_NextAutoDistributionTime = curtime;           // reset will be called in the next update
+        m_NextAutoDistributionTime = curtime; // reset will be called in the next update
         LOG_INFO("server.loading", "Next arena point distribution time in the past, reseting it now.");
     }
     else
+    {
         m_NextAutoDistributionTime = wstime;
+    }
+
     LOG_INFO("server.loading", "Automatic Arena Point Distribution initialized.");
 }
 

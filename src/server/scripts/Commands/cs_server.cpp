@@ -81,7 +81,6 @@ public:
 
         static ChatCommandTable serverSetCommandTable =
         {
-            { "difftime",       SEC_CONSOLE,        true,  &HandleServerSetDiffTimeCommand,         "" },
             { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
             { "motd",           SEC_ADMINISTRATOR,  true,  &HandleServerSetMotdCommand,             "" },
             { "closed",         SEC_CONSOLE,        true,  &HandleServerSetClosedCommand,           "" }
@@ -458,26 +457,6 @@ public:
             return false;
 
         sLog->SetLogLevel(name, *Acore::StringTo<uint32>(level), *type == 'l');
-        return true;
-    }
-
-    // set diff time record interval
-    static bool HandleServerSetDiffTimeCommand(ChatHandler* /*handler*/, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        char* newTimeStr = strtok((char*)args, " ");
-        if (!newTimeStr)
-            return false;
-
-        int32 newTime = atoi(newTimeStr);
-        if (newTime < 0)
-            return false;
-
-        sWorldUpdateTime.SetRecordUpdateTimeInterval(newTime);
-        printf("Record diff every %u ms\n", newTime);
-
         return true;
     }
 };

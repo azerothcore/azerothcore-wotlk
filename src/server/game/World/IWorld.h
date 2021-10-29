@@ -537,9 +537,9 @@ public:
     virtual std::string const& GetNewCharString() const = 0;
     virtual LocaleConstant GetDefaultDbcLocale() const = 0;
     virtual std::string const& GetDataPath() const = 0;
-    virtual time_t GetNextDailyQuestsResetTime() const = 0;
-    virtual time_t GetNextWeeklyQuestsResetTime() const = 0;
-    virtual time_t GetNextRandomBGResetTime() const = 0;
+    virtual Seconds GetNextDailyQuestsResetTime() const = 0;
+    virtual Seconds GetNextWeeklyQuestsResetTime() const = 0;
+    virtual Seconds GetNextRandomBGResetTime() const = 0;
     virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;

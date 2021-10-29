@@ -238,9 +238,9 @@ public:
     std::string const& GetDataPath() const { return m_dataPath; }
 
     /// Next daily quests and random bg reset time
-    time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
-    time_t GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
-    time_t GetNextRandomBGResetTime() const { return m_NextRandomBGReset; }
+    Seconds GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
+    Seconds GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
+    Seconds GetNextRandomBGResetTime() const { return m_NextRandomBGReset; }
 
     /// Get the maximum skill level a player can reach
     uint16 GetConfigMaxSkillValue() const

@@ -3062,7 +3062,7 @@ void World::InitCalendarOldEventsDeletionTime()
     // If the reset time saved in the worldstate is before now it means the server was offline when the reset was supposed to occur.
     // In this case we set the reset time in the past and next world update will do the reset and schedule next one in the future.
     if (currentDeletionTime < now)
-        m_NextCalendarOldEventsDeletionTime = nextDeletionTime - 1d;
+        m_NextCalendarOldEventsDeletionTime = nextDeletionTime - 1_days;
     else
         m_NextCalendarOldEventsDeletionTime = nextDeletionTime;
 
@@ -3175,7 +3175,7 @@ void World::CalendarDeleteOldEvents()
 {
     LOG_INFO("server.worldserver", "Calendar deletion of old events.");
 
-    m_NextCalendarOldEventsDeletionTime += 1d;
+    m_NextCalendarOldEventsDeletionTime += 1_days;
     sWorld->setWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, m_NextCalendarOldEventsDeletionTime);
     sCalendarMgr->DeleteOldEvents();
 }
@@ -3293,19 +3293,15 @@ void World::setWorldState(uint32 index, Seconds timeValue)
     if (it != m_worldstates.end())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WORLDSTATE);
-
         stmt->setUInt32(0, uint32(timeValue.count()));
         stmt->setUInt32(1, index);
-
         CharacterDatabase.Execute(stmt);
     }
     else
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_WORLDSTATE);
-
         stmt->setUInt32(0, index);
         stmt->setUInt32(1, uint32(timeValue.count()));
-
         CharacterDatabase.Execute(stmt);
     }
 
