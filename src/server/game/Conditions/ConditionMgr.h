@@ -22,7 +22,10 @@
 #include "Errors.h"
 #include <list>
 #include <map>
+#include <unordered_set>
+#include <vector>
 
+class Creature;
 class Player;
 class Unit;
 class WorldObject;
@@ -263,6 +266,7 @@ public:
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+    bool IsSpellUsedInSpellClickConditions(uint32 spellId) const;
 
 private:
     bool isSourceTypeValid(Condition* cond);
@@ -281,6 +285,8 @@ private:
     CreatureSpellConditionContainer   SpellClickEventConditionStore;
     NpcVendorConditionContainer       NpcVendorConditionContainerStore;
     SmartEventConditionContainer      SmartEventConditionStore;
+
+    std::unordered_set<uint32> SpellsUsedInSpellClickConditions;
 };
 
 #define sConditionMgr ConditionMgr::instance()
