@@ -10,7 +10,8 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-anticheat
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-azerothshard.git modules/mod-azerothshard
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-cfbg.git modules/mod-cfbg
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chat-transmitter modules/mod-chat-transmitter
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chromie-xp.git modules/mod-chromie-xp
+# NOTE: disabled because it causes DB error
+#git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chromie-xp.git modules/mod-chromie-xp
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-desertion-warnings.git modules/mod-desertion-warnings
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset.git modules/mod-duel-reset
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ip-tracker.git modules/mod-ip-tracker
