@@ -169,7 +169,7 @@ public:
             if (!hounds.empty())
             {
                 // Alive hound been found within 80 yards -> cancel suicide
-                if (std::find_if(hounds.begin(), hounds.end(), [this, creatureTarget](Creature const* hound)
+                if (std::find_if(hounds.begin(), hounds.end(), [creatureTarget](Creature const* hound)
                 {
                     return creatureTarget != hound && creatureTarget->IsWithinLOSInMap(hound) && hound->IsAlive() && hound->IsInCombat() && !hound->HasAura(SPELL_PLAY_DEAD);
                 }) != hounds.end())

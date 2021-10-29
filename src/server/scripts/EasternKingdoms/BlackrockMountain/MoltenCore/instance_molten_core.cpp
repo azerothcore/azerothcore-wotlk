@@ -173,7 +173,7 @@ public:
                 {
                     for (uint8 i = 0; i < MAX_MC_LINKED_BOSS_OBJ; ++i)
                     {
-                        if (!linkedBossObjData[i].runeId != go->GetEntry())
+                        if (linkedBossObjData[i].runeId != go->GetEntry())
                         {
                             continue;
                         }
