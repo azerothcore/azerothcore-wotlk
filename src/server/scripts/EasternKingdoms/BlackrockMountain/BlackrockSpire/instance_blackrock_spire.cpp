@@ -260,9 +260,7 @@ public:
                 case DATA_HALYCON:
                 case DATA_OVERLORD_WYRMTHALAK:
                 case DATA_PYROGAURD_EMBERSEER:
-                    break;
                 case DATA_WARCHIEF_REND_BLACKHAND:
-                case DATA_GYTH:
                     if (state == FAIL)
                     {
                         if (Creature* rend = instance->GetCreature(WarchiefRendBlackhand))
@@ -276,6 +274,7 @@ public:
                         }
                     }
                     break;
+                case DATA_GYTH:
                 case DATA_THE_BEAST:
                 case DATA_GENERAL_DRAKKISATH:
                 case DATA_DRAGONSPIRE_ROOM:

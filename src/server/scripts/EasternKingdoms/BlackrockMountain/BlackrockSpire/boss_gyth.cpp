@@ -78,7 +78,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            instance->SetBossState(DATA_GYTH, FAIL);
+            instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
             BossAI::EnterEvadeMode();
         }
 
@@ -114,8 +114,6 @@ public:
                             me->AddAura(SPELL_REND_MOUNTS, me);
                             if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 40.0f))
                                 portcullis->UseDoorOrButton();
-                            if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 75.0f, true))
-                                victor->AI()->SetData(1, 1);
                             events.ScheduleEvent(EVENT_SUMMONED_2, 2000);
                             break;
                         case EVENT_SUMMONED_2:

@@ -139,7 +139,7 @@ public:
         {
             if (!summons.IsAnyCreatureAlive())
             {
-                events.ScheduleEvent(EVENT_WAVES_TEXT_1 + _currentWave, 5 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_WAVES_TEXT_1 + _currentWave, 10 * IN_MILLISECONDS);
             }
         }
 
@@ -170,6 +170,11 @@ public:
             instance->SetBossState(DATA_GYTH, FAIL);
             BossAI::EnterEvadeMode();
             me->DespawnOrUnsummon();
+        }
+
+        void IsSummonedBy(Unit* /*summoner*/) override
+        {
+            Talk(EMOTE_BLACKHAND_DISMOUNT);
         }
 
         void JustDied(Unit* /*killer*/) override
