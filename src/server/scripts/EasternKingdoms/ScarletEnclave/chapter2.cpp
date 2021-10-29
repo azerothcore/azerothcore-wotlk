@@ -250,7 +250,7 @@ public:
             {
                 AddEscortState(STATE_ESCORT_RETURNING);
                 ReturnToLastPoint();
-                LOG_DEBUG("scripts.ai", "TSCR: EscortAI has left combat and is now returning to last point");
+                LOG_DEBUG("scripts.ai", "EscortAI has left combat and is now returning to last point");
             }
             else
             {
