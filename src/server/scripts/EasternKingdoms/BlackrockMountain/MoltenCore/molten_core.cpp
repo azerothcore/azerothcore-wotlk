@@ -43,7 +43,7 @@ public:
             serratedBiteTimer = 3000;
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             // Prevent receiving any extra damage if Hound is playing dead
             if (me->HasAura(SPELL_PLAY_DEAD))
