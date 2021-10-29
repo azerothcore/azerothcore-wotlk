@@ -12486,6 +12486,12 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
         if (!HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag))
             return;
 
+        // Clear the current title if it is the one being removed.
+        if (title->bit_index == GetUInt32Value(PLAYER_CHOSEN_TITLE))
+        {
+            SetCurrentTitle(nullptr, true);
+        }
+
         RemoveFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag);
     }
     else
