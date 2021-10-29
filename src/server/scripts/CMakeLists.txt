@@ -329,6 +329,7 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
 
       # Add the module content to the whole static module
       CollectSourceFiles(${MODULE_SOURCE_PATH} PRIVATE_SOURCES_MODULES)
+      CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES)
 
       # Skip deprecated api loaders
       if (AC_SCRIPTS_INCLUDES MATCHES "${SOURCE_MODULE}")
@@ -351,6 +352,7 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     # Add the module content to the whole static module
     unset(MODULE_SOURCE_PRIVATE_SOURCES)
     CollectSourceFiles(${MODULE_SOURCE_PATH} MODULE_SOURCE_PRIVATE_SOURCES)
+    CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES)
 
     # Configure the scriptloader
     ConfigureScriptLoader(${SOURCE_MODULE} SCRIPT_MODULE_PRIVATE_SCRIPTLOADER ON ${SOURCE_MODULE})
@@ -372,7 +374,8 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
 
     target_include_directories(${MODULE_SOURCE_PROJECT_NAME}
       PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR})
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PUBLIC_INCLUDES})
 
     set_target_properties(${MODULE_SOURCE_PROJECT_NAME}
       PROPERTIES
@@ -420,7 +423,8 @@ target_link_libraries(scripts
 
 target_include_directories(scripts
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PUBLIC_INCLUDES})
 
 set_target_properties(scripts
   PROPERTIES
