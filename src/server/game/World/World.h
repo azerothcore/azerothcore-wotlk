@@ -318,8 +318,8 @@ public:
         return index < INT_CONFIG_VALUE_COUNT ? m_int_configs[index] : 0;
     }
 
-    void setWorldState(uint32 index, uint64 value);
-    uint64 getWorldState(uint32 index) const;
+    void setWorldState(uint32 index, Seconds value);
+    Seconds getWorldState(uint32 index) const;
     void LoadWorldStates();
 
     /// Are we on a "Player versus Player" server?
@@ -411,7 +411,7 @@ private:
     bool m_isClosed;
 
     IntervalTimer m_timers[WUPDATE_COUNT];
-    time_t mail_expire_check_timer;
+    Seconds mail_expire_check_timer;
 
     SessionMap m_sessions;
     SessionMap m_offlineSessions;
@@ -428,7 +428,7 @@ private:
     uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
     bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
     float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
-    typedef std::map<uint32, uint64> WorldStatesMap;
+    typedef std::map<uint32, Seconds> WorldStatesMap;
     WorldStatesMap m_worldstates;
     uint32 m_playerLimit;
     AccountTypes m_allowedSecurityLevel;
@@ -453,12 +453,12 @@ private:
     LockedQueue<CliCommandHolder*> cliCmdQueue;
 
     // next daily quests and random bg reset time
-    time_t m_NextDailyQuestReset;
-    time_t m_NextWeeklyQuestReset;
-    time_t m_NextMonthlyQuestReset;
-    time_t m_NextRandomBGReset;
-    time_t m_NextCalendarOldEventsDeletionTime;
-    time_t m_NextGuildReset;
+    Seconds m_NextDailyQuestReset;
+    Seconds m_NextWeeklyQuestReset;
+    Seconds m_NextMonthlyQuestReset;
+    Seconds m_NextRandomBGReset;
+    Seconds m_NextCalendarOldEventsDeletionTime;
+    Seconds m_NextGuildReset;
 
     //Player Queue
     Queue m_QueuedPlayer;

@@ -566,8 +566,8 @@ public:
     virtual float getFloatConfig(WorldFloatConfigs index) const = 0;
     virtual void setIntConfig(WorldIntConfigs index, uint32 value) = 0;
     virtual uint32 getIntConfig(WorldIntConfigs index) const = 0;
-    virtual void setWorldState(uint32 index, uint64 value) = 0;
-    virtual uint64 getWorldState(uint32 index) const = 0;
+    virtual void setWorldState(uint32 index, Seconds value) = 0;
+    virtual Seconds getWorldState(uint32 index) const = 0;
     virtual void LoadWorldStates() = 0;
     virtual bool IsPvPRealm() const = 0;
     virtual bool IsFFAPvPRealm() const = 0;

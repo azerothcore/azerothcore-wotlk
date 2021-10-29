@@ -94,8 +94,8 @@ public:
     MOCK_METHOD(float, getFloatConfig, (WorldFloatConfigs index), (const));
     MOCK_METHOD(void, setIntConfig, (WorldIntConfigs index, uint32 value), ());
     MOCK_METHOD(uint32, getIntConfig, (WorldIntConfigs index), (const));
-    MOCK_METHOD(void, setWorldState, (uint32 index, uint64 value), ());
-    MOCK_METHOD(uint64, getWorldState, (uint32 index), (const));
+    MOCK_METHOD(void, setWorldState, (uint32 index, Seconds value), ());
+    MOCK_METHOD(Seconds, getWorldState, (uint32 index), (const));
     MOCK_METHOD(void, LoadWorldStates, ());
     MOCK_METHOD(bool, IsPvPRealm, (), (const));
     MOCK_METHOD(bool, IsFFAPvPRealm, (), (const));
