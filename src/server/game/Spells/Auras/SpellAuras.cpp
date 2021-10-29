@@ -2682,6 +2682,7 @@ void UnitAura::FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* ca
             {
                 Unit* ref = caster;
                 ConditionList* condList = m_spellInfo->Effects[effIndex].ImplicitTargetConditions;
+                SpellTargetCheckTypes selectionType = TARGET_CHECK_DEFAULT;
                 switch (GetSpellInfo()->Effects[effIndex].Effect)
                 {
                     case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
@@ -2720,17 +2721,25 @@ void UnitAura::FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* ca
                                         units.push_back(owner);
                             break;
                         }
+                        default:
+                            break;
+                }
+                if (selectionType != TARGET_CHECK_DEFAULT)
+                {
+                    Acore::WorldObjectSpellAreaTargetCheck check(radius, GetUnitOwner(), ref, GetUnitOwner(), m_spellInfo, selectionType, condList);
+                    Acore::UnitListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetUnitOwner(), units, check);
+                    Cell::VisitAllObjects(GetUnitOwner(), searcher, radius);
+                }
+
+                for (Unit* unit : units)
+                {
+                    auto itr = targets.find(unit);
+                    if (itr != targets.end())
+                        itr->second |= 1 << effIndex;
+                    else
+                        targets[unit] = 1 << effIndex;
                 }
             }
-        }
-
-        for (Unit* unit : units)
-        {
-            auto itr = targets.find(unit);
-            if (itr != targets.end())
-                itr->second |= 1 << effIndex;
-            else
-                targets[unit] = 1 << effIndex;
         }
     }
 }
