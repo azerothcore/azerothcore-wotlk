@@ -21,12 +21,15 @@
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
-#include "Map.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "WorldSession.h"
+
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 using ChatSubCommandMap = std::map<std::string_view, Acore::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
@@ -282,6 +285,11 @@ namespace Acore::Impl::ChatCommands
 
     while (!cmdStr.empty() && (cmdStr.back() == COMMAND_DELIMITER))
         cmdStr.remove_suffix(1);
+
+#ifdef ELUNA
+    if (!sEluna->OnCommand(handler.GetPlayer() ? handler.GetPlayer() : nullptr, std::string(cmdStr).data()))
+        return true;
+#endif
 
     std::string_view oldTail = cmdStr;
     while (!oldTail.empty())

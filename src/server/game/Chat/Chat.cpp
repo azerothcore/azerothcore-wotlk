@@ -19,7 +19,6 @@
 #include "AccountMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Log.h"
