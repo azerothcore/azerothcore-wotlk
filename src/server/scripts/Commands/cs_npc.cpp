@@ -683,8 +683,7 @@ public:
                 handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, creatureTemplate->Name.c_str(), x, y, z, mapId, "", "");
 
                 ++count;
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         handler->PSendSysMessage(LANG_COMMAND_NEAR_NPC_MESSAGE, distance, count);
@@ -730,8 +729,10 @@ public:
                 const_cast<CreatureData*>(data)->posZ = z;
                 const_cast<CreatureData*>(data)->orientation = o;
             }
+            
             creature->SetPosition(x, y, z, o);
             creature->GetMotionMaster()->Initialize();
+            
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
                 creature->setDeathState(JUST_DIED);
@@ -789,7 +790,6 @@ public:
 
         creature->SetDisplayId(displayId);
         creature->SetNativeDisplayId(displayId);
-
         creature->SaveToDB();
 
         return true;
@@ -884,13 +884,16 @@ public:
 
             creature->SetDefaultMovementType(move_type);
             creature->GetMotionMaster()->Initialize();
+            
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
                 creature->setDeathState(JUST_DIED);
                 creature->Respawn();
             }
+            
             creature->SaveToDB();
         }
+        
         if (!doNotDelete)
         {
             handler->PSendSysMessage(LANG_MOVE_TYPE_SET, move_type);
@@ -940,6 +943,7 @@ public:
         }
 
         MovementGeneratorType mtype = IDLE_MOTION_TYPE;
+        
         if (option > 0.0f)
             mtype = RANDOM_MOTION_TYPE;
 
@@ -954,6 +958,7 @@ public:
         creature->SetWanderDistance((float)option);
         creature->SetDefaultMovementType(mtype);
         creature->GetMotionMaster()->Initialize();
+        
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
         {
             creature->setDeathState(JUST_DIED);
