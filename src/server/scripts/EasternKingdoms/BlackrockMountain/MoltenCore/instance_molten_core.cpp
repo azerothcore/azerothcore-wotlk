@@ -122,6 +122,7 @@ public:
                     if (GetBossState(DATA_GEDDON) == DONE)
                     {
                         go->SetLootMode(GO_JUST_DEACTIVATED);
+                        go->SetGoState(GO_STATE_ACTIVE);
                     }
                     else
                     {
@@ -134,6 +135,7 @@ public:
                     if (GetBossState(DATA_GARR) == DONE)
                     {
                         go->SetLootMode(GO_JUST_DEACTIVATED);
+                        go->SetGoState(GO_STATE_ACTIVE);
                     }
                     else
                     {
@@ -146,6 +148,7 @@ public:
                     if (GetBossState(DATA_GEHENNAS) == DONE)
                     {
                         go->SetLootMode(GO_JUST_DEACTIVATED);
+                        go->SetGoState(GO_STATE_ACTIVE);
                     }
                     else
                     {
@@ -158,6 +161,7 @@ public:
                     if (GetBossState(DATA_GOLEMAGG) == DONE)
                     {
                         go->SetLootMode(GO_JUST_DEACTIVATED);
+                        go->SetGoState(GO_STATE_ACTIVE);
                     }
                     else
                     {
@@ -170,6 +174,7 @@ public:
                     if (GetBossState(DATA_MAGMADAR) == DONE)
                     {
                         go->SetLootMode(GO_JUST_DEACTIVATED);
+                        go->SetGoState(GO_STATE_ACTIVE);
                     }
                     else
                     {
@@ -182,6 +187,7 @@ public:
                     if (GetBossState(DATA_SHAZZRAH) == DONE)
                     {
                         go->SetLootMode(GO_JUST_DEACTIVATED);
+                        go->SetGoState(GO_STATE_ACTIVE);
                     }
                     else
                     {
@@ -194,6 +200,7 @@ public:
                     if (GetBossState(DATA_SULFURON) == DONE)
                     {
                         go->SetLootMode(GO_JUST_DEACTIVATED);
+                        go->SetGoState(GO_STATE_ACTIVE);
                     }
                     else
                     {
@@ -253,6 +260,7 @@ public:
                 if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
                 {
                     circle->SetLootMode(GO_JUST_DEACTIVATED);
+                    circle->SetGoState(GO_STATE_ACTIVE);
                     _circlesGUIDs[bossId].Clear();
                 }
 
