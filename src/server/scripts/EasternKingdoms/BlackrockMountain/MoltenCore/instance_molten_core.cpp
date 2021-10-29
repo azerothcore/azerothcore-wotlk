@@ -34,6 +34,25 @@ MinionData const minionData[] =
     { 0, 0 } // END
 };
 
+struct MCBossObject
+{
+    uint32 bossId;
+    uint32 runeId;
+    uint32 circleId;
+};
+
+constexpr uint8 MAX_MC_LINKED_BOSS_OBJ = 7;
+MCBossObject const linkedBossObjData[MAX_MC_LINKED_BOSS_OBJ]=
+{
+    { DATA_MAGMADAR,    GO_RUNE_KRESS,      GO_CIRCLE_MAGMADAR  },
+    { DATA_GEHENNAS,    GO_RUNE_MOHN,       GO_CIRCLE_GEHENNAS  },
+    { DATA_GARR,        GO_RUNE_BLAZ,       GO_CIRCLE_GARR      },
+    { DATA_SHAZZRAH,    GO_RUNE_MAZJ,       GO_CIRCLE_SHAZZRAH  },
+    { DATA_GEDDON,      GO_RUNE_ZETH,       GO_CIRCLE_GEDDON    },
+    { DATA_GOLEMAGG,    GO_RUNE_THERI,      GO_CIRCLE_GOLEMAGG  },
+    { DATA_SULFURON,    GO_RUNE_KORO,       GO_CIRCLE_SULFURON  },
+};
+
 class instance_molten_core : public InstanceMapScript
 {
 public:
@@ -118,93 +137,64 @@ public:
                     break;
                 }
                 case GO_CIRCLE_GEDDON:
-                {
-                    if (GetBossState(DATA_GEDDON) == DONE)
-                    {
-                        go->SetLootMode(GO_JUST_DEACTIVATED);
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    else
-                    {
-                        _circlesGUIDs[DATA_GEDDON] = go->GetGUID();
-                    }
-                    break;
-                }
                 case GO_CIRCLE_GARR:
-                {
-                    if (GetBossState(DATA_GARR) == DONE)
-                    {
-                        go->SetLootMode(GO_JUST_DEACTIVATED);
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    else
-                    {
-                        _circlesGUIDs[DATA_GARR] = go->GetGUID();
-                    }
-                    break;
-                }
                 case GO_CIRCLE_GEHENNAS:
-                {
-                    if (GetBossState(DATA_GEHENNAS) == DONE)
-                    {
-                        go->SetLootMode(GO_JUST_DEACTIVATED);
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    else
-                    {
-                        _circlesGUIDs[DATA_GEHENNAS] = go->GetGUID();
-                    }
-                    break;
-                }
                 case GO_CIRCLE_GOLEMAGG:
-                {
-                    if (GetBossState(DATA_GOLEMAGG) == DONE)
-                    {
-                        go->SetLootMode(GO_JUST_DEACTIVATED);
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    else
-                    {
-                        _circlesGUIDs[DATA_GOLEMAGG] = go->GetGUID();
-                    }
-                    break;
-                }
                 case GO_CIRCLE_MAGMADAR:
-                {
-                    if (GetBossState(DATA_MAGMADAR) == DONE)
-                    {
-                        go->SetLootMode(GO_JUST_DEACTIVATED);
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    else
-                    {
-                        _circlesGUIDs[DATA_MAGMADAR] = go->GetGUID();
-                    }
-                    break;
-                }
                 case GO_CIRCLE_SHAZZRAH:
-                {
-                    if (GetBossState(DATA_SHAZZRAH) == DONE)
-                    {
-                        go->SetLootMode(GO_JUST_DEACTIVATED);
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    else
-                    {
-                        _circlesGUIDs[DATA_SHAZZRAH] = go->GetGUID();
-                    }
-                    break;
-                }
                 case GO_CIRCLE_SULFURON:
                 {
-                    if (GetBossState(DATA_SULFURON) == DONE)
+                    for (uint8 i = 0; i < MAX_MC_LINKED_BOSS_OBJ; ++i)
                     {
-                        go->SetLootMode(GO_JUST_DEACTIVATED);
-                        go->SetGoState(GO_STATE_ACTIVE);
+                        if (!linkedBossObjData[i].circleId != go->GetEntry())
+                        {
+                            continue;
+                        }
+
+                        if (GetBossState(linkedBossObjData[i].bossId) == DONE)
+                        {
+                            go->SetLootMode(GO_JUST_DEACTIVATED);
+                        }
+                        else
+                        {
+                            _circlesGUIDs[linkedBossObjData[i].bossId] = go->GetGUID();
+                        }
                     }
-                    else
+
+                    break;
+                }
+/*
+    GO_RUNE_KRESS                   = 176956,                   // Magmadar
+    GO_RUNE_MOHN                    = 176957,                   // Gehennas
+    GO_RUNE_BLAZ                    = 176955,                   // Garr
+    GO_RUNE_MAZJ                    = 176953,                   // Shazzrah
+    GO_RUNE_ZETH                    = 176952,                   // Geddon
+    GO_RUNE_THERI                   = 176954,                   // Golemagg
+    GO_RUNE_KORO                    = 176951,                   // Sulfuron
+*/
+                case GO_RUNE_KRESS:
+                case GO_RUNE_MOHN:
+                case GO_RUNE_BLAZ:
+                case GO_RUNE_MAZJ:
+                case GO_RUNE_ZETH:
+                case GO_RUNE_THERI:
+                case GO_RUNE_KORO:
+                {
+                    for (uint8 i = 0; i < MAX_MC_LINKED_BOSS_OBJ; ++i)
                     {
-                        _circlesGUIDs[DATA_SULFURON] = go->GetGUID();
+                        if (!linkedBossObjData[i].runeId != go->GetEntry())
+                        {
+                            continue;
+                        }
+
+                        if (GetBossState(linkedBossObjData[i].bossId) == DONE)
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        else
+                        {
+                            _runesGUIDs[linkedBossObjData[i].bossId] = go->GetGUID();
+                        }
                     }
                     break;
                 }
@@ -260,8 +250,13 @@ public:
                 if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
                 {
                     circle->SetLootMode(GO_JUST_DEACTIVATED);
-                    circle->SetGoState(GO_STATE_ACTIVE);
                     _circlesGUIDs[bossId].Clear();
+                }
+
+                if (GameObject* rune = instance->GetGameObject(_runesGUIDs[bossId]))
+                {
+                    rune->SetGoState(GO_STATE_ACTIVE);
+                    _runesGUIDs[bossId].Clear();
                 }
 
                 if (CheckMajordomoExecutus())
@@ -356,6 +351,8 @@ public:
 
     private:
         std::unordered_map<uint32/*bossid*/, ObjectGuid/*circleGUID*/> _circlesGUIDs;
+        std::unordered_map<uint32/*bossid*/, ObjectGuid/*runeGUID*/> _runesGUIDs;
+
         ObjectGuid _golemaggGUID;
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;

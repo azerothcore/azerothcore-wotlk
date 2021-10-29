@@ -83,6 +83,14 @@ enum MCGameObjects
     GO_CIRCLE_GARR                  = 178191,
     GO_CIRCLE_MAGMADAR              = 178192,
     GO_CIRCLE_GEHENNAS              = 178193,
+
+    GO_RUNE_KRESS                   = 176956,                   // Magmadar
+    GO_RUNE_MOHN                    = 176957,                   // Gehennas
+    GO_RUNE_BLAZ                    = 176955,                   // Garr
+    GO_RUNE_MAZJ                    = 176953,                   // Shazzrah
+    GO_RUNE_ZETH                    = 176952,                   // Geddon
+    GO_RUNE_THERI                   = 176954,                   // Golemagg
+    GO_RUNE_KORO                    = 176951,                   // Sulfuron
 };
 
 template <class AI, class T>
