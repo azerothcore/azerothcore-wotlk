@@ -82,8 +82,6 @@ struct MechanicImmune
     char const* text;
 };
 
-constexpr auto MAX_MECHANIC = 32;
-
 MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 {
     { MECHANIC_NONE, "MECHANIC_NONE"               },
