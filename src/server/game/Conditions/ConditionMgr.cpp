@@ -640,6 +640,11 @@ ConditionMgr::~ConditionMgr()
     Clean();
 }
 
+bool ConditionMgr::IsSpellUsedInSpellClickConditions(uint32 spellId) const
+{
+    return SpellsUsedInSpellClickConditions.find(spellId) != SpellsUsedInSpellClickConditions.end();
+}
+
 ConditionMgr* ConditionMgr::instance()
 {
     static ConditionMgr instance;
@@ -1054,6 +1059,8 @@ void ConditionMgr::LoadConditions(bool isReload)
             case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
             {
                 SpellClickEventConditionStore[cond->SourceGroup][cond->SourceEntry].push_back(cond);
+                if (cond->ConditionType == CONDITION_AURA)
+                    SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
                 valid = true;
                 ++count;
                 continue; // do not add to m_AllocatedMemory to avoid double deleting
@@ -1117,6 +1124,8 @@ void ConditionMgr::LoadConditions(bool isReload)
         }
 
         // add new Condition to storage based on Type/Entry
+        if (cond->SourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT && cond->ConditionType == CONDITION_AURA)
+            SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
         ConditionStore[cond->SourceType][cond->SourceEntry].push_back(cond);
         ++count;
     } while (result->NextRow());
@@ -2291,7 +2300,7 @@ void ConditionMgr::Clean()
         itr->second.clear();
     }
 
-    SpellClickEventConditionStore.clear();
+    SpellsUsedInSpellClickConditions.clear();
 
     for (NpcVendorConditionContainer::iterator itr = NpcVendorConditionContainerStore.begin(); itr != NpcVendorConditionContainerStore.end(); ++itr)
     {
