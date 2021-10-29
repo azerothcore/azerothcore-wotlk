@@ -96,7 +96,7 @@ public:
                     std::list<Unit*> targets;
                     SelectTargetList(targets, [this](Unit* target)
                     {
-                        return target && target->GetTypeId() == TYPEID_PLAYER && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
+                        return target && target->IsPlayer() && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
                     }, 1, SELECT_TARGET_RANDOM);
 
                     if (!targets.empty())
@@ -121,9 +121,7 @@ public:
 class spell_magmadar_lava_bomb : public SpellScriptLoader
 {
 public:
-    spell_magmadar_lava_bomb() : SpellScriptLoader("spell_magmadar_lava_bomb")
-    {
-    }
+    spell_magmadar_lava_bomb() : SpellScriptLoader("spell_magmadar_lava_bomb") {}
 
     class spell_magmadar_lava_bomb_SpellScript : public SpellScript
     {
@@ -175,5 +173,7 @@ public:
 void AddSC_boss_magmadar()
 {
     new boss_magmadar();
+
+    // Spells
     new spell_magmadar_lava_bomb();
 }
