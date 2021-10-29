@@ -153,7 +153,7 @@ public:
 
                         if (GetBossState(linkedBossObjData[i].bossId) == DONE)
                         {
-                            go->SetLootMode(GO_JUST_DEACTIVATED);
+                            go->DespawnOrUnsummon();
                         }
                         else
                         {
@@ -163,15 +163,6 @@ public:
 
                     break;
                 }
-/*
-    GO_RUNE_KRESS                   = 176956,                   // Magmadar
-    GO_RUNE_MOHN                    = 176957,                   // Gehennas
-    GO_RUNE_BLAZ                    = 176955,                   // Garr
-    GO_RUNE_MAZJ                    = 176953,                   // Shazzrah
-    GO_RUNE_ZETH                    = 176952,                   // Geddon
-    GO_RUNE_THERI                   = 176954,                   // Golemagg
-    GO_RUNE_KORO                    = 176951,                   // Sulfuron
-*/
                 case GO_RUNE_KRESS:
                 case GO_RUNE_MOHN:
                 case GO_RUNE_BLAZ:
@@ -249,7 +240,7 @@ public:
             {
                 if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
                 {
-                    circle->SetLootMode(GO_JUST_DEACTIVATED);
+                    circle->DespawnOrUnsummon();
                     _circlesGUIDs[bossId].Clear();
                 }
 
