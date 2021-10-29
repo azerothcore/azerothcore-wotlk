@@ -729,10 +729,10 @@ public:
                 const_cast<CreatureData*>(data)->posZ = z;
                 const_cast<CreatureData*>(data)->orientation = o;
             }
-            
+
             creature->SetPosition(x, y, z, o);
             creature->GetMotionMaster()->Initialize();
-            
+
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
                 creature->setDeathState(JUST_DIED);
@@ -884,16 +884,16 @@ public:
 
             creature->SetDefaultMovementType(move_type);
             creature->GetMotionMaster()->Initialize();
-            
+
             if (creature->IsAlive())                            // dead creature will reset movement generator at respawn
             {
                 creature->setDeathState(JUST_DIED);
                 creature->Respawn();
             }
-            
+
             creature->SaveToDB();
         }
-        
+
         if (!doNotDelete)
         {
             handler->PSendSysMessage(LANG_MOVE_TYPE_SET, move_type);
@@ -943,7 +943,7 @@ public:
         }
 
         MovementGeneratorType mtype = IDLE_MOTION_TYPE;
-        
+
         if (option > 0.0f)
             mtype = RANDOM_MOTION_TYPE;
 
@@ -958,7 +958,7 @@ public:
         creature->SetWanderDistance((float)option);
         creature->SetDefaultMovementType(mtype);
         creature->GetMotionMaster()->Initialize();
-        
+
         if (creature->IsAlive())                                // dead creature will reset movement generator at respawn
         {
             creature->setDeathState(JUST_DIED);
