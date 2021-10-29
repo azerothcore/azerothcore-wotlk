@@ -327,6 +327,7 @@ public:
 
         if (!player)
             player = PlayerIdentifier::FromTarget(handler);
+
         if (!player)
             return false;
 
