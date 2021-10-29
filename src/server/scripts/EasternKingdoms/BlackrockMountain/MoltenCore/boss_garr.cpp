@@ -15,6 +15,7 @@ EndScriptData */
 #include "Containers.h"
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "molten_core.h"
