@@ -1473,6 +1473,7 @@ enum Thassarian
     NPC_PRINCE_VALANAR         = 28189,
     NPC_GENERAL_ARLOS          = 25250,
     NPC_LERYSSA                = 25251,
+    NPC_TANATHAL               = 26173,
     SPELL_THASSARIAN_FLAY      = 46685,
     SPELL_TRANSFORM_VALANAR    = 46753,
     SPELL_STUN                 = 46957,
@@ -1532,7 +1533,10 @@ public:
                 {
                     case EVENT_THASSARIAN_CAST:
                     {
-                        DoCastSelf(SPELL_THASSARIAN_FLAY);
+                        if (Unit* tanathal = me->FindNearestCreature(NPC_TANATHAL, 6.0f))
+                        {
+                            me->CastSpell(tanathal, SPELL_THASSARIAN_FLAY);
+                        }
                     }
                 }
             }
