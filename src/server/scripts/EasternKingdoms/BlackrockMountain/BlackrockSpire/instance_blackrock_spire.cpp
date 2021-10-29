@@ -262,7 +262,7 @@ public:
                     {
                         if (Creature* rend = instance->GetCreature(WarchiefRendBlackhand))
                         {
-                            rend->SetRespawnDelay(10 * IN_MILLISECONDS);
+                            rend->Respawn(true);
                         }
                     }
                     break;

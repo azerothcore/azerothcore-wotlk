@@ -98,11 +98,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WARCHIEF_REND_BLACKHAND)))
-            {
-                creature->Respawn(true);
-            }
-
+            instance->SetBossState(DATA_GYTH, FAIL);
             BossAI::EnterEvadeMode();
         }
 

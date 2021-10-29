@@ -135,6 +135,22 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
     return nullptr;
 }
 
+bool SummonList::HasCreatureAlive() const
+{
+    for (StorageType::const_iterator i = storage_.begin(); i != storage_.end(); ++i)
+    {
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
+        {
+            if (summon->IsAlive())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     me(creature),
     IsFleeing(false),
