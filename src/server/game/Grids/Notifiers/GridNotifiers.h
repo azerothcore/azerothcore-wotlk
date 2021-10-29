@@ -1010,13 +1010,15 @@ namespace Acore
         bool operator()(Unit* u)
         {
             // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
-            if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
+            if (u->GetTypeId() == TYPEID_UNIT && ((Creature*) u)->IsTotem())
+            {
                 return false;
-
-                if (_spellInfo && _spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER) && u->GetTypeId() != TYPEID_PLAYER)
+            }
+            if (_spellInfo && _spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER) && u->GetTypeId() != TYPEID_PLAYER)
+            {
                 return false;
-
-                return i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range);
+            }
+            return i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range);
         }
     private:
         bool i_targetForPlayer;
