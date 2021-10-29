@@ -154,7 +154,7 @@ public:
             return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
         }
 
-        void HandleAuraRemoval(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void HandleAuraRemoval(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             AuraRemoveMode const removeMode = GetTargetApplication()->GetRemoveMode();
             if (removeMode == AURA_REMOVE_BY_DEATH || removeMode == AURA_REMOVE_BY_DEFAULT)
@@ -186,5 +186,5 @@ void AddSC_boss_garr()
     new boss_garr();
 
     // Spells
-    spell_garr_separation_nexiety();
+    new spell_garr_separation_nexiety();
 }
