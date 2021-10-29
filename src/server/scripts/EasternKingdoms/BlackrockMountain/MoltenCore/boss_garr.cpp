@@ -46,7 +46,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_ANTIMAGIC_PULSE    = 1,
+    EVENT_ANTIMAGIC_PULSE               = 1,
     EVENT_MAGMA_SHACKLES,
 };
 
@@ -74,7 +74,7 @@ public:
             DoCastSelf(SPELL_SEPARATION_ANXIETY, true);
             events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
             events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
-            massEruptionTimer = 600000;
+            massEruptionTimer = 600000; // 10 mins
         }
 
         void UpdateAI(uint32 diff) override
