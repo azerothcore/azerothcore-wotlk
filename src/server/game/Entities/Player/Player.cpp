@@ -435,7 +435,7 @@ Player::~Player()
         delete itr->second;
 
     //all mailed items should be deleted, also all mail should be deallocated
-    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
         delete *itr;
     }
@@ -2746,12 +2746,12 @@ void Player::SendInitialSpells()
 
 void Player::RemoveMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
         if ((*itr)->messageID == id)
         {
             //do not delete item, because Player::removeMail() is called when returning mail to sender.
-            m_mailCache.erase(itr);
+            m_mail.erase(itr);
             return;
         }
     }
@@ -2783,7 +2783,8 @@ void Player::SendNewMail()
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), totalMailCount, false);
+    sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), GetMailSize(), false);
+
     if (deliver_time <= time(nullptr))                      // ready now
     {
         ++unReadMails;
@@ -3692,7 +3693,7 @@ void Player::SetFreeTalentPoints(uint32 points)
 
 Mail* Player::GetMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
         if ((*itr)->messageID == id)
         {
@@ -3911,6 +3912,25 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
 
                 if (resultMail)
                 {
+                    std::unordered_map<uint32, std::vector<Item*>> itemsByMail;
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
+                    stmt->setUInt32(0, lowGuid);
+                    PreparedQueryResult resultItems = CharacterDatabase.Query(stmt);
+
+                    if (resultItems)
+                    {
+                        do
+                        {
+                            Field* fields = resultItems->Fetch();
+                            uint32 mailId = fields[14].GetUInt32();
+                            if (Item* mailItem = _LoadMailedItem(playerGuid, nullptr, mailId, nullptr, fields))
+                            {
+                                itemsByMail[mailId].push_back(mailItem);
+                            }
+                        } while (resultItems->NextRow());
+                    }
+
                     do
                     {
                         Field* mailFields = resultMail->Fetch();
@@ -3946,40 +3966,16 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                         if (mailTemplateId)
                             draft = MailDraft(mailTemplateId, false);    // items are already included
 
-                        if (has_items)
+                        auto itemsItr = itemsByMail.find(mail_id);
+                        if (itemsItr != itemsByMail.end())
                         {
-                            // Data needs to be at first place for Item::LoadFromDB
-                            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
-                            stmt->setUInt32(0, mail_id);
-                            PreparedQueryResult resultItems = CharacterDatabase.Query(stmt);
-                            if (resultItems)
+                            for (Item* item : itemsItr->second)
                             {
-                                do
-                                {
-                                    Field* itemFields = resultItems->Fetch();
-                                    ObjectGuid::LowType item_guidlow = itemFields[11].GetUInt32();
-                                    uint32 item_template = itemFields[12].GetUInt32();
-
-                                    ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item_template);
-                                    if (!itemProto)
-                                    {
-                                        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                                        stmt->setUInt32(0, item_guidlow);
-                                        trans->Append(stmt);
-                                        continue;
-                                    }
-
-                                    Item* pItem = NewItemOrBag(itemProto);
-                                    if (!pItem->LoadFromDB(item_guidlow, playerGuid, itemFields, item_template))
-                                    {
-                                        pItem->FSetState(ITEM_REMOVED);
-                                        pItem->SaveToDB(trans);              // it also deletes item object!
-                                        continue;
-                                    }
-
-                                    draft.AddItem(pItem);
-                                } while (resultItems->NextRow());
+                                draft.AddItem(item);
                             }
+
+                            // MailDraft will take care of freeing memory.
+                            itemsByMail.erase(itemsItr);
                         }
 
                         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
@@ -8731,7 +8727,7 @@ void Player::StopCastingCharm()
     }
 }
 
-void Player::Say(const std::string& text, const uint32 language)
+void Player::Say(std::string_view text, Language language, WorldObject const* /*= nullptr*/)
 {
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
@@ -8741,11 +8737,16 @@ void Player::Say(const std::string& text, const uint32 language)
 #endif
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, Language(language), this, this, _text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
-void Player::Yell(const std::string& text, const uint32 language)
+void Player::Say(uint32 textId, WorldObject const* target /*= nullptr*/)
+{
+    Talk(textId, CHAT_MSG_SAY, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), target);
+}
+
+void Player::Yell(std::string_view text, Language language, WorldObject const* /*= nullptr*/)
 {
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
@@ -8755,11 +8756,16 @@ void Player::Yell(const std::string& text, const uint32 language)
 #endif
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, Language(language), this, this, _text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), true);
 }
 
-void Player::TextEmote(const std::string& text)
+void Player::Yell(uint32 textId, WorldObject const* target /*= nullptr*/)
+{
+    Talk(textId, CHAT_MSG_YELL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), target);
+}
+
+void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, bool /*= false*/)
 {
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
@@ -8769,68 +8775,79 @@ void Player::TextEmote(const std::string& text)
 #endif
 
     WorldPacket data;
-    std::list<Player*> players;
-    Acore::AnyPlayerInObjectRangeCheck checker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
-    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
-    Cell::VisitWorldObjects(this, searcher, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
-
-    for (auto const& itr : players)
-    {
-        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE) && this->GetTeamId() != itr->GetTeamId())
-        {
-            LocaleConstant loc_idx = itr->GetSession()->GetSessionDbLocaleIndex();
-            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES))
-            {
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, bct->GetText(loc_idx, this->getGender()));
-                itr->SendDirectMessage(&data);
-            }
-        }
-        else
-        {
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
-            itr->SendDirectMessage(&data);
-        }
-    }
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
-void Player::Whisper(const std::string& text, uint32 language, ObjectGuid receiver)
+void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
 {
+    Talk(textId, CHAT_MSG_EMOTE, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+}
+
+void Player::Whisper(std::string_view text, Language language, Player* target, bool /*= false*/)
+{
+    ASSERT(target);
+
     bool isAddonMessage = language == LANG_ADDON;
 
     if (!isAddonMessage)                                    // if not addon data
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
-    Player* rPlayer = ObjectAccessor::FindConnectedPlayer(receiver);
-
     std::string _text(text);
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, rPlayer);
+    sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
 #ifdef ELUNA
-    if (!sEluna->OnChat(this, CHAT_MSG_WHISPER, language, _text, rPlayer))
+    if (!sEluna->OnChat(this, CHAT_MSG_WHISPER, language, _text, target))
+    {
         return;
+    }
 #endif
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, Language(language), this, this, _text);
-    rPlayer->GetSession()->SendPacket(&data);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
+    target->GetSession()->SendPacket(&data);
 
     // rest stuff shouldn't happen in case of addon message
     if (isAddonMessage)
         return;
 
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, Language(language), rPlayer, rPlayer, _text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, Language(language), target, target, _text);
     GetSession()->SendPacket(&data);
 
-    if (!isAcceptWhispers() && !IsGameMaster() && !rPlayer->IsGameMaster())
+    if (!isAcceptWhispers() && !IsGameMaster() && !target->IsGameMaster())
     {
         SetAcceptWhispers(true);
         ChatHandler(GetSession()).SendSysMessage(LANG_COMMAND_WHISPERON);
     }
 
     // announce afk or dnd message
-    if (rPlayer->isAFK())
-        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_AFK, rPlayer->GetName().c_str(), rPlayer->autoReplyMsg.c_str());
-    else if (rPlayer->isDND())
-        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_DND, rPlayer->GetName().c_str(), rPlayer->autoReplyMsg.c_str());
+    if (target->isAFK())
+    {
+        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_AFK, target->GetName().c_str(), target->autoReplyMsg.c_str());
+    }
+    else if (target->isDND())
+    {
+        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_DND, target->GetName().c_str(), target->autoReplyMsg.c_str());
+    }
+}
+
+void Player::Whisper(uint32 textId, Player* target, bool /*isBossWhisper = false*/)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    BroadcastText const* bct = sObjectMgr->GetBroadcastText(textId);
+    if (!bct)
+    {
+        LOG_ERROR("entities.unit", "Player::Whisper: `broadcast_text` was not %u found", textId);
+        return;
+    }
+
+    LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
+    target->SendDirectMessage(&data);
 }
 
 void Player::PetSpellInitialize()
@@ -10229,6 +10246,13 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
 
                 // If spell category is applied by item, then other spells should be exists in item templates
                 if ((itemId > 0) != i_scset->first)
+                {
+                    continue;
+                }
+
+                // Only within the same spellfamily
+                SpellInfo const* categorySpellInfo = sSpellMgr->GetSpellInfo(i_scset->second);
+                if (!categorySpellInfo || categorySpellInfo->SpellFamilyName != spellInfo->SpellFamilyName)
                 {
                     continue;
                 }
@@ -12142,7 +12166,7 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
     if (!grp)
         return ERR_NOT_IN_GROUP;
 
-    if (grp->isLFGGroup())
+    if (grp->isLFGGroup(true))
     {
         ObjectGuid gguid = grp->GetGUID();
         if (!sLFGMgr->GetKicksLeft(gguid))
@@ -12168,9 +12192,13 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
 
         if (Player* target = ObjectAccessor::FindConnectedPlayer(targetPlayerGUID))
         {
-            if (target->HasAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
+            if (Aura* dungeonCooldownAura = target->GetAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
             {
-                return ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S;
+                int32 elapsedTime = dungeonCooldownAura->GetMaxDuration() - dungeonCooldownAura->GetDuration();
+                if (static_cast<int32>(sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER)) > elapsedTime)
+                {
+                    return ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S;
+                }
             }
         }
 
@@ -14171,6 +14199,8 @@ void Player::ActivateSpec(uint8 spec)
     SendActionButtons(2);
     uint8 oldSpec = GetActiveSpec();
 
+    std::unordered_set<uint32> removedSpecAuras;
+
     // xinef: reset talent auras
     for (PlayerTalentMap::iterator itr = m_talents.begin(); itr != m_talents.end(); ++itr)
     {
@@ -14186,13 +14216,18 @@ void Player::ActivateSpec(uint8 spec)
         // pussywizard: was => isn't
         if (!itr->second->IsInSpec(spec) && !itr->second->inSpellBook)
             SendLearnPacket(itr->first, false);
+
+        removedSpecAuras.insert(itr->first);
     }
 
     // xinef: remove glyph auras
     for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
         if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
             if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
+            {
                 RemoveAurasDueToSpell(glyphEntry->SpellId);
+                removedSpecAuras.insert(glyphEntry->SpellId);
+            }
 
     // xinef: set active spec as new one
     SetActiveSpec(spec);
@@ -14215,6 +14250,8 @@ void Player::ActivateSpec(uint8 spec)
         _addTalentAurasAndSpells(itr->first);
         TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first);
         spentTalents += talentPos->rank + 1;
+
+        removedSpecAuras.erase(itr->first);
     }
 
     // pussywizard: remove spells that are in previous spec, but are not present in new one (or are in new spec, but not in the old one)
@@ -14229,11 +14266,15 @@ void Player::ActivateSpec(uint8 spec)
             SendLearnPacket(itr->first, false);
             // We want to remove all auras of the unlearned spell
             _removeTalentAurasAndSpells(itr->first);
+
+            removedSpecAuras.insert(itr->first);
         }
         // pussywizard: wasn't => is
         else if (!itr->second->IsInSpec(oldSpec) && itr->second->IsInSpec(spec))
         {
             SendLearnPacket(itr->first, true);
+
+            removedSpecAuras.erase(itr->first);
         }
     }
 
@@ -14248,10 +14289,30 @@ void Player::ActivateSpec(uint8 spec)
                 if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
                 {
                     CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
+                    removedSpecAuras.erase(glyphEntry->SpellId);
                 }
             }
 
             SetGlyph(slot, glyphId, true);
+        }
+    }
+
+    // Remove auras triggered/activated by talents/glyphs
+    // Mostly explicit casts in dummy aura scripts
+    if (!removedSpecAuras.empty())
+    {
+        for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+        {
+            Aura* aura = iter->second;
+            if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+            {
+                if (removedSpecAuras.find(triggeredByAuraSpellInfo->Id) != removedSpecAuras.end())
+                {
+                    RemoveOwnedAura(iter);
+                    continue;
+                }
+            }
+            ++iter;
         }
     }
 

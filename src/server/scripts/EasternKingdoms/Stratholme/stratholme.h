@@ -20,6 +20,8 @@
 
 #include "SpellAuras.h"
 
+#define StratholmeScriptName "instance_stratholme"
+
 enum DataTypes
 {
     TYPE_BARON_RUN                      = 0,
@@ -89,5 +91,11 @@ enum MiscIds
 
     SPELL_BARON_ULTIMATUM               = 27861
 };
+
+template <class AI, class T>
+inline AI* GetStratholmeAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, StratholmeScriptName);
+}
 
 #endif
