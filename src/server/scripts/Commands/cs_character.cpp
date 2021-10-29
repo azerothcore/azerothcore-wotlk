@@ -277,6 +277,7 @@ public:
     {
         if (!player)
             player = PlayerIdentifier::FromTargetOrSelf(handler);
+
         if (!player || !player->IsConnected())
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
