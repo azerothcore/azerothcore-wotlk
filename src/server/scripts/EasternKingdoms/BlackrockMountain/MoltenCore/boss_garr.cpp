@@ -154,23 +154,19 @@ public:
             return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
         }
 
-        void HandleAuraRemoval(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandlePeriodic(AuraEffect const* aurEff)
         {
-            AuraRemoveMode const removeMode = GetTargetApplication()->GetRemoveMode();
-            if (removeMode == AURA_REMOVE_BY_DEATH || removeMode == AURA_REMOVE_BY_DEFAULT)
+            Unit const* caster = GetCaster();
+            Unit* target = GetTarget();
+            if (caster && target && target->GetDistance(caster) > 40.0f && !target->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
             {
-                return;
-            }
-
-            if (Unit* target = GetTarget())
-            {
-                target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION);
+                target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION, true, nullptr, aurEff);
             }
         }
 
         void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_garr_separation_nexiety_AuraScript::HandleAuraRemoval, EFFECT_0, SPELL_AURA_DUMMY, AuraEffectHandleModes::AURA_EFFECT_HANDLE_REAL);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_garr_separation_nexiety_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 

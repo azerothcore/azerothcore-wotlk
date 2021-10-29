@@ -192,6 +192,7 @@ update `creature` set `MovementType`=0 where `guid` IN (56606, 56607);
 UPDATE `creature_template` SET `ScriptName`='' WHERE  `entry`=12099;
 
 -- Gar "Separation Anexiety"(23487, server side)
+UPDATE `spell_dbc` SET `EffectAura_1`=226, `EffectAuraPeriod_1`=1000 WHERE  `Id`=23487;
 DELETE FROM `spell_script_names` WHERE `spell_id`=23487 AND `ScriptName`='spell_garr_separation_nexiety';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (23487, 'spell_garr_separation_nexiety');
