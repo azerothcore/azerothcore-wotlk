@@ -124,8 +124,9 @@ public:
             }
             else
             {
-                me->setFaction(FACTION_FRIENDLY);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->setFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -216,6 +217,7 @@ public:
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                     me->setFaction(FACTION_FRIENDLY);
                     EnterEvadeMode();
                     Talk(SAY_DEFEAT);
@@ -359,6 +361,10 @@ public:
                     }
                     break;
                 }
+                case PHASE_RAGNAROS_INTRO:
+                {
+                    break;
+                }
             }
         }
 
@@ -366,7 +372,6 @@ public:
         {
             if (events.IsInPhase(PHASE_DEFEAT_OUTRO) && spellInfo->Id == SPELL_TELEPORT_SELF)
             {
-                me->setFaction(FACTION_FRIENDLY);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetHomePosition(majordomoRagnaros);
                 me->NearTeleportTo(majordomoRagnaros.GetPositionX(), majordomoRagnaros.GetPositionY(), majordomoRagnaros.GetPositionZ(), majordomoRagnaros.GetOrientation());
@@ -425,15 +430,14 @@ public:
     {
         PrepareSpellScript(spell_hate_to_zero_SpellScript);
 
-        bool Validate(SpellInfo const* /*spell*/) override
+        bool Load() override
         {
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
         }
 
         void HandleHit(SpellEffIndex /*effIndex*/)
         {
-            Unit* caster = GetCaster();
-            if (caster)
+            if (Unit* caster = GetCaster())
             {
                 if (Creature* creatureCaster = caster->ToCreature())
                 {

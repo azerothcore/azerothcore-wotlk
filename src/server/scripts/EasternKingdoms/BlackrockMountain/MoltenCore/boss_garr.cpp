@@ -235,7 +235,6 @@ public:
         }
     };
 
-    // Should return a fully valid AuraScript pointer.
     SpellScript* GetSpellScript() const override
     {
         return new spell_garr_frenzy_SpellScript();
