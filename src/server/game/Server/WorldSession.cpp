@@ -27,8 +27,10 @@
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "Hyperlinks.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -318,6 +320,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
 
+        METRIC_DETAILED_TIMER("worldsession_update_opcode_time", METRIC_TAG("opcode", opHandle->Name));
+
         try
         {
             switch (opHandle->Status)
@@ -389,6 +393,26 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                 break;
             }
         }
+        catch (WorldPackets::InvalidHyperlinkException const& ihe)
+        {
+            LOG_ERROR("network", "%s sent %s with an invalid link:\n%s", GetPlayerInfo().c_str(),
+                GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), ihe.GetInvalidValue().c_str());
+
+            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+            {
+                KickPlayer("WorldSession::Update Invalid chat link");
+            }
+        }
+        catch (WorldPackets::IllegalHyperlinkException const& ihe)
+        {
+            LOG_ERROR("network", "%s sent %s which illegally contained a hyperlink:\n%s", GetPlayerInfo().c_str(),
+                GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), ihe.GetInvalidValue().c_str());
+
+            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+            {
+                KickPlayer("WorldSession::Update Illegal chat link");
+            }
+        }
         catch (WorldPackets::PacketArrayMaxCapacityException const& pamce)
         {
             LOG_ERROR("network", "PacketArrayMaxCapacityException: %s while parsing %s from %s.",
@@ -419,6 +443,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     }
 
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
+
+    METRIC_VALUE("processed_packets", processedPackets);
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
@@ -650,6 +676,8 @@ void WorldSession::LogoutPlayer(bool save)
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);
 
+        METRIC_EVENT("player_events", "Logout", _player->GetName());
+
         LOG_INFO("entities.player", "Account: %d (IP: %s) Logout Character:[%s] (%s) Level: %d",
             GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), _player->getLevel());
 
@@ -696,6 +724,34 @@ void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 
     if (setKicked)
         SetKicked(true); // pussywizard: the session won't be left ingame for 60 seconds and to also kick offline session
+}
+
+bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
+{
+    if (Acore::Hyperlinks::CheckAllLinks(str))
+        return true;
+
+    LOG_ERROR("network", "Player %s%s sent a message with an invalid link:\n%.*s", GetPlayer()->GetName().c_str(),
+        GetPlayer()->GetGUID().ToString().c_str(), STRING_VIEW_FMT_ARG(str));
+
+    if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+        KickPlayer("WorldSession::ValidateHyperlinksAndMaybeKick Invalid chat link");
+
+    return false;
+}
+
+bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
+{
+    if (str.find('|') == std::string_view::npos)
+        return true;
+
+    LOG_ERROR("network", "Player %s %s sent a message which illegally contained a hyperlink:\n%.*s", GetPlayer()->GetName().c_str(),
+        GetPlayer()->GetGUID().ToString().c_str(), STRING_VIEW_FMT_ARG(str));
+
+    if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+        KickPlayer("WorldSession::DisallowHyperlinksAndMaybeKick Illegal chat link");
+
+    return false;
 }
 
 void WorldSession::SendNotification(const char* format, ...)

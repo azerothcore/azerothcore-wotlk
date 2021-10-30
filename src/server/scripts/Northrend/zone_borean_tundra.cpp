@@ -44,6 +44,7 @@ EndContentData */
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "WorldSession.h"
+#include "ScriptedGossip.h"
 
 // Ours
 enum eDrakeHunt
@@ -504,18 +505,22 @@ public:
 };
 
 /*######
-## npc_beryl_sorcerer
+## Quest 11590: Abduction
 ######*/
 
+// NPC 25316: Beryl Sorcerer
 enum BerylSorcerer
 {
-    NPC_BERYL_SORCERER                  = 25316,
-    NPC_CAPTURED_BERLY_SORCERER         = 25474,
-    NPC_LIBRARIAN_DONATHAN              = 25262,
-
-    SPELL_ARCANE_CHAINS                 = 45611,
-    SPELL_COSMETIC_CHAINS               = 54324,
-    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF  = 45631
+    EVENT_FROSTBOLT                                = 1,
+    EVENT_ARCANE_CHAINS                            = 2,
+    NPC_LIBRARIAN_DONATHAN                         = 25262,
+    NPC_CAPTURED_BERLY_SORCERER                    = 25474,
+    SPELL_FROSTBOLT                                = 9672,
+    SPELL_ARCANE_CHAINS                            = 45611,
+    SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST       = 45625,
+    SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER = 45626,
+    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF             = 45631,
+    SPELL_ARCANE_CHAINS_CHANNEL_II                 = 45735
 };
 
 class npc_beryl_sorcerer : public CreatureScript
@@ -523,67 +528,192 @@ class npc_beryl_sorcerer : public CreatureScript
 public:
     npc_beryl_sorcerer() : CreatureScript("npc_beryl_sorcerer") { }
 
-    struct npc_beryl_sorcererAI : public FollowerAI
+struct npc_beryl_sorcererAI : public CreatureAI
     {
-        npc_beryl_sorcererAI(Creature* creature) : FollowerAI(creature) { }
+        npc_beryl_sorcererAI(Creature* creature) : CreatureAI(creature)
+        {
+            Initialize();
+        }
 
-        bool bEnslaved;
+        void Initialize()
+        {
+            _playerGUID.Clear();
+            _chainsCast = false;
+        }
 
         void Reset() override
         {
-            me->UpdateEntry(NPC_BERYL_SORCERER);
             me->SetReactState(REACT_AGGRESSIVE);
-            bEnslaved = false;
+            Initialize();
         }
 
         void EnterCombat(Unit* who) override
         {
             if (me->IsValidAttackTarget(who))
+            {
                 AttackStart(who);
+            }
+
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
         }
 
-        void SpellHit(Unit* pCaster, const SpellInfo* pSpell) override
+        void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
-            if (pSpell->Id == SPELL_ARCANE_CHAINS && pCaster->GetTypeId() == TYPEID_PLAYER && !HealthAbovePct(50) && !bEnslaved)
+            if (spell->Id == SPELL_ARCANE_CHAINS && !_chainsCast)
             {
-                EnterEvadeMode(); //We make sure that the npc is not attacking the player!
-                me->SetReactState(REACT_PASSIVE);
-                StartFollow(pCaster->ToPlayer(), 0, nullptr);
-                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, nullptr, false);
-                DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
-                me->DespawnOrUnsummon(45000);
+                if (Player* player = unit->ToPlayer())
+                {
+                    _playerGUID = player->GetGUID();
+                    _chainsCast = true;
+                    _events.ScheduleEvent(EVENT_ARCANE_CHAINS, 4000);
+                }
+            }
+        }
 
-                if (Player* player = pCaster->ToPlayer())
-                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+            {
+                return;
+            }
 
-                bEnslaved = true;
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_FROSTBOLT:
+                        DoCastVictim(SPELL_FROSTBOLT);
+                        _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
+                        break;
+                    case EVENT_ARCANE_CHAINS:
+                        if (me->HasAura(SPELL_ARCANE_CHAINS))
+                        {
+                            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                            {
+                                me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM));
+                                player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
+                                me->DisappearAndDie();
+                            }
+                        }
+                        break;
+                }
+            }
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap   _events;
+        ObjectGuid _playerGUID;
+        bool       _chainsCast;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_beryl_sorcererAI(creature);
+    }
+};
+
+// NPC 25474: Captured Beryl Sorcerer
+enum CapturedBerylSorcerer
+{
+    EVENT_ADD_ARCANE_CHAINS                        = 1,
+    EVENT_FOLLOW_PLAYER                            = 2
+};
+
+class npc_captured_beryl_sorcerer : public CreatureScript
+{
+public:
+    npc_captured_beryl_sorcerer() : CreatureScript("npc_captured_beryl_sorcerer") {}
+
+    struct npc_captured_beryl_sorcererAI : public FollowerAI
+    {
+        npc_captured_beryl_sorcererAI(Creature* creature) : FollowerAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0);
+        }
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_ADD_ARCANE_CHAINS:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
+                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
+                            _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1000);
+                        }
+                        break;
+                    case EVENT_FOLLOW_PLAYER:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
+                            StartFollow(summoner);
+                        }
+                        break;
+                }
             }
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             FollowerAI::MoveInLineOfSight(who);
 
             if (who->GetEntry() == NPC_LIBRARIAN_DONATHAN && me->IsWithinDistInMap(who, INTERACTION_DISTANCE))
             {
                 SetFollowComplete();
-                me->DisappearAndDie();
+                me->DespawnOrUnsummon();
             }
         }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
+    private:
+        EventMap _events;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_beryl_sorcererAI(creature);
+        return new npc_captured_beryl_sorcererAI(creature);
+    }
+};
+
+// Spell 45625: - Arcane Chains: Character Force Cast
+class spell_arcane_chains_character_force_cast : public SpellScriptLoader
+{
+public:
+    spell_arcane_chains_character_force_cast() : SpellScriptLoader("spell_arcane_chains_character_force_cast") {}
+
+    class spell_arcane_chains_character_force_cast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_arcane_chains_character_force_cast_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /* effIndex */)
+        {
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_arcane_chains_character_force_cast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_arcane_chains_character_force_cast_SpellScript();
     }
 };
 
@@ -1026,33 +1156,26 @@ public:
 };
 
 /*######
-## npc_hidden_cultist
+## Quest 11794: The hunt is on
 ######*/
 
+// NPCs 25827: Tom Hegger, 25248: Salty John Thorpe, 25828: Guard Mitchells
 enum HiddenCultist
 {
-    SPELL_SHROUD_OF_THE_DEATH_CULTIST           = 46077, //not working
-    SPELL_RIGHTEOUS_VISION                      = 46078, //player aura
-
-    QUEST_THE_HUNT_IS_ON                        = 11794,
-
-    GOSSIP_TEXT_SALTY_JOHN_THORPE               = 12529,
-    GOSSIP_TEXT_GUARD_MITCHELSS                 = 12530,
-    GOSSIP_TEXT_TOM_HEGGER                      = 12528,
-
-    NPC_TOM_HEGGER                              = 25827,
-    NPC_SALTY_JOHN_THORPE                       = 25248,
-    NPC_GUARD_MITCHELLS                         = 25828,
-
-    SAY_HIDDEN_CULTIST_1                        = 0,
-    SAY_HIDDEN_CULTIST_2                        = 1,
-    SAY_HIDDEN_CULTIST_3                        = 2,
-    SAY_HIDDEN_CULTIST_4                        = 3
+    SPELL_SHROUD_OF_THE_DEATH_CULTIST = 46077,
+    SPELL_RIGHTEOUS_VISION            = 46078,
+    NPC_TOM_HEGGER                    = 25827,
+    NPC_SALTY_JOHN_THORPE             = 25248,
+    NPC_GUARD_MITCHELLS               = 25828,
+    SAY_HIDDEN_CULTIST_1              = 0,
+    SAY_HIDDEN_CULTIST_2              = 1,
+    SAY_HIDDEN_CULTIST_3              = 2,
+    SAY_HIDDEN_CULTIST_4              = 3,
+    EVENT_CULTIST_SCRIPT_1            = 1,
+    EVENT_CULTIST_SCRIPT_2            = 2,
+    EVENT_CULTIST_SCRIPT_3            = 3,
+    FACTION_MONSTER                   = 14
 };
-
-const char* GOSSIP_ITEM_TOM_HEGGER = "What do you know about the Cult of the Damned?";
-const char* GOSSIP_ITEM_GUARD_MITCHELLS = "How long have you worked for the Cult of the Damned?";
-const char* GOSSIP_ITEM_SALTY_JOHN_THORPE = "I have a reason to believe you're involved in the cultist activity";
 
 class npc_hidden_cultist : public CreatureScript
 {
@@ -1063,178 +1186,143 @@ public:
     {
         npc_hidden_cultistAI(Creature* creature) : ScriptedAI(creature)
         {
-            uiEmoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
-            uiNpcFlags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
+            Initialize();
+            _emoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
+            _npcFlags   = creature->GetUInt32Value(UNIT_NPC_FLAGS);
         }
 
-        uint32 uiEmoteState;
-        uint32 uiNpcFlags;
-
-        uint32 uiEventTimer;
-        uint8 uiEventPhase;
-
-        ObjectGuid uiPlayerGUID;
+        void Initialize()
+        {
+            _playerGUID.Clear();
+        }
 
         void Reset() override
         {
-            if (uiEmoteState)
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, uiEmoteState);
+            if (_emoteState)
+            {
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, _emoteState);
+            }
 
-            if (uiNpcFlags)
-                me->SetUInt32Value(UNIT_NPC_FLAGS, uiNpcFlags);
+            if (_npcFlags)
+            {
+                me->SetUInt32Value(UNIT_NPC_FLAGS, _npcFlags);
+            }
 
-            uiEventTimer = 0;
-            uiEventPhase = 0;
-
-            uiPlayerGUID.Clear();
-
+            Initialize();
             DoCast(SPELL_SHROUD_OF_THE_DEATH_CULTIST);
-
             me->RestoreFaction();
         }
 
-        void DoAction(int32 /*iParam*/) override
+        void PreScript()
         {
             me->StopMoving();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-            if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            {
                 me->SetFacingToObject(player);
-            uiEventTimer = 3000;
-            uiEventPhase = 1;
-        }
-
-        void SetGUID(ObjectGuid uiGuid, int32 /*iId*/) override
-        {
-            uiPlayerGUID = uiGuid;
+            }
+            _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_1, 3000);
         }
 
         void AttackPlayer()
         {
-            me->setFaction(14);
-            if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+            me->setFaction(FACTION_MONSTER);
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            {
                 AttackStart(player);
+            }
         }
 
-        void UpdateAI(uint32 uiDiff) override
+        void UpdateAI(uint32 diff) override
         {
-            if (uiEventTimer && uiEventTimer <= uiDiff)
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
             {
-                switch (uiEventPhase)
+                switch (eventId)
                 {
-                    case 1:
+                    case EVENT_CULTIST_SCRIPT_1:
+                    {
                         switch (me->GetEntry())
                         {
                             case NPC_SALTY_JOHN_THORPE:
-                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                                 Talk(SAY_HIDDEN_CULTIST_1);
-                                uiEventTimer = 5000;
-                                uiEventPhase = 2;
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_2, 5000);
                                 break;
                             case NPC_GUARD_MITCHELLS:
                                 Talk(SAY_HIDDEN_CULTIST_2);
-                                uiEventTimer = 5000;
-                                uiEventPhase = 2;
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_2, 5000);
                                 break;
                             case NPC_TOM_HEGGER:
-                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+                                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                                 {
                                     Talk(SAY_HIDDEN_CULTIST_3, player);
                                 }
-                                uiEventTimer = 5000;
-                                uiEventPhase = 2;
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_2, 5000);
                                 break;
                         }
                         break;
-                    case 2:
+                    }
+                    case EVENT_CULTIST_SCRIPT_2:
+                    {
                         switch (me->GetEntry())
                         {
                             case NPC_SALTY_JOHN_THORPE:
                                 Talk(SAY_HIDDEN_CULTIST_4);
-                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+                                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                                {
                                     me->SetFacingToObject(player);
-                                uiEventTimer = 3000;
-                                uiEventPhase = 3;
+                                }
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_3, 3000);
                                 break;
                             case NPC_GUARD_MITCHELLS:
                             case NPC_TOM_HEGGER:
                                 AttackPlayer();
-                                uiEventPhase = 0;
                                 break;
                         }
                         break;
-                    case 3:
+                    }
+                    case EVENT_CULTIST_SCRIPT_3:
+                    {
                         if (me->GetEntry() == NPC_SALTY_JOHN_THORPE)
                         {
                             AttackPlayer();
-                            uiEventPhase = 0;
                         }
+                        break;
+                    }
+                    default:
                         break;
                 }
             }
-            else uiEventTimer -= uiDiff;
 
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             DoMeleeAttackIfReady();
         }
+
+        void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        {
+            if (gossipListId == 0)
+            {
+                CloseGossipMenuFor(player);
+                _playerGUID = player->GetGUID();
+                PreScript();
+            }
+        }
+        private:
+            EventMap   _events;
+            uint32     _emoteState;
+            uint32     _npcFlags;
+            ObjectGuid _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hidden_cultistAI(creature);
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        uint32 uiGossipText = 0;
-        const char* charGossipItem;
-
-        switch (creature->GetEntry())
-        {
-            case NPC_TOM_HEGGER:
-                uiGossipText = GOSSIP_TEXT_TOM_HEGGER;
-                charGossipItem = GOSSIP_ITEM_TOM_HEGGER;
-                break;
-            case NPC_SALTY_JOHN_THORPE:
-                uiGossipText = GOSSIP_TEXT_SALTY_JOHN_THORPE;
-                charGossipItem = GOSSIP_ITEM_SALTY_JOHN_THORPE;
-                break;
-            case NPC_GUARD_MITCHELLS:
-                uiGossipText = GOSSIP_TEXT_GUARD_MITCHELSS;
-                charGossipItem = GOSSIP_ITEM_GUARD_MITCHELLS;
-                break;
-            default:
-                charGossipItem = "";
-                return false;
-        }
-
-        if (player->HasAura(SPELL_RIGHTEOUS_VISION) && player->GetQuestStatus(QUEST_THE_HUNT_IS_ON) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, uiGossipText, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-            creature->AI()->SetGUID(player->GetGUID());
-            creature->AI()->DoAction(1);
-        }
-
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
     }
 };
 
@@ -1352,6 +1440,8 @@ void AddSC_borean_tundra()
     new npc_nerubar_victim();
     new npc_lurgglbr();
     new npc_beryl_sorcerer();
+    new npc_captured_beryl_sorcerer();
+    new spell_arcane_chains_character_force_cast();
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
     new npc_bonker_togglevolt();

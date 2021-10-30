@@ -28,6 +28,7 @@
 #include "LFGMgr.h"
 #include "Map.h"
 #include "MapInstanced.h"
+#include "Metric.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -868,6 +869,14 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     HandleDelayedVisibility();
 
     sScriptMgr->OnMapUpdate(this, t_diff);
+
+    METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
+        METRIC_TAG("map_id", std::to_string(GetId())),
+        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
+
+    METRIC_VALUE("map_gameobjects", uint64(GetObjectsStore().Size<GameObject>()),
+        METRIC_TAG("map_id", std::to_string(GetId())),
+        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
 }
 
 void Map::HandleDelayedVisibility()

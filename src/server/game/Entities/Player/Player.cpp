@@ -12183,9 +12183,13 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
 
         if (Player* target = ObjectAccessor::FindConnectedPlayer(targetPlayerGUID))
         {
-            if (target->HasAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
+            if (Aura* dungeonCooldownAura = target->GetAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
             {
-                return ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S;
+                int32 elapsedTime = dungeonCooldownAura->GetMaxDuration() - dungeonCooldownAura->GetDuration();
+                if (static_cast<int32>(sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER)) > elapsedTime)
+                {
+                    return ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S;
+                }
             }
         }
 
@@ -14179,6 +14183,8 @@ void Player::ActivateSpec(uint8 spec)
     SendActionButtons(2);
     uint8 oldSpec = GetActiveSpec();
 
+    std::unordered_set<uint32> removedSpecAuras;
+
     // xinef: reset talent auras
     for (PlayerTalentMap::iterator itr = m_talents.begin(); itr != m_talents.end(); ++itr)
     {
@@ -14194,13 +14200,18 @@ void Player::ActivateSpec(uint8 spec)
         // pussywizard: was => isn't
         if (!itr->second->IsInSpec(spec) && !itr->second->inSpellBook)
             SendLearnPacket(itr->first, false);
+
+        removedSpecAuras.insert(itr->first);
     }
 
     // xinef: remove glyph auras
     for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
         if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
             if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
+            {
                 RemoveAurasDueToSpell(glyphEntry->SpellId);
+                removedSpecAuras.insert(glyphEntry->SpellId);
+            }
 
     // xinef: set active spec as new one
     SetActiveSpec(spec);
@@ -14223,6 +14234,8 @@ void Player::ActivateSpec(uint8 spec)
         _addTalentAurasAndSpells(itr->first);
         TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first);
         spentTalents += talentPos->rank + 1;
+
+        removedSpecAuras.erase(itr->first);
     }
 
     // pussywizard: remove spells that are in previous spec, but are not present in new one (or are in new spec, but not in the old one)
@@ -14237,11 +14250,15 @@ void Player::ActivateSpec(uint8 spec)
             SendLearnPacket(itr->first, false);
             // We want to remove all auras of the unlearned spell
             _removeTalentAurasAndSpells(itr->first);
+
+            removedSpecAuras.insert(itr->first);
         }
         // pussywizard: wasn't => is
         else if (!itr->second->IsInSpec(oldSpec) && itr->second->IsInSpec(spec))
         {
             SendLearnPacket(itr->first, true);
+
+            removedSpecAuras.erase(itr->first);
         }
     }
 
@@ -14256,10 +14273,30 @@ void Player::ActivateSpec(uint8 spec)
                 if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
                 {
                     CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
+                    removedSpecAuras.erase(glyphEntry->SpellId);
                 }
             }
 
             SetGlyph(slot, glyphId, true);
+        }
+    }
+
+    // Remove auras triggered/activated by talents/glyphs
+    // Mostly explicit casts in dummy aura scripts
+    if (!removedSpecAuras.empty())
+    {
+        for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+        {
+            Aura* aura = iter->second;
+            if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+            {
+                if (removedSpecAuras.find(triggeredByAuraSpellInfo->Id) != removedSpecAuras.end())
+                {
+                    RemoveOwnedAura(iter);
+                    continue;
+                }
+            }
+            ++iter;
         }
     }
 
