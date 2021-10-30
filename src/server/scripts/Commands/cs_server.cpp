@@ -219,6 +219,10 @@ public:
         handler->PSendSysMessage("Using World DB Revision: %s", sWorld->GetWorldDBRevision());
         handler->PSendSysMessage("Using Character DB Revision: %s", sWorld->GetCharacterDBRevision());
         handler->PSendSysMessage("Using Auth DB Revision: %s", sWorld->GetAuthDBRevision());
+
+        handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
+        handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
+        handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
         return true;
     }
 
