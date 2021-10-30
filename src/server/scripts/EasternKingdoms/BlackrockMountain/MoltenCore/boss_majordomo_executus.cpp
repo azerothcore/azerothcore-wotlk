@@ -530,5 +530,6 @@ void AddSC_boss_majordomo()
     new boss_majordomo();
 
     // Spells
+    new spell_hate_to_zero();
     new spell_majordomo_separation_nexiety();
 }
