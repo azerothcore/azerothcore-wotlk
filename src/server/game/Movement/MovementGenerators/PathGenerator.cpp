@@ -565,7 +565,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
         _type = PathType(_type | PATHFIND_NOPATH);
         return;
     }
-    else if (pointCount >= _pointPathLimit)
+    else if (pointCount > _pointPathLimit)
     {
         BuildShortcut();
         _type = PathType(_type | PATHFIND_SHORT);
