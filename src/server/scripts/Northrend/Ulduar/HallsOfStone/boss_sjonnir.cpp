@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "halls_of_stone.h"
 #include "Player.h"
@@ -207,7 +220,7 @@ public:
                             if (pInstance)
                                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                                 {
-                                    brann->MonsterYell("What in the name o' Madoran did THAT do? Oh! Wait: I just about got it...", LANG_UNIVERSAL, 0);
+                                    brann->Yell("What in the name o' Madoran did THAT do? Oh! Wait: I just about got it...", LANG_UNIVERSAL);
                                     brann->PlayDirectSound(14276);
                                 }
                         }
@@ -216,7 +229,7 @@ public:
                         {
                             if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                             {
-                                brann->MonsterYell("Ha, that did it! Help's a-comin'! Take this, ya glowin' iron brute!", LANG_UNIVERSAL, 0);
+                                brann->Yell("Ha, that did it! Help's a-comin'! Take this, ya glowin' iron brute!", LANG_UNIVERSAL);
                                 brann->PlayDirectSound(14277);
                             }
                             SummonPhase = PHASE_SUMMON_FRIENDLY_DWARFES;
@@ -263,7 +276,7 @@ public:
                     {
                         if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                         {
-                            brann->MonsterYell("This is a wee bit trickier that before... Oh, bloody--incomin'!", LANG_UNIVERSAL, 0);
+                            brann->Yell("This is a wee bit trickier that before... Oh, bloody--incomin'!", LANG_UNIVERSAL);
                             brann->PlayDirectSound(14275);
                         }
 

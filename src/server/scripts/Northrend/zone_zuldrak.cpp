@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CombatAI.h"
@@ -121,33 +132,33 @@ public:
             switch (counter)
             {
                 case 1:
-                    me->MonsterTextEmote("Quickly, get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Quickly, get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 2:
-                    me->MonsterTextEmote("Find me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Find me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 3:
-                    me->MonsterTextEmote("I think it needs...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("I think it needs...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 4:
-                    me->MonsterTextEmote("Alright, now fetch me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Alright, now fetch me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 5:
-                    me->MonsterTextEmote("Before it thickens, we must add...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Before it thickens, we must add...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 6:
-                    me->MonsterTextEmote("It's thickening! Quickly get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("It's thickening! Quickly get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
             }

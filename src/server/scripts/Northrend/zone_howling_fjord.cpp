@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -108,16 +119,16 @@ public:
             switch (newPhase)
             {
                 case 1:
-                    me->MonsterWhisper("You think that you can get rid of me through meditation?", summoner->ToPlayer());
+                    me->Whisper("You think that you can get rid of me through meditation?", LANG_UNIVERSAL, summoner->ToPlayer());
                     return;
                 case 2:
-                    me->MonsterWhisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", summoner->ToPlayer());
+                    me->Whisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", LANG_UNIVERSAL, summoner->ToPlayer());
                     return;
                 case 3:
-                    me->MonsterWhisper("You cannot defeat me. I'm an inseparable part of you!", summoner->ToPlayer());
+                    me->Whisper("You cannot defeat me. I'm an inseparable part of you!", LANG_UNIVERSAL, summoner->ToPlayer());
                     return;
                 case 4:
-                    me->MonsterWhisper("NOOOOOOOoooooooooo!", summoner->ToPlayer());
+                    me->Whisper("NOOOOOOOoooooooooo!", LANG_UNIVERSAL, summoner->ToPlayer());
                     me->SetLevel(summoner->getLevel());
                     me->setFaction(14);
                     if (me->GetExactDist(summoner) < 50.0f)
