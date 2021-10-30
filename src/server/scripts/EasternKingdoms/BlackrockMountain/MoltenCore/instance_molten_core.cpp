@@ -303,7 +303,7 @@ public:
         {
             if (action == ACTION_RESET_MAGMADAR_ENCOUNTER)
             {
-                if (Creature* golemagg = instance->GetCreature(DATA_GOLEMAGG))
+                if (Creature* golemagg = instance->GetCreature(_golemaggGUID))
                 {
                     golemagg->AI()->EnterEvadeMode();
                 }
