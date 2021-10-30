@@ -926,11 +926,15 @@ namespace Acore
         bool operator()(Unit* u)
         {
             if (G3D::fuzzyEq(_range, 0.0f))
+            {
                 return false;
-
+            }
+            
             if (_playerOnly && u->GetTypeId() != TYPEID_PLAYER)
+            {
                 return false;
-
+            }
+            
             if (_raid)
             {
                 if (!_refUnit->IsInRaidWith(u))
@@ -1004,8 +1008,12 @@ namespace Acore
             i_targetForPlayer = (check->GetTypeId() == TYPEID_PLAYER);
 
             if (!_spellInfo)
+            {
                 if (DynamicObject const* dynObj = i_obj->ToDynObject())
+                {
                     _spellInfo = sSpellMgr->GetSpellInfo(dynObj->GetSpellId());
+                }
+            }
         }
         bool operator()(Unit* u)
         {

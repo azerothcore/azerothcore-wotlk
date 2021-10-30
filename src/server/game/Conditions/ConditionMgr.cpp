@@ -1060,8 +1060,10 @@ void ConditionMgr::LoadConditions(bool isReload)
             {
                 SpellClickEventConditionStore[cond->SourceGroup][cond->SourceEntry].push_back(cond);
                 if (cond->ConditionType == CONDITION_AURA)
+                {
                     SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
-                valid = true;
+                }
+				valid = true;
                 ++count;
                 continue; // do not add to m_AllocatedMemory to avoid double deleting
             }
@@ -1125,8 +1127,10 @@ void ConditionMgr::LoadConditions(bool isReload)
 
         // add new Condition to storage based on Type/Entry
         if (cond->SourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT && cond->ConditionType == CONDITION_AURA)
+        {
             SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
-        ConditionStore[cond->SourceType][cond->SourceEntry].push_back(cond);
+        }
+		ConditionStore[cond->SourceType][cond->SourceEntry].push_back(cond);
         ++count;
     } while (result->NextRow());
 
