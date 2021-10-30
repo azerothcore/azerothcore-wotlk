@@ -35,6 +35,7 @@ enum Spells
     SPELL_ANTIMAGIC_PULSE               = 19492,    // Dispels magic on nearby enemies, removing 1 beneficial spell
     SPELL_MAGMA_SHACKLES                = 19496,    // Reduces the movement speed of nearby enemies by 60%
     SPELL_SEPARATION_ANXIETY            = 23487,    // Aura cast on himself by Garr, if adds move out of range, they will cast spell 23492 on themselves (server side)
+    SPELL_FRENZY                        = 19516,    // Increases the caster's attack speed by 9 + scale. Stacks up to 10 times
 
     // Fireworn
     SPELL_SEPARATION_ANXIETY_MINION     = 23492,    // Increases damage done by 300% and applied banish immunity
@@ -157,7 +158,7 @@ public:
                 DoCastSelf(SPELL_ERUPTION, true);
             }
 
-            DoCastAOE(SPELL_ENRAGE_TRIGGER, true);
+            DoCastAOE(SPELL_ENRAGE_TRIGGER);
         }
     };
 
@@ -205,6 +206,39 @@ public:
     }
 };
 
+//19515 Frenzy (SERVERSIDE)
+class spell_garr_frenzy : public SpellScriptLoader
+{
+public:
+    spell_garr_frenzy() : SpellScriptLoader("spell_garr_frenzy") {}
+
+    class spell_garr_frenzy_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_garr_frenzy_SpellScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return ValidateSpellInfo({ SPELL_FRENZY });
+        }
+
+        void HandleHit(SpellEffIndex effIndex)
+        {
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_FRENZY);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_garr_frenzy_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    // Should return a fully valid AuraScript pointer.
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_garr_frenzy_SpellScript();
+    }
+};
+
 void AddSC_boss_garr()
 {
     new boss_garr();
@@ -212,4 +246,5 @@ void AddSC_boss_garr()
 
     // Spells
     new spell_garr_separation_nexiety();
+    new spell_garr_frenzy();
 }

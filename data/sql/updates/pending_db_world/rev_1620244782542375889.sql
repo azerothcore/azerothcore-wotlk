@@ -219,9 +219,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 -- Allow casting while dead
 update `spell_dbc` set `attributes`=`attributes` | 0x00800000 where `id` = 19515;
 
-DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=19515 AND `spell_effect`=19516 AND `type`=1;
-INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
-(19515, 19516, 1, 'Frenzy - On Hit - Trigger Enrage');
+DELETE FROM `spell_script_names` WHERE `spell_id`=19515 AND `ScriptName`='spell_garr_frenzy';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(19515, 'spell_garr_frenzy');
 
 -- 20482 Firesworn Eruption Trigger (SERVERSIDE)
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=17 AND `SourceGroup`=0 AND `SourceEntry`=20482 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=1 AND `ConditionValue1`=3 AND `ConditionValue2`=12099 AND `ConditionValue3`=0;
