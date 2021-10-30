@@ -353,14 +353,11 @@ public:
                 return false;
             }
 
-            if (WorldSession* session = handler->GetSession())
+            if (sObjectMgr->IsReservedName(newName))
             {
-                if (sObjectMgr->IsReservedName(newName))
-                {
-                    handler->SendSysMessage(LANG_RESERVED_NAME);
-                    handler->SetSentErrorMessage(true);
-                    return false;
-                }
+                handler->SendSysMessage(LANG_RESERVED_NAME);
+                handler->SetSentErrorMessage(true);
+                return false;
             }
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
