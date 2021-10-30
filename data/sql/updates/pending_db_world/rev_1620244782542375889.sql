@@ -232,3 +232,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=20482 AND `spell_effect`=20483 AND `type`=1;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
 (20482, 20483, 1, 'Firesworn Eruption Trigger - On Hit - Trigger Massive Eruption');
+
+-- Golemagg formation
+set @leader := 56684;
+DELETE FROM `creature_formations` WHERE `memberGUID` IN (@leader, 56685, 56699);
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (@leader, 56685, 56699);
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
+(@leader, @leader, 0, 0, 2, 0, 0),
+(@leader, 56685, 0, 0, 3, 0, 0),
+(@leader, 56699, 0, 0, 3, 0, 0);

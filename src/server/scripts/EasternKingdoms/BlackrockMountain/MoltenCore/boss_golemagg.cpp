@@ -35,14 +35,8 @@ enum Spells
     SPELL_ATTRACK_RAGER         = 20544,
 
     // Core Rager
-    SPELL_QUIET_SUICIDE         = 3617,     // Server side
     SPELL_MANGLE                = 19820,
     SPELL_FULL_HEAL             = 17683,
-};
-
-enum Misc
-{
-    DATA_GOLEMAGG_CORE_HOUND    = 1
 };
 
 class boss_golemagg : public CreatureScript
@@ -60,53 +54,15 @@ public:
 
         void Reset() override
         {
+            _Reset();
             earthquakeTimer = 0;
             pyroblastTimer = urand(3000, 7000);
             enraged = false;
-
-            _Reset();
-            for (ObjectGuid const& minionGuid : coreHoundsGuids)
-            {
-                Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
-                if (minion && minion->isDead())
-                {
-                    minion->Respawn();
-                }
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            for (ObjectGuid const& minionGuid : coreHoundsGuids)
-            {
-                Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
-                if (minion && minion->IsAlive())
-                {
-                    minion->CastSpell(minion, SPELL_QUIET_SUICIDE, true);
-                }
-            }
-
-            coreHoundsGuids.clear();
         }
 
         void EnterCombat(Unit* victim) override
         {
             _EnterCombat();
-            for (ObjectGuid const& minionGuid : coreHoundsGuids)
-            {
-                if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
-                {
-                    if (minion->isDead())
-                    {
-                        minion->Respawn();
-                    }
-
-                    minion->AI()->DoZoneInCombat();
-                    minion->AI()->AttackStart(victim);
-                }
-            }
-
             pyroblastTimer = urand(3000, 7000);
         }
 
@@ -122,18 +78,12 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 id) override
-        {
-            if (id == DATA_GOLEMAGG_CORE_HOUND)
-            {
-                coreHoundsGuids.insert(guid);
-            }
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             // Should not get impact by cast state (cast should always happen)
             if (earthquakeTimer)
@@ -172,7 +122,6 @@ public:
         }
 
     private:
-        GuidSet coreHoundsGuids;
         uint32 earthquakeTimer;
         uint32 pyroblastTimer;
         bool enraged;
@@ -197,26 +146,13 @@ public:
         {
         }
 
-        void InitializeAI() override
-        {
-            ScriptedAI::InitializeAI();
-
-            if (instance->GetBossState(DATA_GOLEMAGG) != DONE)
-            {
-                if (Creature* golemagg = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GOLEMAGG)))
-                {
-                    golemagg->AI()->SetGUID(me->GetGUID(), DATA_GOLEMAGG_CORE_HOUND);
-                }
-            }
-        }
-
         void Reset() override
         {
             mangleTimer = 7000;               // These times are probably wrong
 
             if (instance->GetBossState(DATA_GOLEMAGG) == DONE)
             {
-                DoCastSelf(SPELL_QUIET_SUICIDE);
+                DoCastSelf(SPELL_CORE_RAGER_QUIET_SUICIDE, true);
             }
         }
 

@@ -83,6 +83,11 @@ public:
                     _golemaggGUID = creature->GetGUID();
                     break;
                 }
+                case NPC_CORE_RAGER:
+                {
+                    _golemaggMinionsGUIDS.insert(creature->GetGUID());
+                    break;
+                }
                 case NPC_MAJORDOMO_EXECUTUS:
                 {
                     _majordomoExecutusGUID = creature->GetGUID();
@@ -216,7 +221,60 @@ public:
             {
                 DoRespawnGameObject(_cacheOfTheFirelordGUID, 7 * DAY);
             }
-
+            else if (bossId == DATA_GOLEMAGG)
+            {
+                switch (state)
+                {
+                    case NOT_STARTED:
+                    case FAIL:
+                    {
+                        if (!_golemaggMinionsGUIDS.empty())
+                        {
+                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                            {
+                                Creature* minion = instance->GetCreature(minionGuid);
+                                if (minion && minion->isDead())
+                                {
+                                    minion->Respawn();
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case IN_PROGRESS:
+                    {
+                        if (!_golemaggMinionsGUIDS.empty())
+                        {
+                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                            {
+                                if (Creature* minion = instance->GetCreature(minionGuid))
+                                {
+                                    minion->AI()->DoZoneInCombat(nullptr, 150.0f);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case DONE:
+                    {
+                        if (!_golemaggMinionsGUIDS.empty())
+                        {
+                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                            {
+                                if (Creature* minion = instance->GetCreature(minionGuid))
+                                {
+                                    minion->CastSpell(minion, SPELL_CORE_RAGER_QUIET_SUICIDE, true);
+                                }
+                            }
+                            // TODO: uncomment this once rewrite is ready for release
+                            //_golemaggMinionsGUIDS.clear();
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
             // Perform needed checks for Majordomu
             if (bossId < DATA_MAJORDOMO_EXECUTUS && state == DONE)
             {
@@ -326,10 +384,14 @@ public:
         std::unordered_map<uint32/*bossid*/, ObjectGuid/*circleGUID*/> _circlesGUIDs;
         std::unordered_map<uint32/*bossid*/, ObjectGuid/*runeGUID*/> _runesGUIDs;
 
+        // Golemagg encounter related
         ObjectGuid _golemaggGUID;
+        GuidSet _golemaggMinionsGUIDS;
+
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;
         ObjectGuid _garrGUID;
+        ObjectGuid _magmadarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
