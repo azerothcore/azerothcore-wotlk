@@ -221,7 +221,7 @@ public:
             return ValidateSpellInfo({ SPELL_FRENZY });
         }
 
-        void HandleHit(SpellEffIndex effIndex)
+        void HandleHit(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
             {
