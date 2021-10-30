@@ -70,7 +70,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,3,3741.9653,3571.4446,477.44086,0,0,0,100,0);
 
 -- Add scriptnames
-UPDATE `creature_template` SET `ScriptName`='npc_general_arlos' WHERE `entry`=25250;
 UPDATE `creature_template` SET `ScriptName`='npc_leryssa' WHERE `entry`=25251;
 UPDATE `creature_template` SET `ScriptName`='npc_counselor_talbot' WHERE `entry`=25301;
 UPDATE `creature` SET `ScriptName`='npc_thassarian' WHERE `guid`=101136;
@@ -78,12 +77,6 @@ UPDATE `creature` SET `ScriptName`='npc_thassarian2' WHERE `guid`=101303;
 
 -- Image of the Lich King flags were wrong
 UPDATE `creature_template` SET `unit_flags`=768 WHERE `entry`=26203;
-
--- Condition for source Spell implicit target condition type Object entry guid
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=3 AND `SourceEntry`=50995 AND `SourceId`=0;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 3, 50995, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Spell Empowered Blood Presence (effects 0 & 1) will hit the potential target of the spell if target is player any player.'),
-(13, 3, 50995, 0, 1, 31, 0, 3, 26170, 0, 0, 0, 0, '', 'Spell Empowered Blood Presence (effects 0 & 1) will hit the potential target of the spell if target is Thassarian.');
 
 -- Prince Valanar fix class and expansion and add missing loot 
 UPDATE `creature_template` SET `exp`=2, `unit_class`=8, `lootid`=28189,`mingold`=3000, `maxgold`=6500 WHERE `entry`=28189;
@@ -104,6 +97,6 @@ UPDATE `creature_template` SET `flags_extra`=64 WHERE  `entry`=26170;
 UPDATE `creature_addon` SET `emote`=20 WHERE `guid`=101355;
 
 -- Condition for source Spell implicit target condition type Object entry guid
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=46685 AND `SourceId`=0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=46685;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 46685, 0, 0, 31, 0, 3, 26173, 0, 0, 0, 0, '', 'Spell Borean Tundra - Quest - Thassarian Flay (effect 0) will hit the potential target of the spell if target is unit Tanathal.');
