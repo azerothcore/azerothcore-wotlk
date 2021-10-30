@@ -57,7 +57,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_MAGIC_REFLECTION  = 1,
+    EVENT_MAGIC_REFLECTION          = 1,
     EVENT_DAMAGE_REFLECTION,
     EVENT_BLAST_WAVE,
     EVENT_TELEPORT,
@@ -70,13 +70,14 @@ enum Events
 
 enum Misc
 {
-    GOSSIP_HELLO        = 4995,
-    FACTION_FRIENDLY    = 35,
-    SUMMON_GROUP_ADDS   = 1,
+    GOSSIP_HELLO                    = 4995,
+    FACTION_FRIENDLY                = 35,
+    SUMMON_GROUP_ADDS               = 1,
 
     // Event phases
-    EVENT_NORMAL_COMBAT = 0x01,
-    EVENT_OUTRO_EVENT   = 0x02,
+    EVENT_PHASE_NONE                = 0x00,
+    EVENT_PHASE_COMBAT              = 0x01,
+    EVENT_PHASE_OUTRO               = 0x02,
 };
 
 Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.0f};
@@ -120,14 +121,14 @@ public:
 
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
-                events.SetPhase(EVENT_NORMAL_COMBAT);
+                events.SetPhase(EVENT_PHASE_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
             }
             else
             {
                 static_minionsGUIDS.clear();
                 summons.DespawnAll();
-                events.SetPhase(EVENT_OUTRO_EVENT);
+                events.SetPhase(EVENT_PHASE_OUTRO);
             }
         }
 
@@ -149,10 +150,10 @@ public:
             _EnterCombat();
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
-            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
-            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT, 20000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
+            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT, 20000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -182,7 +183,7 @@ public:
                 else if (!remainingAdds)
                 {
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
-                    events.CancelEventGroup(EVENT_NORMAL_COMBAT);
+                    events.CancelEventGroup(EVENT_PHASE_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
                     me->setFaction(FACTION_FRIENDLY);
                     EnterEvadeMode();
@@ -213,7 +214,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (events.IsInPhase(EVENT_NORMAL_COMBAT))
+            if (events.IsInPhase(EVENT_PHASE_COMBAT))
             {
                 if (!UpdateVictim())
                 {
