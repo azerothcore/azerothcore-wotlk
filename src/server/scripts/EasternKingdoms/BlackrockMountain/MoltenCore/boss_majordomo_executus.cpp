@@ -103,10 +103,10 @@ public:
                 {
                     for (TempSummon const* summon : p_summons)
                     {
-                        if (!summon)
-                            continue;
-                        
-                        static_minionsGUIDS.insert(summon->GetGUID());
+                        if (summon)
+                        {
+                            static_minionsGUIDS.insert(summon->GetGUID());
+                        }
                     }
                 }
             }
