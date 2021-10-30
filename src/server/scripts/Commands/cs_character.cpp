@@ -397,14 +397,6 @@ public:
             sWorld->UpdateGlobalPlayerData(player->GetGUID().GetCounter(), PLAYER_UPDATE_DATA_NAME, newName);
 
             handler->PSendSysMessage(LANG_RENAME_PLAYER_WITH_NEW_NAME, player->GetName().c_str(), newName.c_str());
-
-            if (WorldSession* session = handler->GetSession())
-            {
-                if (Player* player = session->GetPlayer())
-                    LOG_GM(session->GetAccountId(), "GM %s (Account: %u) forced rename %s to player %s (Account: %u)", player->GetName().c_str(), session->GetAccountId(), newName.c_str(), player->GetName().c_str(), sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter()));
-            }
-            else
-                LOG_GM(0, "CONSOLE forced rename '%s' to '%s' (%s)", player->GetName().c_str(), newName.c_str(), player->GetGUID().ToString().c_str());
         }
         else
         {
