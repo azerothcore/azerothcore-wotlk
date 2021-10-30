@@ -343,6 +343,11 @@ public:
 
             for (uint8 i = 0; i < DATA_MAJORDOMO_EXECUTUS; ++i)
             {
+                if (i == DATA_LUCIFRON)
+                {
+                    continue;
+                }
+
                 if (GetBossState(i) != DONE)
                 {
                     return false;
