@@ -224,9 +224,9 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (19515, 'spell_garr_frenzy');
 
 -- 20482 Firesworn Eruption Trigger (SERVERSIDE)
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=17 AND `SourceGroup`=0 AND `SourceEntry`=20482 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=1 AND `ConditionValue1`=3 AND `ConditionValue2`=12099 AND `ConditionValue3`=0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=3 AND `SourceEntry`=20482 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=1 AND `ConditionValue1`=3 AND `ConditionValue2`=12099 AND `ConditionValue3`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(17, 0, 20482, 0, 0, 31, 1, 3, 12099, 0, 0, 0, 0, '', 'spell "Firesworn Eruption Trigger" should target only Firesworn');
+(13, 3, 20482, 0, 0, 31, 0, 3, 12099, 0, 0, 0, 0, '', 'spell "Firesworn Eruption Trigger" should target only Firesworn');
 
 -- 20482 Firesworn Eruption Trigger (SERVERSIDE)
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=20482 AND `spell_effect`=20483 AND `type`=1;
