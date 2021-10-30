@@ -125,6 +125,7 @@ public:
             }
             else
             {
+                static_minionsGUIDS.clear();
                 summons.DespawnAll();
                 events.SetPhase(EVENT_OUTRO_EVENT);
             }
