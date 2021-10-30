@@ -67,6 +67,7 @@ enum Spells
     SPELL_ELEMENTAL_FIRE                    = 19773,
     SPELL_RAGNA_EMERGE                      = 20568,
     SPELL_RAGNAROS_FADE                     = 21107,
+    SPELL_RAGNAROS_SUBMERGE_EFFECT          = 21859,    // Applies pacify state and applies all schools immunity
 };
 
 enum Events
@@ -197,6 +198,11 @@ public:
 
         void EnterCombat(Unit* /*attacker*/) override
         {
+            if (!events.IsInPhase(PHASE_COMBAT))
+            {
+                return;
+            }
+
             _EnterCombat();
             DoCastAOE(SPELL_SEPARATION_ANXIETY);
             spawnInTextTimer = 0;
@@ -275,7 +281,7 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            if (me->GetHealth() <= damage)
+            if (events.IsInPhase(PHASE_COMBAT) && me->GetHealth() <= damage)
             {
                 damage = 0;
             }
@@ -457,7 +463,7 @@ public:
                             {
                                 if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
                                 {
-                                    ragnaros->CastSpell(me, SPELL_ELEMENTAL_FIRE);
+                                    ragnaros->CastSpell(me, SPELL_ELEMENTAL_FIRE, true);
                                 }
                                 break;
                             }
@@ -655,6 +661,7 @@ public:
                 if (TempSummon* ragnaros = caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS))
                 {
                     ragnaros->CastSpell(ragnaros, SPELL_RAGNAROS_FADE);
+                    ragnaros->CastSpell(ragnaros, SPELL_RAGNAROS_SUBMERGE_EFFECT, true);
                 }
             }
         }
