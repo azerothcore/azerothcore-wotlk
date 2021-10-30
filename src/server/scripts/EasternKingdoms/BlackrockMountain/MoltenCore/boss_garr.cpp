@@ -223,7 +223,10 @@ public:
 
         void HandleHit(SpellEffIndex effIndex)
         {
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_FRENZY);
+            if (Unit* target = GetHitUnit())
+            {
+                target->CastSpell(target, SPELL_FRENZY);
+            }
         }
 
         void Register() override
