@@ -21,6 +21,7 @@
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "ObjectAccessor.h"
+#include "SpellScript.h"
 
 enum Texts
 {
@@ -65,9 +66,9 @@ enum Events
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
 
-    EVENT_OUTRO_1,
-    EVENT_OUTRO_2,
-    EVENT_OUTRO_3,
+    EVENT_DEFEAT_OUTRO_1,
+    EVENT_DEFEAT_OUTRO_2,
+    EVENT_DEFEAT_OUTRO_3,
 };
 
 enum Misc
@@ -77,9 +78,9 @@ enum Misc
     SUMMON_GROUP_ADDS               = 1,
 
     // Event phases
-    EVENT_PHASE_NONE                = 0x00,
-    EVENT_PHASE_COMBAT              = 0x01,
-    EVENT_PHASE_OUTRO               = 0x02,
+    PHASE_COMBAT                    = 0x01,
+    PHASE_DEFEAT_OUTRO              = 0x02,
+    PHASE_RAGNAROS_INTRO            = 0x04,
 };
 
 Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.0f};
@@ -90,7 +91,7 @@ public:
 
     struct boss_majordomoAI : public BossAI
     {
-        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS) {}
+        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
 
         // Disabled events
         void JustDied(Unit* /*killer*/) override {}
@@ -100,6 +101,8 @@ public:
             BossAI::InitializeAI();
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
+                events.SetPhase(PHASE_RAGNAROS_INTRO);
+
                 std::list<TempSummon*> p_summons;
                 me->SummonCreatureGroup(SUMMON_GROUP_ADDS, &p_summons);
                 if (!p_summons.empty())
@@ -112,6 +115,8 @@ public:
                         }
                     }
                 }
+
+                spawnInTextTimer = 5000;
             }
         }
 
@@ -123,14 +128,15 @@ public:
 
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
-                events.SetPhase(EVENT_PHASE_COMBAT);
+                events.SetPhase(PHASE_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
             }
             else
             {
+                me->setFaction(FACTION_FRIENDLY);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 static_minionsGUIDS.clear();
                 summons.DespawnAll();
-                events.SetPhase(EVENT_PHASE_OUTRO);
             }
         }
 
@@ -150,14 +156,15 @@ public:
         void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
+            spawnInTextTimer = 0;
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
-            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -187,7 +194,7 @@ public:
                 else if (!remainingAdds)
                 {
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
-                    events.CancelEventGroup(EVENT_PHASE_COMBAT);
+                    events.CancelEventGroup(PHASE_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
                     me->setFaction(FACTION_FRIENDLY);
                     EnterEvadeMode();
@@ -204,7 +211,8 @@ public:
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) == DONE)
             {
                 events.Reset();
-                events.ScheduleEvent(EVENT_OUTRO_1, 32000);
+                events.SetPhase(PHASE_DEFEAT_OUTRO);
+                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_1, 1000);
             }
         }
 
@@ -218,9 +226,22 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (spawnInTextTimer)
+            {
+                if (spawnInTextTimer <= diff)
+                {
+                    spawnInTextTimer = 0;
+                    Talk(SAY_SPAWN);
+                }
+                else
+                {
+                    spawnInTextTimer -= diff;
+                }
+            }
+
             switch (events.GetPhaseMask())
             {
-                case EVENT_PHASE_COMBAT:
+                case PHASE_COMBAT:
                 {
                     if (!UpdateVictim())
                     {
@@ -285,25 +306,25 @@ public:
                     DoMeleeAttackIfReady();
                     break;
                 }
-                case EVENT_PHASE_OUTRO:
+                case PHASE_DEFEAT_OUTRO:
                 {
                     events.Update(diff);
                     while (uint32 const eventId = events.ExecuteEvent())
                     {
                         switch (eventId)
                         {
-                            case EVENT_OUTRO_1:
+                            case EVENT_DEFEAT_OUTRO_1:
                             {
                                 me->NearTeleportTo(RagnarosTelePos.GetPositionX(), RagnarosTelePos.GetPositionY(), RagnarosTelePos.GetPositionZ(), RagnarosTelePos.GetOrientation());
                                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                                 break;
                             }
-                            case EVENT_OUTRO_2:
+                            case EVENT_DEFEAT_OUTRO_2:
                             {
                                 instance->instance->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos);
                                 break;
                             }
-                            case EVENT_OUTRO_3:
+                            case EVENT_DEFEAT_OUTRO_3:
                             {
                                 Talk(SAY_ARRIVAL2_MAJ);
                                 break;
@@ -315,9 +336,9 @@ public:
             }
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 /*action*/) override
         {
-            if (action == ACTION_START_RAGNAROS && events.GetNextEventTime(EVENT_OUTRO_2) == 0)
+            /*if (action == ACTION_START_RAGNAROS && events.GetNextEventTime(EVENT_OUTRO_2) == 0)
             {
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 Talk(SAY_SUMMON_MAJ);
@@ -328,12 +349,13 @@ public:
             {
                 me->setFaction(FACTION_FRIENDLY);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
+            }*/
         }
 
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
+        uint32 spawnInTextTimer;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
