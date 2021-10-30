@@ -4108,7 +4108,7 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMo
         {
             if (sConditionMgr->IsSpellUsedInSpellClickConditions(aurApp->GetBase()->GetId()))
             {
-            player->UpdateVisibleGameobjectsOrSpellClicks();
+                player->UpdateVisibleGameobjectsOrSpellClicks();
             }
         }
 
