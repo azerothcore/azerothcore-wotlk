@@ -281,3 +281,14 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (12018, 6, 0, 'You think you\'ve won already? Perhaps you\'ll need another lesson in pain!', 14, 0, 100, 0, 0, 0, 8545, 0, 'majordomo SAY_LAST_ADD'),
 (12018, 7, 0, 'Brashly, you have come to wrest the secrets of the Living Flame! You will soon regret the recklessness of your quest.', 14, 0, 100, 0, 0, 0, 7567, 0, 'majordomo SAY_DEFEAT_2'),
 (12018, 8, 0, 'I go now to summon the lord whose house this is. Should you seek an audience with him, your paltry lives will surely be forfeit! Nevertheless, seek out his lair, if you dare!', 14, 0, 100, 0, 0, 0, 7568, 0, 'majordomo SAY_DEFEAT_3');
+
+-- Majordomu "21094 Separation Anxiety (SERVERSIDE)"
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=21094;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 21094, 0, 0, 31, 0, 3, 11663, 0, 0, 0, 0, '', 'Separation Anxiety should target Flamewaker Healer'),
+(13, 1, 21094, 0, 1, 31, 0, 3, 11664, 0, 0, 0, 0, '', 'Separation Anxiety should target Flamewaker Elite');
+
+UPDATE `spell_dbc` SET `EffectAura_1`=226, `EffectAuraPeriod_1`=1000 WHERE `Id`=21094;
+DELETE FROM `spell_script_names` WHERE `spell_id`=21094 AND `ScriptName`='spell_majordomo_separation_nexiety';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(21094, 'spell_majordomo_separation_nexiety');

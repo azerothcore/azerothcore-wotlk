@@ -129,7 +129,7 @@ public:
                     }
                 }
 
-                spawnInTextTimer = 5000;
+                spawnInTextTimer = 10000;
             }
             else
             {
@@ -173,6 +173,7 @@ public:
         void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
+            DoCastAOE(SPELL_SEPARATION_ANXIETY);
             spawnInTextTimer = 0;
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
@@ -486,10 +487,48 @@ public:
     }
 };
 
+// 21094 Separation Anxiety (server side)
+class spell_majordomo_separation_nexiety : public SpellScriptLoader
+{
+public:
+    spell_majordomo_separation_nexiety() : SpellScriptLoader("spell_majordomo_separation_nexiety") {}
+
+    class spell_majordomo_separation_nexiety_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_majordomo_separation_nexiety_AuraScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
+        }
+
+        void HandlePeriodic(AuraEffect const* aurEff)
+        {
+            Unit const* caster = GetCaster();
+            Unit* target = GetTarget();
+            if (caster && target && target->GetDistance(caster) > 40.0f && !target->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
+            {
+                target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION, true, nullptr, aurEff);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_majordomo_separation_nexiety_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    // Should return a fully valid AuraScript pointer.
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_majordomo_separation_nexiety_AuraScript();
+    }
+};
+
 void AddSC_boss_majordomo()
 {
     new boss_majordomo();
 
     // Spells
-    new spell_hate_to_zero();
+    new spell_majordomo_separation_nexiety();
 }
