@@ -66,6 +66,7 @@ enum Spells
     SPELL_SUMMON_RAGNAROS                   = 19774,
     SPELL_ELEMENTAL_FIRE                    = 19773,
     SPELL_RAGNA_EMERGE                      = 20568,
+    SPELL_RAGNAROS_FADE                     = 21107,
 };
 
 enum Events
@@ -88,6 +89,7 @@ enum Events
     EVENT_RAGNAROS_SUMMON_5,
     EVENT_RAGNAROS_SUMMON_6,
     EVENT_RAGNAROS_SUMMON_7,
+    EVENT_RAGNAROS_EMERGE,
 };
 
 enum Misc
@@ -391,7 +393,6 @@ public:
                 }
                 case (1 << (PHASE_RAGNAROS_SUMMONING - 1)):
                 {
-                    printf("TRIGGERED\n");
                     events.Update(diff);
                     while (uint32 const eventId = events.ExecuteEvent())
                     {
@@ -423,41 +424,36 @@ public:
                                 }
 
                                 Talk(SAY_SUMMON_MAJ);
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_3, 8000, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_3, 16700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_3:
-                            {
-                                me->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_4, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
-                                break;
-                            }
-                            case EVENT_RAGNAROS_SUMMON_4:
                             {
                                 if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
                                 {
                                     ragnaros->AI()->Talk(SAY_ARRIVAL1_RAG);
                                 }
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_5, 11700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_4, 11700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                break;
+                            }
+                            case EVENT_RAGNAROS_SUMMON_4:
+                            {
+                                Talk(SAY_ARRIVAL2_MAJ);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_5, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_EMERGE, 6500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_5:
-                            {
-                                Talk(SAY_ARRIVAL2_MAJ);
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_6, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
-                                break;
-                            }
-                            case EVENT_RAGNAROS_SUMMON_6:
                             {
                                 if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
                                 {
                                     ragnaros->AI()->Talk(SAY_ARRIVAL3_RAG);
                                 }
 
-                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_7, 16500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_6, 16500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
-                            case EVENT_RAGNAROS_SUMMON_7:
+                            case EVENT_RAGNAROS_SUMMON_6:
                             {
                                 if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
                                 {
@@ -465,6 +461,15 @@ public:
                                 }
                                 break;
                             }
+                            // Additional events
+                            case EVENT_RAGNAROS_EMERGE:
+                            {
+                                if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
+                                {
+                                    ragnaros->SetStandState(UNIT_STAND_STATE_STAND);
+                                    ragnaros->CastSpell(ragnaros, SPELL_RAGNA_EMERGE);
+                                }
+                            }break;
                         }
                     }
                     break;
@@ -633,6 +638,36 @@ public:
     }
 };
 
+// 19774 Summon Ragnaros
+class spell_summon_ragnaros : public SpellScriptLoader
+{
+public:
+    spell_summon_ragnaros() : SpellScriptLoader("spell_summon_ragnaros") {}
+
+    class spell_summon_ragnaros_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_summon_ragnaros_SpellScript);
+
+        void HandleHit()
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
+            }
+        }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_summon_ragnaros_SpellScript::HandleHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_summon_ragnaros_SpellScript();
+    }
+};
+
 void AddSC_boss_majordomo()
 {
     new boss_majordomo();
@@ -640,4 +675,5 @@ void AddSC_boss_majordomo()
     // Spells
     new spell_hate_to_zero();
     new spell_majordomo_separation_nexiety();
+    new spell_summon_ragnaros();
 }

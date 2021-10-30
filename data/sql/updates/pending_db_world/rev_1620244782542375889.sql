@@ -298,10 +298,14 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 -- Ragnaros texts
 UPDATE `creature_text` SET `Emote`='15' WHERE  `CreatureID`=11502 AND `GroupID`=1 AND `ID`=0;
 
-
 delete from `gameobject` where `guid`=2135424 and `id`=178107;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
 (2135424, 178107, 409, 1, 1, 838.951, -830.383, -230.206, 0.837757, 0, 0, 0, 1, -604800, 255, 1);
 delete from `gameobject` where `guid`=2135423 and `id`=178108;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
 (2135423, 178108, 409, 1, 1, 839.279, -831.058, -230.202, -1.37881, 0, 0, 0, 1, -604800, 255, 1);
+
+-- 19774 Summon Ragnaros
+DELETE FROM `spell_script_names` WHERE `spell_id`=19774 AND `ScriptName`='spell_summon_ragnaros';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(19774, 'spell_summon_ragnaros');
