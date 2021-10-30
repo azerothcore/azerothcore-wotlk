@@ -241,3 +241,8 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (@leader, @leader, 0, 0, 2, 0, 0),
 (@leader, 56685, 0, 0, 3, 0, 0),
 (@leader, 56699, 0, 0, 3, 0, 0);
+
+-- Condition for "20553 Golemagg's Trust"
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=7 AND `SourceEntry`=20553 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=11672 AND `ConditionValue3`=0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 7, 20553, 0, 0, 31, 0, 3, 11672, 0, 0, 0, 0, '', 'Golemagg\'s Trust spell effects should target only Core Ragers');
