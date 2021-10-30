@@ -929,12 +929,12 @@ namespace Acore
             {
                 return false;
             }
-            
+
             if (_playerOnly && u->GetTypeId() != TYPEID_PLAYER)
             {
                 return false;
             }
-            
+
             if (_raid)
             {
                 if (!_refUnit->IsInRaidWith(u))
