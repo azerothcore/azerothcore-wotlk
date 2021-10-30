@@ -24,8 +24,6 @@
 #include "TemporarySummon.h"
 #include "molten_core.h"
 
-Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
-
 MinionData const minionData[] =
 {
     { NPC_FIRESWORN,                DATA_GARR },

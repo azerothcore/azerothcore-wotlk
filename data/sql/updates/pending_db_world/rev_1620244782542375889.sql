@@ -48,11 +48,6 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=21
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 3, 21087, 0, 0, 31, 0, 3, 11663, 0, 0, 0, 0, '', 'Champion - can target Flamewaker Healer');
 
--- Texts
-DELETE FROM `creature_text` WHERE `CreatureID`=12018 AND `GroupID`=7 AND `ID`=0;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(12018, 7, 0, 'You think you\'ve won already? Perhaps you\'ll need another lesson in pain!', 14, 0, 100, 0, 0, 0, 8545, 0, 'majordomo SAY_LAST_ADD');
-
 -- Majordomu summon
 DELETE FROM `creature_summon_groups` WHERE `summonerId`=12018;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
@@ -269,3 +264,17 @@ INSERT INTO `spell_target_position` (`id`, `EffectIndex`, `MapID`, `PositionX`, 
 DELETE FROM `spell_script_names` WHERE `spell_id`=20538 AND `ScriptName`='spell_hate_to_zero';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (20538, 'spell_hate_to_zero');
+
+-- Majordomo texts
+DELETE FROM `creature_text` WHERE `CreatureID`=12018;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(12018, 0, 0, 'Reckless mortals! None may challenge the Sons of the Living flame!', 14, 0, 100, 0, 0, 8035, 7612, 0, 'majordomo SAY_AGGRO'),
+(12018, 1, 0, 'The runes of warding have been destroyed! Hunt down the infidels, my brethren!', 14, 0, 100, 0, 0, 8039, 7566, 3, 'majordomo SAY_SPAWN'),
+(12018, 2, 0, 'Ashes to ashes!', 14, 0, 100, 0, 0, 8037, 9425, 0, 'majordomo SAY_SLAY'),
+(12018, 2, 1, 'Burn mortals! Burn for this transgression!', 14, 0, 100, 0, 0, 8036, 0, 0, 'majordomo SAY_SPECIAL'),
+(12018, 3, 0, 'Impossible! Stay your attack, mortals... I submit! I submit!', 14, 0, 100, 0, 0, 8038, 7561, 0, 'majordomo SAY_DEFEAT'),
+(12018, 4, 0, 'Behold Ragnaros - the Firelord! He who was ancient when this world was young! Bow before him, mortals! Bow before your ending!', 14, 0, 100, 0, 0, 8040, 7657, 0, 'majordomo SAY_SUMMON_MAJ'),
+(12018, 5, 0, 'These mortal infidels, my lord! They have invaded your sanctum and seek to steal your secrets!', 14, 0, 100, 0, 0, 8041, 7661, 0, 'majordomo SAY_ARRIVAL2_MAJ'),
+(12018, 6, 0, 'You think you\'ve won already? Perhaps you\'ll need another lesson in pain!', 14, 0, 100, 0, 0, 0, 8545, 0, 'majordomo SAY_LAST_ADD'),
+(12018, 7, 0, 'Brashly, you have come to wrest the secrets of the Living Flame! You will soon regret the recklessness of your quest.', 14, 0, 100, 0, 0, 0, 7567, 0, 'majordomo SAY_DEFEAT_2'),
+(12018, 8, 0, 'I go now to summon the lord whose house this is. Should you seek an audience with him, your paltry lives will surely be forfeit! Nevertheless, seek out his lair, if you dare!', 14, 0, 100, 0, 0, 0, 7568, 0, 'majordomo SAY_DEFEAT_3');

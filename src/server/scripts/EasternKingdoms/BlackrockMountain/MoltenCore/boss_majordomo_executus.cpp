@@ -28,11 +28,12 @@ enum Texts
     SAY_AGGRO                       = 0,
     SAY_SPAWN                       = 1,
     SAY_SLAY                        = 2,
-    SAY_SPECIAL                     = 3,
-    SAY_DEFEAT                      = 4,
-    SAY_SUMMON_MAJ                  = 5,
-    SAY_ARRIVAL2_MAJ                = 6,
-    SAY_LAST_ADD                    = 7,
+    SAY_DEFEAT                      = 3,
+    SAY_SUMMON_MAJ                  = 4,
+    SAY_ARRIVAL2_MAJ                = 5,
+    SAY_LAST_ADD                    = 6,
+    SAY_DEFEAT_2                    = 7,
+    SAY_DEFEAT_3                    = 8,
 };
 
 enum Spells
@@ -83,7 +84,9 @@ enum Misc
     PHASE_RAGNAROS_INTRO            = 0x04,
 };
 
-Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.0f};
+Position const majordomoRagnaros = { 848.933f, -812.875f, -229.601f, 4.046f };
+Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
+
 class boss_majordomo : public CreatureScript
 {
 public:
@@ -95,6 +98,7 @@ public:
 
         // Disabled events
         void JustDied(Unit* /*killer*/) override {}
+        void JustSummoned(Creature* /*summon*/) override {}
 
         void InitializeAI() override
         {
@@ -118,6 +122,11 @@ public:
 
                 spawnInTextTimer = 5000;
             }
+            else
+            {
+                me->setFaction(FACTION_FRIENDLY);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
         }
 
         void Reset() override
@@ -133,8 +142,6 @@ public:
             }
             else
             {
-                me->setFaction(FACTION_FRIENDLY);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 static_minionsGUIDS.clear();
                 summons.DespawnAll();
             }
@@ -193,6 +200,19 @@ public:
                 }
                 else if (!remainingAdds)
                 {
+                    if (!static_minionsGUIDS.empty())
+                    {
+                        for (ObjectGuid const& guid : static_minionsGUIDS)
+                        {
+                            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
+                            {
+                                minion->DespawnOrUnsummon();
+                            }
+                        }
+
+                        static_minionsGUIDS.clear();
+                    }
+
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
@@ -212,7 +232,7 @@ public:
             {
                 events.Reset();
                 events.SetPhase(PHASE_DEFEAT_OUTRO);
-                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_1, 1000);
+                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_1, 7500, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
             }
         }
 
@@ -308,6 +328,11 @@ public:
                 }
                 case PHASE_DEFEAT_OUTRO:
                 {
+                    if (events.Empty())
+                    {
+                        return;
+                    }
+
                     events.Update(diff);
                     while (uint32 const eventId = events.ExecuteEvent())
                     {
@@ -315,24 +340,36 @@ public:
                         {
                             case EVENT_DEFEAT_OUTRO_1:
                             {
-                                me->NearTeleportTo(RagnarosTelePos.GetPositionX(), RagnarosTelePos.GetPositionY(), RagnarosTelePos.GetPositionZ(), RagnarosTelePos.GetOrientation());
-                                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                                Talk(SAY_DEFEAT_2);
+                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_2, 8000, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
                                 break;
                             }
                             case EVENT_DEFEAT_OUTRO_2:
                             {
-                                instance->instance->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos);
+                                Talk(SAY_DEFEAT_3);
+                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_2, 21500, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
                                 break;
                             }
                             case EVENT_DEFEAT_OUTRO_3:
                             {
-                                Talk(SAY_ARRIVAL2_MAJ);
+                                DoCastSelf(SPELL_TELEPORT_SELF);
                                 break;
                             }
                         }
                     }
                     break;
                 }
+            }
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+        {
+            if (events.IsInPhase(PHASE_DEFEAT_OUTRO) && spellInfo->Id == SPELL_TELEPORT_SELF)
+            {
+                me->setFaction(FACTION_FRIENDLY);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetHomePosition(majordomoRagnaros);
+                me->NearTeleportTo(majordomoRagnaros.GetPositionX(), majordomoRagnaros.GetPositionY(), majordomoRagnaros.GetPositionZ(), majordomoRagnaros.GetOrientation());
             }
         }
 
