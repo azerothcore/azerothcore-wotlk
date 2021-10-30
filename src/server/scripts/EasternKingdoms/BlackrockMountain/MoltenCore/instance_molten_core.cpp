@@ -335,7 +335,7 @@ public:
                 return;
             }
 
-            instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE ? MajordomoSummonPos : RagnarosTelePos);
+            instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE ? MajordomoSummonPos : MajordomoRagnaros);
         }
 
         bool CheckMajordomoExecutus() const

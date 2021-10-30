@@ -266,6 +266,9 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (20538, 'spell_hate_to_zero');
 
 -- Majordomo texts
+UPDATE `creature_template` SET `gossip_menu_id`='4093' WHERE  `entry`=12018;
+
+-- Majordomo texts
 DELETE FROM `creature_text` WHERE `CreatureID`=12018;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (12018, 0, 0, 'Reckless mortals! None may challenge the Sons of the Living flame!', 14, 0, 100, 0, 0, 8035, 7612, 0, 'majordomo SAY_AGGRO'),

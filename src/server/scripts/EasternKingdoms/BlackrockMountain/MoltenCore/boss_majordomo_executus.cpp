@@ -25,66 +25,75 @@
 
 enum Texts
 {
-    SAY_AGGRO                       = 0,
-    SAY_SPAWN                       = 1,
-    SAY_SLAY                        = 2,
-    SAY_DEFEAT                      = 3,
-    SAY_SUMMON_MAJ                  = 4,
-    SAY_ARRIVAL2_MAJ                = 5,
-    SAY_LAST_ADD                    = 6,
-    SAY_DEFEAT_2                    = 7,
-    SAY_DEFEAT_3                    = 8,
+    SAY_AGGRO                               = 0,
+    SAY_SPAWN                               = 1,
+    SAY_SLAY                                = 2,
+    SAY_DEFEAT                              = 3,
+    SAY_SUMMON_MAJ                          = 4,
+    SAY_ARRIVAL2_MAJ                        = 5,
+    SAY_LAST_ADD                            = 6,
+    SAY_DEFEAT_2                            = 7,
+    SAY_DEFEAT_3                            = 8,
 };
 
 enum Spells
 {
-    SPELL_MAGIC_REFLECTION          = 20619,
-    SPELL_DAMAGE_REFLECTION         = 21075,
-    SPELL_BLAST_WAVE                = 20229,
-    SPELL_AEGIS_OF_RAGNAROS         = 20620,
-    SPELL_TELEPORT_RANDOM           = 20618,    // Teleport random target
-    SPELL_TELEPORT_TARGET           = 20534,    // Teleport Victim
-    SPELL_ENCOURAGEMENT             = 21086,
-    SPELL_CHAMPION                  = 21090,    // Server side
-    SPELL_IMMUNE_POLY               = 21087,    // Server side
-    SPELL_HATE_TO_ZERO              = 20538,    // Threat reset after each teleport. Server side
-    SPELL_SEPARATION_ANXIETY        = 21094,    // Aura cast on himself by Majordomo Executus, if adds move out of range, they will cast spell 21095 on themselves
-    SPELL_SEPARATION_ANXIETY_MINION = 21095,
+    SPELL_MAGIC_REFLECTION                  = 20619,
+    SPELL_DAMAGE_REFLECTION                 = 21075,
+    SPELL_BLAST_WAVE                        = 20229,
+    SPELL_AEGIS_OF_RAGNAROS                 = 20620,
+    SPELL_TELEPORT_RANDOM                   = 20618,    // Teleport random target
+    SPELL_TELEPORT_TARGET                   = 20534,    // Teleport Victim
+    SPELL_ENCOURAGEMENT                     = 21086,
+    SPELL_CHAMPION                          = 21090,    // Server side
+    SPELL_IMMUNE_POLY                       = 21087,    // Server side
+    SPELL_HATE_TO_ZERO                      = 20538,    // Threat reset after each teleport. Server side
+    SPELL_SEPARATION_ANXIETY                = 21094,    // Aura cast on himself by Majordomo Executus, if adds move out of range, they will cast spell 21095 on themselves
+    SPELL_SEPARATION_ANXIETY_MINION         = 21095,
 
     // Outro & Ragnaros intro
-    SPELL_TELEPORT_SELF             = 19484,
-    SPELL_SUMMON_RAGNAROS           = 19774,
-    SPELL_ELEMENTAL_FIRE            = 19773,
-    SPELL_RAGNA_EMERGE              = 20568,
+    SPELL_TELEPORT_SELF                     = 19484,
+    SPELL_SUMMON_RAGNAROS                   = 19774,
+    SPELL_ELEMENTAL_FIRE                    = 19773,
+    SPELL_RAGNA_EMERGE                      = 20568,
 };
 
 enum Events
 {
-    EVENT_MAGIC_REFLECTION          = 1,
+    EVENT_MAGIC_REFLECTION                  = 1,
     EVENT_DAMAGE_REFLECTION,
     EVENT_BLAST_WAVE,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
 
-    EVENT_DEFEAT_OUTRO_1,
+    EVENT_DEFEAT_OUTRO_1                    = 1,
     EVENT_DEFEAT_OUTRO_2,
     EVENT_DEFEAT_OUTRO_3,
+
+    EVENT_RAGNAROS_INTRO_1                  = 1,
 };
 
 enum Misc
 {
-    GOSSIP_HELLO                    = 4995,
-    FACTION_FRIENDLY                = 35,
-    SUMMON_GROUP_ADDS               = 1,
+    TEXT_ID_SUMMON_1                        = 4995,
+    TEXT_ID_SUMMON_2                        = 5011,
+    TEXT_ID_SUMMON_3                        = 5012,
+
+    GOSSIP_ITEM_SUMMON_1                    = 4093,
+    GOSSIP_ITEM_SUMMON_2                    = 4109,
+    GOSSIP_ITEM_SUMMON_3                    = 4108,
+
+    FACTION_FRIENDLY                        = 35,
+    SUMMON_GROUP_ADDS                       = 1,
 
     // Event phases
-    PHASE_COMBAT                    = 0x01,
-    PHASE_DEFEAT_OUTRO              = 0x02,
-    PHASE_RAGNAROS_INTRO            = 0x04,
+    PHASE_COMBAT                            = 0x01,
+    PHASE_DEFEAT_OUTRO                      = 0x02,
+    PHASE_RAGNAROS_INTRO                    = 0x04,
 };
 
-Position const majordomoRagnaros = { 848.933f, -812.875f, -229.601f, 4.046f };
+Position const MajordomoRagnaros = { 848.933f, -812.875f, -229.601f, 4.046f };
 Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
 
 class boss_majordomo : public CreatureScript
@@ -373,27 +382,18 @@ public:
             if (events.IsInPhase(PHASE_DEFEAT_OUTRO) && spellInfo->Id == SPELL_TELEPORT_SELF)
             {
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                me->SetHomePosition(majordomoRagnaros);
-                me->NearTeleportTo(majordomoRagnaros.GetPositionX(), majordomoRagnaros.GetPositionY(), majordomoRagnaros.GetPositionZ(), majordomoRagnaros.GetOrientation());
+                me->SetHomePosition(MajordomoRagnaros);
+                me->NearTeleportTo(MajordomoRagnaros.GetPositionX(), MajordomoRagnaros.GetPositionY(), MajordomoRagnaros.GetPositionZ(), MajordomoRagnaros.GetOrientation());
             }
         }
 
-        void DoAction(int32 /*action*/) override
+        void DoAction(int32 action) override
         {
-            /*if (action == ACTION_START_RAGNAROS && events.GetNextEventTime(EVENT_OUTRO_2) == 0)
+            if (action == ACTION_START_RAGNAROS_INTRO)
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                Talk(SAY_SUMMON_MAJ);
-                events.ScheduleEvent(EVENT_OUTRO_2, 8000);
-                events.ScheduleEvent(EVENT_OUTRO_3, 24000);
+                events.SetPhase(PHASE_RAGNAROS_INTRO);
             }
-            else if (action == ACTION_START_RAGNAROS_ALT)
-            {
-                me->setFaction(FACTION_FRIENDLY);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }*/
         }
-
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
@@ -402,15 +402,43 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, 4093, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, GOSSIP_HELLO, creature->GetGUID());
+        AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        SendGossipMenuFor(player, TEXT_ID_SUMMON_1, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        CloseGossipMenuFor(player);
-        creature->AI()->DoAction(ACTION_START_RAGNAROS);
+        ClearGossipMenuFor(player);
+        switch (action)
+        {
+            case GOSSIP_ACTION_INFO_DEF:
+            {
+                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, TEXT_ID_SUMMON_2, creature->GetGUID());
+                break;
+            }
+            case GOSSIP_ACTION_INFO_DEF+1:
+            {
+                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, TEXT_ID_SUMMON_2, creature->GetGUID());
+                break;
+            }
+            case GOSSIP_ACTION_INFO_DEF+2:
+            {
+                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                SendGossipMenuFor(player, TEXT_ID_SUMMON_3, creature->GetGUID());
+                break;
+            }
+            case GOSSIP_ACTION_INFO_DEF+3:
+            {
+                //Trigger ragnaros intro event
+                break;
+            }
+            default:
+                CloseGossipMenuFor(player);
+                break;
+        }
         return true;
     }
 

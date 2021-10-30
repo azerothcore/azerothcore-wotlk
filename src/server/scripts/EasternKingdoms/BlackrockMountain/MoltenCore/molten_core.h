@@ -38,13 +38,10 @@ enum MCData
 
 enum MCActions
 {
-    ACTION_START_RAGNAROS               = -1,
-    ACTION_START_RAGNAROS_ALT           = -2,
-    ACTION_RESET_MAGMADAR_ENCOUNTER     = -3,   // Used when ragers are pulled far away
-    ACTION_PREPARE_MAJORDOMO_RAGNA      = -4,
+    ACTION_START_RAGNAROS_INTRO         = -1,
+    ACTION_RESET_MAGMADAR_ENCOUNTER     = -2,   // Used when ragers are pulled far away
+    ACTION_PREPARE_MAJORDOMO_RAGNA      = -3,
 };
-
-Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
 
 enum MCCreatures
 {
@@ -107,9 +104,8 @@ enum MCSpells
     SPELL_CORE_RAGER_QUIET_SUICIDE  = 3617,     // Server side
 };
 
-// Majordomo Ragnaros
-extern Position const majordomoRagnaros;
-extern Position const MajordomoSummonPos;
+extern Position const MajordomoRagnaros;        // Teleport location to Ragnaros summons area
+extern Position const MajordomoSummonPos;       // Majordomo summon position (battle)
 
 template <class AI, class T>
 inline AI* GetMoltenCoreAI(T* obj)
