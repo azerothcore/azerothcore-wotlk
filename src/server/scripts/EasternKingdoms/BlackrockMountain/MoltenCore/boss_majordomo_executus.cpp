@@ -132,7 +132,17 @@ public:
 
         // Disabled events
         void JustDied(Unit* /*killer*/) override {}
-        void JustSummoned(Creature* /*summon*/) override {}
+
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon->GetEntry() == NPC_RAGNAROS)
+            {
+                summon->CastSpell(summon, SPELL_RAGNAROS_FADE);
+                summon->CastSpell(summon, SPELL_RAGNAROS_SUBMERGE_EFFECT, true);
+                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                summon->SetReactState(REACT_PASSIVE);
+            }
+        }
 
         void InitializeAI() override
         {
@@ -658,11 +668,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                if (TempSummon* ragnaros = caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS))
-                {
-                    ragnaros->CastSpell(ragnaros, SPELL_RAGNAROS_FADE);
-                    ragnaros->CastSpell(ragnaros, SPELL_RAGNAROS_SUBMERGE_EFFECT, true);
-                }
+                caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
             }
         }
 
