@@ -137,9 +137,9 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
 
 bool SummonList::IsAnyCreatureAlive() const
 {
-    for (StorageType::const_iterator i = storage_.begin(); i != storage_.end(); ++i)
+    for (auto const& guid : storage_)
     {
-        if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
         {
             if (summon->IsAlive())
             {
@@ -153,9 +153,9 @@ bool SummonList::IsAnyCreatureAlive() const
 
 bool SummonList::IsAnyCreatureInCombat() const
 {
-    for (StorageType::const_iterator i = storage_.begin(); i != storage_.end(); ++i)
+    for (auto const& guid : storage_)
     {
-        if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
         {
             if (summon->IsInCombat())
             {
