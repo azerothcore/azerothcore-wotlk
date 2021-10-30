@@ -166,7 +166,7 @@ public:
     //This is to prevent players from entering during boss encounters.
     virtual bool IsEncounterInProgress() const;
 
-            // Called when a creature/gameobject is added to map or removed from map.
+    // Called when a creature/gameobject is added to map or removed from map.
     // Insert/Remove objectguid to dynamic guid store
     void OnCreatureCreate(Creature* creature) override;
     void OnCreatureRemove(Creature* creature) override;
