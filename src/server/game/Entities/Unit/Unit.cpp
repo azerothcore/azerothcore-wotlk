@@ -4022,7 +4022,7 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
     if (Player* player = ToPlayer())
         if (sConditionMgr->IsSpellUsedInSpellClickConditions(aurApp->GetBase()->GetId()))
 		{
-			player->UpdateVisibleGameobjectsOrSpellClicks();
+            player->UpdateVisibleGameobjectsOrSpellClicks();
 		}
 }
 
