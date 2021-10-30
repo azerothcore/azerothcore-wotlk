@@ -60,12 +60,6 @@ public:
             enraged = false;
         }
 
-        void EnterCombat(Unit* victim) override
-        {
-            _EnterCombat();
-            pyroblastTimer = urand(3000, 7000);
-        }
-
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!enraged && me->HealthBelowPctDamaged(10, damage))
