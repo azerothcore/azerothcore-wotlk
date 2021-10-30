@@ -32,8 +32,20 @@ enum Texts
     SAY_SUMMON_MAJ                          = 4,
     SAY_ARRIVAL2_MAJ                        = 5,
     SAY_LAST_ADD                            = 6,
+
+
     SAY_DEFEAT_2                            = 7,
     SAY_DEFEAT_3                            = 8,
+
+    // Ragnaros event
+    // Majordomo
+    SAY_RAG_SUM_1                           = 9,
+    SAY_RAG_SUM_2                           = 10,
+
+    // Ragnaros
+    SAY_ARRIVAL1_RAG                        = 1,
+    SAY_ARRIVAL3_RAG                        = 3,
+
 };
 
 enum Spells
@@ -71,7 +83,14 @@ enum Events
     EVENT_DEFEAT_OUTRO_2,
     EVENT_DEFEAT_OUTRO_3,
 
-    EVENT_RAGNAROS_INTRO_1                  = 1,
+    EVENT_RAGNAROS_SUMMON_1                 = 1,
+    EVENT_RAGNAROS_SUMMON_2,
+    EVENT_RAGNAROS_SUMMON_3,
+    EVENT_RAGNAROS_SUMMON_4,
+    EVENT_RAGNAROS_SUMMON_5,
+    EVENT_RAGNAROS_SUMMON_6,
+    EVENT_RAGNAROS_SUMMON_7,
+    EVENT_RAGNAROS_SUMMON_8,
 };
 
 enum Misc
@@ -84,17 +103,22 @@ enum Misc
     GOSSIP_ITEM_SUMMON_2                    = 4109,
     GOSSIP_ITEM_SUMMON_3                    = 4108,
 
-    FACTION_FRIENDLY                        = 35,
+    FACTION_MAJORDOMO_FRIENDLY              = 1080,
     SUMMON_GROUP_ADDS                       = 1,
+
+    // Points
+    POINT_RAGNAROS_SUMMON                   = 1,
 
     // Event phases
     PHASE_COMBAT                            = 0x01,
     PHASE_DEFEAT_OUTRO                      = 0x02,
-    PHASE_RAGNAROS_INTRO                    = 0x04,
+    PHASE_RAGNAROS_SUMMONING                = 0x04,
 };
 
 Position const MajordomoRagnaros = { 848.933f, -812.875f, -229.601f, 4.046f };
-Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
+Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f };
+Position const MajordomoMoveRagPos = { 830.9636f, -814.7055f, -228.9733f, 0.0f };   // Position used at Ragnaros summoning event
+Position const RagnarosSummonPos = { 838.3082f, -831.4665f, -232.1853f, 2.199115f };
 
 class boss_majordomo : public CreatureScript
 {
@@ -114,7 +138,7 @@ public:
             BossAI::InitializeAI();
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
-                events.SetPhase(PHASE_RAGNAROS_INTRO);
+                events.SetPhase(PHASE_RAGNAROS_SUMMONING);
 
                 std::list<TempSummon*> p_summons;
                 me->SummonCreatureGroup(SUMMON_GROUP_ADDS, &p_summons);
@@ -135,7 +159,7 @@ public:
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                me->setFaction(FACTION_FRIENDLY);
+                me->setFaction(FACTION_MAJORDOMO_FRIENDLY);
             }
         }
 
@@ -228,7 +252,7 @@ public:
                     events.CancelEventGroup(PHASE_COMBAT);
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                    me->setFaction(FACTION_FRIENDLY);
+                    me->setFaction(FACTION_MAJORDOMO_FRIENDLY);
                     EnterEvadeMode();
                     Talk(SAY_DEFEAT);
                     return;
@@ -306,7 +330,7 @@ public:
                             case EVENT_BLAST_WAVE:
                             {
                                 DoCastVictim(SPELL_BLAST_WAVE);
-                                events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
+                                events.RepeatEvent(10000);
                                 break;
                             }
                             case EVENT_TELEPORT_RANDOM:
@@ -371,10 +395,99 @@ public:
                     }
                     break;
                 }
-                case PHASE_RAGNAROS_INTRO:
+                case PHASE_RAGNAROS_SUMMONING:
                 {
+                    if (events.Empty())
+                    {
+                        return;
+                    }
+
+                    events.Update(diff);
+                    while (uint32 const eventId = events.ExecuteEvent())
+                    {
+                        switch (eventId)
+                        {
+                            case EVENT_RAGNAROS_SUMMON_1:
+                            {
+                                if (GameObject* lavaSplash = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_LAVA_SPLASH)))
+                                {
+                                    lavaSplash->SetRespawnTime(900);
+                                    lavaSplash->Refresh();
+                                }
+                                if (GameObject* lavaSteam = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_LAVA_STEAM)))
+                                {
+                                    lavaSteam->SetRespawnTime(900);
+                                    lavaSteam->Refresh();
+                                }
+                                Talk(SAY_RAG_SUM_2);
+                                // Next event will get triggered in MovementInform
+                                me->GetMotionMaster()->MovePoint(POINT_RAGNAROS_SUMMON, MajordomoMoveRagPos, true, false);
+                                
+                                break;
+                            }
+                            case EVENT_RAGNAROS_SUMMON_2:
+                            {
+                                if (GameObject* lavaSteam = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_LAVA_STEAM)))
+                                {
+                                    me->SetFacingToObject(lavaSteam);
+                                }
+
+                                Talk(SAY_SUMMON_MAJ);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_3, 8000, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                break;
+                            }
+                            case EVENT_RAGNAROS_SUMMON_3:
+                            {
+                                me->SummonCreature(NPC_RAGNAROS, 838.3082f, -831.4665f, -232.1853f, 2.199115f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_4, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                break;
+                            }
+                            case EVENT_RAGNAROS_SUMMON_4:
+                            {
+                                if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
+                                {
+                                    ragnaros->AI()->Talk(SAY_ARRIVAL1_RAG);
+                                }
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_5, 11700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                break;
+                            }
+                            case EVENT_RAGNAROS_SUMMON_5:
+                            {
+                                Talk(SAY_ARRIVAL2_MAJ);
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_6, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                break;
+                            }
+                            case EVENT_RAGNAROS_SUMMON_6:
+                            {
+                                if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
+                                {
+                                    ragnaros->AI()->Talk(SAY_ARRIVAL3_RAG);
+                                }
+
+                                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_7, 16500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                break;
+                            }
+                            case EVENT_RAGNAROS_SUMMON_7:
+                            {
+                                if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
+                                {
+                                    ragnaros->CastSpell(me, SPELL_ELEMENTAL_FIRE);
+                                }
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 pointId) override
+        {
+            if (type == POINT_MOTION_TYPE && pointId == POINT_RAGNAROS_SUMMON)
+            {
+                DoCastAOE(SPELL_SUMMON_RAGNAROS);
+                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_2, 11500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
             }
         }
 
@@ -390,9 +503,10 @@ public:
 
         void DoAction(int32 action) override
         {
-            if (action == ACTION_START_RAGNAROS_INTRO)
+            if (action == ACTION_START_RAGNAROS_INTRO && !events.IsInPhase(PHASE_RAGNAROS_SUMMONING))
             {
-                events.SetPhase(PHASE_RAGNAROS_INTRO);
+                events.SetPhase(PHASE_RAGNAROS_SUMMONING);
+                events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_1, 5000, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
             }
         }
     private:
@@ -433,7 +547,10 @@ public:
             }
             case GOSSIP_ACTION_INFO_DEF+3:
             {
-                //Trigger ragnaros intro event
+                CloseGossipMenuFor(player);
+                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->AI()->Talk(SAY_RAG_SUM_1, player);
+                creature->AI()->DoAction(ACTION_START_RAGNAROS_INTRO);
                 break;
             }
             default:

@@ -99,11 +99,12 @@ public:
                     _garrGUID = creature->GetGUID();
                     break;
                 }
-                case NPC_FIRESWORN:
+                case NPC_RAGNAROS:
                 {
-                    AddMinion(creature, true);
+                    _ragnarosGUID = creature->GetGUID();
                     break;
                 }
+                case NPC_FIRESWORN:
                 case NPC_FLAMEWALKER:
                 case NPC_FLAMEWALKER_PROTECTOR:
                 case NPC_FLAMEWALKER_PRIEST:
@@ -199,6 +200,16 @@ public:
                     }
                     break;
                 }
+                case GO_LAVA_STEAM:
+                {
+                    _lavaSteamGUID = go->GetGUID();
+                    break;
+                }
+                case GO_LAVA_SPLASH:
+                {
+                    _lavaSplashGUID = go->GetGUID();
+                    break;
+                }
             }
         }
 
@@ -212,6 +223,12 @@ public:
                     return _majordomoExecutusGUID;
                 case DATA_GARR:
                     return _garrGUID;
+                case DATA_LAVA_STEAM:
+                    return _lavaSteamGUID;
+                case DATA_LAVA_SPLASH:
+                    return _lavaSplashGUID;
+                case DATA_RAGNAROS:
+                    return _ragnarosGUID;
             }
 
             return ObjectGuid::Empty;
@@ -273,8 +290,7 @@ public:
                                     minion->CastSpell(minion, SPELL_CORE_RAGER_QUIET_SUICIDE, true);
                                 }
                             }
-                            // TODO: uncomment this once rewrite is ready for release
-                            //_golemaggMinionsGUIDS.clear();
+                            _golemaggMinionsGUIDS.clear();
                         }
                         break;
                     }
@@ -358,6 +374,12 @@ public:
                 }
             }
 
+            // Prevent spawning if Ragnaros is present
+            if (instance->GetCreature(_ragnarosGUID))
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -421,6 +443,11 @@ public:
         // Golemagg encounter related
         ObjectGuid _golemaggGUID;
         GuidSet _golemaggMinionsGUIDS;
+
+        // Ragnaros encounter related
+        ObjectGuid _ragnarosGUID;
+        ObjectGuid _lavaSteamGUID;
+        ObjectGuid _lavaSplashGUID;
 
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;

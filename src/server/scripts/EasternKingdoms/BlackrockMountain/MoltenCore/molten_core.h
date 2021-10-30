@@ -34,6 +34,10 @@ enum MCData
     DATA_GOLEMAGG                   = 7,
     DATA_MAJORDOMO_EXECUTUS         = 8,
     DATA_RAGNAROS                   = 9,
+
+    // Other data
+    DATA_LAVA_STEAM                 = 10,
+    DATA_LAVA_SPLASH                = 11,
 };
 
 enum MCActions
@@ -97,6 +101,10 @@ enum MCGameObjects
     GO_RUNE_ZETH                    = 176952,   // Geddon
     GO_RUNE_THERI                   = 176954,   // Golemagg
     GO_RUNE_KORO                    = 176951,   // Sulfuron
+
+    // Ragnaros event related
+    GO_LAVA_STEAM                   = 178107,
+    GO_LAVA_SPLASH                  = 178108,
 };
 
 enum MCSpells

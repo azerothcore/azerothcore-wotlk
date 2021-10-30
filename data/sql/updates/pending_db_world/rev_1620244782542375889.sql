@@ -280,7 +280,9 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (12018, 5, 0, 'These mortal infidels, my lord! They have invaded your sanctum and seek to steal your secrets!', 14, 0, 100, 0, 0, 8041, 7661, 0, 'majordomo SAY_ARRIVAL2_MAJ'),
 (12018, 6, 0, 'You think you\'ve won already? Perhaps you\'ll need another lesson in pain!', 14, 0, 100, 0, 0, 0, 8545, 0, 'majordomo SAY_LAST_ADD'),
 (12018, 7, 0, 'Brashly, you have come to wrest the secrets of the Living Flame! You will soon regret the recklessness of your quest.', 14, 0, 100, 0, 0, 0, 7567, 0, 'majordomo SAY_DEFEAT_2'),
-(12018, 8, 0, 'I go now to summon the lord whose house this is. Should you seek an audience with him, your paltry lives will surely be forfeit! Nevertheless, seek out his lair, if you dare!', 14, 0, 100, 0, 0, 0, 7568, 0, 'majordomo SAY_DEFEAT_3');
+(12018, 8, 0, 'I go now to summon the lord whose house this is. Should you seek an audience with him, your paltry lives will surely be forfeit! Nevertheless, seek out his lair, if you dare!', 14, 0, 100, 0, 0, 0, 7568, 0, 'majordomo SAY_DEFEAT_3'),
+(12018, 9, 0, 'Very well, $n', 12, 0, 100, 0, 0, 0, 7649, 0, 'majordomo SAY_RAG_SUM_1'),
+(12018, 10, 0, 'Impudent whelps! You\'\'ve rushed headlong to your own deaths! See now, the master stirs!', 14, 0, 100, 0, 0, 0, 7655, 0, 'majordomo SAY_RAG_SUM_2');
 
 -- Majordomu "21094 Separation Anxiety (SERVERSIDE)"
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=21094;
@@ -292,3 +294,6 @@ UPDATE `spell_dbc` SET `EffectAura_1`=226, `EffectAuraPeriod_1`=1000 WHERE `Id`=
 DELETE FROM `spell_script_names` WHERE `spell_id`=21094 AND `ScriptName`='spell_majordomo_separation_nexiety';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (21094, 'spell_majordomo_separation_nexiety');
+
+-- Ragnaros texts
+UPDATE `creature_text` SET `Emote`='15' WHERE  `CreatureID`=11502 AND `GroupID`=1 AND `ID`=0;
