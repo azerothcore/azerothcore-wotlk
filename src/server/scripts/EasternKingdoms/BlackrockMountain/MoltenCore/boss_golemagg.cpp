@@ -142,13 +142,15 @@ public:
     {
         npc_core_ragerAI(Creature* creature) : ScriptedAI(creature),
             instance(creature->GetInstanceScript()),
-            mangleTimer(7000)
+            mangleTimer(7000),
+            rangeCheckTimer(1000)
         {
         }
 
         void Reset() override
         {
             mangleTimer = 7000;               // These times are probably wrong
+            rangeCheckTimer = 1000;
 
             if (instance->GetBossState(DATA_GOLEMAGG) == DONE)
             {
@@ -179,6 +181,22 @@ public:
                 return;
             }
 
+            // Should have no impact from unit state
+            if (rangeCheckTimer <= diff)
+            {
+                
+                Creature const* golemagg = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GEDDON));
+                if (golemagg && me->GetDistance(golemagg) > 100.0f)
+                {
+                    instance->DoAction(ACTION_RESET_MAGMADAR_ENCOUNTER)
+                }
+                rangeCheckTimer = 1000;
+            }
+            else
+            {
+                rangeCheckTimer -= diff;
+            }
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
                 return;
@@ -201,6 +219,7 @@ public:
     private:
         InstanceScript* instance;
         uint32 mangleTimer;
+        uint32 rangeCheckTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

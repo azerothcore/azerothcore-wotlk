@@ -299,6 +299,28 @@ public:
             return true;
         }
 
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_RESET_MAGMADAR_ENCOUNTER)
+            {
+                if (Creature* golemagg = instance->GetCreature(DATA_GOLEMAGG))
+                {
+                    golemagg->AI()->EnterEvadeMode();
+                }
+
+                if (!_golemaggMinionsGUIDS.empty())
+                {
+                    for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                    {
+                        if (Creature* minion = instance->GetCreature(minionGuid))
+                        {
+                            minion->AI()->EnterEvadeMode();
+                        }
+                    }
+                }
+            }
+        }
+
         void SummonMajordomoExecutus()
         {
             if (instance->GetCreature(_majordomoExecutusGUID))

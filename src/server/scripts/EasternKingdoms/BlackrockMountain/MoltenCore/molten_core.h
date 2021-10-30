@@ -40,6 +40,7 @@ enum MCActions
 {
     ACTION_START_RAGNAROS               = -1,
     ACTION_START_RAGNAROS_ALT           = -2,
+    ACTION_RESET_MAGMADAR_ENCOUNTER     = -3,   // Used when ragers are pulled far away
 };
 
 Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
