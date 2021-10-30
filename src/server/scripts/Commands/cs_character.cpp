@@ -401,10 +401,10 @@ public:
             if (WorldSession* session = handler->GetSession())
             {
                 if (Player* player = session->GetPlayer())
-                    sLog->outCommand(session->GetAccountId(), "GM %s (Account: %u) forced rename %s to player %s (Account: %u)", player->GetName().c_str(), session->GetAccountId(), newName.c_str(), player->GetName().c_str(), sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter()));
+                    LOG_GM(session->GetAccountId(), "GM %s (Account: %u) forced rename %s to player %s (Account: %u)", player->GetName().c_str(), session->GetAccountId(), newName.c_str(), player->GetName().c_str(), sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter()));
             }
             else
-                sLog->outCommand(0, "CONSOLE forced rename '%s' to '%s' (%s)", player->GetName().c_str(), newName.c_str(), player->GetGUID().ToString().c_str());
+                LOG_GM(0, "CONSOLE forced rename '%s' to '%s' (%s)", player->GetName().c_str(), newName.c_str(), player->GetGUID().ToString().c_str());
         }
         else
         {
