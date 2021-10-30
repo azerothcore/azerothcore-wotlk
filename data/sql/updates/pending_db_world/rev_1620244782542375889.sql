@@ -264,3 +264,8 @@ INSERT INTO `spell_target_position` (`id`, `EffectIndex`, `MapID`, `PositionX`, 
 DELETE FROM `spell_target_position` WHERE `id`=20534 AND `EffectIndex`=0;
 INSERT INTO `spell_target_position` (`id`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`) VALUES
 (20534, 0, 409, 736.516, -1176.35, -119.006, 0);
+
+-- 20538 Hate to Zero (SERVERSIDE, majordomu)
+DELETE FROM `spell_script_names` WHERE `spell_id`=20538 AND `ScriptName`='spell_hate_to_zero';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(20538, 'spell_hate_to_zero');

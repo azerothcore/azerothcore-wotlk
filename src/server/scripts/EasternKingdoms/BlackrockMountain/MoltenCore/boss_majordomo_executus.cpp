@@ -40,7 +40,8 @@ enum Spells
     SPELL_DAMAGE_REFLECTION         = 21075,
     SPELL_BLAST_WAVE                = 20229,
     SPELL_AEGIS_OF_RAGNAROS         = 20620,
-    SPELL_TELEPORT                  = 20618,
+    SPELL_TELEPORT_RANDOM           = 20618,    // Teleport random target
+    SPELL_TELEPORT_TARGET           = 20534,    // Teleport Victim
     SPELL_ENCOURAGEMENT             = 21086,
     SPELL_CHAMPION                  = 21090,    // Server side
     SPELL_IMMUNE_POLY               = 21087,    // Server side
@@ -60,7 +61,8 @@ enum Events
     EVENT_MAGIC_REFLECTION          = 1,
     EVENT_DAMAGE_REFLECTION,
     EVENT_BLAST_WAVE,
-    EVENT_TELEPORT,
+    EVENT_TELEPORT_RANDOM,
+    EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
 
     EVENT_OUTRO_1,
@@ -150,10 +152,12 @@ public:
             _EnterCombat();
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
+
             events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
             events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT, 20000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, EVENT_PHASE_COMBAT, EVENT_PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -214,87 +218,99 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (events.IsInPhase(EVENT_PHASE_COMBAT))
+            switch (events.GetPhaseMask())
             {
-                if (!UpdateVictim())
+                case EVENT_PHASE_COMBAT:
                 {
-                    return;
-                }
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                {
-                    return;
-                }
-
-                while (uint32 const eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
+                    if (!UpdateVictim())
                     {
-                        case EVENT_MAGIC_REFLECTION:
-                        {
-                            DoCastSelf(SPELL_MAGIC_REFLECTION);
-                            events.RepeatEvent(30000);
-                            break;
-                        }
-                        case EVENT_DAMAGE_REFLECTION:
-                        {
-                            DoCastSelf(SPELL_DAMAGE_REFLECTION);
-                            events.RepeatEvent(30000);
-                            break;
-                        }
-                        case EVENT_BLAST_WAVE:
-                        {
-                            DoCastVictim(SPELL_BLAST_WAVE);
-                            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
-                            break;
-                        }
-                        case EVENT_TELEPORT:
-                        {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
-                            {
-                                DoCast(target, SPELL_TELEPORT);
-                            }
-
-                            events.RepeatEvent(20000);
-                            break;
-                        }
+                        return;
                     }
+
+                    events.Update(diff);
 
                     if (me->HasUnitState(UNIT_STATE_CASTING))
                     {
                         return;
                     }
-                }
 
-                DoMeleeAttackIfReady();
-            }
-            else if (!events.Empty())
-            {
-                events.Update(diff);
-
-                while (uint32 const eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
+                    while (uint32 const eventId = events.ExecuteEvent())
                     {
-                        case EVENT_OUTRO_1:
+                        switch (eventId)
                         {
-                            me->NearTeleportTo(RagnarosTelePos.GetPositionX(), RagnarosTelePos.GetPositionY(), RagnarosTelePos.GetPositionZ(), RagnarosTelePos.GetOrientation());
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            break;
+                            case EVENT_MAGIC_REFLECTION:
+                            {
+                                DoCastSelf(SPELL_MAGIC_REFLECTION);
+                                events.RepeatEvent(30000);
+                                break;
+                            }
+                            case EVENT_DAMAGE_REFLECTION:
+                            {
+                                DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                events.RepeatEvent(30000);
+                                break;
+                            }
+                            case EVENT_BLAST_WAVE:
+                            {
+                                DoCastVictim(SPELL_BLAST_WAVE);
+                                events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
+                                break;
+                            }
+                            case EVENT_TELEPORT_RANDOM:
+                            {
+                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                                {
+                                    DoCastSelf(SPELL_HATE_TO_ZERO, true);
+                                    DoCast(target, SPELL_TELEPORT_RANDOM);
+                                }
+
+                                events.RepeatEvent(15000);
+                                break;
+                            }
+                            case EVENT_TELEPORT_TARGET:
+                            {
+                                DoCastSelf(SPELL_HATE_TO_ZERO, true);
+                                DoCastAOE(SPELL_TELEPORT_TARGET);
+                                events.RepeatEvent(30000);
+                                break;
+                            }
                         }
-                        case EVENT_OUTRO_2:
+
+                        if (me->HasUnitState(UNIT_STATE_CASTING))
                         {
-                            instance->instance->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos);
-                            break;
-                        }
-                        case EVENT_OUTRO_3:
-                        {
-                            Talk(SAY_ARRIVAL2_MAJ);
-                            break;
+                            return;
                         }
                     }
+
+                    DoMeleeAttackIfReady();
+                    break;
+                }
+                case EVENT_PHASE_OUTRO:
+                {
+                    events.Update(diff);
+                    while (uint32 const eventId = events.ExecuteEvent())
+                    {
+                        switch (eventId)
+                        {
+                            case EVENT_OUTRO_1:
+                            {
+                                me->NearTeleportTo(RagnarosTelePos.GetPositionX(), RagnarosTelePos.GetPositionY(), RagnarosTelePos.GetPositionZ(), RagnarosTelePos.GetOrientation());
+                                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                                break;
+                            }
+                            case EVENT_OUTRO_2:
+                            {
+                                instance->instance->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos);
+                                break;
+                            }
+                            case EVENT_OUTRO_3:
+                            {
+                                Talk(SAY_ARRIVAL2_MAJ);
+                                break;
+                            }
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -340,7 +356,49 @@ public:
     }
 };
 
+// 20538 Hate to Zero (SERVERSIDE)
+class spell_hate_to_zero : public SpellScriptLoader
+{
+public:
+    spell_hate_to_zero() : SpellScriptLoader("spell_hate_to_zero") {}
+
+    class spell_hate_to_zero_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hate_to_zero_SpellScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        }
+
+        void HandleHit(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (caster)
+            {
+                if (Creature* creatureCaster = caster->ToCreature())
+                {
+                    creatureCaster->getThreatMgr().resetAllAggro();
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_hate_to_zero_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hate_to_zero_SpellScript();
+    }
+};
+
 void AddSC_boss_majordomo()
 {
     new boss_majordomo();
+
+    // Spells
+    new spell_hate_to_zero();
 }
