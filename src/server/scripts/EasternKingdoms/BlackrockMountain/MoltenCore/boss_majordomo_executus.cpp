@@ -349,7 +349,7 @@ public:
                             case EVENT_DEFEAT_OUTRO_2:
                             {
                                 Talk(SAY_DEFEAT_3);
-                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_2, 21500, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
+                                events.ScheduleEvent(EVENT_DEFEAT_OUTRO_3, 21500, PHASE_DEFEAT_OUTRO, PHASE_DEFEAT_OUTRO);
                                 break;
                             }
                             case EVENT_DEFEAT_OUTRO_3:
