@@ -33,7 +33,6 @@ enum Texts
     SAY_ARRIVAL2_MAJ                        = 5,
     SAY_LAST_ADD                            = 6,
 
-
     SAY_DEFEAT_2                            = 7,
     SAY_DEFEAT_3                            = 8,
 
@@ -45,7 +44,6 @@ enum Texts
     // Ragnaros
     SAY_ARRIVAL1_RAG                        = 1,
     SAY_ARRIVAL3_RAG                        = 3,
-
 };
 
 enum Spells
@@ -90,7 +88,6 @@ enum Events
     EVENT_RAGNAROS_SUMMON_5,
     EVENT_RAGNAROS_SUMMON_6,
     EVENT_RAGNAROS_SUMMON_7,
-    EVENT_RAGNAROS_SUMMON_8,
 };
 
 enum Misc
