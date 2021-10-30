@@ -192,7 +192,8 @@ public:
     struct npc_core_ragerAI : public ScriptedAI
     {
         npc_core_ragerAI(Creature* creature) : ScriptedAI(creature),
-            instance(creature->GetInstanceScript())
+            instance(creature->GetInstanceScript()),
+            mangleTimer(7000)
         {
         }
 
