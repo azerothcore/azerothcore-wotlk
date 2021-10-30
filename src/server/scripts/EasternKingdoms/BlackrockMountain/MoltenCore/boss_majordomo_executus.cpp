@@ -20,30 +20,39 @@
 #include "molten_core.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
+#include "ObjectAccessor.h"
 
 enum Texts
 {
-    SAY_AGGRO           = 0,
-    SAY_SPAWN           = 1,
-    SAY_SLAY            = 2,
-    SAY_SPECIAL         = 3,
-    SAY_DEFEAT          = 4,
-    SAY_SUMMON_MAJ      = 5,
-    SAY_ARRIVAL2_MAJ    = 6,
-    SAY_LAST_ADD        = 7,
+    SAY_AGGRO                       = 0,
+    SAY_SPAWN                       = 1,
+    SAY_SLAY                        = 2,
+    SAY_SPECIAL                     = 3,
+    SAY_DEFEAT                      = 4,
+    SAY_SUMMON_MAJ                  = 5,
+    SAY_ARRIVAL2_MAJ                = 6,
+    SAY_LAST_ADD                    = 7,
 };
 
 enum Spells
 {
-    SPELL_MAGIC_REFLECTION  = 20619,
-    SPELL_DAMAGE_REFLECTION = 21075,
-    SPELL_BLAST_WAVE        = 20229,
-    SPELL_AEGIS_OF_RAGNAROS = 20620,
-    SPELL_TELEPORT          = 20618,
-    SPELL_SUMMON_RAGNAROS   = 19774,
-    SPELL_ENCOURAGEMENT     = 21086,
-    SPELL_CHAMPION          = 21090,
-    SPELL_IMMUNE_POLY       = 21087,
+    SPELL_MAGIC_REFLECTION          = 20619,
+    SPELL_DAMAGE_REFLECTION         = 21075,
+    SPELL_BLAST_WAVE                = 20229,
+    SPELL_AEGIS_OF_RAGNAROS         = 20620,
+    SPELL_TELEPORT                  = 20618,
+    SPELL_ENCOURAGEMENT             = 21086,
+    SPELL_CHAMPION                  = 21090,    // Server side
+    SPELL_IMMUNE_POLY               = 21087,    // Server side
+    SPELL_HATE_TO_ZERO              = 20538,    // Threat reset after each teleport. Server side
+    SPELL_SEPARATION_ANXIETY        = 21094,    // Aura cast on himself by Majordomo Executus, if adds move out of range, they will cast spell 21095 on themselves
+    SPELL_SEPARATION_ANXIETY_MINION = 21095,
+
+    // Outro & Ragnaros intro
+    SPELL_TELEPORT_SELF             = 19484,
+    SPELL_SUMMON_RAGNAROS           = 19774,
+    SPELL_ELEMENTAL_FIRE            = 19773,
+    SPELL_RAGNA_EMERGE              = 20568,
 };
 
 enum Events
@@ -83,19 +92,27 @@ public:
         // Disabled events
         void JustDied(Unit* /*killer*/) override {}
 
+        void InitializeAI() override
+        {
+            BossAI::InitializeAI();
+            if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
+            {
+                me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
+            }
+        }
+
         void Reset() override
         {
             me->ResetLootMode();
             events.Reset();
-            summons.DespawnAll();
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
                 events.SetPhase(EVENT_NORMAL_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
-                me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
             }
             else
             {
+                summons.DespawnAll();
                 events.SetPhase(EVENT_OUTRO_EVENT);
             }
         }
@@ -113,7 +130,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* attacker) override
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
