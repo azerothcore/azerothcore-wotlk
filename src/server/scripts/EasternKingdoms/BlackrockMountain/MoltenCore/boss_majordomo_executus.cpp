@@ -97,7 +97,18 @@ public:
             BossAI::InitializeAI();
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
-                me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
+                std::list<TempSummon*> p_summons;
+                me->SummonCreatureGroup(SUMMON_GROUP_ADDS, &p_summons);
+                if (!p_summons.empty())
+                {
+                    for (TempSummon const* summon : p_summons)
+                    {
+                        if (!summon)
+                            continue;
+                        
+                        static_minionsGUIDS.insert(summon->GetGUID());
+                    }
+                }
             }
         }
 
@@ -105,6 +116,8 @@ public:
         {
             me->ResetLootMode();
             events.Reset();
+            aliveMinionsGUIDS.clear();
+
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
                 events.SetPhase(EVENT_NORMAL_COMBAT);
@@ -130,7 +143,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* attacker) override
+        void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
@@ -139,14 +152,17 @@ public:
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
             events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT, 20000, EVENT_NORMAL_COMBAT, EVENT_NORMAL_COMBAT);
+
+            aliveMinionsGUIDS.clear();
+            aliveMinionsGUIDS = static_minionsGUIDS;
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
-            summons.Despawn(summon);
+            aliveMinionsGUIDS.erase(summon->GetGUID());
             if (summon->GetEntry() == NPC_FLAMEWAKER_HEALER || summon->GetEntry() == NPC_FLAMEWAKER_ELITE)
             {
-                uint32 const remainingAdds = std::count_if(summons.begin(), summons.end(), [](ObjectGuid const& summonGuid)
+                uint32 const remainingAdds = std::count_if(aliveMinionsGUIDS.begin(), aliveMinionsGUIDS.end(), [](ObjectGuid const& summonGuid)
                 {
                     return summonGuid.GetEntry() == NPC_FLAMEWAKER_HEALER || summonGuid.GetEntry() == NPC_FLAMEWAKER_ELITE;
                 });
@@ -296,6 +312,10 @@ public:
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
         }
+
+    private:
+        GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
+        GuidSet aliveMinionsGUIDS;      // used for calculations
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
