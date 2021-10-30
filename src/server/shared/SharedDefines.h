@@ -179,7 +179,7 @@ enum FactionTemplates
     FACTION_ELEMENTAL                   = 91,
     FACTION_DRAGONFLIGHT_BLACK          = 103,
     FACTION_ESCORTEE_N_NEUTRAL_PASSIVE  = 113,
-    FACTION_PYREWOOD                    = 123,
+    FACTION_STORMWIND                   = 123,
     FACTION_ENEMY                       = 168,
     FACTION_ESCORTEE_A_NEUTRAL_ACTIVE   = 231,
     FACTION_ESCORTEE_H_NEUTRAL_ACTIVE   = 232,

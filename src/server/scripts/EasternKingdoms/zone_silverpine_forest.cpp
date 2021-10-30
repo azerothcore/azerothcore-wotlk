@@ -240,7 +240,7 @@ public:
                 if (!target)
                     target = me;
 
-                summoned->SetFaction(FACTION_PYREWOOD);
+                summoned->SetFaction(FACTION_STORMWIND);
                 summoned->AddThreat(target, 32.0f);
                 summoned->AI()->AttackStart(target);
             }
