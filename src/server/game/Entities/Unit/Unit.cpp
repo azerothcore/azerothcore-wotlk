@@ -4104,7 +4104,9 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMo
 
         if (Player* player = ToPlayer())
         if (sConditionMgr->IsSpellUsedInSpellClickConditions(aurApp->GetBase()->GetId()))
-            player->UpdateVisibleGameobjectsOrSpellClicks();
+		{
+			player->UpdateVisibleGameobjectsOrSpellClicks();
+		}
 
     // only way correctly remove all auras from list
     //if (removedAuras != m_removedAurasCount) new aura may be added
