@@ -216,7 +216,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
         if (_sourceUnit)
         {
-            bool isUnderWater = (_sourceUnit->CanSwim() && isUnderWaterStart && isUnderWaterEnd) || (isFarUnderWater && _useRaycast);
+            bool isUnderWater = (_sourceUnit->CanSwim() && isUnderWaterStart && isUnderWaterEnd) || (_sourceUnit->IsInWater() && isUnderWaterEnd) || (isFarUnderWater && _useRaycast);
 
             if (isUnderWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
             {
@@ -1112,9 +1112,8 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
     // we're guessing a position, we should make sure we normalize the path so that we correctly set Z position
     NormalizePath();
 
-    // this is not strictly necessary, but makes sense?
+    // this seems to improve underwater charing leaving character standing on top of creatures
     SetEndPosition(_pathPoints[i]);
-    SetActualEndPosition(_pathPoints[i]);
 }
 
 bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
