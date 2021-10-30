@@ -212,12 +212,12 @@ INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`)
 SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` = 12101 AND `map`=409;
 
 -- "19515 Frenzy (SERVERSIDE)" used by Garr's Firesworn
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=19515 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=1 AND `ConditionValue1`=3 AND `ConditionValue2`=12057 AND `ConditionValue3`=0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=19515 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=12057 AND `ConditionValue3`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 19515, 0, 0, 31, 1, 3, 12057, 0, 0, 0, 0, '', 'Frenzy (SERVERSIDE) - should target only Garr');
+(13, 1, 19515, 0, 0, 31, 0, 3, 12057, 0, 0, 0, 0, '', 'Frenzy (SERVERSIDE) - should target only Garr');
 
 -- Allow casting while dead
-update `spell_dbc` set `attributesEx`=`attributesEx` | 0x00800000 where `id` = 19515;
+update `spell_dbc` set `attributes`=`attributes` | 0x00800000 where `id` = 19515;
 
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger`=19515 AND `spell_effect`=19516 AND `type`=1;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
