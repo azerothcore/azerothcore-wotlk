@@ -1063,7 +1063,7 @@ void ConditionMgr::LoadConditions(bool isReload)
                 {
                     SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
                 }
-				valid = true;
+                valid = true;
                 ++count;
                 continue; // do not add to m_AllocatedMemory to avoid double deleting
             }
@@ -1130,7 +1130,7 @@ void ConditionMgr::LoadConditions(bool isReload)
         {
             SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
         }
-		ConditionStore[cond->SourceType][cond->SourceEntry].push_back(cond);
+        ConditionStore[cond->SourceType][cond->SourceEntry].push_back(cond);
         ++count;
     } while (result->NextRow());
 
