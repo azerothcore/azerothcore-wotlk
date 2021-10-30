@@ -50,7 +50,6 @@ enum MCCreatures
     NPC_MAGMADAR                    = 11982,
     NPC_SHAZZRAH                    = 12264,
     NPC_BARON_GEDDON                = 12056,
-    NPC_SULFURON_HARBINGER          = 12098,
     NPC_MAJORDOMO_EXECUTUS          = 12018,
     NPC_RAGNAROS                    = 11502,
     NPC_FLAMEWAKER_HEALER           = 11663,
@@ -72,6 +71,10 @@ enum MCCreatures
     // Lucifron
     NPC_LUCIFRON                    = 12118,
     NPC_FLAMEWALKER_PROTECTOR       = 12119,
+
+    // Sulfuron
+    NPC_SULFURON_HARBINGER          = 12098,
+    NPC_FLAMEWALKER_PRIEST          = 11662,
 };
 
 enum MCGameObjects

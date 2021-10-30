@@ -31,6 +31,7 @@ MinionData const minionData[] =
     { NPC_FIRESWORN,                DATA_GARR },
     { NPC_FLAMEWALKER,              DATA_GEHENNAS },
     { NPC_FLAMEWALKER_PROTECTOR,    DATA_LUCIFRON },
+    { NPC_FLAMEWALKER_PRIEST,       DATA_SULFURON },
     { 0, 0 } // END
 };
 
@@ -105,6 +106,7 @@ public:
                 }
                 case NPC_FLAMEWALKER:
                 case NPC_FLAMEWALKER_PROTECTOR:
+                case NPC_FLAMEWALKER_PRIEST:
                 {
                     AddMinion(creature, true);
                     break;
@@ -123,6 +125,7 @@ public:
                 }
                 case NPC_FLAMEWALKER:
                 case NPC_FLAMEWALKER_PROTECTOR:
+                case NPC_FLAMEWALKER_PRIEST:
                 {
                     AddMinion(creature, false);
                     break;
