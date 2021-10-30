@@ -1440,7 +1440,20 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+     virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+};
+
+class DatabaseScript : public ScriptObject
+{
+protected:
+
+    DatabaseScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void AfterDatabasesLoaded(uint32 /*updateFlags*/) {}
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1924,6 +1937,10 @@ public: /* AchievementScript */
     public: /* CommandSC */
 
         void OnHandleDevCommand(Player* player, std::string& argstr);
+
+    public: /* DatabaseScript */
+
+        void AfterDatabasesLoaded(uint32 updateFlags);
 
 private:
     uint32 _scriptCount;

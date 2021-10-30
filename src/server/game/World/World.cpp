@@ -1455,9 +1455,6 @@ void World::SetInitialWorldSettings()
     ///- Initialize detour memory management
     dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
 
-    LOG_INFO("server.loading", "Initializing Scripts...");
-    sScriptMgr->Initialize();
-
     ///- Initialize VMapMgr function pointers (to untangle game/collision circular deps)
     VMAP::VMapMgr2* vmmgr2 = VMAP::VMapFactory::createOrGetVMapMgr();
     vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
