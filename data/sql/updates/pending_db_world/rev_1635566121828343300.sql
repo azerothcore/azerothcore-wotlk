@@ -1,3 +1,0 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1635566121828343300');
-
-UPDATE `quest_template_addon` SET `exclusiveGroup` = 14166 WHERE `id` IN (13952, 14166, 14167, 14168, 14169, 14170, 14171, 14172, 14173, 14174, 14175, 14176, 14177);
