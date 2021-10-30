@@ -107,9 +107,10 @@ enum Misc
     POINT_RAGNAROS_SUMMON                   = 1,
 
     // Event phases
-    PHASE_COMBAT                            = 0x01,
-    PHASE_DEFEAT_OUTRO                      = 0x02,
-    PHASE_RAGNAROS_SUMMONING                = 0x04,
+    PHASE_NONE                              = 0,
+    PHASE_COMBAT                            = 1,
+    PHASE_DEFEAT_OUTRO                      = 2,
+    PHASE_RAGNAROS_SUMMONING                = 3,
 };
 
 Position const MajordomoRagnaros = { 848.933f, -812.875f, -229.601f, 4.046f };
@@ -135,7 +136,7 @@ public:
             BossAI::InitializeAI();
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
-                events.SetPhase(PHASE_RAGNAROS_SUMMONING);
+                events.SetPhase(PHASE_COMBAT);
 
                 std::list<TempSummon*> p_summons;
                 me->SummonCreatureGroup(SUMMON_GROUP_ADDS, &p_summons);
@@ -154,6 +155,7 @@ public:
             }
             else
             {
+                events.SetPhase(PHASE_NONE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->setFaction(FACTION_MAJORDOMO_FRIENDLY);
@@ -294,7 +296,7 @@ public:
 
             switch (events.GetPhaseMask())
             {
-                case PHASE_COMBAT:
+                case  (1 << (PHASE_COMBAT - 1)):
                 {
                     if (!UpdateVictim())
                     {
@@ -359,13 +361,8 @@ public:
                     DoMeleeAttackIfReady();
                     break;
                 }
-                case PHASE_DEFEAT_OUTRO:
+                case (1 << (PHASE_DEFEAT_OUTRO - 1)):
                 {
-                    if (events.Empty())
-                    {
-                        return;
-                    }
-
                     events.Update(diff);
                     while (uint32 const eventId = events.ExecuteEvent())
                     {
@@ -392,13 +389,9 @@ public:
                     }
                     break;
                 }
-                case PHASE_RAGNAROS_SUMMONING:
+                case (1 << (PHASE_RAGNAROS_SUMMONING - 1)):
                 {
-                    if (events.Empty())
-                    {
-                        return;
-                    }
-
+                    printf("TRIGGERED\n");
                     events.Update(diff);
                     while (uint32 const eventId = events.ExecuteEvent())
                     {
@@ -435,7 +428,7 @@ public:
                             }
                             case EVENT_RAGNAROS_SUMMON_3:
                             {
-                                me->SummonCreature(NPC_RAGNAROS, 838.3082f, -831.4665f, -232.1853f, 2.199115f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
+                                me->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
                                 events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_4, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
@@ -495,6 +488,7 @@ public:
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetHomePosition(MajordomoRagnaros);
                 me->NearTeleportTo(MajordomoRagnaros.GetPositionX(), MajordomoRagnaros.GetPositionY(), MajordomoRagnaros.GetPositionZ(), MajordomoRagnaros.GetOrientation());
+                events.SetPhase(PHASE_NONE);
             }
         }
 
