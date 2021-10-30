@@ -35,10 +35,10 @@ enum AcoreStrings
     LANG_SYSTEMMESSAGE                  = 3,
     LANG_EVENTMESSAGE                   = 4,
     LANG_NO_HELP_CMD                    = 5,
-    LANG_NO_CMD                         = 6,
-    LANG_NO_SUBCMD                      = 7,
+    LANG_CMD_INVALID                    = 6,
+    LANG_SUBCMD_AMBIGUOUS               = 7,
     LANG_SUBCMDS_LIST                   = 8,
-    LANG_AVIABLE_CMD                    = 9,
+    LANG_AVAILABLE_CMDS                 = 9,
     LANG_CMD_SYNTAX                     = 10,
     LANG_ACCOUNT_LEVEL                  = 11,
     LANG_CONNECTED_USERS                = 12,
@@ -222,7 +222,13 @@ enum AcoreStrings
     LANG_2FA_SECRET_TOO_LONG            = 188,
     LANG_2FA_SECRET_INVALID             = 189,
     LANG_2FA_SECRET_SET_COMPLETE        = 190,
-    // free 191 - 199
+    LANG_SUBCMDS_LIST_ENTRY             = 191,
+    LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS    = 192,
+    LANG_SUBCMD_INVALID                 = 193,
+    LANG_CMD_AMBIGUOUS                  = 194,
+    LANG_CMD_HELP_GENERIC               = 195,
+    LANG_CMD_NO_HELP_AVAILABLE          = 196,
+    // Room for more level 1                197-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -857,7 +863,7 @@ enum AcoreStrings
     LANG_ARENA_ERROR_NAME_EXISTS        = 858,
     LANG_ARENA_ERROR_SIZE               = 859,
     LANG_ARENA_ERROR_COMBAT             = 860,
-    LANG_AREAN_ERROR_NAME_NOT_FOUND     = 861,
+    LANG_ARENA_ERROR_NAME_NOT_FOUND     = 861,
     LANG_ARENA_ERROR_NOT_MEMBER         = 862,
     LANG_ARENA_ERROR_CAPTAIN            = 863,
     LANG_ARENA_CREATE                   = 864,
@@ -1089,7 +1095,26 @@ enum AcoreStrings
     //Player Ticket Strings
     LANG_TICKET_CLOSED                  = 1334,
     LANG_TICKET_COMPLETED               = 1335,
-    // FREE IDS                           1336-1999
+    // FREE IDS                           1336-1499
+
+    // Command argument parsers
+    LANG_CMDPARSER_EITHER                 = 1500,
+    LANG_CMDPARSER_OR                     = 1501,
+    LANG_CMDPARSER_STRING_VALUE_INVALID   = 1502,
+    LANG_CMDPARSER_INVALID_UTF8           = 1503,
+    LANG_CMDPARSER_LINKDATA_INVALID       = 1504,
+    LANG_CMDPARSER_ACCOUNT_NAME_NO_EXIST  = 1505,
+    LANG_CMDPARSER_ACCOUNT_ID_NO_EXIST    = 1506,
+    LANG_CMDPARSER_CHAR_GUID_NO_EXIST     = 1507,
+    LANG_CMDPARSER_CHAR_NAME_NO_EXIST     = 1508,
+    LANG_CMDPARSER_CHAR_NAME_INVALID      = 1509,
+    LANG_CMDPARSER_ACHIEVEMENT_NO_EXIST   = 1510,
+    LANG_CMDPARSER_GAME_TELE_ID_NO_EXIST  = 1511,
+    LANG_CMDPARSER_GAME_TELE_NO_EXIST     = 1512,
+    LANG_CMDPARSER_ITEM_NO_EXIST          = 1513,
+    LANG_CMDPARSER_SPELL_NO_EXIST         = 1514,
+    LANG_CMDPARSER_EXACT_SEQ_MISMATCH     = 1515,
+    // FREE IDS                             1516-1499
 
     // Ticket Strings 2000-2030
     LANG_COMMAND_TICKETNEW              = 2000,

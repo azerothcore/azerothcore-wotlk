@@ -32,27 +32,33 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class lookup_commandscript : public CommandScript
 {
 public:
     lookup_commandscript() : CommandScript("lookup_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> lookupPlayerCommandTable =
+        static ChatCommandTable lookupPlayerCommandTable =
         {
             { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "" },
             { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "" },
             { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "" }
         };
 
-        static std::vector<ChatCommand> lookupSpellCommandTable =
+        static ChatCommandTable lookupSpellCommandTable =
         {
             { "id",             SEC_MODERATOR,      true,  &HandleLookupSpellIdCommand,         "" },
             { "",               SEC_MODERATOR,      true,  &HandleLookupSpellCommand,           "" }
         };
 
-        static std::vector<ChatCommand> lookupCommandTable =
+        static ChatCommandTable lookupCommandTable =
         {
             { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,        "" },
             { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,    "" },
@@ -72,7 +78,7 @@ public:
             { "spell",          SEC_MODERATOR,      true,  nullptr, "", lookupSpellCommandTable }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "lookup",         SEC_MODERATOR,  true,  nullptr,                                 "", lookupCommandTable }
         };

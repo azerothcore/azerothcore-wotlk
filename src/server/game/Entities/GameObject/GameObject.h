@@ -711,6 +711,7 @@ struct GameObjectData
     float orientation{0.0f};
     G3D::Quat rotation;
     int32  spawntimesecs{0};
+    uint32 ScriptId;
     uint32 animprogress{0};
     GOState go_state{GO_STATE_ACTIVE};
     uint8 spawnMask{0};
@@ -811,6 +812,7 @@ public:
     }
 
     void SetRespawnTime(int32 respawn);
+    void SetRespawnDelay(int32 respawn);
     void Respawn();
     [[nodiscard]] bool isSpawned() const
     {
@@ -932,7 +934,7 @@ public:
 
     void EventInform(uint32 eventId);
 
-    [[nodiscard]] virtual uint32 GetScriptId() const { return GetGOInfo()->ScriptId; }
+    [[nodiscard]] virtual uint32 GetScriptId() const;
     [[nodiscard]] GameObjectAI* AI() const { return m_AI; }
 
     [[nodiscard]] std::string GetAIName() const;
