@@ -1549,8 +1549,6 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
-
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
         {
@@ -1646,8 +1644,6 @@ public:
         Player* playerTarget = handler->getSelectedPlayer();
         if (!playerTarget)
             playerTarget = player;
-
-        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
