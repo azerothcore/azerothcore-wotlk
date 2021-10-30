@@ -21,32 +21,33 @@
 
 enum Texts
 {
-    SAY_SUMMON_MAJ              = 0,
-    SAY_ARRIVAL1_RAG            = 1,
-    SAY_ARRIVAL2_MAJ            = 2,
-    SAY_ARRIVAL3_RAG            = 3,
-    SAY_ARRIVAL5_RAG            = 4,
-    SAY_REINFORCEMENTS1         = 5,
-    SAY_REINFORCEMENTS2         = 6,
-    SAY_HAND                    = 7,
-    SAY_WRATH                   = 8,
-    SAY_KILL                    = 9,
-    SAY_MAGMABURST              = 10
+    SAY_SUMMON_MAJ                          = 0,
+    SAY_ARRIVAL1_RAG                        = 1,
+    SAY_ARRIVAL2_MAJ                        = 2,
+    SAY_ARRIVAL3_RAG                        = 3,
+    SAY_ARRIVAL5_RAG                        = 4,
+    SAY_REINFORCEMENTS1                     = 5,
+    SAY_REINFORCEMENTS2                     = 6,
+    SAY_HAND                                = 7,
+    SAY_WRATH                               = 8,
+    SAY_KILL                                = 9,
+    SAY_MAGMABURST                          = 10
 };
 
 enum Spells
 {
-    SPELL_HAND_OF_RAGNAROS      = 19780,
-    SPELL_WRATH_OF_RAGNAROS     = 20566,
-    SPELL_LAVA_BURST            = 21158,
-    SPELL_MAGMA_BLAST           = 20565,                   // Ranged attack
-    SPELL_SONS_OF_FLAME_DUMMY   = 21108,                   // Server side effect
-    SPELL_RAGSUBMERGE           = 21107,                   // Stealth aura
-    SPELL_RAGNA_SUBMERGE_VISUAL = 20567,                   // Visual for submerging into lava
-    SPELL_RAGEMERGE             = 20568,
-    SPELL_MELT_WEAPON           = 21387,
-    SPELL_ELEMENTAL_FIRE        = 20563,
-    SPELL_ERRUPTION             = 17731,
+    SPELL_HAND_OF_RAGNAROS                  = 19780,
+    SPELL_WRATH_OF_RAGNAROS                 = 20566,
+    SPELL_LAVA_BURST                        = 21158,
+    SPELL_MAGMA_BLAST                       = 20565,                   // Ranged attack
+    SPELL_SONS_OF_FLAME_DUMMY               = 21108,                   // Server side effect
+    SPELL_RAGSUBMERGE                       = 21107,                   // Stealth aura
+    SPELL_RAGNA_SUBMERGE_VISUAL             = 20567,                   // Visual for submerging into lava
+    SPELL_RAGEMERGE                         = 20568,
+    SPELL_MELT_WEAPON                       = 21387,
+    SPELL_ELEMENTAL_FIRE                    = 20563,
+    SPELL_ERRUPTION                         = 17731,
+    SPELL_RAGNAROS_SUBMERGE_EFFECT          = 21859,    // Applies pacify state and applies all schools immunity
 };
 
 enum Events
@@ -85,8 +86,8 @@ public:
     struct boss_ragnarosAI : public BossAI
     {
         boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
+            attackableTImer(0),
             _emergeTimer(90000),
-            _introState(0),
             _hasYelledMagmaBurst(false),
             _hasSubmergedOnce(false),
             _isBanished(false)
@@ -105,6 +106,14 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             DoCastSelf(SPELL_MELT_WEAPON, true);
             DoCastSelf(SPELL_ELEMENTAL_FIRE, true);
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_FINISH_RAGNAROS_INTRO)
+            {
+                attackableTImer = 10000;
+            }
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -147,6 +156,22 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (attackableTImer)
+            {
+                if (attackableTImer <= diff)
+                {
+                    me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    DoZoneInCombat();
+                    attackableTImer = 0;
+                }
+                else
+                {
+                    attackableTImer -= diff;
+                }
+            }
+
             if (_isBanished && (_emergeTimer <= diff || !summons.HasEntry(NPC_SON_OF_FLAME)))
             {
                 //Become unbanished again
@@ -260,9 +285,8 @@ public:
         }
 
     private:
-        EventMap introEvents;
+        uint32 attackableTImer;     // used after intro
         uint32 _emergeTimer;
-        uint8 _introState;
         bool _hasYelledMagmaBurst;
         bool _hasSubmergedOnce;
         bool _isBanished;

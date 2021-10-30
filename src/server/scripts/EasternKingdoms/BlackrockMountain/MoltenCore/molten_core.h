@@ -43,8 +43,9 @@ enum MCData
 enum MCActions
 {
     ACTION_START_RAGNAROS_INTRO         = -1,
-    ACTION_RESET_MAGMADAR_ENCOUNTER     = -2,   // Used when ragers are pulled far away
-    ACTION_PREPARE_MAJORDOMO_RAGNA      = -3,
+    ACTION_FINISH_RAGNAROS_INTRO        = -2,
+    ACTION_RESET_MAGMADAR_ENCOUNTER     = -3,   // Used when ragers are pulled far away
+    ACTION_PREPARE_MAJORDOMO_RAGNA      = -4,
 };
 
 enum MCCreatures

@@ -474,6 +474,7 @@ public:
                                 if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
                                 {
                                     ragnaros->CastSpell(me, SPELL_ELEMENTAL_FIRE, true);
+                                    ragnaros->AI()->DoAction(ACTION_FINISH_RAGNAROS_INTRO);
                                 }
                                 break;
                             }
