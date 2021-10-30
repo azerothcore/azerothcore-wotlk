@@ -147,172 +147,116 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (_introState != 2)
+            if (_isBanished && (_emergeTimer <= diff || !summons.HasEntry(NPC_SON_OF_FLAME)))
             {
-                if (!_introState)
+                //Become unbanished again
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->setFaction(14);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                 {
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                    introEvents.ScheduleEvent(EVENT_INTRO_1, 4000);
-                    introEvents.ScheduleEvent(EVENT_INTRO_2, 23000);
-                    introEvents.ScheduleEvent(EVENT_INTRO_3, 42000);
-                    introEvents.ScheduleEvent(EVENT_INTRO_4, 43000);
-                    introEvents.ScheduleEvent(EVENT_INTRO_5, 53000);
-                    _introState = 1;
+                    AttackStart(target);
                 }
 
-                introEvents.Update(diff);
-
-                while (uint32 const eventId = introEvents.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_INTRO_1:
-                        {
-                            Talk(SAY_ARRIVAL1_RAG);
-                            break;
-                        }
-                        case EVENT_INTRO_2:
-                        {
-                            Talk(SAY_ARRIVAL3_RAG);
-                            break;
-                        }
-                        case EVENT_INTRO_3:
-                        {
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
-                            break;
-                        }
-                        case EVENT_INTRO_4:
-                        {
-                            Talk(SAY_ARRIVAL5_RAG);
-                            if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MAJORDOMO_EXECUTUS)))
-                            {
-                                Unit::Kill(me, executus);
-                            }
-                            break;
-                        }
-                        case EVENT_INTRO_5:
-                        {
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            _introState = 2;
-                            break;
-                        }
-                    }
-                }
+                _isBanished = false;
             }
-            else
+            else if (_isBanished)
             {
-                if (_isBanished && (_emergeTimer <= diff || !summons.HasEntry(NPC_SON_OF_FLAME)))
+                _emergeTimer -= diff;
+                return;
+            }
+
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+            while (uint32 const eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
                 {
-                    //Become unbanished again
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->setFaction(14);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    case EVENT_ERUPTION:
                     {
-                        AttackStart(target);
+                        DoCastVictim(SPELL_ERRUPTION);
+                        events.RepeatEvent(urand(20000, 45000));
+                        break;
                     }
-
-                    _isBanished = false;
+                    case EVENT_WRATH_OF_RAGNAROS:
+                    {
+                        DoCastVictim(SPELL_WRATH_OF_RAGNAROS);
+                        if (urand(0, 1))
+                        {
+                            Talk(SAY_WRATH);
+                        }
+                        events.RepeatEvent(25000);
+                        break;
+                    }
+                    case EVENT_HAND_OF_RAGNAROS:
+                    {
+                        DoCastSelf(SPELL_HAND_OF_RAGNAROS);
+                        if (urand(0, 1))
+                        {
+                            Talk(SAY_HAND);
+                        }
+                        events.RepeatEvent(20000);
+                        break;
+                    }
+                    case EVENT_LAVA_BURST:
+                    {
+                        DoCastVictim(SPELL_LAVA_BURST);
+                        events.RepeatEvent(10000);
+                        break;
+                    }
+                    case EVENT_MAGMA_BLAST:
+                    {
+                        Unit* victim = me->GetVictim();
+                        if (victim && !me->IsWithinMeleeRange(victim))
+                        {
+                            DoCast(victim, SPELL_MAGMA_BLAST);
+                            if (!_hasYelledMagmaBurst)
+                            {
+                                Talk(SAY_MAGMABURST);
+                                _hasYelledMagmaBurst = true;
+                            }
+                        }
+                        events.RepeatEvent(2500);
+                        break;
+                    }
+                    case EVENT_SUBMERGE:
+                    {
+                        if (!_isBanished)
+                        {
+                            me->InterruptNonMeleeSpells(false);
+                            me->AttackStop();
+                            DoResetThreat();
+                            me->SetReactState(REACT_PASSIVE);
+                            me->setFaction(35);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
+                            DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
+                            //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
+                            SummonMinions();
+                        }
+                        events.ScheduleEvent(EVENT_SUBMERGE, 180000);
+                        break;
+                    }
                 }
-                else if (_isBanished)
-                {
-                    _emergeTimer -= diff;
-                    return;
-                }
-
-                if (!UpdateVictim())
-                {
-                    return;
-                }
-
-                events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                 {
                     return;
                 }
-                while (uint32 const eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_ERUPTION:
-                        {
-                            DoCastVictim(SPELL_ERRUPTION);
-                            events.RepeatEvent(urand(20000, 45000));
-                            break;
-                        }
-                        case EVENT_WRATH_OF_RAGNAROS:
-                        {
-                            DoCastVictim(SPELL_WRATH_OF_RAGNAROS);
-                            if (urand(0, 1))
-                            {
-                                Talk(SAY_WRATH);
-                            }
-                            events.RepeatEvent(25000);
-                            break;
-                        }
-                        case EVENT_HAND_OF_RAGNAROS:
-                        {
-                            DoCastSelf(SPELL_HAND_OF_RAGNAROS);
-                            if (urand(0, 1))
-                            {
-                                Talk(SAY_HAND);
-                            }
-                            events.RepeatEvent(20000);
-                            break;
-                        }
-                        case EVENT_LAVA_BURST:
-                        {
-                            DoCastVictim(SPELL_LAVA_BURST);
-                            events.RepeatEvent(10000);
-                            break;
-                        }
-                        case EVENT_MAGMA_BLAST:
-                        {
-                            Unit* victim = me->GetVictim();
-                            if (victim && !me->IsWithinMeleeRange(victim))
-                            {
-                                DoCast(victim, SPELL_MAGMA_BLAST);
-                                if (!_hasYelledMagmaBurst)
-                                {
-                                    Talk(SAY_MAGMABURST);
-                                    _hasYelledMagmaBurst = true;
-                                }
-                            }
-                            events.RepeatEvent(2500);
-                            break;
-                        }
-                        case EVENT_SUBMERGE:
-                        {
-                            if (!_isBanished)
-                            {
-                                me->InterruptNonMeleeSpells(false);
-                                me->AttackStop();
-                                DoResetThreat();
-                                me->SetReactState(REACT_PASSIVE);
-                                me->setFaction(35);
-                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
-                                DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
-                                //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                                SummonMinions();
-                            }
-                            events.ScheduleEvent(EVENT_SUBMERGE, 180000);
-                            break;
-                        }
-                    }
-
-                    if (me->HasUnitState(UNIT_STATE_CASTING))
-                    {
-                        return;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
             }
+
+            DoMeleeAttackIfReady();
         }
 
     private:

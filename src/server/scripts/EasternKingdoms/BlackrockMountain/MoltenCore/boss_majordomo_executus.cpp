@@ -412,8 +412,8 @@ public:
                                 }
                                 Talk(SAY_RAG_SUM_2);
                                 // Next event will get triggered in MovementInform
+                                me->SetWalk(true);
                                 me->GetMotionMaster()->MovePoint(POINT_RAGNAROS_SUMMON, MajordomoMoveRagPos, true, false);
-                                
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_2:
@@ -425,6 +425,7 @@ public:
 
                                 Talk(SAY_SUMMON_MAJ);
                                 events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_3, 16700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
+                                events.ScheduleEvent(EVENT_RAGNAROS_EMERGE, 15000, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_3:
@@ -440,7 +441,6 @@ public:
                             {
                                 Talk(SAY_ARRIVAL2_MAJ);
                                 events.ScheduleEvent(EVENT_RAGNAROS_SUMMON_5, 8700, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
-                                events.ScheduleEvent(EVENT_RAGNAROS_EMERGE, 6500, PHASE_RAGNAROS_SUMMONING, PHASE_RAGNAROS_SUMMONING);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_5:
@@ -466,7 +466,7 @@ public:
                             {
                                 if (Creature* ragnaros = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAGNAROS)))
                                 {
-                                    ragnaros->SetStandState(UNIT_STAND_STATE_STAND);
+                                    ragnaros->RemoveAurasDueToSpell(SPELL_RAGNAROS_FADE);
                                     ragnaros->CastSpell(ragnaros, SPELL_RAGNA_EMERGE);
                                 }
                             }break;
@@ -652,7 +652,10 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
+                if (TempSummon* ragnaros = caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS))
+                {
+                    ragnaros->CastSpell(ragnaros, SPELL_RAGNAROS_FADE);
+                }
             }
         }
 
