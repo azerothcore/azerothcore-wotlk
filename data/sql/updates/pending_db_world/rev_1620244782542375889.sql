@@ -262,3 +262,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=21075 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=34 AND `ConditionTarget`=1 AND `ConditionValue1`=0 AND `ConditionValue2`=1 AND `ConditionValue3`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 21075, 0, 0, 34, 1, 0, 1, 0, 0, 0, 0, '', 'Damage Shield - Should target only friendly creatures');
+
+-- Teleport position for spell "20618 Teleport" (Majordomu)
+DELETE FROM `spell_target_position` WHERE `id`=20618;
+INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
+(20618, 409, 736.516, -1176.35, -119.006, 0);
+
+-- Teleport position for spell "20534 Teleport" (Majordomu)
+DELETE FROM `spell_target_position` WHERE `id`=20534;
+INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
+(20534, 409, 736.516, -1176.35, -119.006, 0);
