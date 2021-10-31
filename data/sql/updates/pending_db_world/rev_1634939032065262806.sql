@@ -4,7 +4,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634939032065262806');
 
 -- Remove Quest SAI
 UPDATE `creature_template` SET `AIName`='' WHERE `entry` IN (26170,26203,25301,25250,25251);
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (26170,26203,25301,25250,25251);
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (26170,26203,25301,25250,25251) AND `source_type`=0;
 DELETE FROM `waypoints` WHERE `entry` IN (26170);
 
 -- Add Gossip Option
