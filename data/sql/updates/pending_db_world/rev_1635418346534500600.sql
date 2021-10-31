@@ -8,4 +8,4 @@ UPDATE `broadcast_text` SET `MaleText`='prepares a Fish Feast!', `FemaleText`='p
 
 UPDATE `broadcast_text` SET `FemaleText`='prepares a Gigantic Feast!', `MaleText`='prepares a Gigantic Feast!' WHERE `ID`=31846;
 
-UPDATE `broadcast_text` SET `VerifiedBuild`='0' WHERE `ID` IN (31843,31845,31844,31846);
+UPDATE `broadcast_text` SET `VerifiedBuild`=0 WHERE `ID` IN (31843,31845,31844,31846);
