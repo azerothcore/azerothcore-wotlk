@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ArenaSpectator.h"
@@ -12,22 +25,16 @@
 #include "SpellAuras.h"
 #include "World.h"
 
-bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args)
+bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)
 {
     Player* player = handler->GetSession()->GetPlayer();
     std::list<std::string> errors;
-
-    if (!*args)
-    {
-        handler->SendSysMessage("Missing player name.");
-        return true;
-    }
 
     if (player->IsSpectator())
     {
         if (player->FindMap() && player->FindMap()->IsBattleArena())
         {
-            HandleSpectatorWatchCommand(handler, args);
+            HandleSpectatorWatchCommand(handler, name);
             return true;
         }
         handler->PSendSysMessage("You are already spectacting arena.");
@@ -40,7 +47,6 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
         return true;
     }
 
-    std::string name = std::string(args);
     Player* spectate = ObjectAccessor::FindPlayerByName(name);
     if (!spectate)
     {
@@ -167,11 +173,8 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     return true;
 }
 
-bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, char const* args)
+bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, std::string const& name)
 {
-    if (!*args)
-        return true;
-
     Player* player = handler->GetSession()->GetPlayer();
     if (!player->IsSpectator())
         return true;
@@ -183,7 +186,6 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, char cons
     if (!bg || bg->GetStatus() != STATUS_IN_PROGRESS)
         return true;
 
-    std::string name = std::string(args);
     Player* spectate = ObjectAccessor::FindPlayerByName(name);
     if (!spectate || !spectate->IsAlive() || spectate->IsSpectator() || spectate->GetGUID() == player->GetGUID() || !spectate->IsInWorld() || !spectate->FindMap() || spectate->IsBeingTeleported() || spectate->FindMap() != player->FindMap() || !bg->IsPlayerInBattleground(spectate->GetGUID()))
         return true;

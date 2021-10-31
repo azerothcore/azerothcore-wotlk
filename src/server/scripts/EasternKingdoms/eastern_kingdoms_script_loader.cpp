@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 // This is where scripts' loading functions should be declared:
@@ -81,6 +93,7 @@ void AddSC_instance_scarlet_monastery();     //Scarlet Monastery
 void AddSC_boss_kirtonos_the_herald();
 void AddSC_instance_scholomance();           //Scholomance
 void AddSC_instance_shadowfang_keep();       //Shadowfang keep
+void AddSC_boss_baroness_anastari();
 void AddSC_instance_stratholme();            //Stratholme
 void AddSC_instance_sunken_temple();         //Sunken Temple
 void AddSC_instance_sunwell_plateau();       //Sunwell Plateau
@@ -132,7 +145,7 @@ void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
-// void AddSC_wetlands();
+//void AddSC_wetlands();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -215,6 +228,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_kirtonos_the_herald();
     AddSC_instance_scholomance();           //Scholomance
     AddSC_instance_shadowfang_keep();       //Shadowfang keep
+    AddSC_boss_baroness_anastari();
     AddSC_instance_stratholme();            //Stratholme
     AddSC_instance_sunken_temple();         //Sunken Temple
     AddSC_instance_sunwell_plateau();       //Sunwell Plateau
