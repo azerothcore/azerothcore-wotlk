@@ -65,7 +65,10 @@ namespace
         // Check old option
         if (isOptional && itr == _configOptions.end())
         {
-            PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
+            if (!isReload)
+            {
+                PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
+            }
 
 #ifdef CONFIG_ABORT_INCORRECT_OPTIONS
             if (!isReload)
@@ -398,7 +401,6 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
     bool isExistDefaultConfig = true;
     bool isExistDistConfig = true;
-    bool isError = false;
 
     for (auto const& distFileName : _additonalFiles)
     {
@@ -410,14 +412,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
         }
 
         // Load .conf.dist config
-        isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName, isReload);
-
-        // Skip loading and send error load
-        if (!isExistDistConfig)
-        {
-            isError = true;
-            break;
-        }
+        isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName, false, isReload);
 
         // Load .conf config
         isExistDefaultConfig = LoadAdditionalFile(moduleConfigPath + defaultFileName, true, isReload);
@@ -432,27 +427,24 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
         }
     }
 
-    if (isError)
+    if (isNeedPrintInfo)
     {
-        // One or more modules config file .conf.dist not loaded
-        return false;
-    }
-
-    if (!_moduleConfigFiles.empty() && isNeedPrintInfo)
-    {
-        // Print modules configurations
-        FMT_LOG_INFO("server.loading", " ");
-        FMT_LOG_INFO("server.loading", "Using modules configuration:");
-
-        for (auto const& itr : _moduleConfigFiles)
+        if (!_moduleConfigFiles.empty())
         {
-            FMT_LOG_INFO("server.loading", "> {}", itr);
+            // Print modules configurations
+            FMT_LOG_INFO("server.loading", " ");
+            FMT_LOG_INFO("server.loading", "Using modules configuration:");
+
+            for (auto const& itr : _moduleConfigFiles)
+            {
+                FMT_LOG_INFO("server.loading", "> {}", itr);
+            }
         }
-    }
-    else
-    {
-        FMT_LOG_INFO("server.loading", "> Not found modules config files");
-    }
+        else
+        {
+            FMT_LOG_INFO("server.loading", "> Not found modules config files");
+        }
+    }    
 
     FMT_LOG_INFO("server.loading", " ");
 
