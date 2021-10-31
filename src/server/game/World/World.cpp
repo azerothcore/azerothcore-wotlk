@@ -2201,7 +2201,7 @@ void World::Update(uint32 diff)
 
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
-    Seconds currentGameTime = GameTime::GetGameTime();    
+    Seconds currentGameTime = GameTime::GetGameTime();
 
     sWorldUpdateTime.UpdateWithDiff(diff);
 
@@ -2337,7 +2337,7 @@ void World::Update(uint32 diff)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update LFG 0"));
         sLFGMgr->Update(diff, 0); // pussywizard: remove obsolete stuff before finding compatibility during map update
     }
-    
+
     {
         ///- Update objects when the timer has passed (maps, transport, creatures, ...)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update maps"));
