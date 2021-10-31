@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: debug_commandscript
-%Complete: 100
-Comment: All debug related commands
-Category: commandscripts
-EndScriptData */
+ /* ScriptData
+ Name: debug_commandscript
+ %Complete: 100
+ Comment: All debug related commands
+ Category: commandscripts
+ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "Bag.h"
@@ -123,11 +123,11 @@ public:
         // Dump camera locations
         if (CinematicSequencesEntry const* cineSeq = sCinematicSequencesStore.LookupEntry(cinematicId))
         {
-            std::unordered_map<uint32, FlyByCameraCollection>::const_iterator itr = sFlyByCameraStore.find(cineSeq->cinematicCamera);
+            auto const& itr = sFlyByCameraStore.find(cineSeq->cinematicCamera);
             if (itr != sFlyByCameraStore.end())
             {
                 handler->PSendSysMessage("Waypoints for sequence %u, camera %u", cinematicId, cineSeq->cinematicCamera);
-                uint32 count = 1 ;
+                uint32 count = 1;
                 for (FlyByCamera cam : itr->second)
                 {
                     handler->PSendSysMessage("%02u - %7ums [%f, %f, %f] Facing %f (%f degrees)", count, cam.timeStamp, cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w, cam.locations.w * (180 / M_PI));
@@ -190,10 +190,16 @@ public:
         data << uint8(0);
         data << uint32(133); // Spell "Fireball"
         data << uint8(result);
+
         if (failArg1 || failArg2)
+        {
             data << uint32(failArg1.value_or(0));
+        }
+
         if (failArg2)
+        {
             data << uint32(*failArg2);
+        }
 
         handler->GetSession()->SendPacket(&data);
         return true;
@@ -221,13 +227,20 @@ public:
     {
         Unit* unit = handler->getSelectedUnit();
         Player* player = nullptr;
+
         if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
+        {
             player = handler->GetSession()->GetPlayer();
+        }
         else
+        {
             player = unit->ToPlayer();
+        }
 
         if (!unit)
+        {
             unit = player;
+        }
 
         std::ifstream ifs("opcode.txt");
         if (!ifs.is_open())
@@ -263,19 +276,23 @@ public:
                     }
                     continue;
                 }
-                    // line comment
+                // line comment
                 else if (commentToken[1] == '/')
                 {
                     std::string str;
                     getline(ifs, str);
                     continue;
                 }
-                    // regular data
+                // regular data
                 else
+                {
                     ifs.putback(commentToken[1]);
+                }
             }
+
             parsedStream.put(commentToken[0]);
         }
+
         ifs.close();
 
         uint32 opcode;
@@ -411,12 +428,13 @@ public:
             handler->PSendSysMessage(LANG_DEBUG_AREATRIGGER_OFF);
             player->isDebugAreaTriggers = false;
         }
+
         return true;
     }
 
     static bool HandleDebugSendChannelNotifyCommand(ChatHandler* handler, uint8 type)
     {
-        WorldPacket data(SMSG_CHANNEL_NOTIFY, (1+10));
+        WorldPacket data(SMSG_CHANNEL_NOTIFY, (1 + 10));
         data << type;
         data << "test";
         data << uint32(0);
@@ -446,8 +464,8 @@ public:
             return false;
 
         handler->PSendSysMessage("Loot recipient for creature %s (GUID %u, SpawnID %u) is %s",
-                                 target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetSpawnId(),
-                                 target->hasLootRecipient() ? (target->GetLootRecipient() ? target->GetLootRecipient()->GetName().c_str() : "offline") : "no loot recipient");
+            target->GetName().c_str(), target->GetGUID().GetCounter(), target->GetSpawnId(),
+            target->hasLootRecipient() ? (target->GetLootRecipient() ? target->GetLootRecipient()->GetName().c_str() : "offline") : "no loot recipient");
         return true;
     }
 
@@ -508,35 +526,33 @@ public:
 
         if (listQueue)
         {
-            std::vector<Item*>& updateQueue = player->GetItemUpdateQueue();
-            for (size_t i = 0; i < updateQueue.size(); ++i)
-            {
-                Item* item = updateQueue[i];
-                if (!item)
-                    continue;
+            auto const& updateQueue = player->GetItemUpdateQueue();
 
+            for (auto const& item : updateQueue)
+            {
                 Bag* container = item->GetContainer();
                 uint8 bagSlot = container ? container->GetSlot() : uint8(INVENTORY_SLOT_BAG_0);
 
                 std::string st;
                 switch (item->GetState())
                 {
-                    case ITEM_UNCHANGED:
-                        st = "unchanged";
-                        break;
-                    case ITEM_CHANGED:
-                        st = "changed";
-                        break;
-                    case ITEM_NEW:
-                        st = "new";
-                        break;
-                    case ITEM_REMOVED:
-                        st = "removed";
-                        break;
+                case ITEM_UNCHANGED:
+                    st = "unchanged";
+                    break;
+                case ITEM_CHANGED:
+                    st = "changed";
+                    break;
+                case ITEM_NEW:
+                    st = "new";
+                    break;
+                case ITEM_REMOVED:
+                    st = "removed";
+                    break;
                 }
 
                 handler->PSendSysMessage("bag: %d slot: %d guid: %d - state: %s", bagSlot, item->GetSlot(), item->GetGUID().GetCounter(), st.c_str());
             }
+
             if (updateQueue.empty())
                 handler->PSendSysMessage("The player's updatequeue is empty");
         }
@@ -544,7 +560,7 @@ public:
         if (checkAll)
         {
             bool error = false;
-            std::vector<Item*>& updateQueue = player->GetItemUpdateQueue();
+            auto const& updateQueue = player->GetItemUpdateQueue();
             for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
             {
                 if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
@@ -677,22 +693,22 @@ public:
                 }
             }
 
-            for (size_t i = 0; i < updateQueue.size(); ++i)
+            uint32 index = 0;
+
+            for (auto const& item : updateQueue)
             {
-                Item* item = updateQueue[i];
-                if (!item)
-                    continue;
+                index++;
 
                 if (item->GetOwnerGUID() != player->GetGUID())
                 {
-                    handler->PSendSysMessage("queue(%zu): For the item %s, the owner (%s) and the player (%s) don't match!", i, item->GetGUID().ToString().c_str(), item->GetOwnerGUID().ToString().c_str(), player->GetGUID().ToString().c_str());
+                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): For the item {}, the owner ({}) and the player ({}) don't match!", index, item->GetGUID().ToString(), item->GetOwnerGUID().ToString(), player->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
 
-                if (item->GetQueuePos() != i)
+                if (item->GetQueuePos() != index)
                 {
-                    handler->PSendSysMessage("queue(%zu): For the item %s, the queuepos doesn't match it's position in the queue!", i, item->GetGUID().ToString().c_str());
+                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): For the item {}, the queuepos doesn't match it's position in the queue!", index, item->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
@@ -704,18 +720,19 @@ public:
 
                 if (test == nullptr)
                 {
-                    handler->PSendSysMessage("queue(%zu): The bag(%d) and slot(%d) values for %s are incorrect, the player doesn't have any item at that position!", i, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString().c_str());
+                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): The bag({}) and slot({}) values for {} are incorrect, the player doesn't have any item at that position!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
 
                 if (test != item)
                 {
-                    handler->PSendSysMessage("queue(%zu): The bag(%d) and slot(%d) values for the %s are incorrect, %s is there instead!", i, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString().c_str(), test->GetGUID().ToString().c_str());
+                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): The bag({}) and slot({}) values for the %s are incorrect, {} is there instead!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString(), test->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
             }
+
             if (!error)
                 handler->SendSysMessage("All OK!");
         }
@@ -747,10 +764,12 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        ThreatContainer::StorageType const& threatList = target->getThreatMgr().getThreatList();
+        auto const& threatList = target->getThreatMgr().getThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
+
         handler->PSendSysMessage("Threat list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
+
         for (itr = threatList.begin(); itr != threatList.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();
@@ -759,9 +778,11 @@ public:
                 handler->PSendSysMessage("   %u.   No Unit  - threat %f", ++count, (*itr)->getThreat());
                 continue;
             }
+
             handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
         }
-        ThreatContainer::StorageType const& threatList2 = target->getThreatMgr().getOfflineThreatList();
+
+        auto const& threatList2 = target->getThreatMgr().getOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();
@@ -770,8 +791,10 @@ public:
                 handler->PSendSysMessage("   %u.   [offline] No Unit  - threat %f", ++count, (*itr)->getThreat());
                 continue;
             }
+
             handler->PSendSysMessage("   %u.   [offline] %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
         }
+
         handler->SendSysMessage("End of threat list.");
 
         return true;
@@ -782,18 +805,27 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
             target = handler->GetSession()->GetPlayer();
+
         HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
+
         handler->PSendSysMessage("Hostil reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
+
         while (ref)
         {
             if (Unit* unit = ref->GetSource()->GetOwner())
+            {
                 handler->PSendSysMessage("   %u.   %s %s   (%s)  - threat %f", ++count, (ref->isOnline() ? "" : "[offline]"),
-                                         unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), ref->getThreat());
+                    unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), ref->getThreat());
+            }
             else
+            {
                 handler->PSendSysMessage("   %u.   No Owner  - threat %f", ++count, ref->getThreat());
+            }
+
             ref = ref->next();
         }
+
         handler->SendSysMessage("End of hostil reference list.");
         return true;
     }
@@ -826,8 +858,10 @@ public:
             Acore::AllCreaturesOfEntryInRange check(handler->GetPlayer(), entry, 20.0f);
             Acore::CreatureSearcher<Acore::AllCreaturesOfEntryInRange> searcher(handler->GetPlayer(), passenger, check);
             Cell::VisitAllObjects(handler->GetPlayer(), searcher, 30.0f);
+
             if (!passenger || passenger == target)
                 return false;
+
             passenger->EnterVehicle(target, *seatId);
         }
 
@@ -871,8 +905,10 @@ public:
     static bool HandleDebugSendLargePacketCommand(ChatHandler* handler)
     {
         std::ostringstream ss;
+
         while (ss.str().size() < 128000)
             ss << "This is a dummy string to push the packet's size beyond 128000 bytes. ";
+
         handler->SendSysMessage(ss.str().c_str());
         return true;
     }
@@ -950,6 +986,7 @@ public:
             handler->PSendSysMessage("%s is %sin line of sight of %s.", unit->GetName().c_str(), (player->IsWithinLOSInMap(unit) ? "" : "not "), player->GetName().c_str());
             return true;
         }
+
         return false;
     }
 
@@ -1125,8 +1162,8 @@ public:
         else
         {
             static uint32 const FlagsWithHandlers = MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE |
-                                                    MOVEMENTFLAG_WALKING | MOVEMENTFLAG_SWIMMING |
-                                                    MOVEMENTFLAG_SPLINE_ENABLED;
+                MOVEMENTFLAG_WALKING | MOVEMENTFLAG_SWIMMING |
+                MOVEMENTFLAG_SPLINE_ENABLED;
 
             bool unhandledFlag = ((*moveFlags ^ target->GetUnitMovementFlags()) & ~FlagsWithHandlers) != 0;
 
