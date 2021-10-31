@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: event_commandscript
-%Complete: 100
-Comment: All event related commands
-Category: commandscripts
-EndScriptData */
+ /* ScriptData
+ Name: event_commandscript
+ %Complete: 100
+ Comment: All event related commands
+ Category: commandscripts
+ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "Chat.h"
@@ -29,6 +29,8 @@ EndScriptData */
 #include "Player.h"
 
 using namespace Acore::ChatCommands;
+
+using EventEntry = Variant<Hyperlink<gameevent>, uint16>;
 
 class event_commandscript : public CommandScript
 {
@@ -65,25 +67,32 @@ public:
             GameEventData const& eventData = events[eventId];
 
             if (handler->GetSession())
+            {
                 handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, eventId, eventId, eventData.description.c_str(), active);
+            }
             else
+            {
                 handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, eventId, eventData.description.c_str(), active);
+            }
 
             ++counter;
         }
 
         if (counter == 0)
+        {
             handler->SendSysMessage(LANG_NOEVENTFOUND);
+        }
+
         handler->SetSentErrorMessage(true);
 
         return true;
     }
 
-    static bool HandleEventInfoCommand(ChatHandler* handler, Variant<Hyperlink<gameevent>, uint16> const eventId)
+    static bool HandleEventInfoCommand(ChatHandler* handler, EventEntry const eventId)
     {
         GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
 
-        if (eventId >= events.size())
+        if (std::size_t(eventId) >= events.size())
         {
             handler->SendSysMessage(LANG_EVENT_NOT_EXIST);
             handler->SetSentErrorMessage(true);
@@ -113,12 +122,13 @@ public:
         std::string lengthStr = secsToTimeString(eventData.length * MINUTE, true);
 
         handler->PSendSysMessage(LANG_EVENT_INFO, uint16(eventId), eventData.description.c_str(), activeStr,
-                                 startTimeStr.c_str(), endTimeStr.c_str(), occurenceStr.c_str(), lengthStr.c_str(),
-                                 nextStr.c_str());
+            startTimeStr.c_str(), endTimeStr.c_str(), occurenceStr.c_str(), lengthStr.c_str(),
+            nextStr.c_str());
+
         return true;
     }
 
-    static bool HandleEventStartCommand(ChatHandler* handler, Variant<Hyperlink<gameevent>, uint16> const eventId)
+    static bool HandleEventStartCommand(ChatHandler* handler, EventEntry const eventId)
     {
         GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
 
@@ -149,7 +159,7 @@ public:
         return true;
     }
 
-    static bool HandleEventStopCommand(ChatHandler* handler, Variant<Hyperlink<gameevent>, uint16> const eventId)
+    static bool HandleEventStopCommand(ChatHandler* handler, EventEntry const eventId)
     {
         GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
 
