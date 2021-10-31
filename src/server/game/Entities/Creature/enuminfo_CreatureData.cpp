@@ -63,14 +63,12 @@ AC_API_EXPORT EnumText EnumUtils<CreatureFlagsExtra>::ToString(CreatureFlagsExtr
         case CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING: return { "CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING", "CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING", "creature ignore pathfinding" };
         case CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK: return { "CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK", "CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK", "creature is immune to knockback effects" };
         case CREATURE_FLAG_EXTRA_HARD_RESET: return { "CREATURE_FLAG_EXTRA_HARD_RESET", "CREATURE_FLAG_EXTRA_HARD_RESET", "" };
-        case CREATURE_FLAG_EXTRA_UNUSED_27: return { "CREATURE_FLAG_EXTRA_UNUSED_27", "CREATURE_FLAG_EXTRA_UNUSED_27", "" };
-        case CREATURE_FLAG_EXTRA_DB_ALLOWED: return { "CREATURE_FLAG_EXTRA_DB_ALLOWED", "CREATURE_FLAG_EXTRA_DB_ALLOWED", "" };
         default: throw std::out_of_range("value");
     }
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<CreatureFlagsExtra>::Count() { return 34; }
+AC_API_EXPORT size_t EnumUtils<CreatureFlagsExtra>::Count() { return 32; }
 
 template <>
 AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(size_t index)
@@ -109,8 +107,6 @@ AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(size_t
         case 29: return CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING;
         case 30: return CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK;
         case 31: return CREATURE_FLAG_EXTRA_HARD_RESET;
-        case 32: return CREATURE_FLAG_EXTRA_UNUSED_27;
-        case 33: return CREATURE_FLAG_EXTRA_DB_ALLOWED;
         default: throw std::out_of_range("index");
     }
 }
@@ -152,8 +148,6 @@ AC_API_EXPORT size_t EnumUtils<CreatureFlagsExtra>::ToIndex(CreatureFlagsExtra v
         case CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING: return 29;
         case CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK: return 30;
         case CREATURE_FLAG_EXTRA_HARD_RESET: return 31;
-        case CREATURE_FLAG_EXTRA_UNUSED_27: return 32;
-        case CREATURE_FLAG_EXTRA_DB_ALLOWED: return 33;
         default: throw std::out_of_range("value");
     }
 }
