@@ -93,15 +93,26 @@ public:
             summon->AI()->AttackStart(me->SelectVictim());
         }
 
-        void UpdateAI(uint32 diff) override
+        // Prevent clearing summon list, otherwise Rend despawns if the drake is killed first.
+        void JustDied(Unit* /*killer*/) override { }
+
+        void DamageTaken(Unit* /*aggressor*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {
-            if (!_summonedRend && HealthBelowPct(25))
+            if (!_summonedRend && me->HealthBelowPctDamaged(25, damage))
             {
+                if (damage >= me->GetHealth())
+                {
+                    // Let creature fall to 1 HP but prevent it from dying before boss is summoned.
+                    damage = me->GetHealth() - 1;
+                }
                 DoCast(me, SPELL_SUMMON_REND);
                 me->RemoveAura(SPELL_REND_MOUNTS);
                 _summonedRend = true;
             }
+        }
 
+        void UpdateAI(uint32 diff) override
+        {
             if (!UpdateVictim())
             {
                 events.Update(diff);
