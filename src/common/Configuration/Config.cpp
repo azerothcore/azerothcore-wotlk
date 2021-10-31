@@ -417,6 +417,12 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
         // Load .conf.dist config
         isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName, false, isReload);
 
+        if (!isReload && !isExistDistConfig)
+        {
+            FMT_LOG_FATAL("server.loading", "> ConfigMgr::LoadModulesConfigs: Not found original config '{}'. Stop loading", distFileName);
+            ABORT();
+        }
+
         // Load .conf config
         isExistDefaultConfig = LoadAdditionalFile(moduleConfigPath + defaultFileName, true, isReload);
 
