@@ -3491,6 +3491,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
+    // Spirit of Kirith
+    ApplySpellFix({ 10853 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 3; // 1min
+    });
+
     // Headless Horseman - Start Fire
     ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
     {
@@ -4518,13 +4524,6 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         // fixes bug with empowered renew, single target aura
         spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
-    });
-
-    // Sunder Armor
-    ApplySpellFix({ 58567 }, [](SpellEntry* spellInfo)
-    {
-        // trigger, remove spellfamilyflags because of glyph of sunder armor
-        spellInfo->SpellFamilyFlags = flag96(0x0, 0x0, 0x0);
     });
 
     // Sunder Armor - Old Ranks
@@ -7371,6 +7370,13 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
     {
         spellInfo->RangeIndex = 5; // 40yd
+    });
+
+    // 29519 - Silithyst
+    ApplySpellFix({ 29519 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_DECREASE_SPEED;
+        spellInfo->EffectBasePoints[EFFECT_0] = -25;
     });
 
     // Ulduar: Kologarn Focused Eyebeam Summon Trigger

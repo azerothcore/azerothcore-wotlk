@@ -786,25 +786,27 @@ public:
             Player* caster = GetCaster()->ToPlayer();
             // immediately finishes the cooldown on your other Hunter abilities except Bestial Wrath
 
-            PlayerSpellMap const& spellMap = caster->GetSpellMap();
-            for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
-            {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
-                        spellInfo->Id != SPELL_HUNTER_READINESS &&
-                        spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH &&
-                        spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU &&
-                        spellInfo->GetRecoveryTime() > 0)
-                {
-                    SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-                    if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-                        caster->RemoveSpellCooldown(spellInfo->Id, true);
-                    else
-                        caster->RemoveSpellCooldown(spellInfo->Id, false);
-                }
+            // force removal of the disarm cooldown
+            caster->RemoveSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID);
 
-                // force removal of the disarm cooldown
-                caster->RemoveSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID, false);
+            SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
+
+            SpellCooldowns::iterator itr, next;
+            for (itr = cooldowns.begin(); itr != cooldowns.end(); itr = next)
+            {
+                next = itr;
+                ++next;
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                if (spellInfo
+                && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
+                && spellInfo->Id != SPELL_HUNTER_READINESS
+                && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
+                && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU
+                && spellInfo->GetRecoveryTime() > 0)
+                {
+                    caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
+                }
             }
         }
 
