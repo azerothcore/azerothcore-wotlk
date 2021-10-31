@@ -93,6 +93,7 @@ void AddSC_instance_scarlet_monastery();     //Scarlet Monastery
 void AddSC_boss_kirtonos_the_herald();
 void AddSC_instance_scholomance();           //Scholomance
 void AddSC_instance_shadowfang_keep();       //Shadowfang keep
+void AddSC_boss_baroness_anastari();
 void AddSC_instance_stratholme();            //Stratholme
 void AddSC_instance_sunken_temple();         //Sunken Temple
 void AddSC_instance_sunwell_plateau();       //Sunwell Plateau
@@ -144,7 +145,7 @@ void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
-// void AddSC_wetlands();
+//void AddSC_wetlands();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -227,6 +228,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_kirtonos_the_herald();
     AddSC_instance_scholomance();           //Scholomance
     AddSC_instance_shadowfang_keep();       //Shadowfang keep
+    AddSC_boss_baroness_anastari();
     AddSC_instance_stratholme();            //Stratholme
     AddSC_instance_sunken_temple();         //Sunken Temple
     AddSC_instance_sunwell_plateau();       //Sunwell Plateau
