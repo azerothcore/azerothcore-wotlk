@@ -458,7 +458,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
     if (isNeedPrintInfo)
     {
         FMT_LOG_INFO("server.loading", " ");
-    }    
+    }
 
     return true;
 }
