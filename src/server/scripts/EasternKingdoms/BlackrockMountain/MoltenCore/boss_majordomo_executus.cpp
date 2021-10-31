@@ -110,10 +110,10 @@ enum Misc
     POINT_RAGNAROS_SUMMON                   = 1,
 
     // Event phases
-    PHASE_NONE                              = 0,
-    PHASE_COMBAT                            = 1,
-    PHASE_DEFEAT_OUTRO                      = 2,
-    PHASE_RAGNAROS_SUMMONING                = 3,
+    PHASE_NONE                              = 1,
+    PHASE_COMBAT                            = 2,
+    PHASE_DEFEAT_OUTRO                      = 3,
+    PHASE_RAGNAROS_SUMMONING                = 4,
 };
 
 Position const MajordomoRagnaros = { 848.933f, -812.875f, -229.601f, 4.046f };
@@ -503,7 +503,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             if (events.IsInPhase(PHASE_DEFEAT_OUTRO) && spellInfo->Id == SPELL_TELEPORT_SELF)
             {
