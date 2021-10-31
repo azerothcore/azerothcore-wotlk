@@ -24,6 +24,7 @@ Category: Zul'Gurub
 
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "Player.h"
 #include "zulgurub.h"
 
 enum Says
@@ -184,6 +185,8 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+            // Without this, the creature never says anything, because it doesn't load in time.
             player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
 
             if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
