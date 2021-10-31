@@ -33,7 +33,6 @@ enum Timers
     TIMER_BLOODLUST = 30000
 };
 
-
 class boss_gorosh_the_dervish : public CreatureScript
 {
 public:
@@ -47,6 +46,8 @@ public:
     struct boss_gorosh_the_dervishAI : public BossAI
     {
         boss_gorosh_the_dervishAI(Creature* creature) : BossAI(creature, DATA_GOROSH) { }
+
+        uint32 nextWhirlwindTime;
 
         void EnterCombat(Unit* /*who*/) override
         {
@@ -75,8 +76,14 @@ public:
                     if (me->GetDistance2d(me->GetVictim()) < 10.0f)
                     {
                         DoCastVictim(SPELL_WHIRLWIND);
+                        nextWhirlwindTime = urand(TIMER_WHIRLWIND - 2000, TIMER_WHIRLWIND + 2000);
                     }
-                    events.ScheduleEvent(SPELL_WHIRLWIND, urand(TIMER_WHIRLWIND - 2000, TIMER_WHIRLWIND + 2000));
+                    else
+                    {
+                        // reschedule sooner
+                        nextWhirlwindTime = 0.3 * urand(TIMER_WHIRLWIND - 2000, TIMER_WHIRLWIND + 2000);
+                    }
+                    events.ScheduleEvent(SPELL_WHIRLWIND, nextWhirlwindTime);
                     break;
                 case SPELL_MORTALSTRIKE:
                     DoCastVictim(SPELL_MORTALSTRIKE);
