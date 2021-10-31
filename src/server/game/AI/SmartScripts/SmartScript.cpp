@@ -4039,11 +4039,17 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             case 1:
                 // GossipHello only filter set, skip action if reportUse
                 if (var0)
+                {
                     return;
+                }
+                break;
             case 2:
                 // reportUse only filter set, skip action if GossipHello
                 if (!var0)
+                {
                     return;
+                }
+                break;
             default:
                 // Ignore any other value
                 break;
