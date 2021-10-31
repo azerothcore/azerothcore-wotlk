@@ -394,8 +394,11 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
         return true;
     }
 
-    FMT_LOG_INFO("server.loading", " ");
-    FMT_LOG_INFO("server.loading", "Loading modules configuration...");
+    if (isNeedPrintInfo)
+    {
+        FMT_LOG_INFO("server.loading", " ");
+        FMT_LOG_INFO("server.loading", "Loading modules configuration...");
+    }
 
     // Start loading module configs
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
@@ -444,9 +447,12 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
         {
             FMT_LOG_INFO("server.loading", "> Not found modules config files");
         }
-    }    
+    }
 
-    FMT_LOG_INFO("server.loading", " ");
+    if (isNeedPrintInfo)
+    {
+        FMT_LOG_INFO("server.loading", " ");
+    }    
 
     return true;
 }
