@@ -175,7 +175,33 @@ public:
     }
 };
 
+class at_zulgurub_entrance_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_entrance_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_entrance_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                hakkar->setActive(true);
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_PROTECT_ALTAR);
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
+    new at_zulgurub_entrance_speech();
 }
