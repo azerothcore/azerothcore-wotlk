@@ -16,16 +16,22 @@
  */
 
 #include "blackrock_depths.h"
+#include "Player.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "Player.h"
 #include "Map.h"
 
-#define TIMER_TOMBOFTHESEVEN    30000
-#define TIMER_TOMB_START        5000
-#define MAX_ENCOUNTER           6
 #define RADIUS_RING_OF_LAW      80.0f
 #define DISTANCE_EMPEROR_ROOM   125
+#define MAX_ENCOUNTER 6
+
+enum Timers
+{
+    TIMER_TOMBOFTHESEVEN = 30000,
+    TIMER_TOMB_START     = 1000,
+    TIMER_TOMB_RESET     = 15000
+};
 
 enum Creatures
 {
@@ -171,7 +177,7 @@ public:
         uint32 BarAleCount;
         uint32 GhostKillCount;
         ObjectGuid TombBossGUIDs[7];
-        ObjectGuid TombEventStarterGUID;
+        uint32 tombResetTimer;
         uint32 TombTimer;
         uint32 TombEventCounter;
         uint32 OpenedCoofers;
@@ -243,6 +249,7 @@ public:
             GhostKillCount = 0;
             TombTimer = TIMER_TOMB_START;
             TombEventCounter = 0;
+            tombResetTimer   = 0;
             OpenedCoofers = 0;
             IronhandCounter  = 0;
             ArenaSpectators.clear();
@@ -448,28 +455,27 @@ public:
                         emperor->AI()->SetData(0, (100 * deadSenators) / EmperorSenatorsVector.size());
                     }
                     break;
-                default:
+                case NPC_ANGERREL:
+                case NPC_DOPEREL:
+                case NPC_HATEREL:
+                case NPC_VILEREL:
+                case NPC_SEETHREL:
+                case NPC_GLOOMREL:
+                case NPC_DOOMREL:
+                    GhostKillCount++;
+                    if (GhostKillCount >= 7)
+                    {
+                        SetData(TYPE_TOMB_OF_SEVEN, DONE);
+                    }
                     break;
-            }
-        }
-
-        void SetGuidData(uint32 type, ObjectGuid data) override
-        {
-            switch (type)
-            {
-                case DATA_EVENSTARTER:
-                    TombEventStarterGUID = data;
-                    if (!TombEventStarterGUID)
-                        TombOfSevenReset();//reset
-                    else
-                        TombOfSevenStart();//start
+                default:
                     break;
             }
         }
 
         void SetData(uint32 type, uint32 data) override
         {
-            LOG_DEBUG("scripts.ai", "TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+            LOG_DEBUG("scripts.ai", "Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
 
             switch (type)
             {
@@ -514,6 +520,18 @@ public:
                     break;
                 case TYPE_TOMB_OF_SEVEN:
                     encounter[3] = data;
+                    switch (data)
+                    {
+                        case IN_PROGRESS:
+                            HandleGameObject(GoTombExitGUID, false);
+                            HandleGameObject(GoTombEnterGUID, false);
+                            break;
+                        case DONE:
+                            DoRespawnGameObject(GoChestGUID, DAY);
+                            HandleGameObject(GoTombExitGUID, true);
+                            HandleGameObject(GoTombEnterGUID, true);
+                            break;
+                    }
                     break;
                 case TYPE_LYCEUM:
                     encounter[4] = data;
@@ -549,9 +567,6 @@ public:
                     default:
                         break;
                     }
-                    break;
-                case DATA_GHOSTKILL:
-                    GhostKillCount += data;
                     break;
                 case DATA_OPEN_COFFER_DOORS:
                     OpenedCoofers += 1;
@@ -671,8 +686,6 @@ public:
                     return encounter[4];
                 case TYPE_IRON_HALL:
                     return encounter[5];
-                case DATA_GHOSTKILL:
-                    return GhostKillCount;
             }
             return 0;
         }
@@ -703,8 +716,6 @@ public:
                     return GoBarKegTrapGUID;
                 case DATA_GO_BAR_DOOR:
                     return GoBarDoorGUID;
-                case DATA_EVENSTARTER:
-                    return TombEventStarterGUID;
                 case DATA_SF_BRAZIER_N:
                     return GoSFNGUID;
                 case DATA_SF_BRAZIER_S:
@@ -762,18 +773,26 @@ public:
             {
                 if (Creature* boss = instance->GetCreature(TombBossGUIDs[TombEventCounter]))
                 {
+                    ++TombEventCounter;
                     boss->setFaction(FACTION_HOSTILE);
                     boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    if (Unit* target = boss->SelectNearestTarget(500))
+
+                    // find suitable target here.
+                    Player* target = boss->SelectNearestPlayer(130);
+                    if (target && boss->CanCreatureAttack(target, true))
+                    {
                         boss->AI()->AttackStart(target);
+                        boss->AI()->DoZoneInCombat();
+                        tombResetTimer = TIMER_TOMB_RESET;
+                    }
                 }
             }
         }
 
         void TombOfSevenReset()
         {
-            HandleGameObject(GoTombExitGUID, false);//event reseted, close exit door
-            HandleGameObject(GoTombEnterGUID, true);//event reseted, open entrance door
+            HandleGameObject(GoTombExitGUID, false);// close exit door
+            HandleGameObject(GoTombEnterGUID, true);// open entrance door
             for (uint8 i = 0; i < 7; ++i)
             {
                 if (Creature* boss = instance->GetCreature(TombBossGUIDs[i]))
@@ -790,55 +809,63 @@ public:
                         boss->SetLootRecipient(nullptr);
                     }
                     boss->setFaction(FACTION_FRIEND);
+                    boss->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC); // think this is useless
+                    if (i == 6) // doomrel needs explicit reset
+                    {
+                        boss->AI()->Reset();
+                    }
                 }
             }
+
             GhostKillCount = 0;
             TombEventCounter = 0;
             TombTimer = TIMER_TOMB_START;
             SetData(TYPE_TOMB_OF_SEVEN, NOT_STARTED);
         }
 
-        void TombOfSevenStart()
+        bool CheckTombReset(uint32 diff)
         {
-            HandleGameObject(GoTombExitGUID, false);//event started, close exit door
-            HandleGameObject(GoTombEnterGUID, false);//event started, close entrance door
-            SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
-        }
-
-        void TombOfSevenEnd()
-        {
-            DoRespawnGameObject(GoChestGUID, DAY);
-            HandleGameObject(GoTombExitGUID, true);//event done, open exit door
-            HandleGameObject(GoTombEnterGUID, true);//event done, open entrance door
-            TombEventStarterGUID.Clear();
-            SetData(TYPE_TOMB_OF_SEVEN, DONE);
+            bool anyBossAlive = false; // status of the bosses up until the current one
+            for (uint8 i = 0; i < TombEventCounter; i++)
+            {
+                Creature* boss = instance->GetCreature(TombBossGUIDs[i]);
+                if (boss)
+                {
+                    anyBossAlive |= boss->IsAlive();
+                    if (boss->IsAlive() && boss->IsInCombat())
+                    {
+                        tombResetTimer = TIMER_TOMB_RESET;
+                        return false;  // any boss in combat means we shouldn't reset.
+                    }
+                }
+            }
+            if (!anyBossAlive) // no boss alive, put reset timer back up
+            {
+                tombResetTimer = TIMER_TOMB_RESET;
+            }
+            tombResetTimer -= diff;
+            return tombResetTimer < diff;
         }
 
         void Update(uint32 diff) override
         {
-            if (TombEventStarterGUID && GhostKillCount < 7)
+            if ((GetData(TYPE_TOMB_OF_SEVEN) == IN_PROGRESS) && GhostKillCount < 7)
             {
                 if (TombTimer <= diff)
                 {
                     TombTimer = TIMER_TOMBOFTHESEVEN;
                     TombOfSevenEvent();
-                    ++TombEventCounter;
-                    // Check Killed bosses
-                    for (uint8 i = 0; i < 7; ++i)
-                    {
-                        if (Creature* boss = instance->GetCreature(TombBossGUIDs[i]))
-                        {
-                            if (!boss->IsAlive())
-                            {
-                                GhostKillCount = i + 1;
-                            }
-                        }
-                    }
                 }
-                else TombTimer -= diff;
+                else
+                {
+                    TombTimer -= diff;
+                }
+
+                if (CheckTombReset(diff))
+                {
+                    TombOfSevenReset();
+                }
             }
-            if (GhostKillCount >= 7 && TombEventStarterGUID)
-                TombOfSevenEnd();
         }
     };
 };
