@@ -2211,7 +2211,7 @@ void ObjectMgr::LoadGameobjects()
         data.rotation.z     = fields[9].GetFloat();
         data.rotation.w     = fields[10].GetFloat();
         data.spawntimesecs  = fields[11].GetInt32();
-        data.ScriptId       = GetScriptId(fields[19].GetString());
+        data.ScriptId       = GetScriptId(fields[18].GetString());
         if (!data.ScriptId)
             data.ScriptId = gInfo->ScriptId;
 
