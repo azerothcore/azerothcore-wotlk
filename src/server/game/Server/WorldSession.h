@@ -309,6 +309,13 @@ public:
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
 
+    // Returns true if all contained hyperlinks are valid
+    // May kick player on false depending on world config (handler should abort)
+    bool ValidateHyperlinksAndMaybeKick(std::string_view str);
+    // Returns true if the message contains no hyperlinks
+    // May kick player on false depending on world config (handler should abort)
+    bool DisallowHyperlinksAndMaybeKick(std::string_view str);
+
     void QueuePacket(WorldPacket* new_packet);
     bool Update(uint32 diff, PacketFilter& updater);
 

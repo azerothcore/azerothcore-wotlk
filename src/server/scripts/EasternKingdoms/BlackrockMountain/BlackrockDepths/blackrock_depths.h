@@ -55,9 +55,6 @@ enum DataTypes
     DATA_GO_BAR_DOOR                = 18,
     DATA_GO_CHALICE                 = 19,
 
-    DATA_GHOSTKILL                  = 20,
-    DATA_EVENSTARTER                = 21,
-
     DATA_GOLEM_DOOR_N               = 22,
     DATA_GOLEM_DOOR_S               = 23,
 

@@ -1,4 +1,4 @@
-    /*
+ /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -1904,6 +1904,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
         if (Aura* aura = Aura::TryCreate(m_spellInfo, MAX_EFFECT_MASK, dynObj, caster, &m_spellValue->EffectBasePoints[0]))
         {
             m_spellAura = aura;
+            m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
             m_spellAura->_RegisterForTargets();
         }
         else
@@ -3379,17 +3380,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 // Devastate (player ones)
                 if (m_spellInfo->SpellFamilyFlags[1] & 0x40)
                 {
-                    // Player can apply only 58567 Sunder Armor effect.
-                    // Xinef: 7386 triggers 58567
-                    bool needCast = !unitTarget->HasAura(58567);
-                    if (needCast)
-                        m_caster->CastSpell(unitTarget, 7386, true);
+                    m_caster->CastSpell(unitTarget, 58567, true);
 
                     if (Aura* aur = unitTarget->GetAura(58567))
                     {
                         // 58388 - Glyph of Devastate dummy aura.
-                        if (int32 num = (needCast ? 0 : 1) + (m_caster->HasAura(58388) ? 1 : 0))
-                            aur->ModStackAmount(num);
+                        if (m_caster->HasAura(58388))
+                            aur->ModStackAmount(1);
+
                         spell_bonus += (aur->GetStackAmount() - 1) * CalculateSpellDamage(2, unitTarget);
                     }
                 }
@@ -3789,28 +3787,11 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             if (Battleground* bg = player->GetBattleground())
                 bg->SetDroppedFlagGUID(pGameObj->GetGUID(), player->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
 
-    if (uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
+    if (GameObject* linkedTrap = pGameObj->GetLinkedTrap())
     {
-        GameObject* linkedGO = sObjectMgr->IsGameObjectStaticTransport(linkedEntry) ? new StaticTransport() : new GameObject();
-        if (linkedGO->Create(map->GenerateLowGuid<HighGuid::GameObject>(), linkedEntry, map, m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-        {
-            linkedGO->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
-            linkedGO->SetSpellId(m_spellInfo->Id);
-
-            // xinef: this is wrong
-            //ExecuteLogEffectSummonObject(effIndex, linkedGO);
-
-            pGameObj->SetLinkedTrap(linkedGO);
-
-            // Wild object not have owner and check clickable by players
-            map->AddToMap(linkedGO, true);
-        }
-        else
-        {
-            delete linkedGO;
-            linkedGO = nullptr;
-            return;
-        }
+        linkedTrap->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS :0);
+        linkedTrap->SetSpellId(m_spellInfo->Id);
+        ExecuteLogEffectSummonObject(effIndex, linkedTrap);
     }
 }
 
@@ -3970,7 +3951,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             if (m_caster->getGender() > 0)
                                 gender = "her";
                             sprintf(buf, "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
-                            m_caster->MonsterTextEmote(buf, nullptr);
+                            m_caster->TextEmote(buf);
                             break;
                         }
                     // Roll 'dem Bones - Worn Troll Dice
@@ -3981,7 +3962,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             if (m_caster->getGender() > 0)
                                 gender = "her";
                             sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName().c_str(), gender, urand(1, 6), urand(1, 6));
-                            m_caster->MonsterTextEmote(buf, nullptr);
+                            m_caster->TextEmote(buf);
                             break;
                         }
                     // Death Knight Initiate Visual
@@ -5687,27 +5668,13 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     cMap->AddToMap(pGameObj, true);
 
-    if (uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
+    if (GameObject* linkedTrap = pGameObj->GetLinkedTrap())
     {
-        GameObject* linkedGO = sObjectMgr->IsGameObjectStaticTransport(linkedEntry) ? new StaticTransport() : new GameObject();
-        if (linkedGO->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), linkedEntry, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-        {
-            linkedGO->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
-            linkedGO->SetSpellId(m_spellInfo->Id);
+        linkedTrap->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
+        linkedTrap->SetSpellId(m_spellInfo->Id);
+        linkedTrap->SetOwnerGUID(m_caster->GetGUID());
 
-            // xinef: this is wrong
-            //linkedGO->SetOwnerGUID(m_caster->GetGUID());
-            //ExecuteLogEffectSummonObject(effIndex, linkedGO);
-            pGameObj->SetLinkedTrap(linkedGO);
-
-            cMap->AddToMap(linkedGO, true);
-        }
-        else
-        {
-            delete linkedGO;
-            linkedGO = nullptr;
-            return;
-        }
+        ExecuteLogEffectSummonObject(effIndex, linkedTrap);
     }
 }
 
@@ -6392,9 +6359,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
         return;
     }
 
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(soundId);
-    unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
+    player->PlayDirectSound(soundId, player);
 }
 
 void Spell::EffectRemoveAura(SpellEffIndex effIndex)
