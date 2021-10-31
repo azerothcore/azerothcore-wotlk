@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: instance_commandscript
-%Complete: 100
-Comment: All instance related commands
-Category: commandscripts
-EndScriptData */
+ /* ScriptData
+ Name: instance_commandscript
+ %Complete: 100
+ Comment: All instance related commands
+ Category: commandscripts
+ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "Chat.h"
@@ -59,18 +59,6 @@ public:
         return commandTable;
     }
 
-    static std::string GetTimeString(uint64 time)
-    {
-        uint64 days = time / DAY, hours = (time % DAY) / HOUR, minute = (time % HOUR) / MINUTE;
-        std::ostringstream ss;
-        if (days)
-            ss << days << "d ";
-        if (hours)
-            ss << hours << "h ";
-        ss << minute << 'm';
-        return ss.str();
-    }
-
     static bool HandleInstanceListBindsCommand(ChatHandler* handler)
     {
         Player* player = handler->getSelectedPlayer();
@@ -78,19 +66,21 @@ public:
             player = handler->GetSession()->GetPlayer();
 
         uint32 counter = 0;
+
         for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
         {
-            BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUID(), Difficulty(i));
-            for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
+            for (auto const& [mapId, bind] : sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUID(), Difficulty(i)))
             {
-                InstanceSave* save = itr->second.save;
-                uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
+                InstanceSave const* save = bind.save;
+                uint32 resetTime = bind.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                 uint32 ttr = (resetTime >= time(nullptr) ? resetTime - time(nullptr) : 0);
-                std::string timeleft = GetTimeString(ttr);
-                handler->PSendSysMessage("map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no",  save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
+                std::string timeleft = secsToTimeString(ttr);
+                handler->PSendSysMessage("map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s",
+                    mapId, save->GetInstanceId(), bind.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (bind.extended ? " (extended)" : ""));
                 counter++;
             }
         }
+
         handler->PSendSysMessage("player binds: %d", counter);
 
         return true;
@@ -117,12 +107,12 @@ public:
             BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUID(), Difficulty(i));
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
             {
-                InstanceSave* save = itr->second.save;
-                if (itr->first != player->GetMapId() && (!mapId || mapId == itr->first) && (difficultyArg == -1 || difficultyArg == save->GetDifficulty()))
+                InstanceSave const* save = itr->second.save;
+                if (itr->first != player->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                     uint32 ttr = (resetTime >= time(nullptr) ? resetTime - time(nullptr) : 0);
-                    std::string timeleft = GetTimeString(ttr);
+                    std::string timeleft = secsToTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);
                     itr = m_boundInstances.begin();
@@ -132,6 +122,7 @@ public:
                     ++itr;
             }
         }
+
         handler->PSendSysMessage("instances unbound: %d", counter);
 
         return true;
