@@ -1436,6 +1436,9 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "LFG.KickPreventionTimer can't be higher than 15 minutes.");
     }
 
+    // Realm Availability
+    m_bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", false);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
