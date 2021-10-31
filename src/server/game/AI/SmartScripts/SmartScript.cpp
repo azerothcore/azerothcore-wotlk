@@ -4029,7 +4029,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         case SMART_EVENT_ON_SPELLCLICK:
             ProcessAction(e, unit, var0, var1, bvar, spell, gob);
             break;
-        // Xinef: added no report use distinction for gameobjects
+
         case SMART_EVENT_GOSSIP_HELLO:
             switch (e.event.gossipHello.filter)
             {
