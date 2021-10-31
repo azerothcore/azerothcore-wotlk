@@ -496,7 +496,7 @@ public:
 
         uint32 tempfaction = (uint32)atoi((char*)args);
 
-        creature->setFaction(tempfaction);
+        creature->SetFaction(tempfaction);
 
         return true;
     }
