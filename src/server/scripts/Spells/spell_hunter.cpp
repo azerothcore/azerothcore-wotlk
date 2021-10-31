@@ -798,8 +798,12 @@ public:
                 ++next;
 
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && spellInfo->Id != SPELL_HUNTER_READINESS && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH &&
-                    spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU && spellInfo->GetRecoveryTime() > 0)
+                if (spellInfo
+                && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
+                && spellInfo->Id != SPELL_HUNTER_READINESS
+                && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
+                && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU
+                && spellInfo->GetRecoveryTime() > 0)
                 {
                     caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
                 }
