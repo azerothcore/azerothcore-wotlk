@@ -144,9 +144,10 @@ public:
             // Xinef: no _procTarget but checkproc passed??
             // Unit::CalculateAOEDamageReduction (this=0x0, damage=4118, schoolMask=1, caster=0x7ffdad089000)
             Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
-            if (procTarget && eventInfo.GetDamageInfo())
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (procTarget && damageInfo)
             {
-                int32 damage = eventInfo.GetDamageInfo()->GetUnmitigatedDamage();
+                int32 damage = damageInfo->GetUnmitigatedDamage();
 
                 CustomSpellValues values;
                 values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);

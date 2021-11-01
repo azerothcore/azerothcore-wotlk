@@ -484,7 +484,7 @@ public:
             events.ScheduleEvent(EVENT_SARA_P1_SUMMON, 0, 0, EVENT_PHASE_ONE);
             events.SetPhase(EVENT_PHASE_ONE);
 
-            me->MonsterYell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL, 0);
+            me->Yell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL);
             me->PlayDirectSound(SARA_AGGRO);
             me->setActive(true);
         }
@@ -584,12 +584,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL, 0);
+                me->Yell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST2 : SARA_P1_CAST1);
             }
             else
             {
-                me->MonsterYell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL, 0);
+                me->Yell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST1 : SARA_P1_CAST2);
             }
         }
@@ -601,12 +601,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("Could they have been saved?", LANG_UNIVERSAL, 0);
+                me->Yell("Could they have been saved?", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL2);
             }
             else
             {
-                me->MonsterYell("Powerless to act...", LANG_UNIVERSAL, 0);
+                me->Yell("Powerless to act...", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL1);
             }
         }
@@ -706,7 +706,7 @@ public:
                         cr->SetVisible(false);
 
                     _p2TalkTimer++;
-                    me->MonsterYell("I am the lucid dream.", LANG_UNIVERSAL, 0);
+                    me->Yell("I am the lucid dream.", LANG_UNIVERSAL);
                     me->PlayDirectSound(SARA_P2_START);
                 }
                 return;
@@ -747,18 +747,18 @@ public:
                 {
                     EntryCheckPredicate pred(NPC_OMINOUS_CLOUD);
                     summons.DoAction(ACTION_UNSUMMON_CLOUDS, pred);
-                    me->MonsterYell("The monster in your nightmares.", LANG_UNIVERSAL, 0);
+                    me->Yell("The monster in your nightmares.", LANG_UNIVERSAL);
                     _p2TalkTimer = 20000;
                 }
                 else if (_p2TalkTimer >= 25000 && _p2TalkTimer < 40000)
                 {
                     summons.DespawnEntry(NPC_OMINOUS_CLOUD);
-                    me->MonsterYell("The fiend of a thousand faces.", LANG_UNIVERSAL, 0);
+                    me->Yell("The fiend of a thousand faces.", LANG_UNIVERSAL);
                     _p2TalkTimer = 40000;
                 }
                 else if (_p2TalkTimer >= 44500 && _p2TalkTimer < 60000)
                 {
-                    me->MonsterYell("Cower before my true form.", LANG_UNIVERSAL, 0);
+                    me->Yell("Cower before my true form.", LANG_UNIVERSAL);
                     _p2TalkTimer = 60000;
                 }
                 else if (_p2TalkTimer >= 64000)
@@ -1079,7 +1079,7 @@ public:
             summons.DespawnAll();
             events.Reset();
 
-            me->MonsterYell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL, 0);
+            me->Yell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL);
             me->PlayDirectSound(YS_P3_DEATH);
 
             if (m_pInstance)
@@ -1116,11 +1116,11 @@ public:
             }
             else if (param == ACTION_YOGG_SARON_START_YELL)
             {
-                me->MonsterYell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL, 0);
+                me->Yell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL);
             }
             else if (param == ACTION_YOGG_SARON_OPEN_PORTAL_YELL)
             {
-                me->MonsterYell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL, 0);
+                me->Yell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_OPEN_PORTALS);
             }
             else if (param == ACTION_YOGG_SARON_START_P3)
@@ -1135,7 +1135,7 @@ public:
                 events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0);
                 _thirdPhase = true;
 
-                me->MonsterYell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL, 0);
+                me->Yell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_P3_START);
             }
             else if (param == ACTION_YOGG_SARON_HARD_MODE)
@@ -1181,14 +1181,14 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_YS_LUNATIC_GAZE:
-                    me->MonsterYell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL, 0);
+                    me->Yell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_LUNATIC_GAZE);
                     me->CastSpell(me, SPELL_LUNATIC_GAZE_YS, true);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_YS_DEAFENING_ROAR:
-                    me->MonsterTextEmote("Yogg-Saron opens his mouth wide!", 0, true);
-                    me->MonsterYell("Eternal suffering awaits!", LANG_UNIVERSAL, 0);
+                    me->TextEmote("Yogg-Saron opens his mouth wide!", nullptr, true);
+                    me->Yell("Eternal suffering awaits!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_DEAFENING_ROAR);
                     me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
                     events.RepeatEvent(50000);
@@ -2274,7 +2274,7 @@ public:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
                         {
                             me->PlayDirectSound(15760, player);
-                            me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
+                            me->Whisper("Destroy them minion, your master commands it!", LANG_UNIVERSAL, player);
                         }
                         break;
                     }
@@ -2680,7 +2680,7 @@ public:
 
             Unit* caster = GetCaster();
             caster->PlayDirectSound(VOYS_INSANE1, target);
-            caster->MonsterWhisper("Your will is no longer you own...", target, false);
+            caster->Whisper("Your will is no longer you own...", LANG_UNIVERSAL, target);
             caster->CastSpell(target, SPELL_INSANE1, true);
             target->CastSpell(target, SPELL_INSANE2, true);
         }
@@ -2971,8 +2971,15 @@ public:
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
-            int32 damage = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), 60);
-            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, nullptr, aurEff);
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 damage = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), 60);
+            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, damageInfo->GetAttacker(), true, nullptr, aurEff);
         }
 
         void Register() override

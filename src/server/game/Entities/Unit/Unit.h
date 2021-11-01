@@ -125,10 +125,11 @@ enum SpellValueMod
     SPELLVALUE_RADIUS_MOD,
     SPELLVALUE_MAX_TARGETS,
     SPELLVALUE_AURA_STACK,
+    SPELLVALUE_AURA_DURATION,
     SPELLVALUE_FORCED_CRIT_RESULT
 };
 
-typedef std::pair<SpellValueMod, int32>     CustomSpellValueMod;
+typedef std::pair<SpellValueMod, int32> CustomSpellValueMod;
 class CustomSpellValues : public std::vector<CustomSpellValueMod>
 {
 public:
@@ -1595,8 +1596,8 @@ public:
     virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
 
     // faction template id
-    [[nodiscard]] uint32 getFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
-    void setFaction(uint32 faction);
+    [[nodiscard]] uint32 GetFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
+    void SetFaction(uint32 faction);
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
 
     ReputationRank GetReactionTo(Unit const* target) const;
@@ -2296,7 +2297,7 @@ public:
     void SetLastManaUse(uint32 spellCastTime) { m_lastManaUse = spellCastTime; }
     [[nodiscard]] bool IsUnderLastManaUseEffect() const;
 
-    void SetContestedPvP(Player* attackedPlayer = nullptr);
+    void SetContestedPvP(Player* attackedPlayer = nullptr, bool lookForNearContestedGuards = true);
 
     uint32 GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const;
     float CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffectType damagetype) const;
@@ -2501,6 +2502,17 @@ public:
 
     // Movement info
     Movement::MoveSpline* movespline;
+
+    virtual void Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target);
+    virtual void Say(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void Yell(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void TextEmote(std::string_view text, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(std::string_view text, Language language, Player* target, bool isBossWhisper = false);
+    virtual void Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target);
+    virtual void Say(uint32 textId, WorldObject const* target = nullptr);
+    virtual void Yell(uint32 textId, WorldObject const* target = nullptr);
+    virtual void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(uint32 textId, Player* target, bool isBossWhisper = false);
 
     [[nodiscard]] float GetCollisionHeight() const override;
     [[nodiscard]] float GetCollisionWidth() const override;

@@ -1006,7 +1006,7 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             Unit* target = eventInfo.GetActionTarget();
-            return target && target->getFaction() == 1843; // Xinef: Illidari demons faction
+            return target && target->GetFaction() == 1843; // Xinef: Illidari demons faction
         }
 
         void Register() override
@@ -3077,6 +3077,42 @@ public:
     }
 };
 
+enum QuestShyRotam
+{
+    NPC_SHY_ROTAM = 10737,
+};
+
+// 16796 - Summon Shy-Rotam
+class spell_q5056_summon_shy_rotam : public SpellScriptLoader
+{
+public:
+    spell_q5056_summon_shy_rotam() : SpellScriptLoader("spell_q5056_summon_shy_rotam") {}
+
+    class spell_q5056_summon_shy_rotam_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q5056_summon_shy_rotam_SpellScript);
+
+        void HandleFinish()
+        {
+            Position shyRotamSpawnPosition = Position(8072.38f, -3833.81f, 690.03f, 4.56f);
+            if (Creature* summon = GetCaster()->SummonCreature(NPC_SHY_ROTAM, shyRotamSpawnPosition, TEMPSUMMON_TIMED_DESPAWN, 15 * MINUTE * IN_MILLISECONDS))
+            {
+                summon->AI()->AttackStart(GetCaster());
+            }
+        }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_q5056_summon_shy_rotam_SpellScript::HandleFinish);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q5056_summon_shy_rotam_SpellScript();
+    };
+};
+
 void AddSC_quest_spell_scripts()
 {
     // Ours
@@ -3148,4 +3184,5 @@ void AddSC_quest_spell_scripts()
     new spell_q12619_emblazon_runeblade_effect();
     new spell_q12919_gymers_grab();
     new spell_q12919_gymers_throw();
+    new spell_q5056_summon_shy_rotam();
 }

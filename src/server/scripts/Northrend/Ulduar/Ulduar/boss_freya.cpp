@@ -324,12 +324,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("Forgive me.", LANG_UNIVERSAL, 0);
+                me->Yell("Forgive me.", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY1);
             }
             else
             {
-                me->MonsterYell("From your death springs life anew!", LANG_UNIVERSAL, 0);
+                me->Yell("From your death springs life anew!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY2);
             }
         }
@@ -339,12 +339,12 @@ public:
             // kaboom!
             if (damage >= me->GetHealth())
             {
-                me->MonsterYell("His hold on me dissipates. I can see clearly once more. Thank you, heroes.", LANG_UNIVERSAL, 0);
+                me->Yell("His hold on me dissipates. I can see clearly once more. Thank you, heroes.", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_DEATH);
 
                 damage = 0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetHealth(me->GetMaxHealth());
                 me->CombatStop();
                 me->RemoveAllAuras();
@@ -398,7 +398,7 @@ public:
             // Wave of three
             if (_waveNumber == 1)
             {
-                me->MonsterYell("Children, assist me!", LANG_UNIVERSAL, 0);
+                me->Yell("Children, assist me!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_TRIO);
                 me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
                 me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
@@ -407,14 +407,14 @@ public:
             // Ancient Conservator
             else if (_waveNumber == 2)
             {
-                me->MonsterYell("Eonar, your servant requires aid!", LANG_UNIVERSAL, 0);
+                me->Yell("Eonar, your servant requires aid!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_CONSERVATOR);
                 me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
             // Detonating Lashers
             else if (_waveNumber == 3)
             {
-                me->MonsterYell("The swarm of the elements shall overtake you!", LANG_UNIVERSAL, 0);
+                me->Yell("The swarm of the elements shall overtake you!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_DETONATING);
                 for (uint8 i = 0; i < 10; ++i)
                     me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
@@ -550,12 +550,12 @@ public:
 
             if (_elderGUID[0] || _elderGUID[1] || _elderGUID[2])
             {
-                me->MonsterYell("Elders, grant me your strength!", LANG_UNIVERSAL, 0);
+                me->Yell("Elders, grant me your strength!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_ELDERS);
             }
             else
             {
-                me->MonsterYell("The Conservatory must be protected!", LANG_UNIVERSAL, 0);
+                me->Yell("The Conservatory must be protected!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_AGGRO);
             }
         }
@@ -640,7 +640,7 @@ public:
                         break;
                     }
                 case EVENT_FREYA_BERSERK:
-                    me->MonsterYell("You have strayed too far, wasted too much time!", LANG_UNIVERSAL, 0);
+                    me->Yell("You have strayed too far, wasted too much time!", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
@@ -706,12 +706,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterTextEmote("Angry roar", 0);
+                me->TextEmote("Angry roar");
                 me->PlayDirectSound(SOUND_STONEBARK_SLAY1);
             }
             else
             {
-                me->MonsterYell("Such a waste.", LANG_UNIVERSAL, 0);
+                me->Yell("Such a waste.", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_STONEBARK_SLAY2);
             }
         }
@@ -720,7 +720,7 @@ public:
         {
             if (me->GetEntry() == killer->GetEntry())
                 return;
-            me->MonsterYell("Matron, flee! They are ruthless....", LANG_UNIVERSAL, 0);
+            me->Yell("Matron, flee! They are ruthless....", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_STONEBARK_DEATH);
 
             // Lumberjacked
@@ -735,7 +735,7 @@ public:
             events.ScheduleEvent(EVENT_STONEBARK_GROUND_TREMOR, 5000);
             events.ScheduleEvent(EVENT_STONEBARK_PETRIFIED_BARK, 20000);
 
-            me->MonsterYell("This place will serve as your graveyard.", LANG_UNIVERSAL, 0);
+            me->Yell("This place will serve as your graveyard.", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_STONEBARK_AGGRO);
         }
 
@@ -812,12 +812,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("Fertilizer.", LANG_UNIVERSAL, 0);
+                me->Yell("Fertilizer.", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_BRIGHTLEAF_SLAY1);
             }
             else
             {
-                me->MonsterYell("Your corpse will nourish the soil!", LANG_UNIVERSAL, 0);
+                me->Yell("Your corpse will nourish the soil!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_BRIGHTLEAF_SLAY2);
             }
         }
@@ -826,7 +826,7 @@ public:
         {
             if (me->GetEntry() == killer->GetEntry())
                 return;
-            me->MonsterYell("Matron, one has fallen!", LANG_UNIVERSAL, 0);
+            me->Yell("Matron, one has fallen!", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_BRIGHTLEAF_DEATH);
 
             // Lumberjacked
@@ -841,7 +841,7 @@ public:
             events.ScheduleEvent(EVENT_BRIGHTLEAF_SOLAR_FLARE, 5000);
             events.ScheduleEvent(EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM, 8000);
 
-            me->MonsterYell("Matron, the Conservatory has been breached!", LANG_UNIVERSAL, 0);
+            me->Yell("Matron, the Conservatory has been breached!", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_BRIGHTLEAF_AGGRO);
         }
 
@@ -933,12 +933,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("I return you whence you came!", LANG_UNIVERSAL, 0);
+                me->Yell("I return you whence you came!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_IRONBRANCH_SLAY1);
             }
             else
             {
-                me->MonsterYell("BEGONE!", LANG_UNIVERSAL, 0);
+                me->Yell("BEGONE!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_IRONBRANCH_SLAY2);
             }
         }
@@ -947,7 +947,7 @@ public:
         {
             if (me->GetEntry() == killer->GetEntry())
                 return;
-            me->MonsterYell("Freya! They come for you.", LANG_UNIVERSAL, 0);
+            me->Yell("Freya! They come for you.", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_IRONBRANCH_DEATH);
 
             // Lumberjacked
@@ -962,7 +962,7 @@ public:
             events.ScheduleEvent(EVENT_IRONBRANCH_IRON_ROOT, 15000);
             events.ScheduleEvent(EVENT_IRONBRANCH_THORN_SWARM, 3000);
 
-            me->MonsterYell("Mortals have no place here!", LANG_UNIVERSAL, 0);
+            me->Yell("Mortals have no place here!", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_IRONBRANCH_AGGRO);
         }
 
