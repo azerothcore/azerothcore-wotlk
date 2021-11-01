@@ -63,7 +63,7 @@ public:
                 Talk(SAY_CORPORAL_1, player);
                 npc_escortAI::Start(true, false, player->GetGUID(), quest);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                me->setFaction(250);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
             }
         }
 
