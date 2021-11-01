@@ -359,7 +359,7 @@ public:
         void Reset() override
         {
             speachTimer = 0;
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             summons.DespawnAll();
             events.Reset();
             me->SummonCreature(NPC_APOTHECARY_FRYE, -205.449f, 2219.56f, 79.7633f, 0.7f);
@@ -383,7 +383,7 @@ public:
         void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
-            cr->setFaction(35);
+            cr->SetFaction(FACTION_FRIENDLY);
             cr->SetControlled(true, UNIT_STATE_STUNNED);
             cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -407,7 +407,7 @@ public:
                 {
                     me->AI()->Talk(SAY_HUMMEL_2);
                     speachTimer = 0;
-                    me->setFaction(16);
+                    me->SetFaction(FACTION_MONSTER_2);
                     me->SetInCombatWithZone();
                     if (Unit* target = SelectTargetFromPlayerList(40.0f))
                     {
@@ -513,7 +513,7 @@ public:
             {
                 me->SetControlled(false, UNIT_STATE_STUNNED);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->setFaction(16);
+                me->SetFaction(FACTION_MONSTER_2);
                 me->SetInCombatWithZone();
                 if (Unit* target = SelectTargetFromPlayerList(40.0f))
                     AttackStart(target);

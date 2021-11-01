@@ -64,7 +64,7 @@ public:
             creature->AI()->Talk(SAY_READY, player);
             creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             // Change faction so mobs attack
-            creature->setFaction(113);
+            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
         }
         return true;
     }
@@ -164,8 +164,7 @@ enum Ringo
 
     SPELL_REVIVE_RINGO          = 15591,
     QUEST_A_LITTLE_HELP         = 4491,
-    NPC_SPRAGGLE                = 9997,
-    FACTION_ESCORTEE            = 113
+    NPC_SPRAGGLE                = 9997
 };
 
 class npc_ringo : public CreatureScript
@@ -180,7 +179,7 @@ public:
             if (npc_ringoAI* ringoAI = CAST_AI(npc_ringo::npc_ringoAI, creature->AI()))
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
-                ringoAI->StartFollow(player, FACTION_ESCORTEE, quest);
+                ringoAI->StartFollow(player, FACTION_ESCORTEE_N_NEUTRAL_PASSIVE, quest);
             }
         }
 
