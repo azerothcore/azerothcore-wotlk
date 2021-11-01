@@ -1029,7 +1029,7 @@ public:
                                         a->SetDuration(8000);
                                 }
 
-                                pMarwyn->MonsterTextEmote("Spirits appear and surround the altar!", 0, true);
+                                pMarwyn->TextEmote("Spirits appear and surround the altar!", nullptr, true);
                             }
                             ++ResumeFirstEventStep;
                             ResumeFirstEventTimer = 7500;

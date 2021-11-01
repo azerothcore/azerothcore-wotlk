@@ -814,7 +814,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         return nullptr;
     }
 
-    creature->setFaction(BattlefieldFactions[teamId]);
+    creature->SetFaction(BattlefieldFactions[teamId]);
     creature->SetHomePosition(x, y, z, o);
 
     // force using DB speeds -- do we really need this?

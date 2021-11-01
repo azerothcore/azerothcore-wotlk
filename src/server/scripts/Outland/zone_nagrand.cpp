@@ -76,7 +76,7 @@ public:
             if (npc_maghar_captiveAI* EscortAI = dynamic_cast<npc_maghar_captiveAI*>(creature->AI()))
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
-                creature->setFaction(232);
+                creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE);
                 EscortAI->Start(true, false, player->GetGUID(), quest);
                 creature->AI()->Talk(SAY_MAG_START);
 

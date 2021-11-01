@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && github.event.label.name == 'run-build' || github.ref == 'refs/heads/master'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}
     env:
       COMPOSE_DOCKER_CLI_BUILD: 1
       DOCKER_BUILDKIT: 1
