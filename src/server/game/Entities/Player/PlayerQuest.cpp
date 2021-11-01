@@ -1681,10 +1681,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
                     // If quest has daily flag
                     else if (quest->IsDaily())
                     {
-                        if (isLowLevel)
-                            result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
-                        else
-                            result2 = DIALOG_STATUS_AVAILABLE_REP;
+                        result2 = isLowLevel ? DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP : DIALOG_STATUS_AVAILABLE_REP;
                     }
                     // If quest is normal type
                     else
