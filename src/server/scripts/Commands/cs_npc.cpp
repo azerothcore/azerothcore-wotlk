@@ -491,11 +491,6 @@ public:
         if (!creature)
             return false;
 
-        if (!*args)
-            return false;
-
-        uint32 tempfaction = (uint32)atoi((char*)args);
-
         creature->SetFaction(tempfaction);
 
         return true;
