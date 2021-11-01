@@ -69,9 +69,11 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
     for (QuestRelations::const_iterator i = objectQIR.first; i != objectQIR.second; ++i)
     {
         uint32 quest_id = i->second;
+        Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
         QuestStatus status = GetQuestStatus(quest_id);
+
         if (status == QUEST_STATUS_COMPLETE)
-            qm.AddMenuItem(quest_id, 4);
+            qm.AddMenuItem(quest_id, 4);      
         else if (status == QUEST_STATUS_INCOMPLETE)
             qm.AddMenuItem(quest_id, 4);
         //else if (status == QUEST_STATUS_AVAILABLE)
@@ -88,7 +90,7 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
         if (!CanTakeQuest(quest, false))
             continue;
 
-        if (quest->IsAutoComplete())
+        if (!quest->GetQuestMethod()) // If is an auto complete quest
             qm.AddMenuItem(quest_id, 4);
         else if (GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
             qm.AddMenuItem(quest_id, 2);
@@ -363,6 +365,7 @@ bool Player::CanCompleteRepeatableQuest(Quest const* quest)
     // Solve problem that player don't have the quest and try complete it.
     // if repeatable she must be able to complete event if player don't have it.
     // Seem that all repeatable quest are DELIVER Flag so, no need to add more.
+    // auto complete quest
     if (!CanTakeQuest(quest, false))
         return false;
 
@@ -1604,28 +1607,32 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
-        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
+
+        // If quest is complete and not rewarded or quest is auto complete by method and player can take
+        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (!quest->GetQuestMethod()) && CanTakeQuest(quest, false))
         {
-            if (quest->IsRepeatable() && quest->IsDailyOrWeekly())
-            {
-                if (quest->IsAutoComplete())
-                {
-                    result2 = DIALOG_STATUS_AVAILABLE_REP;
-                }
-                else
-                {
-                    result2 = DIALOG_STATUS_REWARD_REP;
-                }
-            }
-            else if (quest->IsAutoComplete())
+            if (quest->GetQuestLevel() == -1)
             {
                 result2 = DIALOG_STATUS_AVAILABLE;
             }
             else
             {
-                result2 = DIALOG_STATUS_REWARD;
+                if (quest->IsRepeatable())
+                {
+                    result2 = DIALOG_STATUS_REWARD_REP;
+                }
+                else
+                {
+                    result2 = DIALOG_STATUS_REWARD;
+                }
             }
         }
+        // If quest is auto complete by flag and player can take
+        else if (quest->IsAutoComplete() && CanTakeQuest(quest, false))
+        {
+            result2 = DIALOG_STATUS_AVAILABLE;
+        }
+        // If quest is not complete
         else if (status == QUEST_STATUS_INCOMPLETE)
         {
             result2 = DIALOG_STATUS_INCOMPLETE;
@@ -1638,8 +1645,8 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
     for (QuestRelations::const_iterator i = qr.first; i != qr.second; ++i)
     {
         QuestGiverStatus result2 = DIALOG_STATUS_NONE;
-        uint32 questId = i->second;
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        uint32           questId = i->second;
+        Quest const*     quest   = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
             continue;
 
@@ -1656,29 +1663,36 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
                 {
                     bool isLowLevel = (getLevel() > (GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)));
 
-                    if (quest->IsAutoComplete())
+                    // If quest is auto complete by method type
+                    if (!quest->GetQuestMethod())
+                    {
+                        if (quest->IsRepeatable())
+                        {
+                            if (isLowLevel)
+                                result2 = DIALOG_STATUS_LOW_LEVEL_REWARD_REP;
+                            else
+                                result2 = DIALOG_STATUS_REWARD_REP;
+                        }
+                        else
+                        {
+                            result2 = DIALOG_STATUS_REWARD;
+                        }
+                    }
+                    // If quest has daily flag
+                    else if (quest->IsDaily())
                     {
                         if (isLowLevel)
-                            result2 = DIALOG_STATUS_LOW_LEVEL_REWARD_REP;
+                            result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
                         else
-                            result2 = DIALOG_STATUS_REWARD_REP;
+                            result2 = DIALOG_STATUS_AVAILABLE_REP;
                     }
+                    // If quest is normal type
                     else
                     {
-                        if (quest->IsDaily())
-                        {
-                            if (isLowLevel)
-                                result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
-                            else
-                                result2 = DIALOG_STATUS_AVAILABLE_REP;
-                        }
+                        if (isLowLevel)
+                            result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
                         else
-                        {
-                            if (isLowLevel)
-                                result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
-                            else
-                                result2 = DIALOG_STATUS_AVAILABLE;
-                        }
+                            result2 = DIALOG_STATUS_AVAILABLE;
                     }
                 }
                 else
