@@ -36,8 +36,8 @@ ORIGIN_REMOTE="https://github.com/azerothcore/azerothcore-wotlk.git"
 
 # Branch configuration for the installer to pull from. 
 # By default git will select the current working branch 
-# You can change it to "master" if you want the latest updates
-INSTALLER_PULL_FROM=$(git rev-parse --abbrev-ref HEAD)
+# You can set it to "master" if you want the latest updates
+INSTALLER_PULL_FROM=
 
 ##############################################
 #

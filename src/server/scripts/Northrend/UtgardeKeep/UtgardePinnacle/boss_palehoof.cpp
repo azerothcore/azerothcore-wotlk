@@ -320,7 +320,7 @@ public:
 
         void JustDied(Unit*  /*pKiller*/) override
         {
-            me->SendPlaySound(SOUND_DEATH, false);
+            me->PlayDirectSound(SOUND_DEATH);
             if(m_pInstance)
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, DONE);
         }

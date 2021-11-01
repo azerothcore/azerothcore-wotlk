@@ -177,7 +177,7 @@ public:
                 {
                     //Become unbanished again
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->setFaction(14);
+                    me->SetFaction(FACTION_MONSTER);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
@@ -246,7 +246,7 @@ public:
                                     DoResetThreat();
                                     me->SetReactState(REACT_PASSIVE);
                                     me->InterruptNonMeleeSpells(false);
-                                    me->setFaction(35);
+                                    me->SetFaction(FACTION_FRIENDLY);
                                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
                                     me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);

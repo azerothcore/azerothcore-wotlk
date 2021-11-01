@@ -551,16 +551,16 @@ public:
                     switch (stackAmount)
                     {
                         case 10:
-                            target->MonsterTextEmote("Turkey Hunter!", target, true);
+                            target->TextEmote("Turkey Hunter!", target, true);
                             break;
                         case 20:
-                            target->MonsterTextEmote("Turkey Domination!", target, true);
+                            target->TextEmote("Turkey Domination!", target, true);
                             break;
                         case 30:
-                            target->MonsterTextEmote("Turkey Slaughter!", target, true);
+                            target->TextEmote("Turkey Slaughter!", target, true);
                             break;
                         case 40:
-                            target->MonsterTextEmote("TURKEY TRIUMPH!", target, true);
+                            target->TextEmote("TURKEY TRIUMPH!", target, true);
                             target->CastSpell(target, SPELL_ACHI_TURKINATOR_CREDIT, true);
                             aurEff->GetBase()->Remove();
                             break;
