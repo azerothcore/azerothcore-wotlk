@@ -44,9 +44,6 @@ enum EternalBoard
 {
     QUEST_A_PAWN_ON_THE_ETERNAL_BOARD   = 8519,
 
-    FACTION_HOSTILE                     = 14,
-    FACTION_FRIENDLY                    = 35,
-
     C_ANACHRONOS                        = 15381,
     C_FANDRAL_STAGHELM                  = 15382,
     C_ARYGOS                            = 15380,
@@ -919,7 +916,7 @@ public:
                     Merithra->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15420);
-                    Merithra->setFaction(35);
+                    Merithra->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Caelestrasz)
@@ -927,7 +924,7 @@ public:
                     Caelestrasz->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15419);
-                    Caelestrasz->setFaction(35);
+                    Caelestrasz->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Arygos)
@@ -935,7 +932,7 @@ public:
                     Arygos->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15418);
-                    Arygos->setFaction(35);
+                    Arygos->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Anachronos)
