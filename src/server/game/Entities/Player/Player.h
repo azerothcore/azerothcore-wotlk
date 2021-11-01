@@ -2048,7 +2048,7 @@ public:
 
     static TeamId TeamIdForRace(uint8 race);
     [[nodiscard]] TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };
-    void setFactionForRace(uint8 race);
+    void SetFactionForRace(uint8 race);
     void setTeamId(TeamId teamid) { m_team = teamid; };
 
     void InitDisplayIds();
