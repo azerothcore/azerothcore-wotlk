@@ -5624,14 +5624,15 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         {
             default:
             case 0:      // disable
+                SetAcceptMail(false);
                 break;
             case 1:      // enable
                 SetAcceptMail(true);
                 break;
             case 2:      // save state
-                if (extraflags & PLAYER_EXTRA_ACCEPT_MAIL)
+                if (extraflags & PLAYER_EXTRA_NOT_ACCEPT_MAIL)
                 {
-                    SetAcceptMail(true);
+                    SetAcceptMail(false);
                 }
                 break;
         }

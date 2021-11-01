@@ -1989,7 +1989,7 @@ GM.WhisperingTo = 2
 #                     0 - (Disable)
 #                     1 - (Enable)
 
-GM.MailTo = 2
+GM.MailTo = 0
 
 #
 #    GM.InGMList.Level

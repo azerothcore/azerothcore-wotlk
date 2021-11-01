@@ -572,7 +572,7 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_SPECTATOR_ON       = 0x0080,               // Marks if player is spectactor
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
     PLAYER_EXTRA_SHOW_DK_PET        = 0x0400,               // Marks if player should see ghoul on login screen
-    PLAYER_EXTRA_ACCEPT_MAIL        = 0x0800,               // Marks if GM can accept mail.
+    PLAYER_EXTRA_NOT_ACCEPT_MAIL    = 0x0800,               // Marks if GM can accept mail.
 };
 
 // 2^n values
@@ -1112,8 +1112,8 @@ public:
     void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
-    [[nodiscard]] bool IsNotAcceptingMail() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_MAIL; }
-    void SetAcceptMail(bool on) { if (on) m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_MAIL; else m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_MAIL; }
+    [[nodiscard]] bool IsNotAcceptingMail() const { return m_ExtraFlags & PLAYER_EXTRA_NOT_ACCEPT_MAIL; }
+    void SetAcceptMail(bool on) { if (on) m_ExtraFlags &= ~PLAYER_EXTRA_NOT_ACCEPT_MAIL; else m_ExtraFlags |= PLAYER_EXTRA_NOT_ACCEPT_MAIL; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
     void SetGameMaster(bool on);
     [[nodiscard]] bool isGMChat() const { return m_ExtraFlags & PLAYER_EXTRA_GM_CHAT; }

@@ -26,6 +26,7 @@ EndScriptData */
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "Chat.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "Language.h"
@@ -53,7 +54,7 @@ public:
             { "notify",         HandleNotifyCommand,         SEC_GAMEMASTER, Console::Yes },
             { "gmnotify",       HandleGMNotifyCommand,       SEC_GAMEMASTER, Console::Yes },
             { "whispers",       HandleWhispersCommand,       SEC_MODERATOR,  Console::No  },
-            { "mail",           HandleMailCommand            SEC_MODERATOR,  Console::No  },
+            { "mail",           HandleMailCommand,           SEC_MODERATOR,  Console::No  },
         };
         return commandTable;
     }
@@ -189,7 +190,7 @@ public:
         return false;
     }
 
-    static bool HandleMailCommand(ChatHandler* handler, char const* args)
+    static bool HandleMailCommand(ChatHandler* handler, std::string args)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
@@ -197,27 +198,29 @@ public:
             return true;
         }
 
-        if (!*args)
+        if (args == "")
         {
             handler->PSendSysMessage(LANG_COMMAND_ACCEPT_MAIL, player->IsNotAcceptingMail() ? handler->GetAcoreString(LANG_OFF) : handler->GetAcoreString(LANG_ON));
             return true;
         }
 
-        std::string argStr = (char*)args;
-        // mail on
-        if (argStr == "on")
+        if (!sConfigMgr->GetOption<int32>("CONFIG_GM_MAIL_TO", 0))
         {
-            player->SetAcceptMail(true);
-            handler->SendSysMessage(LANG_COMMAND_ACCEPT_MAIL_ON);
-            return true;
-        }
+            // mail on
+            if (args == "on")
+            {
+                player->SetAcceptMail(true);
+                handler->SendSysMessage(LANG_COMMAND_ACCEPT_MAIL_ON);
+                return true;
+            }
 
-        // mail off
-        if (argStr == "off")
-        {
-            player->SetAcceptMail(false);
-            handler->SendSysMessage(LANG_COMMAND_ACCEPT_MAIL_OFF);
-            return true;
+            // mail off
+            if (args == "off")
+            {
+                player->SetAcceptMail(false);
+                handler->SendSysMessage(LANG_COMMAND_ACCEPT_MAIL_OFF);
+                return true;
+            }
         }
 
         handler->SendSysMessage(LANG_USE_BOL);
