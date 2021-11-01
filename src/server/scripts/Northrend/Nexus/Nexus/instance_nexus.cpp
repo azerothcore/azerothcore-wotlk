@@ -58,27 +58,27 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_ALLIANCE_RANGER:
-                    creature->setFaction(16);
+                    creature->SetFaction(FACTION_MONSTER_2);
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_RANGER);
                     break;
                 case NPC_ALLIANCE_BERSERKER:
-                    creature->setFaction(16);
+                    creature->SetFaction(FACTION_MONSTER_2);
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_BERSERKER);
                     break;
                 case NPC_ALLIANCE_COMMANDER:
-                    creature->setFaction(16);
+                    creature->SetFaction(FACTION_MONSTER_2);
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_COMMANDER);
                     break;
                 case NPC_ALLIANCE_CLERIC:
-                    creature->setFaction(16);
+                    creature->SetFaction(FACTION_MONSTER_2);
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_CLERIC);
                     break;
                 case NPC_COMMANDER_STOUTBEARD:
-                    creature->setFaction(16);
+                    creature->SetFaction(FACTION_MONSTER_2);
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_COMMANDER_KOLURG);
                     break;

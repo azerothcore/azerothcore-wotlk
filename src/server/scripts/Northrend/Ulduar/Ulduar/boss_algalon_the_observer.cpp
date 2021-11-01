@@ -379,7 +379,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetSheath(SHEATH_STATE_UNARMED);
-            me->setFaction(190);
+            me->SetFaction(190);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
 
             _phaseTwo = false;
@@ -437,7 +437,7 @@ public:
 
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(false);
                     if (m_pInstance)
@@ -602,7 +602,7 @@ public:
                 damage = 0;
                 me->SetReactState(REACT_PASSIVE);
                 me->AttackStop();
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 events.Reset();
                 summons.DespawnAll();
@@ -666,7 +666,7 @@ public:
                     me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
                     // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->setFaction(14);
+                    me->SetFaction(FACTION_MONSTER);
                     if (Player* target = SelectTargetFromPlayerList(150.0f))
                         AttackStart(target);
                     me->SetInCombatWithZone();
