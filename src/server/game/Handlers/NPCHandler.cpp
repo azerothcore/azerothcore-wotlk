@@ -314,7 +314,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
         return;
 
     // set faction visible if needed
-    if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
+    if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->GetFaction()))
         _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
