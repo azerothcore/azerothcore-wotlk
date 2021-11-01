@@ -31,7 +31,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_FIRE_NOVA                 = 1,
+    EVENT_FLAMESTRIKE               = 1,
     EVENT_CLEAVE,
     EVENT_CONFLAGRATION,
     EVENT_THUNDERCLAP,
@@ -74,7 +74,7 @@ public:
         {
             _EnterCombat();
             CallForHelp();
-            events.ScheduleEvent(EVENT_FIRE_NOVA, 6000);
+            events.ScheduleEvent(EVENT_FLAMESTRIKE, 6000);
             events.ScheduleEvent(EVENT_CLEAVE,    8000);
             events.ScheduleEvent(EVENT_CONFLAGRATION, 15000);
             events.ScheduleEvent(EVENT_THUNDERCLAP,    17000);
@@ -112,9 +112,9 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_FIRE_NOVA:
+                    case EVENT_FLAMESTRIKE:
                         DoCastAOE(SPELL_FLAMESTRIKE);
-                        events.ScheduleEvent(EVENT_FIRE_NOVA, 10000);
+                        events.ScheduleEvent(EVENT_FLAMESTRIKE, 10000);
                         break;
                     case EVENT_CLEAVE:
                         DoCastVictim(SPELL_CLEAVE);
