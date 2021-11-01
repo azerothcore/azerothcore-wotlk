@@ -1994,29 +1994,31 @@ public:
                 if (id)
                 {
                     // Try to find an existing script.
-                    TScript const* oldScript = nullptr;
+                    bool existing = false;
                     for (auto iterator = ScriptPointerList.begin(); iterator != ScriptPointerList.end(); ++iterator)
                     {
                         // If the script names match...
                         if (iterator->second->GetName() == script->GetName())
                         {
                             // ... It exists.
-                            oldScript = iterator->second;
+                            existing = true;
                             break;
                         }
                     }
 
-                    // If exists, delete the old script and replace it by new one
-                    if (oldScript)
+                    // If the script isn't assigned -> assign it!
+                    if (!existing)
                     {
-                        delete oldScript;
-                    }
-
-                    ScriptPointerList[id] = script;
-
-                    if (!oldScript)
-                    {
+                        ScriptPointerList[id] = script;
                         sScriptMgr->IncrementScriptCount();
+                    }
+                    else
+                    {
+                        // If the script is already assigned -> delete it!
+                        LOG_ERROR("scripts", "Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
+                                       script->GetName().c_str());
+
+                        ABORT(); // Error that should be fixed ASAP.
                     }
                 }
                 else

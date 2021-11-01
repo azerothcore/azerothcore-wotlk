@@ -1125,7 +1125,7 @@ public:
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetReactState(REACT_AGGRESSIVE);
-            DoZoneInCombat();
+            DoZoneInCombat(nullptr, 150.0f);
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override

@@ -2396,7 +2396,7 @@ public:
                                 if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(100.0f, 0, true))
                                     AttackStart(plr);
                         }
-                        DoZoneInCombat();
+                        DoZoneInCombat(nullptr, 150.0f);
                     }
                     break;
                 case EVENT_SOUL_SHRIEK:

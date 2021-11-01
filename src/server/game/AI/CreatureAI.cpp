@@ -86,7 +86,7 @@ inline bool IsValidCombatTarget(Creature* source, Player* target)
     return true;
 }
 
-void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/)
+void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRangeToNearestTarget /*= 250.0f*/)
 {
     if (!creature)
         creature = me;
@@ -110,6 +110,11 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/)
         if (Player* player = itr->GetSource())
         {
             if (!IsValidCombatTarget(creature, player))
+            {
+                continue;
+            }
+
+            if (!creature->IsWithinDistInMap(player, maxRangeToNearestTarget))
             {
                 continue;
             }

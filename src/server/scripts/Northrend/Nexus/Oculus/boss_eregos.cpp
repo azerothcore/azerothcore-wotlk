@@ -169,7 +169,7 @@ public:
             if( pSummon->GetEntry() != NPC_LEY_GUARDIAN_WHELP )
                 return;
 
-            DoZoneInCombat(pSummon);
+            DoZoneInCombat(pSummon, 300.0f);
         }
 
         void UpdateAI(uint32 diff) override
