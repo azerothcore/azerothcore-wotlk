@@ -62,7 +62,7 @@ public:
             events.Reset();
             me->SetVisible(false);
             me->SetReactState(REACT_PASSIVE);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             _events2.Reset();
             _events2.ScheduleEvent(EVENT_CHECK_VISIBILITY, 5000);
             if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
