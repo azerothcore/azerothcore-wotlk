@@ -344,7 +344,7 @@ public:
 
                 damage = 0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetHealth(me->GetMaxHealth());
                 me->CombatStop();
                 me->RemoveAllAuras();

@@ -517,7 +517,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     m_realRace = createInfo->Race; // set real race flag
     m_race = createInfo->Race; // set real race flag
 
-    setFactionForRace(createInfo->Race);
+    SetFactionForRace(createInfo->Race);
 
     if (!IsValidGender(createInfo->Gender))
     {
@@ -2060,7 +2060,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 
     // xinef: not needed, CORRECTLY checked above including forced reputations etc
     // not unfriendly
-    //if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(creature->getFaction()))
+    //if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(creature->GetFaction()))
     //    if (factionTemplate->faction)
     //        if (FactionEntry const* faction = sFactionStore.LookupEntry(factionTemplate->faction))
     //            if (faction->reputationListID >= 0 && GetReputationMgr().GetRank(faction) <= REP_UNFRIENDLY)
@@ -2150,14 +2150,14 @@ void Player::SetGameMaster(bool on)
     {
         m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
         if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
-            setFaction(35);
+            SetFaction(FACTION_FRIENDLY);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
         {
             if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
-                pet->setFaction(35);
+                pet->SetFaction(FACTION_FRIENDLY);
             pet->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
@@ -2181,13 +2181,13 @@ void Player::SetGameMaster(bool on)
         SetPhaseMask(newPhase, false);
 
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
-        setFactionForRace(getRace(true));
+        SetFactionForRace(getRace(true));
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
         {
-            pet->setFaction(getFaction());
+            pet->SetFaction(GetFaction());
             pet->getHostileRefMgr().setOnlineOfflineState(true);
         }
 
@@ -5649,7 +5649,7 @@ TeamId Player::TeamIdForRace(uint8 race)
     return TEAM_ALLIANCE;
 }
 
-void Player::setFactionForRace(uint8 race)
+void Player::SetFactionForRace(uint8 race)
 {
     m_team = TeamIdForRace(race);
 
@@ -5659,7 +5659,7 @@ void Player::setFactionForRace(uint8 race)
         return;
 
     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
-    setFaction(rEntry ? rEntry->FactionID : 0);
+    SetFaction(rEntry ? rEntry->FactionID : 0);
 }
 
 ReputationRank Player::GetReputationRank(uint32 faction) const
@@ -14442,7 +14442,7 @@ void Player::SetIsSpectator(bool on)
         AddAura(SPECTATOR_SPELL_SPEED, this);
         m_ExtraFlags |= PLAYER_EXTRA_SPECTATOR_ON;
         AddUnitState(UNIT_STATE_ISOLATED);
-        //setFaction(1100);
+        //SetFaction(1100);
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         ResetContestedPvP();
@@ -14459,7 +14459,7 @@ void Player::SetIsSpectator(bool on)
 
         if (!IsGameMaster())
         {
-            //setFactionForRace(getRace());
+            //SetFactionForRace(getRace());
 
             // restore FFA PvP Server state
             // Xinef: it will be removed if necessery in UpdateArea called in WorldPortOpcode

@@ -314,7 +314,7 @@ public:
                 if (infernal)
                 {
                     infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-                    infernal->setFaction(me->getFaction());
+                    infernal->SetFaction(me->GetFaction());
                     infernals.push_back(infernal->GetGUID());
                     infernal->SetControlled(true, UNIT_STATE_ROOT);
                     RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);

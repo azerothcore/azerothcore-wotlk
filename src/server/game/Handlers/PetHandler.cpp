@@ -181,7 +181,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     pet->SetLoading(true);
     pet->Relocate(px, py, pz, owner->GetOrientation());
     pet->setPetType(pet_type);
-    pet->setFaction(owner->getFaction());
+    pet->SetFaction(owner->GetFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
 
     if (pet->IsCritter())
