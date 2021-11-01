@@ -1869,7 +1869,13 @@ public:
         {
             PreventDefaultAction();
 
-            int32 absorb = int32(CalculatePct(eventInfo.GetHealInfo()->GetHeal(), 15.0f));
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (!healInfo || !healInfo->GetHeal())
+            {
+                return;
+            }
+
+            int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 15.0f));
             // xinef: all heals contribute to one bubble
             if (AuraEffect* protEff = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PROTECTION_OF_ANCIENT_KINGS, 0/*, eventInfo.GetActor()->GetGUID()*/))
             {
