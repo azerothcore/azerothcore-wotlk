@@ -517,6 +517,12 @@ public:
             entry = static_cast<uint32>(objectId->get<GameObjectEntry>());
 
         GameObjectTemplate const* gameObjectInfo = sObjectMgr->GetGameObjectTemplate(entry);
+        if (!gameObjectInfo)
+        {
+            handler->PSendSysMessage(LANG_GAMEOBJECT_NOT_EXIST, entry);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         type = gameObjectInfo->type;
         displayId = gameObjectInfo->displayId;
