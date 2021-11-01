@@ -234,8 +234,13 @@ public:
     AuraScript* GetScriptByName(std::string const& scriptName) const;
 
     std::list<AuraScript*> m_loadedScripts;
+
+    void SetTriggeredByAuraSpellInfo(SpellInfo const* triggeredByAuraSpellInfo);
+    SpellInfo const* GetTriggeredByAuraSpellInfo() const;
+
 private:
     void _DeleteRemovedApplications();
+
 protected:
     SpellInfo const* const m_spellInfo;
     ObjectGuid const m_casterGuid;
@@ -262,6 +267,8 @@ protected:
 
 private:
     Unit::AuraApplicationList m_removedApplications;
+
+    SpellInfo const* m_triggeredByAuraSpellInfo;
 };
 
 class UnitAura : public Aura

@@ -41,38 +41,44 @@ EndScriptData */
 #include <openssl/opensslv.h>
 #include <numeric>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class server_commandscript : public CommandScript
 {
 public:
     server_commandscript() : CommandScript("server_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> serverIdleRestartCommandTable =
+        static ChatCommandTable serverIdleRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_CONSOLE,        true,  &HandleServerIdleRestartCommand,         "" }
         };
 
-        static std::vector<ChatCommand> serverIdleShutdownCommandTable =
+        static ChatCommandTable serverIdleShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_CONSOLE,        true,  &HandleServerIdleShutDownCommand,        "" }
         };
 
-        static std::vector<ChatCommand> serverRestartCommandTable =
+        static ChatCommandTable serverRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
         };
 
-        static std::vector<ChatCommand> serverShutdownCommandTable =
+        static ChatCommandTable serverShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
         };
 
-        static std::vector<ChatCommand> serverSetCommandTable =
+        static ChatCommandTable serverSetCommandTable =
         {
             { "difftime",       SEC_CONSOLE,        true,  &HandleServerSetDiffTimeCommand,         "" },
             { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
@@ -80,7 +86,7 @@ public:
             { "closed",         SEC_CONSOLE,        true,  &HandleServerSetClosedCommand,           "" }
         };
 
-        static std::vector<ChatCommand> serverCommandTable =
+        static ChatCommandTable serverCommandTable =
         {
             { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
             { "debug",          SEC_ADMINISTRATOR,  true,  &HandleServerDebugCommand,               "" },
@@ -94,7 +100,7 @@ public:
             { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
         };
@@ -213,6 +219,10 @@ public:
         handler->PSendSysMessage("Using World DB Revision: %s", sWorld->GetWorldDBRevision());
         handler->PSendSysMessage("Using Character DB Revision: %s", sWorld->GetCharacterDBRevision());
         handler->PSendSysMessage("Using Auth DB Revision: %s", sWorld->GetAuthDBRevision());
+
+        handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
+        handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
+        handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
         return true;
     }
 
