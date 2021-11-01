@@ -146,6 +146,13 @@ public:
         bool startPath;
         uint8 flyTimes;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->setActive(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -157,11 +164,6 @@ public:
             CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
-
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
-            me->setActive(true);
 
             if( pInstance )
                 pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
@@ -193,7 +195,7 @@ public:
                     break;
                 ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
                 if (!i)
-                    (*itr)->MonsterYell(TEXT_EE_AGGRO, LANG_UNIVERSAL, 0);
+                    (*itr)->Yell(TEXT_EE_AGGRO, LANG_UNIVERSAL);
                 ++i;
             }
             if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
@@ -302,7 +304,6 @@ public:
                 me->DisableRotate(true);
                 me->SetOrientation((float)(M_PI + 0.01) / 2);
                 me->SetFacingTo(M_PI / 2);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->CastSpell(me, 62794, true);
                 events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
@@ -359,7 +360,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -453,7 +454,7 @@ public:
                     }
                     break;
                 case EVENT_WARN_DEEP_BREATH:
-                    me->MonsterTextEmote(TEXT_DEEP_BREATH, 0, true);
+                    me->TextEmote(TEXT_DEEP_BREATH, nullptr, true);
                     me->RemoveAura(62794);
                     events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
                     break;
@@ -515,9 +516,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
                     }
@@ -528,7 +527,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -591,6 +590,7 @@ public:
 
         void EnterEvadeMode() override
         {
+            me->SetDisableGravity(true);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
@@ -758,7 +758,7 @@ public:
                             if( GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
                             {
                                 me->RemoveGameObject(wh, false);
-                                me->MonsterTextEmote(TEXT_TURRET_READY, 0, true);
+                                me->TextEmote(TEXT_TURRET_READY, nullptr, true);
                             }
                         }
                     }

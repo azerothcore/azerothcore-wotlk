@@ -437,27 +437,27 @@ public:
                         if (Unit* seat = vehicle->GetPassenger(i))
                             if (seat->GetTypeId() == TYPEID_UNIT)
                                 seat->ToCreature()->AI()->EnterEvadeMode();
-                    me->MonsterTextEmote("Flame Leviathan reactivated. Resumming combat functions.", 0, true);
+                    me->TextEmote("Flame Leviathan reactivated. Resumming combat functions.", nullptr, true);
                     return;
                 case EVENT_THORIMS_HAMMER:
                     SummonTowerHelpers(TOWER_OF_STORMS);
                     events.RepeatEvent(60000 + rand() % 60000);
-                    me->MonsterTextEmote("Flame Leviathan activates Thorim's Hammer.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Thorim's Hammer.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
                     return;
                 case EVENT_FREYA:
                     SummonTowerHelpers(TOWER_OF_LIFE);
-                    me->MonsterTextEmote("Flame Leviathan activates Freya's Ward.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Freya's Ward.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
                     return;
                 case EVENT_MIMIRONS_INFERNO:
                     SummonTowerHelpers(TOWER_OF_FLAMES);
-                    me->MonsterTextEmote("Flame Leviathan activates Mimiron's Inferno.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Mimiron's Inferno.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
                     return;
                 case EVENT_HODIRS_FURY:
                     SummonTowerHelpers(TOWER_OF_FROST);
-                    me->MonsterTextEmote("Flame Leviathan activates Hodir's Fury.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Hodir's Fury.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
                     return;
             }
@@ -1523,11 +1523,11 @@ public:
             if (!vehicle)
                 return;
 
-            Player* driver = vehicle->GetPassenger(0) ? vehicle->GetPassenger(0)->ToPlayer() : nullptr;
+            Unit* driver = vehicle->GetPassenger(0);
             if (!driver)
                 return;
 
-            driver->MonsterTextEmote("Automatic repair sequence initiated.", driver, true);
+            driver->TextEmote("Automatic repair sequence initiated.", driver, true);
 
             // Actually should/could use basepoints (100) for this spell effect as percentage of health, but oh well.
             vehicle->GetBase()->SetFullHealth();

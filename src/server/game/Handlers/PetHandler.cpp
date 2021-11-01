@@ -181,7 +181,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     pet->SetLoading(true);
     pet->Relocate(px, py, pz, owner->GetOrientation());
     pet->setPetType(pet_type);
-    pet->setFaction(owner->getFaction());
+    pet->SetFaction(owner->GetFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
 
     if (pet->IsCritter())
@@ -441,6 +441,12 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     // Xinef: allow to controll players
     if (pet->GetTypeId() == TYPEID_PLAYER && flag != ACT_COMMAND && flag != ACT_REACTION)
         return;
+
+    // Do not follow itself vehicle
+    if (spellid == COMMAND_FOLLOW && _player->IsOnVehicle(pet))
+    {
+        return;
+    }
 
     if (GetPlayer()->m_Controlled.size() == 1)
         HandlePetActionHelper(pet, guid1, spellid, flag, guid2);

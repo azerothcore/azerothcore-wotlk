@@ -89,7 +89,7 @@ public:
             HasYelled = false;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
@@ -154,7 +154,7 @@ public:
                             if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
                             {
                                 nefarius->CastSpell(me, SPELL_NEFARIUS_CORRUPTION, TRIGGERED_CAST_DIRECTLY);
-                                nefarius->MonsterYell(SAY_NEFARIAN_VAEL_INTRO, LANG_UNIVERSAL, 0);
+                                nefarius->Yell(SAY_NEFARIAN_VAEL_INTRO);
                                 nefarius->SetStandState(UNIT_STAND_STATE_STAND);
                             }
                             events.ScheduleEvent(EVENT_SPEECH_3, 18000);
@@ -182,7 +182,7 @@ public:
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_SPEECH_7:
-                            me->setFaction(103);
+                            me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                             if (PlayerGUID && ObjectAccessor::GetUnit(*me, PlayerGUID))
                                 AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));
                             break;

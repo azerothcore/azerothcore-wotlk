@@ -105,6 +105,17 @@ public:
         SummonList summons;
         ObjectGuid InvokerGUID;
 
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_FROST_LORD_AHUNE;
+        }
+
         void StartPhase1()
         {
             me->CastSpell(me, SPELL_AHUNES_SHIELD, true);
@@ -147,19 +158,19 @@ public:
                 case EVENT_INVOKER_SAY_1:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
                     {
-                        plr->MonsterSay("The Ice Stone has melted!", LANG_UNIVERSAL, 0);
+                        plr->Say("The Ice Stone has melted!", LANG_UNIVERSAL);
                         plr->CastSpell(plr, SPELL_MAKE_BONFIRE, true);
                     }
                     events.RescheduleEvent(EVENT_INVOKER_SAY_2, 2000);
                     break;
                 case EVENT_INVOKER_SAY_2:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
-                        plr->MonsterSay("Ahune, your strength grows no more!", LANG_UNIVERSAL, 0);
+                        plr->Say("Ahune, your strength grows no more!", LANG_UNIVERSAL);
                     events.RescheduleEvent(EVENT_INVOKER_SAY_3, 2000);
                     break;
                 case EVENT_INVOKER_SAY_3:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
-                        plr->MonsterSay("Your frozen reign will not come to pass!", LANG_UNIVERSAL, 0);
+                        plr->Say("Your frozen reign will not come to pass!", LANG_UNIVERSAL);
                     break;
                 case EVENT_ATTACK:
                     events.Reset();
@@ -181,7 +192,7 @@ public:
                     events.RescheduleEvent(EVENT_SUBMERGE, 10000);
                     break;
                 case EVENT_SUBMERGE:
-                    me->MonsterTextEmote(TEXT_RETREAT, 0, true);
+                    me->TextEmote(TEXT_RETREAT, nullptr, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, true);
                     me->CastSpell(me, SPELL_SELF_STUN, true);
@@ -194,7 +205,7 @@ public:
                     events.RescheduleEvent(EVENT_EMERGE_WARNING, 20000);
                     break;
                 case EVENT_EMERGE_WARNING:
-                    me->MonsterTextEmote(TEXT_RESURFACE, 0, true);
+                    me->TextEmote(TEXT_RESURFACE, nullptr, true);
                     break;
                 case EVENT_COMBAT_EMERGE:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -300,7 +311,7 @@ public:
                         if (player->GetGroup() && !finished)
                         {
                             finished = true;
-                            sLFGMgr->FinishDungeon(player->GetGroup()->GetGUID(), 286, me->FindMap());
+                            sLFGMgr->FinishDungeon(player->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_FROST_LORD_AHUNE, me->FindMap());
                         }
                     }
         }

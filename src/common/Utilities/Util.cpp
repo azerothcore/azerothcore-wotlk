@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <boost/core/demangle.hpp>
 #include <utf8.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
@@ -409,12 +410,12 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
     return true;
 }
 
-bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
+bool Utf8toWStr(std::string_view utf8str, std::wstring& wstr)
 {
     wstr.clear();
     try
     {
-        utf8::utf8to16(utf8str.c_str(), utf8str.c_str() + utf8str.size(), std::back_inserter(wstr));
+        utf8::utf8to16(utf8str.begin(), utf8str.end(), std::back_inserter(wstr));
     }
     catch (std::exception const&)
     {
@@ -425,18 +426,19 @@ bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
     return true;
 }
 
-bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str)
+bool WStrToUtf8(wchar_t const* wstr, size_t size, std::string& utf8str)
 {
     try
     {
         std::string utf8str2;
-        utf8str2.resize(size * 4);                          // allocate for most long case
+        utf8str2.resize(size * 4);                            // allocate for most long case
 
         if (size)
         {
             char* oend = utf8::utf16to8(wstr, wstr + size, &utf8str2[0]);
-            utf8str2.resize(oend - (&utf8str2[0]));             // remove unused tail
+            utf8str2.resize(oend - (&utf8str2[0]));               // remove unused tail
         }
+
         utf8str = utf8str2;
     }
     catch (std::exception const&)
@@ -448,18 +450,19 @@ bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str)
     return true;
 }
 
-bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str)
+bool WStrToUtf8(std::wstring_view wstr, std::string& utf8str)
 {
     try
     {
         std::string utf8str2;
-        utf8str2.resize(wstr.size() * 4);                   // allocate for most long case
+        utf8str2.resize(wstr.size() * 4);                     // allocate for most long case
 
-        if (wstr.size())
+        if (!wstr.empty())
         {
-            char* oend = utf8::utf16to8(wstr.c_str(), wstr.c_str() + wstr.size(), &utf8str2[0]);
-            utf8str2.resize(oend - (&utf8str2[0]));              // remove unused tail
+            char* oend = utf8::utf16to8(wstr.begin(), wstr.end(), &utf8str2[0]);
+            utf8str2.resize(oend - (&utf8str2[0]));                // remove unused tail
         }
+
         utf8str = utf8str2;
     }
     catch (std::exception const&)
@@ -471,17 +474,10 @@ bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str)
     return true;
 }
 
-typedef wchar_t const* const* wstrlist;
-
-void wstrToUpper(std::wstring& str)
-{
-    std::transform(str.begin(), str.end(), str.begin(), wcharToUpper);
-}
-
-void wstrToLower(std::wstring& str)
-{
-    std::transform(str.begin(), str.end(), str.begin(), wcharToLower);
-}
+void wstrToUpper(std::wstring& str) { std::transform(std::begin(str), std::end(str), std::begin(str), wcharToUpper); }
+void wstrToLower(std::wstring& str) { std::transform(std::begin(str), std::end(str), std::begin(str), wcharToLower); }
+void strToUpper(std::string& str) { std::transform(std::begin(str), std::end(str), std::begin(str), charToUpper); }
+void strToLower(std::string& str) { std::transform(std::begin(str), std::end(str), std::begin(str), charToLower); }
 
 std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
 {
@@ -539,7 +535,7 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
     return wname;
 }
 
-bool utf8ToConsole(const std::string& utf8str, std::string& conStr)
+bool utf8ToConsole(std::string_view utf8str, std::string& conStr)
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     std::wstring wstr;
@@ -558,7 +554,7 @@ bool utf8ToConsole(const std::string& utf8str, std::string& conStr)
     return true;
 }
 
-bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
+bool consoleToUtf8(std::string_view conStr, std::string& utf8str)
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     std::wstring wstr;
@@ -573,7 +569,7 @@ bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
 #endif
 }
 
-bool Utf8FitTo(const std::string& str, std::wstring const& search)
+bool Utf8FitTo(std::string_view str, std::wstring_view search)
 {
     std::wstring temp;
 
@@ -661,7 +657,7 @@ std::string Acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, 
     return ss.str();
 }
 
-void Acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
+void Acore::Impl::HexStrToByteArray(std::string_view str, uint8* out, size_t outlen, bool reverse /*= false*/)
 {
     ASSERT(str.size() == (2 * outlen));
 
@@ -684,13 +680,23 @@ void Acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t o
     }
 }
 
-bool StringContainsStringI(std::string const& haystack, std::string const& needle)
-{
-    return haystack.end() !=
-    std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), [](char c1, char c2) { return std::toupper(c1) == std::toupper(c2); });
-}
-
 bool StringEqualI(std::string_view a, std::string_view b)
 {
     return std::equal(a.begin(), a.end(), b.begin(), b.end(), [](char c1, char c2) { return std::tolower(c1) == std::tolower(c2); });
+}
+
+bool StringContainsStringI(std::string_view haystack, std::string_view needle)
+{
+    return haystack.end() !=
+        std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), [](char c1, char c2) { return std::tolower(c1) == std::tolower(c2); });
+}
+
+bool StringCompareLessI(std::string_view a, std::string_view b)
+{
+    return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), [](char c1, char c2) { return std::tolower(c1) < std::tolower(c2); });
+}
+
+std::string GetTypeName(std::type_info const& info)
+{
+    return boost::core::demangle(info.name());
 }
