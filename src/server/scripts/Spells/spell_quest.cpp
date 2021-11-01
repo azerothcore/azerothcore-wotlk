@@ -1006,7 +1006,7 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             Unit* target = eventInfo.GetActionTarget();
-            return target && target->getFaction() == 1843; // Xinef: Illidari demons faction
+            return target && target->GetFaction() == 1843; // Xinef: Illidari demons faction
         }
 
         void Register() override
