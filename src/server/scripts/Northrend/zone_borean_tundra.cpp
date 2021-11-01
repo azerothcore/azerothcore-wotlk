@@ -1459,9 +1459,6 @@ enum Thassarian
     EVENT_THASSARIAN_SCRIPT_28    = 28,
     EVENT_THASSARIAN_SCRIPT_29    = 29,
     EVENT_THASSARIAN_CAST         = 30,
-    FACTION_UNDEAD_SCOURGE        = 974,
-    FACTION_VALIANCE_EXPEDITION_7 = 1974,
-    FACTION_UNDEAD_SCOURGE_9      = 1988,
     NPC_IMAGE_LICH_KING           = 26203,
     NPC_COUNSELOR_TALBOT          = 25301,
     NPC_PRINCE_VALANAR            = 28189,
@@ -1563,7 +1560,7 @@ public:
 
         void Reset() override
         {
-            me->setFaction(FACTION_VALIANCE_EXPEDITION_7);
+            me->SetFaction(FACTION_VALIANCE_EXPEDITION_7);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -1656,7 +1653,7 @@ public:
                             talbot->CastSpell(talbot, SPELL_TRANSFORM_VALANAR);
                             talbot->UpdateEntry(NPC_PRINCE_VALANAR);
                             talbot->SetFullHealth();
-                            talbot->setFaction(FACTION_UNDEAD_SCOURGE);
+                            talbot->SetFaction(FACTION_UNDEAD_SCOURGE);
                             talbot->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             talbot->SetReactState(REACT_PASSIVE);
                             talbot->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -1779,7 +1776,7 @@ public:
                         if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                         {
                             talbot->AI()->Talk(SAY_TALBOT_4);
-                            talbot->setFaction(FACTION_UNDEAD_SCOURGE_9);
+                            talbot->SetFaction(FACTION_UNDEAD_SCOURGE_9);
                             talbot->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             talbot->SetReactState(REACT_AGGRESSIVE);
                             talbot->Attack(me, false);
