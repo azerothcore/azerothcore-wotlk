@@ -2385,8 +2385,6 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update uptime"));
 
-        uint32 maxOnlinePlayers = GetMaxPlayerCount();
-
         m_timers[WUPDATE_UPTIME].Reset();
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
