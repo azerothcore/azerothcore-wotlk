@@ -3463,7 +3463,9 @@ class spell_gen_gryphon_wyvern_mount_check : public AuraScript
         Unit* owner = target->GetOwner();
 
         if (!owner)
+        {
             return;
+        }
 
         target->SetDisableGravity(owner->IsMounted());
     }
@@ -5585,6 +5587,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_spirit_healer_res();
     new spell_gen_gadgetzan_transporter_backfire();
     new spell_gen_gnomish_transporter();
+    new spell_gen_gryphon_wyvern_mount_check();
     new spell_gen_dalaran_disguise("spell_gen_sunreaver_disguise");
     new spell_gen_dalaran_disguise("spell_gen_silver_covenant_disguise");
     new spell_gen_elune_candle();
