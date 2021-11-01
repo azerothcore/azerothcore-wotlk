@@ -184,7 +184,7 @@ public:
                 float dist = rand_norm() * 40.0f;
                 if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
                 {
-                    c->setFaction(31);
+                    c->SetFaction(FACTION_PREY);
                     c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     c->GetMotionMaster()->MoveRandom(15.0f);
                 }
@@ -452,7 +452,7 @@ public:
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
             determinationTimer = urand(10000, 50000);
             despawnTimer = 0;
-            if( me->getFaction() == 16 ) // hostile - it's phase 2
+            if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
                 if( Unit* target = me->SelectNearestTarget(250.0f) )
                 {
                     AttackStart(target);
