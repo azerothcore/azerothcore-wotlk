@@ -1870,7 +1870,7 @@ public:
             PreventDefaultAction();
 
             HealInfo* healInfo = eventInfo.GetHealInfo();
-            if (!healInfo || !healInfo->GetHeal())
+            if (!healInfo)
             {
                 return;
             }
