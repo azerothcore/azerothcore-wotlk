@@ -106,7 +106,7 @@ public:
                 if (!me->FindNearestCreature(NPC_FLAMEWAKER_HEALER, 100.0f) && !me->FindNearestCreature(NPC_FLAMEWAKER_ELITE, 100.0f))
                 {
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     EnterEvadeMode();
                     Talk(SAY_DEFEAT);
                     _JustDied();
@@ -184,7 +184,7 @@ public:
             }
             else if (action == ACTION_START_RAGNAROS_ALT)
             {
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
         }
