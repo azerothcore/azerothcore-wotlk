@@ -205,7 +205,7 @@ void UnitAI::DoCastAOE(uint32 spellId, bool triggered)
     me->CastSpell((Unit*)nullptr, spellId, triggered);
 }
 
-void UnitAI::DoCastRandomVictim(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
+void UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
 {
     if (!triggered && me->HasUnitState(UNIT_STATE_CASTING))
     {

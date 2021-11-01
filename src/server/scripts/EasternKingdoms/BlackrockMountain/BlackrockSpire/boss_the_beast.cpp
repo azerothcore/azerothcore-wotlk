@@ -84,7 +84,7 @@ public:
                         events.ScheduleEvent(EVENT_FLAME_BREAK, 10 * IN_MILLISECONDS);
                         break;
                     case EVENT_IMMOLATE:
-                        DoCastRandomVictim(SPELL_IMMOLATE, 0, 100.0f);
+                        DoCastRandomTarget(SPELL_IMMOLATE, 0, 100.0f);
                         events.ScheduleEvent(EVENT_IMMOLATE, 8 * IN_MILLISECONDS);
                         break;
                     case EVENT_TERRIFYING_ROAR:
