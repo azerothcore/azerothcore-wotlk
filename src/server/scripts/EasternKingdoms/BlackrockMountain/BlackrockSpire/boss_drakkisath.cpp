@@ -137,7 +137,7 @@ public:
                         break;
                     case EVENT_RAGE:
                         DoCastSelf(SPELL_RAGE);
-                        events.ScheduleEvent(EVENT_RAGE, 5000);
+                        events.ScheduleEvent(EVENT_RAGE, 35000);
                         break;
                 }
             }
