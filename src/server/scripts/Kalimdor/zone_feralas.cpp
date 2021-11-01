@@ -204,7 +204,7 @@ public:
 
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                me->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                me->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                 me->GetMotionMaster()->MoveFollow(player, 3.f, M_PI);
 
                 _events.ScheduleEvent(EVENT_WANDERING_START, urand(40 * IN_MILLISECONDS, 70 * IN_MILLISECONDS));
