@@ -36,7 +36,6 @@ enum AshbringerEventMisc
     NPC_FAIRBANKS                   =   4542,
     NPC_COMMANDER_MOGRAINE          =   3976,
     NPC_INQUISITOR_WHITEMANE        =   3977,
-    FACTION_FRIENDLY_TO_ALL         =   35,
     DOOR_HIGH_INQUISITOR_ID         =   104600,
 };
 
@@ -86,8 +85,7 @@ public:
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_COMMANDER_MOGRAINE, 4000.0f);
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
                 if (!ScarletList.empty())
-                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++)
-                        (*itr)->setFaction(FACTION_FRIENDLY_TO_ALL);
+                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++) (*itr)->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -108,8 +106,7 @@ public:
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_COMMANDER_MOGRAINE, 4000.0f);
                 player->GetCreatureListWithEntryInGrid(ScarletList, NPC_FAIRBANKS, 4000.0f);
                 if (!ScarletList.empty())
-                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++)
-                        (*itr)->setFaction(FACTION_FRIENDLY_TO_ALL);
+                    for (std::list<Creature*>::iterator itr = ScarletList.begin(); itr != ScarletList.end(); itr++) (*itr)->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -221,7 +218,7 @@ public:
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
                         Talk(SAY_WELCOME);
-                        me->setFaction(FACTION_FRIENDLY_TO_ALL);
+                        me->SetFaction(FACTION_FRIENDLY);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetFacingToObject(player);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -318,7 +315,7 @@ public:
                     return 10 * IN_MILLISECONDS;
                 case 4:
                     me->SummonCreature(NPC_HIGHLORD_MOGRAINE, 1065.130737f, 1399.350586f, 30.763723f, 6.282961f, TEMPSUMMON_TIMED_DESPAWN, 400000)->SetName("Highlord Mograine");
-                    me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->setFaction(FACTION_FRIENDLY_TO_ALL);
+                    me->FindNearestCreature(NPC_HIGHLORD_MOGRAINE, 200.0f)->SetFaction(FACTION_FRIENDLY);
                     return 30 * IN_MILLISECONDS;
                 case 5:
                     mograine->StopMovingOnCurrentPos();
@@ -381,7 +378,7 @@ public:
                 if (Player* player = who->ToPlayer())
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
-                        me->setFaction(FACTION_FRIENDLY_TO_ALL);
+                        me->SetFaction(FACTION_FRIENDLY);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         me->SetFacingToObject(player);
@@ -783,7 +780,7 @@ public:
                 if (Player* player = who->ToPlayer())
                     if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
                     {
-                        me->setFaction(FACTION_FRIENDLY_TO_ALL);
+                        me->SetFaction(FACTION_FRIENDLY);
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->CastSpell(me, 57767, true);
