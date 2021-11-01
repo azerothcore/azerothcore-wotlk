@@ -170,7 +170,7 @@ CreatureBaseStats const* CreatureBaseStats::GetBaseStats(uint8 level, uint8 unit
 
 bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    m_owner.DespawnOrUnsummon();    // since we are here, we are not TempSummon as object type cannot change during runtime
+    m_owner.DespawnOrUnsummon(0s, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
     return true;
 }
 
@@ -446,7 +446,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     if (!GetCreatureAddon())
         SetSheath(SHEATH_STATE_MELEE);
 
-    setFaction(cInfo->faction);
+    SetFaction(cInfo->faction);
 
     uint32 npcflag, unit_flags, dynamicflags;
     ObjectMgr::ChooseCreatureFlags(cInfo, npcflag, unit_flags, dynamicflags, data);
@@ -517,7 +517,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     {
         if (Player* owner = Creature::GetCharmerOrOwnerPlayerOrPlayerItself()) // this check comes in case we don't have a player
         {
-            setFaction(owner->getFaction()); // vehicles should have same as owner faction
+            SetFaction(owner->GetFaction()); // vehicles should have same as owner faction
             owner->VehicleSpellInitialize();
         }
     }
@@ -1916,12 +1916,11 @@ void Creature::Respawn(bool force)
     UpdateObjectVisibility(false);
 }
 
-void Creature::ForcedDespawn(uint32 timeMSToDespawn)
+void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
 {
     if (timeMSToDespawn)
     {
-        ForcedDespawnDelayEvent* pEvent = new ForcedDespawnDelayEvent(*this);
-
+        ForcedDespawnDelayEvent* pEvent = new ForcedDespawnDelayEvent(*this, forceRespawnTimer);
         m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
         return;
     }
@@ -1931,14 +1930,20 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn)
 
     // Xinef: set new respawn time, ignore corpse decay time...
     RemoveCorpse(true);
+
+    if (forceRespawnTimer > Seconds::zero())
+    {
+        m_respawnTime = time(nullptr) + forceRespawnTimer.count();
+        m_respawnDelay = forceRespawnTimer.count();
+    }
 }
 
-void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
+void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds forcedRespawnTimer)
 {
     if (TempSummon* summon = this->ToTempSummon())
-        summon->UnSummon(msTimeToDespawn);
+        summon->UnSummon(msTimeToDespawn.count());
     else
-        ForcedDespawn(msTimeToDespawn);
+        ForcedDespawn(msTimeToDespawn.count(), forcedRespawnTimer);
 }
 
 void Creature::DespawnOnEvade()
@@ -2275,7 +2280,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
     // only from same creature faction
     if (checkfaction)
     {
-        if (getFaction() != u->getFaction())
+        if (GetFaction() != u->GetFaction())
             return false;
     }
     else
@@ -2357,7 +2362,7 @@ void Creature::UpdateMoveInLineOfSightState()
     }
 
     bool nonHostile = true;
-    if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(getFaction()))
+    if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(GetFaction()))
         if (factionTemplate->hostileMask || factionTemplate->enemyFaction[0] || factionTemplate->enemyFaction[1] || factionTemplate->enemyFaction[2] || factionTemplate->enemyFaction[3])
             nonHostile = false;
 
