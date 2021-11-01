@@ -1,5 +1,8 @@
 {
     "files.associations": {
+        "*.dist": "properties",
+        "*.crash": "properties",
+        "*.wtf": "properties",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -62,8 +65,10 @@
         "thread": "cpp",
         "cfenv": "cpp",
         "typeinfo": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "xstring": "cpp"
     },
     "deno.enable": true,
-    "deno.path" : "deps/deno/bin/deno"
+    "deno.path": "deps/deno/bin/deno",
+    "deno.lint": true
 }

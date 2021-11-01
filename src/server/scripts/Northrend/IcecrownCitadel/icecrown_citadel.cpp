@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "AccountMgr.h"
 #include "Cell.h"
@@ -840,8 +853,8 @@ public:
                 // get all nearby vrykul
                 std::list<Creature*> temp;
                 FrostwingVrykulSearcher check(me, 150.0f);
-                acore::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
-                me->VisitNearbyGridObject(150.0f, searcher);
+                Acore::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
+                Cell::VisitGridObjects(me, searcher, 150.0f);
 
                 _aliveTrash.clear();
                 for (std::list<Creature*>::iterator itr = temp.begin(); itr != temp.end(); ++itr)
@@ -884,16 +897,16 @@ public:
                 _wipeCheckTimer = 3000;
 
                 Player* player = nullptr;
-                acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
-                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
-                me->VisitNearbyWorldObject(140.0f, searcher);
+                Acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
+                Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
+                Cell::VisitWorldObjects(me, searcher, 140.0f);
                 // wipe
                 if (!player || me->GetExactDist(4357.0f, 2606.0f, 350.0f) > 125.0f)
                 {
                     //Talk(SAY_CROK_DEATH);
                     FrostwingGauntletRespawner respawner;
-                    acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
-                    me->VisitNearbyGridObject(333.0f, worker);
+                    Acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
+                    Cell::VisitGridObjects(me, worker, 333.0f);
                     return;
                 }
             }
@@ -1337,7 +1350,7 @@ public:
                     {
                         std::list<Creature*> targets = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
                         if (!targets.empty())
-                            DoCast(acore::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
+                            DoCast(Acore::Containers::SelectRandomContainerElement(targets), SPELL_POWER_WORD_SHIELD);
                         Events.ScheduleEvent(EVENT_ARNATH_PW_SHIELD, urand(15000, 20000));
                         break;
                     }
@@ -1361,9 +1374,9 @@ public:
         Creature* FindFriendlyCreature() const
         {
             Creature* target = nullptr;
-            acore::MostHPMissingInRange u_check(me, 60.0f, 0);
-            acore::CreatureLastSearcher<acore::MostHPMissingInRange> searcher(me, target, u_check);
-            me->VisitNearbyGridObject(60.0f, searcher);
+            Acore::MostHPMissingInRange u_check(me, 60.0f, 0);
+            Acore::CreatureLastSearcher<Acore::MostHPMissingInRange> searcher(me, target, u_check);
+            Cell::VisitGridObjects(me, searcher, 60.0f);
             return target;
         }
     };
@@ -1761,15 +1774,15 @@ public:
                 me->GetPosition(&myPos);
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
-                const ThreatContainer::StorageType me_tl = me->getThreatManager().getThreatList();
-                const ThreatContainer::StorageType target_tl = c->getThreatManager().getThreatList();
+                const ThreatContainer::StorageType me_tl = me->getThreatMgr().getThreatList();
+                const ThreatContainer::StorageType target_tl = c->getThreatMgr().getThreatList();
                 DoResetThreat();
                 for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
-                    me->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    me->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
 
-                c->getThreatManager().resetAllAggro();
+                c->getThreatMgr().resetAllAggro();
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
-                    c->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    c->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
             }
         }
 
@@ -1969,7 +1982,7 @@ public:
 
             std::list<Creature*> wards;
             GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
-            wards.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            wards.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
             {
                 if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
@@ -2065,8 +2078,8 @@ public:
         // First effect
         void CountTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(acore::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
 
             bool kill = true;
             for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -2159,7 +2172,7 @@ public:
         void RemoveAliveTarget(std::list<WorldObject*>& targets)
         {
             targets.remove_if(AliveCheck());
-            acore::Containers::RandomResize(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void Land(SpellEffIndex /*effIndex*/)
@@ -2171,7 +2184,7 @@ public:
             Position pos;
             caster->GetPosition(&pos);
             caster->GetNearPosition(pos, 5.0f, 0.0f);
-            pos.m_positionZ = caster->GetBaseMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
+            pos.m_positionZ = caster->GetMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
             pos.m_positionZ += 0.1f;
             caster->SendMeleeAttackStop(caster->GetVictim());
             caster->GetMotionMaster()->MoveLand(POINT_LAND, pos, 7.0f);
@@ -2274,7 +2287,7 @@ public:
             instance->SetData(DATA_COLDFLAME_JETS, IN_PROGRESS);
             std::list<Creature*> traps;
             GetCreatureListWithEntryInGrid(traps, player, NPC_FROST_FREEZE_TRAP, 120.0f);
-            traps.sort(acore::ObjectDistanceOrderPred(player));
+            traps.sort(Acore::ObjectDistanceOrderPred(player));
             bool instant = false;
             for (std::list<Creature*>::iterator itr = traps.begin(); itr != traps.end(); ++itr)
             {
@@ -2332,8 +2345,8 @@ public:
                     if (!crok->IsAlive())
                     {
                         FrostwingGauntletRespawner respawner;
-                        acore::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
-                        crok->VisitNearbyGridObject(333.0f, worker);
+                        Acore::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
+                        Cell::VisitGridObjects(crok, worker, 333.0f);
                         return true;
                     }
                     else

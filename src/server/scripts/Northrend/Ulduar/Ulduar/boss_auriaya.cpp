@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -45,7 +58,7 @@ enum AuriayaSpells
 #define SPELL_RIP_FLESH                 RAID_MODE(SPELL_RIP_FLESH_10, SPELL_RIP_FLESH_25)
 #define SPELL_FERAL_POUNCE              RAID_MODE(SPELL_FERAL_POUNCE_10, SPELL_FERAL_POUNCE_25)
 #define SPELL_FERAL_RUSH                RAID_MODE(SPELL_FERAL_RUSH_10, SPELL_FERAL_RUSH_25)
-#define SPELL_SEEPING_FERAL_ESSENCE     RAID_MODE(SPELL_SEEPING_FERAL_ESSENCE_10, SPELL_SEEPING_FERAL_ESSENCE_25)
+//#define SPELL_SEEPING_FERAL_ESSENCE     RAID_MODE(SPELL_SEEPING_FERAL_ESSENCE_10, SPELL_SEEPING_FERAL_ESSENCE_25)
 
 enum AuriayaNPC
 {
@@ -173,7 +186,7 @@ public:
 
             summons.DoZoneInCombat(NPC_SANCTUM_SENTRY);
 
-            me->MonsterYell("Some things are better left alone!", LANG_UNIVERSAL, 0);
+            me->Yell("Some things are better left alone!", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_AGGRO);
             me->setActive(true);
         }
@@ -185,12 +198,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("The secret dies with you!", LANG_UNIVERSAL, 0);
+                me->Yell("The secret dies with you!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY1);
             }
             else
             {
-                me->MonsterYell("There is no escape!", LANG_UNIVERSAL, 0);
+                me->Yell("There is no escape!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY2);
             }
         }
@@ -203,7 +216,7 @@ public:
             EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
             summons.DoAction(ACTION_DESPAWN_ADDS, pred);
             summons.DespawnAll();
-            me->MonsterTextEmote("Auriaya screams in agony.", 0);
+            me->TextEmote("Auriaya screams in agony.", nullptr, true);
             me->PlayDirectSound(SOUND_DEATH);
         }
 
@@ -227,7 +240,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SUMMON_FERAL_DEFENDER:
-                    me->MonsterTextEmote("Auriaya begins to activate Feral Defender.", 0, true);
+                    me->TextEmote("Auriaya begins to activate Feral Defender.", nullptr, true);
                     me->CastSpell(me, SPELL_ACTIVATE_FERAL_DEFENDER, true);
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                     events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3000);
@@ -236,7 +249,7 @@ public:
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
                     break;
                 case EVENT_TERRIFYING_SCREECH:
-                    me->MonsterTextEmote("Auriaya begins to cast Terrifying Screech.", 0, true);
+                    me->TextEmote("Auriaya begins to cast Terrifying Screech.", nullptr, true);
                     me->CastSpell(me, SPELL_TERRIFYING_SCREECH, false);
                     events.RepeatEvent(35000);
                     break;
@@ -260,7 +273,7 @@ public:
                         break;
                     }
                 case EVENT_ENRAGE:
-                    me->MonsterTextEmote("You waste my time!", 0);
+                    me->TextEmote("You waste my time!", nullptr, true);
                     me->PlayDirectSound(SOUND_BERSERK);
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
@@ -460,7 +473,7 @@ class achievement_auriaya_crazy_cat_lady : public AchievementCriteriaScript
 public:
     achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -476,7 +489,7 @@ class achievement_auriaya_nine_lives : public AchievementCriteriaScript
 public:
     achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())

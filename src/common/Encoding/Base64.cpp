@@ -15,31 +15,31 @@ struct B64Impl
     static constexpr char Encode(uint8 v)
     {
         ASSERT(v < 0x40);
-        if (v < 26)  return 'A' + v;
-        if (v < 52)  return 'a' + (v - 26);
-        if (v < 62)  return '0' + (v - 52);
-        if (v == 62) return '+';
-        else         return '/';
+        if (v < 26) { return 'A' + v; }
+        if (v < 52) { return 'a' + (v - 26); }
+        if (v < 62) { return '0' + (v - 52); }
+        if (v == 62) { return '+'; }
+        else { return '/'; }
     }
 
     static constexpr uint8 DECODE_ERROR = 0xff;
     static constexpr uint8 Decode(uint8 v)
     {
-        if (('A' <= v) && (v <= 'Z')) return (v - 'A');
-        if (('a' <= v) && (v <= 'z')) return (v - 'a') + 26;
-        if (('0' <= v) && (v <= '9')) return (v - '0') + 52;
-        if (v == '+') return 62;
-        if (v == '/') return 63;
+        if (('A' <= v) && (v <= 'Z')) { return (v - 'A'); }
+        if (('a' <= v) && (v <= 'z')) { return (v - 'a') + 26; }
+        if (('0' <= v) && (v <= '9')) { return (v - '0') + 52; }
+        if (v == '+') { return 62; }
+        if (v == '/') { return 63; }
         return DECODE_ERROR;
     }
 };
 
-/*static*/ std::string acore::Encoding::Base64::Encode(std::vector<uint8> const& data)
+/*static*/ std::string Acore::Encoding::Base64::Encode(std::vector<uint8> const& data)
 {
-    return acore::Impl::GenericBaseEncoding<B64Impl>::Encode(data);
+    return Acore::Impl::GenericBaseEncoding<B64Impl>::Encode(data);
 }
 
-/*static*/ Optional<std::vector<uint8>> acore::Encoding::Base64::Decode(std::string const& data)
+/*static*/ Optional<std::vector<uint8>> Acore::Encoding::Base64::Decode(std::string const& data)
 {
-    return acore::Impl::GenericBaseEncoding<B64Impl>::Decode(data);
+    return Acore::Impl::GenericBaseEncoding<B64Impl>::Decode(data);
 }

@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_WORLDMOCK_H
@@ -12,9 +25,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-uint32 realmID;
 void AddScripts() {}
-bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args) { return false; }
 
 class WorldMock: public IWorld {
 public:
@@ -113,7 +124,11 @@ public:
     MOCK_METHOD(void, UpdateRealmCharCount, (uint32 accid), ());
     MOCK_METHOD(LocaleConstant, GetAvailableDbcLocale, (LocaleConstant locale), (const));
     MOCK_METHOD(void, LoadDBVersion, ());
+    MOCK_METHOD(void, LoadDBRevision, ());
     MOCK_METHOD(char const *, GetDBVersion, (), (const));
+    MOCK_METHOD(char const *, GetWorldDBRevision, (), (const));
+    MOCK_METHOD(char const *, GetCharacterDBRevision, (), (const));
+    MOCK_METHOD(char const *, GetAuthDBRevision, (), (const));
     MOCK_METHOD(void, LoadAutobroadcasts, ());
     MOCK_METHOD(void, UpdateAreaDependentAuras, ());
     MOCK_METHOD(uint32, GetCleaningFlags, (), (const));

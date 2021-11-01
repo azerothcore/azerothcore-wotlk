@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "GridNotifiers.h"
@@ -148,9 +161,9 @@ const Position PosSummonDead[5] =
     {2664.8f, -3340.7f, 268.23f, 3.7f}
 };
 
-const Position PosGroundLivingSide = {2691.2f, -3387.0f, 267.68f, 1.52f};
-const Position PosGroundDeadSide   = {2693.5f, -3334.6f, 267.68f, 4.67f};
-const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
+//const Position PosGroundLivingSide = {2691.2f, -3387.0f, 267.68f, 1.52f};
+//const Position PosGroundDeadSide   = {2693.5f, -3334.6f, 267.68f, 4.67f};
+//const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
 
 #define POS_Y_GATE  -3360.78f
 #define POS_Y_WEST  -3285.0f
@@ -160,7 +173,7 @@ const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
-struct NotOnSameSide : public acore::unary_function<Unit*, bool>
+struct NotOnSameSide : public Acore::unary_function<Unit*, bool>
 {
     bool m_inLiveSide;
     explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) {}
@@ -436,10 +449,10 @@ public:
                     {
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                     }
-                    me->getThreatManager().resetAggro(NotOnSameSide(me));
+                    me->getThreatMgr().resetAggro(NotOnSameSide(me));
                     if (Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0))
                     {
-                        me->getThreatManager().addThreat(pTarget, 100.0f);
+                        me->getThreatMgr().addThreat(pTarget, 100.0f);
                         AttackStart(pTarget);
                     }
                     events.RepeatEvent(20000);
@@ -555,10 +568,11 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!attacker && !IsOnSameSide(attacker))
+            if (!attacker || !IsOnSameSide(attacker))
             {
                 damage = 0;
             }
+
             if (!me->IsInCombat())
             {
                 me->CallForHelp(25.0f);
@@ -677,7 +691,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::UnitAuraCheck(false, SPELL_SHADOW_MARK));
+            targets.remove_if(Acore::UnitAuraCheck(false, SPELL_SHADOW_MARK));
         }
 
         void Register() override

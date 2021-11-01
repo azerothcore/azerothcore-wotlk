@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -15,7 +26,7 @@ EndScriptData */
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "Language.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -23,26 +34,32 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "Transport.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class gobject_commandscript : public CommandScript
 {
 public:
     gobject_commandscript() : CommandScript("gobject_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> gobjectAddCommandTable =
+        static ChatCommandTable gobjectAddCommandTable =
         {
             { "temp",           SEC_GAMEMASTER,        false, &HandleGameObjectAddTempCommand,   "" },
             { "",               SEC_ADMINISTRATOR,     false, &HandleGameObjectAddCommand,       "" }
         };
-        static std::vector<ChatCommand> gobjectSetCommandTable =
+        static ChatCommandTable gobjectSetCommandTable =
         {
             { "phase",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetPhaseCommand,  "" },
             { "state",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetStateCommand,  "" }
         };
-        static std::vector<ChatCommand> gobjectCommandTable =
+        static ChatCommandTable gobjectCommandTable =
         {
-            { "activate",       SEC_ADMINISTRATOR,     false, &HandleGameObjectActivateCommand,  "" },
+            { "activate",       SEC_GAMEMASTER,        false, &HandleGameObjectActivateCommand,  "" },
             { "delete",         SEC_ADMINISTRATOR,     false, &HandleGameObjectDeleteCommand,    "" },
             { "info",           SEC_MODERATOR,         false, &HandleGameObjectInfoCommand,      "" },
             { "move",           SEC_ADMINISTRATOR,     false, &HandleGameObjectMoveCommand,      "" },
@@ -52,7 +69,7 @@ public:
             { "add",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectAddCommandTable },
             { "set",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectSetCommandTable }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "gobject",        SEC_MODERATOR,     false, nullptr,                               "", gobjectCommandTable }
         };
@@ -148,6 +165,7 @@ public:
 
         // fill the gameobject data and save to the db
         object->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), player->GetPhaseMaskForSpawn());
+        guidLow = object->GetSpawnId();
         // delete the old object and do a clean load from DB with a fresh new GameObject instance.
         // this is required to avoid weird behavior and memory leaks
         delete object;
@@ -223,9 +241,9 @@ public:
                 std::string name = id;
                 WorldDatabase.EscapeString(name);
                 result = WorldDatabase.PQuery(
-                             "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
-                             "FROM gameobject, gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " ORDER BY order_ ASC LIMIT 1",
-                             player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), name.c_str());
+                    "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
+                    "FROM gameobject, gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name LIKE '%%%s%%' ORDER BY order_ ASC LIMIT 1",
+                    player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), name.c_str());
             }
         }
         else
@@ -405,7 +423,7 @@ public:
         Map* map = object->GetMap();
 
         object->Relocate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), oz);
-        object->SetWorldRotationAngles(oz, oy, ox);
+        object->SetLocalRotationAngles(oz, oy, ox);
 
         object->SaveToDB(true);
 
@@ -465,7 +483,7 @@ public:
             float y = (float)atof(toY);
             float z = (float)atof(toZ);
 
-            if (!MapManager::IsValidMapCoord(object->GetMapId(), x, y, z))
+            if (!MapMgr::IsValidMapCoord(object->GetMapId(), x, y, z))
             {
                 handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, object->GetMapId());
                 handler->SetSentErrorMessage(true);
@@ -544,7 +562,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_NEAREST);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_NEAREST);
         stmt->setFloat(0, player->GetPositionX());
         stmt->setFloat(1, player->GetPositionY());
         stmt->setFloat(2, player->GetPositionZ());
@@ -554,8 +572,8 @@ public:
         stmt->setFloat(6, player->GetPositionZ());
         stmt->setFloat(7, distance * distance);
         stmt->setUInt32(8, player->GetPhaseMask());
-        PreparedQueryResult result = WorldDatabase.Query(stmt);
 
+        PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
             do

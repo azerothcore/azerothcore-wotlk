@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -19,7 +30,6 @@
 
 enum DruidSpells
 {
-    // Ours
     SPELL_DRUID_GLYPH_OF_WILD_GROWTH        = 62970,
     SPELL_DRUID_NURTURING_INSTINCT_R1       = 47179,
     SPELL_DRUID_NURTURING_INSTINCT_R2       = 47180,
@@ -30,8 +40,6 @@ enum DruidSpells
     SPELL_DRUID_BARKSKIN                    = 22812,
     SPELL_DRUID_GLYPH_OF_BARKSKIN           = 63057,
     SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER   = 63058,
-
-    // Theirs
     SPELL_DRUID_ENRAGE_MOD_DAMAGE           = 51185,
     SPELL_DRUID_GLYPH_OF_TYPHOON            = 62135,
     SPELL_DRUID_IDOL_OF_FERAL_SHADOWS       = 34241,
@@ -47,9 +55,65 @@ enum DruidSpells
     SPELL_DRUID_SAVAGE_ROAR                 = 62071,
     SPELL_DRUID_TIGER_S_FURY_ENERGIZE       = 51178,
     SPELL_DRUID_ITEM_T8_BALANCE_RELIC       = 64950,
+    SPELL_DRUID_BEAR_FORM_PASSIVE           = 1178,
+    SPELL_DRUID_DIRE_BEAR_FORM_PASSIVE      = 9635,
+    SPELL_DRUID_ENRAGE                      = 5229,
+    SPELL_DRUID_ENRAGED_DEFENSE             = 70725,
+    SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS     = 70726,
 };
 
-// Ours
+// 1178 - Bear Form (Passive)
+// 9635 - Dire Bear Form (Passive)
+class spell_dru_bear_form_passive : public SpellScriptLoader
+{
+    public:
+        spell_dru_bear_form_passive() : SpellScriptLoader("spell_dru_bear_form_passive") { }
+
+        class spell_dru_bear_form_passive_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dru_bear_form_passive_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                return ValidateSpellInfo({ SPELL_DRUID_ENRAGE, SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS });
+            }
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+            {
+                if (!GetUnitOwner()->HasAura(SPELL_DRUID_ENRAGE) || GetUnitOwner()->HasAura(SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS))
+                {
+                    return;
+                }
+
+                int32 mod = 0;
+                switch (GetId())
+                {
+                    case SPELL_DRUID_BEAR_FORM_PASSIVE:
+                        mod = -48;
+                        break;
+                    case SPELL_DRUID_DIRE_BEAR_FORM_PASSIVE:
+                        mod = -59;
+                        break;
+                    default:
+                        return;
+                }
+
+                amount += mod;
+            }
+
+            void Register() override
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_bear_form_passive_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_BASE_RESISTANCE_PCT);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_dru_bear_form_passive_AuraScript();
+        }
+};
+
+// 70723 - Item - Druid T10 Balance 4P Bonus
 class spell_dru_t10_balance_4p_bonus : public SpellScriptLoader
 {
 public:
@@ -90,6 +154,7 @@ public:
     }
 };
 
+// -33872 - Nurturing Instinct
 class spell_dru_nurturing_instinct : public SpellScriptLoader
 {
 public:
@@ -124,6 +189,8 @@ public:
     }
 };
 
+/* 5487 - Bear Form
+   9634 - Dire Bear Form */
 class spell_dru_feral_swiftness : public SpellScriptLoader
 {
 public:
@@ -159,6 +226,7 @@ public:
     }
 };
 
+// 16864 - Omen of Clarity
 class spell_dru_omen_of_clarity : public SpellScriptLoader
 {
 public:
@@ -170,7 +238,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return true;
 
@@ -194,6 +262,7 @@ public:
     }
 };
 
+// 50419 - Brambles
 class spell_dru_brambles_treant : public SpellScriptLoader
 {
 public:
@@ -222,7 +291,7 @@ public:
             // xinef: chance of success stores proper amount of damage increase
             // xinef: little hack because GetSpellModOwner will return nullptr pointer at this point (early summoning stage)
             if (GetUnitOwner()->IsSummon())
-                if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
+                if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
                     if (Player* player = owner->GetSpellModOwner())
                         player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
         }
@@ -240,6 +309,7 @@ public:
     }
 };
 
+// 22812 - Barkskin
 class spell_dru_barkskin : public SpellScriptLoader
 {
 public:
@@ -273,6 +343,10 @@ public:
     }
 };
 
+/* 35669 - Serverside - Druid Pet Scaling 01
+   35670 - Serverside - Druid Pet Scaling 02
+   35671 - Serverside - Druid Pet Scaling 03
+   35672 - Serverside - Druid Pet Scaling 04 */
 class spell_dru_treant_scaling : public SpellScriptLoader
 {
 public:
@@ -364,7 +438,6 @@ public:
     }
 };
 
-// Theirs
 // -1850 - Dash
 class spell_dru_dash : public SpellScriptLoader
 {
@@ -400,30 +473,64 @@ class spell_dru_enrage : public SpellScriptLoader
 public:
     spell_dru_enrage() : SpellScriptLoader("spell_dru_enrage") { }
 
-    class spell_dru_enrage_SpellScript : public SpellScript
+    class spell_dru_enrage_AuraScript : public AuraScript
     {
-        PrepareSpellScript(spell_dru_enrage_SpellScript);
+        PrepareAuraScript(spell_dru_enrage_AuraScript);
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return ValidateSpellInfo({ SPELL_DRUID_KING_OF_THE_JUNGLE, SPELL_DRUID_ENRAGE_MOD_DAMAGE });
+            return ValidateSpellInfo({ SPELL_DRUID_KING_OF_THE_JUNGLE, SPELL_DRUID_ENRAGE_MOD_DAMAGE, SPELL_DRUID_ENRAGED_DEFENSE, SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS });
         }
 
-        void OnHit()
+        void RecalculateBaseArmor()
         {
-            if (AuraEffect const* aurEff = GetHitUnit()->GetAuraEffectOfRankedSpell(SPELL_DRUID_KING_OF_THE_JUNGLE, EFFECT_0))
-                GetHitUnit()->CastCustomSpell(SPELL_DRUID_ENRAGE_MOD_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetHitUnit(), true);
+            Unit::AuraEffectList const& auras = GetTarget()->GetAuraEffectsByType(SPELL_AURA_MOD_BASE_RESISTANCE_PCT);
+            for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+            {
+                SpellInfo const* spellInfo = (*i)->GetSpellInfo();
+                // Dire- / Bear Form (Passive)
+                if (spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && spellInfo->SpellFamilyFlags.HasFlag(0x0, 0x0, 0x2))
+                {
+                    (*i)->RecalculateAmount();
+                }
+            }
+        }
+
+        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            if (AuraEffect const* aurEff = target->GetAuraEffectOfRankedSpell(SPELL_DRUID_KING_OF_THE_JUNGLE, EFFECT_0))
+            {
+                target->CastCustomSpell(SPELL_DRUID_ENRAGE_MOD_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), target, true);
+            }
+
+            // Item - Druid T10 Feral 4P Bonus
+            if (target->HasAura(SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS))
+            {
+                target->CastSpell(target, SPELL_DRUID_ENRAGED_DEFENSE, true);
+            }
+
+            RecalculateBaseArmor();
+        }
+
+        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_ENRAGE_MOD_DAMAGE);
+            GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_ENRAGED_DEFENSE);
+
+            RecalculateBaseArmor();
         }
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_dru_enrage_SpellScript::OnHit);
+            AfterEffectApply += AuraEffectApplyFn(spell_dru_enrage_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_dru_enrage_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    SpellScript* GetSpellScript() const override
+    AuraScript* GetAuraScript() const override
     {
-        return new spell_dru_enrage_SpellScript();
+        return new spell_dru_enrage_AuraScript();
     }
 };
 
@@ -477,8 +584,8 @@ public:
     }
 };
 
-// 34246 - Idol of the Emerald Queen
-// 60779 - Idol of Lush Moss
+/* 34246 - Increased Lifebloom Periodic
+   60779 - Idol of Lush Moss */
 class spell_dru_idol_lifebloom : public SpellScriptLoader
 {
 public:
@@ -680,7 +787,7 @@ public:
     }
 };
 
-// 48504 - Living Seed (Proc)
+// 48504 - Living Seed
 class spell_dru_living_seed_proc : public SpellScriptLoader
 {
 public:
@@ -713,7 +820,7 @@ public:
     }
 };
 
-// 69366 - Moonkin Form passive
+// 69366 - Moonkin Form (Passive)
 class spell_dru_moonkin_form_passive : public SpellScriptLoader
 {
 public:
@@ -886,8 +993,8 @@ public:
                 if (AuraEffect const* idol = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_FERAL_SHADOWS, EFFECT_0))
                     amount += cp * idol->GetAmount();
                 // Idol of Worship. Can't be handled as SpellMod due its dependency from CPs
-                else if (AuraEffect const* idol = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_WORSHIP, EFFECT_0))
-                    amount += cp * idol->GetAmount();
+                else if (AuraEffect const* idol2 = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_WORSHIP, EFFECT_0))
+                    amount += cp * idol2->GetAmount();
 
                 amount += int32(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), cp));
             }
@@ -1011,7 +1118,7 @@ public:
     }
 };
 
-// -50294 - Starfall (AOE)
+// -50294 - Starfall
 class spell_dru_starfall_aoe : public SpellScriptLoader
 {
 public:
@@ -1038,7 +1145,7 @@ public:
     }
 };
 
-// -50286 - Starfall (Dummy)
+// -50286 - Starfall
 class spell_dru_starfall_dummy : public SpellScriptLoader
 {
 public:
@@ -1050,7 +1157,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            acore::Containers::RandomResize(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1239,7 +1346,7 @@ public:
     }
 };
 
-// 70691 - Item T10 Restoration 4P Bonus
+// 70691 - Rejuvenation
 class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
 {
 public:
@@ -1276,7 +1383,7 @@ public:
                     return;
                 }
 
-                tempTargets.sort(acore::HealthPctOrderPred());
+                tempTargets.sort(Acore::HealthPctOrderPred());
                 targets.clear();
                 targets.push_back(tempTargets.front());
             }
@@ -1313,13 +1420,13 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RaidCheck(GetCaster(), false));
+            targets.remove_if(Acore::RaidCheck(GetCaster(), false));
 
             uint32 const maxTargets = GetCaster()->HasAura(SPELL_DRUID_GLYPH_OF_WILD_GROWTH) ? 6 : 5;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
 
@@ -1391,7 +1498,7 @@ public:
 
 void AddSC_druid_spell_scripts()
 {
-    // Ours
+    new spell_dru_bear_form_passive();
     new spell_dru_t10_balance_4p_bonus();
     new spell_dru_nurturing_instinct();
     new spell_dru_feral_swiftness();
@@ -1400,8 +1507,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_barkskin();
     new spell_dru_treant_scaling();
     new spell_dru_berserk();
-
-    // Theirs
     new spell_dru_dash();
     new spell_dru_enrage();
     new spell_dru_glyph_of_starfire();

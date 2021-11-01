@@ -2,16 +2,27 @@ from re import compile, MULTILINE
 from os import walk, getcwd
 
 notice = ('''/*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 ''')
 
 if not getcwd().endswith('src'):
     print('Run this from the src directory!')
-    print('(Invoke as \'python ../contrib/enumutils_describe.py\')')
+    print('(Invoke as \'python ../apps/EnumUtils/enumutils_describe.py\')')
     exit(1)
 
 EnumPattern = compile(r'//\s*EnumUtils: DESCRIBE THIS(?:\s*\(in ([^\)]+)\))?\s+enum\s+([0-9A-Za-z]+)[^\n]*\s*{([^}]+)};')
@@ -36,7 +47,7 @@ def processFile(path, filename):
     if input is None:
         print('Failed to open %s.h' % filename)
         return
-        
+
     file = input.read()
 
     enums = []
@@ -46,22 +57,22 @@ def processFile(path, filename):
         values = []
         for value in EnumValuesPattern.finditer(enum.group(3)):
             valueData = value.group(0)
-            
+
             valueNameMatch = EnumValueNamePattern.search(valueData)
             if valueNameMatch is None:
                 if EnumValueSkipLinePattern.search(valueData) is None:
                     print('Name of value not found: %s' % repr(valueData))
                 continue
             valueName = valueNameMatch.group(1)
-                
+
             valueCommentMatch = EnumValueCommentPattern.search(valueData)
             valueComment = None
             if valueCommentMatch:
                 valueComment = valueCommentMatch.group(1)
-            
+
             valueTitle = None
             valueDescription = None
-            
+
             if valueComment is not None:
                 if CommentSkipFormat.match(valueComment) is not None:
                     continue
@@ -71,20 +82,20 @@ def processFile(path, filename):
                     valueDescription = commentMatch.group(6)
                 else:
                     valueDescription = valueComment
-            
+
             if valueTitle is None:
                 valueTitle = valueName
             if valueDescription is None:
                 valueDescription = ''
-            
+
             values.append((valueName, valueTitle, valueDescription))
-                
+
         enums.append((prefix + name, prefix, values))
         print('%s.h: Enum %s parsed with %d values' % (filename, name, len(values)))
-        
+
     if not enums:
         return
-        
+
     print('Done parsing %s.h (in %s)\n' % (filename, path))
     output = open('%s/enuminfo_%s.cpp' % (path, filename), 'w')
     if output is None:
@@ -98,7 +109,7 @@ def processFile(path, filename):
     output.write('#include "SmartEnum.h"\n')
     output.write('#include <stdexcept>\n')
     output.write('\n')
-    output.write('namespace acore::Impl::EnumUtilsImpl\n')
+    output.write('namespace Acore::Impl::EnumUtilsImpl\n')
     output.write('{\n')
     for name, prefix, values in enums:
         tag = ('data for enum \'%s\' in \'%s.h\' auto-generated' % (name, filename))
@@ -107,7 +118,7 @@ def processFile(path, filename):
         output.write('|* ' + tag + ' *|\n')
         output.write('\\*' + ('*'*(len(tag)+2)) + '*/\n')
         output.write('template <>\n')
-        output.write('EnumText EnumUtils<%s>::ToString(%s value)\n' % (name, name))
+        output.write('AC_API_EXPORT EnumText EnumUtils<%s>::ToString(%s value)\n' % (name, name))
         output.write('{\n')
         output.write('    switch (value)\n')
         output.write('    {\n')
@@ -118,10 +129,10 @@ def processFile(path, filename):
         output.write('}\n')
         output.write('\n')
         output.write('template <>\n')
-        output.write('size_t EnumUtils<%s>::Count() { return %d; }\n' % (name, len(values)))
+        output.write('AC_API_EXPORT size_t EnumUtils<%s>::Count() { return %d; }\n' % (name, len(values)))
         output.write('\n')
         output.write('template <>\n')
-        output.write('%s EnumUtils<%s>::FromIndex(size_t index)\n' % (name, name))
+        output.write('AC_API_EXPORT %s EnumUtils<%s>::FromIndex(size_t index)\n' % (name, name))
         output.write('{\n')
         output.write('    switch (index)\n')
         output.write('    {\n')
@@ -132,7 +143,7 @@ def processFile(path, filename):
         output.write('}\n')
         output.write('\n')
         output.write('template <>\n')
-        output.write('size_t EnumUtils<%s>::ToIndex(%s value)\n' % (name, name))
+        output.write('AC_API_EXPORT size_t EnumUtils<%s>::ToIndex(%s value)\n' % (name, name))
         output.write('{\n')
         output.write('    switch (value)\n')
         output.write('    {\n')

@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "SRP6.h"
@@ -9,8 +21,8 @@
 #include <algorithm>
 #include <functional>
 
-using SHA1 = acore::Crypto::SHA1;
-using SRP6 = acore::Crypto::SRP6;
+using SHA1 = Acore::Crypto::SHA1;
+using SRP6 = Acore::Crypto::SRP6;
 
 /*static*/ std::array<uint8, 1> const SRP6::g = { 7 };
 /*static*/ std::array<uint8, 32> const SRP6::N = HexStrToByteArray<32>("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7", true);
@@ -48,13 +60,13 @@ using SRP6 = acore::Crypto::SRP6;
 
     // find position of first nonzero byte
     size_t p = 0;
-    while (p < EPHEMERAL_KEY_LENGTH && !S[p]) ++p;
-    if (p & 1) ++p; // skip one extra byte if p is odd
+    while (p < EPHEMERAL_KEY_LENGTH && !S[p]) { ++p; }
+    if (p & 1) { ++p; } // skip one extra byte if p is odd
     p /= 2; // offset into buffers
 
     // hash each of the halves, starting at the first nonzero byte
-    SHA1::Digest const hash0 = SHA1::GetDigestOf(buf0.data() + p, EPHEMERAL_KEY_LENGTH/2 - p);
-    SHA1::Digest const hash1 = SHA1::GetDigestOf(buf1.data() + p, EPHEMERAL_KEY_LENGTH/2 - p);
+    SHA1::Digest const hash0 = SHA1::GetDigestOf(buf0.data() + p, EPHEMERAL_KEY_LENGTH / 2 - p);
+    SHA1::Digest const hash1 = SHA1::GetDigestOf(buf1.data() + p, EPHEMERAL_KEY_LENGTH / 2 - p);
 
     // stick the two hashes back together
     SessionKey K;
@@ -76,7 +88,9 @@ std::optional<SessionKey> SRP6::VerifyChallengeResponse(EphemeralKey const& A, S
 
     BigNumber const _A(A);
     if ((_A % _N).IsZero())
+    {
         return std::nullopt;
+    }
 
     BigNumber const u(SHA1::GetDigestOf(A, B));
     EphemeralKey const S = (_A * (_v.ModExp(u, _N))).ModExp(_b, N).ToByteArray<32>();
@@ -91,7 +105,11 @@ std::optional<SessionKey> SRP6::VerifyChallengeResponse(EphemeralKey const& A, S
 
     SHA1::Digest const ourM = SHA1::GetDigestOf(NgHash, _I, s, A, B, K);
     if (ourM == clientM)
+    {
         return K;
+    }
     else
+    {
         return std::nullopt;
+    }
 }

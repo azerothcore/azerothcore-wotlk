@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -89,9 +100,14 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
+            {
                 if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
+                {
                     return false;
+                }
+            }
+
             return true;
         }
 
@@ -99,11 +115,21 @@ public:
         {
             PreventDefaultAction();
             int32 targets = 3;
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
+            {
                 if (procSpell->IsAffectingArea())
+                {
                     targets = 1;
+                }
+            }
 
-            eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, eventInfo.GetActionTarget(), false, nullptr, aurEff);
+            if (Unit* target = eventInfo.GetActionTarget())
+            {
+                if (target->IsAlive())
+                {
+                    eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, target, false, nullptr, aurEff);
+                }
+            }
         }
 
         void Register() override
@@ -184,7 +210,7 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             // xinef: skip divine storm self hit (dummy) and righteous vengeance (0x20000000=
-            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
+            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
         }
 
         void Register() override
@@ -221,16 +247,20 @@ public:
                 // Xinef: removed divine guardian because it will affect triggered spell with increased amount
                 // Arena - Dampening
                 if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
+                {
                     AddPct(amount, dampening->GetAmount());
+                }
                 // Battleground - Dampening
-                else if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
-                    AddPct(amount, dampening->GetAmount());
+                else if (AuraEffect const* dampening2 = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
+                {
+                    AddPct(amount, dampening2->GetAmount());
+                }
             }
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo()->GetDamage() > 0;
+            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -240,11 +270,24 @@ public:
             if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS)
             {
                 Unit* caster = eventInfo.GetActor();
-                const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+
+                DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+                if (!damageInfo || !damageInfo->GetDamage())
+                {
+                    return;
+                }
+
+                const SpellInfo* procSpell = damageInfo->GetSpellInfo();
+                if (!procSpell)
+                {
+                    return;
+                }
+
                 if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
                         procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
                 {
-                    int32 basepoints = int32(float(eventInfo.GetDamageInfo()->GetDamage()) / 12.0f);
+                    int32 basepoints = int32(float(damageInfo->GetDamage()) / 12.0f);
                     // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
                     if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
                         AddPct(basepoints, aurEffect->GetAmount());
@@ -652,7 +695,7 @@ public:
 
         void CountTargets(std::list<WorldObject*>& targetList)
         {
-            acore::Containers::RandomResize(targetList, GetSpellValue()->MaxAffectedTargets);
+            Acore::Containers::RandomResize(targetList, GetSpellValue()->MaxAffectedTargets);
             _targetCount = targetList.size();
         }
 
@@ -734,8 +777,16 @@ public:
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
             // return damage % to attacker but < 50% own total health
-            int32 damage = int32(std::min(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()), GetTarget()->GetMaxHealth() / 2));
+            int32 damage = std::min(CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount()), static_cast<int32>(GetTarget()->GetMaxHealth()) / 2);
             GetTarget()->CastCustomSpell(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
@@ -767,7 +818,7 @@ public:
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
         }
@@ -1241,7 +1292,14 @@ public:
             if (!target)
                 return false;
 
-            return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (eventInfo.GetDamageInfo()->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return false;
+            }
+
+            return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (damageInfo->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -1253,8 +1311,10 @@ public:
             holy += eventInfo.GetProcTarget()->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_HOLY);
 
             // Xinef: Libram of Divine Purpose
-            if (AuraEffect* aurEff = GetTarget()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2025, EFFECT_0))
-                holy += aurEff->GetAmount();
+            if (AuraEffect* aurEffPaladin = GetTarget()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2025, EFFECT_0))
+            {
+                holy += aurEffPaladin->GetAmount();
+            }
 
             int32 bp = std::max<int32>(0, int32((ap * 0.022f + 0.044f * holy) * GetTarget()->GetAttackTime(BASE_ATTACK) / 1000));
             GetTarget()->CastCustomSpell(SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);

@@ -69,7 +69,7 @@ function comp_configure() {
   -DSCRIPTS=$CSCRIPTS \
   -DBUILD_TESTING=$CBUILD_TESTING \
   -DTOOLS=$CTOOLS -DUSE_SCRIPTPCH=$CSCRIPTPCH -DUSE_COREPCH=$CCOREPCH -DWITH_COREDEBUG=$CDEBUG  -DCMAKE_BUILD_TYPE=$CTYPE -DWITH_WARNINGS=$CWARNINGS \
-  -DCMAKE_C_COMPILER=$CCOMPILERC -DCMAKE_CXX_COMPILER=$CCOMPILERCXX -DENABLE_EXTRA_LOGS=$CEXTRA_LOGS "-DDISABLED_AC_MODULES=$CDISABLED_AC_MODULES" $CCUSTOMOPTIONS
+  -DCMAKE_C_COMPILER=$CCOMPILERC -DCMAKE_CXX_COMPILER=$CCOMPILERCXX "-DDISABLED_AC_MODULES=$CDISABLED_AC_MODULES" $CCUSTOMOPTIONS
 
   cd $CWD
 
@@ -95,7 +95,7 @@ function comp_compile() {
 
   cd $CWD
 
-  if [ $DOCKER = 1 ]; then
+  if [[ $DOCKER = 1 ]]; then
     echo "Generating confs..."
     cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/etc/worldserver.conf"
     cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/etc/authserver.conf"

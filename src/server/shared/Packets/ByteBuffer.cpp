@@ -1,12 +1,23 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ByteBuffer.h"
 #include "Errors.h"
 #include "MessageBuffer.h"
-#include "Common.h"
 #include "Log.h"
 #include "Util.h"
 #include <utf8.h>
@@ -40,7 +51,7 @@ ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size, si
 
 ByteBufferInvalidValueException::ByteBufferInvalidValueException(char const* type, char const* value)
 {
-    message().assign(acore::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
+    message().assign(Acore::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
 }
 
 ByteBuffer& ByteBuffer::operator>>(float& value)
@@ -141,7 +152,7 @@ void ByteBuffer::put(size_t pos, uint8 const* src, size_t cnt)
 
 void ByteBuffer::print_storage() const
 {
-    if (!sLog->ShouldLog("network", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
+    if (!sLog->ShouldLog("network.opcode.buffer", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
         return;
 
     std::ostringstream o;
@@ -152,12 +163,12 @@ void ByteBuffer::print_storage() const
 
     o << " ";
 
-    LOG_TRACE("network", "%s", o.str().c_str());
+    LOG_TRACE("network.opcode.buffer", "%s", o.str().c_str());
 }
 
 void ByteBuffer::textlike() const
 {
-    if (!sLog->ShouldLog("network", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
+    if (!sLog->ShouldLog("network.opcode.buffer", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
         return;
 
     std::ostringstream o;
@@ -172,12 +183,12 @@ void ByteBuffer::textlike() const
 
     o << " ";
 
-    LOG_TRACE("network", "%s", o.str().c_str());
+    LOG_TRACE("network.opcode.buffer", "%s", o.str().c_str());
 }
 
 void ByteBuffer::hexlike() const
 {
-    if (!sLog->ShouldLog("network", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
+    if (!sLog->ShouldLog("network.opcode.buffer", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
         return;
 
     uint32 j = 1, k = 1;
@@ -207,5 +218,5 @@ void ByteBuffer::hexlike() const
 
     o << " ";
 
-    LOG_TRACE("network", "%s", o.str().c_str());
+    LOG_TRACE("network.opcode.buffer", "%s", o.str().c_str());
 }

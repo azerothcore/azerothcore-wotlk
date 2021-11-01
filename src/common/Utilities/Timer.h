@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_TIMER_H
@@ -30,9 +41,13 @@ inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
 {
     // getMSTime() have limited data range and this is case when it overflow in this tick
     if (oldMSTime > newMSTime)
+    {
         return (0xFFFFFFFF - oldMSTime) + newMSTime;
+    }
     else
+    {
         return newMSTime - oldMSTime;
+    }
 }
 
 inline uint32 getMSTimeDiff(uint32 oldMSTime, TimePoint newTime)
@@ -60,7 +75,9 @@ public:
     {
         _current += diff;
         if (_current < 0)
+        {
             _current = 0;
+        }
     }
 
     bool Passed()
@@ -71,7 +88,9 @@ public:
     void Reset()
     {
         if (_current >= _interval)
+        {
             _current %= _interval;
+        }
     }
 
     void SetCurrent(time_t current)
@@ -174,7 +193,9 @@ public:
     bool Update(const uint32 diff)
     {
         if ((i_expireTime -= diff) > 0)
+        {
             return false;
+        }
 
         i_expireTime += i_period > int32(diff) ? i_period : diff;
         return true;

@@ -11,7 +11,7 @@
 #include "Optional.h"
 #include <string>
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     struct AC_COMMON_API Argon2
     {
