@@ -314,7 +314,7 @@ public:
             SetDespawnAtEnd(false);
             ResetEvent();
 
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetReactState(REACT_PASSIVE);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
@@ -341,7 +341,7 @@ public:
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             {
-                                me->setFaction(i->GetSource()->getFaction());
+                                me->SetFaction(i->GetSource()->GetFaction());
                                 break;
                             }
 
@@ -356,13 +356,13 @@ public:
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
                     break;
                 case ACTION_START_SJONNIR_FIGHT:
-                    me->setFaction(35);
-                    me->MonsterYell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL, 0);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    me->Yell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL);
                     me->PlayDirectSound(14274);
                     SetEscortPaused(false);
                     break;
                 case ACTION_SJONNIR_DEAD:
-                    me->MonsterYell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL, 0);
+                    me->Yell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL);
                     me->PlayDirectSound(14278);
                     events.ScheduleEvent(EVENT_END, 14000);
                     break;
@@ -538,7 +538,7 @@ public:
                             pInstance->SetData(BRANN_BRONZEBEARD, 6);
 
                         me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                        me->MonsterYell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL, 0);
+                        me->Yell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL);
                         me->PlayDirectSound(14279);
                         break;
                     }
@@ -568,7 +568,7 @@ public:
 
                     if (cs)
                     {
-                        cs->MonsterYell(Conversation[SpeechCount].text, LANG_UNIVERSAL, 0);
+                        cs->Yell(Conversation[SpeechCount].text, LANG_UNIVERSAL);
                         cs->PlayDirectSound(Conversation[SpeechCount].sound);
                     }
 

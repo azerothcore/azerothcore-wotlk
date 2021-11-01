@@ -162,7 +162,7 @@ public:
             caster->CastSpell(target, 52605, true);
             char buff[100];
             sprintf(buff, "%s plants the Flag of Ownership in the corpse of %s.", caster->GetName().c_str(), target->GetName().c_str());
-            caster->MonsterTextEmote(buff, caster);
+            caster->TextEmote(buff, caster);
             haveTarget = true;
         }
 
@@ -414,7 +414,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -773,7 +773,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -927,7 +927,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->IsTargetingArea();
+            return !eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea();
         }
 
         void Register() override
@@ -1694,7 +1694,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            if (eventInfo.GetSpellInfo())
                 return false;
 
             // find Mage Armor
@@ -2145,8 +2145,10 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            if (eventInfo.GetSpellInfo())
+            {
                 return false;
+            }
 
             if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
                 return false;
@@ -2260,7 +2262,7 @@ public:
         {
             Player* player = GetCaster()->ToPlayer();
             if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-                Pet::LoadPetFromDB(player, PET_LOAD_SUMMON_PET, 0, player->GetLastPetNumber(), true);
+                Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
         }
 
         void Register() override
@@ -5409,62 +5411,6 @@ public:
     }
 };
 
-// 58984 - Shadowmeld
-class spell_gen_shadowmeld : public SpellScriptLoader
-{
-public:
-    spell_gen_shadowmeld() : SpellScriptLoader("spell_gen_shadowmeld") {}
-
-    class spell_gen_shadowmeld_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_gen_shadowmeld_SpellScript);
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL); // break Auto Shot and autohit
-            caster->InterruptSpell(CURRENT_CHANNELED_SPELL); // break channeled spells
-
-            bool instant_exit = true;
-            if (Player* pCaster = caster->ToPlayer()) // if is a creature instant exits combat, else check if someone in party is in combat in visibility distance
-            {
-                ObjectGuid myGUID = pCaster->GetGUID();
-                float visibilityRange = pCaster->GetMap()->GetVisibilityRange();
-                if (Group* pGroup = pCaster->GetGroup())
-                {
-                    const Group::MemberSlotList membersList = pGroup->GetMemberSlots();
-                    for (Group::member_citerator itr = membersList.begin(); itr != membersList.end() && instant_exit; ++itr)
-                        if (itr->guid != myGUID)
-                            if (Player* GroupMember = ObjectAccessor::GetPlayer(*pCaster, itr->guid))
-                                if (GroupMember->IsInCombat() && pCaster->GetMap() == GroupMember->GetMap() && pCaster->IsWithinDistInMap(GroupMember, visibilityRange))
-                                    instant_exit = false;
-                }
-
-                pCaster->SendAttackSwingCancelAttack();
-            }
-
-            if (instant_exit)
-            {
-                caster->getHostileRefMgr().deleteReferences();
-            }
-            caster->CombatStop();
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_gen_shadowmeld_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_gen_shadowmeld_SpellScript();
-    }
-};
-
 // 7102 Contagion of Rot
 class spell_contagion_of_rot : public SpellScriptLoader
 {
@@ -5501,8 +5447,42 @@ public:
     }
 };
 
+// 29519 - Silithyst
+class spell_silithyst : public SpellScriptLoader
+{
+public:
+    spell_silithyst() : SpellScriptLoader("spell_silithyst") {}
+
+    class spell_silithyst_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_silithyst_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetCaster()->SetPvP(true);
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetCaster()->SummonGameObject(181597, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10 * IN_MILLISECONDS * MINUTE);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_silithyst_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_silithyst_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_silithyst_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
+    new spell_silithyst();
     new spell_gen_5000_gold();
     new spell_gen_model_visible();
     new spell_the_flag_of_ownership();
@@ -5629,6 +5609,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_eject_all_passengers();
     new spell_gen_eject_passenger();
     new spell_gen_charmed_unit_spell_cooldown();
-    new spell_gen_shadowmeld();
     new spell_contagion_of_rot();
 }

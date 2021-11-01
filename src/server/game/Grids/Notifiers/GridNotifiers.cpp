@@ -150,18 +150,19 @@ void VisibleChangesNotifier::Visit(DynamicObjectMapType& m)
 inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
 {
     if (!u->IsAlive() || !c->IsAlive() || c == u || u->IsInFlight())
+    {
         return;
+    }
 
-    if (c->HasReactState(REACT_AGGRESSIVE) && !c->HasUnitState(UNIT_STATE_SIGHTLESS))
+    if (!c->HasUnitState(UNIT_STATE_SIGHTLESS))
     {
         if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
         {
             c->AI()->MoveInLineOfSight_Safe(u);
         }
-        else
+        else if (u->GetTypeId() == TYPEID_PLAYER && u->HasStealthAura() && c->IsAIEnabled && c->CanSeeOrDetect(u, false, true, true))
         {
-            if (u->GetTypeId() == TYPEID_PLAYER && u->HasStealthAura() && c->IsAIEnabled && c->CanSeeOrDetect(u, false, true, true))
-                c->AI()->TriggerAlert(u);
+            c->AI()->TriggerAlert(u);
         }
     }
 }

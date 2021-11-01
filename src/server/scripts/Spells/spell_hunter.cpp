@@ -26,6 +26,7 @@
 #include "GridNotifiers.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
+#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
@@ -64,7 +65,9 @@ enum HunterSpells
     SPELL_HUNTER_VICIOUS_VIPER                      = 61609,
     SPELL_HUNTER_VIPER_ATTACK_SPEED                 = 60144,
     SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
-    SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389
+    SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389,
+    SPELL_LOCK_AND_LOAD_TRIGGER                     = 56453,
+    SPELL_LOCK_AND_LOAD_MARKER                      = 67544
 };
 
 // Ours
@@ -441,7 +444,7 @@ public:
 
         bool CheckProc(ProcEventInfo& procInfo)
         {
-            SpellInfo const* spellInfo = procInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = procInfo.GetSpellInfo();
             // Xinef: cannot proc from volley damage
             if (spellInfo && (spellInfo->SpellFamilyFlags[0] & 0x2000) && spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
                 return false;
@@ -783,25 +786,27 @@ public:
             Player* caster = GetCaster()->ToPlayer();
             // immediately finishes the cooldown on your other Hunter abilities except Bestial Wrath
 
-            PlayerSpellMap const& spellMap = caster->GetSpellMap();
-            for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
-            {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
-                        spellInfo->Id != SPELL_HUNTER_READINESS &&
-                        spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH &&
-                        spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU &&
-                        spellInfo->GetRecoveryTime() > 0)
-                {
-                    SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-                    if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-                        caster->RemoveSpellCooldown(spellInfo->Id, true);
-                    else
-                        caster->RemoveSpellCooldown(spellInfo->Id, false);
-                }
+            // force removal of the disarm cooldown
+            caster->RemoveSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID);
 
-                // force removal of the disarm cooldown
-                caster->RemoveSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID, false);
+            SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
+
+            SpellCooldowns::iterator itr, next;
+            for (itr = cooldowns.begin(); itr != cooldowns.end(); itr = next)
+            {
+                next = itr;
+                ++next;
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                if (spellInfo
+                && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
+                && spellInfo->Id != SPELL_HUNTER_READINESS
+                && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
+                && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU
+                && spellInfo->GetRecoveryTime() > 0)
+                {
+                    caster->RemoveSpellCooldown(spellInfo->Id, itr->second.needSendToClient);
+                }
             }
         }
 
@@ -1367,6 +1372,130 @@ public:
     }
 };
 
+enum LocknLoadSpells
+{
+    SPELL_FROST_TRAP_SLOW = 67035
+};
+
+// -56342 - Lock and Load
+class spell_hun_lock_and_load : public SpellScriptLoader
+{
+    public:
+        spell_hun_lock_and_load() : SpellScriptLoader("spell_hun_lock_and_load") { }
+
+        class spell_hun_lock_and_load_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hun_lock_and_load_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER, SPELL_FROST_TRAP_SLOW });
+            }
+
+            bool CheckTrapProc(ProcEventInfo& eventInfo)
+            {
+                SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+                if (!spellInfo)
+                {
+                    return false;
+                }
+
+                // Black Arrow and Fire traps may trigger on periodic tick only.
+                if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                    && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE))
+                {
+                    return true;
+                }
+
+                return IsTargetValid(spellInfo, eventInfo.GetProcTarget()) && !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
+            }
+
+            bool IsTargetValid(SpellInfo const* spellInfo, Unit* target)
+            {
+                if (!spellInfo || !target)
+                {
+                    return false;
+                }
+
+                // Don't check it for fire traps and black arrow, they proc on periodic only and not spell hit.
+                // So it's wrong to check for immunity, it was already checked when the spell was applied.
+                if ((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                {
+                    return false;
+                }
+
+                // HitMask for Frost Trap can't be checked correctly as it is.
+                // That's because the talent is triggered by the spell that fires the trap (63487)...
+                // ...and not the actual spell that applies the slow effect (67035).
+                // So the IMMUNE result is never sent by the spell that triggers this.
+                if (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+                {
+                    if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
+                    {
+                        return !target->IsImmunedToSpell(triggerSpell);
+                    }
+                }
+
+                return true;
+            }
+
+            template <uint32 mask>
+            void HandleProcs(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+
+                SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+
+                if (!(eventInfo.GetTypeMask() & mask) || !spellInfo)
+                {
+                    return;
+                }
+
+                // Also check if the proc from the fire traps and black arrow actually comes from the periodic ticks here.
+                // Normally this wouldn't be required, but we are circumventing the current proc system limitations.
+                if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                    && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
+                    && !(mask & PROC_FLAG_DONE_PERIODIC))
+                {
+                    return;
+                }
+
+                if (!roll_chance_i(aurEff->GetAmount()))
+                {
+                    return;
+                }
+
+                Unit* caster = eventInfo.GetActor();
+                caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_TRIGGER, true);
+            }
+
+            void ApplyMarker(ProcEventInfo& eventInfo)
+            {
+                if (IsTargetValid(eventInfo.GetSpellInfo(), eventInfo.GetProcTarget()))
+                {
+                    Unit* caster = eventInfo.GetActor();
+                    caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
+                }
+            }
+
+            void Register() override
+            {
+                DoCheckProc += AuraCheckProcFn(spell_hun_lock_and_load_AuraScript::CheckTrapProc);
+
+                OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load_AuraScript::HandleProcs<PROC_FLAG_DONE_TRAP_ACTIVATION>, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+                OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load_AuraScript::HandleProcs<PROC_FLAG_DONE_PERIODIC>, EFFECT_1, SPELL_AURA_DUMMY);
+
+                AfterProc += AuraProcFn(spell_hun_lock_and_load_AuraScript::ApplyMarker);
+            }
+
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_hun_lock_and_load_AuraScript();
+        }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     // Ours
@@ -1397,4 +1526,5 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_tame_beast();
     new spell_hun_viper_attack_speed();
     new spell_hun_volley_trigger();
+    new spell_hun_lock_and_load();
 }
