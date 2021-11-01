@@ -72,7 +72,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
         {
-            creature->AI()->SetData(player->getFaction(), 0);
+            creature->AI()->SetData(player->GetFaction(), 0);
             creature->AI()->SetGUID(player->GetGUID());
         }
 
@@ -160,7 +160,7 @@ public:
             summons.Summon(creature);
             if (creature->GetEntry() == NPC_INJURED_PEASANT || creature->GetEntry() == NPC_PLAGUED_PEASANT)
             {
-                creature->setFaction(_faction);
+                creature->SetFaction(_faction);
                 if (!_spoken)
                 {
                     _spoken = true;

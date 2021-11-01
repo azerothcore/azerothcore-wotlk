@@ -1054,7 +1054,7 @@ public:
                         float o = me->GetAngle(tirion);
                         tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * sin(o), me->GetPositionZ(), false);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                        tirion->setFaction(35);
+                        tirion->SetFaction(FACTION_FRIENDLY);
                     }
                     break;
                 case EVENT_OUTRO_SCENE_48:

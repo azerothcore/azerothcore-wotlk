@@ -243,12 +243,12 @@ public:
             if (instance->GetData(DATA_MINI_BOSSES) != 6)
             {
                 me->SetVisible(false);
-                me->setFaction(35);
+                me->SetFaction(35);
             }
             else
             {
                 me->SetVisible(true);
-                me->setFaction(21);
+                me->SetFaction(21);
             }
             OpenAllGates();
             summons.DespawnAll();
