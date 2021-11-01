@@ -5104,7 +5104,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     //Need to call it to initialize m_team (m_team can be calculated from race)
     //Other way is to saves m_team into characters table.
-    setFactionForRace(getRace(true));
+    SetFactionForRace(getRace(true));
 
     // pussywizard: create empty instance bind containers if necessary
     sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(playerGuid);
