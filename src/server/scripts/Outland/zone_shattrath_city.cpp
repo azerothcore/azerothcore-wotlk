@@ -47,8 +47,7 @@ EndContentData */
 enum Raliq
 {
     SPELL_UPPERCUT          = 10966,
-    QUEST_CRACK_SKULLS      = 10009,
-    FACTION_HOSTILE_RD      = 45
+    QUEST_CRACK_SKULLS      = 10009
 };
 
 class npc_raliq_the_drunk : public CreatureScript
@@ -62,7 +61,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            creature->setFaction(FACTION_HOSTILE_RD);
+            creature->SetFaction(FACTION_OGRE);
             creature->AI()->AttackStart(player);
         }
         return true;
@@ -86,7 +85,7 @@ public:
     {
         npc_raliq_the_drunkAI(Creature* creature) : ScriptedAI(creature)
         {
-            m_uiNormFaction = creature->getFaction();
+            m_uiNormFaction = creature->GetFaction();
         }
 
         uint32 m_uiNormFaction;
@@ -121,10 +120,6 @@ public:
 
 enum Salsalabim
 {
-    // Factions
-    FACTION_HOSTILE_SA             = 90,
-    FACTION_FRIENDLY_SA            = 35,
-
     // Quests
     QUEST_10004                    = 10004,
 
@@ -141,7 +136,7 @@ public:
     {
         if (player->GetQuestStatus(QUEST_10004) == QUEST_STATUS_INCOMPLETE)
         {
-            creature->setFaction(FACTION_HOSTILE_SA);
+            creature->SetFaction(FACTION_DEMON);
             creature->AI()->AttackStart(player);
         }
         else
