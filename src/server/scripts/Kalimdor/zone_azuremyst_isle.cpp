@@ -228,8 +228,7 @@ enum Magwin
     EVENT_STAND                 = 3,
     EVENT_TALK_END              = 4,
     EVENT_COWLEN_TALK           = 5,
-    QUEST_A_CRY_FOR_HELP        = 9528,
-    FACTION_QUEST               = 113
+    QUEST_A_CRY_FOR_HELP        = 9528
 };
 
 class npc_magwin : public CreatureScript
@@ -297,7 +296,7 @@ public:
                         {
                             Talk(SAY_START, player);
                         }
-                        me->setFaction(FACTION_QUEST);
+                        me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                         _events.ScheduleEvent(EVENT_START_ESCORT, 1000);
                         break;
                     case EVENT_START_ESCORT:
