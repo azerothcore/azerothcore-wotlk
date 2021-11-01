@@ -804,19 +804,19 @@ public:
                 {
                     case SPELL_GREAT_FEAST:
                         if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                            player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                         break;
                     case SPELL_FISH_FEAST:
                         if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                            player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                         break;
                     case SPELL_SMALL_FEAST:
                         if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                            player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                         break;
                     case SPELL_GIGANTIC_FEAST:
                         if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                            player->MonsterTextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player, false);
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                         break;
                 }
             }
@@ -1310,8 +1310,10 @@ public:
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if ((eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
+            if (!eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo() || (eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
+            {
                 return;
+            }
 
             const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
             int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
@@ -1465,7 +1467,7 @@ public:
                     continue;
 
                 summon->SetOwnerGUID(GetCaster()->GetGUID());
-                summon->setFaction(GetCaster()->getFaction());
+                summon->SetFaction(GetCaster()->GetFaction());
                 summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->GetMotionMaster()->MoveFollow(GetCaster(), PET_FOLLOW_DIST, GetCaster()->GetAngle(summon), MOTION_SLOT_CONTROLLED);
@@ -1867,7 +1869,13 @@ public:
         {
             PreventDefaultAction();
 
-            int32 absorb = int32(CalculatePct(eventInfo.GetHealInfo()->GetHeal(), 15.0f));
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (!healInfo)
+            {
+                return;
+            }
+
+            int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 15.0f));
             // xinef: all heals contribute to one bubble
             if (AuraEffect* protEff = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PROTECTION_OF_ANCIENT_KINGS, 0/*, eventInfo.GetActor()->GetGUID()*/))
             {
@@ -4395,6 +4403,119 @@ public:
     }
 };
 
+enum LinkenBoomerang
+{
+    SPELL_DISARM  = 15752,
+    SPELL_STUN    = 15753,
+    CHANCE_TO_HIT = 3
+};
+
+class spell_item_linken_boomerang : public SpellScriptLoader
+{
+public:
+    spell_item_linken_boomerang() : SpellScriptLoader("spell_item_linken_boomerang") {}
+
+    class spell_item_linken_boomerang_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_linken_boomerang_SpellScript)
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({SPELL_DISARM, SPELL_STUN});
+        }
+
+        void OnEffectHitTargetDisarm(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+        }
+
+        void OnEffectHitTargetStun(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+        }
+
+        void OnEffectLaunchTargetDisarm(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+
+            if (roll_chance_i(CHANCE_TO_HIT)) // 3% from wiki
+            {
+                GetCaster()->CastSpell(GetHitUnit(), SPELL_DISARM, true);
+            }
+        }
+
+        void OnEffectLaunchTargetStun(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+
+            if (roll_chance_i(CHANCE_TO_HIT)) // 3% from wiki
+            {
+                GetCaster()->CastSpell(GetHitUnit(), SPELL_STUN, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_item_linken_boomerang_SpellScript::OnEffectLaunchTargetDisarm, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
+            OnEffectLaunchTarget += SpellEffectFn(spell_item_linken_boomerang_SpellScript::OnEffectLaunchTargetStun, EFFECT_2, SPELL_EFFECT_TRIGGER_SPELL);
+
+            OnEffectHitTarget += SpellEffectFn(spell_item_linken_boomerang_SpellScript::OnEffectHitTargetDisarm, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
+            OnEffectHitTarget += SpellEffectFn(spell_item_linken_boomerang_SpellScript::OnEffectHitTargetStun, EFFECT_2, SPELL_EFFECT_TRIGGER_SPELL);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_linken_boomerang_SpellScript();
+    }
+};
+
+enum RecallSpellIds
+{
+    SPELL_RECALL_HORDE = 22563,
+    SPELL_RECALL_ALLIANCE = 22564
+};
+
+class spell_item_recall : public SpellScriptLoader
+{
+public:
+    spell_item_recall() : SpellScriptLoader("spell_item_recall") { }
+
+    class spell_item_recall_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_recall_SpellScript);
+
+        void SetDest(SpellDestination& dest)
+        {
+            Player* player = GetCaster()->ToPlayer();
+            if (!player)
+            {
+                return;
+            }
+
+            TeamId bgTeam = player->GetBgTeamId();
+            if (player->GetTeamId(true) != bgTeam)
+            {
+                if (SpellTargetPosition const* recallSpellTarget = sSpellMgr->GetSpellTargetPosition(bgTeam == TEAM_HORDE ? SPELL_RECALL_HORDE : SPELL_RECALL_ALLIANCE, EFFECT_0))
+                {
+                    Position pos = Position(recallSpellTarget->target_X, recallSpellTarget->target_Y, recallSpellTarget->target_Z, recallSpellTarget->target_Orientation);
+                    dest.Relocate(pos);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_item_recall_SpellScript::SetDest, EFFECT_0, TARGET_DEST_DB);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_recall_SpellScript();
+    };
+};
+
 void AddSC_item_spell_scripts()
 {
     // Ours
@@ -4504,4 +4625,6 @@ void AddSC_item_spell_scripts()
     new spell_item_greatmothers_soulcatcher();
     new spell_item_eggnog();
     new spell_item_goblin_bomb();
+    new spell_item_linken_boomerang();
+    new spell_item_recall();
 }

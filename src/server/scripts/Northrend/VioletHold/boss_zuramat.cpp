@@ -116,7 +116,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
                     {
                         me->CastSpell(target, SPELL_VOID_SHIFT, false);
-                        me->MonsterWhisper("Gaze... into the void.", target->ToPlayer(), false);
+                        me->Whisper("Gaze... into the void.", LANG_UNIVERSAL, target->ToPlayer());
                     }
                     events.RepeatEvent(urand(18000, 22000));
                     break;

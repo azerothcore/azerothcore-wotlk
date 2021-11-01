@@ -195,7 +195,7 @@ public:
                     break;
                 ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
                 if (!i)
-                    (*itr)->MonsterYell(TEXT_EE_AGGRO, LANG_UNIVERSAL, 0);
+                    (*itr)->Yell(TEXT_EE_AGGRO, LANG_UNIVERSAL);
                 ++i;
             }
             if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
@@ -360,7 +360,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -454,7 +454,7 @@ public:
                     }
                     break;
                 case EVENT_WARN_DEEP_BREATH:
-                    me->MonsterTextEmote(TEXT_DEEP_BREATH, 0, true);
+                    me->TextEmote(TEXT_DEEP_BREATH, nullptr, true);
                     me->RemoveAura(62794);
                     events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
                     break;
@@ -527,7 +527,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -758,7 +758,7 @@ public:
                             if( GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
                             {
                                 me->RemoveGameObject(wh, false);
-                                me->MonsterTextEmote(TEXT_TURRET_READY, 0, true);
+                                me->TextEmote(TEXT_TURRET_READY, nullptr, true);
                             }
                         }
                     }

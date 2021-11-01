@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -186,7 +186,7 @@ public:
                     y = 1380.0f + rand() % 60;
                     if (Unit* trigger = me->SummonTrigger(x, y, z, 0, 2000))
                     {
-                        trigger->setFaction(35);
+                        trigger->SetFaction(FACTION_FRIENDLY);
                         trigger->SetMaxHealth(100000);
                         trigger->SetHealth(100000);
                         trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -281,7 +281,7 @@ public:
                                 Cloud->SetDisableGravity(true);
                                 Cloud->StopMoving();
                                 Cloud->SetObjectScale(1.0f);
-                                Cloud->setFaction(35);
+                                Cloud->SetFaction(FACTION_FRIENDLY);
                                 Cloud->SetMaxHealth(9999999);
                                 Cloud->SetHealth(9999999);
                                 Cloud->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
