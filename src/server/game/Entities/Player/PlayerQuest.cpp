@@ -1689,10 +1689,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
                     // If quest is normal type
                     else
                     {
-                        if (isLowLevel)
-                            result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
-                        else
-                            result2 = DIALOG_STATUS_AVAILABLE;
+                        result2 = isLowLevel ? DIALOG_STATUS_LOW_LEVEL_AVAILABLE : DIALOG_STATUS_AVAILABLE;
                     }
                 }
                 else
