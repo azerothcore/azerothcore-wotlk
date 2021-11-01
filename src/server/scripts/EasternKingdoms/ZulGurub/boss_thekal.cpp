@@ -174,7 +174,7 @@ public:
                                 if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
                                 {
                                     pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pLorKhan->setFaction(14);
+                                    pLorKhan->SetFaction(FACTION_MONSTER);
                                     pLorKhan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                     pLorKhan->SetFullHealth();
                                     instance->SetData(DATA_LORKHAN, DONE);
@@ -187,7 +187,7 @@ public:
                                 if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
                                 {
                                     pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pZath->setFaction(14);
+                                    pZath->SetFaction(FACTION_MONSTER);
                                     pZath->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                     pZath->SetFullHealth();
                                     instance->SetBossState(DATA_ZATH, DONE);
@@ -361,7 +361,7 @@ public:
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->setFaction(14);
+                        pThekal->SetFaction(FACTION_MONSTER);
                         pThekal->SetFullHealth();
                     }
                 }
@@ -373,7 +373,7 @@ public:
                     {
                         pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pZath->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pZath->setFaction(14);
+                        pZath->SetFaction(FACTION_MONSTER);
                         pZath->SetFullHealth();
                     }
                 }
@@ -389,7 +389,7 @@ public:
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->AttackStop();
 
                 instance->SetBossState(DATA_LORKHAN, SPECIAL);
@@ -514,7 +514,7 @@ public:
                     {
                         pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pLorKhan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pLorKhan->setFaction(14);
+                        pLorKhan->SetFaction(FACTION_MONSTER);
                         pLorKhan->SetFullHealth();
                     }
                 }
@@ -526,7 +526,7 @@ public:
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->setFaction(14);
+                        pThekal->SetFaction(FACTION_MONSTER);
                         pThekal->SetFullHealth();
                     }
                 }
@@ -542,7 +542,7 @@ public:
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->AttackStop();
 
                 instance->SetBossState(DATA_ZATH, SPECIAL);
