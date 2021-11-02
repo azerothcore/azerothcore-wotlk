@@ -390,7 +390,7 @@ public:
 
                         if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
                         {
-                            pSpawn->setFaction(me->getFaction());
+                            pSpawn->SetFaction(me->GetFaction());
                             pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
                         }
                         break;
@@ -419,7 +419,7 @@ public:
                     DoStartNoMovement(target);
                     ElementalOne->SetInCombatWithZone();
                     ElementalOne->CombatStart(target);
-                    ElementalOne->setFaction(me->getFaction());
+                    ElementalOne->SetFaction(me->GetFaction());
                     ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
@@ -433,7 +433,7 @@ public:
                     DoStartNoMovement(target);
                     ElementalTwo->SetInCombatWithZone();
                     ElementalTwo->CombatStart(target);
-                    ElementalTwo->setFaction(me->getFaction());
+                    ElementalTwo->SetFaction(me->GetFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
@@ -447,7 +447,7 @@ public:
                     DoStartNoMovement(target);
                     ElementalThree->SetInCombatWithZone();
                     ElementalThree->CombatStart(target);
-                    ElementalThree->setFaction(me->getFaction());
+                    ElementalThree->SetFaction(me->GetFaction());
                     ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
@@ -461,7 +461,7 @@ public:
                     DoStartNoMovement(target);
                     ElementalFour->SetInCombatWithZone();
                     ElementalFour->CombatStart(target);
-                    ElementalFour->setFaction(me->getFaction());
+                    ElementalFour->SetFaction(me->GetFaction());
                     ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
@@ -476,7 +476,7 @@ public:
                     if (Creature* unit = me->SummonCreature(CREATURE_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                     {
                         unit->Attack(me->GetVictim(), true);
-                        unit->setFaction(me->getFaction());
+                        unit->SetFaction(me->GetFaction());
                     }
                 }
 
