@@ -15,6 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedGossip.h"
+#include "ScriptedCreature.h"
+
 /*######
 ## NPC 9836: Maredis Firestar
 ######*/
