@@ -69,7 +69,6 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
     for (QuestRelations::const_iterator i = objectQIR.first; i != objectQIR.second; ++i)
     {
         uint32 quest_id = i->second;
-        Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
         QuestStatus status = GetQuestStatus(quest_id);
 
         if (status == QUEST_STATUS_COMPLETE)
