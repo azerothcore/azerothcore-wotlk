@@ -157,6 +157,60 @@ enum ReputationRank
     REP_EXALTED     = 7
 };
 
+enum FactionTemplates
+{
+    FACTION_NONE                        = 0,
+    FACTION_CREATURE                    = 7,
+    FACTION_ESCORTEE_A_NEUTRAL_PASSIVE  = 10,
+    FACTION_MONSTER                     = 14,
+    FACTION_MONSTER_2                   = 16,
+    FACTION_BOOTY_BAY                   = 21,
+    FACTION_TROLL_BLOODSCALP            = 28,
+    FACTION_PREY                        = 31,
+    FACTION_ESCORTEE_H_NEUTRAL_PASSIVE  = 33,
+    FACTION_FRIENDLY                    = 35,
+    FACTION_TROLL_FROSTMANE             = 37,
+    FACTION_OGRE                        = 45,
+    FACTION_ORC_DRAGONMAW               = 62,
+    FACTION_HORDE_GENERIC               = 83,
+    FACTION_ALLIANCE_GENERIC            = 84,
+    FACTION_BLACKFATHOM                 = 88,
+    FACTION_DEMON                       = 90,
+    FACTION_ELEMENTAL                   = 91,
+    FACTION_DRAGONFLIGHT_BLACK          = 103,
+    FACTION_ESCORTEE_N_NEUTRAL_PASSIVE  = 113,
+    FACTION_STORMWIND                   = 123,
+    FACTION_ENEMY                       = 168,
+    FACTION_ESCORTEE_A_NEUTRAL_ACTIVE   = 231,
+    FACTION_ESCORTEE_H_NEUTRAL_ACTIVE   = 232,
+    FACTION_ESCORTEE_N_NEUTRAL_ACTIVE   = 250,
+    FACTION_ESCORTEE_N_FRIEND_PASSIVE   = 290,
+    FACTION_TITAN                       = 415,
+    FACTION_ESCORTEE_N_FRIEND_ACTIVE    = 495,
+    FACTION_RATCHET                     = 637,
+    FACTION_GOBLIN_DARK_IRON_BAR_PATRON = 736,
+    FACTION_DARK_IRON_DWARVES           = 754,
+    FACTION_ESCORTEE_A_PASSIVE          = 774,
+    FACTION_ESCORTEE_H_PASSIVE          = 775,
+    FACTION_UNDEAD_SCOURGE              = 974,
+    FACTION_DRAGONKIN                   = 1720,
+    FACTION_EARTHEN_RING                = 1726,
+    FACTION_ALLIANCE_GENERIC_WG         = 1732,
+    FACTION_HORDE_GENERIC_WG            = 1735,
+    FACTION_ARAKKOA                     = 1738,
+    FACTION_ASHTONGUE_DEATHSWORN        = 1820,
+    FACTION_FLAYER_HUNTER               = 1840,
+    FACTION_MONSTER_SPAR_BUDDY          = 1868,
+    FACTION_VALIANCE_EXPEDITION_7       = 1974,
+    FACTION_ESCORTEE_N_ACTIVE           = 1986,
+    FACTION_UNDEAD_SCOURGE_9            = 1988,
+    FACTION_ESCORTEE_H_ACTIVE           = 2046,
+    FACTION_UNDEAD_SCOURGE_2            = 2068,
+    FACTION_UNDEAD_SCOURGE_3            = 2084,
+    FACTION_SCARLET_CRUSADE             = 2089,
+    FACTION_SCARLET_CRUSADE_2           = 2096
+};
+
 #define MIN_REPUTATION_RANK (REP_HATED)
 #define MAX_REPUTATION_RANK 8
 
@@ -573,7 +627,7 @@ enum SpellAttr7
     SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Spell cannot be parried 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
     SPELL_ATTR7_NO_ATTACK_MISS                                = 0x02000000, // TITLE Spell cannot be missed 25@Attr7
     SPELL_ATTR7_TREAT_AS_NPC_AOE                              = 0x04000000, // TITLE Unknown attribute 26@Attr7
-    SPELL_ATTR7_BYPASS_NO_RESSURECTION_AURA                   = 0x08000000, // TITLE Unknown attribute 27@Attr7
+    SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA                   = 0x08000000, // TITLE Bypasses the prevent resurrection aura
     SPELL_ATTR7_DO_NOT_COUNT_FOR_PVP_SCOREBOARD               = 0x10000000, // TITLE Consolidate in raid buff frame (client only)
     SPELL_ATTR7_REFLECTION_ONLY_DEFENDS                       = 0x20000000, // TITLE Unknown attribute 29@Attr7 DESCRIPTION only 69028, 71237
     SPELL_ATTR7_CAN_PROC_FROM_SUPPRESSED_TARGET_PROCS         = 0x40000000, // TITLE Unknown attribute 30@Attr7 DESCRIPTION Burning Determination, Divine Sacrifice, Earth Shield, Prayer of Mending
@@ -3595,6 +3649,19 @@ enum ServerProcessTypes
     SERVER_PROCESS_WORLDSERVER = 1,
 
     NUM_SERVER_PROCESS_TYPES
+};
+
+// Login Failure Reasons
+enum class LoginFailureReason : uint8
+{
+    Failed             = 0,
+    NoWorld            = 1,
+    DuplicateCharacter = 2,
+    NoInstances        = 3,
+    Disabled           = 4,
+    NoCharacter        = 5,
+    LockedForTransfer  = 6,
+    LockedByBilling    = 7
 };
 
 namespace Acore::Impl

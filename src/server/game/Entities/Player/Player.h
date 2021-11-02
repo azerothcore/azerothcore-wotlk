@@ -2048,7 +2048,7 @@ public:
 
     static TeamId TeamIdForRace(uint8 race);
     [[nodiscard]] TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };
-    void setFactionForRace(uint8 race);
+    void SetFactionForRace(uint8 race);
     void setTeamId(TeamId teamid) { m_team = teamid; };
 
     void InitDisplayIds();
@@ -2510,6 +2510,7 @@ public:
     void ClearWhisperWhiteList() { WhisperList.clear(); }
     void AddWhisperWhiteList(ObjectGuid guid) { WhisperList.push_back(guid); }
     bool IsInWhisperWhiteList(ObjectGuid guid);
+    void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
     bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;

@@ -314,7 +314,7 @@ public:
             SetDespawnAtEnd(false);
             ResetEvent();
 
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetReactState(REACT_PASSIVE);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
@@ -341,7 +341,7 @@ public:
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             {
-                                me->setFaction(i->GetSource()->getFaction());
+                                me->SetFaction(i->GetSource()->GetFaction());
                                 break;
                             }
 
@@ -356,7 +356,7 @@ public:
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
                     break;
                 case ACTION_START_SJONNIR_FIGHT:
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->Yell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL);
                     me->PlayDirectSound(14274);
                     SetEscortPaused(false);

@@ -2502,7 +2502,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                             if (properties->Category == SUMMON_CATEGORY_ALLY)
                             {
                                 summon->SetOwnerGUID(m_originalCaster->GetGUID());
-                                summon->setFaction(m_originalCaster->getFaction());
+                                summon->SetFaction(m_originalCaster->GetFaction());
                             }
 
                             ExecuteLogEffectSummonObject(effIndex, summon);
@@ -2552,9 +2552,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             // xinef: i think this is wrong, found only 2 vehicles with faction override and one of them should inherit caster faction...
             //uint32 faction = properties->Faction;
             //if (!faction)
-            uint32 faction = m_originalCaster->getFaction();
+            uint32 faction = m_originalCaster->GetFaction();
 
-            summon->setFaction(faction);
+            summon->SetFaction(faction);
             break;
     }
 
@@ -3787,28 +3787,11 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             if (Battleground* bg = player->GetBattleground())
                 bg->SetDroppedFlagGUID(pGameObj->GetGUID(), player->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
 
-    if (uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
+    if (GameObject* linkedTrap = pGameObj->GetLinkedTrap())
     {
-        GameObject* linkedGO = sObjectMgr->IsGameObjectStaticTransport(linkedEntry) ? new StaticTransport() : new GameObject();
-        if (linkedGO->Create(map->GenerateLowGuid<HighGuid::GameObject>(), linkedEntry, map, m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-        {
-            linkedGO->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
-            linkedGO->SetSpellId(m_spellInfo->Id);
-
-            // xinef: this is wrong
-            //ExecuteLogEffectSummonObject(effIndex, linkedGO);
-
-            pGameObj->SetLinkedTrap(linkedGO);
-
-            // Wild object not have owner and check clickable by players
-            map->AddToMap(linkedGO, true);
-        }
-        else
-        {
-            delete linkedGO;
-            linkedGO = nullptr;
-            return;
-        }
+        linkedTrap->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS :0);
+        linkedTrap->SetSpellId(m_spellInfo->Id);
+        ExecuteLogEffectSummonObject(effIndex, linkedTrap);
     }
 }
 
@@ -4404,7 +4387,7 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
         return;
     }
 
-    pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->getFaction());
+    pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->GetFaction());
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel() + 1);
     int32 duration = m_spellInfo->GetDuration();
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
@@ -5685,27 +5668,13 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     cMap->AddToMap(pGameObj, true);
 
-    if (uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
+    if (GameObject* linkedTrap = pGameObj->GetLinkedTrap())
     {
-        GameObject* linkedGO = sObjectMgr->IsGameObjectStaticTransport(linkedEntry) ? new StaticTransport() : new GameObject();
-        if (linkedGO->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), linkedEntry, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
-        {
-            linkedGO->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
-            linkedGO->SetSpellId(m_spellInfo->Id);
+        linkedTrap->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
+        linkedTrap->SetSpellId(m_spellInfo->Id);
+        linkedTrap->SetOwnerGUID(m_caster->GetGUID());
 
-            // xinef: this is wrong
-            //linkedGO->SetOwnerGUID(m_caster->GetGUID());
-            //ExecuteLogEffectSummonObject(effIndex, linkedGO);
-            pGameObj->SetLinkedTrap(linkedGO);
-
-            cMap->AddToMap(linkedGO, true);
-        }
-        else
-        {
-            delete linkedGO;
-            linkedGO = nullptr;
-            return;
-        }
+        ExecuteLogEffectSummonObject(effIndex, linkedTrap);
     }
 }
 
@@ -6262,7 +6231,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         }
 
         if (properties && properties->Category == SUMMON_CATEGORY_ALLY)
-            summon->setFaction(caster->getFaction());
+            summon->SetFaction(caster->GetFaction());
 
         ExecuteLogEffectSummonObject(i, summon);
     }
