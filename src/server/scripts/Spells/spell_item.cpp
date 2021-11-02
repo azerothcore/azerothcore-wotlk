@@ -1286,9 +1286,11 @@ public:
                 return;
             }
 
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64442 /*SPELL_BLADE_WARDING*/);
-            int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+            if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64442 /*SPELL_BLADE_WARDING*/))
+            {
+                int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
+                eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+            }
         }
 
         void Register() override
@@ -1320,10 +1322,12 @@ public:
                 return;
             }
 
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
-            int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-            eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
+            if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/))
+            {
+                int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
+                eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
+                eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
+            }
         }
 
         void Register() override
@@ -1873,6 +1877,11 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
+
+            if (!eventInfo.GetHealInfo())
+            {
+                return;
+            }
 
             int32 absorb = int32(CalculatePct(eventInfo.GetHealInfo()->GetHeal(), 15.0f));
             // xinef: all heals contribute to one bubble
@@ -2886,7 +2895,8 @@ public:
                 return false;*/
 
             if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
-                if (!eventInfo.GetDamageInfo()->GetDamage())
+            {
+                if (eventInfo.GetDamageInfo() && !eventInfo.GetDamageInfo()->GetDamage())
                 {
                     if (procSpell->SpellFamilyName == SPELLFAMILY_WARRIOR)
                     {
@@ -2901,6 +2911,7 @@ public:
                     else
                         return false;
                 }
+            }
 
             return eventInfo.GetProcTarget() && eventInfo.GetActor() != eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->IsAlive();
         }
@@ -3915,6 +3926,12 @@ public:
         void HandleDummy(SpellEffIndex /* effIndex */)
         {
             Player* caster = GetCaster()->ToPlayer();
+
+            if (!caster)
+            {
+                return;
+            }
+
             if (caster->HasAuraType(SPELL_AURA_MOUNTED))
             {
                 caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
@@ -4204,6 +4221,11 @@ public:
         void HandleDummy(SpellEffIndex /* effIndex */)
         {
             Player* caster = GetCaster()->ToPlayer();
+            if (!caster)
+            {
+                return;
+            }
+
             if (Unit* target = GetHitUnit())
             {
                 if (!target->HasAura(SPELL_CHICKEN_NET) && (caster->GetQuestStatus(QUEST_CHICKEN_PARTY) == QUEST_STATUS_INCOMPLETE || caster->GetQuestStatus(QUEST_FLOWN_THE_COOP) == QUEST_STATUS_INCOMPLETE))
