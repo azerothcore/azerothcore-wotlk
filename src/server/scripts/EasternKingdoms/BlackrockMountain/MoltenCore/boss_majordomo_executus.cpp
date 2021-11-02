@@ -171,7 +171,7 @@ public:
                 events.SetPhase(PHASE_NONE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                me->setFaction(FACTION_MAJORDOMO_FRIENDLY);
+                me->SetFaction(FACTION_MAJORDOMO_FRIENDLY);
             }
         }
 
