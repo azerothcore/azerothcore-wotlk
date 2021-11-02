@@ -43,11 +43,9 @@ class npc_maredis_firestar : public CreatureScript
 public:
     npc_maredis_firestar() : CreatureScript("npc_maredis_firestar") {}
 
-    struct npc_maredis_firestarAI : public NullCreatureAI
+    struct npc_maredis_firestarAI : public CreatureAI
     {
-        npc_maredis_firestarAI(Creature* creature) : NullCreatureAI(creature) {}
-
-        void Reset() override {}
+        npc_maredis_firestarAI(Creature* creature) : CreatureAI(creature) {}
 
         void sGossipHello(Player* player) override
         {
@@ -87,11 +85,6 @@ public:
             player->SendPreparedQuest(me->GetGUID());
         }
     };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_maredis_firestarAI (creature);
-    }
 };
 
 void AddSC_burning_steppes()
