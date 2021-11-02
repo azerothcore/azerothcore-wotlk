@@ -7484,7 +7484,7 @@ void Player::SendQuestGiverStatusMultiple()
     GetSession()->SendPacket(&data);
 }
 
-    /*  If in a battleground a player dies, and an enemy removes the insignia, the player's bones is lootable
+/*  If in a battleground a player dies, and an enemy removes the insignia, the player's bones is lootable
     Called by remove insignia spell effect    */
 void Player::RemovedInsignia(Player* looterPlr)
 {
