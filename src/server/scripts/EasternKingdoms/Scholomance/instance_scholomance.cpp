@@ -129,7 +129,7 @@ public:
                             // summon kirtonos and close door
                             if (_kirtonosState == NOT_STARTED)
                             {
-                                instance->SummonCreature(10506, KirtonosSpawn);
+                                instance->SummonCreature(NPC_KIRTONOS, KirtonosSpawn);
                                 if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
                                 {
                                     gate->SetGoState(GO_STATE_READY);
