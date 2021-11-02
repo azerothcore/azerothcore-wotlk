@@ -396,7 +396,7 @@ public:
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                     if (player->IsWithinDistInMap(me, 80))
                         return;
-            me->setFaction(974);
+            me->SetFaction(FACTION_UNDEAD_SCOURGE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             ScriptedAI::EnterEvadeMode();
         }
@@ -407,7 +407,7 @@ public:
             summons.DespawnAll();
             playerGUID.Clear();
             lichGUID.Clear();
-            me->setFaction(974);
+            me->SetFaction(FACTION_UNDEAD_SCOURGE);
             me->SetVisible(false);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -473,7 +473,7 @@ public:
                 me->RemoveAllAuras();
                 me->CombatStop();
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 events.Reset();
                 events.ScheduleEvent(EVENT_BETRAYAL_4, 1000);
             }
@@ -579,7 +579,7 @@ public:
                     break;
             }
 
-            if (me->getFaction() == 35 || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
+            if (me->GetFaction() == FACTION_FRIENDLY || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                 return;
 
             if (!UpdateVictim())
@@ -726,7 +726,7 @@ public:
 
         void Reset() override
         {
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             DoCast(me, SPELL_KNEEL, true); // Little Hack for kneel - Thanks Illy :P
         }
 
@@ -737,7 +737,7 @@ public:
                 me->RemoveAurasDueToSpell(SPELL_LEFT_CHAIN);
                 me->RemoveAurasDueToSpell(SPELL_RIGHT_CHAIN);
                 me->RemoveAurasDueToSpell(SPELL_KNEEL);
-                me->setFaction(me->GetCreatureTemplate()->faction);
+                me->SetFaction(me->GetCreatureTemplate()->faction);
                 DoCast(me, SPELL_UNSHACKLED, true);
                 Talk(SAY_RAGECLAW);
                 me->GetMotionMaster()->MoveRandom(10);
