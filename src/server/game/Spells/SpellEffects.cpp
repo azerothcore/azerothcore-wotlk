@@ -5118,17 +5118,8 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
         else
         {
-            Position pos;
-            unitTarget->GetContactPoint(m_caster, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            // assume that target is not in water - else should be always in los
-            if (!m_caster->IsWithinLOS(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()))
-            {
-                float angle = m_caster->GetRelativeAngle(&pos);
-                float dist = m_caster->GetDistance(pos);
-                m_caster->GetFirstCollisionPosition(pos, dist, angle);
-            }
-
-            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT, SPEED_CHARGE, EVENT_CHARGE,
+            Position pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetCombatReach(), unitTarget->GetRelativeAngle(m_caster));
+            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ, SPEED_CHARGE, EVENT_CHARGE,
                 nullptr, false, 0.f, targetGUID);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
