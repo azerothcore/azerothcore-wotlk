@@ -73,7 +73,7 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
         QuestStatus status = GetQuestStatus(quest_id);
 
         if (status == QUEST_STATUS_COMPLETE)
-            qm.AddMenuItem(quest_id, 4);      
+            qm.AddMenuItem(quest_id, 4);
         else if (status == QUEST_STATUS_INCOMPLETE)
             qm.AddMenuItem(quest_id, 4);
         //else if (status == QUEST_STATUS_AVAILABLE)
@@ -1617,14 +1617,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             }
             else
             {
-                if (quest->IsRepeatable())
-                {
-                    result2 = DIALOG_STATUS_REWARD_REP;
-                }
-                else
-                {
-                    result2 = DIALOG_STATUS_REWARD;
-                }
+                result2 = quest->IsRepeatable() ? DIALOG_STATUS_REWARD_REP : DIALOG_STATUS_REWARD;
             }
         }
         // If quest is auto complete by flag and player can take
@@ -1668,10 +1661,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
                     {
                         if (quest->IsRepeatable())
                         {
-                            if (isLowLevel)
-                                result2 = DIALOG_STATUS_LOW_LEVEL_REWARD_REP;
-                            else
-                                result2 = DIALOG_STATUS_REWARD_REP;
+                            result2 = isLowLevel ? DIALOG_STATUS_LOW_LEVEL_REWARD_REP : DIALOG_STATUS_REWARD_REP;
                         }
                         else
                         {
