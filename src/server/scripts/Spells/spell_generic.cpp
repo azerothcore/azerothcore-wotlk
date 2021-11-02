@@ -4610,7 +4610,7 @@ public:
             Unit* caster = eventInfo.GetActionTarget();
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
 
-            if (!caster || !spellInfo)
+            if (!caster)
             {
                 return;
             }
