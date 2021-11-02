@@ -78,7 +78,7 @@ public:
             }
         }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 /*action*/) override
+        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             // All gossip menus only have one option. Conditions are handled in db.
             player->PrepareQuestMenu(me->GetGUID());
