@@ -4221,10 +4221,6 @@ public:
         void HandleDummy(SpellEffIndex /* effIndex */)
         {
             Player* caster = GetCaster()->ToPlayer();
-            if (!caster)
-            {
-                return;
-            }
 
             if (Unit* target = GetHitUnit())
             {
