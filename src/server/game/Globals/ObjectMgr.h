@@ -1156,6 +1156,8 @@ public:
             return &itr->second;
         return nullptr;
     }
+    
+    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
