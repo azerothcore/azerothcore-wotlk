@@ -665,16 +665,22 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
-    if (PlayerLoading() || GetPlayer() != nullptr)
-    {
-        LOG_ERROR("network", "Player tries to login again, AccountId = %d", GetAccountId());
-        KickPlayer("WorldSession::HandlePlayerLoginOpcode Another client logging in");
-        return;
-    }
-
     m_playerLoading = true;
     ObjectGuid playerGuid;
     recvData >> playerGuid;
+
+    if (PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
+    {
+        // limit player interaction with the world
+        if (!sWorld->getBoolConfig(CONFIG_REALM_LOGIN_ENABLED))
+        {
+            WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
+            // see LoginFailureReason enum for more reasons
+            data << uint8(LoginFailureReason::NoWorld);
+            SendPacket(&data);
+            return;
+        }
+    }
 
     if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
     {
@@ -991,7 +997,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
         SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077 });
 
-        switch (pCurrChar->getFaction())
+        switch (pCurrChar->GetFaction())
         {
             case ALLIANCE:
                 SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946 });
