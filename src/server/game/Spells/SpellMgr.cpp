@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlefieldMgr.h"
@@ -2845,6 +2856,11 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_MOD_STUN:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
                     break;
+                case SPELL_AURA_BIND_SIGHT:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                    break;
+                default:
+                    break;
             }
 
             switch (spellInfo->Effects[j].Effect)
@@ -3185,7 +3201,6 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
-            case 13877: // Blade Flurry (Rogue Spell) should ignore armor and share damage to 2nd mob
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
@@ -3257,6 +3272,12 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 6197: // Eagle Eye
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                break;
+            case 50315: // Disco Ball
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                break;
+            case 14183: // Premeditation
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
                 break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
@@ -3434,16 +3455,6 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     ApplySpellFix({
-        45257,  // Using Steam Tonk Controller
-        45440,  // Steam Tonk Controller
-        60256,  // Collect Sample
-        45634   // Neural Needle
-        }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;    // Crashes client on pressing ESC
-    });
-
-    ApplySpellFix({
         40244,  // Simon Game Visual
         40245,  // Simon Game Visual
         40246,  // Simon Game Visual
@@ -3476,6 +3487,18 @@ void SpellMgr::LoadDbcDataCorrections()
         42818,  // Headless Horseman - Wisp Flight Port
         42821   // Headless Horseman - Wisp Flight Missile
         }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 6; // 100 yards
+    });
+
+    // Spirit of Kirith
+    ApplySpellFix({ 10853 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 3; // 1min
+    });
+
+    // Headless Horseman - Start Fire
+    ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
     {
         spellInfo->RangeIndex = 6; // 100 yards
     });
@@ -4503,13 +4526,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
     });
 
-    // Sunder Armor
-    ApplySpellFix({ 58567 }, [](SpellEntry* spellInfo)
-    {
-        // trigger, remove spellfamilyflags because of glyph of sunder armor
-        spellInfo->SpellFamilyFlags = flag96(0x0, 0x0, 0x0);
-    });
-
     // Sunder Armor - Old Ranks
     ApplySpellFix({ 7405, 8380, 11596, 11597, 25225, 47467 }, [](SpellEntry* spellInfo)
     {
@@ -4608,8 +4624,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx &= ~SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
     });
 
+    ApplySpellFix({ 49376 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_3_YARDS; // 3yd
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
     // Feral Charge - Cat
-    ApplySpellFix({ 49376, 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
@@ -6755,7 +6777,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
         spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Still At It
@@ -7001,12 +7022,6 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 47424 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
-    });
-
-    // Leading the Charge (13380), All Infra-Green bomber quests
-    ApplySpellFix({ 59059 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Dark Horizon (12664), Reunited (12663)
@@ -7357,6 +7372,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 5; // 40yd
     });
 
+    // 29519 - Silithyst
+    ApplySpellFix({ 29519 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_DECREASE_SPEED;
+        spellInfo->EffectBasePoints[EFFECT_0] = -25;
+    });
+
     // Ulduar: Kologarn Focused Eyebeam Summon Trigger
     ApplySpellFix({ 63342 }, [](SpellEntry* spellInfo)
     {
@@ -7368,6 +7390,18 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 23595 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectBasePoints[EFFECT_0] = 1;
+    });
+
+    // Eye of Kilrogg Passive
+    ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+    });
+
+    // Conflagration, Horseman's Cleave
+    ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
@@ -7430,6 +7464,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 if (spellInfo->SpellIconID == 2721 && spellInfo->SpellFamilyFlags[0] & 0x2)
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
                 break;
+        }
+
+        // Recklessness/Shield Wall/Retaliation
+        if (spellInfo->Category == 132 && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
+        {
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
         }
     }
 

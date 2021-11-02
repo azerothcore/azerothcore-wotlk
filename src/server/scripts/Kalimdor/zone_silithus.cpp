@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -26,131 +37,12 @@ EndContentData */
 #include "Spell.h"
 #include "SpellInfo.h"
 
-/*###
-## npcs_rutgar_and_frankal
-###*/
-
-//gossip item text best guess
-#define GOSSIP_ITEM1 "I seek information about Natalia"
-
-#define GOSSIP_ITEM2 "That sounds dangerous!"
-#define GOSSIP_ITEM3 "What did you do?"
-#define GOSSIP_ITEM4 "Who?"
-#define GOSSIP_ITEM5 "Women do that. What did she demand?"
-#define GOSSIP_ITEM6 "What do you mean?"
-#define GOSSIP_ITEM7 "What happened next?"
-
-#define GOSSIP_ITEM11 "Yes, please continue"
-#define GOSSIP_ITEM12 "What language?"
-#define GOSSIP_ITEM13 "The Priestess attacked you?!"
-#define GOSSIP_ITEM14 "I should ask the monkey about this"
-#define GOSSIP_ITEM15 "Then what..."
-
-enum RutgarAndFrankal //trigger creatures to kill
-{
-    TRIGGER_FRANKAL     = 15221,
-    TRIGGER_RUTGAR      = 15222
-};
-
-class npcs_rutgar_and_frankal : public CreatureScript
-{
-public:
-    npcs_rutgar_and_frankal() : CreatureScript("npcs_rutgar_and_frankal") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 7755, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 7756, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 7757, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, 7758, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                SendGossipMenuFor(player, 7759, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 5:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, 7760, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 6:
-                SendGossipMenuFor(player, 7761, creature->GetGUID());
-                //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_RUTGAR);
-                break;
-
-            case GOSSIP_ACTION_INFO_DEF + 9:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM11, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, 7762, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 10:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM12, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, 7763, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 11:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM13, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-                SendGossipMenuFor(player, 7764, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 12:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM14, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-                SendGossipMenuFor(player, 7765, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 13:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM15, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
-                SendGossipMenuFor(player, 7766, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 14:
-                SendGossipMenuFor(player, 7767, creature->GetGUID());
-                //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_FRANKAL);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(8304) == QUEST_STATUS_INCOMPLETE &&
-                creature->GetEntry() == 15170 &&
-                !player->GetReqKillOrCastCurrentCount(8304, TRIGGER_RUTGAR))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        if (player->GetQuestStatus(8304) == QUEST_STATUS_INCOMPLETE &&
-                creature->GetEntry() == 15171 &&
-                player->GetReqKillOrCastCurrentCount(8304, TRIGGER_RUTGAR))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-
-        SendGossipMenuFor(player, 7754, creature->GetGUID());
-
-        return true;
-    }
-};
-
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
 ####*/
 enum EternalBoard
 {
     QUEST_A_PAWN_ON_THE_ETERNAL_BOARD   = 8519,
-
-    FACTION_HOSTILE                     = 14,
-    FACTION_FRIENDLY                    = 35,
 
     C_ANACHRONOS                        = 15381,
     C_FANDRAL_STAGHELM                  = 15382,
@@ -1024,7 +916,7 @@ public:
                     Merithra->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Merithra->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15420);
-                    Merithra->setFaction(35);
+                    Merithra->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Caelestrasz)
@@ -1032,7 +924,7 @@ public:
                     Caelestrasz->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Caelestrasz->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15419);
-                    Caelestrasz->setFaction(35);
+                    Caelestrasz->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Arygos)
@@ -1040,7 +932,7 @@ public:
                     Arygos->SetUInt32Value(UNIT_NPC_FLAGS, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                     Arygos->SetUInt32Value(UNIT_FIELD_DISPLAYID, 15418);
-                    Arygos->setFaction(35);
+                    Arygos->SetFaction(FACTION_FRIENDLY);
                 }
 
                 if (Anachronos)
@@ -1442,6 +1334,5 @@ void AddSC_silithus()
     new npc_anachronos_quest_trigger();
     new npc_anachronos_the_ancient();
     new npc_qiraj_war_spawn();
-    new npcs_rutgar_and_frankal();
     new go_wind_stone();
 }

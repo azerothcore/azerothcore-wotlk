@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Common.h"
@@ -161,19 +172,47 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     if (!pSrcItem)
         return;                                             // only at cheat
 
-    uint16 dest;
-    InventoryResult msg = _player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
-    if (msg != EQUIP_ERR_OK)
+    ItemTemplate const* pProto = pSrcItem->GetTemplate();
+    if (!pProto)
     {
-        _player->SendEquipError(msg, pSrcItem, nullptr);
+        return;
+    }
+
+    uint8 eslot = _player->FindEquipSlot(pProto, NULL_SLOT, !pSrcItem->IsBag());
+    if (eslot == NULL_SLOT)
+    {
         return;
     }
 
     uint16 src = pSrcItem->GetPos();
-    if (dest == src)                                           // prevent equip in same slot, only at cheat
+    uint16 dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
+    if (dest == src) // prevent equip in same slot, only at cheat
+    {
         return;
+    }
 
     Item* pDstItem = _player->GetItemByPos(dest);
+
+    // Remove item enchantments for now and restore it later
+    // Needed for swap sanity checks
+    if (pDstItem)
+    {
+        _player->ApplyEnchantment(pDstItem, false);
+    }
+
+    InventoryResult msg = _player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
+    if (msg != EQUIP_ERR_OK)
+    {
+        // Restore enchantments
+        if (pDstItem)
+        {
+            _player->ApplyEnchantment(pDstItem, true);
+        }
+
+        _player->SendEquipError(msg, pSrcItem, nullptr);
+        return;
+    }
+
     if (!pDstItem)                                         // empty slot, simple case
     {
         _player->RemoveItem(srcbag, srcslot, true);
@@ -182,6 +221,9 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     }
     else                                                    // have currently equipped item, not simple case
     {
+        // Restore enchantments
+        _player->ApplyEnchantment(pDstItem, true);
+
         uint8 dstbag = pDstItem->GetBagSlot();
         uint8 dstslot = pDstItem->GetSlot();
 

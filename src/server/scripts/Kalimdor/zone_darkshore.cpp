@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -155,17 +166,17 @@ public:
 
 enum Kerlonian
 {
-    SAY_KER_START = 0,
-    EMOTE_KER_SLEEP = 1,
-    SAY_KER_SLEEP = 2,
-    SAY_KER_ALERT_1 = 3,
-    SAY_KER_END = 4,
-    EMOTE_KER_AWAKEN = 5,
+    SAY_KER_START               = 0,
+    EMOTE_KER_SLEEP             = 1,
+    SAY_KER_SLEEP               = 2,
+    SAY_KER_ALERT_1             = 3,
+    SAY_KER_END                 = 4,
+    EMOTE_KER_AWAKEN            = 5,
 
-    SPELL_SLEEP_VISUAL = 25148,
-    SPELL_AWAKEN = 17536,
-    QUEST_SLEEPER_AWAKENED = 5321,
-    NPC_LILADRIS = 11219                    //attackers entries unknown
+    SPELL_SLEEP_VISUAL          = 25148,
+    SPELL_AWAKEN                = 17536,
+    QUEST_SLEEPER_AWAKENED      = 5321,
+    NPC_LILADRIS                = 11219                    //attackers entries unknown
 };
 
 /// @todo make concept similar as "ringo" -escort. Find a way to run the scripted attacks, _if_ player are choosing road.
@@ -268,7 +279,7 @@ public:
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
                 creature->AI()->Talk(SAY_KER_START, player);
-                pKerlonianAI->StartFollow(player, FACTION_KER_ESCORTEE, quest);
+                pKerlonianAI->StartFollow(player, FACTION_ESCORTEE_N_NEUTRAL_PASSIVE, quest);
             }
         }
 
@@ -287,24 +298,24 @@ public:
 
 enum Remtravel
 {
-    SAY_REM_START = 0,
-    SAY_REM_AGGRO = 1,
-    SAY_REM_RAMP1_1 = 2,
-    SAY_REM_RAMP1_2 = 3,
-    SAY_REM_BOOK = 4,
-    SAY_REM_TENT1_1 = 5,
-    SAY_REM_TENT1_2 = 6,
-    SAY_REM_MOSS = 7,
-    EMOTE_REM_MOSS = 8,
-    SAY_REM_MOSS_PROGRESS = 9,
-    SAY_REM_PROGRESS = 10,
-    SAY_REM_REMEMBER = 11,
-    EMOTE_REM_END = 12,
+    SAY_REM_START               = 0,
+    SAY_REM_AGGRO               = 1,
+    SAY_REM_RAMP1_1             = 2,
+    SAY_REM_RAMP1_2             = 3,
+    SAY_REM_BOOK                = 4,
+    SAY_REM_TENT1_1             = 5,
+    SAY_REM_TENT1_2             = 6,
+    SAY_REM_MOSS                = 7,
+    EMOTE_REM_MOSS              = 8,
+    SAY_REM_MOSS_PROGRESS       = 9,
+    SAY_REM_PROGRESS            = 10,
+    SAY_REM_REMEMBER            = 11,
+    EMOTE_REM_END               = 12,
 
-    QUEST_ABSENT_MINDED_PT2 = 731,
-    NPC_GRAVEL_SCOUT = 2158,
-    NPC_GRAVEL_BONE = 2159,
-    NPC_GRAVEL_GEO = 2160
+    QUEST_ABSENT_MINDED_PT2     = 731,
+    NPC_GRAVEL_SCOUT            = 2158,
+    NPC_GRAVEL_BONE             = 2159,
+    NPC_GRAVEL_GEO              = 2160
 };
 
 class npc_prospector_remtravel : public CreatureScript
@@ -399,7 +410,7 @@ public:
             if (npc_escortAI* pEscortAI = CAST_AI(npc_prospector_remtravel::npc_prospector_remtravelAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID());
 
-            creature->setFaction(FACTION_ESCORTEE);
+            creature->SetFaction(FACTION_ESCORTEE_A_NEUTRAL_PASSIVE);
         }
 
         return true;

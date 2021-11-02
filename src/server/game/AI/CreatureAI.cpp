@@ -1,8 +1,19 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Creature.h"
 #include "CreatureAI.h"
@@ -138,7 +149,7 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
                 !me->IsWithinDist(who, ATTACK_DISTANCE, true, false))                      // if in combat and in dist - neutral to all can actually assist other creatures
             return;
 
-    if (me->CanStartAttack(who))
+    if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
         AttackStart(who);
 }
 
@@ -185,38 +196,9 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
-    // @todo: Turn into a flags_extra in creature_template
     // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
-    static constexpr std::array<uint32, 24> bosses = {
-        /* dungeons */
-        28684, /* Krik'thir the Gatewatcher */
-        36502, /* Devourer of Souls */
-        36658, /* Scourgelord Tyrannus */
-        /* raids */
-        32871, /* Algalon */
-        39863, /* Halion */
-        33186, /* Razorscale */
-        36626, /* Festergut */
-        32867, /* Steelbreaker - Assembly of Iron */
-        32927, /* Runemaster Molgeim - Assembly of Iron */
-        32857, /* Stormcaller Brundir - Assembly of Iron */
-        33350, /* Mimiron */
-        16060, /* Gothik the Harvester */
-        36678, /* Professor Putricide */
-        15990, /* Kel'Thuzad */
-        33993, /* Emalon the Storm Watcher */
-        17257, /* Magtheridon */
-        25315, /* Kil'jaeden */
-        15928, /* Thaddius */
-        32930, /* Kologarn */
-        32906, /* Freya */
-        36597, /* The Lich King */
-        36853, /* Sindragosa */
-        36855, /* Lady Deathwhisper */
-        37955  /* Blood-Queen Lana'thel */
-    };
-
-    if (std::find(std::begin(bosses), std::end(bosses), me->GetEntry()) != std::end(bosses))
+    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(me->GetEntry());
+    if (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET))
     {
         me->DespawnOnEvade();
         me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
