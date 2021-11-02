@@ -134,6 +134,8 @@ typedef std::multimap<uint32 /*entry*/, DoorInfo> DoorInfoMap;
 typedef std::pair<DoorInfoMap::const_iterator, DoorInfoMap::const_iterator> DoorInfoMapBounds;
 
 typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
+typedef std::map<uint32 /*type*/, ObjectGuid /*guid*/> ObjectGuidMap;
+typedef std::map<uint32 /*entry*/, uint32 /*type*/> ObjectInfoMap;
 
 class InstanceScript : public ZoneScript
 {
@@ -163,6 +165,20 @@ public:
     //Used by the map's CanEnter function.
     //This is to prevent players from entering during boss encounters.
     virtual bool IsEncounterInProgress() const;
+
+    // Called when a creature/gameobject is added to map or removed from map.
+    // Insert/Remove objectguid to dynamic guid store
+    void OnCreatureCreate(Creature* creature) override;
+    void OnCreatureRemove(Creature* creature) override;
+
+    void OnGameObjectCreate(GameObject* go) override;
+    void OnGameObjectRemove(GameObject* go) override;
+
+    ObjectGuid GetObjectGuid(uint32 type) const;
+    ObjectGuid GetGuidData(uint32 type) const override;
+
+    Creature* GetCreature(uint32 type);
+    GameObject* GetGameObject(uint32 type);
 
     //Called when a player successfully enters the instance.
     virtual void OnPlayerEnter(Player* /*player*/) {}
@@ -232,6 +248,11 @@ protected:
     void SetBossNumber(uint32 number) { bosses.resize(number); }
     void LoadDoorData(DoorData const* data);
     void LoadMinionData(MinionData const* data);
+    void LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData);
+
+    void AddObject(Creature* obj, bool add);
+    void AddObject(GameObject* obj, bool add);
+    void AddObject(WorldObject* obj, uint32 type, bool add);
 
     void AddDoor(GameObject* door, bool add);
     void AddMinion(Creature* minion, bool add);
@@ -242,9 +263,14 @@ protected:
     std::string LoadBossState(char const* data);
     std::string GetBossSaveData();
 private:
+    static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);
+
     std::vector<BossInfo> bosses;
     DoorInfoMap doors;
     MinionInfoMap minions;
+    ObjectInfoMap _creatureInfo;
+    ObjectInfoMap _gameObjectInfo;
+    ObjectGuidMap _objectGuids;
     uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
 };
 
