@@ -75,7 +75,7 @@ public:
         {
             SendItemTimer = 0;
             SwitchFactionTimer = 10000;
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             isFriendly = true;
 
             AquaJetTimer = 5000;
@@ -109,7 +109,7 @@ public:
             {
                 if (SwitchFactionTimer <= diff)
                 {
-                    me->setFaction(91);
+                    me->SetFaction(FACTION_ELEMENTAL);
                     isFriendly = false;
                 }
                 else SwitchFactionTimer -= diff;

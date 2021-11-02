@@ -18,6 +18,7 @@
 #ifndef AZEROTHCORE_CHAT_H
 #define AZEROTHCORE_CHAT_H
 
+#include "ChatCommand.h"
 #include "SharedDefines.h"
 #include "Errors.h"
 #include "WorldSession.h"
@@ -33,26 +34,9 @@ class WorldObject;
 
 struct GameTele;
 
-class ChatCommand
-{
-    typedef bool(*pHandler)(ChatHandler*, char const*);
-
-public:
-    ChatCommand(char const* name, uint32 securityLevel, bool allowConsole, pHandler handler, std::string help, std::vector<ChatCommand> childCommands = std::vector<ChatCommand>())
-        : Name(ASSERT_NOTNULL(name)), SecurityLevel(securityLevel), AllowConsole(allowConsole), Handler(handler), Help(std::move(help)), ChildCommands(std::move(childCommands)) { }
-
-    char const* Name;
-    uint32 SecurityLevel;
-    bool AllowConsole;
-    pHandler Handler;
-    std::string Help;
-    std::vector<ChatCommand> ChildCommands;
-};
-
-class ChatHandler
+class AC_GAME_API ChatHandler
 {
 public:
-    WorldSession* GetSession() { return m_session; }
     explicit ChatHandler(WorldSession* session) : m_session(session), sentErrorMessage(false) {}
     virtual ~ChatHandler() { }
 
@@ -68,24 +52,35 @@ public:
 
     // function with different implementation for chat/console
     virtual char const* GetAcoreString(uint32 entry) const;
-    virtual void SendSysMessage(char const* str);
+    virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     void SendSysMessage(uint32 entry);
-    void PSendSysMessage(char const* format, ...) ATTR_PRINTF(2, 3);
-    void PSendSysMessage(uint32 entry, ...);
-    std::string PGetParseString(uint32 entry, ...) const;
 
-    bool ParseCommands(const char* text);
+    template<typename... Args>
+    void PSendSysMessage(char const* fmt, Args&&... args)
+    {
+        SendSysMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...).c_str());
+    }
 
-    static std::vector<ChatCommand> const& getCommandTable();
+    template<typename... Args>
+    void PSendSysMessage(uint32 entry, Args&&... args)
+    {
+        SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...).c_str());
+    }
 
-    bool isValidChatMessage(const char* msg);
+    template<typename... Args>
+    std::string PGetParseString(uint32 entry, Args&&... args) const
+    {
+        return Acore::StringFormat(GetAcoreString(entry), std::forward<Args>(args)...);
+    }
+
+    bool _ParseCommands(std::string_view text);
+    virtual bool ParseCommands(std::string_view text);
+
     void SendGlobalSysMessage(const char* str);
 
-    bool hasStringAbbr(const char* name, const char* part);
-
     // function with different implementation for chat/console
-    virtual bool isAvailable(ChatCommand const& cmd) const;
+    virtual bool IsHumanReadable() const { return true; }
     virtual std::string GetNameLink() const { return GetNameLink(m_session->GetPlayer()); }
     virtual bool needReportToTarget(Player* chr) const;
     virtual LocaleConstant GetSessionDbcLocale() const;
@@ -102,16 +97,12 @@ public:
     // Returns either the selected player or self if there is no selected player
     Player*   getSelectedPlayerOrSelf();
 
-    char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
-    char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
-
-    // if args have single value then it return in arg2 and arg1 == nullptr
-    void      extractOptFirstArg(char* args, char** arg1, char** arg2);
-    char*     extractQuotedArg(char* args);
+    char* extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
+    char* extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
+    char* extractQuotedArg(char* args);
 
     uint32    extractSpellIdFromLink(char* text);
     ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);
-    GameTele const* extractGameTeleFromLink(char* text);
     bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline = false);
     std::string extractPlayerNameFromLink(char* text);
     // select by arg (name/link) or in-game selection online/offline player
@@ -125,34 +116,31 @@ public:
     Creature* GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
     bool HasSentErrorMessage() const { return sentErrorMessage; }
     void SetSentErrorMessage(bool val) { sentErrorMessage = val; }
-    static bool LoadCommandTable() { return load_command_table; }
-    static void SetLoadCommandTable(bool val) { load_command_table = val; }
 
-    bool ShowHelpForCommand(std::vector<ChatCommand> const& table, const char* cmd);
+    bool IsConsole() const { return (m_session == nullptr); }
+    Player* GetPlayer() const;
+    WorldSession* GetSession() { return m_session; }
+    bool IsAvailable(uint32 securityLevel) const;
 protected:
     explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) {}      // for CLI subclass
-    static bool SetDataForCommandInTable(std::vector<ChatCommand>& table, const char* text, uint32 securityLevel, std::string const& help, std::string const& fullcommand);
-    bool ExecuteCommandInTable(std::vector<ChatCommand> const& table, const char* text, std::string const& fullcmd);
-    bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
 
 private:
     WorldSession* m_session;                           // != nullptr for chat command call and nullptr for CLI command
 
     // common global flag
-    static bool load_command_table;
     bool sentErrorMessage;
 };
 
-class CliHandler : public ChatHandler
+class AC_GAME_API CliHandler : public ChatHandler
 {
 public:
-    typedef void Print(void*, char const*);
-    explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) {}
+    using Print = void(void*, std::string_view);
+    explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) { }
 
     // overwrite functions
     char const* GetAcoreString(uint32 entry) const override;
-    bool isAvailable(ChatCommand const& cmd) const override;
-    void SendSysMessage(const char* str) override;
+    void SendSysMessage(std::string_view, bool escapeCharacters) override;
+    bool ParseCommands(std::string_view str) override;
     std::string GetNameLink() const override;
     bool needReportToTarget(Player* chr) const override;
     LocaleConstant GetSessionDbcLocale() const override;

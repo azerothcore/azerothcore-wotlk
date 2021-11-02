@@ -567,7 +567,7 @@ public:
     typedef GuidVector BGCreatures;
     BGObjects BgObjects;
     BGCreatures BgCreatures;
-    void SpawnBGObject(uint32 type, uint32 respawntime);
+    void SpawnBGObject(uint32 type, uint32 respawntime, uint32 forceRespawnDelay = 0);
     bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0, GOState goState = GO_STATE_READY);
     Creature* AddCreature(uint32 entry, uint32 type, float x, float y, float z, float o, uint32 respawntime = 0, MotionTransport* transport = nullptr);
     bool DelCreature(uint32 type);

@@ -285,6 +285,7 @@ struct CreatureData
     uint32 npcflag{0};
     uint32 unit_flags{0};                                      // enum UnitFlags mask values
     uint32 dynamicflags{0};
+    uint32 ScriptId;
     bool dbData{true};
     bool overwrittenZ{false};
 };

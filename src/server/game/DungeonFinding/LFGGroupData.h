@@ -22,12 +22,6 @@
 
 namespace lfg
 {
-
-    enum LfgGroupEnum
-    {
-        LFG_GROUP_MAX_KICKS                           = 2,
-    };
-
     /**
         Stores all lfg data needed about a group.
     */

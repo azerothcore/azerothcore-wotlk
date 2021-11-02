@@ -125,10 +125,11 @@ enum SpellValueMod
     SPELLVALUE_RADIUS_MOD,
     SPELLVALUE_MAX_TARGETS,
     SPELLVALUE_AURA_STACK,
+    SPELLVALUE_AURA_DURATION,
     SPELLVALUE_FORCED_CRIT_RESULT
 };
 
-typedef std::pair<SpellValueMod, int32>     CustomSpellValueMod;
+typedef std::pair<SpellValueMod, int32> CustomSpellValueMod;
 class CustomSpellValues : public std::vector<CustomSpellValueMod>
 {
 public:
@@ -1595,8 +1596,8 @@ public:
     virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
 
     // faction template id
-    [[nodiscard]] uint32 getFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
-    void setFaction(uint32 faction);
+    [[nodiscard]] uint32 GetFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
+    void SetFaction(uint32 faction);
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
 
     ReputationRank GetReactionTo(Unit const* target) const;

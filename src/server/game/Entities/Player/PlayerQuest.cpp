@@ -751,8 +751,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
-    if (quest->GetRewOrReqMoney())
-        moneyRew += quest->GetRewOrReqMoney();
+    if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(this))
+    {
+        moneyRew += rewOrReqMoney;
+    }
 
     if (moneyRew)
     {
@@ -1602,16 +1604,32 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
-        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) ||
-            (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
+        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
         {
-            if (quest->IsAutoComplete() && quest->IsRepeatable() && !quest->IsDailyOrWeekly())
-                result2 = DIALOG_STATUS_REWARD_REP;
+            if (quest->IsRepeatable() && quest->IsDailyOrWeekly())
+            {
+                if (quest->IsAutoComplete())
+                {
+                    result2 = DIALOG_STATUS_AVAILABLE_REP;
+                }
+                else
+                {
+                    result2 = DIALOG_STATUS_REWARD_REP;
+                }
+            }
+            else if (quest->IsAutoComplete())
+            {
+                result2 = DIALOG_STATUS_AVAILABLE;
+            }
             else
+            {
                 result2 = DIALOG_STATUS_REWARD;
+            }
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
+        {
             result2 = DIALOG_STATUS_INCOMPLETE;
+        }
 
         if (result2 > result)
             result = result2;
@@ -2084,23 +2102,30 @@ void Player::MoneyChanged(uint32 count)
         if (!questid)
             continue;
 
-        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
-        if (qInfo && qInfo->GetRewOrReqMoney() < 0)
+        if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid))
         {
-            QuestStatusData& q_status = m_QuestStatus[questid];
+            int32 rewOrReqMoney = qInfo->GetRewOrReqMoney();
+            if (rewOrReqMoney < 0)
+            {
+                QuestStatusData& q_status = m_QuestStatus[questid];
 
-            if (q_status.Status == QUEST_STATUS_INCOMPLETE)
-            {
-                if (int32(count) >= -qInfo->GetRewOrReqMoney())
+                if (q_status.Status == QUEST_STATUS_INCOMPLETE)
                 {
-                    if (CanCompleteQuest(questid))
-                        CompleteQuest(questid);
+                    if (int32(count) >= -rewOrReqMoney)
+                    {
+                        if (CanCompleteQuest(questid))
+                        {
+                            CompleteQuest(questid);
+                        }
+                    }
                 }
-            }
-            else if (q_status.Status == QUEST_STATUS_COMPLETE)
-            {
-                if (int32(count) < -qInfo->GetRewOrReqMoney())
-                    IncompleteQuest(questid);
+                else if (q_status.Status == QUEST_STATUS_COMPLETE)
+                {
+                    if (int32(count) < -rewOrReqMoney)
+                    {
+                        IncompleteQuest(questid);
+                    }
+                }
             }
         }
     }
@@ -2262,12 +2287,12 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         data << uint32(XP);
-        data << uint32(quest->GetRewOrReqMoney());
+        data << uint32(quest->GetRewOrReqMoney(this));
     }
     else
     {
         data << uint32(0);
-        data << uint32(quest->GetRewOrReqMoney() + quest->GetRewMoneyMaxLevel());
+        data << uint32(quest->GetRewOrReqMoney(this) + quest->GetRewMoneyMaxLevel());
     }
 
     data << uint32(10 * quest->CalculateHonorGain(GetQuestLevel(quest)));

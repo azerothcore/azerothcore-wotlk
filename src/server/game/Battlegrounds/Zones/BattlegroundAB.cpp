@@ -271,7 +271,7 @@ void BattlegroundAB::NodeOccupied(uint8 node)
 
     if (trigger)
     {
-        trigger->setFaction(_capturePointInfo[node]._ownerTeamId == TEAM_ALLIANCE ? 84 : 83);
+        trigger->SetFaction(_capturePointInfo[node]._ownerTeamId == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
         trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, false);
     }
 }

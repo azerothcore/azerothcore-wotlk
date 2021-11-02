@@ -517,7 +517,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     m_realRace = createInfo->Race; // set real race flag
     m_race = createInfo->Race; // set real race flag
 
-    setFactionForRace(createInfo->Race);
+    SetFactionForRace(createInfo->Race);
 
     if (!IsValidGender(createInfo->Gender))
     {
@@ -2060,7 +2060,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 
     // xinef: not needed, CORRECTLY checked above including forced reputations etc
     // not unfriendly
-    //if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(creature->getFaction()))
+    //if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(creature->GetFaction()))
     //    if (factionTemplate->faction)
     //        if (FactionEntry const* faction = sFactionStore.LookupEntry(factionTemplate->faction))
     //            if (faction->reputationListID >= 0 && GetReputationMgr().GetRank(faction) <= REP_UNFRIENDLY)
@@ -2150,14 +2150,14 @@ void Player::SetGameMaster(bool on)
     {
         m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
         if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
-            setFaction(35);
+            SetFaction(FACTION_FRIENDLY);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
         {
             if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
-                pet->setFaction(35);
+                pet->SetFaction(FACTION_FRIENDLY);
             pet->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
@@ -2181,13 +2181,13 @@ void Player::SetGameMaster(bool on)
         SetPhaseMask(newPhase, false);
 
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
-        setFactionForRace(getRace(true));
+        SetFactionForRace(getRace(true));
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
         {
-            pet->setFaction(getFaction());
+            pet->SetFaction(GetFaction());
             pet->getHostileRefMgr().setOnlineOfflineState(true);
         }
 
@@ -5649,7 +5649,7 @@ TeamId Player::TeamIdForRace(uint8 race)
     return TEAM_ALLIANCE;
 }
 
-void Player::setFactionForRace(uint8 race)
+void Player::SetFactionForRace(uint8 race)
 {
     m_team = TeamIdForRace(race);
 
@@ -5659,7 +5659,7 @@ void Player::setFactionForRace(uint8 race)
         return;
 
     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
-    setFaction(rEntry ? rEntry->FactionID : 0);
+    SetFaction(rEntry ? rEntry->FactionID : 0);
 }
 
 ReputationRank Player::GetReputationRank(uint32 faction) const
@@ -12183,9 +12183,13 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
 
         if (Player* target = ObjectAccessor::FindConnectedPlayer(targetPlayerGUID))
         {
-            if (target->HasAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
+            if (Aura* dungeonCooldownAura = target->GetAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
             {
-                return ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S;
+                int32 elapsedTime = dungeonCooldownAura->GetMaxDuration() - dungeonCooldownAura->GetDuration();
+                if (static_cast<int32>(sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER)) > elapsedTime)
+                {
+                    return ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S;
+                }
             }
         }
 
@@ -14179,6 +14183,8 @@ void Player::ActivateSpec(uint8 spec)
     SendActionButtons(2);
     uint8 oldSpec = GetActiveSpec();
 
+    std::unordered_set<uint32> removedSpecAuras;
+
     // xinef: reset talent auras
     for (PlayerTalentMap::iterator itr = m_talents.begin(); itr != m_talents.end(); ++itr)
     {
@@ -14194,13 +14200,18 @@ void Player::ActivateSpec(uint8 spec)
         // pussywizard: was => isn't
         if (!itr->second->IsInSpec(spec) && !itr->second->inSpellBook)
             SendLearnPacket(itr->first, false);
+
+        removedSpecAuras.insert(itr->first);
     }
 
     // xinef: remove glyph auras
     for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
         if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
             if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
+            {
                 RemoveAurasDueToSpell(glyphEntry->SpellId);
+                removedSpecAuras.insert(glyphEntry->SpellId);
+            }
 
     // xinef: set active spec as new one
     SetActiveSpec(spec);
@@ -14223,6 +14234,8 @@ void Player::ActivateSpec(uint8 spec)
         _addTalentAurasAndSpells(itr->first);
         TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first);
         spentTalents += talentPos->rank + 1;
+
+        removedSpecAuras.erase(itr->first);
     }
 
     // pussywizard: remove spells that are in previous spec, but are not present in new one (or are in new spec, but not in the old one)
@@ -14237,11 +14250,15 @@ void Player::ActivateSpec(uint8 spec)
             SendLearnPacket(itr->first, false);
             // We want to remove all auras of the unlearned spell
             _removeTalentAurasAndSpells(itr->first);
+
+            removedSpecAuras.insert(itr->first);
         }
         // pussywizard: wasn't => is
         else if (!itr->second->IsInSpec(oldSpec) && itr->second->IsInSpec(spec))
         {
             SendLearnPacket(itr->first, true);
+
+            removedSpecAuras.erase(itr->first);
         }
     }
 
@@ -14256,10 +14273,30 @@ void Player::ActivateSpec(uint8 spec)
                 if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
                 {
                     CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
+                    removedSpecAuras.erase(glyphEntry->SpellId);
                 }
             }
 
             SetGlyph(slot, glyphId, true);
+        }
+    }
+
+    // Remove auras triggered/activated by talents/glyphs
+    // Mostly explicit casts in dummy aura scripts
+    if (!removedSpecAuras.empty())
+    {
+        for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+        {
+            Aura* aura = iter->second;
+            if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+            {
+                if (removedSpecAuras.find(triggeredByAuraSpellInfo->Id) != removedSpecAuras.end())
+                {
+                    RemoveOwnedAura(iter);
+                    continue;
+                }
+            }
+            ++iter;
         }
     }
 
@@ -14405,7 +14442,7 @@ void Player::SetIsSpectator(bool on)
         AddAura(SPECTATOR_SPELL_SPEED, this);
         m_ExtraFlags |= PLAYER_EXTRA_SPECTATOR_ON;
         AddUnitState(UNIT_STATE_ISOLATED);
-        //setFaction(1100);
+        //SetFaction(1100);
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         ResetContestedPvP();
@@ -14422,7 +14459,7 @@ void Player::SetIsSpectator(bool on)
 
         if (!IsGameMaster())
         {
-            //setFactionForRace(getRace());
+            //SetFactionForRace(getRace());
 
             // restore FFA PvP Server state
             // Xinef: it will be removed if necessery in UpdateArea called in WorldPortOpcode
