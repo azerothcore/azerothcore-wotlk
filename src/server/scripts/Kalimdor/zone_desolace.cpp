@@ -73,7 +73,7 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BODYGUARD_FOR_HIRE)
-            creature->AI()->SetGUID(player->GetGUID(), player->getFaction());
+            creature->AI()->SetGUID(player->GetGUID(), player->GetFaction());
 
         return true;
     }
@@ -155,7 +155,7 @@ public:
         {
             if (field == 1 && data == 1)
                 if (Player* player = me->SelectNearestPlayer(50.0f))
-                    SetGUID(player->GetGUID(), player->getFaction());
+                    SetGUID(player->GetGUID(), player->GetFaction());
         }
 
         bool CheckCaravan()
@@ -256,7 +256,7 @@ public:
             for (uint8 i = 0; i < MAX_CARAVAN_SUMMONS; ++i)
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summons[i]))
                 {
-                    summon->setFaction(faction);
+                    summon->SetFaction(faction);
                     if (remove)
                         summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                     else
@@ -266,7 +266,7 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             else
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-            me->setFaction(faction);
+            me->SetFaction(faction);
         }
 
         void WaypointReached(uint32 waypointId) override

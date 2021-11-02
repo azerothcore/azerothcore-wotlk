@@ -471,7 +471,7 @@ public:
                 if (trigger)
                 {
                     trigger->SetVisible(false);
-                    trigger->setFaction(me->getFaction());
+                    trigger->SetFaction(me->GetFaction());
                     trigger->SetDisableGravity(true);
                     trigger->CastSpell(me, SPELL_METEOR, true);
                 }
