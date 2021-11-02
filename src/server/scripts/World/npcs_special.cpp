@@ -68,8 +68,6 @@ enum elderClearwater
     CLEARWATER_SAY_END                  = 3,
 
     QUEST_FISHING_DERBY                 = 24803,
-
-    DATA_DERBY_FINISHED                 = 1,
 };
 
 class npc_elder_clearwater : public CreatureScript
@@ -95,18 +93,48 @@ public:
         bool startWarning;
         bool finishWarning;
 
-        uint32 GetData(uint32 type) const override
+        bool GossipHello(Player* player) override
         {
-            if (type == DATA_DERBY_FINISHED)
-                return (uint32)finished;
+            QuestRelationBounds pObjectQR;
+            QuestRelationBounds pObjectQIR;
 
-            return 0;
+            // pets also can have quests
+            pObjectQR  = sObjectMgr->GetCreatureQuestRelationBounds(me->GetEntry());
+            pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(me->GetEntry());
+
+
+            QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
+            qm.ClearMenu();
+
+            for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
+            {
+                uint32       quest_id = i->second;
+                Quest const* quest    = sObjectMgr->GetQuestTemplate(quest_id);
+                if (!quest)
+                    continue;
+
+                if (!finished)
+                {
+                    if (quest_id == QUEST_FISHING_DERBY)
+                        player->PlayerTalkClass->SendQuestGiverRequestItems(quest, me->GetGUID(), player->CanRewardQuest(quest, false), true);
+                }
+                else
+                {
+                    if (quest_id != QUEST_FISHING_DERBY)
+                        player->PlayerTalkClass->SendQuestGiverRequestItems(quest, me->GetGUID(), player->CanRewardQuest(quest, false), true);
+                }
+            }
+
+            return true;
         }
 
-        void DoAction(int32 param) override
+        void QuestReward(Player* player, Quest const* quest, uint32 /*opt*/) override
         {
-            if (param == DATA_DERBY_FINISHED)
+            if (!finished && quest->GetQuestId() == QUEST_FISHING_DERBY)
+            {
                 finished = true;
+                sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -148,56 +176,6 @@ public:
             }
         }
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        QuestRelationBounds pObjectQR;
-        QuestRelationBounds pObjectQIR;
-
-        // pets also can have quests
-        if (creature)
-        {
-            pObjectQR  = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
-            pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
-        }
-        else
-            return true;
-
-        QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
-        qm.ClearMenu();
-
-        for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
-        {
-            uint32 quest_id = i->second;
-            Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
-            if (!quest)
-                continue;
-
-            if (!creature->AI()->GetData(DATA_DERBY_FINISHED))
-            {
-                if (quest_id == QUEST_FISHING_DERBY)
-                    player->PlayerTalkClass->SendQuestGiverRequestItems(quest, creature->GetGUID(), player->CanRewardQuest(quest, false), true);
-            }
-            else
-            {
-                if (quest_id != QUEST_FISHING_DERBY)
-                    player->PlayerTalkClass->SendQuestGiverRequestItems(quest, creature->GetGUID(), player->CanRewardQuest(quest, false), true);
-            }
-        }
-
-        return true;
-    }
-
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) override
-    {
-        if (!creature->AI()->GetData(DATA_DERBY_FINISHED) && quest->GetQuestId() == QUEST_FISHING_DERBY)
-        {
-            creature->AI()->DoAction(DATA_DERBY_FINISHED);
-            sCreatureTextMgr->SendChat(creature, CLEARWATER_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-        }
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
@@ -253,6 +231,26 @@ public:
                 finished = true;
         }
 
+        bool GossipHello(Player* player) override
+        {
+            if (!finished)
+            {
+                player->PrepareQuestMenu(me->GetGUID());
+            }
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return true;
+        }
+
+        void QuestReward(Player* player, Quest const* quest, uint32 /*opt*/) override
+        {
+            if (!finished && quest->GetQuestId() == QUEST_MASTER_ANGLER)
+            {
+                finished = true;
+                sCreatureTextMgr->SendChat(me, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -286,25 +284,6 @@ public:
             }
         }
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED))
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*opt*/) override
-    {
-        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && quest->GetQuestId() == QUEST_MASTER_ANGLER)
-        {
-            creature->AI()->DoAction(DATA_ANGLER_FINISHED);
-            sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-        }
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
@@ -671,6 +650,14 @@ public:
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
+        void QuestAccept(Player* /*player*/, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_CLUCK)
+            {
+                Reset();
+            }
+        }
+
         void EnterCombat(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
@@ -718,14 +705,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_chicken_cluckAI(creature);
-    }
-
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_CLUCK)
-            CAST_AI(npc_chicken_cluck::npc_chicken_cluckAI, creature->AI())->Reset();
-
-        return true;
     }
 
     bool OnQuestComplete(Player* /*player*/, Creature* creature, Quest const* quest) override
@@ -930,6 +909,14 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if ((quest->GetQuestId() == 6624) || (quest->GetQuestId() == 6622))
+            {
+                BeginEvent(player);
+            }
+        }
+
         void BeginEvent(Player* player)
         {
             PlayerGUID = player->GetGUID();
@@ -1017,14 +1004,6 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
     };
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if ((quest->GetQuestId() == 6624) || (quest->GetQuestId() == 6622))
-            CAST_AI(npc_doctor::npc_doctorAI, creature->AI())->BeginEvent(player);
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {

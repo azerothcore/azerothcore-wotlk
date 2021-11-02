@@ -236,7 +236,7 @@ public:
 
     struct npc_balance_of_light_and_shadowAI : public NullCreatureAI
     {
-        npc_balance_of_light_and_shadowAI() : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
+        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
 
         bool CanBeSeen(Player const* player) override
         {

@@ -51,16 +51,6 @@ class npc_bartleby : public CreatureScript
 public:
     npc_bartleby() : CreatureScript("npc_bartleby") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_BEAT)
-        {
-            creature->SetFaction(FACTION_ENEMY);
-            creature->AI()->AttackStart(player);
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_bartlebyAI(creature);
@@ -79,6 +69,15 @@ public:
         {
             if (me->GetFaction() != m_uiNormalFaction)
                 me->SetFaction(m_uiNormalFaction);
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_BEAT)
+            {
+                me->SetFaction(FACTION_ENEMY);
+                AttackStart(player);
+            }
         }
 
         void AttackedBy(Unit* pAttacker) override

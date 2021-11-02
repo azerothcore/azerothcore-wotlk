@@ -79,9 +79,7 @@ enum Sylvanas
     EVENT_SHOOT                     = 4,
     EVENT_MULTI_SHOT                = 5,
     EVENT_LAMENT_OF_THE_HIGHBORN    = 6,
-    EVENT_SUNSORROW_WHISPER         = 7,
-
-    GUID_EVENT_INVOKER              = 1,
+    EVENT_SUNSORROW_WHISPER         = 7
 };
 
 float HighborneLoc[4][3] =
@@ -100,14 +98,6 @@ class npc_lady_sylvanas_windrunner : public CreatureScript
 public:
     npc_lady_sylvanas_windrunner() : CreatureScript("npc_lady_sylvanas_windrunner") { }
 
-    bool OnQuestReward(Player* player, Creature* creature, const Quest* _Quest, uint32 /*slot*/) override
-    {
-        if (_Quest->GetQuestId() == QUEST_JOURNEY_TO_UNDERCITY)
-            creature->AI()->SetGUID(player->GetGUID(), GUID_EVENT_INVOKER);
-
-        return true;
-    }
-
     struct npc_lady_sylvanas_windrunnerAI : public ScriptedAI
     {
         npc_lady_sylvanas_windrunnerAI(Creature* creature) : ScriptedAI(creature)
@@ -121,6 +111,24 @@ public:
             _events.Reset();
         }
 
+        void QuestReward(Player* player, const Quest* _Quest, uint32 /*slot*/) override
+        {
+            if (_Quest->GetQuestId() == QUEST_JOURNEY_TO_UNDERCITY)
+            {
+                Talk(EMOTE_LAMENT);
+                DoPlayMusic(SOUND_CREDIT, true);
+                DoCast(me, SPELL_SYLVANAS_CAST, false);
+                playerGUID  = player->GetGUID();
+                LamentEvent = true;
+
+                for (uint8 i = 0; i < 4; ++i) me->SummonCreature(NPC_HIGHBORNE_LAMENTER, HighborneLoc[i][0], HighborneLoc[i][1], HIGHBORNE_LOC_Y, HighborneLoc[i][2], TEMPSUMMON_TIMED_DESPAWN, 160000);
+
+                _events.ScheduleEvent(EVENT_LAMENT_OF_THE_HIGHBORN, 2000);
+                _events.ScheduleEvent(EVENT_SUNSORROW_WHISPER, 10000);
+            }
+
+        }
+
         void EnterCombat(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_FADE, 30000);
@@ -128,24 +136,6 @@ public:
             _events.ScheduleEvent(EVENT_BLACK_ARROW, 15000);
             _events.ScheduleEvent(EVENT_SHOOT, 8000);
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 10000);
-        }
-
-        void SetGUID(ObjectGuid guid, int32 type) override
-        {
-            if (type == GUID_EVENT_INVOKER)
-            {
-                Talk(EMOTE_LAMENT);
-                DoPlayMusic(SOUND_CREDIT, true);
-                DoCast(me, SPELL_SYLVANAS_CAST, false);
-                playerGUID = guid;
-                LamentEvent = true;
-
-                for (uint8 i = 0; i < 4; ++i)
-                    me->SummonCreature(NPC_HIGHBORNE_LAMENTER, HighborneLoc[i][0], HighborneLoc[i][1], HIGHBORNE_LOC_Y, HighborneLoc[i][2], TEMPSUMMON_TIMED_DESPAWN, 160000);
-
-                _events.ScheduleEvent(EVENT_LAMENT_OF_THE_HIGHBORN, 2000);
-                _events.ScheduleEvent(EVENT_SUNSORROW_WHISPER, 10000);
-            }
         }
 
         void JustSummoned(Creature* summoned) override
@@ -939,45 +929,6 @@ class npc_varian_wrynn : public CreatureScript
 public:
     npc_varian_wrynn() : CreatureScript("npc_varian_wrynn") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                CloseGossipMenuFor(player);
-
-                if (auto ai = CAST_AI(npc_varian_wrynn::npc_varian_wrynnAI, creature->AI()))
-                {
-                    ai->Start(true, true, player->GetGUID());
-                    if (Creature* jaina = GetClosestCreatureWithEntry(creature, NPC_JAINA, 50.0f))
-                        ai->jainaGUID = jaina->GetGUID();
-                    else
-                        ai->jainaGUID.Clear();
-                    ai->SetDespawnAtEnd(false);
-                    ai->SetDespawnAtFar(false);
-                }
-
-                break;
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_BATTLE_A) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WRYNN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-
     struct npc_varian_wrynnAI : public npc_escortAI
     {
         npc_varian_wrynnAI(Creature* creature) : npc_escortAI(creature)
@@ -1106,6 +1057,46 @@ public:
                     }
                 }
             }
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+
+            switch (action)
+            {
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                    CloseGossipMenuFor(player);
+
+                    Start(true, true, player->GetGUID());
+
+                    if (Creature* jaina = GetClosestCreatureWithEntry(me, NPC_JAINA, 50.0f))
+                    {
+                        jainaGUID = jaina->GetGUID();
+                    }
+                    else
+                    {
+                        jainaGUID.Clear();
+                    }
+                    SetDespawnAtEnd(false);
+                    SetDespawnAtFar(false);
+                    break;
+            }
+
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(QUEST_BATTLE_A) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WRYNN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
         }
 
         void JustSummoned(Creature* summonedCreature) override

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -62,19 +62,6 @@ class npc_daphne_stilwell : public CreatureScript
 public:
     npc_daphne_stilwell() : CreatureScript("npc_daphne_stilwell") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_TOME_VALOR)
-        {
-            creature->AI()->Talk(SAY_DS_START);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_daphne_stilwell::npc_daphne_stilwellAI, creature->AI()))
-                pEscortAI->Start(true, true, player->GetGUID());
-        }
-
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_daphne_stilwellAI(creature);
@@ -91,6 +78,15 @@ public:
         {
             summons.DespawnAll();
             textCounter = SAY_DS_DOWN_1;
+        }
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_TOME_VALOR)
+            {
+                Talk(SAY_DS_START);
+                Start(true, true, player->GetGUID());
+            }
         }
 
         void WaypointReached(uint32 waypointId) override

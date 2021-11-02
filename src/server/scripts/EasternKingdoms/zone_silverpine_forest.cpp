@@ -113,20 +113,16 @@ public:
         {
             Talk(SAY_AGGRO, who);
         }
-    };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_ESCORTING)
+        void QuestAccept(Player* player, Quest const* quest) override
         {
-            creature->AI()->Talk(SAY_QUESTACCEPT, player);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_deathstalker_erland::npc_deathstalker_erlandAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            if (quest->GetQuestId() == QUEST_ESCORTING)
+            {
+                Talk(SAY_QUESTACCEPT, player);
+                Start(true, false, player->GetGUID());
+            }
         }
-
-        return true;
-    }
+    };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -167,19 +163,6 @@ class pyrewood_ambush : public CreatureScript
 public:
     pyrewood_ambush() : CreatureScript("pyrewood_ambush") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_PYREWOOD_AMBUSH && !CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->QuestInProgress)
-        {
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->QuestInProgress = true;
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->Phase = 0;
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->KillCount = 0;
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->PlayerGUID = player->GetGUID();
-        }
-
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new pyrewood_ambushAI(creature);
@@ -210,6 +193,17 @@ public:
                 KillCount = 0;
                 PlayerGUID.Clear();
                 Summons.DespawnAll();
+            }
+        }
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_PYREWOOD_AMBUSH && !QuestInProgress)
+            {
+                QuestInProgress = true;
+                Phase = 0;
+                KillCount = 0;
+                PlayerGUID = player->GetGUID();
             }
         }
 
