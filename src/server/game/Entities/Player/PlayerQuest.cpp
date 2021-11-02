@@ -1608,7 +1608,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         QuestStatus status = GetQuestStatus(questId);
 
         // If quest is complete and not rewarded or quest is auto complete by method and player can take
-        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (!quest->GetQuestMethod()) && CanTakeQuest(quest, false))
+        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (!quest->GetQuestMethod() && CanTakeQuest(quest, false)))
         {
             if (quest->GetQuestLevel() == -1)
             {
