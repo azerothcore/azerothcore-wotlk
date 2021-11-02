@@ -2742,6 +2742,7 @@ public:
 
     RewardedQuestSet m_RewardedQuests;
     QuestStatusSaveMap m_RewardedQuestsSave;
+    void SendQuestGiverStatusMultiple();
 
     SkillStatusMap mSkillStatus;
 
