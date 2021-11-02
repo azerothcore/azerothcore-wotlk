@@ -573,9 +573,9 @@ class npc_essence_of_twin : public CreatureScript
 public:
     npc_essence_of_twin() : CreatureScript("npc_essence_of_twin") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    bool GossipHello(Player* player, Creature* creature) override
     {
-        switch( creature->GetEntry() )
+        switch(creature->GetEntry())
         {
             case NPC_LIGHT_ESSENCE:
                 {
@@ -584,7 +584,7 @@ public:
                     //uint32 empoweredId = 0;
                     uint32 touchId1 = 0;
                     //uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty() )
+                    switch(creature->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId = 65684;
@@ -630,7 +630,7 @@ public:
                     //uint32 empoweredId = 0;
                     //uint32 touchId1 = 0;
                     uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty() )
+                    switch(creature->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId = 65686;

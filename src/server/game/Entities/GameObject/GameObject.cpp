@@ -24,6 +24,7 @@
 #include "GameObjectAI.h"
 #include "GameObjectModel.h"
 #include "GridNotifiersImpl.h"
+#include "GossipDef.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "ObjectMgr.h"
@@ -1388,10 +1389,6 @@ void GameObject::SwitchDoorOrButton(bool activate, bool alternative /* = false *
 
 void GameObject::Use(Unit* user)
 {
-    // Xinef: we cannot use go with not selectable flags
-    if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
-        return;
-
     // by default spell caster is user
     Unit* spellCaster = user;
     uint32 spellId = 0;
@@ -1404,8 +1401,8 @@ void GameObject::Use(Unit* user)
         if (sEluna->OnGossipHello(playerUser, this))
             return;
 #endif
-        if (sScriptMgr->OnGossipHello(playerUser, this))
-            return;
+
+        playerUser->PlayerTalkClass->ClearMenus();
 
         if (AI()->GossipHello(playerUser, false))
             return;

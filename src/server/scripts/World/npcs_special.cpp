@@ -2418,7 +2418,7 @@ public:
 
         void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
         {
-            SmartAI::sGossipSelect(player, menuId, gossipListId);
+            SmartAI::GossipSelect(player, menuId, gossipListId);
             if (menuId != STABLE_MASTER_GOSSIP_SUB_MENU)
                 return;
 

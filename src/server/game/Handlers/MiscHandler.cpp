@@ -164,14 +164,17 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
     {
         if (unit)
         {
-            unit->AI()->sGossipSelectCode(_player, menuId, gossipListId, code.c_str());
-            if (!sScriptMgr->OnGossipSelectCode(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
+            if (!unit->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str()))
+            {
                 _player->OnGossipSelect(unit, gossipListId, menuId);
+            }
         }
         else if (go)
         {
-            go->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str());
-            sScriptMgr->OnGossipSelectCode(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str());
+            if (!go->AI()->GossipSelect(_player, menuId, gossipListId))
+            {
+                _player->OnGossipSelect(go, gossipListId, menuId);
+            }
         }
         else if (item)
         {
@@ -186,15 +189,17 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
     {
         if (unit)
         {
-            unit->AI()->sGossipSelect(_player, menuId, gossipListId);
-            if (!sScriptMgr->OnGossipSelect(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
+            if (!unit->AI()->GossipSelect(_player, menuId, gossipListId))
+            {
                 _player->OnGossipSelect(unit, gossipListId, menuId);
+            }
         }
         else if (go)
         {
-            go->AI()->GossipSelect(_player, menuId, gossipListId);
-            if (!sScriptMgr->OnGossipSelect(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
+            if (!go->AI()->GossipSelect(_player, menuId, gossipListId))
+            {
                 _player->OnGossipSelect(go, gossipListId, menuId);
+            }
         }
         else if (item)
         {

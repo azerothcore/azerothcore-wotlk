@@ -98,13 +98,14 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
         return;
 #endif
 
-    if (sScriptMgr->OnGossipHello(_player, creature))
+    _player->PlayerTalkClass->ClearMenus();
+    if (creature->AI()->GossipHello(_player))
+    {
         return;
+    }
 
     _player->PrepareGossipMenu(creature, creature->GetCreatureTemplate()->GossipMenuId, true);
     _player->SendPreparedGossip(creature);
-
-    creature->AI()->sGossipHello(_player);
 }
 
 void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
@@ -291,53 +292,50 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
                 case TYPEID_UNIT:
                     {
                         Creature* questgiver = object->ToCreature();
-                        if (!sScriptMgr->OnQuestReward(_player, questgiver, quest, reward))
+
+                        // Send next quest
+                        if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                         {
-                            // Send next quest
-                            if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
+                            if (_player->CanTakeQuest(nextQuest, false))
                             {
-                                if (_player->CanTakeQuest(nextQuest, false))
+                                if (nextQuest->IsAutoAccept())
                                 {
-                                    if (nextQuest->IsAutoAccept())
+                                    // QUEST_FLAGS_AUTO_ACCEPT was not used by Blizzard.
+                                    if (_player->CanAddQuest(nextQuest, false))
                                     {
-                                        // QUEST_FLAGS_AUTO_ACCEPT was not used by Blizzard.
-                                        if (_player->CanAddQuest(nextQuest, false))
-                                        {
-                                            _player->AddQuestAndCheckCompletion(nextQuest, object);
-                                        }
-                                        else
-                                        {
-                                            // Auto accept is set for a custom quest and there is no inventory space
-                                            _player->PlayerTalkClass->SendCloseGossip();
-                                            break;
-                                        }
+                                        _player->AddQuestAndCheckCompletion(nextQuest, object);
                                     }
-                                    _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
+                                    else
+                                    {
+                                        // Auto accept is set for a custom quest and there is no inventory space
+                                        _player->PlayerTalkClass->SendCloseGossip();
+                                        break;
+                                    }
                                 }
+                                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
                             }
 
-                            questgiver->AI()->sQuestReward(_player, quest, reward);
+                            questgiver->AI()->QuestReward(_player, quest, reward);
                         }
                         break;
                     }
                 case TYPEID_GAMEOBJECT:
                     {
                         GameObject* questGiver = object->ToGameObject();
-                        if (!sScriptMgr->OnQuestReward(_player, questGiver, quest, reward))
-                        {
-                            // Send next quest
-                            if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
-                            {
-                                if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
-                                {
-                                    if (nextQuest->IsAutoAccept())
-                                        _player->AddQuestAndCheckCompletion(nextQuest, object);
-                                    _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
-                                }
-                            }
 
-                            questGiver->AI()->QuestReward(_player, quest, reward);
+                        // Send next quest
+                        if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
+                        {
+                            if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
+                            {
+                                if (nextQuest->IsAutoAccept())
+                                    _player->AddQuestAndCheckCompletion(nextQuest, object);
+                                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
+                            }
                         }
+
+                        _player->PlayerTalkClass->ClearMenus();
+                        questGiver->AI()->QuestReward(_player, quest, reward);
                         break;
                     }
                 default:

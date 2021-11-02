@@ -68,17 +68,6 @@ public:
         return new npc_eris_hevenfireAI(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
-        {
-            creature->AI()->SetData(player->GetFaction(), 0);
-            creature->AI()->SetGUID(player->GetGUID());
-        }
-
-        return true;
-    }
-
     struct npc_eris_hevenfireAI : public ScriptedAI
     {
         npc_eris_hevenfireAI(Creature* c) : ScriptedAI(c), summons(me) {}
@@ -105,21 +94,20 @@ public:
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void SetData(uint32 faction, uint32) override
+        void QuestAccept(Player* player, Quest const* quest) override
         {
-            _faction = faction;
-        }
+            if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
+            {
+                _faction = player->GetFaction();
+                _playerGUID = player->GetGUID();
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                events.Reset();
+                summons.DespawnAll();
 
-        void SetGUID(ObjectGuid guid, int32) override
-        {
-            _playerGUID = guid;
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-            events.Reset();
-            summons.DespawnAll();
-
-            events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            events.ScheduleEvent(EVENT_SUMMON_ARCHERS, 4000);
-            events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8000);
+                events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
+                events.ScheduleEvent(EVENT_SUMMON_ARCHERS, 4000);
+                events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8000);
+            }
         }
 
         bool CanBeSeen(Player const* player) override
@@ -244,16 +232,11 @@ public:
 class npc_balance_of_light_and_shadow : public CreatureScript
 {
 public:
-    npc_balance_of_light_and_shadow() : CreatureScript("npc_balance_of_light_and_shadow") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_balance_of_light_and_shadowAI (creature);
-    }
+    npc_balance_of_light_and_shadow(Creature* c) : CreatureScript("npc_balance_of_light_and_shadow") { }
 
     struct npc_balance_of_light_and_shadowAI : public NullCreatureAI
     {
-        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
+        npc_balance_of_light_and_shadowAI() : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
 
         bool CanBeSeen(Player const* player) override
         {
@@ -311,6 +294,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_balance_of_light_and_shadowAI(creature);
+    }
 };
 
 // Theirs
@@ -323,24 +311,34 @@ class npc_augustus_the_touched : public CreatureScript
 public:
     npc_augustus_the_touched() : CreatureScript("npc_augustus_the_touched") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct npc_augustus_the_touchedAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-        return true;
-    }
+        npc_augustus_the_touchedAI(Creature* c) : ScriptedAI(c) {}
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_TRADE)
+                player->GetSession()->SendListInventory(me->GetGUID());
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (me->IsVendor() && player->GetQuestRewardStatus(6164))
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (creature->IsVendor() && player->GetQuestRewardStatus(6164))
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
+        return new npc_augustus_the_touchedAI(creature);
     }
 };
 

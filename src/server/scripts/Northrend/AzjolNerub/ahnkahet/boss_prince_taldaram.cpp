@@ -17,6 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "GameObjectAI.h"
 #include "ahnkahet.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
@@ -517,35 +518,47 @@ class go_prince_taldaram_sphere : public GameObjectScript
 public:
     go_prince_taldaram_sphere() : GameObjectScript("go_prince_taldaram_sphere") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject *go) override
+    struct go_prince_taldaram_sphereAI : public GameObjectAI
     {
-        if (pPlayer && pPlayer->IsInCombat())
-        {
-            return true;
-        }
+        go_prince_taldaram_sphereAI(GameObject* go) : GameObjectAI(go), instance(go->GetInstanceScript()) {}
 
-        InstanceScript *pInstance = go->GetInstanceScript();
-        if (!pInstance)
-        {
-            return true;
-        }
+        InstanceScript* instance;
 
-        go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-        go->SetGoState(GO_STATE_ACTIVE);
-
-        uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
-        if (pInstance->GetData(objectIndex) == NOT_STARTED)
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            Creature* taldaram = ObjectAccessor::GetCreature(*go, pInstance->GetGuidData(DATA_PRINCE_TALDARAM));
-            if (taldaram && taldaram->IsAlive())
+            if (player && player->IsInCombat())
             {
-                taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
+                return true;
             }
 
-            pInstance->SetData(objectIndex, DONE);
-        }
+            InstanceScript* instance = me->GetInstanceScript();
+            if (!instance)
+            {
+                return true;
+            }
 
-        return true;
+            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            me->SetGoState(GO_STATE_ACTIVE);
+
+            uint32 const objectIndex = me->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
+            if (instance->GetData(objectIndex) == NOT_STARTED)
+            {
+                Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM));
+                if (taldaram && taldaram->IsAlive())
+                {
+                    taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
+                }
+
+                instance->SetData(objectIndex, DONE);
+            }
+
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return GetAhnkahetAI<go_prince_taldaram_sphereAI>(go);
     }
 };
 
