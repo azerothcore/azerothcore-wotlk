@@ -150,15 +150,18 @@ public:
     {
         npc_garr_fireswornAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void JustDied(Unit* killer) override
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/ ) override
         {
-            // Prevent double damage because Firesworn can kill himself with Massive Erruption
-            if (me != killer)
+            if (damage >= me->GetHealth())
             {
-                DoCastSelf(SPELL_ERUPTION, true);
-            }
+                // Prevent double damage because Firesworn can kill himself with Massive Erruption
+                if (me != attacker)
+                {
+                    DoCastSelf(SPELL_ERUPTION, true);
+                }
 
-            DoCastAOE(SPELL_ENRAGE_TRIGGER);
+                DoCastAOE(SPELL_ENRAGE_TRIGGER);
+            }
         }
     };
 
