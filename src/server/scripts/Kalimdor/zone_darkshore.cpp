@@ -155,18 +155,17 @@ public:
 
 enum Kerlonian
 {
-    SAY_KER_START    = 0,
-    EMOTE_KER_SLEEP  = 1,
-    SAY_KER_SLEEP    = 2,
-    SAY_KER_ALERT_1  = 3,
-    SAY_KER_END      = 4,
+    SAY_KER_START = 0,
+    EMOTE_KER_SLEEP = 1,
+    SAY_KER_SLEEP = 2,
+    SAY_KER_ALERT_1 = 3,
+    SAY_KER_END = 4,
     EMOTE_KER_AWAKEN = 5,
 
-    SPELL_SLEEP_VISUAL     = 25148,
-    SPELL_AWAKEN           = 17536,
+    SPELL_SLEEP_VISUAL = 25148,
+    SPELL_AWAKEN = 17536,
     QUEST_SLEEPER_AWAKENED = 5321,
-    NPC_LILADRIS           = 11219, // attackers entries unknown
-    FACTION_KER_ESCORTEE   = 113
+    NPC_LILADRIS = 11219                    //attackers entries unknown
 };
 
 /// @todo make concept similar as "ringo" -escort. Find a way to run the scripted attacks, _if_ player are choosing road.
@@ -288,25 +287,24 @@ public:
 
 enum Remtravel
 {
-    SAY_REM_START         = 0,
-    SAY_REM_AGGRO         = 1,
-    SAY_REM_RAMP1_1       = 2,
-    SAY_REM_RAMP1_2       = 3,
-    SAY_REM_BOOK          = 4,
-    SAY_REM_TENT1_1       = 5,
-    SAY_REM_TENT1_2       = 6,
-    SAY_REM_MOSS          = 7,
-    EMOTE_REM_MOSS        = 8,
+    SAY_REM_START = 0,
+    SAY_REM_AGGRO = 1,
+    SAY_REM_RAMP1_1 = 2,
+    SAY_REM_RAMP1_2 = 3,
+    SAY_REM_BOOK = 4,
+    SAY_REM_TENT1_1 = 5,
+    SAY_REM_TENT1_2 = 6,
+    SAY_REM_MOSS = 7,
+    EMOTE_REM_MOSS = 8,
     SAY_REM_MOSS_PROGRESS = 9,
-    SAY_REM_PROGRESS      = 10,
-    SAY_REM_REMEMBER      = 11,
-    EMOTE_REM_END         = 12,
+    SAY_REM_PROGRESS = 10,
+    SAY_REM_REMEMBER = 11,
+    EMOTE_REM_END = 12,
 
-    FACTION_ESCORTEE        = 10,
     QUEST_ABSENT_MINDED_PT2 = 731,
-    NPC_GRAVEL_SCOUT        = 2158,
-    NPC_GRAVEL_BONE         = 2159,
-    NPC_GRAVEL_GEO          = 2160
+    NPC_GRAVEL_SCOUT = 2158,
+    NPC_GRAVEL_BONE = 2159,
+    NPC_GRAVEL_GEO = 2160
 };
 
 class npc_prospector_remtravel : public CreatureScript
