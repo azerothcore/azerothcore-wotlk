@@ -7,4 +7,4 @@ INSERT INTO `creature_equip_template` (`CreatureID`,`ID`,`ItemID1`,`ItemID2`,`It
 (4664,1,4991,0,0,0),
 (4665,1,2559,0,0,0),
 (4666,1,5285,5281,0,0),
-(4667,1,xxxx,0,0,0);
+(4667,1,1927,0,0,0);
