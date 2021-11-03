@@ -15,73 +15,106 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Player.h"
-
 #ifndef DEF_MOLTEN_CORE_H
 #define DEF_MOLTEN_CORE_H
 
-#include "CreatureAIImpl.h"
-
 #define MCScriptName "instance_molten_core"
 
-enum Encounters
+constexpr uint32 MAX_ENCOUNTER = 10;
+
+enum MCData
 {
-    BOSS_LUCIFRON                   = 0,
-    BOSS_MAGMADAR                   = 1,
-    BOSS_GEHENNAS                   = 2,
-    BOSS_GARR                       = 3,
-    BOSS_SHAZZRAH                   = 4,
-    BOSS_BARON_GEDDON               = 5,
-    BOSS_SULFURON_HARBINGER         = 6,
-    BOSS_GOLEMAGG_THE_INCINERATOR   = 7,
-    BOSS_MAJORDOMO_EXECUTUS         = 8,
-    BOSS_RAGNAROS                   = 9,
-    MAX_ENCOUNTER,
+    DATA_LUCIFRON                   = 0,
+    DATA_MAGMADAR                   = 1,
+    DATA_GEHENNAS                   = 2,
+    DATA_GARR                       = 3,
+    DATA_SHAZZRAH                   = 4,
+    DATA_GEDDON                     = 5,
+    DATA_SULFURON                   = 6,
+    DATA_GOLEMAGG                   = 7,
+    DATA_MAJORDOMO_EXECUTUS         = 8,
+    DATA_RAGNAROS                   = 9,
+
+    // Other data
+    DATA_LAVA_STEAM                 = 10,
+    DATA_LAVA_SPLASH                = 11,
 };
 
-enum Actions
+enum MCActions
 {
-    ACTION_START_RAGNAROS       = 0,
-    ACTION_START_RAGNAROS_ALT   = 1,
+    ACTION_START_RAGNAROS_INTRO         = -1,
+    ACTION_FINISH_RAGNAROS_INTRO        = -2,
+    ACTION_RESET_MAGMADAR_ENCOUNTER     = -3,   // Used when ragers are pulled far away
+    ACTION_PREPARE_MAJORDOMO_RAGNA      = -4,
 };
 
-Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
-Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.00000f};
-
-enum Creatures
+enum MCCreatures
 {
-    NPC_LUCIFRON                    = 12118,
     NPC_MAGMADAR                    = 11982,
-    NPC_GEHENNAS                    = 12259,
-    NPC_GARR                        = 12057,
     NPC_SHAZZRAH                    = 12264,
     NPC_BARON_GEDDON                = 12056,
-    NPC_SULFURON_HARBINGER          = 12098,
-    NPC_GOLEMAGG_THE_INCINERATOR    = 11988,
-    NPC_MAJORDOMO_EXECUTUS          = 12018,
     NPC_RAGNAROS                    = 11502,
     NPC_FLAMEWAKER_HEALER           = 11663,
     NPC_FLAMEWAKER_ELITE            = 11664,
-    NPC_CORE_RAGER                  = 11672,
     NPC_CORE_HOUND                  = 11671,
+
+    // Garr
+    NPC_GARR                        = 12057,
+    NPC_FIRESWORN                   = 12099,
+
+    // Gehennas
+    NPC_GEHENNAS                    = 12259,
+    NPC_FLAMEWALKER                 = 11661,
+
+    // Golemagg
+    NPC_GOLEMAGG_THE_INCINERATOR    = 11988,
+    NPC_CORE_RAGER                  = 11672,
+
+    // Lucifron
+    NPC_LUCIFRON                    = 12118,
+    NPC_FLAMEWALKER_PROTECTOR       = 12119,
+
+    // Sulfuron
+    NPC_SULFURON_HARBINGER          = 12098,
+    NPC_FLAMEWALKER_PRIEST          = 11662,
+
+    // Majordomo
+    NPC_MAJORDOMO_EXECUTUS          = 12018,
+    NPC_FLAMEWALKER_HEALER          = 11663,
+    NPC_FLAMEWALKER_ELITE           = 11664,
 };
 
-enum GameObjects
+enum MCGameObjects
 {
     GO_CACHE_OF_THE_FIRELORD        = 179703,
     GO_CIRCLE_SULFURON              = 178187,
-    GO_CIRCLE_BARON                 = 178188,
+    GO_CIRCLE_GEDDON                = 178188,
     GO_CIRCLE_SHAZZRAH              = 178189,
     GO_CIRCLE_GOLEMAGG              = 178190,
     GO_CIRCLE_GARR                  = 178191,
     GO_CIRCLE_MAGMADAR              = 178192,
     GO_CIRCLE_GEHENNAS              = 178193,
+
+    GO_RUNE_KRESS                   = 176956,   // Magmadar
+    GO_RUNE_MOHN                    = 176957,   // Gehennas
+    GO_RUNE_BLAZ                    = 176955,   // Garr
+    GO_RUNE_MAZJ                    = 176953,   // Shazzrah
+    GO_RUNE_ZETH                    = 176952,   // Geddon
+    GO_RUNE_THERI                   = 176954,   // Golemagg
+    GO_RUNE_KORO                    = 176951,   // Sulfuron
+
+    // Ragnaros event related
+    GO_LAVA_STEAM                   = 178107,
+    GO_LAVA_SPLASH                  = 178108,
 };
 
-enum Data
+enum MCSpells
 {
-    DATA_RAGNAROS_ADDS  = 0,
+    SPELL_CORE_RAGER_QUIET_SUICIDE  = 3617,     // Server side
 };
+
+extern Position const MajordomoRagnaros;        // Teleport location to Ragnaros summons area
+extern Position const MajordomoSummonPos;       // Majordomo summon position (battle)
 
 template <class AI, class T>
 inline AI* GetMoltenCoreAI(T* obj)
