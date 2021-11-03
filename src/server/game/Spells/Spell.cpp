@@ -5788,7 +5788,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                         float objSize = target->GetCombatReach();
                         float range   = m_spellInfo->GetMaxRange(true, m_caster, this) * 1.5f + objSize;
 
-
                         if (m_caster->GetTransport() != target->GetTransport())
                             return SPELL_FAILED_NOPATH;
                         if (m_caster->GetTransport())
