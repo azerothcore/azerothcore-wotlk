@@ -49,7 +49,8 @@ enum Spells
     SPELL_PARASITIC_SERPENT_TRIGGER = 23867,
     // used when swapping event-stages
     SPELL_VENOXIS_TRANSFORM         = 23849,    // 50% health - shapechange to cobra
-    SPELL_FRENZY                    = 8269      // 20% health - frenzy
+    SPELL_FRENZY                    = 8269,      // 20% health - frenzy
+    SPELL_POISON = 24097
 };
 
 enum Events
@@ -68,6 +69,7 @@ enum Events
     EVENT_VENOM_SPIT                = 9,
     EVENT_PARASITIC_SERPENT         = 10,
     EVENT_FRENZY                    = 11,
+    EVENT_POISON
 };
 
 enum Phases
@@ -78,7 +80,9 @@ enum Phases
 
 enum NPCs
 {
-    NPC_PARASITIC_SERPENT           = 14884
+    NPC_PARASITIC_SERPENT           = 14884,
+    NPC_RAZZASHI_COBRA    = 11373,
+    BOSS_VENOXIS          = 14507
 };
 
 class boss_venoxis : public CreatureScript
@@ -101,6 +105,8 @@ public:
             _transformed = false;
             _frenzied = false;
             events.SetPhase(PHASE_ONE);
+
+            SpawnCobras();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -108,6 +114,28 @@ public:
             _JustDied();
             Talk(SAY_VENOXIS_DEATH);
             me->RemoveAllAuras();
+        }
+
+        void SpawnCobras()
+        {
+            me->SummonCreature(NPC_RAZZASHI_COBRA, -12021.20f, -1719.73f, 39.34f, 0.85f, TEMPSUMMON_CORPSE_DESPAWN);
+            me->SummonCreature(NPC_RAZZASHI_COBRA, -12029.40f, -1714.54f, 39.36f, 0.68f, TEMPSUMMON_CORPSE_DESPAWN);
+            me->SummonCreature(NPC_RAZZASHI_COBRA, -12036.79f, -1704.27f, 40.06f, 0.45f, TEMPSUMMON_CORPSE_DESPAWN);
+            me->SummonCreature(NPC_RAZZASHI_COBRA, -12037.70f, -1694.20f, 39.35f, 0.27f, TEMPSUMMON_CORPSE_DESPAWN);
+        }
+
+        void SetCombatCombras()
+        {
+            std::list<Creature*> cobraList;
+            me->GetCreatureListWithEntryInGrid(cobraList, NPC_RAZZASHI_COBRA, 50.0f);
+
+            if (!cobraList.empty())
+            {
+                for (auto cobras : cobraList)
+                {
+                    cobras->SetInCombatWithZone();
+                }
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -127,6 +155,7 @@ public:
 
             // Set zone in combat
             DoZoneInCombat();
+            SetCombatCombras();
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -267,7 +296,72 @@ public:
     }
 };
 
+class npc_razzashi_cobra_venoxis : public CreatureScript
+{
+public:
+    npc_razzashi_cobra_venoxis() : CreatureScript("npc_razzashi_cobra_venoxis") {}
+
+    struct npc_razzashi_cobra_venoxis_AI : public ScriptedAI
+    {
+        npc_razzashi_cobra_venoxis_AI(Creature* creature) : ScriptedAI(creature) {}
+
+        EventMap events;
+
+        void Reset()
+        {
+            events.Reset();
+        }
+
+        void EnterCombat(Unit*)
+        {
+            events.ScheduleEvent(EVENT_POISON, 8 * IN_MILLISECONDS);
+
+            if (Creature* Venoxis = GetVenoxis())
+            {
+                Venoxis->SetInCombatWithZone();
+            }
+        }
+
+        Creature* GetVenoxis()
+        {
+            return me->FindNearestCreature(BOSS_VENOXIS, 200.0f, true);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_POISON:
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_POISON);
+                    events.ScheduleEvent(EVENT_POISON, 15 * IN_MILLISECONDS);
+                    break;
+                }
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_razzashi_cobra_venoxis_AI(creature);
+    }
+};
+
 void AddSC_boss_venoxis()
 {
     new boss_venoxis();
+    new npc_razzashi_cobra_venoxis();
 }
