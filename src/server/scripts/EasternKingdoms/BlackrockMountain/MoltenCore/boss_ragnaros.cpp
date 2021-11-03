@@ -102,7 +102,7 @@ public:
             _Reset();
 
             // Never reset intro events!
-            if (extraEvents.GetPhaseMask() != (1 << (PHASE_INTRO - 1)))
+            if (!(extraEvents.GetPhaseMask() & (1 << (PHASE_INTRO - 1))))
             {
                 extraEvents.Reset();
                 extraEvents.SetPhase(PHASE_EMERGED);
@@ -330,6 +330,7 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
             {
                 AttackStart(target);
