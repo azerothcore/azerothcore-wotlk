@@ -106,6 +106,10 @@ public:
             {
                 extraEvents.Reset();
                 extraEvents.SetPhase(PHASE_EMERGED);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
             }
 
             _hasYelledMagmaBurst = false;
