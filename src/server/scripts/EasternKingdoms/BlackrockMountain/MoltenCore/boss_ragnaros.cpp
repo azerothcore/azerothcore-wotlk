@@ -44,8 +44,6 @@ enum Spells
     SPELL_RAGSUBMERGE                       = 21107,                   // Stealth aura
     SPELL_RAGNA_SUBMERGE_VISUAL             = 20567,                   // Visual for submerging into lava
     SPELL_RAGEMERGE                         = 20568,
-    SPELL_MELT_WEAPON                       = 21387,
-    SPELL_ELEMENTAL_FIRE                    = 20563,
     SPELL_ERRUPTION                         = 17731,
     SPELL_RAGNAROS_SUBMERGE_EFFECT          = 21859,    // Applies pacify state and applies all schools immunity
 };
