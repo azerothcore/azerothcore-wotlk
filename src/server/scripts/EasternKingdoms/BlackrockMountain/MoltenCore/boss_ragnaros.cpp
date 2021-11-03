@@ -136,6 +136,7 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
+            events.SetPhase(PHASE_EMERGED);
             SechedulleCombatEvents();
         }
 
@@ -321,6 +322,7 @@ public:
             }
 
             events.CancelEventGroup(PHASE_SUBMERGED);
+            events.SetPhase(PHASE_EMERGED);
             SechedulleCombatEvents();
             extraEvents.CancelEventGroup(PHASE_SUBMERGED);
             extraEvents.SetPhase(PHASE_EMERGED);
@@ -337,7 +339,7 @@ public:
 
         void SechedulleCombatEvents()
         {
-            events.SetPhase(PHASE_EMERGED);
+            
             events.ScheduleEvent(EVENT_ERUPTION, 15000, PHASE_EMERGED, PHASE_EMERGED);
             events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, PHASE_EMERGED, PHASE_EMERGED);
             events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, PHASE_EMERGED, PHASE_EMERGED);
