@@ -82,8 +82,6 @@ enum Aeranas
 {
     SAY_SUMMON                  = 0,
     SAY_FREE                    = 1,
-    FACTION_HOSTILE             = 16,
-    FACTION_FRIENDLY            = 35,
     SPELL_ENVELOPING_WINDS      = 15535,
     SPELL_SHOCK                 = 12553
 };
@@ -104,7 +102,7 @@ public:
             shock_Timer = 5000;
 
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            me->setFaction(FACTION_FRIENDLY);
+            me->SetFaction(FACTION_FRIENDLY);
 
             Talk(SAY_SUMMON);
         }
@@ -115,7 +113,7 @@ public:
             {
                 if (faction_Timer <= diff)
                 {
-                    me->setFaction(FACTION_HOSTILE);
+                    me->SetFaction(FACTION_MONSTER_2);
                     faction_Timer = 0;
                 }
                 else faction_Timer -= diff;
@@ -126,7 +124,7 @@ public:
 
             if (HealthBelowPct(30))
             {
-                me->setFaction(FACTION_FRIENDLY);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 me->RemoveAllAuras();
                 me->DeleteThreatList();
@@ -249,8 +247,7 @@ enum WoundedBloodElf
     SAY_ELF_AGGRO               = 5,
     QUEST_ROAD_TO_FALCON_WATCH  = 9375,
     NPC_HAALESHI_WINDWALKER     = 16966,
-    NPC_HAALESHI_TALONGUARD     = 16967,
-    FACTION_FALCON_WATCH_QUEST  = 775
+    NPC_HAALESHI_TALONGUARD     = 16967
 };
 
 class npc_wounded_blood_elf : public CreatureScript
@@ -279,7 +276,7 @@ public:
         {
             if (quest->GetQuestId() == QUEST_ROAD_TO_FALCON_WATCH)
             {
-                me->setFaction(FACTION_FALCON_WATCH_QUEST);
+                me->SetFaction(FACTION_ESCORTEE_H_PASSIVE);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
         }

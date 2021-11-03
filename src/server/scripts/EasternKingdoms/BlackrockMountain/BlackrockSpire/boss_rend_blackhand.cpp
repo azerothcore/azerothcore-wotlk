@@ -64,63 +64,6 @@ enum Misc
     REND_PATH_2                     = 1379681,
 };
 
-struct Wave
-{
-    uint32 entry;
-    float  x_pos;
-    float  y_pos;
-    float  z_pos;
-};
-
-static Wave Wave1[] = // 22 sec
-{
-    { 10447, 202.511f, -421.307f, 110.9877f },
-    { 10442, 204.015f, -418.443f, 110.989f },
-    { 10442, 203.142f, -423.999f, 110.986f },
-    { 10442, 201.008f, -416.648f, 110.974f }
-};
-
-static Wave Wave2[] = // 22 sec
-{
-    { 10447, 209.8637f, -428.2729f, 110.9877f },
-    { 10442, 209.3122f, -430.8724f, 110.9814f },
-    { 10442, 211.3309f, -425.9111f, 111.0006f }
-};
-
-static Wave Wave3[] = // 60 sec
-{
-    { 10742, 208.6493f, -424.5787f, 110.9872f },
-    { 10447, 203.9482f, -428.9446f, 110.982f, },
-    { 10442, 203.3441f, -426.8668f, 110.9772f },
-    { 10442, 206.3079f, -424.7509f, 110.9943f }
-};
-
-static Wave Wave4[] = // 49 sec
-{
-    { 10742, 212.3541f, -412.6826f, 111.0352f },
-    { 10447, 212.5754f, -410.2841f, 111.0296f },
-    { 10442, 212.3449f, -414.8659f, 111.0348f },
-    { 10442, 210.6568f, -412.1552f, 111.0124f }
-};
-
-static Wave Wave5[] = // 60 sec
-{
-    { 10742, 210.2188f, -410.6686f, 111.0211f },
-    { 10447, 209.4078f, -414.13f,   111.0264f },
-    { 10442, 208.0858f, -409.3145f, 111.0118f },
-    { 10442, 207.9811f, -413.0728f, 111.0098f },
-    { 10442, 208.0854f, -412.1505f, 111.0057f }
-};
-
-static Wave Wave6[] = // 27 sec
-{
-    { 10742, 213.9138f, -426.512f,  111.0013f },
-    { 10447, 213.7121f, -429.8102f, 110.9888f },
-    { 10447, 213.7157f, -424.4268f, 111.009f, },
-    { 10442, 210.8935f, -423.913f,  111.0125f },
-    { 10442, 212.2642f, -430.7648f, 110.9807f }
-};
-
 /*Position const GythLoc =      { 211.762f,  -397.5885f, 111.1817f,  4.747295f   };
 Position const Teleport1Loc = { 194.2993f, -474.0814f, 121.4505f, -0.01225555f };
 Position const Teleport2Loc = { 216.485f,  -434.93f,   110.888f,  -0.01225555f };*/
@@ -136,12 +79,7 @@ enum Events
     EVENT_TURN_TO_FACING_1          = 7,
     EVENT_TURN_TO_FACING_2          = 8,
     EVENT_TURN_TO_FACING_3          = 9,
-    EVENT_WAVE_1                    = 10,
-    EVENT_WAVE_2                    = 11,
-    EVENT_WAVE_3                    = 12,
-    EVENT_WAVE_4                    = 13,
-    EVENT_WAVE_5                    = 14,
-    EVENT_WAVE_6                    = 15,
+    EVENT_SPAWN_WAVE                = 10,
     EVENT_WAVES_TEXT_1              = 16,
     EVENT_WAVES_TEXT_2              = 17,
     EVENT_WAVES_TEXT_3              = 18,
@@ -184,6 +122,7 @@ public:
             gythEvent = false;
             victorGUID.Clear();
             waveDoorGUID.Clear();
+            _currentWave = 0;
 
             summons.DespawnAll();
 
@@ -196,13 +135,12 @@ public:
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, NOT_STARTED);
         }
 
-        void SummonWave(Wave* wave, uint32 size)
+        void SummonedCreatureDies(Creature* /*creature*/, Unit* /*killer*/) override
         {
-            for (uint8 i = 0; i < size; ++i)
-                me->SummonCreature(wave[i].entry, wave[i].x_pos, wave[i].y_pos, wave[i].z_pos, M_PI);
-
-            if (GameObject* waveDoor = me->GetMap()->GetGameObject(waveDoorGUID))
-                waveDoor->UseDoorOrButton();
+            if (!summons.IsAnyCreatureAlive())
+            {
+                events.ScheduleEvent(EVENT_WAVES_TEXT_1 + _currentWave, 10 * IN_MILLISECONDS);
+            }
         }
 
         void JustSummoned(Creature* summon) override
@@ -211,15 +149,11 @@ public:
 
             if (summon->GetEntry() == NPC_GYTH)
             {
-                summon->AI()->SetData(1, 1);
                 me->DespawnOrUnsummon();
                 return;
             }
 
-            if (Unit* target = SelectTargetFromPlayerList(100.0f))
-                summon->AI()->AttackStart(target);
-            else
-                Reset();
+            summon->AI()->DoZoneInCombat(nullptr, 100.0f);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -228,6 +162,19 @@ public:
             events.ScheduleEvent(EVENT_WHIRLWIND,     urand(13000, 15000));
             events.ScheduleEvent(EVENT_CLEAVE,        urand(15000, 17000));
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(17000, 19000));
+        }
+
+        void EnterEvadeMode() override
+        {
+            instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
+            instance->SetBossState(DATA_GYTH, FAIL);
+            BossAI::EnterEvadeMode();
+            me->DespawnOrUnsummon();
+        }
+
+        void IsSummonedBy(Unit* /*summoner*/) override
+        {
+            Talk(EMOTE_BLACKHAND_DISMOUNT);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -242,6 +189,16 @@ public:
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, DONE);
         }
 
+        void SummonedCreatureDespawn(Creature* creature) override
+        {
+            if (creature->IsAlive() && !summons.IsAnyCreatureInCombat())
+            {
+                instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
+            }
+
+            BossAI::SummonedCreatureDespawn(creature);
+        }
+
         void SetData(uint32 type, uint32 data) override
         {
             if (type == AREATRIGGER && data == AREATRIGGER_BLACKROCK_STADIUM)
@@ -250,15 +207,15 @@ public:
                 {
                     gythEvent = true;
 
-                    Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 5.0f, false);
+                    if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 5.0f))
+                    {
+                        if (!victor->IsAlive())
+                        {
+                            victor->Respawn(true);
+                        }
 
-                    if (victor)
-                        victor->Respawn();
-                    else
-                        victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 5.0f, true);
-
-                    if (victor)
                         victorGUID = victor->GetGUID();
+                    }
 
                     if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 50.0f))
                         waveDoorGUID = portcullis->GetGUID();
@@ -312,9 +269,8 @@ public:
                         case EVENT_START_3:
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_1);
-                            events.ScheduleEvent(EVENT_WAVE_1, 2000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE, 2000);
                             events.ScheduleEvent(EVENT_TURN_TO_REND, 4000);
-                            events.ScheduleEvent(EVENT_WAVES_TEXT_1, 20000);
                             break;
                         case EVENT_TURN_TO_REND:
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
@@ -352,39 +308,34 @@ public:
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4000);
                             events.ScheduleEvent(EVENT_WAVES_EMOTE_1, 5000);
-                            events.ScheduleEvent(EVENT_WAVE_2, 2000);
-                            events.ScheduleEvent(EVENT_WAVES_TEXT_2, 20000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE, 3000);
                             break;
                         case EVENT_WAVES_TEXT_2:
                             events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_3);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4000);
-                            events.ScheduleEvent(EVENT_WAVE_3, 2000);
-                            events.ScheduleEvent(EVENT_WAVES_TEXT_3, 20000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE, 3000);
                             break;
                         case EVENT_WAVES_TEXT_3:
                             events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_4);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4000);
-                            events.ScheduleEvent(EVENT_WAVE_4, 2000);
-                            events.ScheduleEvent(EVENT_WAVES_TEXT_4, 20000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE, 3000);
                             break;
                         case EVENT_WAVES_TEXT_4:
                             Talk(SAY_BLACKHAND_1);
                             events.ScheduleEvent(EVENT_WAVES_EMOTE_2, 4000);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_3, 8000);
-                            events.ScheduleEvent(EVENT_WAVE_5, 2000);
-                            events.ScheduleEvent(EVENT_WAVES_TEXT_5, 20000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE, 3000);
                             break;
                         case EVENT_WAVES_TEXT_5:
                             events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_5);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4000);
-                            events.ScheduleEvent(EVENT_WAVE_6, 2000);
-                            events.ScheduleEvent(EVENT_WAVES_COMPLETE_TEXT_1, 20000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE, 3000);
                             break;
                         case EVENT_WAVES_COMPLETE_TEXT_1:
                             events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
@@ -421,23 +372,8 @@ public:
                             me->NearTeleportTo(216.485f, -434.93f, 110.888f, -0.01225555f);
                             me->SummonCreature(NPC_GYTH, 211.762f, -397.5885f, 111.1817f, 4.747295f);
                             break;
-                        case EVENT_WAVE_1:
-                            SummonWave(Wave1, 4);
-                            break;
-                        case EVENT_WAVE_2:
-                            SummonWave(Wave2, 3);
-                            break;
-                        case EVENT_WAVE_3:
-                            SummonWave(Wave3, 4);
-                            break;
-                        case EVENT_WAVE_4:
-                            SummonWave(Wave4, 4);
-                            break;
-                        case EVENT_WAVE_5:
-                            SummonWave(Wave5, 5);
-                            break;
-                        case EVENT_WAVE_6:
-                            SummonWave(Wave6, 5);
+                        case EVENT_SPAWN_WAVE:
+                            SummonWave();
                             break;
                         default:
                             break;
@@ -474,8 +410,21 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void SummonWave()
+        {
+            me->SummonCreatureGroup(_currentWave);
+
+            if (GameObject* waveDoor = me->GetMap()->GetGameObject(waveDoorGUID))
+            {
+                waveDoor->UseDoorOrButton();
+            }
+
+            ++_currentWave;
+        }
+
     private:
         bool   gythEvent;
+        uint8 _currentWave;
         ObjectGuid victorGUID;
         ObjectGuid waveDoorGUID;
     };

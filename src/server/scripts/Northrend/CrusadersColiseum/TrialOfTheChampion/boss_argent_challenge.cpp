@@ -148,11 +148,11 @@ public:
             if( damage >= me->GetHealth() )
             {
                 damage = me->GetHealth() - 1;
-                if( me->getFaction() != 35 )
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(TEXT_EADRIC_DEATH);
                     me->getThreatMgr().clearReferences();
@@ -296,10 +296,10 @@ public:
             {
                 damage = me->GetHealth() - 1;
 
-                if( me->getFaction() != 35 )
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68574, true); // achievements
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(TEXT_PALETRESS_DEATH);
                     me->getThreatMgr().clearReferences();

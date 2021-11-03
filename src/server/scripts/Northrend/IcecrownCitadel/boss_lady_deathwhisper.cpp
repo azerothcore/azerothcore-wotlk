@@ -514,7 +514,7 @@ public:
                 if (darnavan->IsAlive())
                 {
                     darnavan->RemoveAllAuras();
-                    darnavan->setFaction(35);
+                    darnavan->SetFaction(FACTION_FRIENDLY);
                     darnavan->DeleteThreatList();
                     darnavan->CombatStop(true);
                     darnavan->GetMotionMaster()->MoveIdle();
