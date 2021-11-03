@@ -59,9 +59,14 @@ enum Events
     EVENT_MAGMA_BLAST,
     EVENT_SUBMERGE,
 
+    // Submerge
+    EVENT_EMERGE,
+
+    // Intro
     EVENT_INTRO_SAY,
     EVENT_INTRO_MAKE_ATTACKABLE
 };
+
 enum Creatures
 {
     NPC_SON_OF_FLAME                        = 12143,
@@ -73,7 +78,8 @@ enum Misc
 
     // Event phase
     PHASE_INTRO                             = 1,
-    PHASE_COMBAT                            = 2,
+    PHASE_EMERGED                           = 2,
+    PHASE_SUBMERGED                         = 3,
 };
 
 constexpr float DEATH_ORIENTATION = 4.0f;
@@ -86,10 +92,8 @@ public:
     struct boss_ragnarosAI : public BossAI
     {
         boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
-            _emergeTimer(90000),
             _hasYelledMagmaBurst(false),
-            _hasSubmergedOnce(false),
-            _isBanished(false)
+            _hasSubmergedOnce(false)
         {
         }
 
@@ -101,13 +105,11 @@ public:
             if (extraEvents.GetPhaseMask() != (1 << (PHASE_INTRO - 1)))
             {
                 extraEvents.Reset();
-                extraEvents.SetPhase(PHASE_COMBAT);
+                extraEvents.SetPhase(PHASE_EMERGED);
             }
 
-            _emergeTimer = 90000;
             _hasYelledMagmaBurst = false;
             _hasSubmergedOnce = false;
-            _isBanished = false;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             DoCastSelf(SPELL_MELT_WEAPON, true);
             DoCastSelf(SPELL_ELEMENTAL_FIRE, true);
@@ -125,17 +127,22 @@ public:
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
             summons.Despawn(summon);
+            if (events.IsInPhase(PHASE_SUBMERGED) && !summons.HasEntry(NPC_SON_OF_FLAME))
+            {
+                HandleEmerge();
+            }
         }
 
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_ERUPTION, 15000, 0, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, 0, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, 0, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_LAVA_BURST, 10000, 0, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000, 0, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_SUBMERGE, 180000, 0, PHASE_COMBAT);
+            events.SetPhase(PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_ERUPTION, 15000, 0, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, 0, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, 0, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_LAVA_BURST, 10000, 0, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000, 0, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_SUBMERGE, 180000, 0, PHASE_EMERGED);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -147,7 +154,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (roll_chance_i(25) && victim->GetTypeId() == TYPEID_PLAYER)
+            if (roll_chance_i(25) && victim->IsPlayer())
             {
                 Talk(SAY_KILL);
             }
@@ -171,6 +178,7 @@ public:
                 {
                     switch (eventId)
                     {
+                        // Intro events
                         case EVENT_INTRO_SAY:
                         {
                             Talk(SAY_ARRIVAL5_RAG);
@@ -179,36 +187,21 @@ public:
                         }
                         case EVENT_INTRO_MAKE_ATTACKABLE:
                         {
-                            extraEvents.SetPhase(PHASE_COMBAT);
+                            extraEvents.SetPhase(PHASE_EMERGED);
                             me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                             me->SetReactState(REACT_AGGRESSIVE);
                             DoZoneInCombat();
                             break;
                         }
+                        // Submerge events
+                        case EVENT_EMERGE:
+                        {
+                            HandleEmerge();
+                            break;
+                        }
                     }
                 }
-            }
-
-            if (_isBanished && (_emergeTimer <= diff || !summons.HasEntry(NPC_SON_OF_FLAME)))
-            {
-                //Become unbanished again
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetFaction(14);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                {
-                    AttackStart(target);
-                }
-
-                _isBanished = false;
-            }
-            else if (_isBanished)
-            {
-                _emergeTimer -= diff;
-                return;
             }
 
             if (!UpdateVictim())
@@ -222,6 +215,7 @@ public:
             {
                 return;
             }
+
             while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
@@ -275,20 +269,37 @@ public:
                     }
                     case EVENT_SUBMERGE:
                     {
-                        if (!_isBanished)
+                        events.SetPhase(PHASE_SUBMERGED);
+                        extraEvents.SetPhase(PHASE_SUBMERGED);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->InterruptNonMeleeSpells(false);
+                        me->AttackStop();
+                        DoResetThreat();
+                        
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
+                        DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
+                        //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
+
+                        Talk(_hasSubmergedOnce ? SAY_REINFORCEMENTS2 : SAY_REINFORCEMENTS1);
+
+                        for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
                         {
-                            me->InterruptNonMeleeSpells(false);
-                            me->AttackStop();
-                            DoResetThreat();
-                            me->SetReactState(REACT_PASSIVE);
-                            me->SetFaction(35);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
-                            DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
-                            //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                            SummonMinions();
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            {
+                                if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPosition(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
+                                {
+                                    summoned->AI()->AttackStart(target);
+                                }
+                            }
                         }
-                        events.ScheduleEvent(EVENT_SUBMERGE, 180000);
+
+                        if (!_hasSubmergedOnce)
+                        {
+                            _hasSubmergedOnce = true;
+                        }
+
+                        extraEvents.ScheduleEvent(EVENT_EMERGE, 90000, PHASE_SUBMERGED, PHASE_SUBMERGED);
                         break;
                     }
                 }
@@ -304,31 +315,28 @@ public:
 
     private:
         EventMap extraEvents;
-        uint32 _emergeTimer;
         bool _hasYelledMagmaBurst;
         bool _hasSubmergedOnce;
-        bool _isBanished;
 
-        void SummonMinions()
+        void HandleEmerge()
         {
-            Talk(_hasSubmergedOnce ? SAY_REINFORCEMENTS2 : SAY_REINFORCEMENTS1);
-
-            for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
+            if (events.IsInPhase(PHASE_EMERGED))
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                {
-                    if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
-                    {
-                        summoned->AI()->AttackStart(target);
-                    }
-                }
+                return;
             }
 
-            _isBanished = true;
-            _emergeTimer = 90000;
-            if (!_hasSubmergedOnce)
+            events.CancelEventGroup(PHASE_SUBMERGED);
+            events.SetPhase(PHASE_EMERGED);
+            extraEvents.CancelEventGroup(PHASE_SUBMERGED);
+            extraEvents.SetPhase(PHASE_EMERGED);
+
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
             {
-                _hasSubmergedOnce = true;
+                AttackStart(target);
             }
         }
     };
