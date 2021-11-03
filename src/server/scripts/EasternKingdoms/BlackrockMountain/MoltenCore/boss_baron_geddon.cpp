@@ -184,10 +184,51 @@ public:
     }
 };
 
+// 20478 Armageddon
+class spell_geddon_armageddon : public SpellScriptLoader
+{
+public:
+    spell_geddon_armageddon() : SpellScriptLoader("spell_geddon_armageddon") { }
+
+    class spell_geddon_armageddon_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_geddon_armageddon_AuraScript);
+
+        void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
+            {
+                pCreatureTarget->SetReactState(REACT_PASSIVE);
+                pCreatureTarget->AttackStop();
+            }
+        }
+
+        void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
+            {
+                pCreatureTarget->SetReactState(REACT_AGGRESSIVE);
+            }
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_geddon_armageddon_AuraScript::HandleAfterApply, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_geddon_armageddon_AuraScript::HandleAfterRemove, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_geddon_armageddon_AuraScript();
+    }
+};
+
 void AddSC_boss_baron_geddon()
 {
     new boss_baron_geddon();
 
     // Spells
     new spell_geddon_inferno();
+    new spell_geddon_armageddon();
 }
