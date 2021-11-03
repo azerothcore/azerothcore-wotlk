@@ -1746,7 +1746,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         delete targets;
                 }
                 if (e.action.wpStart.reactState <= REACT_AGGRESSIVE)
-                    me->SetReactState((ReactStates)e.action.wpStart.reactState);
+                {
+                    me->SetReactState((ReactStates) e.action.wpStart.reactState);
+                }
                 CAST_AI(SmartAI, me->AI())->StartPath(run, entry, repeat, unit);
 
                 uint32 quest = e.action.wpStart.quest;
