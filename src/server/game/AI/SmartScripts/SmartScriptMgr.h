@@ -28,12 +28,14 @@
 
 struct WayPoint
 {
-    WayPoint(uint32 _id, float _x, float _y, float _z)
+    WayPoint(uint32 _id, float _x, float _y, float _z, float _o, uint32 _delay)
     {
         id = _id;
         x = _x;
         y = _y;
         z = _z;
+        o = _o;
+        delay = _delay;
     }
 
     uint32 id;
