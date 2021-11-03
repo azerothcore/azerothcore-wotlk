@@ -114,8 +114,6 @@ public:
             _hasYelledMagmaBurst = false;
             _hasSubmergedOnce = false;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-            DoCastSelf(SPELL_MELT_WEAPON, true);
-            DoCastSelf(SPELL_ELEMENTAL_FIRE, true);
         }
 
         void DoAction(int32 action) override
