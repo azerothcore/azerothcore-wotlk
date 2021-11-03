@@ -131,7 +131,10 @@ public:
         boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
 
         // Disabled events
-        void JustDied(Unit* /*killer*/) override {}
+        void JustDied(Unit* /*killer*/) override
+        {
+            me->DespawnOrUnsummon(5000);
+        }
 
         void JustSummoned(Creature* summon) override
         {
