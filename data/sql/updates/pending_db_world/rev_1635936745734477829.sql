@@ -32,3 +32,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (811503, 9, 0, 0, 0, 0, 100, 0, 500, 500, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 4.72984, 'Witch Doctor Uzer''i - On Script - Set Orientation'),
 (811503, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Witch Doctor Uzer''i - On Script - Say Line 3'),
 (811503, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 82, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Witch Doctor Uzer''i - On Script - Add Npc Flag Questgiver+Gossip');
+-- Add Waypoints for Witch Doctor Uzer'i
+DELETE FROM `waypoints` WHERE `entry`=8115;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
+(8115, 1, -4375.1, 259.339, 26.584, 'Witch Doctor Uzer''i'),
+(8115, 2, -4378.28, 255.898, 26.3856, 'Witch Doctor Uzer''i'),
+(8115, 3, -4383, 256.683, 25.8833, 'Witch Doctor Uzer''i'),
+(8115, 4, -4378.28, 255.898, 26.3856, 'Witch Doctor Uzer''i'),
+(8115, 5, -4375.1, 259.339, 26.584, 'Witch Doctor Uzer''i'),
+(8115, 6, -4375.68, 269.717, 25.4947, 'Witch Doctor Uzer''i');
