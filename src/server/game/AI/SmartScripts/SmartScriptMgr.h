@@ -42,6 +42,8 @@ struct WayPoint
     float x;
     float y;
     float z;
+    float  o;
+    uint32 delay;
 };
 
 enum SMART_EVENT_PHASE
