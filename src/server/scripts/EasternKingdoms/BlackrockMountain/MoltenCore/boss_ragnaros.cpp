@@ -77,9 +77,9 @@ enum Misc
     MAX_SON_OF_FLAME_COUNT                  = 8,
 
     // Event phase
-    PHASE_INTRO                             = 1,
-    PHASE_EMERGED                           = 2,
-    PHASE_SUBMERGED                         = 3,
+    PHASE_INTRO                             = 1,        // Intro events with Majordomu
+    PHASE_EMERGED                           = 2,        // events which are executed while Ragnaros is visible
+    PHASE_SUBMERGED                         = 3,        // events which are executed while Ragnaros is submerged (not visible)
 };
 
 constexpr float DEATH_ORIENTATION = 4.0f;
@@ -136,13 +136,7 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
-            events.SetPhase(PHASE_EMERGED);
-            events.ScheduleEvent(EVENT_ERUPTION, 15000, 0, PHASE_EMERGED);
-            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, 0, PHASE_EMERGED);
-            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, 0, PHASE_EMERGED);
-            events.ScheduleEvent(EVENT_LAVA_BURST, 10000, 0, PHASE_EMERGED);
-            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000, 0, PHASE_EMERGED);
-            events.ScheduleEvent(EVENT_SUBMERGE, 180000, 0, PHASE_EMERGED);
+            SechedulleCombatEvents();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -269,6 +263,7 @@ public:
                     }
                     case EVENT_SUBMERGE:
                     {
+                        events.CancelEventGroup(PHASE_EMERGED);
                         events.SetPhase(PHASE_SUBMERGED);
                         extraEvents.SetPhase(PHASE_SUBMERGED);
                         me->SetReactState(REACT_PASSIVE);
@@ -326,7 +321,7 @@ public:
             }
 
             events.CancelEventGroup(PHASE_SUBMERGED);
-            events.SetPhase(PHASE_EMERGED);
+            SechedulleCombatEvents();
             extraEvents.CancelEventGroup(PHASE_SUBMERGED);
             extraEvents.SetPhase(PHASE_EMERGED);
 
@@ -338,6 +333,17 @@ public:
             {
                 AttackStart(target);
             }
+        }
+
+        void SechedulleCombatEvents()
+        {
+            events.SetPhase(PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_ERUPTION, 15000, PHASE_EMERGED, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, PHASE_EMERGED, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, PHASE_EMERGED, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_LAVA_BURST, 10000, PHASE_EMERGED, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000, PHASE_EMERGED, PHASE_EMERGED);
+            events.ScheduleEvent(EVENT_SUBMERGE, 180000, PHASE_EMERGED, PHASE_EMERGED);
         }
     };
 
