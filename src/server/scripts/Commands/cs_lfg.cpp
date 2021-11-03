@@ -62,7 +62,6 @@ public:
         return commandTable;
     }
 
-
     static bool HandleLfgPlayerInfoCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
         if (!player)
