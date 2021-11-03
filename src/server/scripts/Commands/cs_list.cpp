@@ -152,12 +152,21 @@ public:
         return true;
     }
 
-    static bool HandleListItemCommand(ChatHandler* handler, Hyperlink<item> item, Optional<uint32> countArg)
+    static bool HandleListItemCommand(ChatHandler* handler, Variant<Hyperlink<item>, uint32> itemArg, Optional<uint32> countArg)
     {
-        uint32 itemId = item->Item->ItemId;
+        uint32 itemId = 0;
         uint32 count = countArg.value_or(10);
 
-        if (count == 0)
+        if (itemArg.holds_alternative<Hyperlink<item>>())
+        {
+            itemId = itemArg.get<Hyperlink<item>>()->Item->ItemId;
+        }
+        else
+        {
+            itemId = itemArg.get<uint32>();
+        }
+
+        if (!count || !itemId)
             return false;
 
         PreparedQueryResult result;
