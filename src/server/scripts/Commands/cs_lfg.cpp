@@ -117,7 +117,7 @@ public:
         return true;
     }
 
-    static bool HandleLfgQueueInfoCommand(ChatHandler*  /*handler*/)
+    static bool HandleLfgQueueInfoCommand(ChatHandler* /*handler*/)
     {
         return true;
     }
