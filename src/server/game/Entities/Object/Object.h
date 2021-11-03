@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _OBJECT_H
@@ -926,15 +937,6 @@ public:
 
     virtual uint8 getLevelForTarget(WorldObject const* /*target*/) const { return 1; }
 
-    void MonsterSay(const char* text, uint32 language, WorldObject const* target);
-    void MonsterYell(const char* text, uint32 language, WorldObject const* target);
-    void MonsterTextEmote(const char* text, WorldObject const* target, bool IsBossEmote = false);
-    void MonsterWhisper(const char* text, Player const* target, bool IsBossWhisper = false);
-    void MonsterSay(int32 textId, uint32 language, WorldObject const* target);
-    void MonsterYell(int32 textId, uint32 language, WorldObject const* target);
-    void MonsterTextEmote(int32 textId, WorldObject const* target, bool IsBossEmote = false);
-    void MonsterWhisper(int32 textId, Player const* target, bool IsBossWhisper = false);
-
     void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
     void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
@@ -960,7 +962,6 @@ public:
     FlaggedValuesArray32<int32, uint32, ServerSideVisibilityType, TOTAL_SERVERSIDE_VISIBILITY_TYPES> m_serverSideVisibilityDetect;
 
     // Low Level Packets
-    void SendPlaySound(uint32 Sound, bool OnlySelf);
     void SendPlayMusic(uint32 Music, bool OnlySelf);
 
     virtual void SetMap(Map* map);
@@ -996,6 +997,7 @@ public:
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
     void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
     void DestroyForNearbyPlayers();
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);

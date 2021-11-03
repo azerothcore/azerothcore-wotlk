@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
@@ -171,7 +184,7 @@ public:
                 float dist = rand_norm() * 40.0f;
                 if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
                 {
-                    c->setFaction(31);
+                    c->SetFaction(FACTION_PREY);
                     c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     c->GetMotionMaster()->MoveRandom(15.0f);
                 }
@@ -439,7 +452,7 @@ public:
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
             determinationTimer = urand(10000, 50000);
             despawnTimer = 0;
-            if( me->getFaction() == 16 ) // hostile - it's phase 2
+            if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
                 if( Unit* target = me->SelectNearestTarget(250.0f) )
                 {
                     AttackStart(target);

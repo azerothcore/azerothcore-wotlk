@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CreatureAI.h"
@@ -666,9 +677,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     RemoveTimedQuest(quest_id);
 
-    std::vector<std::pair<uint32, uint32> > problematicItems;
+    std::vector<std::pair<uint32, uint32>> problematicItems;
 
-    if (quest->GetRewChoiceItemsCount() > 0)
+    if (quest->GetRewChoiceItemsCount())
     {
         if (uint32 itemId = quest->RewardChoiceItemId[reward])
         {
@@ -681,11 +692,13 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 sScriptMgr->OnQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
             }
             else
-                problematicItems.push_back(std::pair<uint32, uint32>(itemId, quest->RewardChoiceItemCount[reward]));
+            {
+                problematicItems.emplace_back(itemId, quest->RewardChoiceItemCount[reward]);
+            }
         }
     }
 
-    if (quest->GetRewItemsCount() > 0)
+    if (quest->GetRewItemsCount())
     {
         for (uint32 i = 0; i < quest->GetRewItemsCount(); ++i)
         {
@@ -700,7 +713,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                     sScriptMgr->OnQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
                 }
                 else
-                    problematicItems.push_back(std::pair<uint32, uint32>(itemId, quest->RewardItemIdCount[i]));
+                    problematicItems.emplace_back(itemId, quest->RewardItemIdCount[i]);
             }
         }
     }
@@ -708,21 +721,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // Xinef: send items that couldn't be added properly by mail
     if (!problematicItems.empty())
     {
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-        MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */ );
-        MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed."); // This is the text used in Cataclysm, it probably wasn't changed.
-
-        for (std::vector<std::pair<uint32, uint32> >::const_iterator itr = problematicItems.begin(); itr != problematicItems.end(); ++itr)
-        {
-            if(Item* item = Item::CreateItem(itr->first, itr->second))
-            {
-                item->SaveToDB(trans);
-                draft.AddItem(item);
-            }
-        }
-
-        draft.SendMailTo(trans, MailReceiver(this, GetGUID().GetCounter()), sender);
-        CharacterDatabase.CommitTransaction(trans);
+        SendItemRetrievalMail(problematicItems);
     }
 
     RewardReputation(quest);
@@ -752,8 +751,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
-    if (quest->GetRewOrReqMoney())
-        moneyRew += quest->GetRewOrReqMoney();
+    if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(this))
+    {
+        moneyRew += rewOrReqMoney;
+    }
 
     if (moneyRew)
     {
@@ -1603,16 +1604,32 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
-        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) ||
-            (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
+        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
         {
-            if (quest->IsAutoComplete() && quest->IsRepeatable() && !quest->IsDailyOrWeekly())
-                result2 = DIALOG_STATUS_REWARD_REP;
+            if (quest->IsRepeatable() && quest->IsDailyOrWeekly())
+            {
+                if (quest->IsAutoComplete())
+                {
+                    result2 = DIALOG_STATUS_AVAILABLE_REP;
+                }
+                else
+                {
+                    result2 = DIALOG_STATUS_REWARD_REP;
+                }
+            }
+            else if (quest->IsAutoComplete())
+            {
+                result2 = DIALOG_STATUS_AVAILABLE;
+            }
             else
+            {
                 result2 = DIALOG_STATUS_REWARD;
+            }
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
+        {
             result2 = DIALOG_STATUS_INCOMPLETE;
+        }
 
         if (result2 > result)
             result = result2;
@@ -1794,7 +1811,6 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                     CompleteQuest(questid);
                 else
                     AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
-                return;
             }
         }
     }
@@ -1836,7 +1852,6 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
                     m_QuestStatusSave[questid] = true;
                     IncompleteQuest(questid);
                 }
-                return;
             }
         }
     }
@@ -2087,23 +2102,30 @@ void Player::MoneyChanged(uint32 count)
         if (!questid)
             continue;
 
-        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
-        if (qInfo && qInfo->GetRewOrReqMoney() < 0)
+        if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid))
         {
-            QuestStatusData& q_status = m_QuestStatus[questid];
+            int32 rewOrReqMoney = qInfo->GetRewOrReqMoney();
+            if (rewOrReqMoney < 0)
+            {
+                QuestStatusData& q_status = m_QuestStatus[questid];
 
-            if (q_status.Status == QUEST_STATUS_INCOMPLETE)
-            {
-                if (int32(count) >= -qInfo->GetRewOrReqMoney())
+                if (q_status.Status == QUEST_STATUS_INCOMPLETE)
                 {
-                    if (CanCompleteQuest(questid))
-                        CompleteQuest(questid);
+                    if (int32(count) >= -rewOrReqMoney)
+                    {
+                        if (CanCompleteQuest(questid))
+                        {
+                            CompleteQuest(questid);
+                        }
+                    }
                 }
-            }
-            else if (q_status.Status == QUEST_STATUS_COMPLETE)
-            {
-                if (int32(count) < -qInfo->GetRewOrReqMoney())
-                    IncompleteQuest(questid);
+                else if (q_status.Status == QUEST_STATUS_COMPLETE)
+                {
+                    if (int32(count) < -rewOrReqMoney)
+                    {
+                        IncompleteQuest(questid);
+                    }
+                }
             }
         }
     }
@@ -2265,12 +2287,12 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         data << uint32(XP);
-        data << uint32(quest->GetRewOrReqMoney());
+        data << uint32(quest->GetRewOrReqMoney(this));
     }
     else
     {
         data << uint32(0);
-        data << uint32(quest->GetRewOrReqMoney() + quest->GetRewMoneyMaxLevel());
+        data << uint32(quest->GetRewOrReqMoney(this) + quest->GetRewMoneyMaxLevel());
     }
 
     data << uint32(10 * quest->CalculateHonorGain(GetQuestLevel(quest)));

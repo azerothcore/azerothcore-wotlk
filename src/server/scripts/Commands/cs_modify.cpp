@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -21,14 +32,20 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "StringConvert.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class modify_commandscript : public CommandScript
 {
 public:
     modify_commandscript() : CommandScript("modify_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> modifyspeedCommandTable =
+        static ChatCommandTable modifyspeedCommandTable =
         {
             { "fly",            SEC_GAMEMASTER,      false, &HandleModifyFlyCommand,           "" },
             { "all",            SEC_GAMEMASTER,      false, &HandleModifyASpeedCommand,        "" },
@@ -38,7 +55,7 @@ public:
             { "",               SEC_GAMEMASTER,      false, &HandleModifyASpeedCommand,        "" }
         };
 
-        static std::vector<ChatCommand> modifyCommandTable =
+        static ChatCommandTable modifyCommandTable =
         {
             { "hp",             SEC_GAMEMASTER,      false, &HandleModifyHPCommand,            "" },
             { "mana",           SEC_GAMEMASTER,      false, &HandleModifyManaCommand,          "" },
@@ -49,7 +66,7 @@ public:
             { "scale",          SEC_GAMEMASTER,      false, &HandleModifyScaleCommand,         "" },
             { "bit",            SEC_GAMEMASTER,      false, &HandleModifyBitCommand,           "" },
             { "faction",        SEC_ADMINISTRATOR,   false, &HandleModifyFactionCommand,       "" },
-            { "spell",          SEC_GAMEMASTER,      false, &HandleModifySpellCommand,         "" },
+            { "spell",          SEC_CONSOLE,         false, &HandleModifySpellCommand,         "" },
             { "talentpoints",   SEC_GAMEMASTER,      false, &HandleModifyTalentCommand,        "" },
             { "mount",          SEC_GAMEMASTER,      false, &HandleModifyMountCommand,         "" },
             { "honor",          SEC_GAMEMASTER,      false, &HandleModifyHonorCommand,         "" },
@@ -62,13 +79,13 @@ public:
             { "speed",          SEC_GAMEMASTER,      false, nullptr,                           "", modifyspeedCommandTable }
         };
 
-        static std::vector<ChatCommand> morphCommandTable =
+        static ChatCommandTable morphCommandTable =
         {
             { "reset",      SEC_MODERATOR,     false, &HandleMorphResetCommand, "" },
             { "target",     SEC_MODERATOR,     false, &HandleMorphTargetCommand, "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "morph",          SEC_MODERATOR,      false, nullptr,     "", morphCommandTable },
             { "modify",         SEC_GAMEMASTER,     false, nullptr,     "", modifyCommandTable }
@@ -316,7 +333,7 @@ public:
 
         if (!pfactionid)
         {
-            uint32 factionid = target->getFaction();
+            uint32 factionid = target->GetFaction();
             uint32 flag      = target->GetUInt32Value(UNIT_FIELD_FLAGS);
             uint32 npcflag   = target->GetUInt32Value(UNIT_NPC_FLAGS);
             uint32 dyflag    = target->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
@@ -358,7 +375,7 @@ public:
 
         handler->PSendSysMessage(LANG_YOU_CHANGE_FACTION, target->GetGUID().GetCounter(), factionid, flag, npcflag, dyflag);
 
-        target->setFaction(factionid);
+        target->SetFaction(factionid);
         target->SetUInt32Value(UNIT_FIELD_FLAGS, flag);
         target->SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
         target->SetUInt32Value(UNIT_DYNAMIC_FLAGS, dyflag);
