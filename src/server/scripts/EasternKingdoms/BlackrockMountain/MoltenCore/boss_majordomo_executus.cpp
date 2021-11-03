@@ -134,7 +134,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
         }
 
         void JustSummoned(Creature* summon) override
