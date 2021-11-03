@@ -29,7 +29,8 @@ class Player;
 
 #define CHANNEL_BAN_DURATION            DAY*60
 
-enum ChatNotify
+// EnumUtils: DESCRIBE THIS
+enum ChatNotify : uint8
 {
     CHAT_JOINED_NOTICE                = 0x00,           //+ "%s joined channel.";
     CHAT_LEFT_NOTICE                  = 0x01,           //+ "%s left channel.";
