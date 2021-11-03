@@ -73,13 +73,13 @@ public:
             // If boss is below 2% hp - cast Armageddon
             if (!armageddonCasted && damage < me->GetHealth() && me->HealthBelowPctDamaged(2, damage))
             {
-                me->InterruptNonMeleeSpells(true);
+                me->RemoveAurasDueToSpell(SPELL_INFERNO);
+                me->StopMoving();
                 if (me->CastSpell(me, SPELL_ARMAGEDDON) == SPELL_CAST_OK)
                 {
                     Talk(EMOTE_SERVICE);
+                    armageddonCasted = true;
                 }
-
-                armageddonCasted = true;
             }
         }
 
