@@ -59,11 +59,8 @@ enum Events
     EVENT_MAGMA_BLAST,
     EVENT_SUBMERGE,
 
-    EVENT_INTRO_1,
-    EVENT_INTRO_2,
-    EVENT_INTRO_3,
-    EVENT_INTRO_4,
-    EVENT_INTRO_5,
+    EVENT_INTRO_SAY,
+    EVENT_INTRO_MAKE_ATTACKABLE
 };
 
 enum Creatures
@@ -86,7 +83,6 @@ public:
     struct boss_ragnarosAI : public BossAI
     {
         boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
-            attackableTImer(0),
             _emergeTimer(90000),
             _hasYelledMagmaBurst(false),
             _hasSubmergedOnce(false),
@@ -112,7 +108,7 @@ public:
         {
             if (action == ACTION_FINISH_RAGNAROS_INTRO)
             {
-                attackableTImer = 10000;
+                introEvents.ScheduleEvent(EVENT_INTRO_SAY, 5000);
             }
         }
 
@@ -156,19 +152,26 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (attackableTImer)
+            if (!introEvents.Empty())
             {
-                if (attackableTImer <= diff)
+                introEvents.Update(diff);
+
+                switch (introEvents.ExecuteEvent())
                 {
-                    me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    DoZoneInCombat();
-                    attackableTImer = 0;
-                }
-                else
-                {
-                    attackableTImer -= diff;
+                    case EVENT_INTRO_SAY:
+                    {
+                        Talk(SAY_ARRIVAL5_RAG);
+                        introEvents.ScheduleEvent(EVENT_INTRO_MAKE_ATTACKABLE, 2500);
+                        break;
+                    }
+                    case EVENT_INTRO_MAKE_ATTACKABLE:
+                    {
+                        me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        DoZoneInCombat();
+                        break;
+                    }
                 }
             }
 
@@ -285,7 +288,7 @@ public:
         }
 
     private:
-        uint32 attackableTImer;     // used after intro
+        EventMap introEvents;
         uint32 _emergeTimer;
         bool _hasYelledMagmaBurst;
         bool _hasSubmergedOnce;
