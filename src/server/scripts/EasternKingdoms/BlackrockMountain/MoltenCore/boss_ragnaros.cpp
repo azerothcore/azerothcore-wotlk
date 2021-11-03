@@ -137,7 +137,7 @@ public:
         {
             _EnterCombat();
             events.SetPhase(PHASE_EMERGED);
-            SechedulleCombatEvents();
+            SchedulleCombatEvents();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -321,9 +321,8 @@ public:
                 return;
             }
 
-            events.CancelEventGroup(PHASE_SUBMERGED);
             events.SetPhase(PHASE_EMERGED);
-            SechedulleCombatEvents();
+            SchedulleCombatEvents();
             extraEvents.CancelEventGroup(PHASE_SUBMERGED);
             extraEvents.SetPhase(PHASE_EMERGED);
 
@@ -337,7 +336,7 @@ public:
             }
         }
 
-        void SechedulleCombatEvents()
+        void SchedulleCombatEvents()
         {
             events.RescheduleEvent(EVENT_ERUPTION, 15000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, PHASE_EMERGED, PHASE_EMERGED);
