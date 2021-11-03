@@ -52,7 +52,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_ERUPTION              = 1,
+    EVENT_ERUPTION                          = 1,
     EVENT_WRATH_OF_RAGNAROS,
     EVENT_HAND_OF_RAGNAROS,
     EVENT_LAVA_BURST,
@@ -62,15 +62,18 @@ enum Events
     EVENT_INTRO_SAY,
     EVENT_INTRO_MAKE_ATTACKABLE
 };
-
 enum Creatures
 {
-    NPC_SON_OF_FLAME            = 12143,
+    NPC_SON_OF_FLAME                        = 12143,
 };
 
 enum Misc
 {
-    MAX_SON_OF_FLAME_COUNT      = 8,
+    MAX_SON_OF_FLAME_COUNT                  = 8,
+
+    // Event phase
+    PHASE_INTRO                             = 1,
+    PHASE_COMBAT                            = 2,
 };
 
 constexpr float DEATH_ORIENTATION = 4.0f;
@@ -88,13 +91,19 @@ public:
             _hasSubmergedOnce(false),
             _isBanished(false)
         {
-            creature->SetReactState(REACT_PASSIVE);
-            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void Reset() override
         {
             _Reset();
+
+            // Never reset intro events!
+            if (extraEvents.GetPhaseMask() != (1 << (PHASE_INTRO - 1)))
+            {
+                extraEvents.Reset();
+                extraEvents.SetPhase(PHASE_COMBAT);
+            }
+
             _emergeTimer = 90000;
             _hasYelledMagmaBurst = false;
             _hasSubmergedOnce = false;
@@ -108,7 +117,8 @@ public:
         {
             if (action == ACTION_FINISH_RAGNAROS_INTRO)
             {
-                introEvents.ScheduleEvent(EVENT_INTRO_SAY, 5000);
+                extraEvents.SetPhase(PHASE_INTRO);
+                extraEvents.ScheduleEvent(EVENT_INTRO_SAY, 5000, 0, PHASE_INTRO);
             }
         }
 
@@ -120,17 +130,18 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_ERUPTION, 15000);
-            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000);
-            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000);
-            events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
-            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000);
-            events.ScheduleEvent(EVENT_SUBMERGE, 180000);
+            events.ScheduleEvent(EVENT_ERUPTION, 15000, 0, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, 0, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, 0, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_LAVA_BURST, 10000, 0, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000, 0, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_SUBMERGE, 180000, 0, PHASE_COMBAT);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
+            extraEvents.Reset();
             me->SetFacingTo(DEATH_ORIENTATION);
         }
 
@@ -152,25 +163,29 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!introEvents.Empty())
+            if (!extraEvents.Empty())
             {
-                introEvents.Update(diff);
+                extraEvents.Update(diff);
 
-                switch (introEvents.ExecuteEvent())
+                while (uint32 const eventId = extraEvents.ExecuteEvent())
                 {
-                    case EVENT_INTRO_SAY:
+                    switch (eventId)
                     {
-                        Talk(SAY_ARRIVAL5_RAG);
-                        introEvents.ScheduleEvent(EVENT_INTRO_MAKE_ATTACKABLE, 2500);
-                        break;
-                    }
-                    case EVENT_INTRO_MAKE_ATTACKABLE:
-                    {
-                        me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        DoZoneInCombat();
-                        break;
+                        case EVENT_INTRO_SAY:
+                        {
+                            Talk(SAY_ARRIVAL5_RAG);
+                            extraEvents.ScheduleEvent(EVENT_INTRO_MAKE_ATTACKABLE, 2500, 0, PHASE_INTRO);
+                            break;
+                        }
+                        case EVENT_INTRO_MAKE_ATTACKABLE:
+                        {
+                            extraEvents.SetPhase(PHASE_COMBAT);
+                            me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            DoZoneInCombat();
+                            break;
+                        }
                     }
                 }
             }
@@ -288,7 +303,7 @@ public:
         }
 
     private:
-        EventMap introEvents;
+        EventMap extraEvents;
         uint32 _emergeTimer;
         bool _hasYelledMagmaBurst;
         bool _hasSubmergedOnce;
