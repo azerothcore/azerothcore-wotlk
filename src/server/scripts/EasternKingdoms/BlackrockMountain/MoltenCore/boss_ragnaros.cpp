@@ -92,6 +92,7 @@ public:
     struct boss_ragnarosAI : public BossAI
     {
         boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
+            _isIntroDone(false),
             _hasYelledMagmaBurst(false),
             _hasSubmergedOnce(false)
         {
@@ -102,7 +103,7 @@ public:
             _Reset();
 
             // Never reset intro events!
-            if (!(extraEvents.GetPhaseMask() & (1 << (PHASE_INTRO - 1))))
+            if (_isIntroDone && !(extraEvents.GetPhaseMask() & (1 << (PHASE_INTRO - 1))))
             {
                 extraEvents.Reset();
                 extraEvents.SetPhase(PHASE_EMERGED);
@@ -186,6 +187,7 @@ public:
                         }
                         case EVENT_INTRO_MAKE_ATTACKABLE:
                         {
+                            _isIntroDone = true;
                             extraEvents.SetPhase(PHASE_EMERGED);
                             me->RemoveAurasDueToSpell(SPELL_RAGNAROS_SUBMERGE_EFFECT);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
@@ -315,6 +317,7 @@ public:
 
     private:
         EventMap extraEvents;
+        bool _isIntroDone;
         bool _hasYelledMagmaBurst;
         bool _hasSubmergedOnce;
 
