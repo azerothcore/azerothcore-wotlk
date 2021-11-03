@@ -629,8 +629,9 @@ enum SMART_ACTION
     SMART_ACTION_PLAYER_TALK                        = 220,    // acore_string.entry, yell? (0/1)
     SMART_ACTION_VORTEX_SUMMON                      = 221,    // entry, duration (0 = perm), spiral scaling, spiral appearance, range max, phi_delta     <-- yes confusing math, try it ingame and see, my lovely AC boys!
     SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
+    SMART_ACTION_DO_ACTION                          = 223,    // ActionId
 
-    SMART_ACTION_AC_END                             = 223,    // placeholder
+    SMART_ACTION_AC_END                             = 224,    // placeholder
 };
 
 struct SmartAction
@@ -844,6 +845,7 @@ struct SmartAction
         {
             uint32 field;
             uint32 data;
+            uint32 type;
         } setInstanceData;
 
         struct
@@ -871,6 +873,7 @@ struct SmartAction
         struct
         {
             uint32 delay;
+            uint32 forceRespawnTimer;
         } forceDespawn;
 
         struct
@@ -1261,6 +1264,12 @@ struct SmartAction
             uint32 phi_delta;
         } summonVortex;
 
+        struct
+        {
+            uint32 actionId;
+            uint32 isNegative;
+            uint32 instanceTarget;
+        } doAction;
         //! Note for any new future actions
         //! All parameters must have type uint32
 

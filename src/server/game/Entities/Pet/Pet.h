@@ -73,7 +73,7 @@ public:
     bool CreateBaseAtCreature(Creature* creature);
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
-    static SpellCastResult TryLoadFromDB(Player* owner, bool current = false, PetType mandatoryPetType = MAX_PET_TYPE);
+    static SpellCastResult TryLoadFromDB(Player* owner, bool current = false, PetType mandatoryPetType = MAX_PET_TYPE, bool checkDead = false);
     static bool LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, AsynchPetSummon* info = nullptr);
     bool isBeingLoaded() const override { return m_loading;}
     void SavePetToDB(PetSaveMode mode, bool logout);

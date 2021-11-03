@@ -65,7 +65,7 @@ public:
         void InitializeAI() override
         {
             startedFight = false;
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             postGossipStep = 0;
             Text_Timer = 0;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -125,7 +125,7 @@ public:
                             Text_Timer = 5000;
                             break;
                         case 3:
-                            me->setFaction(14);
+                            me->SetFaction(FACTION_MONSTER);
                             Player* target = ObjectAccessor::GetPlayer(*me, PlayerGUID);
 
                             switchFactionIfAlive(NPC_RAVEN, target);
@@ -186,7 +186,7 @@ public:
             {
                 if (crew->IsAlive())
                 {
-                    crew->setFaction(14);
+                    crew->SetFaction(FACTION_MONSTER);
 
                     if (target)
                     {
@@ -279,7 +279,7 @@ public:
                 crew->SetWalk(true);
                 crew->SetHomePosition(x, y, z, 4.78f);
                 crew->GetMotionMaster()->MovePoint(1, { x, y, z, 4.78f });
-                crew->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                crew->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
 
                 switch (entry)
                 {
@@ -470,7 +470,7 @@ public:
         {
             if (me->IsAlive())
             {
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetWalk(false);
                 me->GetMotionMaster()->MovePoint(0, { 1858.57f, 1146.35f, 14.745f, 3.85f });
                 me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f);

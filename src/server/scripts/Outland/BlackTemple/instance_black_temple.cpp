@@ -118,7 +118,7 @@ public:
             {
                 ashtongueGUIDs.push_back(creature->GetGUID());
                 if (GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
-                    creature->setFaction(FACTION_ASHTONGUE);
+                    creature->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
             }
         }
 
@@ -202,7 +202,7 @@ public:
             {
                 for (ObjectGuid const& guid : ashtongueGUIDs)
                     if (Creature* ashtongue = instance->GetCreature(guid))
-                        ashtongue->setFaction(FACTION_ASHTONGUE);
+                        ashtongue->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
             }
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
             {

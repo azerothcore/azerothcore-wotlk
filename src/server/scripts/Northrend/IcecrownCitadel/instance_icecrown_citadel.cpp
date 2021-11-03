@@ -1640,7 +1640,7 @@ public:
                             std::string const& text = sCreatureTextMgr->GetLocalizedChatString(NPC_THE_LICH_KING_LH, 0, 20 + id, 0, LOCALE_enUS);
                             WorldPacket data;
                             ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, ObjectGuid::Empty, player->GetGUID(), text, CHAT_TAG_NONE, "The Lich King");
-                            player->SendPlaySound(17235 + id, true);
+                            player->PlayDirectSound(17235 + id);
                             player->SendDirectMessage(&data);
                         }
             }

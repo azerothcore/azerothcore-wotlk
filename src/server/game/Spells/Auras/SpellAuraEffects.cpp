@@ -466,13 +466,13 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                         {
                             for (uint8 k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; k++)
                             {
-                                SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(item_rand_suffix->enchant_id[k]);
+                                SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(item_rand_suffix->Enchantment[k]);
                                 if (pEnchant)
                                 {
                                     for (uint8 t = 0; t < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; t++)
                                         if (pEnchant->spellid[t] == m_spellInfo->Id)
                                         {
-                                            amount = uint32((item_rand_suffix->prefix[k] * castItem->GetItemSuffixFactor()) / 10000);
+                                            amount = uint32((item_rand_suffix->AllocationPct[k] * castItem->GetItemSuffixFactor()) / 10000);
                                             break;
                                         }
                                 }
@@ -518,17 +518,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_SCHOOL_ABSORB:
         case SPELL_AURA_MANA_SHIELD:
             m_canBeRecalculated = false;
-            break;
-        case SPELL_AURA_MOD_BASE_RESISTANCE_PCT:
-            if (!caster)
-                break;
-            if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID)
-            {
-                if (GetId() == 1178 && caster->HasAura(5229) && !caster->HasAura(70726)) // Feral t10 4p
-                    amount -= 48; // percentage
-                else if (GetId() == 9635 && caster->HasAura(5229) && !caster->HasAura(70726)) // Feral t10 4p
-                    amount -= 57; // percentage
-            }
             break;
         case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
             // Titan's Grip
@@ -1586,13 +1575,8 @@ void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
     }
 
-    if (!apply && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT)
-    {
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
-        target->bRequestForcedVisibilityUpdate = false;
-    }
-    else
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable());
+    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
+    target->bRequestForcedVisibilityUpdate = false;
 }
 
 void AuraEffect::HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1665,13 +1649,8 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
     }
 
-    if (!apply && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT)
-    {
-        target->UpdateObjectVisibility((target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable()), true);
-        target->bRequestForcedVisibilityUpdate = false;
-    }
-    else
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable());
+    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
+    target->bRequestForcedVisibilityUpdate = false;
 }
 
 void AuraEffect::HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -5431,7 +5410,6 @@ void AuraEffect::HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mod
         return;
 
     Player* plCaster = caster->ToPlayer();
-    Unit* target = aurApp->GetTarget();
 
     // Item amount
     if (GetAmount() <= 0)
@@ -5439,24 +5417,6 @@ void AuraEffect::HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mod
 
     if (GetSpellInfo()->Effects[m_effIndex].ItemType == 0)
         return;
-
-    // Soul Shard
-    if (GetSpellInfo()->Effects[m_effIndex].ItemType == 6265)
-    {
-        // Soul Shard only from units that grant XP or honor
-        if (!plCaster->isHonorOrXPTarget(target) ||
-                (target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->isTappedBy(plCaster)))
-            return;
-
-        // If this is Drain Soul, check for Glyph of Drain Soul
-        if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARLOCK && (GetSpellInfo()->SpellFamilyFlags[0] & 0x00004000))
-        {
-            // Glyph of Drain Soul - chance to create an additional Soul Shard
-            if (AuraEffect* aur = caster->GetAuraEffect(58070, 0))
-                if (roll_chance_i(aur->GetMiscValue()))
-                    caster->CastSpell(caster, 58068, true, 0, aur); // We _could_ simply do ++count here, but Blizz does it this way :)
-        }
-    }
 
     //Adding items
     uint32 noSpaceForCount = 0;
@@ -5572,7 +5532,7 @@ void AuraEffect::HandleAuraModFaction(AuraApplication const* aurApp, uint8 mode,
 
     if (apply)
     {
-        target->setFaction(GetMiscValue());
+        target->SetFaction(GetMiscValue());
         if (target->GetTypeId() == TYPEID_PLAYER)
             target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     }
@@ -6308,21 +6268,6 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
                 damage += (damage + 1) / 2;       // +1 prevent 0.5 damage possible lost at 1..4 ticks
             // 5..8 ticks have normal tick damage
         }
-        // There is a Chance to make a Soul Shard when Drain soul does damage
-        if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARLOCK && (GetSpellInfo()->SpellFamilyFlags[0] & 0x00004000))
-        {
-            if (caster && caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
-            {
-                if (roll_chance_i(20))
-                {
-                    caster->CastSpell(caster, 43836, true, 0, this);
-                    // Glyph of Drain Soul - chance to create an additional Soul Shard
-                    if (AuraEffect* aur = caster->GetAuraEffect(58070, 0))
-                        if (roll_chance_i(aur->GetMiscValue()))
-                            caster->CastSpell(caster, 58068, true, 0, aur);
-                }
-            }
-        }
     }
     else // xinef: ceil obtained value, it may happen that 10 ticks for 10% damage may not kill owner
         damage = uint32(ceil(CalculatePct<float, float>(target->GetMaxHealth(), damage)));
@@ -6878,6 +6823,12 @@ void AuraEffect::HandleProcTriggerDamageAuraProc(AuraApplication* aurApp, ProcEv
 {
     Unit* target = aurApp->GetTarget();
     Unit* triggerTarget = eventInfo.GetProcTarget();
+    if (triggerTarget->HasUnitState(UNIT_STATE_ISOLATED) || triggerTarget->IsImmunedToDamageOrSchool(GetSpellInfo()))
+    {
+        SendTickImmune(triggerTarget, target);
+        return;
+    }
+
     SpellNonMeleeDamage damageInfo(target, triggerTarget, GetSpellInfo(), GetSpellInfo()->SchoolMask);
     uint32 damage = target->SpellDamageBonusDone(triggerTarget, GetSpellInfo(), GetAmount(), SPELL_DIRECT_DAMAGE);
     damage = triggerTarget->SpellDamageBonusTaken(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);

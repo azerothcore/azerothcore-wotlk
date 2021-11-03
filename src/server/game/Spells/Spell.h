@@ -30,6 +30,7 @@ class GameObject;
 class DynamicObject;
 class WorldObject;
 class Aura;
+class AuraEffect;
 class SpellScript;
 class SpellEvent;
 class ByteBuffer;
@@ -213,6 +214,7 @@ struct SpellValue
     uint32    MaxAffectedTargets;
     float     RadiusMod;
     uint8     AuraStackAmount;
+    int32     AuraDuration;
     bool      ForcedCritResult;
 };
 
@@ -263,6 +265,17 @@ struct TargetInfo
 };
 
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
+
+struct TriggeredByAuraSpellData
+{
+    TriggeredByAuraSpellData() : spellInfo(nullptr), effectIndex(-1), tickNumber(0) {}
+
+    void Init(AuraEffect const* aurEff);
+
+    SpellInfo const* spellInfo;
+    int8 effectIndex;
+    uint32 tickNumber;
+};
 
 class Spell
 {
@@ -557,7 +570,7 @@ public:
     void LoadScripts();
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
 
-    [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraTickNumber; }
+    [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
 
  protected:
     bool HasGlobalCooldown() const;
@@ -734,9 +747,7 @@ public:
     // if need this can be replaced by Aura copy
     // we can't store original aura link to prevent access to deleted auras
     // and in same time need aura data and after aura deleting.
-    SpellInfo const* m_triggeredByAuraSpell;
-    int8 m_triggeredByAuraEffectIndex;
-    uint32 m_triggeredByAuraTickNumber;
+    TriggeredByAuraSpellData m_triggeredByAuraSpell;
 
     bool m_skipCheck;
     uint8 m_auraScaleMask;
