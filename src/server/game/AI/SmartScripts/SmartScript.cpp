@@ -4029,10 +4029,32 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         case SMART_EVENT_ON_SPELLCLICK:
             ProcessAction(e, unit, var0, var1, bvar, spell, gob);
             break;
-        // Xinef: added no report use distinction for gameobjects
+
         case SMART_EVENT_GOSSIP_HELLO:
-            if (e.event.gossipHello.noReportUse && var0)
-                return;
+            switch (e.event.gossipHello.filter)
+            {
+            case 0:
+                // no filter set, always execute action
+                break;
+            case 1:
+                // GossipHello only filter set, skip action if reportUse
+                if (var0)
+                {
+                    return;
+                }
+                break;
+            case 2:
+                // reportUse only filter set, skip action if GossipHello
+                if (!var0)
+                {
+                    return;
+                }
+                break;
+            default:
+                // Ignore any other value
+                break;
+            }
+
             ProcessAction(e, unit, var0, var1, bvar, spell, gob);
             break;
         case SMART_EVENT_IS_BEHIND_TARGET:
