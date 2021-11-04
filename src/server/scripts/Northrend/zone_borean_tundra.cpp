@@ -44,6 +44,7 @@ EndContentData */
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "WorldSession.h"
+#include "ScriptedGossip.h"
 
 // Ours
 enum eDrakeHunt
@@ -79,7 +80,7 @@ public:
             owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
             owner->CastSpell(owner, SPELL_SUBDUED, true);
             GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
-            owner->setFaction(35);
+            owner->SetFaction(FACTION_FRIENDLY);
             owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
@@ -265,53 +266,6 @@ public:
 };
 
 /*######
-## npc_corastrasza
-######*/
-
-#define GOSSIP_ITEM_C_1 "I... I think so..."
-
-enum Corastrasza
-{
-    SPELL_SUMMON_WYRMREST_SKYTALON               = 61240,
-    SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC        = 61244,
-
-    QUEST_ACES_HIGH_DAILY                        = 13414,
-    QUEST_ACES_HIGH                              = 13413
-};
-
-class npc_corastrasza : public CreatureScript
-{
-public:
-    npc_corastrasza() : CreatureScript("npc_corastrasza") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_ACES_HIGH) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_ACES_HIGH_DAILY) == QUEST_STATUS_INCOMPLETE) //It's the same dragon for both quests.
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-
-            player->CastSpell(player, SPELL_SUMMON_WYRMREST_SKYTALON, true);
-            player->CastSpell(player, SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC, true);
-        }
-
-        return true;
-    }
-};
-
-/*######
 ## npc_iruk
 ######*/
 
@@ -421,12 +375,7 @@ public:
 enum Lurgglbr
 {
     QUEST_ESCAPE_WINTERFIN_CAVERNS      = 11570,
-
     GO_CAGE                             = 187369,
-
-    FACTION_ESCORTEE_A                  = 774,
-    FACTION_ESCORTEE_H                  = 775,
-
     SAY_START_1                         = 0,
     SAY_START_2                         = 1,
     SAY_END_1                           = 2,
@@ -543,7 +492,7 @@ public:
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
 
-            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
         }
         return false;
@@ -551,18 +500,22 @@ public:
 };
 
 /*######
-## npc_beryl_sorcerer
+## Quest 11590: Abduction
 ######*/
 
+// NPC 25316: Beryl Sorcerer
 enum BerylSorcerer
 {
-    NPC_BERYL_SORCERER                  = 25316,
-    NPC_CAPTURED_BERLY_SORCERER         = 25474,
-    NPC_LIBRARIAN_DONATHAN              = 25262,
-
-    SPELL_ARCANE_CHAINS                 = 45611,
-    SPELL_COSMETIC_CHAINS               = 54324,
-    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF  = 45631
+    EVENT_FROSTBOLT                                = 1,
+    EVENT_ARCANE_CHAINS                            = 2,
+    NPC_LIBRARIAN_DONATHAN                         = 25262,
+    NPC_CAPTURED_BERLY_SORCERER                    = 25474,
+    SPELL_FROSTBOLT                                = 9672,
+    SPELL_ARCANE_CHAINS                            = 45611,
+    SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST       = 45625,
+    SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER = 45626,
+    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF             = 45631,
+    SPELL_ARCANE_CHAINS_CHANNEL_II                 = 45735
 };
 
 class npc_beryl_sorcerer : public CreatureScript
@@ -570,67 +523,192 @@ class npc_beryl_sorcerer : public CreatureScript
 public:
     npc_beryl_sorcerer() : CreatureScript("npc_beryl_sorcerer") { }
 
-    struct npc_beryl_sorcererAI : public FollowerAI
+struct npc_beryl_sorcererAI : public CreatureAI
     {
-        npc_beryl_sorcererAI(Creature* creature) : FollowerAI(creature) { }
+        npc_beryl_sorcererAI(Creature* creature) : CreatureAI(creature)
+        {
+            Initialize();
+        }
 
-        bool bEnslaved;
+        void Initialize()
+        {
+            _playerGUID.Clear();
+            _chainsCast = false;
+        }
 
         void Reset() override
         {
-            me->UpdateEntry(NPC_BERYL_SORCERER);
             me->SetReactState(REACT_AGGRESSIVE);
-            bEnslaved = false;
+            Initialize();
         }
 
         void EnterCombat(Unit* who) override
         {
             if (me->IsValidAttackTarget(who))
+            {
                 AttackStart(who);
+            }
+
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
         }
 
-        void SpellHit(Unit* pCaster, const SpellInfo* pSpell) override
+        void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
-            if (pSpell->Id == SPELL_ARCANE_CHAINS && pCaster->GetTypeId() == TYPEID_PLAYER && !HealthAbovePct(50) && !bEnslaved)
+            if (spell->Id == SPELL_ARCANE_CHAINS && !_chainsCast)
             {
-                EnterEvadeMode(); //We make sure that the npc is not attacking the player!
-                me->SetReactState(REACT_PASSIVE);
-                StartFollow(pCaster->ToPlayer(), 0, nullptr);
-                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, nullptr, false);
-                DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
-                me->DespawnOrUnsummon(45000);
+                if (Player* player = unit->ToPlayer())
+                {
+                    _playerGUID = player->GetGUID();
+                    _chainsCast = true;
+                    _events.ScheduleEvent(EVENT_ARCANE_CHAINS, 4000);
+                }
+            }
+        }
 
-                if (Player* player = pCaster->ToPlayer())
-                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+            {
+                return;
+            }
 
-                bEnslaved = true;
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_FROSTBOLT:
+                        DoCastVictim(SPELL_FROSTBOLT);
+                        _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
+                        break;
+                    case EVENT_ARCANE_CHAINS:
+                        if (me->HasAura(SPELL_ARCANE_CHAINS))
+                        {
+                            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                            {
+                                me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM));
+                                player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
+                                me->DisappearAndDie();
+                            }
+                        }
+                        break;
+                }
+            }
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap   _events;
+        ObjectGuid _playerGUID;
+        bool       _chainsCast;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_beryl_sorcererAI(creature);
+    }
+};
+
+// NPC 25474: Captured Beryl Sorcerer
+enum CapturedBerylSorcerer
+{
+    EVENT_ADD_ARCANE_CHAINS                        = 1,
+    EVENT_FOLLOW_PLAYER                            = 2
+};
+
+class npc_captured_beryl_sorcerer : public CreatureScript
+{
+public:
+    npc_captured_beryl_sorcerer() : CreatureScript("npc_captured_beryl_sorcerer") {}
+
+    struct npc_captured_beryl_sorcererAI : public FollowerAI
+    {
+        npc_captured_beryl_sorcererAI(Creature* creature) : FollowerAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0);
+        }
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_ADD_ARCANE_CHAINS:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
+                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
+                            _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1000);
+                        }
+                        break;
+                    case EVENT_FOLLOW_PLAYER:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
+                            StartFollow(summoner);
+                        }
+                        break;
+                }
             }
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             FollowerAI::MoveInLineOfSight(who);
 
             if (who->GetEntry() == NPC_LIBRARIAN_DONATHAN && me->IsWithinDistInMap(who, INTERACTION_DISTANCE))
             {
                 SetFollowComplete();
-                me->DisappearAndDie();
+                me->DespawnOrUnsummon();
             }
         }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
+    private:
+        EventMap _events;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_beryl_sorcererAI(creature);
+        return new npc_captured_beryl_sorcererAI(creature);
+    }
+};
+
+// Spell 45625: - Arcane Chains: Character Force Cast
+class spell_arcane_chains_character_force_cast : public SpellScriptLoader
+{
+public:
+    spell_arcane_chains_character_force_cast() : SpellScriptLoader("spell_arcane_chains_character_force_cast") {}
+
+    class spell_arcane_chains_character_force_cast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_arcane_chains_character_force_cast_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /* effIndex */)
+        {
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_arcane_chains_character_force_cast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_arcane_chains_character_force_cast_SpellScript();
     }
 };
 
@@ -772,7 +850,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
-            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
@@ -1073,33 +1151,25 @@ public:
 };
 
 /*######
-## npc_hidden_cultist
+## Quest 11794: The hunt is on
 ######*/
 
+// NPCs 25827: Tom Hegger, 25248: Salty John Thorpe, 25828: Guard Mitchells
 enum HiddenCultist
 {
-    SPELL_SHROUD_OF_THE_DEATH_CULTIST           = 46077, //not working
-    SPELL_RIGHTEOUS_VISION                      = 46078, //player aura
-
-    QUEST_THE_HUNT_IS_ON                        = 11794,
-
-    GOSSIP_TEXT_SALTY_JOHN_THORPE               = 12529,
-    GOSSIP_TEXT_GUARD_MITCHELSS                 = 12530,
-    GOSSIP_TEXT_TOM_HEGGER                      = 12528,
-
-    NPC_TOM_HEGGER                              = 25827,
-    NPC_SALTY_JOHN_THORPE                       = 25248,
-    NPC_GUARD_MITCHELLS                         = 25828,
-
-    SAY_HIDDEN_CULTIST_1                        = 0,
-    SAY_HIDDEN_CULTIST_2                        = 1,
-    SAY_HIDDEN_CULTIST_3                        = 2,
-    SAY_HIDDEN_CULTIST_4                        = 3
+    SPELL_SHROUD_OF_THE_DEATH_CULTIST = 46077,
+    SPELL_RIGHTEOUS_VISION            = 46078,
+    NPC_TOM_HEGGER                    = 25827,
+    NPC_SALTY_JOHN_THORPE             = 25248,
+    NPC_GUARD_MITCHELLS               = 25828,
+    SAY_HIDDEN_CULTIST_1              = 0,
+    SAY_HIDDEN_CULTIST_2              = 1,
+    SAY_HIDDEN_CULTIST_3              = 2,
+    SAY_HIDDEN_CULTIST_4              = 3,
+    EVENT_CULTIST_SCRIPT_1            = 1,
+    EVENT_CULTIST_SCRIPT_2            = 2,
+    EVENT_CULTIST_SCRIPT_3            = 3
 };
-
-const char* GOSSIP_ITEM_TOM_HEGGER = "What do you know about the Cult of the Damned?";
-const char* GOSSIP_ITEM_GUARD_MITCHELLS = "How long have you worked for the Cult of the Damned?";
-const char* GOSSIP_ITEM_SALTY_JOHN_THORPE = "I have a reason to believe you're involved in the cultist activity";
 
 class npc_hidden_cultist : public CreatureScript
 {
@@ -1110,178 +1180,143 @@ public:
     {
         npc_hidden_cultistAI(Creature* creature) : ScriptedAI(creature)
         {
-            uiEmoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
-            uiNpcFlags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
+            Initialize();
+            _emoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
+            _npcFlags   = creature->GetUInt32Value(UNIT_NPC_FLAGS);
         }
 
-        uint32 uiEmoteState;
-        uint32 uiNpcFlags;
-
-        uint32 uiEventTimer;
-        uint8 uiEventPhase;
-
-        ObjectGuid uiPlayerGUID;
+        void Initialize()
+        {
+            _playerGUID.Clear();
+        }
 
         void Reset() override
         {
-            if (uiEmoteState)
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, uiEmoteState);
+            if (_emoteState)
+            {
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, _emoteState);
+            }
 
-            if (uiNpcFlags)
-                me->SetUInt32Value(UNIT_NPC_FLAGS, uiNpcFlags);
+            if (_npcFlags)
+            {
+                me->SetUInt32Value(UNIT_NPC_FLAGS, _npcFlags);
+            }
 
-            uiEventTimer = 0;
-            uiEventPhase = 0;
-
-            uiPlayerGUID.Clear();
-
+            Initialize();
             DoCast(SPELL_SHROUD_OF_THE_DEATH_CULTIST);
-
             me->RestoreFaction();
         }
 
-        void DoAction(int32 /*iParam*/) override
+        void PreScript()
         {
             me->StopMoving();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-            if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            {
                 me->SetFacingToObject(player);
-            uiEventTimer = 3000;
-            uiEventPhase = 1;
-        }
-
-        void SetGUID(ObjectGuid uiGuid, int32 /*iId*/) override
-        {
-            uiPlayerGUID = uiGuid;
+            }
+            _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_1, 3000);
         }
 
         void AttackPlayer()
         {
-            me->setFaction(14);
-            if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+            me->SetFaction(FACTION_MONSTER);
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            {
                 AttackStart(player);
+            }
         }
 
-        void UpdateAI(uint32 uiDiff) override
+        void UpdateAI(uint32 diff) override
         {
-            if (uiEventTimer && uiEventTimer <= uiDiff)
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
             {
-                switch (uiEventPhase)
+                switch (eventId)
                 {
-                    case 1:
+                    case EVENT_CULTIST_SCRIPT_1:
+                    {
                         switch (me->GetEntry())
                         {
                             case NPC_SALTY_JOHN_THORPE:
-                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                                 Talk(SAY_HIDDEN_CULTIST_1);
-                                uiEventTimer = 5000;
-                                uiEventPhase = 2;
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_2, 5000);
                                 break;
                             case NPC_GUARD_MITCHELLS:
                                 Talk(SAY_HIDDEN_CULTIST_2);
-                                uiEventTimer = 5000;
-                                uiEventPhase = 2;
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_2, 5000);
                                 break;
                             case NPC_TOM_HEGGER:
-                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+                                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                                 {
                                     Talk(SAY_HIDDEN_CULTIST_3, player);
                                 }
-                                uiEventTimer = 5000;
-                                uiEventPhase = 2;
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_2, 5000);
                                 break;
                         }
                         break;
-                    case 2:
+                    }
+                    case EVENT_CULTIST_SCRIPT_2:
+                    {
                         switch (me->GetEntry())
                         {
                             case NPC_SALTY_JOHN_THORPE:
                                 Talk(SAY_HIDDEN_CULTIST_4);
-                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
+                                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                                {
                                     me->SetFacingToObject(player);
-                                uiEventTimer = 3000;
-                                uiEventPhase = 3;
+                                }
+                                _events.ScheduleEvent(EVENT_CULTIST_SCRIPT_3, 3000);
                                 break;
                             case NPC_GUARD_MITCHELLS:
                             case NPC_TOM_HEGGER:
                                 AttackPlayer();
-                                uiEventPhase = 0;
                                 break;
                         }
                         break;
-                    case 3:
+                    }
+                    case EVENT_CULTIST_SCRIPT_3:
+                    {
                         if (me->GetEntry() == NPC_SALTY_JOHN_THORPE)
                         {
                             AttackPlayer();
-                            uiEventPhase = 0;
                         }
+                        break;
+                    }
+                    default:
                         break;
                 }
             }
-            else uiEventTimer -= uiDiff;
 
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             DoMeleeAttackIfReady();
         }
+
+        void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        {
+            if (gossipListId == 0)
+            {
+                CloseGossipMenuFor(player);
+                _playerGUID = player->GetGUID();
+                PreScript();
+            }
+        }
+        private:
+            EventMap   _events;
+            uint32     _emoteState;
+            uint32     _npcFlags;
+            ObjectGuid _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hidden_cultistAI(creature);
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        uint32 uiGossipText = 0;
-        const char* charGossipItem;
-
-        switch (creature->GetEntry())
-        {
-            case NPC_TOM_HEGGER:
-                uiGossipText = GOSSIP_TEXT_TOM_HEGGER;
-                charGossipItem = GOSSIP_ITEM_TOM_HEGGER;
-                break;
-            case NPC_SALTY_JOHN_THORPE:
-                uiGossipText = GOSSIP_TEXT_SALTY_JOHN_THORPE;
-                charGossipItem = GOSSIP_ITEM_SALTY_JOHN_THORPE;
-                break;
-            case NPC_GUARD_MITCHELLS:
-                uiGossipText = GOSSIP_TEXT_GUARD_MITCHELSS;
-                charGossipItem = GOSSIP_ITEM_GUARD_MITCHELLS;
-                break;
-            default:
-                charGossipItem = "";
-                return false;
-        }
-
-        if (player->HasAura(SPELL_RIGHTEOUS_VISION) && player->GetQuestStatus(QUEST_THE_HUNT_IS_ON) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, uiGossipText, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-            creature->AI()->SetGUID(player->GetGUID());
-            creature->AI()->DoAction(1);
-        }
-
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
     }
 };
 
@@ -1387,19 +1422,677 @@ public:
     }
 };
 
+/*######
+## Quest 12019: Last Rites
+######*/
+
+// NPC 26170: Thassarian
+enum Thassarian
+{
+    EVENT_THASSARIAN_SCRIPT_1     = 1,
+    EVENT_THASSARIAN_SCRIPT_2     = 2,
+    EVENT_THASSARIAN_SCRIPT_3     = 3,
+    EVENT_THASSARIAN_SCRIPT_4     = 4,
+    EVENT_THASSARIAN_SCRIPT_5     = 5,
+    EVENT_THASSARIAN_SCRIPT_6     = 6,
+    EVENT_THASSARIAN_SCRIPT_7     = 7,
+    EVENT_THASSARIAN_SCRIPT_8     = 8,
+    EVENT_THASSARIAN_SCRIPT_9     = 9,
+    EVENT_THASSARIAN_SCRIPT_10    = 10,
+    EVENT_THASSARIAN_SCRIPT_11    = 11,
+    EVENT_THASSARIAN_SCRIPT_12    = 12,
+    EVENT_THASSARIAN_SCRIPT_13    = 13,
+    EVENT_THASSARIAN_SCRIPT_14    = 14,
+    EVENT_THASSARIAN_SCRIPT_15    = 15,
+    EVENT_THASSARIAN_SCRIPT_16    = 16,
+    EVENT_THASSARIAN_SCRIPT_17    = 17,
+    EVENT_THASSARIAN_SCRIPT_18    = 18,
+    EVENT_THASSARIAN_SCRIPT_19    = 19,
+    EVENT_THASSARIAN_SCRIPT_20    = 20,
+    EVENT_THASSARIAN_SCRIPT_21    = 21,
+    EVENT_THASSARIAN_SCRIPT_22    = 22,
+    EVENT_THASSARIAN_SCRIPT_23    = 23,
+    EVENT_THASSARIAN_SCRIPT_24    = 24,
+    EVENT_THASSARIAN_SCRIPT_25    = 25,
+    EVENT_THASSARIAN_SCRIPT_26    = 26,
+    EVENT_THASSARIAN_SCRIPT_27    = 27,
+    EVENT_THASSARIAN_SCRIPT_28    = 28,
+    EVENT_THASSARIAN_SCRIPT_29    = 29,
+    EVENT_THASSARIAN_CAST         = 30,
+    NPC_IMAGE_LICH_KING           = 26203,
+    NPC_COUNSELOR_TALBOT          = 25301,
+    NPC_PRINCE_VALANAR            = 28189,
+    NPC_GENERAL_ARLOS             = 25250,
+    NPC_LERYSSA                   = 25251,
+    NPC_TANATHAL                  = 26173,
+    SPELL_THASSARIAN_FLAY         = 46685,
+    SPELL_TRANSFORM_VALANAR       = 46753,
+    SPELL_BLOOD_PRESENCE          = 50995,
+    SAY_THASSARIAN_1              = 0,
+    SAY_THASSARIAN_2              = 1,
+    SAY_THASSARIAN_3              = 2,
+    SAY_THASSARIAN_4              = 3,
+    SAY_THASSARIAN_5              = 4,
+    SAY_THASSARIAN_6              = 5,
+    SAY_THASSARIAN_7              = 6,
+    SAY_TALBOT_1                  = 0,
+    SAY_TALBOT_2                  = 1,
+    SAY_TALBOT_3                  = 2,
+    SAY_TALBOT_4                  = 3,
+    SAY_LICH_1                    = 0,
+    SAY_LICH_2                    = 1,
+    SAY_LICH_3                    = 2,
+    SAY_ARLOS_1                   = 0,
+    SAY_ARLOS_2                   = 1,
+    SAY_LERYSSA_1                 = 0,
+    SAY_LERYSSA_2                 = 1,
+    SAY_LERYSSA_3                 = 2,
+    SAY_LERYSSA_4                 = 3,
+    PATH_THASSARIAN               = 1013030,
+    PATH_ARTHAS                   = 1013031,
+    PATH_TALBOT                   = 1013032,
+    PATH_ARLOS                    = 1013033,
+    PATH_LERYSSA                  = 1013034
+};
+
+class npc_thassarian : public CreatureScript
+{
+public:
+    npc_thassarian() : CreatureScript("npc_thassarian") {}
+
+    struct npc_thassarianAI : public ScriptedAI
+    {
+        npc_thassarianAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_THASSARIAN_CAST:
+                    {
+                        if (Unit* tanathal = me->FindNearestCreature(NPC_TANATHAL, 10.0f))
+                        {
+                            me->CastSpell(tanathal, SPELL_THASSARIAN_FLAY);
+                        }
+                    }
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_thassarianAI(creature);
+    }
+};
+
+class npc_thassarian2 : public CreatureScript
+{
+public:
+    npc_thassarian2() : CreatureScript("npc_thassarian2") {}
+
+    struct npc_thassarian2AI : public ScriptedAI
+    {
+        npc_thassarian2AI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _arthasGUID.Clear();
+            _talbotGUID.Clear();
+            _leryssaGUID.Clear();
+            _arlosGUID.Clear();
+        }
+
+        void Reset() override
+        {
+            me->SetFaction(FACTION_VALIANCE_EXPEDITION_7);
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            Initialize();
+        }
+
+        void SetData(uint32 /*type*/, uint32 data) override
+        {
+            switch (data)
+            {
+                case NPC_LERYSSA:
+                {
+                    if (Creature* arlos = ObjectAccessor::GetCreature(*me, _arlosGUID))
+                    {
+                        arlos->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
+                    }
+                    if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+                    {
+                        leryssa->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
+                        leryssa->SetOrientation(4.537856f);
+                    }
+                    _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_8, 1000);
+                    break;
+                }
+                case NPC_COUNSELOR_TALBOT:
+                {
+                    _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_18, 0);
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 param) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE && param == 2)
+            {
+                me->SetWalk(false);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_1, 2000);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_THASSARIAN_SCRIPT_1:
+                        // Summon Arthas and Talbot
+                        if (Creature* arthas = me->SummonCreature(NPC_IMAGE_LICH_KING, 3729.4614f, 3520.386f, 473.4048f, 1.361f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000))
+                        {
+                            _arthasGUID = arthas->GetGUID();
+                            arthas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            arthas->SetReactState(REACT_PASSIVE);
+                            arthas->SetWalk(true);
+                        }
+                        if (Creature* talbot = me->SummonCreature(NPC_COUNSELOR_TALBOT, 3748.7627f, 3614.0374f, 473.4048f, 4.5553f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000))
+                        {
+                            _talbotGUID = talbot->GetGUID();
+                            talbot->SetWalk(true);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_2, 1000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_2:
+                        // Arthas load path
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
+                        {
+                            arthas->GetMotionMaster()->MovePath(PATH_ARTHAS, false);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_3, 1000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_3:
+                        // Talbot load path
+                        if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                        {
+                            talbot->GetMotionMaster()->MovePath(PATH_TALBOT, false);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_4, 20000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_4:
+                        // Talbot transform and knell
+                        if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                        {
+                            talbot->CastSpell(talbot, SPELL_TRANSFORM_VALANAR);
+                            talbot->UpdateEntry(NPC_PRINCE_VALANAR);
+                            talbot->SetFullHealth();
+                            talbot->SetFaction(FACTION_UNDEAD_SCOURGE);
+                            talbot->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            talbot->SetReactState(REACT_PASSIVE);
+                            talbot->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_5, 7000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_5:
+                        // Talbot say text 1
+                        if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                        {
+                            talbot->AI()->Talk(SAY_TALBOT_1);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_6, 9000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_6:
+                        // Summon General Arlos and Leryssa
+                        if (Creature* arlos = me->SummonCreature(NPC_GENERAL_ARLOS, 3746.2825f, 3616.3699f, 473.4048f, 4.5029f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
+                        {
+                            _arlosGUID = arlos->GetGUID();
+                            arlos->SetWalk(true);
+                            arlos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            arlos->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
+                        }
+                        if (Creature* leryssa = me->SummonCreature(NPC_LERYSSA, 3751.0986f, 3614.9219f, 473.4048f, 4.5029f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
+                        {
+                            _leryssaGUID = leryssa->GetGUID();
+                            leryssa->SetWalk(true);
+                            leryssa->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            leryssa->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_7, 7000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_7:
+                        // Talbot say text 2
+                        if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                        {
+                            talbot->AI()->Talk(SAY_TALBOT_2);
+                        }
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_8:
+                        // Thassarian say text 1 and move to location
+                        Talk(SAY_THASSARIAN_1);
+                        me->SetWalk(false);
+                        me->GetMotionMaster()->MovePoint(0, 3722.527f, 3567.2583f, 477.44086f);
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_9, 7000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_9:
+                        // Thassarian say text 2
+                        Talk(SAY_THASSARIAN_2);
+                        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_10, 6000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_10:
+                        // Arthas turn to Thassarian and Talbot stand
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
+                        {
+                            arthas->SetFacingToObject(me);
+                        }
+                        if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                        {
+                            talbot->SetStandState(UNIT_STAND_STATE_STAND);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_11, 4000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_11:
+                        // Arthas say text 2
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
+                        {
+                            arthas->AI()->Talk(SAY_LICH_2);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_12, 18000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_12:
+                        // Thassarian say text 3
+                        Talk(SAY_THASSARIAN_3);
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_13, 10000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_13:
+                        // Talbot say text 3
+                        if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                        {
+                            talbot->AI()->Talk(SAY_TALBOT_3);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_14, 5000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_14:
+                        // Arthas turn to Talbot say text 3
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
+                        {
+                            if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                            {
+                                arthas->SetFacingToObject(talbot);
+                            }
+                            arthas->AI()->Talk(SAY_LICH_3);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_15, 5000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_15:
+                        // Arthas turn to me and emote
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
+                        {
+                            arthas->SetFacingToObject(me);
+                            arthas->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_16, 5000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_16:
+                        // Arthas despawn
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
+                        {
+                            arthas->RemoveFromWorld();
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_17, 3000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_17:
+                        // Talbot say text 4 and attack
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                        {
+                            talbot->AI()->Talk(SAY_TALBOT_4);
+                            talbot->SetFaction(FACTION_UNDEAD_SCOURGE_9);
+                            talbot->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            talbot->SetReactState(REACT_AGGRESSIVE);
+                            talbot->Attack(me, false);
+                        }
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_18:
+                        // Arlos say text 1
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                        if (Creature* arlos = ObjectAccessor::GetCreature(*me, _arlosGUID))
+                        {
+                            arlos->AI()->Talk(SAY_ARLOS_1);
+                            arlos->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                            arlos->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        }
+                        if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+                        {
+                            leryssa->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_19, 3000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_19:
+                        // Leryssa set facing to me
+                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                        if (Creature* leryssa = me->FindNearestCreature(NPC_LERYSSA, 50.0f, true))
+                        {
+                            _leryssaGUID = leryssa->GetGUID();
+                            leryssa->SetFacingToObject(me);
+                            me->SetFacingToObject(leryssa);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_20, 3000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_20:
+                        // Arlos say text 2 and die. Leryssa say text 1
+                        if (Creature* arlos = me->FindNearestCreature(NPC_GENERAL_ARLOS, 50.0f, true))
+                        {
+                            _arlosGUID = arlos->GetGUID();
+                            arlos->AI()->Talk(SAY_ARLOS_2);
+                            arlos->SetStandState(UNIT_STAND_STATE_DEAD);
+                        }
+                        if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+                        {
+                            leryssa->AI()->Talk(SAY_LERYSSA_1);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_21, 5000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_21:
+                        // Thassarian say text 4
+                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        Talk(SAY_THASSARIAN_4);
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_22, 3000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_22:
+                        // Leryssa run to Thassarian
+                        if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+                        {
+                            leryssa->SetWalk(false);
+                            leryssa->MonsterMoveWithSpeed(3726.751f, 3568.1633f, 477.44086f, leryssa->GetSpeed(MOVE_RUN));
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_23, 2000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_23:
+                        // Leryssa say text 2
+                        if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+                        {
+                            leryssa->AI()->Talk(SAY_LERYSSA_2);
+                            leryssa->SetStandState(UNIT_STAND_STATE_SIT);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_24, 5000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_24:
+                        // Thassarian say text 5
+                        Talk(SAY_THASSARIAN_5);
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_25, 10000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_25:
+                        // Leryssa say text 3
+                        if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+                        {
+                            leryssa->AI()->Talk(SAY_LERYSSA_3);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_26, 12000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_26:
+                        // Thassarian say text 6
+                        Talk(SAY_THASSARIAN_6);
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_27, 11000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_27:
+                        // Leryssa say text 4
+                        if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+                        {
+                            leryssa->AI()->Talk(SAY_LERYSSA_4);
+                        }
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_28, 12000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_28:
+                        // Thassarian say text 7
+                        Talk(SAY_THASSARIAN_7);
+                        _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_29, 35000);
+                        break;
+                    case EVENT_THASSARIAN_SCRIPT_29:
+                        Cleanup();
+                        me->DespawnOrUnsummon(30000ms, 120s);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Cleanup();
+            me->DespawnOrUnsummon(1000ms, 120s);
+        }
+
+        void Cleanup()
+        {
+            if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+            {
+                talbot->RemoveFromWorld();
+            }
+
+            if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
+            {
+                leryssa->RemoveFromWorld();
+            }
+
+            if (Creature* arlos = ObjectAccessor::GetCreature(*me, _arlosGUID))
+            {
+                arlos->RemoveFromWorld();
+            }
+
+            if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
+            {
+                arthas->RemoveFromWorld();
+            }
+        }
+
+        void sGossipHello(Player* /*player*/) override
+        {
+            if (!me->HasAura(SPELL_BLOOD_PRESENCE))
+            {
+                DoCastSelf(SPELL_BLOOD_PRESENCE);
+            }
+        }
+
+        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            if (action == 0)
+            {
+                _playerGUID = player->GetGUID();
+                CloseGossipMenuFor(player);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
+            }
+        }
+
+    private:
+        EventMap   _events;
+        ObjectGuid _playerGUID;
+        ObjectGuid _arthasGUID;
+        ObjectGuid _talbotGUID;
+        ObjectGuid _leryssaGUID;
+        ObjectGuid _arlosGUID;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_thassarian2AI(creature);
+    }
+};
+
+// NPC 25251: Leryssa
+class npc_leryssa : public CreatureScript
+{
+public:
+    npc_leryssa() : CreatureScript("npc_leryssa") {}
+
+    struct npc_leryssaAI : public ScriptedAI
+    {
+        npc_leryssaAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void MovementInform(uint32 type, uint32 param) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE && param == 2)
+            {
+                if (me->IsSummon())
+                {
+                    if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                    {
+                        summoner->ToCreature()->AI()->SetData(1, NPC_LERYSSA);
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_leryssaAI(creature);
+    }
+};
+
+// NPC 25301: Counselor Talbot
+enum CounselorTalbot
+{
+    AREA_LAST_RITES     = 4128,
+    SPELL_DEFLECTION    = 51009,
+    SPELL_SOUL_BLAST    = 50992,
+    SPELL_VAMPIRIC_BOLT = 51016,
+    EVENT_DEFLECTION    = 1,
+    EVENT_SOUL_BLAST    = 2,
+    EVENT_VAMPIRIC_BOLT = 3
+};
+
+class npc_counselor_talbot : public CreatureScript
+{
+public:
+    npc_counselor_talbot() : CreatureScript("npc_counselor_talbot") {}
+
+    struct npc_counselor_talbotAI : public ScriptedAI
+    {
+        npc_counselor_talbotAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void Reset() override {}
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            _events.ScheduleEvent(EVENT_DEFLECTION, 10000, 20000);
+            _events.ScheduleEvent(EVENT_SOUL_BLAST, 4000, 6000);
+            _events.ScheduleEvent(EVENT_VAMPIRIC_BOLT, 0);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            if (me->GetAreaId() == AREA_LAST_RITES)
+            {
+                _events.Update(diff);
+
+                if (uint32 eventId = _events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_DEFLECTION:
+                            DoCastSelf(SPELL_DEFLECTION);
+                            _events.ScheduleEvent(EVENT_DEFLECTION, 10000, 20000);
+                            break;
+                        case EVENT_SOUL_BLAST:
+                            DoCastVictim(SPELL_SOUL_BLAST);
+                            _events.ScheduleEvent(EVENT_SOUL_BLAST, 4000, 6000);
+                            break;
+                        case EVENT_VAMPIRIC_BOLT:
+                            DoCastVictim(SPELL_VAMPIRIC_BOLT);
+                            _events.ScheduleEvent(EVENT_VAMPIRIC_BOLT, 3000, 4000);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            DoMeleeAttackIfReady();
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (me->IsSummon())
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                {
+                    summoner->ToCreature()->AI()->SetData(1, NPC_COUNSELOR_TALBOT);
+                }
+            }
+        }
+
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_counselor_talbotAI(creature);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     // Ours
     new spell_q11919_q11940_drake_hunt();
+    new npc_thassarian();
+    new npc_thassarian2();
+    new npc_leryssa();
+    new npc_counselor_talbot();
 
     // Theirs
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
-    new npc_corastrasza();
     new npc_iruk();
     new npc_nerubar_victim();
     new npc_lurgglbr();
     new npc_beryl_sorcerer();
+    new npc_captured_beryl_sorcerer();
+    new spell_arcane_chains_character_force_cast();
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
     new npc_bonker_togglevolt();

@@ -21,13 +21,6 @@
 #include "CreatureAIImpl.h"
 #define BRDScriptName "instance_blackrock_depths"
 
-enum FactionIds
-{
-    FACTION_NEUTRAL            = 734,
-    FACTION_HOSTILE            = 754,
-    FACTION_FRIEND             = 35
-};
-
 enum BRDBosses
 {
     BOSS_AMBASSADOR_FLAMELASH = 0,
@@ -54,9 +47,6 @@ enum DataTypes
     DATA_GO_BAR_KEG_TRAP            = 17,
     DATA_GO_BAR_DOOR                = 18,
     DATA_GO_CHALICE                 = 19,
-
-    DATA_GHOSTKILL                  = 20,
-    DATA_EVENSTARTER                = 21,
 
     DATA_GOLEM_DOOR_N               = 22,
     DATA_GOLEM_DOOR_S               = 23,
