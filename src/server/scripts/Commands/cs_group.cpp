@@ -132,25 +132,26 @@ public:
         return true;
     }
 
-    static bool HandleGroupJoinCommand(ChatHandler* handler, char const* args)
+    static bool HandleGroupJoinCommand(ChatHandler* handler, std::string const& playerInGroup, std::string const& playerName)
     {
-        if (!*args)
+        if (playerInGroup.empty() || playerName.empty())
+        {
             return false;
+        }
 
         Player* playerSource = nullptr;
         Group* groupSource = nullptr;
         ObjectGuid guidSource;
         ObjectGuid guidTarget;
-        char* nameplgrStr = strtok((char*)args, " ");
-        char* nameplStr = strtok(nullptr, " ");
 
-        if (handler->GetPlayerGroupAndGUIDByName(nameplgrStr, playerSource, groupSource, guidSource, true))
+        if (handler->GetPlayerGroupAndGUIDByName(playerInGroup.c_str(), playerSource, groupSource, guidSource, true))
         {
             if (groupSource)
             {
                 Group* groupTarget = nullptr;
                 Player* playerTarget = nullptr;
-                if (handler->GetPlayerGroupAndGUIDByName(nameplStr, playerTarget, groupTarget, guidTarget, true))
+
+                if (handler->GetPlayerGroupAndGUIDByName(playerName.c_str(), playerTarget, groupTarget, guidTarget, true))
                 {
                     if (!groupTarget && playerTarget->GetGroup() != groupSource)
                     {
@@ -187,68 +188,81 @@ public:
         return true;
     }
 
-    static bool HandleGroupListCommand(ChatHandler* handler, char const* args)
+    static bool HandleGroupListCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* playerTarget;
-        ObjectGuid guidTarget;
-        std::string nameTarget;
-
-        ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
-
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), nameTarget))
+        if (!target)
         {
-            playerTarget = ObjectAccessor::FindConnectedPlayer(parseGUID);
-            guidTarget = parseGUID;
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
         }
-        else if (!handler->extractPlayerTarget((char*)args, &playerTarget, &guidTarget, &nameTarget))
+
+        if (!target)
+        {
             return false;
+        }
 
         Group* groupTarget = nullptr;
-        if (playerTarget)
-            groupTarget = playerTarget->GetGroup();
 
-        if (!groupTarget && guidTarget)
-            if (uint32 groupGUID = Player::GetGroupIdFromStorage(guidTarget.GetCounter()))
-                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
-
-        if (groupTarget)
+        if (target->IsConnected())
         {
-            handler->PSendSysMessage(LANG_GROUP_TYPE, (groupTarget->isRaidGroup() ? "raid" : "party"));
-            Group::MemberSlotList const& members = groupTarget->GetMemberSlots();
-            for (Group::MemberSlotList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
+            groupTarget = target->GetConnectedPlayer()->GetGroup();
+        }
+
+        if (!groupTarget)
+        {
+            if (uint32 groupGUID = Player::GetGroupIdFromStorage(target->GetGUID().GetCounter()))
             {
-                Group::MemberSlot const& slot = *itr;
-
-                std::string flags;
-                if (slot.flags & MEMBER_FLAG_ASSISTANT)
-                    flags = "Assistant";
-
-                if (slot.flags & MEMBER_FLAG_MAINTANK)
-                {
-                    if (!flags.empty())
-                        flags.append(", ");
-                    flags.append("MainTank");
-                }
-
-                if (slot.flags & MEMBER_FLAG_MAINASSIST)
-                {
-                    if (!flags.empty())
-                        flags.append(", ");
-                    flags.append("MainAssist");
-                }
-
-                if (flags.empty())
-                    flags = "None";
-
-                /*Player* p = ObjectAccessor::FindConnectedPlayer((*itr).guid);
-                const char* onlineState = p ? "online" : "offline";
-
-                handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
-                    slot.guid.GetCounter(), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
+                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
             }
         }
-        else
-            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, nameTarget.c_str());
+
+        if (!groupTarget)
+        {
+            handler->PSendSysMessage(LANG_GROUP_NOT_IN_GROUP, target->GetName().c_str());
+            return true;
+        }
+
+        handler->PSendSysMessage(LANG_GROUP_TYPE, (groupTarget->isRaidGroup() ? "raid" : "party"));
+
+        for (auto const& slot : groupTarget->GetMemberSlots())
+        {
+            std::string flags;
+
+            if (slot.flags & MEMBER_FLAG_ASSISTANT)
+            {
+                flags = "Assistant";
+            }
+
+            if (slot.flags & MEMBER_FLAG_MAINTANK)
+            {
+                if (!flags.empty())
+                {
+                    flags.append(", ");
+                }
+
+                flags.append("MainTank");
+            }
+
+            if (slot.flags & MEMBER_FLAG_MAINASSIST)
+            {
+                if (!flags.empty())
+                {
+                    flags.append(", ");
+                }
+
+                flags.append("MainAssist");
+            }
+
+            if (flags.empty())
+            {
+                flags = "None";
+            }
+
+            /*Player* p = ObjectAccessor::FindConnectedPlayer((*itr).guid);
+            const char* onlineState = p ? "online" : "offline";
+
+            handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
+                slot.guid.GetCounter(), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
+        }
 
         return true;
     }
