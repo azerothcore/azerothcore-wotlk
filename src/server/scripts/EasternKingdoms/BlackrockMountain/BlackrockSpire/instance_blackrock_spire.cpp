@@ -42,6 +42,11 @@ enum EventIds
     EVENT_UROK_DOOMHOWL_SPAWN_IN           = 8
 };
 
+enum Texts
+{
+    SAY_NEFARIUS_REND_WIPE                 = 11
+};
+
 class instance_blackrock_spire : public InstanceMapScript
 {
 public:
@@ -104,7 +109,11 @@ public:
                         creature->DisappearAndDie();
                     break;
                 case NPC_WARCHIEF_REND_BLACKHAND:
-                    WarchiefRendBlackhand = creature->GetGUID();
+                    if (GetBossState(DATA_GYTH) != IN_PROGRESS)
+                    {
+                        WarchiefRendBlackhand = creature->GetGUID();
+                    }
+
                     if (GetBossState(DATA_GYTH) == DONE)
                         creature->DisappearAndDie();
                     break;
@@ -252,6 +261,19 @@ public:
                 case DATA_OVERLORD_WYRMTHALAK:
                 case DATA_PYROGAURD_EMBERSEER:
                 case DATA_WARCHIEF_REND_BLACKHAND:
+                    if (state == FAIL)
+                    {
+                        if (Creature* rend = instance->GetCreature(WarchiefRendBlackhand))
+                        {
+                            rend->Respawn(true);
+                        }
+
+                        if (Creature* nefarius = instance->GetCreature(LordVictorNefarius))
+                        {
+                            nefarius->AI()->Talk(SAY_NEFARIUS_REND_WIPE);
+                        }
+                    }
+                    break;
                 case DATA_GYTH:
                 case DATA_THE_BEAST:
                 case DATA_GENERAL_DRAKKISATH:
