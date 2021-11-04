@@ -331,7 +331,7 @@ public:
                 case DATA_UROK_DOOMHOWL:
                     if (data == FAIL)
                     {
-                        if (!GetBossState(DATA_UROK_DOOMHOWL) == NOT_STARTED)
+                        if (!(GetBossState(DATA_UROK_DOOMHOWL)) == NOT_STARTED)
                         {
                             SetBossState(DATA_UROK_DOOMHOWL, NOT_STARTED);
                             if (GameObject* challenge = instance->GetGameObject(go_urokChallenge))
