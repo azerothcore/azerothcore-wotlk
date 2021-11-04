@@ -9759,7 +9759,7 @@ bool Unit::AttackStop()
     m_attacking = nullptr;
 
     // Clear our target
-    SetTarget();
+    SetTarget(ObjectGuid::Empty);
 
     ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
 
@@ -17588,17 +17588,6 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     else if (GetTypeId() == TYPEID_PLAYER)
         RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
-    _charmThreatInfo.clear();
-
-    // Xinef: move invalid threat / hostile references to offline lists
-    ThreatContainer::StorageType threatList = getThreatMgr().getThreatList();
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-        if (Unit* target = (*itr)->getTarget())
-            _charmThreatInfo[target->GetGUID()] = (*itr)->getThreat() - (*itr)->getTempThreatModifier();
-
-    CombatStop();
-    DeleteThreatList();
-
     if (Creature* creature = ToCreature())
         creature->RefreshSwimmingFlag();
 
@@ -17640,10 +17629,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
         RestoreFaction();
 
     CastStop();
-
-    CombatStop();
-    getHostileRefMgr().deleteReferences();
-    DeleteThreatList();
+    AttackStop();
 
     // xinef: update speed after charming
     UpdateSpeed(MOVE_RUN, false);
