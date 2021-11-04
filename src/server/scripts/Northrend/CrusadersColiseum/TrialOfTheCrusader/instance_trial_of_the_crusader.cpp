@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Group.h"
 #include "Player.h"
@@ -73,7 +86,7 @@ public:
 
                 // move corpses
                 const ObjectGuid npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
-                for (const ObjectGuid i : npcs)
+                for (ObjectGuid const& i : npcs)
                 {
                     if (Creature* c = instance->GetCreature(i))
                     {
@@ -305,7 +318,7 @@ public:
                         {
                             trigger->SetDisplayId(11686);
                             trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            trigger->setFaction(14);
+                            trigger->SetFaction(FACTION_MONSTER);
                             trigger->SetInCombatWithZone();
                         }
 
@@ -327,7 +340,7 @@ public:
                             {
                                 trigger->SetDisplayId(11686);
                                 trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                trigger->setFaction(14);
+                                trigger->SetFaction(FACTION_MONSTER);
                                 trigger->SetInCombatWithZone();
                             }
 
@@ -402,7 +415,7 @@ public:
                             InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
                             events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500);
 
-                            for (ObjectGuid guid : NPC_ChampionGUIDs)
+                            for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                                 if (Creature* c = instance->GetCreature(guid))
                                     c->DespawnOrUnsummon(15000);
                             NPC_ChampionGUIDs.clear();
@@ -425,17 +438,10 @@ public:
                                         cacheEntry = GO_CRUSADERS_CACHE_25_H;
                                         break;
                                 }
+
                                 if (GameObject* go = c->SummonGameObject(cacheEntry, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 630000000))
                                 {
-                                    Map::PlayerList const& pl = instance->GetPlayers();
-                                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                        if (Player* plr = itr->GetSource())
-                                            if (Group* g = plr->GetGroup())
-                                                if (!plr->IsGameMaster() && g->GetLeaderGUID() == plr->GetGUID())
-                                                {
-                                                    go->SetLootRecipient(plr);
-                                                    break;
-                                                }
+                                    go->SetLootRecipient(instance);
                                 }
                             }
 
@@ -455,7 +461,7 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         AchievementTimer = 0;
-                        for (ObjectGuid guid : NPC_ChampionGUIDs)
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                             if (Creature* c = instance->GetCreature(guid))
                                 if (!c->IsInCombat())
                                     if (Unit* target = c->SelectNearestTarget(200.0f))
@@ -872,7 +878,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                         {
-                            c->MonsterYell("Banished to the Nether!", LANG_UNIVERSAL, 0);
+                            c->Yell("Banished to the Nether!", LANG_UNIVERSAL);
                             c->PlayDirectSound(16146, 0);
                             if( Creature* f = instance->GetCreature(NPC_FizzlebangGUID) )
                             {
@@ -1093,7 +1099,7 @@ public:
                     }
                 case EVENT_CHAMPIONS_ATTACK:
                     {
-                        for (ObjectGuid guid : NPC_ChampionGUIDs)
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                             if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -1375,16 +1381,7 @@ public:
                                     if (GameObject* chest = c->SummonGameObject(tributeChest, 665.12f, 143.78f, 142.12f, 0.0f, 0, 0, 0, 0, 90000000))
                                     {
                                         chest->SetRespawnTime(chest->GetRespawnDelay());
-
-                                        Map::PlayerList const& pl = instance->GetPlayers();
-                                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                            if (Player* plr = itr->GetSource())
-                                                if (Group* g = plr->GetGroup())
-                                                    if (!plr->IsGameMaster() && g->GetLeaderGUID() == plr->GetGUID())
-                                                    {
-                                                        chest->SetLootRecipient(plr);
-                                                        break;
-                                                    }
+                                        chest->SetLootRecipient(instance);
                                     }
                                 }
                         }
@@ -1493,7 +1490,7 @@ public:
                 case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    for (ObjectGuid guid : NPC_ChampionGUIDs)
+                    for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                         if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();

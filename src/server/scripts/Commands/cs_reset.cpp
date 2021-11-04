@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -19,14 +30,20 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class reset_commandscript : public CommandScript
 {
 public:
     reset_commandscript() : CommandScript("reset_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> resetCommandTable =
+        static ChatCommandTable resetCommandTable =
         {
             { "achievements",   SEC_CONSOLE,        true,  &HandleResetAchievementsCommand,     "" },
             { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
@@ -36,7 +53,7 @@ public:
             { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "" },
             { "all",            SEC_CONSOLE,        true,  &HandleResetAllCommand,              "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "reset",          SEC_ADMINISTRATOR,  true, nullptr,                              "", resetCommandTable }
         };
@@ -79,7 +96,7 @@ public:
         ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(player->getClass());
         if (!classEntry)
         {
-            LOG_ERROR("server", "Class %u not found in DBC (Wrong DBC files?)", player->getClass());
+            LOG_ERROR("dbc", "Class %u not found in DBC (Wrong DBC files?)", player->getClass());
             return false;
         }
 
@@ -89,7 +106,7 @@ public:
         if (!player->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
             player->SetShapeshiftForm(FORM_NONE);
 
-        player->setFactionForRace(player->getRace());
+        player->SetFactionForRace(player->getRace());
 
         player->SetUInt32Value(UNIT_FIELD_BYTES_0, ((player->getRace()) | (player->getClass() << 8) | (player->getGender() << 16) | (powerType << 24)));
 
@@ -160,7 +177,7 @@ public:
         }
         else
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->setUInt16(0, uint16(AT_LOGIN_RESET_SPELLS));
             stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -234,7 +251,7 @@ public:
         }
         else if (targetGuid)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->setUInt16(0, uint16(AT_LOGIN_NONE | AT_LOGIN_RESET_PET_TALENTS));
             stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -280,7 +297,7 @@ public:
             return false;
         }
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_AT_LOGIN_FLAGS);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_AT_LOGIN_FLAGS);
         stmt->setUInt16(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 

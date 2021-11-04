@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Cell.h"
@@ -98,7 +109,7 @@ WayPoint* SmartAI::GetNextWayPoint()
     {
         mLastWP = (*itr).second;
         if (mLastWP->id != mCurrentWPID)
-            LOG_ERROR("server", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
+            LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
 
         return (*itr).second;
     }
@@ -172,7 +183,7 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 {
     if (me->IsInCombat())// no wp movement in combat
     {
-        LOG_ERROR("server", "SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
+        LOG_ERROR("scripts.ai.sai", "SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
         return;
     }
 
@@ -231,7 +242,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
 
     if (HasEscortState(SMART_ESCORT_PAUSED))
     {
-        LOG_ERROR("server", "SmartAI::StartPath: Creature entry %u wanted to pause waypoint movement while already paused, ignoring.", me->GetEntry());
+        LOG_ERROR("scripts.ai.sai", "SmartAI::StartPath: Creature entry %u wanted to pause waypoint movement while already paused, ignoring.", me->GetEntry());
         return;
     }
 
@@ -718,7 +729,7 @@ void SmartAI::JustRespawned()
     mDespawnState = 0;
     mEscortState = SMART_ESCORT_NONE;
     me->SetVisible(true);
-    if (me->getFaction() != me->GetCreatureTemplate()->faction)
+    if (me->GetFaction() != me->GetCreatureTemplate()->faction)
         me->RestoreFaction();
     mJustReset = true;
     JustReachedHome();
@@ -800,7 +811,8 @@ void SmartAI::AttackStart(Unit* who)
                 me->GetMotionMaster()->MovementExpired();
                 me->StopMoving();
             }
-            me->GetMotionMaster()->MoveChase(who, GetScript()->GetCasterActualDist() ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist());
+            float range = GetScript()->GetCasterActualDist() > 0.f ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist();
+            me->GetMotionMaster()->MoveChase(who, range > 0.f ? ChaseRange(range) : std::optional<ChaseRange>());
         }
     }
 }
@@ -1096,9 +1108,7 @@ void SmartGameObjectAI::Reset()
 // Called when a player opens a gossip dialog with the gameobject.
 bool SmartGameObjectAI::GossipHello(Player* player, bool reportUse)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("sql.sql", "SmartGameObjectAI::GossipHello");
-#endif
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player, (uint32)reportUse, 0, false, nullptr, go);
     return false;
 }
@@ -1178,9 +1188,7 @@ public:
         if (!player->IsAlive())
             return false;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("sql.sql", "AreaTrigger %u is using SmartTrigger script", trigger->entry);
-#endif
         SmartScript script;
         script.OnInitialize(nullptr, trigger);
         script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);

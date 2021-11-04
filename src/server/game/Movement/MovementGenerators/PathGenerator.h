@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _PATH_GENERATOR_H
@@ -9,8 +20,9 @@
 
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
+#include "MapDefines.h"
 #include "MMapFactory.h"
-#include "MMapManager.h"
+#include "MMapMgr.h"
 #include "MoveSplineInitArgs.h"
 #include "SharedDefines.h"
 #include <G3D/Vector3.h>
@@ -58,7 +70,7 @@ class PathGenerator
         [[nodiscard]] bool IsWalkableClimb(float const* v1, float const* v2) const;
         [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
         [[nodiscard]] static bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
-        [[nodiscard]] bool IsWaterPath(Movement::PointsArray _pathPoints) const;
+        [[nodiscard]] bool IsWaterPath(Movement::PointsArray pathPoints) const;
         [[nodiscard]] bool IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim = true) const;
         [[nodiscard]] bool IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim = true) const;
         [[nodiscard]] static float GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
@@ -110,6 +122,12 @@ class PathGenerator
             return len;
         }
 
+        void Clear()
+        {
+            _polyLength = 0;
+            _pathPoints.clear();
+        }
+
     private:
         dtPolyRef _pathPolyRefs[MAX_PATH_LENGTH];   // array of detour polygon references
         uint32 _polyLength;                         // number of polygons in the path
@@ -137,12 +155,6 @@ class PathGenerator
         void SetEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; _endPosition = point; }
         void SetActualEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; }
         void NormalizePath();
-
-        void Clear()
-        {
-            _polyLength = 0;
-            _pathPoints.clear();
-        }
 
         bool InRange(G3D::Vector3 const& p1, G3D::Vector3 const& p2, float r, float h) const;
         float Dist3DSqr(G3D::Vector3 const& p1, G3D::Vector3 const& p2) const;

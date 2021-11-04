@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battlefield.h"
@@ -89,7 +100,7 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
     uint8 Accepted;
 
     recvData >> BattleId >> Accepted;
-    //LOG_ERROR("server", "HandleQueueInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
+
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;
@@ -107,7 +118,7 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
     uint8 Accepted;
 
     recvData >> BattleId >> Accepted;
-    //LOG_ERROR("server", "HandleBattlefieldInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
+
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;
@@ -129,7 +140,7 @@ void WorldSession::HandleBfExitRequest(WorldPacket& recvData)
     uint32 BattleId;
 
     recvData >> BattleId;
-    //LOG_ERROR("server", "HandleBfExitRequest: BattleID:%u ", BattleId);
+
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;

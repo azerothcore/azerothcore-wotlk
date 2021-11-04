@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -93,6 +104,46 @@ public:
     }
 };
 
+enum VictoryRushEnum
+{
+    SPELL_VICTORIOUS    = 32216
+};
+
+class spell_warr_victory_rush : public SpellScriptLoader
+{
+public:
+    spell_warr_victory_rush() : SpellScriptLoader("spell_warr_victory_rush") { }
+
+    class spell_warr_victory_rush_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_victory_rush_SpellScript);
+
+        void VictoryRushHit()
+        {
+            if (Unit* player = GetCaster())
+            {
+                if (Unit* victim = GetHitUnit())
+                {
+                    if (victim->isDead())
+                    {
+                        player->CastSpell(player, SPELL_VICTORIOUS, true);
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_warr_victory_rush_SpellScript::VictoryRushHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_warr_victory_rush_SpellScript();
+    }
+};
+
 class spell_warr_intervene : public SpellScriptLoader
 {
 public:
@@ -131,7 +182,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo() && eventInfo.GetDamageInfo()->GetSpellInfo()->Id == SPELL_WARRIOR_SPELL_REFLECTION;
+            return eventInfo.GetSpellInfo() && eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_SPELL_REFLECTION;
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -168,7 +219,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
             GetCaster()->RemoveAurasDueToSpell(SPELL_WARRIOR_SPELL_REFLECTION);
-            unitList.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            unitList.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             while (unitList.size() > GetSpellValue()->MaxAffectedTargets)
                 unitList.pop_back();
         }
@@ -360,6 +411,20 @@ public:
             return ValidateSpellInfo({ SPELL_WARRIOR_SLAM });
         }
 
+        void SendMiss(SpellMissInfo missInfo)
+        {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        caster->SendSpellMiss(target, SPELL_WARRIOR_SLAM, missInfo);
+                    }
+                }
+            }
+        }
+
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (GetHitUnit())
@@ -368,6 +433,7 @@ public:
 
         void Register() override
         {
+            BeforeHit += BeforeSpellHitFn(spell_warr_slam_SpellScript::SendMiss);
             OnEffectHitTarget += SpellEffectFn(spell_warr_slam_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
@@ -429,6 +495,20 @@ public:
             return ValidateSpellInfo({ SPELL_WARRIOR_EXECUTE, SPELL_WARRIOR_GLYPH_OF_EXECUTION });
         }
 
+        void SendMiss(SpellMissInfo missInfo)
+        {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        caster->SendSpellMiss(target, SPELL_WARRIOR_EXECUTE, missInfo);
+                    }
+                }
+            }
+        }
+
         void HandleEffect(SpellEffIndex effIndex)
         {
             Unit* caster = GetCaster();
@@ -457,6 +537,7 @@ public:
 
         void Register() override
         {
+            BeforeHit += BeforeSpellHitFn(spell_warr_execute_SpellScript::SendMiss);
             OnEffectHitTarget += SpellEffectFn(spell_warr_execute_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
@@ -731,14 +812,25 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             _procTarget = eventInfo.GetActor()->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
-            return _procTarget && !eventInfo.GetDamageInfo()->GetSpellInfo();
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
+            return _procTarget && !damageInfo->GetSpellInfo();
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 damage = eventInfo.GetDamageInfo()->GetDamage();
-            GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
+            if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
+            {
+                int32 damage = damageInfo->GetUnmitigatedDamage();
+                GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
+            }
         }
 
         void Register() override
@@ -963,6 +1055,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_intervene();
     new spell_warr_improved_spell_reflection();
     new spell_warr_improved_spell_reflection_trigger();
+    new spell_warr_victory_rush();
 
     // Theirs
     new spell_warr_bloodthirst();

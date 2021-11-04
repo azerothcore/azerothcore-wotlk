@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -48,7 +59,9 @@ enum ShamanSpells
     SPELL_SHAMAN_TOTEM_EARTHBIND_TOTEM          = 6474,
     SPELL_SHAMAN_TOTEM_EARTHEN_POWER            = 59566,
     SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL      = 52042,
-    SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1    = 51554
+    SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1    = 51554,
+    SPELL_SHAMAN_STORMSTRIKE                    = 17364,
+    SPELL_SHAMAN_LAVA_LASH                      = 60103
 };
 
 enum ShamanSpellIcons
@@ -75,7 +88,7 @@ public:
                     {
                         int32 bp0 = CalculatePct(totemSpell->Effects[EFFECT_0].CalcValue(), aurEff->GetAmount());
                         int32 bp1 = CalculatePct(totemSpell->Effects[EFFECT_1].CalcValue(), aurEff->GetAmount());
-                        GetCaster()->CastCustomSpell(GetCaster(), 63283, &bp0, &bp1, nullptr, true);
+                        GetCaster()->CastCustomSpell(GetCaster(), 63283, &bp0, &bp1, nullptr, true, nullptr, aurEff);
                     }
         }
 
@@ -141,7 +154,15 @@ public:
 
             uint32 triggered_spell_id = 70809;
             SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
-            int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
+
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+
+            if (!healInfo || !triggeredSpell)
+            {
+                return;
+            }
+
+            int32 amount = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
             eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL, amount, EFFECT_0);
         }
 
@@ -424,7 +445,7 @@ public:
             if (targets.size() < 2)
                 return;
 
-            targets.sort(acore::HealthPctOrderPred());
+            targets.sort(Acore::HealthPctOrderPred());
 
             WorldObject* target = targets.front();
             targets.clear();
@@ -512,8 +533,8 @@ public:
 
         void RemoveInvalidTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
         }
 
         void ApplyDebuff()
@@ -999,8 +1020,8 @@ public:
 
         void RemoveInvalidTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SHAMAN_EXHAUSTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SHAMAN_SATED));
         }
 
         void ApplyDebuff()
@@ -1107,13 +1128,13 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo();
+            return eventInfo.GetSpellInfo() != nullptr;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 mana = eventInfo.GetDamageInfo()->GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
+            int32 mana = eventInfo.GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
             int32 damage = CalculatePct(mana, 35);
 
             GetTarget()->CastCustomSpell(SPELL_SHAMAN_ITEM_MANA_SURGE, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, nullptr, aurEff);
@@ -1354,6 +1375,45 @@ public:
     }
 };
 
+// -16257 - SpellName
+class spell_sha_flurry_proc : public SpellScriptLoader
+{
+public:
+    spell_sha_flurry_proc() : SpellScriptLoader("spell_sha_flurry_proc") {}
+
+    class spell_sha_flurry_proc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_sha_flurry_proc_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            // Should not proc from Windfury Attack, Stormstrike and Lava Lash
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            {
+                constexpr std::array<uint32, 2> spellIcons = {SPELL_SHAMAN_STORMSTRIKE, SPELL_SHAMAN_LAVA_LASH};
+                const auto found = std::find(std::begin(spellIcons), std::end(spellIcons), spellInfo->Id);
+
+                if ((spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && (spellInfo->SpellFamilyFlags[0] & 0x00800000) != 0) || found != std::end(spellIcons))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_sha_flurry_proc_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_sha_flurry_proc_AuraScript();
+    }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     // ours
@@ -1387,4 +1447,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_mana_tide_totem();
     new spell_sha_sentry_totem();
     new spell_sha_thunderstorm();
+    new spell_sha_flurry_proc();
 }

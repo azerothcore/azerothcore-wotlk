@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureAI.h"
 #include "Object.h"
@@ -471,7 +484,7 @@ public:
             events.ScheduleEvent(EVENT_SARA_P1_SUMMON, 0, 0, EVENT_PHASE_ONE);
             events.SetPhase(EVENT_PHASE_ONE);
 
-            me->MonsterYell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL, 0);
+            me->Yell("The time to strike at the head of the beast will soon be upon us! Focus your anger and hatred on his minions!", LANG_UNIVERSAL);
             me->PlayDirectSound(SARA_AGGRO);
             me->setActive(true);
         }
@@ -571,12 +584,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL, 0);
+                me->Yell(_secondPhase ? "Tremble, mortals, before the coming of the end!" : "Yes! YES! Show them no mercy! Give no pause to your attacks!", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST2 : SARA_P1_CAST1);
             }
             else
             {
-                me->MonsterYell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL, 0);
+                me->Yell(_secondPhase ? "Suffocate upon your own hate!" : "Let hatred and rage guide your blows!", LANG_UNIVERSAL);
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST1 : SARA_P1_CAST2);
             }
         }
@@ -588,12 +601,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("Could they have been saved?", LANG_UNIVERSAL, 0);
+                me->Yell("Could they have been saved?", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL2);
             }
             else
             {
-                me->MonsterYell("Powerless to act...", LANG_UNIVERSAL, 0);
+                me->Yell("Powerless to act...", LANG_UNIVERSAL);
                 me->PlayDirectSound(SARA_P1_KILL1);
             }
         }
@@ -693,7 +706,7 @@ public:
                         cr->SetVisible(false);
 
                     _p2TalkTimer++;
-                    me->MonsterYell("I am the lucid dream.", LANG_UNIVERSAL, 0);
+                    me->Yell("I am the lucid dream.", LANG_UNIVERSAL);
                     me->PlayDirectSound(SARA_P2_START);
                 }
                 return;
@@ -734,18 +747,18 @@ public:
                 {
                     EntryCheckPredicate pred(NPC_OMINOUS_CLOUD);
                     summons.DoAction(ACTION_UNSUMMON_CLOUDS, pred);
-                    me->MonsterYell("The monster in your nightmares.", LANG_UNIVERSAL, 0);
+                    me->Yell("The monster in your nightmares.", LANG_UNIVERSAL);
                     _p2TalkTimer = 20000;
                 }
                 else if (_p2TalkTimer >= 25000 && _p2TalkTimer < 40000)
                 {
                     summons.DespawnEntry(NPC_OMINOUS_CLOUD);
-                    me->MonsterYell("The fiend of a thousand faces.", LANG_UNIVERSAL, 0);
+                    me->Yell("The fiend of a thousand faces.", LANG_UNIVERSAL);
                     _p2TalkTimer = 40000;
                 }
                 else if (_p2TalkTimer >= 44500 && _p2TalkTimer < 60000)
                 {
-                    me->MonsterYell("Cower before my true form.", LANG_UNIVERSAL, 0);
+                    me->Yell("Cower before my true form.", LANG_UNIVERSAL);
                     _p2TalkTimer = 60000;
                 }
                 else if (_p2TalkTimer >= 64000)
@@ -1066,7 +1079,7 @@ public:
             summons.DespawnAll();
             events.Reset();
 
-            me->MonsterYell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL, 0);
+            me->Yell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL);
             me->PlayDirectSound(YS_P3_DEATH);
 
             if (m_pInstance)
@@ -1103,11 +1116,11 @@ public:
             }
             else if (param == ACTION_YOGG_SARON_START_YELL)
             {
-                me->MonsterYell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL, 0);
+                me->Yell("BOW DOWN BEFORE THE GOD OF DEATH!", LANG_UNIVERSAL);
             }
             else if (param == ACTION_YOGG_SARON_OPEN_PORTAL_YELL)
             {
-                me->MonsterYell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL, 0);
+                me->Yell("MADNESS WILL CONSUME YOU!", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_OPEN_PORTALS);
             }
             else if (param == ACTION_YOGG_SARON_START_P3)
@@ -1122,7 +1135,7 @@ public:
                 events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0);
                 _thirdPhase = true;
 
-                me->MonsterYell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL, 0);
+                me->Yell("Look upon the true face of death and know that your end comes soon!", LANG_UNIVERSAL);
                 me->PlayDirectSound(YS_P3_START);
             }
             else if (param == ACTION_YOGG_SARON_HARD_MODE)
@@ -1168,14 +1181,14 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_YS_LUNATIC_GAZE:
-                    me->MonsterYell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL, 0);
+                    me->Yell("Hoohehehahahaha... AHAHAHAHAHAHA!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_LUNATIC_GAZE);
                     me->CastSpell(me, SPELL_LUNATIC_GAZE_YS, true);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_YS_DEAFENING_ROAR:
-                    me->MonsterTextEmote("Yogg-Saron opens his mouth wide!", 0, true);
-                    me->MonsterYell("Eternal suffering awaits!", LANG_UNIVERSAL, 0);
+                    me->TextEmote("Yogg-Saron opens his mouth wide!", nullptr, true);
+                    me->Yell("Eternal suffering awaits!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_DEAFENING_ROAR);
                     me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
                     events.RepeatEvent(50000);
@@ -1769,7 +1782,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->IsSummon())
-                if (Unit* sara = me->ToTempSummon()->GetSummoner())
+                if (Unit* sara = me->ToTempSummon()->GetSummonerUnit())
                     sara->GetAI()->DoAction(ACTION_INFLUENCE_TENTACLE_DIED);
         }
     };
@@ -2261,7 +2274,7 @@ public:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
                         {
                             me->PlayDirectSound(15760, player);
-                            me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
+                            me->Whisper("Destroy them minion, your master commands it!", LANG_UNIVERSAL, player);
                         }
                         break;
                     }
@@ -2270,6 +2283,7 @@ public:
     };
 };
 
+// 63830, 63881 - Malady of the Mind
 class spell_yogg_saron_malady_of_the_mind : public SpellScriptLoader
 {
 public:
@@ -2303,6 +2317,7 @@ public:
     }
 };
 
+// 63802 - Brain Link
 class spell_yogg_saron_brain_link : public SpellScriptLoader
 {
 public:
@@ -2404,6 +2419,7 @@ public:
     }
 };
 
+// 64465 - Shadow Beacon
 class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
 {
     public:
@@ -2442,6 +2458,7 @@ class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
         }
 };
 
+// 65206 - Destabilization Matrix
 class spell_yogg_saron_destabilization_matrix : public SpellScriptLoader
 {
 public:
@@ -2486,6 +2503,7 @@ public:
     }
 };
 
+// 64172 - Titanic Storm
 class spell_yogg_saron_titanic_storm : public SpellScriptLoader
 {
 public:
@@ -2530,6 +2548,7 @@ public:
     }
 };
 
+// 64164, 64168 - Lunatic Gaze
 class spell_yogg_saron_lunatic_gaze : public SpellScriptLoader
 {
 public:
@@ -2563,7 +2582,7 @@ public:
     }
 };
 
-// Protective Gaze
+// 64174 - Protective Gaze
 class spell_yogg_saron_protective_gaze : public SpellScriptLoader
 {
 public:
@@ -2603,6 +2622,7 @@ public:
     }
 };
 
+// 64161 - Empowered
 class spell_yogg_saron_empowered : public SpellScriptLoader
 {
 public:
@@ -2641,6 +2661,7 @@ public:
     }
 };
 
+// 64555 - Insane Periodic
 class spell_yogg_saron_insane_periodic_trigger : public SpellScriptLoader
 {
 public:
@@ -2659,7 +2680,7 @@ public:
 
             Unit* caster = GetCaster();
             caster->PlayDirectSound(VOYS_INSANE1, target);
-            caster->MonsterWhisper("Your will is no longer you own...", target, false);
+            caster->Whisper("Your will is no longer you own...", LANG_UNIVERSAL, target);
             caster->CastSpell(target, SPELL_INSANE1, true);
             target->CastSpell(target, SPELL_INSANE2, true);
         }
@@ -2689,6 +2710,7 @@ public:
     }
 };
 
+// 63120 - Insane
 class spell_yogg_saron_insane : public SpellScriptLoader
 {
 public:
@@ -2715,6 +2737,7 @@ public:
     }
 };
 
+// 64169 - Sanity Well
 class spell_yogg_saron_sanity_well : public SpellScriptLoader
 {
 public:
@@ -2753,6 +2776,14 @@ public:
     }
 };
 
+/* 63881 - Malady of the Mind
+   63795 - Psychosis
+   63830 - Malady of the Mind
+   64164 - Lunatic Gaze
+   64059 - Induce Madness
+   63803 - Brain Link
+   65301 - Psychosis
+   64168 - Lunatic Gaze */
 class spell_yogg_saron_sanity_reduce : public SpellScriptLoader
 {
 public:
@@ -2823,6 +2854,7 @@ public:
     }
 };
 
+// 64467 - Empowering Shadows
 class spell_yogg_saron_empowering_shadows : public SpellScriptLoader
 {
 public:
@@ -2851,6 +2883,7 @@ public:
     }
 };
 
+// 64184 - In the Maws of the Old God
 class spell_yogg_saron_in_the_maws_of_the_old_god : public SpellScriptLoader
 {
 public:
@@ -2888,7 +2921,10 @@ public:
     }
 };
 
-class spell_yogg_saron_target_selectors : public SpellScriptLoader    // 63744, 63745, 63747, 65206
+/* 63744 - Sara's Anger
+   63747 - Sara's Fervor
+   63745 - Sara's Blessing */
+class spell_yogg_saron_target_selectors : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_target_selectors() : SpellScriptLoader("spell_yogg_saron_target_selectors") { }
@@ -2918,7 +2954,8 @@ public:
     }
 };
 
-class spell_yogg_saron_grim_reprisal : public SpellScriptLoader     // 63305
+// 63305 - Grim Reprisal
+class spell_yogg_saron_grim_reprisal : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_grim_reprisal() : SpellScriptLoader("spell_yogg_saron_grim_reprisal") { }
@@ -2934,8 +2971,15 @@ public:
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
-            int32 damage = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), 60);
-            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, nullptr, aurEff);
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 damage = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), 60);
+            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, damageInfo->GetAttacker(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2955,7 +2999,7 @@ class achievement_yogg_saron_drive_me_crazy : public AchievementCriteriaScript
 public:
     achievement_yogg_saron_drive_me_crazy() : AchievementCriteriaScript("achievement_yogg_saron_drive_me_crazy") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetAI()->GetData(DATA_GET_DRIVE_ME_CRAZY); // target = Yogg-Saron
     }
@@ -2969,7 +3013,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_SARA)))
@@ -2990,7 +3034,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
@@ -3008,7 +3052,7 @@ class achievement_yogg_saron_kiss_and_make_up : public AchievementCriteriaScript
 public:
     achievement_yogg_saron_kiss_and_make_up() : AchievementCriteriaScript("achievement_yogg_saron_kiss_and_make_up") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_SARA && target->GetAI() && target->GetAI()->GetData(DATA_GET_SARA_PHASE);
     }

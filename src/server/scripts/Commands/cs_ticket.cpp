@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,22 +28,29 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "TicketMgr.h"
+
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
 
 class ticket_commandscript : public CommandScript
 {
 public:
     ticket_commandscript() : CommandScript("ticket_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> ticketResponseCommandTable =
+        static ChatCommandTable ticketResponseCommandTable =
         {
             { "append",         SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendCommand,    "" },
             { "appendln",       SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendLnCommand,  "" }
         };
-        static std::vector<ChatCommand> ticketCommandTable =
+        static ChatCommandTable ticketCommandTable =
         {
             { "assign",         SEC_GAMEMASTER,      true,  &HandleGMTicketAssignToCommand,          "" },
             { "close",          SEC_GAMEMASTER,      true,  &HandleGMTicketCloseByIdCommand,         "" },
@@ -51,7 +69,7 @@ public:
             { "viewid",         SEC_GAMEMASTER,      true,  &HandleGMTicketGetByIdCommand,           "" },
             { "viewname",       SEC_GAMEMASTER,      true,  &HandleGMTicketGetByNameCommand,         "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "ticket",         SEC_GAMEMASTER,      false, nullptr,                                 "", ticketCommandTable }
         };
@@ -84,7 +102,7 @@ public:
         // Get target information
         ObjectGuid targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
         uint32 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
-        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realmID);
+        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realm.Id.Realm);
 
         // Target must exist and have administrative rights
         if (!targetGuid || AccountMgr::IsPlayerAccount(targetGmLevel))
@@ -110,7 +128,7 @@ public:
         }
 
         // Assign ticket
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetAssignedTo(targetGuid, AccountMgr::IsAdminAccount(targetGmLevel));
         ticket->SaveToDB(trans);
         sTicketMgr->UpdateLastChange();
@@ -186,7 +204,7 @@ public:
             return true;
         }
 
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetComment(comment);
         ticket->SaveToDB(trans);
         sTicketMgr->UpdateLastChange();
@@ -234,15 +252,15 @@ public:
         if (response)
             ticket->AppendResponse(response);
 
-        if (Player* player = ticket->GetPlayer())
+        if (Player* player2 = ticket->GetPlayer())
         {
-            ticket->SendResponse(player->GetSession());
-            ChatHandler(player->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
+            ticket->SendResponse(player2->GetSession());
+            ChatHandler(player2->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
         }
 
         Player* gm = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
 
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetCompleted();
         ticket->SetResolvedBy(gm ? gm->GetGUID() : ObjectGuid::Empty);
         ticket->SaveToDB(trans);
@@ -382,7 +400,7 @@ public:
         {
             ObjectGuid guid = ticket->GetAssignedToGUID();
             uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
-            security = AccountMgr::GetSecurity(accountId, realmID);
+            security = AccountMgr::GetSecurity(accountId, realm.Id.Realm);
         }
 
         // Check security
@@ -395,7 +413,7 @@ public:
         }
 
         std::string assignedTo = ticket->GetAssignedToName(); // copy assignedto name because we need it after the ticket has been unnassigned
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetUnassigned();
         ticket->SaveToDB(trans);
         sTicketMgr->UpdateLastChange();
@@ -420,7 +438,7 @@ public:
             return true;
         }
 
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetViewed();
         ticket->SaveToDB(trans);
 
@@ -459,7 +477,7 @@ public:
             return true;
         }
 
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetViewed();
         ticket->SaveToDB(trans);
 
@@ -495,7 +513,7 @@ public:
             return true;
         }
 
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->AppendResponse(response);
         if (newLine)
             ticket->AppendResponse("\n");

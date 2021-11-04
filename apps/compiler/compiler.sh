@@ -18,7 +18,7 @@ function run_option() {
     fi
 }
 
-function comp_quit() { 
+function comp_quit() {
     exit 0
 }
 
@@ -26,15 +26,17 @@ comp_options=(
     "build: Configure and compile"
     "clean: Clean build files"
     "configure: Run CMake"
-    "compile: Compile only" 
+    "compile: Compile only"
     "all: clean, configure and compile"
+    "ccacheClean: Clean ccache files, normally not needed"
     "quit: Close this menu")
 comp_functions=(
-    "comp_build" 
-    "comp_clean" 
-    "comp_configure" 
+    "comp_build"
+    "comp_clean"
+    "comp_configure"
     "comp_compile"
     "comp_all"
+    "comp_ccacheClean"
     "comp_quit")
 
 PS3='[ Please enter your choice ]: '
@@ -50,7 +52,7 @@ function _switch() {
             echo "Available commands:"
             printf '%s\n' "${options[@]}"
             ;;
-        *) 
+        *)
             run_option $_reply $_opt
         ;;
     esac

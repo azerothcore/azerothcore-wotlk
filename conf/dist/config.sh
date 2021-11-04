@@ -3,7 +3,7 @@
 SRCPATH="$AC_PATH_ROOT"
 
 # absolute path where build files must be stored
-BUILDPATH="$AC_PATH_ROOT/var/build/obj"
+BUILDPATH=${BUILDPATH:-"$AC_PATH_VAR/build/obj"}
 
 # absolute path where azerothcore will be installed
 # NOTE: on linux the binaries are stored in a subfolder (/bin)
@@ -27,6 +27,17 @@ BINPATH="$AC_PATH_ROOT/env/dist"
 # by the AC dashboard
 # default: the system will use binpath by default
 # DATAPATH="$BINPATH/bin"
+# DATAPATH_ZIP="$DATAPATH/data.zip"
+
+# azerothcore's official remote source address to pull from
+# by default git will fetch form the azrothcore remote 
+# You can change it to "origin" if you want to fetch/pull from the set remote
+ORIGIN_REMOTE="https://github.com/azerothcore/azerothcore-wotlk.git"
+
+# Branch configuration for the installer to pull from. 
+# By default git will select the current working branch 
+# You can set it to "master" if you want the latest updates
+INSTALLER_PULL_FROM=
 
 ##############################################
 #
@@ -45,7 +56,7 @@ CCOMPILERCXX="/usr/bin/clang++"
 
 
 # how many thread must be used for compilation ( leave zero to use all available )
-MTHREADS=0
+MTHREADS=${MTHREADS:-0}
 # enable/disable warnings during compilation
 CWARNINGS=ON
 # enable/disable some debug informations ( it's not a debug compilation )
@@ -59,27 +70,72 @@ CDEBUG=OFF
 # * MinSizeRel: same as Release but optimizing for size rather than speed.
 CTYPE=${CTYPE:-Release}
 # compile scripts
-CSCRIPTS=${CSCRIPTS:-ON}
+CSCRIPTS=${CSCRIPTS:-static}
 # compile unit tests
 CBUILD_TESTING=OFF
 # compile server
-CSERVERS=ON
+CSERVERS=${CSERVERS:-ON}
 # compile tools
-CTOOLS=OFF
+CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
-CSCRIPTPCH=ON
-CCOREPCH=ON
-# enable/disable extra logs
-CEXTRA_LOGS=0
+CSCRIPTPCH=${CSCRIPTPCH:-ON}
+CCOREPCH=${CCOREPCH:-ON}
 
 # Skip specific modules from compilation (cmake reconfigure needed)
 # use semicolon ; to separate modules
 CDISABLED_AC_MODULES=""
 
 # you can add your custom definitions here ( -D )
-# example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON -DENABLE_EXTRA_LOGS=ON"
+# example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON
 #
-CCUSTOMOPTIONS=""
+CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
+
+# Enable ccache to speedup
+# recompilations
+#
+AC_CCACHE=${AC_CCACHE:-false}
+export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
+
+##############################################
+#
+#  GOOGLE PERF TOOLS
+#
+#  Repository: https://github.com/gperftools/gperftools#readme
+#  Documentation: https://gperftools.github.io/gperftools/
+#
+# Install (Ubuntu):
+#  sudo apt-get install google-perftools libgoogle-perftools-dev
+# Note: dependencies above are already installed in docker
+#
+# Usage:
+#  1. To enable the gperftools you need to compile with the -DWITH_PERFTOOLS=ON compiler flag. You can use CCUSTOMOPTIONS above to set it for the dashboard compiler
+#  2. Configure the variable below accordingly to your needs
+#  3. run the worldserver with the "./acore.sh run-worldserver"
+#  4. run "killall -12 worldserver"  This command will start the monitoring process. Run "killall -12 worldserver" again to stop the process when you want
+#  5. At this time you will have the .prof file ready in the folder configured below.
+#  Run "google-pprof --callgrind <path/of/worldserver/bin> </path/of/prof/file>" This will generate a callgrind file that can be read with
+#  QCacheGrind, KCacheGrind and any other compatible tools
+#
+##############################################
+
+# files used by gperftools to store monitored information
+export CPUPROFILE=${CPUPROFILE:-"$BINPATH/logs/worldserver-cpu.prof"}
+# heap profile is disabled by default. Uncomment this line to enable it
+# export HEAPPROFILE=${HEAPPROFILE:-"$BINPATH/logs/worldserver-heap.prof"}
+
+# signal to send to the kill command to start/stop the profiling process. kill -12
+export CPUPROFILESIGNAL=${CPUPROFILESIGNAL:-12}
+
+# How many interrupts/second the cpu-profiler samples.
+#export CPUPROFILE_FREQUENCY=${CPUPROFILESIGNAL:-100}
+
+# If set to any value (including 0 or the empty string), use ITIMER_REAL instead of ITIMER_PROF to gather profiles.
+# In general, ITIMER_REAL is not as accurate as ITIMER_PROF, and also interacts badly with use of alarm(),
+# so prefer ITIMER_PROF unless you have a reason prefer ITIMER_REAL.
+#export CPUPROFILE_REALTIME=${CPUPROFILE_REALTIME}
+
+# Other values for HEAPCHECK: minimal, normal (equivalent to "1"), strict, draconian
+#export HEAPCHECK=${HEAPCHECK:-normal}
 
 
 ##############################################
@@ -102,7 +158,7 @@ readarray -td, DATABASES <<<"$DBLIST";
 
 OUTPUT_FOLDER=${OUTPUT_FOLDER:-"$AC_PATH_ROOT/env/dist/sql/"}
 
-DBASM_WAIT_TIMEOUT=${DBASM_WAIT_TIMEOUT:-1}
+DBASM_WAIT_TIMEOUT=${DBASM_WAIT_TIMEOUT:-5}
 DBASM_WAIT_RETRIES=${DBASM_WAIT_RETRIES:-3}
 
 ####### BACKUP

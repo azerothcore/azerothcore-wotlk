@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GridNotifiers.h"
 #include "icecrown_citadel.h"
@@ -225,7 +238,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -281,7 +294,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -353,7 +365,6 @@ public:
             instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -394,7 +405,6 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
@@ -421,7 +431,6 @@ public:
             {
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
-                    me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
@@ -449,7 +458,6 @@ public:
                 case POINT_LAND_GROUND:
                     {
                         _isInAirPhase = false;
-                        me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
@@ -599,9 +607,7 @@ public:
                     me->AttackStop();
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
-                    me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
                     events.ScheduleEvent(EVENT_AIR_PHASE, 110000);
@@ -842,7 +848,7 @@ public:
 
             uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
 
-            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
             damageInfo.damage = damage;
             GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
             GetCaster()->DealSpellDamage(&damageInfo, false);
@@ -908,10 +914,10 @@ public:
             uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
             healList.remove_if(UnchainedMagicTargetSelector(false));
             if (healList.size() > maxSize)
-                acore::Containers::RandomResizeList(healList, maxSize);
+                Acore::Containers::RandomResize(healList, maxSize);
             dpsList.remove_if(UnchainedMagicTargetSelector(true));
             if (dpsList.size() > maxSize)
-                acore::Containers::RandomResizeList(dpsList, maxSize);
+                Acore::Containers::RandomResize(dpsList, maxSize);
             unitList.splice(unitList.begin(), healList);
             unitList.splice(unitList.begin(), dpsList);
         }
@@ -941,7 +947,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -1202,7 +1208,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            unitList.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+            unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
             targetList.clear();
             targetList = unitList;
         }
@@ -1351,7 +1357,7 @@ class achievement_all_you_can_eat : public AchievementCriteriaScript
 public:
     achievement_all_you_can_eat() : AchievementCriteriaScript("achievement_all_you_can_eat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target || target->GetEntry() != NPC_SINDRAGOSA)
             return false;
@@ -1389,7 +1395,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -1399,7 +1404,6 @@ public:
             ScriptedAI::JustReachedHome();
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -1443,7 +1447,6 @@ public:
                 return;
 
             me->setActive(false);
-            me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
@@ -1523,7 +1526,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -1533,7 +1535,6 @@ public:
             ScriptedAI::JustReachedHome();
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -1579,7 +1580,6 @@ public:
             if (point == POINT_FROSTWYRM_LAND)
             {
                 me->setActive(false);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
@@ -1587,7 +1587,6 @@ public:
             }
             else if (point == POINT_LAND_GROUND)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetReactState(REACT_DEFENSIVE);
                 if (Unit* victim = me->SelectVictim())
@@ -1631,9 +1630,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
 
                         me->AttackStop();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;
@@ -1906,11 +1903,11 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }
@@ -1927,7 +1924,7 @@ public:
             if (unitList.empty())
                 return;
 
-            acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+            Acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
         }
 
         void Register() override

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -341,12 +352,6 @@ public:
 
         return true;
     }
-};
-
-enum Factions
-{
-    FACTION_HOSTILE = 14,
-    FACTION_FRIENDLY_TO_ALL = 35
 };
 
 /*######
@@ -1086,7 +1091,7 @@ public:
                     }
                 }
 
-                for (ObjectGuid const guid : allianceGuardsGUID)
+                for (ObjectGuid const& guid : allianceGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 
@@ -1103,15 +1108,15 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned) override
+        void JustSummoned(Creature* summonedCreature) override
         {
-            switch (summoned->GetEntry())
+            switch (summonedCreature->GetEntry())
             {
                 case NPC_GENERATOR:
-                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    summonedCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     break;
                 default:
                     break;
@@ -1605,7 +1610,7 @@ public:
                             {
                                 jaina->GetMotionMaster()->MoveFollow(me, 5, PET_FOLLOW_ANGLE);
                                 jaina->SetReactState(REACT_AGGRESSIVE);
-                                jaina->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                                jaina->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                             }
                             bStepping = false;
                             JumpToNextStep(0);
@@ -2415,7 +2420,7 @@ public:
                     SaurfangGUID.Clear();
                 }
 
-                for (ObjectGuid const guid : hordeGuardsGUID)
+                for (ObjectGuid const& guid : hordeGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 
@@ -2453,7 +2458,7 @@ public:
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     if (!EnableAttack)
-                        summoned->setFaction(FACTION_FRIENDLY_TO_ALL);
+                        summoned->SetFaction(FACTION_FRIENDLY);
                     summoned->AddThreat(me, 100.0f);
                     me->AddThreat(summoned, 100.0f);
                     summoned->AI()->AttackStart(me);
@@ -2557,7 +2562,7 @@ public:
                 sylvanas->GetMotionMaster()->Clear();
                 sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                 sylvanas->SetReactState(REACT_AGGRESSIVE);
-                sylvanas->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                sylvanas->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
                 sylvanas->GetMotionMaster()->MoveFollow(me, 1, M_PI * 0.1f);
             }
         }
@@ -3130,8 +3135,7 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_DOCTOR_H, 1000.0f);
                                 me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_CHEMIST_H, 1000.0f);
                                 if (!HostileEndList.empty())
-                                    for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++)
-                                        (*itr)->setFaction(FACTION_HOSTILE);
+                                    for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++) (*itr)->SetFaction(FACTION_MONSTER);
                                 SpawnWave(4);
                                 JumpToNextStep(10 * IN_MILLISECONDS);
                                 break;

@@ -1,15 +1,27 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef CONFIG_H
 #define CONFIG_H
 
 #include "Define.h"
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 class ConfigMgr
 {
@@ -58,6 +70,8 @@ public:
     bool isDryRun() { return dryRun; }
     void setDryRun(bool mode) { dryRun = mode; }
 
+    void PrintLoadedModulesConfigs();
+
 private:
     /// Method used only for loading main configuration files (authserver.conf and worldserver.conf)
     bool LoadInitial(std::string const& file);
@@ -67,6 +81,8 @@ private:
     T GetValueDefault(std::string const& name, T const& def, bool showLogs = true) const;
 
     bool dryRun = false;
+
+    std::vector<std::string /*config variant*/> _moduleConfigFiles;
 };
 
 class ConfigException : public std::length_error

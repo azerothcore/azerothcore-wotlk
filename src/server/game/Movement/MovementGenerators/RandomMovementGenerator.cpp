@@ -1,17 +1,39 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Creature.h"
 #include "CreatureGroups.h"
 #include "Map.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
 #include "RandomMovementGenerator.h"
 #include "Spell.h"
 #include "Util.h"
+
+template<class T>
+RandomMovementGenerator<T>::~RandomMovementGenerator() { }
+
+template<>
+RandomMovementGenerator<Creature>::~RandomMovementGenerator()
+{
+    delete _pathGenerator;
+}
 
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
@@ -54,7 +76,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         Map* map = creature->GetMap();
         float x = _destinationPoints[newPoint].x, y = _destinationPoints[newPoint].y, z = _destinationPoints[newPoint].z;
         // invalid coordinates
-        if (!acore::IsValidMapCoord(x, y))
+        if (!Acore::IsValidMapCoord(x, y))
         {
             _validPointsVector[_currentPoint].erase(randomIter);
             _preComputedPaths.erase(pathIdx);

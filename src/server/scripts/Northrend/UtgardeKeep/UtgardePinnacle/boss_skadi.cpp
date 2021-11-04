@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "Player.h"
@@ -120,7 +133,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 104.669f, 3.12414f))
+            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 116.669f, 3.12414f))
             {
                 GraufGUID = cr->GetGUID();
                 summons.Summon(cr);
@@ -352,7 +365,7 @@ public:
                     if (m_pInstance)
                         m_pInstance->SetData(SKADI_IN_RANGE, 1);
 
-                    me->MonsterTextEmote(EMOTE_IN_RANGE, 0, true);
+                    me->TextEmote(EMOTE_IN_RANGE, nullptr, true);
                     me->SetFacingTo(M_PI);
                     break;
             }
