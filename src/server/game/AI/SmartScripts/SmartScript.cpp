@@ -422,7 +422,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         {
                             if (e.action.faction.factionID)
                             {
-                                (*itr)->ToCreature()->setFaction(e.action.faction.factionID);
+                                (*itr)->ToCreature()->SetFaction(e.action.faction.factionID);
                                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_FACTION: Creature entry %u (%s) set faction to %u",
                                                (*itr)->GetEntry(), (*itr)->GetGUID().ToString().c_str(), e.action.faction.factionID);
                             }
@@ -430,9 +430,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             {
                                 if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate((*itr)->ToCreature()->GetEntry()))
                                 {
-                                    if ((*itr)->ToCreature()->getFaction() != ci->faction)
+                                    if ((*itr)->ToCreature()->GetFaction() != ci->faction)
                                     {
-                                        (*itr)->ToCreature()->setFaction(ci->faction);
+                                        (*itr)->ToCreature()->SetFaction(ci->faction);
                                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_FACTION: Creature entry %u (%s) set faction to %u",
                                                        (*itr)->GetEntry(), (*itr)->GetGUID().ToString().c_str(), ci->faction);
                                     }
@@ -1302,20 +1302,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
+                    Milliseconds despawnDelay(e.action.forceDespawn.delay);
+
+                    // Wait at least one world update tick before despawn, so it doesn't break linked actions.
+                    if (despawnDelay <= 0ms)
+                    {
+                        despawnDelay = 1ms;
+                    }
+
+                    Seconds forceRespawnTimer(e.action.forceDespawn.forceRespawnTimer);
                     if (Creature* creature = (*itr)->ToCreature())
                     {
-                        creature->DespawnOrUnsummon(e.action.forceDespawn.delay + 1);
+                        creature->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
                     }
                     else if (GameObject* go = (*itr)->ToGameObject())
                     {
-                        Milliseconds despawnDelay(e.action.forceDespawn.delay);
-
-                        // Wait at least one world update tick before despawn, so it doesn't break linked actions.
-                        if (despawnDelay <= 0ms)
-                        {
-                            despawnDelay = 1ms;
-                        }
-                        go->DespawnOrUnsummon(despawnDelay);
+                        go->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
                     }
                 }
 
@@ -4027,10 +4029,32 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         case SMART_EVENT_ON_SPELLCLICK:
             ProcessAction(e, unit, var0, var1, bvar, spell, gob);
             break;
-        // Xinef: added no report use distinction for gameobjects
+
         case SMART_EVENT_GOSSIP_HELLO:
-            if (e.event.gossipHello.noReportUse && var0)
-                return;
+            switch (e.event.gossipHello.filter)
+            {
+            case 0:
+                // no filter set, always execute action
+                break;
+            case 1:
+                // GossipHello only filter set, skip action if reportUse
+                if (var0)
+                {
+                    return;
+                }
+                break;
+            case 2:
+                // reportUse only filter set, skip action if GossipHello
+                if (!var0)
+                {
+                    return;
+                }
+                break;
+            default:
+                // Ignore any other value
+                break;
+            }
+
             ProcessAction(e, unit, var0, var1, bvar, spell, gob);
             break;
         case SMART_EVENT_IS_BEHIND_TARGET:

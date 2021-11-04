@@ -29,14 +29,20 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "WaypointMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class wp_commandscript : public CommandScript
 {
 public:
     wp_commandscript() : CommandScript("wp_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> wpCommandTable =
+        static ChatCommandTable wpCommandTable =
         {
             { "add",            SEC_ADMINISTRATOR,     false, &HandleWpAddCommand,                "" },
             { "event",          SEC_ADMINISTRATOR,     false, &HandleWpEventCommand,              "" },
@@ -46,7 +52,7 @@ public:
             { "reload",         SEC_ADMINISTRATOR,     false, &HandleWpReloadCommand,             "" },
             { "show",           SEC_ADMINISTRATOR,     false, &HandleWpShowCommand,               "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "wp",             SEC_ADMINISTRATOR,     false, nullptr,                            "", wpCommandTable }
         };

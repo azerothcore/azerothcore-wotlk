@@ -55,11 +55,9 @@ public:
     {
         boss_gythAI(Creature* creature) : BossAI(creature, DATA_GYTH) { }
 
-        bool SummonedRend;
-
         void Reset() override
         {
-            SummonedRend = false;
+            _summonedRend = false;
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
                 instance->SetBossState(DATA_GYTH, NOT_STARTED);
@@ -78,21 +76,15 @@ public:
             events.ScheduleEvent(EVENT_KNOCK_AWAY, urand(12000, 18000));
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void EnterEvadeMode() override
         {
-            instance->SetBossState(DATA_GYTH, DONE);
+            instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
+            BossAI::EnterEvadeMode();
         }
 
-        void SetData(uint32 /*type*/, uint32 data) override
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
-            switch (data)
-            {
-                case 1:
-                    events.ScheduleEvent(EVENT_SUMMONED_1, 1000);
-                    break;
-                default:
-                    break;
-            }
+            events.ScheduleEvent(EVENT_SUMMONED_1, 1000);
         }
 
         void JustSummoned(Creature* summon) override
@@ -101,15 +93,26 @@ public:
             summon->AI()->AttackStart(me->SelectVictim());
         }
 
-        void UpdateAI(uint32 diff) override
+        // Prevent clearing summon list, otherwise Rend despawns if the drake is killed first.
+        void JustDied(Unit* /*killer*/) override { }
+
+        void DamageTaken(Unit* /*aggressor*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {
-            if (!SummonedRend && HealthBelowPct(25))
+            if (!_summonedRend && me->HealthBelowPctDamaged(25, damage))
             {
+                if (damage >= me->GetHealth())
+                {
+                    // Let creature fall to 1 HP but prevent it from dying before boss is summoned.
+                    damage = me->GetHealth() - 1;
+                }
                 DoCast(me, SPELL_SUMMON_REND);
                 me->RemoveAura(SPELL_REND_MOUNTS);
-                SummonedRend = true;
+                _summonedRend = true;
             }
+        }
 
+        void UpdateAI(uint32 diff) override
+        {
             if (!UpdateVictim())
             {
                 events.Update(diff);
@@ -122,8 +125,6 @@ public:
                             me->AddAura(SPELL_REND_MOUNTS, me);
                             if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 40.0f))
                                 portcullis->UseDoorOrButton();
-                            if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 75.0f, true))
-                                victor->AI()->SetData(1, 1);
                             events.ScheduleEvent(EVENT_SUMMONED_2, 2000);
                             break;
                         case EVENT_SUMMONED_2:
@@ -164,6 +165,9 @@ public:
             }
             DoMeleeAttackIfReady();
         }
+
+        private:
+            bool _summonedRend;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

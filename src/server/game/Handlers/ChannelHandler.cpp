@@ -46,10 +46,10 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (isdigit(channelName[0]))
         return;
 
-    // pussywizard: restrict allowed characters in channel name to avoid |0 and possibly other exploits
-    //if (!ObjectMgr::IsValidChannelName(channelName))
-    if (channelName.find("|") != std::string::npos || channelName.size() >= 100)
+    if (channelName.size() >= 100 || !DisallowHyperlinksAndMaybeKick(channelName))
+    {
         return;
+    }
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
     {

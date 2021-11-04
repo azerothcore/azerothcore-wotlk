@@ -41,7 +41,6 @@ class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
 class Channel;
-class ChatCommand;
 class Creature;
 class CreatureAI;
 class DynamicObject;
@@ -80,6 +79,11 @@ struct ItemTemplate;
 struct OutdoorPvPData;
 struct GroupQueueInfo;
 struct TargetInfo;
+
+namespace Acore::ChatCommands
+{
+    struct ChatCommandBuilder;
+}
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
@@ -548,6 +552,19 @@ public:
     [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
+class OnlyOnceAreaTriggerScript : public AreaTriggerScript
+{
+    using AreaTriggerScript::AreaTriggerScript;
+
+public:
+    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) override;
+
+protected:
+    virtual bool _OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) = 0;
+    void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
+    void ResetAreaTriggerDone(Player const* /*player*/, AreaTrigger const* /*trigger*/);
+};
+
 class BattlegroundScript : public ScriptObject
 {
 protected:
@@ -579,7 +596,7 @@ protected:
 
 public:
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-    [[nodiscard]] virtual std::vector<ChatCommand> GetCommands() const = 0;
+    [[nodiscard]] virtual std::vector<Acore::ChatCommands::ChatCommandBuilder> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -1566,7 +1583,7 @@ public: /* OutdoorPvPScript */
     OutdoorPvP* CreateOutdoorPvP(OutdoorPvPData const* data);
 
 public: /* CommandScript */
-    std::vector<ChatCommand> GetChatCommands();
+    std::vector<Acore::ChatCommands::ChatCommandBuilder> GetChatCommands();
 
 public: /* WeatherScript */
     void OnWeatherChange(Weather* weather, WeatherState state, float grade);
