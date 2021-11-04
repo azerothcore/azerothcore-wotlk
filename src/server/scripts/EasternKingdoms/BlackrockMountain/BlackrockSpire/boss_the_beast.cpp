@@ -16,6 +16,7 @@
  */
 
 #include "blackrock_spire.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
