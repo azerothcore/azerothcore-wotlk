@@ -48,5 +48,5 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 DELETE FROM `creature_formations` WHERE `leaderGUID`=@NPC;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (@NPC, @NPC, 0, 0, 2, 0, 0),
-(@NPC, 36692, 2, 120, 2, 0, 0),
-(@NPC, 205803, 2, 210, 0, 0, 0);
+(@NPC, 36692, 2, 120, 514, 0, 0),
+(@NPC, 205803, 2, 210, 514, 0, 0);
