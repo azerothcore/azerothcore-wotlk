@@ -46,6 +46,18 @@
 
 using namespace Acore::ChatCommands;
 
+static std::array<std::string, MAX_ITEM_QUALITY> itemQualityToString =
+{ {
+        "poor",
+        "normal",
+        "uncommon",
+        "rare",
+        "epic",
+        "legendary",
+        "artifact",
+        "all"
+} };
+
 class misc_commandscript : public CommandScript
 {
 public:
@@ -53,6 +65,10 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable bagsCommandTable =
+        {
+            { "clear",             SEC_GAMEMASTER,         false,  &HandleBagsClearCommand,                "" },
+        };
         static ChatCommandTable commandTable =
         {
             { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "" },
@@ -104,7 +120,8 @@ public:
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
             { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
-            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
+            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" },
+            { "bags",               SEC_GAMEMASTER,         false, nullptr,                             "", bagsCommandTable },
         };
         return commandTable;
     }
