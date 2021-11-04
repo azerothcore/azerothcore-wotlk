@@ -3410,9 +3410,21 @@ void Map::DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId)
 void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source)
 {
     Difficulty difficulty_fixed = (IsSharedDifficultyMap(GetId()) ? Difficulty(GetDifficulty() % 2) : GetDifficulty());
-    DungeonEncounterList const* encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    DungeonEncounterList const* encounters;
+    // 631 : ICC - 724 : Ruby Sanctum --- For heroic difficulties, for some reason, we don't have an encounter list, so we get the encounter list from normal diff. We shouldn't change difficulty_fixed variable.
+    if ((GetId() == 631 || GetId() == 724) && IsHeroic())
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), !Is25ManRaid() ? RAID_DIFFICULTY_10MAN_NORMAL : RAID_DIFFICULTY_25MAN_NORMAL);
+    }
+    else
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    }
+
     if (!encounters)
+    {
         return;
+    }
 
     uint32 dungeonId = 0;
     bool updated = false;
