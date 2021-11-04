@@ -15,9 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _PLAYER_COMMAND_H_
+#define _PLAYER_COMMAND_H_
+
+class ChatHandler;
+class Player;
+
 class PlayerCommand
 {
 public:
     static bool Learn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
     static bool UnLearn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
 };
+
+#endif
