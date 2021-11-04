@@ -241,7 +241,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->CombatStop();
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
                     break;
                 case EVENT_TALK_GOOD_2:

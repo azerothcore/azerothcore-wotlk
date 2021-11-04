@@ -360,7 +360,7 @@ public:
                     if (Creature* dwarf = me->SummonCreature(NPC_DWARFES_FRIENDLY, RoomPosition[Pos].GetPositionX(), RoomPosition[Pos].GetPositionY(), RoomPosition[Pos].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
                     {
                         if (Player* plr = SelectTargetFromPlayerList(100.0f))
-                            dwarf->setFaction(plr->getFaction());
+                            dwarf->SetFaction(plr->GetFaction());
 
                         ActivatePipe(Pos);
                         dwarf->AI()->AttackStart(me);

@@ -1101,7 +1101,7 @@ void WorldObject::RemoveFromWorld()
     Object::RemoveFromWorld();
 }
 
-InstanceScript* WorldObject::GetInstanceScript()
+InstanceScript* WorldObject::GetInstanceScript() const
 {
     Map* map = GetMap();
     return map->IsDungeon() ? map->ToInstanceMap()->GetInstanceScript() : nullptr;
@@ -2256,7 +2256,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
     //summon->SetName(GetName());
     if (setLevel && (GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT))
     {
-        summon->setFaction(((Unit*)this)->getFaction());
+        summon->SetFaction(((Unit*)this)->GetFaction());
         summon->SetLevel(((Unit*)this)->getLevel());
     }
 
