@@ -24,10 +24,6 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
 class group_commandscript : public CommandScript
@@ -35,9 +31,9 @@ class group_commandscript : public CommandScript
 public:
     group_commandscript() : CommandScript("group_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> groupCommandTable =
+        static ChatCommandTable groupCommandTable =
         {
             { "list",    HandleGroupListCommand,    SEC_GAMEMASTER, Console::No },
             { "join",    HandleGroupJoinCommand,    SEC_GAMEMASTER, Console::No },
@@ -46,54 +42,92 @@ public:
             { "leader",  HandleGroupLeaderCommand,  SEC_GAMEMASTER, Console::No }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "group",  groupCommandTable }
         };
+
         return commandTable;
     }
 
-    static bool HandleGroupLeaderCommand(ChatHandler* handler, char const* args)
+    static bool HandleGroupLeaderCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target)
+        {
+            return false;
+        }
+
         Player* player = nullptr;
         Group* group = nullptr;
         ObjectGuid guid;
-        char* nameStr = strtok((char*)args, " ");
 
-        if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid))
+        if (handler->GetPlayerGroupAndGUIDByName(target->GetName().c_str(), player, group, guid))
+        {
             if (group && group->GetLeaderGUID() != guid)
             {
                 group->ChangeLeader(guid);
                 group->SendUpdate();
             }
+        }
 
         return true;
     }
 
-    static bool HandleGroupDisbandCommand(ChatHandler* handler, char const* args)
+    static bool HandleGroupDisbandCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
+            return false;
+        }
+
         Player* player = nullptr;
         Group* group = nullptr;
         ObjectGuid guid;
-        char* nameStr = strtok((char*)args, " ");
 
-        if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid))
+        if (handler->GetPlayerGroupAndGUIDByName(target->GetName().c_str(), player, group, guid))
+        {
             if (group)
+            {
                 group->Disband();
+            }
+        }
 
         return true;
     }
 
-    static bool HandleGroupRemoveCommand(ChatHandler* handler, char const* args)
+    static bool HandleGroupRemoveCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
+            return false;
+        }
+
         Player* player = nullptr;
         Group* group = nullptr;
         ObjectGuid guid;
-        char* nameStr = strtok((char*)args, " ");
 
-        if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid, true))
+        if (handler->GetPlayerGroupAndGUIDByName(target->GetName().c_str(), player, group, guid, true))
+        {
             if (group)
+            {
                 group->RemoveMember(guid);
+            }
+        }
 
         return true;
     }
