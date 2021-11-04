@@ -19,6 +19,7 @@
 void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
 void AddSC_arena_commandscript();
+void AddSC_bag_commandscript();
 void AddSC_ban_commandscript();
 void AddSC_bf_commandscript();
 void AddSC_cast_commandscript();
@@ -46,6 +47,7 @@ void AddSC_mmaps_commandscript();
 void AddSC_modify_commandscript();
 void AddSC_npc_commandscript();
 void AddSC_pet_commandscript();
+void AddSC_player_commandscript();
 void AddSC_quest_commandscript();
 void AddSC_reload_commandscript();
 void AddSC_reset_commandscript();
@@ -56,7 +58,6 @@ void AddSC_tele_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
-void AddSC_player_commandscript();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -65,6 +66,7 @@ void AddCommandsScripts()
     AddSC_account_commandscript();
     AddSC_achievement_commandscript();
     AddSC_arena_commandscript();
+    AddSC_bag_commandscript();
     AddSC_ban_commandscript();
     AddSC_bf_commandscript();
     AddSC_cast_commandscript();
@@ -92,6 +94,7 @@ void AddCommandsScripts()
     AddSC_modify_commandscript();
     AddSC_npc_commandscript();
     AddSC_pet_commandscript();
+    AddSC_player_commandscript();
     AddSC_quest_commandscript();
     AddSC_reload_commandscript();
     AddSC_reset_commandscript();
@@ -102,5 +105,4 @@ void AddCommandsScripts()
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
-    AddSC_player_commandscript();
 }
