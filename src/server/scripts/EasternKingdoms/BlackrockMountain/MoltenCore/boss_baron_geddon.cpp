@@ -18,7 +18,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"
-#include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
