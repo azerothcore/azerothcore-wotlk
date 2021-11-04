@@ -18,6 +18,8 @@
 #ifndef _PLAYER_COMMAND_H_
 #define _PLAYER_COMMAND_H_
 
+#include "Define.h"
+
 class ChatHandler;
 class Player;
 
