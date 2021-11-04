@@ -569,7 +569,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
         _type = PathType(_type | PATHFIND_NOPATH);
         return;
     }
-    else if (pointCount > _pointPathLimit)
+    else if (pointCount >= _pointPathLimit)
     {
         BuildShortcut();
         _type = PathType(_type | PATHFIND_SHORT);
@@ -1117,7 +1117,7 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
     NormalizePath();
 
     // this seems to improve underwater charing leaving character standing on top of creatures
-    SetEndPosition(_pathPoints[i]);
+    SetActualEndPosition(_pathPoints[i]);
 }
 
 bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
