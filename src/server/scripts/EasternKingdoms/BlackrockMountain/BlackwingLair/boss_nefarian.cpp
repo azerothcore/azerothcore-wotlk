@@ -222,7 +222,6 @@ public:
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
-
         {
             if (summon->GetEntry() != NPC_NEFARIAN)
             {
@@ -230,6 +229,25 @@ public:
                 summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->SetStandState(UNIT_STAND_STATE_DEAD);
+            }
+        }
+
+        bool GossipSelect(Player* player, uint32 menuId, uint32 gossipActionList) override
+        {
+            if (menuId == GOSSIP_ID && gossipActionList == GOSSIP_OPTION_ID)
+            {
+                // pussywizard:
+                if (InstanceScript* instance = player->GetInstanceScript())
+                {
+                    if (instance->GetBossState(DATA_NEFARIAN) == DONE)
+                    {
+                        return false;
+                    }
+                }
+
+                CloseGossipMenuFor(player);
+                Talk(SAY_GAMESBEGIN_1);
+                BeginEvent(player);
             }
         }
 
@@ -373,21 +391,6 @@ public:
                     if (me->HasUnitState(UNIT_STATE_CASTING))
                         return;
                 }
-            }
-        }
-
-        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
-        {
-            if (sender == GOSSIP_ID && action == GOSSIP_OPTION_ID)
-            {
-                // pussywizard:
-                InstanceScript* instance = player->GetInstanceScript();
-                if (!instance || instance->GetBossState(DATA_NEFARIAN) == DONE)
-                    return;
-
-                CloseGossipMenuFor(player);
-                Talk(SAY_GAMESBEGIN_1);
-                BeginEvent(player);
             }
         }
 

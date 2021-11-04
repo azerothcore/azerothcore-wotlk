@@ -229,6 +229,51 @@ public:
             aliveMinionsGUIDS = static_minionsGUIDS;
         }
 
+        bool GossipHello(Player* player) override
+        {
+            AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            SendGossipMenuFor(player, TEXT_ID_SUMMON_1, me->GetGUID());
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            switch (action)
+            {
+                case GOSSIP_ACTION_INFO_DEF:
+                {
+                    AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    SendGossipMenuFor(player, TEXT_ID_SUMMON_2, me->GetGUID());
+                    break;
+                }
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                {
+                    AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    SendGossipMenuFor(player, TEXT_ID_SUMMON_2, me->GetGUID());
+                    break;
+                }
+                case GOSSIP_ACTION_INFO_DEF + 2:
+                {
+                    AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    SendGossipMenuFor(player, TEXT_ID_SUMMON_3, me->GetGUID());
+                    break;
+                }
+                case GOSSIP_ACTION_INFO_DEF + 3:
+                {
+                    CloseGossipMenuFor(player);
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    Talk(SAY_RAG_SUM_1, player);
+                    DoAction(ACTION_START_RAGNAROS_INTRO);
+                    break;
+                }
+                default:
+                    CloseGossipMenuFor(player);
+                    break;
+            }
+            return true;
+        }
+
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
             aliveMinionsGUIDS.erase(summon->GetGUID());
@@ -527,51 +572,6 @@ public:
         GuidSet aliveMinionsGUIDS;      // used for calculations
         uint32 spawnInTextTimer;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        SendGossipMenuFor(player, TEXT_ID_SUMMON_1, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-            {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, TEXT_ID_SUMMON_2, creature->GetGUID());
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF+1:
-            {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, TEXT_ID_SUMMON_2, creature->GetGUID());
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF+2:
-            {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, TEXT_ID_SUMMON_3, creature->GetGUID());
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF+3:
-            {
-                CloseGossipMenuFor(player);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                creature->AI()->Talk(SAY_RAG_SUM_1, player);
-                creature->AI()->DoAction(ACTION_START_RAGNAROS_INTRO);
-                break;
-            }
-            default:
-                CloseGossipMenuFor(player);
-                break;
-        }
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {

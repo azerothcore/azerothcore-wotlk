@@ -313,6 +313,27 @@ public:
             events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, urand(6000, 8000));
         }
 
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 /*gossipActionList*/) override
+        {
+            CloseGossipMenuFor(player);
+            DoAction(EVENT_ENCOUNTER_START);
+
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(ARTORIUS_HEAD, 1, true))
+            {
+                uint32 gossipMenuId = me->GetCreatureTemplate()->GossipMenuId;
+                AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
+            }
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
+
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -418,27 +439,6 @@ public:
             }
         }
     };
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-        creature->AI()->DoAction(EVENT_ENCOUNTER_START);
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(ARTORIUS_HEAD, 1, true))
-        {
-            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
-            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
 };
 
 class npc_precious : public CreatureScript

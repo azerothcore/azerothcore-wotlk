@@ -16,6 +16,7 @@
  */
 
 #include "blackwing_lair.h"
+#include "GameObjectAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
@@ -165,16 +166,31 @@ class go_orb_of_domination : public GameObjectScript
 public:
     go_orb_of_domination() : GameObjectScript("go_orb_of_domination") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_orb_of_dominationAI : public GameObjectAI
     {
-        if (InstanceScript* instance = go->GetInstanceScript())
-            if (instance->GetData(DATA_EGG_EVENT) != DONE)
-                if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
+        go_orb_of_dominationAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (InstanceScript* instance = go->GetInstanceScript())
+            {
+                if (instance->GetData(DATA_EGG_EVENT) != DONE)
                 {
-                    razor->Attack(player, true);
-                    player->CastSpell(razor, SPELL_MINDCONTROL);
+                    if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
+                    {
+                        razor->Attack(player, true);
+                        player->CastSpell(razor, SPELL_MINDCONTROL);
+                    }
                 }
-        return true;
+            }
+
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const
+    {
+        return new go_orb_of_dominationAI(go);
     }
 };
 

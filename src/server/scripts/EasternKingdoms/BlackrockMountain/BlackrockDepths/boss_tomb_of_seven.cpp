@@ -58,48 +58,58 @@ class boss_gloomrel : public CreatureScript
 public:
     boss_gloomrel() : CreatureScript("boss_gloomrel") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct boss_gloomrelAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        switch (action)
+        boss_gloomrelAI(Creature* creature) : ScriptedAI(creature) { }
+
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipActionList) override
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
+            ClearGossipMenuFor(player);
+            switch (gossipActionList)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
                 AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, SAY_QUEST_COMPLETED_END, creature->GetGUID());
+                SendGossipMenuFor(player, SAY_QUEST_COMPLETED_END, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+11:
+            case GOSSIP_ACTION_INFO_DEF + 11:
                 CloseGossipMenuFor(player);
                 player->CastSpell(player, SPELL_LEARN_SMELT, false);
                 break;
-            case GOSSIP_ACTION_INFO_DEF+2:
+            case GOSSIP_ACTION_INFO_DEF + 2:
                 AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
-                SendGossipMenuFor(player, SAY_QUEST_ACCEPTED, creature->GetGUID());
+                SendGossipMenuFor(player, SAY_QUEST_ACCEPTED, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+22:
+            case GOSSIP_ACTION_INFO_DEF + 22:
                 CloseGossipMenuFor(player);
-                if (InstanceScript* instance = creature->GetInstanceScript())
+                if (InstanceScript* instance = me->GetInstanceScript())
                 {
-                    //are 5 minutes expected? go template may have data to despawn when used at quest
+                    // are 5 minutes expected? go template may have data to despawn when used at quest
                     instance->DoRespawnGameObject(instance->GetGuidData(DATA_GO_CHALICE), MINUTE * 5);
                 }
                 break;
+            }
+            return true;
         }
-        return true;
-    }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 1 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN && !player->HasSpell(SPELL_SMELT_DARK_IRON))
+        bool GossipHello(Player* player) override
         {
-            AddGossipItemFor(player, GOSSIP_GROOMREL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, SAY_QUEST_COMPLETED, creature->GetGUID());
+            if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 1 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN && !player->HasSpell(SPELL_SMELT_DARK_IRON))
+            {
+                AddGossipItemFor(player, GOSSIP_GROOMREL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, SAY_QUEST_COMPLETED, me->GetGUID());
+            }
+
+            if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 0 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN)
+                AddGossipItemFor(player, GOSSIP_GROOMREL, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return true;
         }
+    };
 
-        if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 0 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN)
-            AddGossipItemFor(player, GOSSIP_GROOMREL, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetBlackrockDepthsAI<boss_gloomrelAI>(creature);
     }
 };
 
@@ -124,38 +134,6 @@ class boss_doomrel : public CreatureScript
 {
 public:
     boss_doomrel() : CreatureScript("boss_doomrel") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, SAY_QUEST_COMPLETED, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                CloseGossipMenuFor(player);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                // Start encounter
-                InstanceScript* instance = creature->GetInstanceScript();
-                if (instance)
-                {
-                    instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
-                }
-                creature->AI()->Talk(SAY_START_FIGHT);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        AddGossipItemFor(player, GOSSIP_DOOMREL_START_COMBAT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, SAY_DOOMREL_HELLO, creature->GetGUID());
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -211,6 +189,36 @@ public:
             if (me->IsAlive())
                 me->GetMotionMaster()->MoveTargetedHome();
             me->SetLootRecipient(nullptr);
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            switch (action)
+            {
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                    AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    SendGossipMenuFor(player, SAY_QUEST_COMPLETED, me->GetGUID());
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 2:
+                    CloseGossipMenuFor(player);
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    // Start encounter
+                    if (InstanceScript* instance = me->GetInstanceScript())
+                    {
+                        instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
+                    }
+                    Talk(SAY_START_FIGHT);
+                    break;
+            }
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            AddGossipItemFor(player, GOSSIP_DOOMREL_START_COMBAT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            SendGossipMenuFor(player, SAY_DOOMREL_HELLO, me->GetGUID());
+            return true;
         }
 
         void UpdateAI(uint32 diff) override
