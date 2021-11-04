@@ -47,7 +47,10 @@ enum PriestSpells
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
 
     SPELL_GENERIC_ARENA_DAMPENING                   = 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING            = 74411
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING            = 74411,
+    SPELL_PRIEST_TWIN_DISCIPLINE_R1                 = 47586,
+    SPELL_PRIEST_SPIRITUAL_HEALING_R1               = 14898,
+    SPELL_PRIEST_DIVINE_PROVIDENCE_R1               = 47562
 };
 
 enum PriestSpellIcons
@@ -832,22 +835,47 @@ public:
     {
         PrepareSpellScript(spell_pri_prayer_of_mending_heal_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo(
+                {
+                    SPELL_PRIEST_T9_HEALING_2P,
+                    SPELL_PRIEST_TWIN_DISCIPLINE_R1,
+                    SPELL_PRIEST_SPIRITUAL_HEALING_R1,
+                    SPELL_PRIEST_DIVINE_PROVIDENCE_R1
+                });
+        }
+
         void HandleHeal(SpellEffIndex /*effIndex*/)
         {
             if (Unit* caster = GetOriginalCaster())
             {
+                int32 heal = GetEffectValue();
                 if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_PRIEST_T9_HEALING_2P, EFFECT_0))
                 {
-                    int32 heal = GetHitHeal();
                     AddPct(heal, aurEff->GetAmount());
-                    SetHitHeal(heal);
                 }
+
+                if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PRIEST_TWIN_DISCIPLINE_R1, EFFECT_0))
+                {
+                    AddPct(heal, aurEff->GetAmount());
+                }
+                if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PRIEST_SPIRITUAL_HEALING_R1, EFFECT_0))
+                {
+                    AddPct(heal, aurEff->GetAmount());
+                }
+                if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PRIEST_DIVINE_PROVIDENCE_R1, EFFECT_0))
+                {
+                    AddPct(heal, aurEff->GetAmount());
+                }
+
+                SetEffectValue(heal);
             }
         }
 
         void Register() override
         {
-            OnEffectHitTarget += SpellEffectFn(spell_pri_prayer_of_mending_heal_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+            OnEffectLaunchTarget += SpellEffectFn(spell_pri_prayer_of_mending_heal_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
         }
     };
 
@@ -870,6 +898,11 @@ public:
         bool Load() override
         {
             return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({SPELL_PRIEST_EMPOWERED_RENEW});
         }
 
         void HandleApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
