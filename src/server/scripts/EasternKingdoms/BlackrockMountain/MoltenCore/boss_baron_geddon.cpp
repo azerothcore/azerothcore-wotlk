@@ -76,7 +76,7 @@ public:
             {
                 me->RemoveAurasDueToSpell(SPELL_INFERNO);
                 me->StopMoving();
-                if (me->CastSpell(me, SPELL_ARMAGEDDON) == SPELL_CAST_OK)
+                if (me->CastSpell(me, SPELL_ARMAGEDDON, TRIGGERED_FULL_MASK) == SPELL_CAST_OK)
                 {
                     Talk(EMOTE_SERVICE);
                     armageddonCasted = true;
