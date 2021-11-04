@@ -803,7 +803,7 @@ public:
             summons.DespawnAll();
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
         {
             CloseGossipMenuFor(player);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -830,6 +830,8 @@ public:
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_28, 49200);
                 events.ScheduleEvent(EVENT_AKAMA_SCENE_29, 52000);
             }
+
+            return false;
         }
 
         void JustSummoned(Creature* summon) override

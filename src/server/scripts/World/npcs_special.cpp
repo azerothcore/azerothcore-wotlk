@@ -1682,6 +1682,62 @@ public:
             _showUnderground = urand(0, 100) == 0; // Guessed value, it is really rare though
         }
 
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsSummon())
+            {
+                if (player == me->ToTempSummon()->GetSummonerUnit())
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+
+                    if (me->AI()->GetData(DATA_SHOW_UNDERGROUND))
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+
+                    SendGossipMenuFor(player, TEXT_WORMHOLE, me);
+                }
+            }
+
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+
+            switch (action)
+            {
+                case GOSSIP_ACTION_INFO_DEF + 1: // Borean Tundra
+                    CloseGossipMenuFor(player);
+                    me->CastSpell(player, SPELL_BOREAN_TUNDRA, false);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 2: // Howling Fjord
+                    CloseGossipMenuFor(player);
+                    me->CastSpell(player, SPELL_HOWLING_FJORD, false);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 3: // Sholazar Basin
+                    CloseGossipMenuFor(player);
+                    me->CastSpell(player, SPELL_SHOLAZAR_BASIN, false);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 4: // Icecrown
+                    CloseGossipMenuFor(player);
+                    me->CastSpell(player, SPELL_ICECROWN, false);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 5: // Storm peaks
+                    CloseGossipMenuFor(player);
+                    me->CastSpell(player, SPELL_STORM_PEAKS, false);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 6: // Underground
+                    CloseGossipMenuFor(player);
+                    me->CastSpell(player, SPELL_UNDERGROUND, false);
+                    break;
+            }
+            return true;
+        }
+
         uint32 GetData(uint32 type) const override
         {
             return (type == DATA_SHOW_UNDERGROUND && _showUnderground) ? 1 : 0;
@@ -1690,63 +1746,6 @@ public:
     private:
         bool _showUnderground;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsSummon())
-        {
-            if (player == creature->ToTempSummon()->GetSummonerUnit())
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-
-                if (creature->AI()->GetData(DATA_SHOW_UNDERGROUND))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-
-                SendGossipMenuFor(player, TEXT_WORMHOLE, creature);
-            }
-        }
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF + 1: // Borean Tundra
-                CloseGossipMenuFor(player);
-                creature->CastSpell(player, SPELL_BOREAN_TUNDRA, false);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2: // Howling Fjord
-                CloseGossipMenuFor(player);
-                creature->CastSpell(player, SPELL_HOWLING_FJORD, false);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3: // Sholazar Basin
-                CloseGossipMenuFor(player);
-                creature->CastSpell(player, SPELL_SHOLAZAR_BASIN, false);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 4: // Icecrown
-                CloseGossipMenuFor(player);
-                creature->CastSpell(player, SPELL_ICECROWN, false);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 5: // Storm peaks
-                CloseGossipMenuFor(player);
-                creature->CastSpell(player, SPELL_STORM_PEAKS, false);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 6: // Underground
-                CloseGossipMenuFor(player);
-                creature->CastSpell(player, SPELL_UNDERGROUND, false);
-                break;
-        }
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
