@@ -89,13 +89,17 @@ public:
             {
                 case EVENT_INFERNO:
                 {
-                    DoCastSelf(SPELL_INFERNO);
+                    DoCastAOE(SPELL_INFERNO);
                     events.RepeatEvent(urand(21000, 26000));
                     break;
                 }
                 case EVENT_IGNITE_MANA:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_IGNITE_MANA))
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, [](Unit const* target) -> bool
+                    {
+                        Player const* plr = target->ToPlayer();
+                        return plr && (plr->getPowerType() == POWER_MANA || plr->getClass() == CLASS_DRUID) && !plr->HasAura(SPELL_IGNITE_MANA);
+                    }))
                     {
                         DoCast(target, SPELL_IGNITE_MANA);
                     }
