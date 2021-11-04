@@ -324,7 +324,6 @@ public:
     uint32 AttributesEx6;
     uint32 AttributesEx7;
     uint32 AttributesCu;
-    uint32 AttributesCu1;
     uint32 Stances;
     uint32 StancesNot;
     uint32 Targets;
