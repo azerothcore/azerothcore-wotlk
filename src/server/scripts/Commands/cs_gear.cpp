@@ -22,10 +22,6 @@
 #include "Player.h"
 #include "WorldSession.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
 class gear_commandscript : public CommandScript
@@ -33,7 +29,7 @@ class gear_commandscript : public CommandScript
 public:
     gear_commandscript() : CommandScript("gear_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
         static std::vector<ChatCommand> gearCommandTable =
         {
@@ -45,25 +41,37 @@ public:
         {
             { "gear", gearCommandTable }
         };
+
         return commandTable;
     }
 
-    static bool HandleGearRepairCommand(ChatHandler* handler, char const* args)
+    static bool HandleGearRepairCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
             return false;
+        }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
             return false;
 
         // Repair items
-        target->DurabilityRepairAll(false, 0, false);
+        target->GetConnectedPlayer()->DurabilityRepairAll(false, 0, false);
 
-        handler->PSendSysMessage(LANG_YOU_REPAIR_ITEMS, handler->GetNameLink(target).c_str());
-        if (handler->needReportToTarget(target))
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink().c_str());
+        auto nameLink = handler->playerLink(target->GetName()).c_str();
+
+        handler->PSendSysMessage(LANG_YOU_REPAIR_ITEMS, nameLink);
+
+        if (handler->needReportToTarget(target->GetConnectedPlayer()))
+        {
+            ChatHandler(target->GetConnectedPlayer()->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, nameLink);
+        }
 
         return true;
     }
