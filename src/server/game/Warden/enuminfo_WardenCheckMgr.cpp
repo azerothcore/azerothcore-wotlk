@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ArenaTeam.h"
+#include "WardenCheckMgr.h"
 #include "Define.h"
 #include "SmartEnum.h"
 #include <stdexcept>
@@ -23,44 +23,44 @@
 namespace Acore::Impl::EnumUtilsImpl
 {
 
-/******************************************************************\
-|* data for enum 'ArenaTeamTypes' in 'ArenaTeam.h' auto-generated *|
-\******************************************************************/
+/**********************************************************************\
+|* data for enum 'WardenActions' in 'WardenCheckMgr.h' auto-generated *|
+\**********************************************************************/
 template <>
-AC_API_EXPORT EnumText EnumUtils<ArenaTeamTypes>::ToString(ArenaTeamTypes value)
+AC_API_EXPORT EnumText EnumUtils<WardenActions>::ToString(WardenActions value)
 {
     switch (value)
     {
-        case ARENA_TEAM_2v2: return { "ARENA_TEAM_2v2", "ARENA_TEAM_2v2", "" };
-        case ARENA_TEAM_3v3: return { "ARENA_TEAM_3v3", "ARENA_TEAM_3v3", "" };
-        case ARENA_TEAM_5v5: return { "ARENA_TEAM_5v5", "ARENA_TEAM_5v5", "" };
+        case WARDEN_ACTION_LOG: return { "WARDEN_ACTION_LOG", "Log", "" };
+        case WARDEN_ACTION_KICK: return { "WARDEN_ACTION_KICK", "Kick", "" };
+        case WARDEN_ACTION_BAN: return { "WARDEN_ACTION_BAN", "Ban", "" };
         default: throw std::out_of_range("value");
     }
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ArenaTeamTypes>::Count() { return 3; }
+AC_API_EXPORT size_t EnumUtils<WardenActions>::Count() { return 3; }
 
 template <>
-AC_API_EXPORT ArenaTeamTypes EnumUtils<ArenaTeamTypes>::FromIndex(size_t index)
+AC_API_EXPORT WardenActions EnumUtils<WardenActions>::FromIndex(size_t index)
 {
     switch (index)
     {
-        case 0: return ARENA_TEAM_2v2;
-        case 1: return ARENA_TEAM_3v3;
-        case 2: return ARENA_TEAM_5v5;
+        case 0: return WARDEN_ACTION_LOG;
+        case 1: return WARDEN_ACTION_KICK;
+        case 2: return WARDEN_ACTION_BAN;
         default: throw std::out_of_range("index");
     }
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ArenaTeamTypes>::ToIndex(ArenaTeamTypes value)
+AC_API_EXPORT size_t EnumUtils<WardenActions>::ToIndex(WardenActions value)
 {
     switch (value)
     {
-        case ARENA_TEAM_2v2: return 0;
-        case ARENA_TEAM_3v3: return 1;
-        case ARENA_TEAM_5v5: return 2;
+        case WARDEN_ACTION_LOG: return 0;
+        case WARDEN_ACTION_KICK: return 1;
+        case WARDEN_ACTION_BAN: return 2;
         default: throw std::out_of_range("value");
     }
 }
