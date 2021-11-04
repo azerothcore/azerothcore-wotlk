@@ -315,7 +315,6 @@ void MotionMaster::MoveChase(Unit* target,  std::optional<ChaseRange> dist, std:
     }
     else
     {
-        LOG_FATAL("Entities:unit", "setting chase to %s", target->GetName());
         LOG_DEBUG("movement.motionmaster", "Creature (%s) chase to %s (%s)",
             _owner->GetGUID().ToString().c_str(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString().c_str());
         Mutate(new ChaseMovementGenerator<Creature>(target, dist, angle), MOTION_SLOT_ACTIVE);

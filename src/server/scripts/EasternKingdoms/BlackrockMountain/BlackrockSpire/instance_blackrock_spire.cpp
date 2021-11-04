@@ -341,11 +341,14 @@ public:
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
-                    SolakarState = data;
+                    
                     switch(data)
                     {
                         case IN_PROGRESS:
-                            Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
+                            if (SolakarState == NOT_STARTED)
+                            {
+                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
+                            }
                             break;
                         case FAIL:
                             for (const auto& creature : SolakarSummons)
@@ -359,6 +362,7 @@ public:
                         case DONE:
                             break;
                     }
+                    SolakarState = data;
                     break;
                 default:
                     break;
@@ -762,32 +766,6 @@ public:
     }
 };
 
-/*
-class go_rookery_egg : public GameObjectScript
-{
-public:
-    go_rookery_egg() : GameObjectScript("go_rookery_egg"){}
-    enum STATES
-    {
-        READY = 0,
-        HATCHED = 1
-    };
-
-    void OnGameObjectStateChanged(GameObject* go, uint32 state)
-    {
-        switch (state)
-        {
-        case READY:
-            break;
-        case HATCHED:
-            go->CastSpell(go->SelectNearestPlayer(), 15746);
-            break;
-        default:
-            break;
-        }
-    }
-};
-*/
 void AddSC_instance_blackrock_spire()
 {
     new instance_blackrock_spire();
