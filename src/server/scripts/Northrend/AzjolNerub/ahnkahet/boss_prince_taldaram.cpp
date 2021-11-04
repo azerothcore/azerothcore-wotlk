@@ -531,19 +531,19 @@ public:
                 return true;
             }
 
-            InstanceScript* instance = me->GetInstanceScript();
+            InstanceScript* instance = go->GetInstanceScript();
             if (!instance)
             {
                 return true;
             }
 
-            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-            me->SetGoState(GO_STATE_ACTIVE);
+            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SetGoState(GO_STATE_ACTIVE);
 
-            uint32 const objectIndex = me->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
+            uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
             if (instance->GetData(objectIndex) == NOT_STARTED)
             {
-                Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM));
+                Creature* taldaram = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_PRINCE_TALDARAM));
                 if (taldaram && taldaram->IsAlive())
                 {
                     taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
