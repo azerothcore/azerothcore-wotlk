@@ -489,7 +489,7 @@ bool StartDB()
 
     LOG_INFO("server.loading", "> Version DB world:     %s", sWorld->GetDBVersion());
 
-    sScriptMgr->AfterDatabasesLoaded(loader.GetUpdateFlags());
+    sScriptMgr->OnAfterDatabasesLoaded(loader.GetUpdateFlags());
 
     return true;
 }

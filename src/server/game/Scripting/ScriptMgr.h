@@ -1466,7 +1466,7 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void AfterDatabasesLoaded(uint32 /*updateFlags*/) {}
+    virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) {}
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1953,7 +1953,7 @@ public: /* AchievementScript */
 
     public: /* DatabaseScript */
 
-        void AfterDatabasesLoaded(uint32 updateFlags);
+        void OnAfterDatabasesLoaded(uint32 updateFlags);
 
 private:
     uint32 _scriptCount;

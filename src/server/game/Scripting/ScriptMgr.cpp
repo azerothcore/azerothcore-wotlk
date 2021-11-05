@@ -3150,9 +3150,9 @@ void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
     FOREACH_SCRIPT(CommandSC)->OnHandleDevCommand(player, argstr);
 }
 
-void ScriptMgr::AfterDatabasesLoaded(uint32 updateFlags)
+void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
 {
-    FOREACH_SCRIPT(DatabaseScript)->AfterDatabasesLoaded(updateFlags);
+    FOREACH_SCRIPT(DatabaseScript)->OnAfterDatabasesLoaded(updateFlags);
 }
 
 ///-
