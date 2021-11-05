@@ -31,6 +31,7 @@ enum Timer
 };
 
 constexpr float RANGE_SPELL_HATCH_EGG = 3.0f; // needed because the eggs seem to hatch if the mobs goes too close
+constexpr float RANGE_WHELP_CALL_HELP = 15.0f; // range for the hatchers to call nearby whelps after having summoned them.
 
 enum Says
 {
@@ -81,7 +82,7 @@ public:
                 return;
             }
 
-            GetCreatureListWithEntryInGrid(nearbyWhelps, me, NPC_ROOKERY_WHELP, 15.0);
+            GetCreatureListWithEntryInGrid(nearbyWhelps, me, NPC_ROOKERY_WHELP, RANGE_WHELP_CALL_HELP);
             for (const auto& whelp : nearbyWhelps)
             {
                 if (!whelp->IsInCombat())

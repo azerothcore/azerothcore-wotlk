@@ -48,12 +48,12 @@ enum SolakarWaves
 
 Position SolakarPosLeft  = Position(78.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
 Position SolakarPosRight = Position(84.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
-Position SolakarPosBoss      = Position(80.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
+Position SolakarPosBoss  = Position(80.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
 
 enum Texts
 {
     SAY_NEFARIUS_REND_WIPE      = 11,
-    SAY_SOLAKAR_FIRST_HATCHER           = 0
+    SAY_SOLAKAR_FIRST_HATCHER   = 0
 };
 
 class instance_blackrock_spire : public InstanceMapScript
@@ -350,7 +350,7 @@ public:
                             Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1000);
                     }
                     break;
-                case DATA_SOLAKAR_FLAMEWREATH: 
+                case DATA_SOLAKAR_FLAMEWREATH:
                     switch(data)
                     {
                         case IN_PROGRESS:
