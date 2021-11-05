@@ -16,6 +16,7 @@
  */
 
 #include "ScriptMgr.h"
+#include "Language.h"
 #include "PlayerCommand.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU

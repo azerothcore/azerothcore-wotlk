@@ -23,11 +23,9 @@ Category: commandscripts
 EndScriptData */
 
 #include "ScriptMgr.h"
-#include "Chat.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
-#include "Player.h"
 #include "PlayerCommand.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
