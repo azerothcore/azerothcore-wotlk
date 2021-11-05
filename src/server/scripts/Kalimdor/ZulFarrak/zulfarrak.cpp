@@ -483,7 +483,7 @@ public:
             }
         }
 
-        void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);
@@ -496,7 +496,7 @@ public:
             }
         }
 
-        void sGossipHello(Player* player) override
+        bool GossipHello(Player* player) override
         {
             switch (instance->GetData(DATA_PYRAMID))
             {

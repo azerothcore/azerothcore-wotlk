@@ -1882,15 +1882,15 @@ public:
             if (player->GetQuestRewardStatus(QUEST_HC_KEY_TO_THE_FOCUSING_IRIS) && !player->HasItemCount(ITEM_HC_KEY_TO_THE_FOCUSING_IRIS, 1, true))
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LOST_HC_KEY_TO_THE_FOCUSING_IRIS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
 
-            SendGossipMenuFor(player, player->GetGossipTextId(me), creature->GetGUID());
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
 
             return true;
         }
 
-        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipActionList) override
         {
             ClearGossipMenuFor(player);
-            switch (action)
+            switch (gossipActionList)
             {
             case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
@@ -2487,6 +2487,11 @@ public:
     {
         npc_venomhide_hatchlingAI(Creature* creature) : ScriptedAI(creature) {}
 
+        bool GossipHello(Player* player) override
+        {
+            return !(me->GetOwnerGUID() && me->GetOwnerGUID() == player->GetGUID());
+        };
+
         void IsSummonedBy(Unit* summoner) override
         {
             if (summoner->GetTypeId() != TYPEID_PLAYER)
@@ -2515,16 +2520,6 @@ public:
                 Talk(TALK_EMOTE_EAT);
             }
         }
-    };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->GetOwnerGUID() && creature->GetOwnerGUID() == player->GetGUID())
-        {
-            return false;
-        }
-
-        return true;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
