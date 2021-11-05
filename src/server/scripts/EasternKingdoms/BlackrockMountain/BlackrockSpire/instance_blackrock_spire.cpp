@@ -53,7 +53,7 @@ Position SolakarPosBoss      = Position(80.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0
 enum Texts
 {
     SAY_NEFARIUS_REND_WIPE      = 11,
-    SAY_FIRST_HATCHER           = 0
+    SAY_SOLAKAR_FIRST_HATCHER           = 0
 };
 
 class instance_blackrock_spire : public InstanceMapScript
@@ -430,9 +430,9 @@ public:
                 SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_HATCHER, SolakarPosRight));
                 if (number == 0)
                 {
-                    if (Creature* FirstHatcher = SolakarSummons.back())
+                    if (Creature* FirstHatcher = SolakarSummons.back()) // works because we spawned a hatcher second
                     {
-                        FirstHatcher->AI()->Talk(SAY_FIRST_HATCHER);
+                        FirstHatcher->AI()->Talk(SAY_SOLAKAR_FIRST_HATCHER);
                     }
                 }
             }
