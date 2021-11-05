@@ -30,6 +30,8 @@ enum Timer
     TIMER_WAR_STOMP = 20000
 };
 
+constexpr float RANGE_SPELL_HATCH_EGG = 3.0f; // needed because the eggs seem to hatch if the mobs goes too close
+
 enum Says
 {
     SAY_SUMMON = 0,
@@ -131,7 +133,7 @@ public:
             }
 
             // cast takes 1.5second, during which we don't have a target
-            if (targetEgg && targetEgg->getLootState() == GO_READY && me->GetDistance2d(targetEgg) < 3)
+            if (targetEgg && targetEgg->getLootState() == GO_READY && me->GetDistance2d(targetEgg) < RANGE_SPELL_HATCH_EGG)
             {
                 me->StopMovingOnCurrentPos();
                 me->SetFacingToObject(targetEgg);
@@ -142,8 +144,8 @@ public:
             }
             else if(me->HasUnitState(UNIT_STATE_CASTING))
             {
-                me->StopMovingOnCurrentPos();
-                me->SetOrientation(targetPosition.GetOrientation());
+        //        me->StopMovingOnCurrentPos();
+          //      me->SetOrientation(targetPosition.GetOrientation());
             }
             else if (!targetEgg)
             {

@@ -52,12 +52,14 @@ enum SolakarWaves
     MAX_WAVE_COUNT = 5
 };
 
-Position PosLeft  = Position(78.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
-Position PosRight = Position(84.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
+Position SolakarPosLeft  = Position(78.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
+Position SolakarPosRight = Position(84.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
+Position SolakarPosBoss      = Position(80.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
 
 enum Texts
 {
-    SAY_NEFARIUS_REND_WIPE                 = 11
+    SAY_NEFARIUS_REND_WIPE      = 11,
+    SAY_FIRST_HATCHER           = 0
 };
 
 class instance_blackrock_spire : public InstanceMapScript
@@ -386,20 +388,19 @@ public:
             if (number < MAX_WAVE_COUNT)
             {
 
-                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_GUARDIAN, PosLeft));
-                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_HATCHER, PosRight));
+                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_GUARDIAN, SolakarPosLeft));
+                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_HATCHER, SolakarPosRight));
                 if (number == 0)
                 {
                     if (Creature* FirstHatcher = SolakarSummons.back())
                     {
-                        FirstHatcher->AI()->Talk(0);
+                        FirstHatcher->AI()->Talk(SAY_FIRST_HATCHER);
                     }
                 }
             }
             else if (number == MAX_WAVE_COUNT)
             {
-                Position PosSolakar = Position(80, -280, 93, 3 * M_PI / 2.0);
-                SolakarSummons.push_back(instance->SummonCreature(NPC_SOLAKAR, PosSolakar));
+                SolakarSummons.push_back(instance->SummonCreature(NPC_SOLAKAR, SolakarPosBoss));
             }
         }
 
