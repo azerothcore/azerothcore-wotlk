@@ -59,7 +59,7 @@ public:
         void InitializeAI() override
         {
             CreatureAI::InitializeAI();
-            DoZoneInCombat(nullptr, 100);
+            DoZoneInCombat(nullptr, 100.0f);
             nearbyEggs.clear();
             targetEgg = nullptr;
         }
@@ -177,7 +177,7 @@ public:
         {
             BossAI::InitializeAI();
             Talk(SAY_SUMMON);
-            DoZoneInCombat(nullptr, 100);
+            DoZoneInCombat(nullptr, 100.0f);
         }
 
         void EnterCombat(Unit* /*who*/) override
