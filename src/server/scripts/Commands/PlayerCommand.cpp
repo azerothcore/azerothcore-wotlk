@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PlayerCommand.h"
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
-#include "PlayerCommand.h"
 #include "ScriptMgr.h"
 
 bool PlayerCommand::Learn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all)
