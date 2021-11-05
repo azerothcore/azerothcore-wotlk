@@ -7534,6 +7534,21 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     PermissionTypes permission = ALL_PERMISSION;
 
     LOG_DEBUG("loot", "Player::SendLoot");
+
+    const AuraType toRemove[] = {SPELL_AURA_MOD_STEALTH, SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH};
+    for (const auto& aura : toRemove)
+    {
+        if (HasAuraType(aura))
+        {
+            RemoveAurasByType(aura);
+        }
+    }
+
+    if (IsMounted())
+    {
+        Dismount();
+    }
+
     if (guid.IsGameObject())
     {
         LOG_DEBUG("loot", "guid.IsGameObject");
