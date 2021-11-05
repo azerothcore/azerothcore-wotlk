@@ -7540,8 +7540,14 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     {
         toRemove = { SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH, SPELL_AURA_MOD_STEALTH };
     }
+
     for (const auto& aura : toRemove)
     {
+        if (aura == SPELL_AURA_NONE)
+        {
+            continue;
+        }
+
         RemoveAurasByType(aura);
     }
 
