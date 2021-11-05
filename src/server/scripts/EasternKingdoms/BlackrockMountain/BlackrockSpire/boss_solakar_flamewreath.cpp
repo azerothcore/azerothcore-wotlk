@@ -137,32 +137,25 @@ public:
                 me->SetFacingToObject(targetEgg);
                 targetPosition = me->GetPosition();
                 DoCast(SPELL_HATCH_EGG);
-               // targetEgg->SetLootState(GO_JUST_DEACTIVATED); // doesn't seem needed, leave it for now but clean up later
                 targetEgg = nullptr;
                 events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
-                LOG_FATAL("Entities:unit", "stopping!");
             }
             else if(me->HasUnitState(UNIT_STATE_CASTING))
             {
                 me->StopMovingOnCurrentPos();
                 me->SetOrientation(targetPosition.GetOrientation());
-                LOG_FATAL("Entities:unit", "stopping!");
             }
             else if (!targetEgg)
             {
                 if (Unit* vict = me->GetVictim())
                 {
                     AttackStart(me->GetVictim());
-                    LOG_FATAL("Entities:unit", "trying to attack %s", vict->GetName());
                 }
-                else
+
+                if (me->GetDistance2d(me->GetVictim()) > me->GetMeleeReach())
                 {
-                    LOG_FATAL("Entities:unit", "no victim");
+                    me->GetMotionMaster()->MovePoint(0, me->GetVictim()->GetPosition()); // a bit hacky, but needed to start moving once we've summoned an egg
                 }
-        //        if (me->GetDistance2d(me->GetVictim()) > me->GetMeleeRange(me))
-          //      {
-            //        me->GetMotionMaster()->MovePoint(0, me->GetVictim()->GetPosition()); // a bit hacky, but needed to start moving once we've summoned an egg
-              //  }
             }
             DoMeleeAttackIfReady();
         }
