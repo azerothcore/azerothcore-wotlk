@@ -7544,11 +7544,6 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         }
     }
 
-    if (IsMounted())
-    {
-        Dismount();
-    }
-
     if (guid.IsGameObject())
     {
         LOG_DEBUG("loot", "guid.IsGameObject");
