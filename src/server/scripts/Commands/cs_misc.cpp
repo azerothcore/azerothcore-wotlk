@@ -55,57 +55,58 @@ public:
     {
         static ChatCommandTable commandTable =
         {
-            { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "" },
-            { "gps",                SEC_MODERATOR,          false, &HandleGPSCommand,                   "" },
-            { "aura",               SEC_GAMEMASTER,         false, &HandleAuraCommand,                  "" },
-            { "unaura",             SEC_GAMEMASTER,         false, &HandleUnAuraCommand,                "" },
-            { "appear",             SEC_MODERATOR,          false, &HandleAppearCommand,                "" },
-            { "summon",             SEC_GAMEMASTER,         false, &HandleSummonCommand,                "" },
-            { "groupsummon",        SEC_GAMEMASTER,         false, &HandleGroupSummonCommand,           "" },
-            { "commands",           SEC_PLAYER,             true,  &HandleCommandsCommand,              "" },
-            { "die",                SEC_GAMEMASTER,         false, &HandleDieCommand,                   "" },
-            { "revive",             SEC_GAMEMASTER,         true,  &HandleReviveCommand,                "" },
-            { "dismount",           SEC_PLAYER,             false, &HandleDismountCommand,              "" },
-            { "guid",               SEC_GAMEMASTER,         false, &HandleGUIDCommand,                  "" },
-            { "help",               SEC_PLAYER,             true,  &HandleHelpCommand,                  "" },
-            { "itemmove",           SEC_GAMEMASTER,         false, &HandleItemMoveCommand,              "" },
-            { "cooldown",           SEC_GAMEMASTER,         false, &HandleCooldownCommand,              "" },
-            { "distance",           SEC_ADMINISTRATOR,      false, &HandleGetDistanceCommand,           "" },
-            { "recall",             SEC_GAMEMASTER,         false, &HandleRecallCommand,                "" },
-            { "save",               SEC_PLAYER,             false, &HandleSaveCommand,                  "" },
-            { "saveall",            SEC_GAMEMASTER,         true,  &HandleSaveAllCommand,               "" },
-            { "kick",               SEC_GAMEMASTER,         true,  &HandleKickPlayerCommand,            "" },
-            { "unstuck",            SEC_GAMEMASTER,         true,  &HandleUnstuckCommand,               "" },
-            { "linkgrave",          SEC_ADMINISTRATOR,      false, &HandleLinkGraveCommand,             "" },
-            { "neargrave",          SEC_GAMEMASTER,         false, &HandleNearGraveCommand,             "" },
-            { "showarea",           SEC_GAMEMASTER,         false, &HandleShowAreaCommand,              "" },
-            { "hidearea",           SEC_ADMINISTRATOR,      false, &HandleHideAreaCommand,              "" },
-            { "additem",            SEC_GAMEMASTER,         false, &HandleAddItemCommand,               "" },
-            { "additemset",         SEC_GAMEMASTER,         false, &HandleAddItemSetCommand,            "" },
-            { "wchange",            SEC_ADMINISTRATOR,      false, &HandleChangeWeather,                "" },
-            { "maxskill",           SEC_GAMEMASTER,         false, &HandleMaxSkillCommand,              "" },
-            { "setskill",           SEC_GAMEMASTER,         false, &HandleSetSkillCommand,              "" },
-            { "pinfo",              SEC_GAMEMASTER,         true,  &HandlePInfoCommand,                 "" },
-            { "respawn",            SEC_GAMEMASTER,         false, &HandleRespawnCommand,               "" },
-            { "mute",               SEC_GAMEMASTER,         true,  &HandleMuteCommand,                  "" },
-            { "mutehistory",        SEC_GAMEMASTER,         true,  &HandleMuteInfoCommand,              "" },
-            { "unmute",             SEC_GAMEMASTER,         true,  &HandleUnmuteCommand,                "" },
-            { "movegens",           SEC_ADMINISTRATOR,      false, &HandleMovegensCommand,              "" },
-            { "cometome",           SEC_ADMINISTRATOR,      false, &HandleComeToMeCommand,              "" },
-            { "damage",             SEC_GAMEMASTER,         false, &HandleDamageCommand,                "" },
-            { "combatstop",         SEC_GAMEMASTER,         true,  &HandleCombatStopCommand,            "" },
-            { "flusharenapoints",   SEC_ADMINISTRATOR,      false, &HandleFlushArenaPointsCommand,      "" },
-            { "freeze",             SEC_GAMEMASTER,         false, &HandleFreezeCommand,                "" },
-            { "unfreeze",           SEC_GAMEMASTER,         false, &HandleUnFreezeCommand,              "" },
-            { "possess",            SEC_GAMEMASTER,         false, HandlePossessCommand,                "" },
-            { "unpossess",          SEC_GAMEMASTER,         false, HandleUnPossessCommand,              "" },
-            { "bindsight",          SEC_ADMINISTRATOR,      false, HandleBindSightCommand,              "" },
-            { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
-            { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
-            { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
-            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
+            { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
+            { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
+            { "aura",              HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  },
+            { "unaura",            HandleUnAuraCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "appear",            HandleAppearCommand,            SEC_MODERATOR,          Console::No  },
+            { "summon",            HandleSummonCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "groupsummon",       HandleGroupSummonCommand,       SEC_GAMEMASTER,         Console::No  },
+            { "commands",          HandleCommandsCommand,          SEC_PLAYER,             Console::Yes },
+            { "die",               HandleDieCommand,               SEC_GAMEMASTER,         Console::No  },
+            { "revive",            HandleReviveCommand,            SEC_GAMEMASTER,         Console::Yes },
+            { "dismount",          HandleDismountCommand,          SEC_PLAYER,             Console::No  },
+            { "guid",              HandleGUIDCommand,              SEC_GAMEMASTER,         Console::No  },
+            { "help",              HandleHelpCommand,              SEC_PLAYER,             Console::Yes },
+            { "itemmove",          HandleItemMoveCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "cooldown",          HandleCooldownCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "distance",          HandleGetDistanceCommand,       SEC_ADMINISTRATOR,      Console::No  },
+            { "recall",            HandleRecallCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "save",              HandleSaveCommand,              SEC_PLAYER,             Console::No  },
+            { "saveall",           HandleSaveAllCommand,           SEC_GAMEMASTER,         Console::Yes },
+            { "kick",              HandleKickPlayerCommand,        SEC_GAMEMASTER,         Console::Yes },
+            { "unstuck",           HandleUnstuckCommand,           SEC_GAMEMASTER,         Console::Yes },
+            { "linkgrave",         HandleLinkGraveCommand,         SEC_ADMINISTRATOR,      Console::No  },
+            { "neargrave",         HandleNearGraveCommand,         SEC_GAMEMASTER,         Console::No  },
+            { "showarea",          HandleShowAreaCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "hidearea",          HandleHideAreaCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "additemset",        HandleAddItemSetCommand,        SEC_GAMEMASTER,         Console::No  },
+            { "wchange",           HandleChangeWeather,            SEC_ADMINISTRATOR,      Console::No  },
+            { "maxskill",          HandleMaxSkillCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "setskill",          HandleSetSkillCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "pinfo",             HandlePInfoCommand,             SEC_GAMEMASTER,         Console::Yes },
+            { "respawn",           HandleRespawnCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "mute",              HandleMuteCommand,              SEC_GAMEMASTER,         Console::Yes },
+            { "mutehistory",       HandleMuteInfoCommand,          SEC_GAMEMASTER,         Console::Yes },
+            { "unmute",            HandleUnmuteCommand,            SEC_GAMEMASTER,         Console::Yes },
+            { "movegens",          HandleMovegensCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "cometome",          HandleComeToMeCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "damage",            HandleDamageCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "combatstop",        HandleCombatStopCommand,        SEC_GAMEMASTER,         Console::Yes },
+            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::No  },
+            { "freeze",            HandleFreezeCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "unfreeze",          HandleUnFreezeCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "possess",           HandlePossessCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "unpossess",         HandleUnPossessCommand,         SEC_GAMEMASTER,         Console::No  },
+            { "bindsight",         HandleBindSightCommand,         SEC_ADMINISTRATOR,      Console::No  },
+            { "unbindsight",       HandleUnbindSightCommand,       SEC_ADMINISTRATOR,      Console::No  },
+            { "playall",           HandlePlayAllCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
+            { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
+            { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  }
         };
+
         return commandTable;
     }
 
@@ -328,31 +329,48 @@ public:
         return true;
     }
 
-    static bool HandleDevCommand(ChatHandler* handler, char const* enable)
+    static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
-        Player* player = handler->GetSession()->GetPlayer();
+        WorldSession* session = handler->GetSession();
 
-        if (!*enable)
+        if (!session)
         {
-            handler->GetSession()->SendNotification(player->IsDeveloper() ? LANG_DEV_ON : LANG_DEV_OFF);
-            return true;
+            return false;
         }
 
-        std::string enablestr = (char*)enable;
+        auto SetDevMod = [&](bool const enable)
+        {
+            session->SendNotification(enable ? LANG_DEV_ON : LANG_DEV_OFF);
+            session->GetPlayer()->SetDeveloper(enable);
+            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enable);
+        };
 
-        if (enablestr == "on")
+        if (WorldSession* session = handler->GetSession())
         {
-            player->SetDeveloper(true);
-            handler->GetSession()->SendNotification(LANG_DEV_ON);
-            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
-            return true;
-        }
-        else if (enablestr == "off")
-        {
-            player->SetDeveloper(false);
-            handler->GetSession()->SendNotification(LANG_DEV_OFF);
-            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
-            return true;
+            if (!enableArg)
+            {
+                if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
+                {
+                    SetDevMod(true);
+                }
+                else
+                {
+                    SetDevMod(false);
+                }
+
+                return true;
+            }
+
+            if (*enableArg)
+            {
+                SetDevMod(true);
+                return true;
+            }
+            else
+            {
+                SetDevMod(false);
+                return true;
+            }
         }
 
         handler->SendSysMessage(LANG_USE_BOL);
@@ -868,13 +886,13 @@ public:
         return true;
     }
 
-    static bool HandleCommandsCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleCommandsCommand(ChatHandler* handler)
     {
         SendCommandHelpFor(*handler, "");
         return true;
     }
 
-    static bool HandleDieCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleDieCommand(ChatHandler* handler)
     {
         Unit* target = handler->getSelectedUnit();
 
@@ -928,7 +946,7 @@ public:
         return true;
     }
 
-    static bool HandleDismountCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleDismountCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
@@ -954,7 +972,7 @@ public:
         return true;
     }
 
-    static bool HandleGUIDCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleGUIDCommand(ChatHandler* handler)
     {
         ObjectGuid guid = handler->GetSession()->GetPlayer()->GetTarget();
 
@@ -978,6 +996,7 @@ public:
 
         return true;
     }
+
     // move item to other slot
     static bool HandleItemMoveCommand(ChatHandler* handler, char const* args)
     {
@@ -1141,7 +1160,7 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
@@ -1171,7 +1190,7 @@ public:
     }
 
     // Save all players in the world
-    static bool HandleSaveAllCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveAllCommand(ChatHandler* handler)
     {
         ObjectAccessor::SaveAllPlayers();
         handler->SendSysMessage(LANG_PLAYERS_SAVED);
@@ -1695,7 +1714,7 @@ public:
         return true;
     }
 
-    static bool HandleMaxSkillCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMaxSkillCommand(ChatHandler* handler)
     {
         Player* SelectedPlayer = handler->getSelectedPlayer();
         if (!SelectedPlayer)
@@ -2176,7 +2195,7 @@ public:
         return true;
     }
 
-    static bool HandleRespawnCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleRespawnCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
@@ -2599,7 +2618,7 @@ public:
         return true;
     }
 
-    static bool HandleFlushArenaPointsCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    static bool HandleFlushArenaPointsCommand(ChatHandler* /*handler*/)
     {
         sArenaTeamMgr->DistributeArenaPoints();
         return true;
@@ -2730,7 +2749,7 @@ public:
         return true;
     }
 
-    static bool HandlePossessCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandlePossessCommand(ChatHandler* handler)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
@@ -2740,7 +2759,7 @@ public:
         return true;
     }
 
-    static bool HandleUnPossessCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleUnPossessCommand(ChatHandler* handler)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
@@ -2751,7 +2770,7 @@ public:
         return true;
     }
 
-    static bool HandleBindSightCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleBindSightCommand(ChatHandler* handler)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
@@ -2761,7 +2780,7 @@ public:
         return true;
     }
 
-    static bool HandleUnbindSightCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleUnbindSightCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
@@ -2772,7 +2791,7 @@ public:
         return true;
     }
 
-    static bool HandleMailBoxCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMailBoxCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
 

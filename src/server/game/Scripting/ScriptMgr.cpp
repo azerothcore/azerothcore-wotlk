@@ -3143,9 +3143,9 @@ void ScriptMgr::OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication cons
     FOREACH_SCRIPT(MiscScript)->OnPlayerSetPhase(auraEff, aurApp, mode, apply, newPhase);
 }
 
-void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
+void ScriptMgr::OnHandleDevCommand(Player* player, bool& enable)
 {
-    FOREACH_SCRIPT(CommandSC)->OnHandleDevCommand(player, argstr);
+    FOREACH_SCRIPT(CommandSC)->OnHandleDevCommand(player, enable);
 }
 
 ///-
