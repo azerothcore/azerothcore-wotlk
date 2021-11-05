@@ -59,10 +59,7 @@ public:
         void InitializeAI() override
         {
             CreatureAI::InitializeAI();
-            if (Unit* target = me->SelectNearestTarget(500))
-            {
-                AttackStart(target);
-            }
+            DoZoneInCombat(nullptr, 100);
             nearbyEggs.clear();
             targetEgg = nullptr;
         }
@@ -180,10 +177,7 @@ public:
         {
             BossAI::InitializeAI();
             Talk(SAY_SUMMON);
-            if (Unit* target = me->SelectNearestTarget(500))
-            {
-                AttackStart(target);
-            }
+            DoZoneInCombat(nullptr, 100);
         }
 
         void EnterCombat(Unit* /*who*/) override
