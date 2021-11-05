@@ -21,6 +21,7 @@
 
 enum Spells
 {
+    SPELL_THRASH                    = 3391,
     SPELL_SNAPKICK                  = 15618,
     SPELL_CLEAVE                    = 15284,
     SPELL_UPPERCUT                  = 10966,
@@ -32,11 +33,21 @@ enum Spells
 enum Events
 {
     EVENT_SNAP_KICK                 = 1,
-    EVENT_CLEAVE                    = 2,
-    EVENT_UPPERCUT                  = 3,
-    EVENT_MORTAL_STRIKE             = 4,
-    EVENT_PUMMEL                    = 5,
-    EVENT_THROW_AXE                 = 6
+    EVENT_CLEAVE,
+    EVENT_UPPERCUT,
+    EVENT_MORTAL_STRIKE,
+    EVENT_PUMMEL,
+    EVENT_THROW_AXE,
+    EVENT_THRASH
+};
+
+enum Phases
+{
+    PHASE_THRASHER,
+    PHASE_BRAWLER,
+    PHASE_WARMASTER,
+
+    GROUP_NONE = 0
 };
 
 class boss_warmaster_voone : public CreatureScript
@@ -56,12 +67,27 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_SNAP_KICK, 8 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_CLEAVE,   14 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_UPPERCUT, 20 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_MORTAL_STRIKE, 12 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_PUMMEL,   32 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_THROW_AXE, 1 * IN_MILLISECONDS);
+
+            events.SetPhase(PHASE_BRAWLER);
+            events.ScheduleEvent(EVENT_THRASH, 3 * IN_MILLISECONDS, GROUP_NONE, PHASE_BRAWLER);
+            events.ScheduleEvent(EVENT_THROW_AXE, 1 * IN_MILLISECONDS, GROUP_NONE, PHASE_BRAWLER);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (me->HealthBelowPctDamaged(65, damage) && events.IsInPhase(PHASE_BRAWLER))
+            {
+                events.SetPhase(PHASE_THRASHER);
+                events.ScheduleEvent(EVENT_CLEAVE, 14 * IN_MILLISECONDS, GROUP_NONE, PHASE_THRASHER);
+                events.ScheduleEvent(EVENT_MORTAL_STRIKE, 12 * IN_MILLISECONDS, GROUP_NONE, PHASE_THRASHER);
+            }
+            else if (me->HealthBelowPctDamaged(40, damage) && events.IsInPhase(PHASE_THRASHER))
+            {
+                events.SetPhase(PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_SNAP_KICK, 8 * IN_MILLISECONDS, GROUP_NONE, PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_UPPERCUT, 20 * IN_MILLISECONDS, GROUP_NONE, PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_PUMMEL, 32 * IN_MILLISECONDS, GROUP_NONE, PHASE_WARMASTER);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -85,27 +111,31 @@ public:
                 {
                     case EVENT_SNAP_KICK:
                         DoCastVictim(SPELL_SNAPKICK);
-                        events.ScheduleEvent(EVENT_SNAP_KICK, 6 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_SNAP_KICK, 6 * IN_MILLISECONDS, GROUP_NONE, PHASE_WARMASTER);
                         break;
                     case EVENT_CLEAVE:
                         DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 12 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_CLEAVE, 12 * IN_MILLISECONDS, GROUP_NONE, PHASE_THRASHER);
                         break;
                     case EVENT_UPPERCUT:
                         DoCastVictim(SPELL_UPPERCUT);
-                        events.ScheduleEvent(EVENT_UPPERCUT, 14 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_UPPERCUT, 14 * IN_MILLISECONDS, GROUP_NONE, PHASE_WARMASTER);
                         break;
                     case EVENT_MORTAL_STRIKE:
                         DoCastVictim(SPELL_MORTALSTRIKE);
-                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, 10 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, 10 * IN_MILLISECONDS, GROUP_NONE, PHASE_THRASHER);
                         break;
                     case EVENT_PUMMEL:
                         DoCastVictim(SPELL_PUMMEL);
-                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, 16 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, 16 * IN_MILLISECONDS, GROUP_NONE, PHASE_WARMASTER);
                         break;
                     case EVENT_THROW_AXE:
-                        DoCastVictim(SPELL_THROWAXE);
-                        events.ScheduleEvent(EVENT_THROW_AXE, 8 * IN_MILLISECONDS);
+                        DoCastRandomTarget(SPELL_THROWAXE);
+                        events.ScheduleEvent(EVENT_THROW_AXE, 8 * IN_MILLISECONDS, GROUP_NONE, PHASE_BRAWLER);
+                        break;
+                    case EVENT_THRASH:
+                        DoCastSelf(SPELL_THRASH);
+                        events.ScheduleEvent(EVENT_THRASH, 10 * IN_MILLISECONDS, GROUP_NONE, PHASE_BRAWLER);
                         break;
                 }
             }
