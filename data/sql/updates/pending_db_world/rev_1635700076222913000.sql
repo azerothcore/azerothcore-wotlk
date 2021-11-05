@@ -8,4 +8,4 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 
 -- remove "remove sneak" from assassin, this way they drop the sneak on attacking
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 10318;
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 10318) AND (`source_type` = 0) AND (`id` IN (1));
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 10318 AND `source_type` = 0 AND `id` = 1;
