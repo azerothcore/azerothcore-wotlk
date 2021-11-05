@@ -7535,13 +7535,10 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
     LOG_DEBUG("loot", "Player::SendLoot");
 
-    const AuraType toRemove[] = {SPELL_AURA_MOD_STEALTH, SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH};
+    const std::vector<AuraType> toRemove{ SPELL_AURA_MOD_STEALTH, SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH};
     for (const auto& aura : toRemove)
     {
-        if (HasAuraType(aura))
-        {
-            RemoveAurasByType(aura);
-        }
+        RemoveAurasByType(aura);
     }
 
     if (guid.IsGameObject())
