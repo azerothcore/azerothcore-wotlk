@@ -22,25 +22,6 @@
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
 
-//struct WhoListPlayerInfo
-//{
-//    TeamId teamId;
-//    AccountTypes security;
-//    uint8 level;
-//    uint8 clas;
-//    uint8 race;
-//    uint32 zoneid;
-//    uint8 gender;
-//    std::wstring wpname;
-//    std::wstring wgname;
-//    std::string aname;
-//    std::string pname;
-//    std::string gname;
-//
-//    WhoListPlayerInfo(TeamId teamId, AccountTypes security, uint8 level, uint8 clas, uint8 race, uint32 zoneid, uint8 gender, std::wstring wpname, std::wstring wgname, std::string aname, std::string pname, std::string gname) :
-//        teamId(teamId), security(security), level(level), clas(clas), race(race), zoneid(zoneid), gender(gender), wpname(wpname), wgname(wgname), aname(aname), pname(pname), gname(gname) {}
-//};
-
 class WhoListPlayerInfo
 {
 public:
