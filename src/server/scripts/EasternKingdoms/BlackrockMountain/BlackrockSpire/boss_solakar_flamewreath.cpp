@@ -142,12 +142,7 @@ public:
                 targetEgg = nullptr;
                 events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
             }
-            else if(me->HasUnitState(UNIT_STATE_CASTING))
-            {
-        //        me->StopMovingOnCurrentPos();
-          //      me->SetOrientation(targetPosition.GetOrientation());
-            }
-            else if (!targetEgg)
+            else if (!me->HasUnitState(UNIT_STATE_CASTING)  && !targetEgg)
             {
                 if (Unit* vict = me->GetVictim())
                 {

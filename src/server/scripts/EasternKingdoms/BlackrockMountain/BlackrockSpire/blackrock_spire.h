@@ -83,7 +83,6 @@ enum CreaturesIds
     NPC_UROK_MAGUS                  = 10602,
     NPC_UROK_ENFORCER               = 10601,
     NPC_FINKLE_EINHORN              = 10776
-
 };
 
 enum AdditionalData
@@ -99,7 +98,6 @@ enum AdditionalData
 
 enum GameObjectsIds
 {
-    GO_WHELP_SPAWNER                = 175622, // trap spawned by go id 175124
     GO_ROOKERY_EGG                  = 175124,
     // Doors
     GO_EMBERSEER_IN                 = 175244, // First door to Pyroguard Emberseer
