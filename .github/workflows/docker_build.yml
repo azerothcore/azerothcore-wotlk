@@ -4,6 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
+    types: ['labeled']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -16,7 +17,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.event.label.name == 'run-build' || github.ref == 'refs/heads/master')
     env:
       COMPOSE_DOCKER_CLI_BUILD: 1
       DOCKER_BUILDKIT: 1
