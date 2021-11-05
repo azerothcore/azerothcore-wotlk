@@ -1,3 +1,19 @@
+-- DB update 2021_11_05_01 -> 2021_11_05_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_05_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_05_01 2021_11_05_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1635856510467222141'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1635856510467222141');
 
 -- Fix gossip for Mathredis Firestar
@@ -48,3 +64,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (19, 0, 4484, 0, 0, 2, 0, 11733, 1, 0, 1, 0, 0, '', 'Quest Libram of Voracity available if player does not have 1 of Libram of Constitution. Item cannot be in bank.'),
 (19, 0, 4484, 0, 0, 2, 0, 11734, 1, 0, 1, 0, 0, '', 'Quest Libram of Voracity available if player does not have 1 of Libram of Tenacity. Item cannot be in bank.'),
 (19, 0, 4484, 0, 0, 2, 0, 11736, 1, 0, 1, 0, 0, '', 'Quest Libram of Voracity available if player does not have 1 of Libram of Resilience. Item cannot be in bank.');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_05_02' WHERE sql_rev = '1635856510467222141';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
