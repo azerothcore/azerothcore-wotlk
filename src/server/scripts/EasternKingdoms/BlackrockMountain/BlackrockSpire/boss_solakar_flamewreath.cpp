@@ -142,9 +142,9 @@ public:
             }
             else if (!me->HasUnitState(UNIT_STATE_CASTING)  && !targetEgg)
             {
-                if (Unit* vict = me->GetVictim())
+                if (Unit* victim = me->GetVictim())
                 {
-                    AttackStart(me->GetVictim());
+                    AttackStart(victim);
                 }
 
                 if (me->GetDistance2d(me->GetVictim()) > me->GetMeleeReach())
