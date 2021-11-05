@@ -33,13 +33,7 @@ uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUM
 enum EventIds
 {
     EVENT_DARGONSPIRE_ROOM_STORE           = 1,
-    EVENT_DARGONSPIRE_ROOM_CHECK           = 2,
-    EVENT_UROK_DOOMHOWL_SPAWNS_1           = 3,
-    EVENT_UROK_DOOMHOWL_SPAWNS_2           = 4,
-    EVENT_UROK_DOOMHOWL_SPAWNS_3           = 5,
-    EVENT_UROK_DOOMHOWL_SPAWNS_4           = 6,
-    EVENT_UROK_DOOMHOWL_SPAWNS_5           = 7,
-    EVENT_UROK_DOOMHOWL_SPAWN_IN           = 8
+    EVENT_DARGONSPIRE_ROOM_CHECK           = 2
 };
 
 enum Texts
@@ -76,6 +70,11 @@ public:
         {
             switch (creature->GetEntry())
             {
+                case NPC_UROK_MAGUS:
+                    [[fallthrough]];
+                case NPC_UROK_ENFORCER:
+                    UrokMobs.push_back(creature->GetGUID());
+                    break;
                 case NPC_HIGHLORD_OMOKK:
                     HighlordOmokk = creature->GetGUID();
                     break;
@@ -130,6 +129,9 @@ public:
                     LordVictorNefarius = creature->GetGUID();
                     if (GetBossState(DATA_GYTH) == DONE)
                         creature->DisappearAndDie();
+                    break;
+                case NPC_FINKLE_EINHORN:
+                    creature->AI()->Talk(SAY_FINKLE_GANG);
                     break;
             }
         }
@@ -236,7 +238,13 @@ public:
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_UROK_PILE:
-                    go_urok_pile = go->GetGUID();
+                    go_urokPile = go->GetGUID();
+                    break;
+                case GO_UROK_CIRCLE:
+                    go_urokOgreCirles.push_back(go->GetGUID());
+                    break;
+                case GO_UROK_CHALLENGE:
+                    go_urokChallenge = go->GetGUID();
                     break;
                 default:
                     break;
@@ -300,8 +308,11 @@ public:
                 case EVENT_UROK_DOOMHOWL:
                     if (GetBossState(DATA_UROK_DOOMHOWL) == NOT_STARTED)
                     {
-                        if (GameObject* pile = instance->GetGameObject(go_urok_pile))
+                        SetBossState(DATA_UROK_DOOMHOWL, IN_PROGRESS);
+                        if (GameObject* pile = instance->GetGameObject(go_urokPile))
+                        {
                             pile->SetLootState(GO_JUST_DEACTIVATED);
+                        }
                     }
                     break;
                 default:
@@ -319,6 +330,39 @@ public:
                         if (GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE)
                             Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1000);
                     }
+                    break;
+                case DATA_UROK_DOOMHOWL:
+                    if (data == FAIL)
+                    {
+                        if (!(GetBossState(DATA_UROK_DOOMHOWL) == NOT_STARTED))
+                        {
+                            SetBossState(DATA_UROK_DOOMHOWL, NOT_STARTED);
+                            if (GameObject* challenge = instance->GetGameObject(go_urokChallenge))
+                            {
+                                challenge->Delete();
+                            }
+                            if (GameObject* pile = instance->GetGameObject(go_urokPile))
+                            {
+                                pile->SetLootState(GO_READY);
+                                pile->Respawn();
+                            }
+                            for (const auto& circleGUID : go_urokOgreCirles)
+                            {
+                                if (GameObject* circle = instance->GetGameObject(circleGUID))
+                                {
+                                    circle->Delete();
+                                }
+                            }
+                            for (const auto& mobGUID: UrokMobs)
+                            {
+                                if (Creature* mob = instance->GetCreature(mobGUID))
+                                {
+                                    mob->DespawnOrUnsummon();
+                                }
+                            }
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
@@ -589,7 +633,10 @@ public:
         GuidVector runecreaturelist[7];
         ObjectGuid go_portcullis_active;
         ObjectGuid go_portcullis_tobossrooms;
-        ObjectGuid go_urok_pile;
+        ObjectGuid go_urokPile;
+        ObjectGuid go_urokChallenge;
+        std::vector<ObjectGuid> go_urokOgreCirles;
+        std::vector<ObjectGuid> UrokMobs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
