@@ -798,31 +798,28 @@ public:
             gossipPlayerGUID = playerGUID;
             events.ScheduleEvent(EVENT_ENCOUNTER_START, 1000);
         }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+        {
+            CloseGossipMenuFor(player);
+            ScheduleEncounterStart(player->GetGUID());
+
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(SIMONE_HEAD, 1, true))
+            {
+                uint32 gossipMenuId = me->GetCreatureTemplate()->GossipMenuId;
+                AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
+            }
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
     };
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-        if (creature->AI() && CAST_AI(npc_simone::npc_simoneAI, creature->AI()))
-        {
-            CAST_AI(npc_simone::npc_simoneAI, creature->AI())->ScheduleEncounterStart(player->GetGUID());
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(SIMONE_HEAD, 1, true))
-        {
-            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
-            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
 };
 
 class npc_nelson : public CreatureScript
@@ -1013,28 +1010,28 @@ public:
                 events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
             }
         }
-    };
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-        creature->AI()->DoAction(EVENT_ENCOUNTER_START);
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(NELSON_HEAD, 1, true))
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
-            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
-            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
+            CloseGossipMenuFor(player);
+            DoAction(EVENT_ENCOUNTER_START);
+
+            return true;
         }
 
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(NELSON_HEAD, 1, true))
+            {
+                uint32 gossipMenuId = me->GetCreatureTemplate()->GossipMenuId;
+                AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
+            }
 
-        return true;
-    }
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
+    };
 };
 
 class npc_franklin : public CreatureScript
@@ -1176,31 +1173,28 @@ public:
             gossipPlayerGUID = playerGUID;
             events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
         }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+        {
+            CloseGossipMenuFor(player);
+            ScheduleEncounterStart(player->GetGUID());
+
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(FRANKLIN_HEAD, 1, true))
+            {
+                uint32 gossipMenuId = me->GetCreatureTemplate()->GossipMenuId;
+                AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
+            }
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
     };
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-        if (creature->AI() && CAST_AI(npc_franklin::npc_franklinAI, creature->AI()))
-        {
-            CAST_AI(npc_franklin::npc_franklinAI, creature->AI())->ScheduleEncounterStart(player->GetGUID());
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(FRANKLIN_HEAD, 1, true))
-        {
-            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
-            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
 };
 
 void AddSC_npc_stave_of_ancients()

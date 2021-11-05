@@ -309,38 +309,48 @@ class npc_parqual_fintallas : public CreatureScript
 public:
     npc_parqual_fintallas() : CreatureScript("npc_parqual_fintallas") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct npc_parqual_fintallasAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-            creature->CastSpell(player, SPELL_MARK_OF_SHAME, false);
-        }
-        if (action == GOSSIP_ACTION_INFO_DEF + 2)
-        {
-            CloseGossipMenuFor(player);
-            player->AreaExploredOrEventHappens(6628);
-        }
-        return true;
-    }
+        npc_parqual_fintallasAI(Creature* c) : ScriptedAI(c) { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            {
+                CloseGossipMenuFor(player);
+                me->CastSpell(player, SPELL_MARK_OF_SHAME, false);
+            }
+            if (action == GOSSIP_ACTION_INFO_DEF + 2)
+            {
+                CloseGossipMenuFor(player);
+                player->AreaExploredOrEventHappens(6628);
+            }
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, 5822, me->GetGUID());
+            }
+            else
+                SendGossipMenuFor(player, 5821, me->GetGUID());
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            SendGossipMenuFor(player, 5822, creature->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, 5821, creature->GetGUID());
-
-        return true;
+        return new npc_parqual_fintallasAI(creature);
     }
 };
 
@@ -2262,60 +2272,6 @@ class npc_thrall_bfu : public CreatureScript
 public:
     npc_thrall_bfu() : CreatureScript("npc_thrall_bfu") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                {
-                    CloseGossipMenuFor(player);
-
-                    if (auto thrall_ai = CAST_AI(npc_thrall_bfu::npc_thrall_bfuAI, creature->AI()))
-                    {
-                        if (Creature* sylvannas = GetClosestCreatureWithEntry(creature, NPC_SYLVANAS, 50.0f))
-                        {
-                            thrall_ai->sylvanasfollowGUID = sylvannas->GetGUID();
-                            thrall_ai->Start(true, true, player->GetGUID());
-                            thrall_ai->SetDespawnAtEnd(false);
-                            thrall_ai->SetDespawnAtFar(false);
-                        }
-                        else
-                            thrall_ai->sylvanasfollowGUID.Clear();
-                    }
-                    break;
-                }
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_BATTLE_H) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_THRALL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/) override
-    {
-        if (quest->GetQuestId() == QUEST_BATTLE_H)
-        {
-            player->RemoveAura(SPELL_THRALL_BUFF);
-            player->RemoveAura(SPELL_SYLVANAS_BUFF);
-            player->CastSpell(player, SPELL_TELEPORT_OG, true);
-        }
-
-        return true;
-    }
-
     struct npc_thrall_bfuAI : public npc_escortAI
     {
         npc_thrall_bfuAI(Creature* creature) : npc_escortAI(creature)
@@ -2416,6 +2372,55 @@ public:
                         temp->DespawnOrUnsummon();
 
                 hordeGuardsGUID.clear();
+            }
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+
+            switch (action)
+            {
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                {
+                    CloseGossipMenuFor(player);
+
+                    if (Creature* sylvannas = GetClosestCreatureWithEntry(me, NPC_SYLVANAS, 50.0f))
+                    {
+                        sylvanasfollowGUID = sylvannas->GetGUID();
+                        Start(true, true, player->GetGUID());
+                        SetDespawnAtEnd(false);
+                        SetDespawnAtFar(false);
+                    }
+                    else
+                        sylvanasfollowGUID.Clear();
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(QUEST_BATTLE_H) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_THRALL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
+
+        void QuestReward(Player* player, Quest const* quest, uint32 /*item*/) override
+        {
+            if (quest->GetQuestId() == QUEST_BATTLE_H)
+            {
+                player->RemoveAura(SPELL_THRALL_BUFF);
+                player->RemoveAura(SPELL_SYLVANAS_BUFF);
+                player->CastSpell(player, SPELL_TELEPORT_OG, true);
             }
         }
 

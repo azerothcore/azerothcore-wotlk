@@ -106,17 +106,27 @@ class go_mistwhisper_treasure : public GameObjectScript
 public:
     go_mistwhisper_treasure() : GameObjectScript("go_mistwhisper_treasure") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* go) override
+    struct go_mistwhisper_treasureAI : public GameObjectAI
     {
-        if (!go->FindNearestCreature(28105, 30.0f)) // Tartek
+        go_mistwhisper_treasureAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            if (!go->FindNearestCreature(28105, 30.0f)) // Tartek
             {
-                cr->Yell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL);
-                cr->AI()->AttackStart(pPlayer);
+                if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                {
+                    cr->Yell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL);
+                    cr->AI()->AttackStart(player);
+                }
             }
+            return false;
         }
-        return false;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_mistwhisper_treasureAI(go);
     }
 };
 
@@ -1451,26 +1461,33 @@ enum InconspicuousLandmark
 class go_inconspicuous_landmark : public GameObjectScript
 {
 public:
-    go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
+    go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark") { }
+
+    struct go_inconspicuous_landmarkAI : public GameObjectAI
     {
-        _lastUsedTime = time(nullptr);
-    }
+        go_inconspicuous_landmarkAI(GameObject* go) : GameObjectAI(go) { _lastUsedTime = time(nullptr); }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (player->HasItemCount(ITEM_CUERGOS_KEY))
+                return true;
+
+            if (_lastUsedTime > time(nullptr))
+                return true;
+
+            _lastUsedTime = time(nullptr) + MINUTE;
+            player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
+            return true;
+        }
+
+        private:
+            uint32 _lastUsedTime;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
     {
-        if (player->HasItemCount(ITEM_CUERGOS_KEY))
-            return true;
-
-        if (_lastUsedTime > time(nullptr))
-            return true;
-
-        _lastUsedTime = time(nullptr) + MINUTE;
-        player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
-        return true;
+        return new go_inconspicuous_landmarkAI(go);
     }
-
-private:
-    uint32 _lastUsedTime;
 };
 
 /*######

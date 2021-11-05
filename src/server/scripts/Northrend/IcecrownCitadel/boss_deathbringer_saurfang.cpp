@@ -739,37 +739,37 @@ public:
             }
         }
 
+        bool GossipHello(Player* player) override
+        {
+            InstanceScript* instance = me->GetInstanceScript();
+            if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
+            }
+
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            InstanceScript* instance = me->GetInstanceScript();
+            if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
+            {
+                ClearGossipMenuFor(player);
+                CloseGossipMenuFor(player);
+                if (action == -ACTION_START_EVENT)
+                    DoAction(ACTION_START_EVENT);
+            }
+
+            return true;
+        }
+
     private:
         EventMap _events;
         InstanceScript* _instance;
         std::list<Creature*> _guardList;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
-            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-        }
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
-        {
-            ClearGossipMenuFor(player);
-            CloseGossipMenuFor(player);
-            if (action == -ACTION_START_EVENT)
-                creature->AI()->DoAction(ACTION_START_EVENT);
-        }
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -953,37 +953,37 @@ public:
             }
         }
 
+        bool GossipHello(Player* player) override
+        {
+            InstanceScript* instance = me->GetInstanceScript();
+            if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
+            {
+                AddGossipItemFor(player, 0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
+            }
+
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            InstanceScript* instance = me->GetInstanceScript();
+            if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
+            {
+                ClearGossipMenuFor(player);
+                CloseGossipMenuFor(player);
+                if (action == -ACTION_START_EVENT + 1)
+                    DoAction(ACTION_START_EVENT);
+            }
+
+            return true;
+        }
+
     private:
         EventMap _events;
         InstanceScript* _instance;
         std::list<Creature*> _guardList;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
-        {
-            AddGossipItemFor(player, 0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
-            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-        }
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
-        {
-            ClearGossipMenuFor(player);
-            CloseGossipMenuFor(player);
-            if (action == -ACTION_START_EVENT + 1)
-                creature->AI()->DoAction(ACTION_START_EVENT);
-        }
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {

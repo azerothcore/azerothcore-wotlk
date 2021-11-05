@@ -228,6 +228,36 @@ public:
             }
         }
 
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_A) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
+            {
+                if (player->GetTeamId() == TEAM_ALLIANCE)
+                    AddGossipItemFor(player, 0, "Arcanist Tybalin said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                else
+                    AddGossipItemFor(player, 0, "Magister Hathorel said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            }
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            switch (action)
+            {
+            case GOSSIP_ACTION_INFO_DEF:
+                CloseGossipMenuFor(player);
+                me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                SetData(ACTION_SHANDY_INTRO, 0);
+                break;
+            }
+            return true;
+        }
+
     private:
         EventMap _events;
         ObjectGuid _aquanosGUID;
@@ -236,37 +266,6 @@ public:
 
         bool _canWash;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_A) == QUEST_STATUS_INCOMPLETE ||
-                player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
-        {
-            if(player->GetTeamId() == TEAM_ALLIANCE)
-                AddGossipItemFor(player, 0, "Arcanist Tybalin said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            else
-                AddGossipItemFor(player, 0, "Magister Hathorel said you might be able to lend me a certain tabard.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                CloseGossipMenuFor(player);
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-                creature->AI()->SetData(ACTION_SHANDY_INTRO, 0);
-                break;
-        }
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {

@@ -165,16 +165,6 @@ class npc_apothecary_hanes : public CreatureScript
 public:
     npc_apothecary_hanes() : CreatureScript("npc_apothecary_hanes") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
-        {
-            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
-        }
-        return true;
-    }
-
     struct npc_Apothecary_HanesAI : public npc_escortAI
     {
         npc_Apothecary_HanesAI(Creature* creature) : npc_escortAI(creature) { }
@@ -184,6 +174,16 @@ public:
         {
             SetDespawnAtFar(false);
             PotTimer = 10000; //10 sec cooldown on potion
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
+            {
+                me->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
+                Start(true, false, player->GetGUID());
+            }
+            return;
         }
 
         void JustDied(Unit* /*killer*/) override

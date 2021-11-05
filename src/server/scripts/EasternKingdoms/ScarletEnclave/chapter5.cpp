@@ -337,30 +337,6 @@ public:
         return new npc_highlord_darion_mograineAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_SOLDIERS_ENABLE))
-            AddGossipItemFor(player, 9795, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            ClearGossipMenuFor(player);
-            CloseGossipMenuFor(player);
-            creature->AI()->DoAction(ACTION_START_EVENT);
-        }
-        return true;
-    }
-
     struct npc_highlord_darion_mograineAI : public ScriptedAI
     {
         npc_highlord_darion_mograineAI(Creature* creature) : ScriptedAI(creature), summons(me)
@@ -407,6 +383,30 @@ public:
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337500);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345000);
             }
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !GetData(WORLD_STATE_SOLDIERS_ENABLE))
+                AddGossipItemFor(player, 9795, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            {
+                ClearGossipMenuFor(player);
+                CloseGossipMenuFor(player);
+                DoAction(ACTION_START_EVENT);
+            }
+            return true;
         }
 
         uint32 GetData(uint32 type) const override

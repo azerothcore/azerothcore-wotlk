@@ -285,27 +285,38 @@ class npc_iruk : public CreatureScript
 public:
     npc_iruk() : CreatureScript("npc_iruk") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    struct npc_irukAI : public ScriptedAI
     {
-        if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        npc_irukAI(Creature* c) : ScriptedAI(c) { }
 
-        SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, creature->GetGUID());
 
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+        bool GossipHello(Player* player) override
         {
-            player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
-            CloseGossipMenuFor(player);
+            if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, me->GetGUID());
+
+            return true;
         }
 
-        return true;
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            {
+                player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
+                CloseGossipMenuFor(player);
+            }
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_irukAI(creature);
     }
 };
 
@@ -475,27 +486,24 @@ public:
             if (!UpdateVictim())
                 return;
         }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_ESCAPE_WINTERFIN_CAVERNS)
+            {
+                if (GameObject* go = me->FindNearestGameObject(GO_CAGE, 5.0f))
+                    go->UseDoorOrButton();
+
+                Start(true, false, player->GetGUID());
+
+                me->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
+            }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lurgglbrAI(creature);
-    }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_ESCAPE_WINTERFIN_CAVERNS)
-        {
-            if (GameObject* go = creature->FindNearestGameObject(GO_CAGE, 5.0f))
-                go->UseDoorOrButton();
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
-
-            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            return true;
-        }
-        return false;
     }
 };
 
@@ -846,18 +854,6 @@ class npc_mootoo_the_younger : public CreatureScript
 public:
     npc_mootoo_the_younger() : CreatureScript("npc_mootoo_the_younger") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
-        {
-            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->AI()->Talk(SAY_1, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
-        }
-        return true;
-    }
-
     struct npc_mootoo_the_youngerAI : public npc_escortAI
     {
         npc_mootoo_the_youngerAI(Creature* creature) : npc_escortAI(creature) { }
@@ -865,6 +861,17 @@ public:
         void Reset() override
         {
             SetDespawnAtFar(false);
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
+            {
+                me->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                Talk(SAY_1, player);
+                Start(true, false, player->GetGUID());
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -928,17 +935,6 @@ class npc_bonker_togglevolt : public CreatureScript
 public:
     npc_bonker_togglevolt() : CreatureScript("npc_bonker_togglevolt") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, true, player->GetGUID());
-        }
-        return true;
-    }
-
     struct npc_bonker_togglevoltAI : public npc_escortAI
     {
         npc_bonker_togglevoltAI(Creature* creature) : npc_escortAI(creature) { }
@@ -948,6 +944,16 @@ public:
         {
             Bonker_agro = 0;
             SetDespawnAtFar(false);
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                Talk(SAY_BONKER_2, player);
+                Start(true, true, player->GetGUID());
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1298,7 +1304,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             if (gossipListId == 0)
             {
@@ -1306,7 +1312,10 @@ public:
                 _playerGUID = player->GetGUID();
                 PreScript();
             }
+
+            return false;
         }
+
         private:
             EventMap   _events;
             uint32     _emoteState;
@@ -1924,7 +1933,7 @@ public:
             }
         }
 
-        void sGossipHello(Player* /*player*/) override
+        bool GossipHello(Player* /*player*/) override
         {
             if (!me->HasAura(SPELL_BLOOD_PRESENCE))
             {
@@ -1932,7 +1941,7 @@ public:
             }
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
             if (action == 0)
             {
