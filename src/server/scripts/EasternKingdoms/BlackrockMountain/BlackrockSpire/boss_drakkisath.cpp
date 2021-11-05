@@ -198,11 +198,11 @@ public:
                     break;
                 case EVENT_KNOCKDOWN:
                     DoCastVictim(SPELL_KNOCKDOWN);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(11200, 25700));
+                    _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(11200, 25700));
                     break;
                 case EVENT_STRIKE:
                     DoCastVictim(SPELL_STRIKE);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 9000);
+                    _events.ScheduleEvent(EVENT_STRIKE, 9000);
                     break;
             }
 
