@@ -17,6 +17,8 @@
 
 #ifndef _PLAYER_COMMAND_H
 #define _PLAYER_COMMAND_H
+#include "Chat.h"
+#include "Player.h"
 
 namespace Acore
 {

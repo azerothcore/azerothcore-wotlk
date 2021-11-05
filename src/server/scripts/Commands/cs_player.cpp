@@ -16,9 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "Chat.h"
-#include "Language.h"
-#include "Player.h"
 #include "PlayerCommand.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
