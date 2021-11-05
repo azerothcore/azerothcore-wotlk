@@ -60,11 +60,21 @@ class go_noblegarden_colored_egg : public GameObjectScript
 public:
     go_noblegarden_colored_egg() : GameObjectScript("go_noblegarden_colored_egg") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    struct go_noblegarden_colored_eggAI : GameObjectAI
     {
-        if (roll_chance_i(5))
-            player->CastSpell(player, 61734, true); // SPELL NOBLEGARDEN BUNNY
-        return false;
+        go_noblegarden_colored_eggAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (roll_chance_i(5))
+                player->CastSpell(player, 61734, true); // SPELL NOBLEGARDEN BUNNY
+            return false;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_noblegarden_colored_eggAI(go);
     }
 };
 
@@ -73,11 +83,21 @@ class go_seer_of_zebhalak : public GameObjectScript
 public:
     go_seer_of_zebhalak() : GameObjectScript("go_seer_of_zebhalak") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    struct go_seer_of_zebhalakAI : public GameObjectAI
     {
-        if (player->GetQuestStatus(12007) == QUEST_STATUS_INCOMPLETE)
-            player->CastSpell(player, 47293, true);
-        return true;
+        go_seer_of_zebhalakAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (player->GetQuestStatus(12007) == QUEST_STATUS_INCOMPLETE)
+                player->CastSpell(player, 47293, true);
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_seer_of_zebhalakAI(go);
     }
 };
 
