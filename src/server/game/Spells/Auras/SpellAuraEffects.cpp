@@ -6914,7 +6914,12 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
         {
             float radius = GetSpellInfo()->Effects[GetEffIndex()].CalcRadius(caster);
 
-            if (Unit* triggerTarget = target->GetNextRandomRaidMemberOrPet(radius))
+            Unit*                                                         triggerTarget = nullptr;
+            Acore::MostHPMissingGroupInRange                              u_check(target, radius, 0);
+            Acore::UnitLastSearcher<Acore::MostHPMissingGroupInRange>     searcher(target, triggerTarget, u_check);
+            Cell::VisitAllObjects(target, searcher, radius);
+
+            if (triggerTarget)
             {
                 target->CastCustomSpell(triggerTarget, GetId(), &value, nullptr, nullptr, true, nullptr, this, GetCasterGUID());
                 if (Aura* aura = triggerTarget->GetAura(GetId(), GetCasterGUID()))
