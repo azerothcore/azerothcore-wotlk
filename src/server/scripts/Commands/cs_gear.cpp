@@ -31,13 +31,13 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> gearCommandTable =
+        static ChatCommandTable gearCommandTable =
         {
             { "repair",  HandleGearRepairCommand, SEC_GAMEMASTER, Console::No },
             { "stats",   HandleGearStatsCommand,  SEC_PLAYER,     Console::No }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "gear", gearCommandTable }
         };
