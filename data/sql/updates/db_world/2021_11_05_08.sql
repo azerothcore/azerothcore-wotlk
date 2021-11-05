@@ -1,3 +1,19 @@
+-- DB update 2021_11_05_07 -> 2021_11_05_08
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_05_07';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_05_07 2021_11_05_08 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1635873886464817740'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1635873886464817740');
 
 -- Condition for source Gossip menu condition type Quest taken
@@ -47,3 +63,13 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (1105600, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 11, 15050, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Alchemist Arbington and Apothecary Dithers - On Script - Cast ''Psychometry'''),
 (1105600, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 1, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Alchemist Arbington and Apothecary Dithers - On Script - Say Line 1'),
 (1105600, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Alchemist Arbington and Apothecary Dithers - On Script - Add Npc Flag Questgiver');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_05_08' WHERE sql_rev = '1635873886464817740';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
