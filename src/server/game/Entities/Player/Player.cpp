@@ -7538,7 +7538,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     constexpr std::array<AuraType, 3> toRemove = { SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH };
     if (loot_type != LOOT_PICKPOCKETING)
     {
-        toRemove.push_back(SPELL_AURA_MOD_STEALTH);
+        toRemove = { SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH, SPELL_AURA_MOD_STEALTH };
     }
     for (const auto& aura : toRemove)
     {
