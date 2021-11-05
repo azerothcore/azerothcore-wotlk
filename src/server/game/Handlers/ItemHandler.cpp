@@ -175,12 +175,14 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     ItemTemplate const* pProto = pSrcItem->GetTemplate();
     if (!pProto)
     {
+        _player->SendEquipError(pSrcItem->IsBag() ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem);
         return;
     }
 
     uint8 eslot = _player->FindEquipSlot(pProto, NULL_SLOT, !pSrcItem->IsBag());
     if (eslot == NULL_SLOT)
     {
+        _player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
     }
 
@@ -188,6 +190,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     uint16 dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
     if (dest == src) // prevent equip in same slot, only at cheat
     {
+        _player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
     }
 
