@@ -191,20 +191,23 @@ public:
 
             _events.Update(diff);
 
-            switch (uint32 eventId = _events.ExecuteEvent())
+            while (uint32 const eventId = _events.ExecuteEvent())
             {
-                case EVENT_MORTAL_STRIKE:
-                    DoCastVictim(SPELL_MORTAL_STRIKE);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 13000);
-                    break;
-                case EVENT_KNOCKDOWN:
-                    DoCastVictim(SPELL_KNOCKDOWN);
-                    _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(11200, 25700));
-                    break;
-                case EVENT_STRIKE:
-                    DoCastVictim(SPELL_STRIKE);
-                    _events.ScheduleEvent(EVENT_STRIKE, 9000);
-                    break;
+                switch (eventId)
+                {
+                    case EVENT_MORTAL_STRIKE:
+                        DoCastVictim(SPELL_MORTAL_STRIKE);
+                        _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 13000);
+                        break;
+                    case EVENT_KNOCKDOWN:
+                        DoCastVictim(SPELL_KNOCKDOWN);
+                        _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(11200, 25700));
+                        break;
+                    case EVENT_STRIKE:
+                        DoCastVictim(SPELL_STRIKE);
+                        _events.ScheduleEvent(EVENT_STRIKE, 9000);
+                        break;
+                }
             }
 
             DoMeleeAttackIfReady();
