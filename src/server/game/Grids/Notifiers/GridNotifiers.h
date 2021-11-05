@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_GRIDNOTIFIERS_H
@@ -11,6 +22,7 @@
 #include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "Group.h"
 #include "Object.h"
 #include "ObjectGridLoader.h"
 #include "Optional.h"
@@ -1103,6 +1115,30 @@ namespace Acore
         NearestHostileUnitInAttackDistanceCheck(NearestHostileUnitInAttackDistanceCheck const&);
     };
 
+    class NearestVisibleDetectableContestedGuardUnitCheck
+    {
+    public:
+        explicit NearestVisibleDetectableContestedGuardUnitCheck(Unit const* unit) : me(unit) {}
+        bool operator()(Unit* u)
+        {
+            if (!u->CanSeeOrDetect(me, true, true, false))
+            {
+                return false;
+            }
+
+            if (!u->IsContestedGuard())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+    private:
+        Unit const* me;
+        NearestVisibleDetectableContestedGuardUnitCheck(NearestVisibleDetectableContestedGuardUnitCheck const&);
+    };
+
     class AnyAssistCreatureInRangeCheck
     {
     public:
@@ -1314,6 +1350,79 @@ namespace Acore
         const WorldObject* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
+    };
+
+    class MostHPMissingGroupInRange
+    {
+    public:
+        MostHPMissingGroupInRange(Unit const* obj, float range, uint32 hp) : i_obj(obj), i_range(range), i_hp(hp) {}
+
+        bool operator()(Unit* u)
+        {
+            if (i_obj == u)
+            {
+                return false;
+            }
+
+            Player* player = nullptr;
+            if (u->GetTypeId() == TYPEID_PLAYER)
+            {
+                player = u->ToPlayer();
+            }
+
+            else if (u->IsPet() && u->GetOwner())
+            {
+                player = u->GetOwner()->ToPlayer();
+            }
+
+            if (!player)
+            {
+                return false;
+            }
+
+            Group* group = player->GetGroup();
+            if (!group || !group->IsMember(i_obj->IsPet() ? i_obj->GetOwnerGUID() : i_obj->GetGUID()))
+            {
+                return false;
+            }
+
+            if (u->IsAlive() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) && u->GetMaxHealth() - u->GetHealth() > i_hp)
+            {
+                i_hp = u->GetMaxHealth() - u->GetHealth();
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+        Unit const* i_obj;
+        float       i_range;
+        uint32      i_hp;
+    };
+
+    class AllDeadCreaturesInRange
+    {
+    public:
+        AllDeadCreaturesInRange(WorldObject const* obj, float range, bool reqAlive = true) : _obj(obj), _range(range), _reqAlive(reqAlive) {}
+
+        bool operator()(Unit* unit) const
+        {
+            if (_reqAlive && unit->IsAlive())
+            {
+                return false;
+            }
+            if (!_obj->IsWithinDistInMap(unit, _range))
+            {
+                return false;
+            }
+            return true;
+        }
+
+    private:
+        WorldObject const* _obj;
+        float              _range;
+        bool               _reqAlive;
     };
 
     class PlayerAtMinimumRangeAway

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -30,38 +41,44 @@ EndScriptData */
 #include <openssl/opensslv.h>
 #include <numeric>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class server_commandscript : public CommandScript
 {
 public:
     server_commandscript() : CommandScript("server_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> serverIdleRestartCommandTable =
+        static ChatCommandTable serverIdleRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_CONSOLE,        true,  &HandleServerIdleRestartCommand,         "" }
         };
 
-        static std::vector<ChatCommand> serverIdleShutdownCommandTable =
+        static ChatCommandTable serverIdleShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_CONSOLE,        true,  &HandleServerIdleShutDownCommand,        "" }
         };
 
-        static std::vector<ChatCommand> serverRestartCommandTable =
+        static ChatCommandTable serverRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
         };
 
-        static std::vector<ChatCommand> serverShutdownCommandTable =
+        static ChatCommandTable serverShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
         };
 
-        static std::vector<ChatCommand> serverSetCommandTable =
+        static ChatCommandTable serverSetCommandTable =
         {
             { "difftime",       SEC_CONSOLE,        true,  &HandleServerSetDiffTimeCommand,         "" },
             { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
@@ -69,7 +86,7 @@ public:
             { "closed",         SEC_CONSOLE,        true,  &HandleServerSetClosedCommand,           "" }
         };
 
-        static std::vector<ChatCommand> serverCommandTable =
+        static ChatCommandTable serverCommandTable =
         {
             { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
             { "debug",          SEC_ADMINISTRATOR,  true,  &HandleServerDebugCommand,               "" },
@@ -83,7 +100,7 @@ public:
             { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
         };
@@ -202,6 +219,10 @@ public:
         handler->PSendSysMessage("Using World DB Revision: %s", sWorld->GetWorldDBRevision());
         handler->PSendSysMessage("Using Character DB Revision: %s", sWorld->GetCharacterDBRevision());
         handler->PSendSysMessage("Using Auth DB Revision: %s", sWorld->GetAuthDBRevision());
+
+        handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
+        handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
+        handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
         return true;
     }
 

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CombatAI.h"
@@ -162,7 +173,6 @@ enum deathsChallenge
     SAY_DUEL                    = 0,
 
     QUEST_DEATH_CHALLENGE       = 12733,
-    FACTION_HOSTILE             = 2068,
 
     DATA_IN_PROGRESS            = 0,
 
@@ -326,7 +336,7 @@ public:
                     Talk(SAY_DUEL + 4, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+5:
-                    me->setFaction(FACTION_HOSTILE);
+                    me->SetFaction(FACTION_UNDEAD_SCOURGE_2);
                     if (Player* player = ObjectAccessor::GetPlayer(*me, _duelGUID))
                         AttackStart(player);
                     return;
@@ -712,7 +722,7 @@ public:
             anchorGUID.Clear();
             phase = PHASE_CHAINED;
             events.Reset();
-            me->setFaction(7);
+            me->SetFaction(FACTION_CREATURE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
@@ -814,7 +824,7 @@ public:
                             wait_timer -= diff;
                         else
                         {
-                            me->setFaction(14);
+                            me->SetFaction(FACTION_MONSTER);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                             phase = PHASE_ATTACKING;
 
@@ -936,7 +946,7 @@ public:
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
 
@@ -959,7 +969,7 @@ public:
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
                 me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -1069,7 +1079,7 @@ public:
                         me->SetFacingToObject(car);
                         // xinef: add some flags
                         car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                        car->setFaction(35);
+                        car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);
                     SetRun(true);

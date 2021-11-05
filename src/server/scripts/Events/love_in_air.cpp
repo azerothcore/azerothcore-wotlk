@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
@@ -332,10 +345,21 @@ public:
         EventMap events;
         uint32 speachTimer;
 
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO;
+        }
+
         void Reset() override
         {
             speachTimer = 0;
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             summons.DespawnAll();
             events.Reset();
             me->SummonCreature(NPC_APOTHECARY_FRYE, -205.449f, 2219.56f, 79.7633f, 0.7f);
@@ -353,13 +377,13 @@ public:
             me->AI()->Talk(SAY_HUMMEL_5);
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
-                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 288, me->FindMap());
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO, me->FindMap());
         }
 
         void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
-            cr->setFaction(35);
+            cr->SetFaction(FACTION_FRIENDLY);
             cr->SetControlled(true, UNIT_STATE_STUNNED);
             cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -383,7 +407,7 @@ public:
                 {
                     me->AI()->Talk(SAY_HUMMEL_2);
                     speachTimer = 0;
-                    me->setFaction(16);
+                    me->SetFaction(FACTION_MONSTER_2);
                     me->SetInCombatWithZone();
                     if (Unit* target = SelectTargetFromPlayerList(40.0f))
                     {
@@ -468,6 +492,17 @@ public:
 
         EventMap events;
 
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO;
+        }
+
         void Reset() override
         {
         }
@@ -478,7 +513,7 @@ public:
             {
                 me->SetControlled(false, UNIT_STATE_STUNNED);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->setFaction(16);
+                me->SetFaction(FACTION_MONSTER_2);
                 me->SetInCombatWithZone();
                 if (Unit* target = SelectTargetFromPlayerList(40.0f))
                     AttackStart(target);
