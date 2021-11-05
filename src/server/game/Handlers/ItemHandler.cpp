@@ -329,7 +329,10 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         _player->DestroyItemCount(pItem, i_count, true);
     }
     else
+    {
         _player->DestroyItem(bag, slot, true);
+    }
+    _player->SendQuestGiverStatusMultiple();
 }
 
 bool ItemTemplate::HasStat(ItemModType stat) const
