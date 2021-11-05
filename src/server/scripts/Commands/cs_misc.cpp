@@ -39,10 +39,7 @@
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
-
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
+#include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
 
@@ -110,29 +107,28 @@ public:
         return commandTable;
     }
 
-    static bool HandleSkirmishCommand(ChatHandler* handler, char const* args)
+    static bool HandleSkirmishCommand(ChatHandler* handler, std::string_view args)
     {
-        Tokenizer tokens(args, ' ');
+        auto tokens = Acore::Tokenize(args, ' ', true);
 
-        if (!*args || !tokens.size())
+        if (args.empty() || !tokens.size())
         {
             handler->PSendSysMessage("Usage: .skirmish [arena] [XvX] [Nick1] [Nick2] ... [NickN]");
-            handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA,BE,RL,DS,RV).");
+            handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA, BE, RL, DS, RV).");
             handler->PSendSysMessage("[XvX] can be 1v1, 2v2, 3v3, 5v5. After [XvX] specify enough nicknames for that mode.");
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Tokenizer::const_iterator tokensItr = tokens.begin();
+        auto tokensItr = tokens.begin();
 
-        std::set<BattlegroundTypeId> allowedArenas;
-        std::string arenasStr = *(tokensItr++);
-        std::string tmpStr;
-        Tokenizer arenaTokens(arenasStr, ',');
-        for (Tokenizer::const_iterator itr = arenaTokens.begin(); itr != arenaTokens.end(); ++itr)
+        std::vector<BattlegroundTypeId> allowedArenas;
+        std::string_view arenasStr = *(tokensItr++);
+
+        auto arenaTokens = Acore::Tokenize(arenasStr, ',', false);
+        for (auto const& arenaName : arenaTokens)
         {
-            tmpStr = std::string(*itr);
-            if (tmpStr == "all")
+            if (arenaName == "all")
             {
                 if (arenaTokens.size() > 1)
                 {
@@ -140,22 +136,33 @@ public:
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                allowedArenas.insert(BATTLEGROUND_NA);
-                allowedArenas.insert(BATTLEGROUND_BE);
-                allowedArenas.insert(BATTLEGROUND_RL);
-                allowedArenas.insert(BATTLEGROUND_DS);
-                allowedArenas.insert(BATTLEGROUND_RV);
+
+                allowedArenas.emplace_back(BATTLEGROUND_NA);
+                allowedArenas.emplace_back(BATTLEGROUND_BE);
+                allowedArenas.emplace_back(BATTLEGROUND_RL);
+                allowedArenas.emplace_back(BATTLEGROUND_DS);
+                allowedArenas.emplace_back(BATTLEGROUND_RV);
             }
-            else if (tmpStr == "NA")
-                allowedArenas.insert(BATTLEGROUND_NA);
-            else if (tmpStr == "BE")
-                allowedArenas.insert(BATTLEGROUND_BE);
-            else if (tmpStr == "RL")
-                allowedArenas.insert(BATTLEGROUND_RL);
-            else if (tmpStr == "DS")
-                allowedArenas.insert(BATTLEGROUND_DS);
-            else if (tmpStr == "RV")
-                allowedArenas.insert(BATTLEGROUND_RV);
+            else if (arenaName == "NA")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_NA);
+            }
+            else if (arenaName == "BE")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_BE);
+            }
+            else if (arenaName == "RL")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_RL);
+            }
+            else if (arenaName == "DS")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_DS);
+            }
+            else if (arenaName == "RV")
+            {
+                allowedArenas.emplace_back(BATTLEGROUND_RV);
+            }
             else
             {
                 handler->PSendSysMessage("Invalid [arena] specified.");
@@ -163,17 +170,31 @@ public:
                 return false;
             }
         }
+
         ASSERT(!allowedArenas.empty());
         BattlegroundTypeId randomizedArenaBgTypeId = Acore::Containers::SelectRandomContainerElement(allowedArenas);
 
         uint8 count = 0;
         if (tokensItr != tokens.end())
         {
-            std::string mode = *(tokensItr++);
-            if (mode == "1v1") count = 2;
-            else if (mode == "2v2") count = 4;
-            else if (mode == "3v3") count = 6;
-            else if (mode == "5v5") count = 10;
+            std::string_view mode = *(tokensItr++);
+
+            if (mode == "1v1")
+            {
+                count = 2;
+            }
+            else if (mode == "2v2")
+            {
+                count = 4;
+            }
+            else if (mode == "3v3")
+            {
+                count = 6;
+            }
+            else if (mode == "5v5")
+            {
+                count = 10;
+            }
         }
 
         if (!count)
@@ -194,34 +215,84 @@ public:
         uint8 error = 0;
         std::string last_name;
         Player* plr = nullptr;
-        Player* players[10] = {nullptr};
+        std::array<Player*, 10> players = {};
         uint8 cnt = 0;
+
         for (; tokensItr != tokens.end(); ++tokensItr)
         {
             last_name = std::string(*tokensItr);
             plr = ObjectAccessor::FindPlayerByName(last_name, false);
-            if (!plr) { error = 1; break; }
-            if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported()) { error = 2; break; }
-            if (plr->GetMap()->GetEntry()->Instanceable()) { error = 3; break; }
-            if (plr->isUsingLfg()) { error = 4; break; }
-            if (plr->InBattlegroundQueue()) { error = 5; break; }
-            if (plr->IsInFlight()) { error = 10; break; }
-            if (!plr->IsAlive()) { error = 11; break; }
+
+            if (!plr)
+            {
+                error = 1; break;
+            }
+
+            if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported())
+            {
+                error = 2; break;
+            }
+
+            if (plr->GetMap()->GetEntry()->Instanceable())
+            {
+                error = 3; break;
+            }
+
+            if (plr->isUsingLfg())
+            {
+                error = 4; break;
+            }
+
+            if (plr->InBattlegroundQueue())
+            {
+                error = 5; break;
+            }
+
+            if (plr->IsInFlight())
+            {
+                error = 10; break;
+            }
+
+            if (!plr->IsAlive())
+            {
+                error = 11; break;
+            }
+
             const Group* g = plr->GetGroup();
+
             if (hcnt > 1)
             {
-                if (!g) { error = 6; break; }
-                if (g->isRaidGroup() || g->isBGGroup() || g->isBFGroup() || g->isLFGGroup()) { error = 7; break; }
-                if (g->GetMembersCount() != hcnt) { error = 8; break; }
+                if (!g)
+                {
+                    error = 6;
+                    break;
+                }
+
+                if (g->isRaidGroup() || g->isBGGroup() || g->isBFGroup() || g->isLFGGroup())
+                {
+                    error = 7; break;
+                }
+
+                if (g->GetMembersCount() != hcnt)
+                {
+                    error = 8; break;
+                }
 
                 uint8 sti = (cnt < hcnt ? 0 : hcnt);
-                if (sti != cnt)
-                    if (players[sti]->GetGroup() != plr->GetGroup()) { error = 9; last_name += " and " + players[sti]->GetName(); break; }
+                if (sti != cnt && players[sti]->GetGroup() != plr->GetGroup())
+                {
+                    error = 9; last_name += " and " + players[sti]->GetName();
+                    break;
+                }
             }
             else // 1v1
             {
-                if (g) { error = 12; break; }
+                if (g)
+                {
+                    error = 12; break;
+                }
             }
+
             players[cnt++] = plr;
         }
 
@@ -309,6 +380,7 @@ public:
 
         TeamId teamId1 = Player::TeamIdForRace(players[0]->getRace());
         TeamId teamId2 = (teamId1 == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+
         for (uint8 i = 0; i < cnt; ++i)
         {
             Player* player = players[i];
@@ -338,7 +410,7 @@ public:
             return false;
         }
 
-        auto SetDevMod = [&](bool const enable)
+        auto SetDevMod = [&](bool enable)
         {
             session->SendNotification(enable ? LANG_DEV_ON : LANG_DEV_OFF);
             session->GetPlayer()->SetDeveloper(enable);
@@ -496,42 +568,36 @@ public:
         return true;
     }
 
-    static bool HandleAuraCommand(ChatHandler* handler, char const* args)
+    static bool HandleAuraCommand(ChatHandler* handler, SpellInfo const* spell)
     {
-        Unit* target = handler->getSelectedUnit();
-        if (!target)
-        {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
-            return false;
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo)
+        if (!spell)
         {
             handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (!SpellMgr::IsSpellValid(spellInfo))
+        if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spellId);
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Aura::TryRefreshStackOrCreate(spell, MAX_EFFECT_MASK, target, target);
 
         return true;
     }
 
-    static bool HandleUnAuraCommand(ChatHandler* handler, char const* args)
+    static bool HandleUnAuraCommand(ChatHandler* handler, Variant<SpellInfo const*, std::string_view> spells)
     {
         Unit* target = handler->getSelectedUnit();
         if (!target)
@@ -541,62 +607,80 @@ public:
             return false;
         }
 
-        std::string argstr = args;
-        if (argstr == "all")
+        if (spells.holds_alternative<std::string_view>() && spells.get<std::string_view>() == "all")
         {
             target->RemoveAllAuras();
             return true;
         }
 
-        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
+        if (!spells.holds_alternative<SpellInfo const*>())
+        {
+            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+            handler->SetSentErrorMessage(true);
             return false;
+        }
 
-        target->RemoveAurasDueToSpell(spellId);
+        auto spell = spells.get<SpellInfo const*>();
+
+        if (!SpellMgr::IsSpellValid(spell))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        target->RemoveAurasDueToSpell(spell->Id);
 
         return true;
     }
     // Teleport to Player
-    static bool HandleAppearCommand(ChatHandler* handler, char const* args)
+    static bool HandleAppearCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTarget(handler);
+        }
+
+        if (!target)
+        {
             return false;
+        }
 
         Player* _player = handler->GetSession()->GetPlayer();
-        if (target == _player || targetGuid == _player->GetGUID())
+        if (target->GetGUID() == _player->GetGUID())
         {
             handler->SendSysMessage(LANG_CANT_TELEPORT_SELF);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (target)
+        std::string nameLink = handler->playerLink(target->GetName());
+
+        if (target->IsConnected())
         {
             // check online security
-            if (handler->HasLowerSecurity(target))
+            if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
                 return false;
 
-            std::string chrNameLink = handler->playerLink(targetName);
+            auto targetPlayer = target->GetConnectedPlayer();
 
-            Map* map = target->GetMap();
+            Map* map = target->GetConnectedPlayer()->GetMap();
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
                 if (!_player->IsGameMaster())
                 {
-                    handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, chrNameLink.c_str());
+                    handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, nameLink.c_str());
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 if (!_player->GetMap()->IsBattlegroundOrArena())
+                {
                     _player->SetEntryPoint();
+                }
 
-                _player->SetBattlegroundId(target->GetBattlegroundId(), target->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+                _player->SetBattlegroundId(targetPlayer->GetBattlegroundId(), targetPlayer->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
             }
             else if (map->IsDungeon())
             {
@@ -606,9 +690,9 @@ public:
                 if (_player->GetGroup())
                 {
                     // we are in group, we can go only if we are in the player group
-                    if (_player->GetGroup() != target->GetGroup())
+                    if (_player->GetGroup() != targetPlayer->GetGroup())
                     {
-                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_PARTY, chrNameLink.c_str());
+                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_PARTY, nameLink.c_str());
                         handler->SetSentErrorMessage(true);
                         return false;
                     }
@@ -618,46 +702,53 @@ public:
                     // we are not in group, let's verify our GM mode
                     if (!_player->IsGameMaster())
                     {
-                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM, chrNameLink.c_str());
+                        handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM, nameLink.c_str());
                         handler->SetSentErrorMessage(true);
                         return false;
                     }
                 }
 
                 // if the GM is bound to another instance, he will not be bound to another one
-                InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(_player->GetGUID(), target->GetMapId(), target->GetDifficulty(map->IsRaid()));
+                InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(_player->GetGUID(), targetPlayer->GetMapId(), targetPlayer->GetDifficulty(map->IsRaid()));
                 if (!bind)
-                    if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetInstanceId()))
+                {
+                    if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetConnectedPlayer()->GetInstanceId()))
+                    {
                         sInstanceSaveMgr->PlayerBindToInstance(_player->GetGUID(), save, !save->CanReset(), _player);
+                    }
+                }
 
                 if (map->IsRaid())
-                    _player->SetRaidDifficulty(target->GetRaidDifficulty());
+                {
+                    _player->SetRaidDifficulty(targetPlayer->GetRaidDifficulty());
+                }
                 else
-                    _player->SetDungeonDifficulty(target->GetDungeonDifficulty());
+                {
+                    _player->SetDungeonDifficulty(targetPlayer->GetDungeonDifficulty());
+                }
             }
 
-            handler->PSendSysMessage(LANG_APPEARING_AT, chrNameLink.c_str());
+            handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
             // stop flight if need
             if (_player->IsInFlight())
             {
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
-            }
-            // save only in non-flight case
-            else
+            }            
+            else // save only in non-flight case
+            {
                 _player->SaveRecallPosition();
+            }
 
-            if (_player->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, target))
-                _player->SetPhaseMask(target->GetPhaseMask() | 1, false);
+            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
         }
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(nullptr, targetGuid))
-                return false;
-
-            std::string nameLink = handler->playerLink(targetName);
+            if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
+                return false;            
 
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
@@ -665,8 +756,11 @@ public:
             float x, y, z, o;
             uint32 map;
             bool in_flight;
-            if (!Player::LoadPositionFromDB(map, x, y, z, o, in_flight, targetGuid.GetCounter()))
+
+            if (!Player::LoadPositionFromDB(map, x, y, z, o, in_flight, target->GetGUID().GetCounter()))
+            {
                 return false;
+            }
 
             // stop flight if need
             if (_player->IsInFlight())
@@ -676,38 +770,50 @@ public:
             }
             // save only in non-flight case
             else
+            {
                 _player->SaveRecallPosition();
+            }
 
             _player->TeleportTo(map, x, y, z, _player->GetOrientation());
         }
 
         return true;
     }
+
     // Summon Player
-    static bool HandleSummonCommand(ChatHandler* handler, char const* args)
+    static bool HandleSummonCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTarget(handler);
+        }
+
+        if (!target)
+        {
             return false;
+        }
 
         Player* _player = handler->GetSession()->GetPlayer();
-        if (target == _player || targetGuid == _player->GetGUID())
+        if (target->GetGUID() == _player->GetGUID())
         {
             handler->PSendSysMessage(LANG_CANT_TELEPORT_SELF);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (target)
-        {
-            std::string nameLink = handler->playerLink(targetName);
-            // check online security
-            if (handler->HasLowerSecurity(target))
-                return false;
+        std::string nameLink = handler->playerLink(target->GetName());
 
-            if (target->IsBeingTeleported())
+        if (target->IsConnected())
+        {
+            auto targetPlayer = target->GetConnectedPlayer();
+
+            // check online security
+            if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+            {
+                return false;
+            }
+
+            if (targetPlayer->IsBeingTeleported())
             {
                 handler->PSendSysMessage(LANG_IS_TELEPORTED, nameLink.c_str());
                 handler->SetSentErrorMessage(true);
@@ -728,7 +834,7 @@ public:
                 if (!sWorld->getBoolConfig(CONFIG_INSTANCE_GMSUMMON_PLAYER))
                 {
                     // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
-                    if (!target->GetSession()->GetSecurity())
+                    if (!targetPlayer->GetSession()->GetSecurity())
                     {
                         handler->PSendSysMessage("Only GMs can be summoned to an instance!");
                         handler->SetSentErrorMessage(true);
@@ -736,14 +842,14 @@ public:
                     }
                 }
 
-                Map* destMap = target->GetMap();
+                Map* destMap = targetPlayer->GetMap();
 
                 if (destMap->Instanceable() && destMap->GetInstanceId() != map->GetInstanceId())
-                    sInstanceSaveMgr->PlayerUnbindInstance(target->GetGUID(), map->GetInstanceId(), target->GetDungeonDifficulty(), true, target);
+                    sInstanceSaveMgr->PlayerUnbindInstance(target->GetGUID(), map->GetInstanceId(), targetPlayer->GetDungeonDifficulty(), true, targetPlayer);
 
                 // we are in an instance, and can only summon players in our group with us as leader
-                if (!handler->GetSession()->GetPlayer()->GetGroup() || !target->GetGroup() ||
-                        (target->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
+                if (!handler->GetSession()->GetPlayer()->GetGroup() || !targetPlayer->GetGroup() ||
+                        (targetPlayer->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
                         (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()))
                     // the last check is a bit excessive, but let it be, just in case
                 {
@@ -754,31 +860,29 @@ public:
             }
 
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
-            if (handler->needReportToTarget(target))
-                ChatHandler(target->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()).c_str());
+            if (handler->needReportToTarget(targetPlayer))
+                ChatHandler(targetPlayer->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()).c_str());
 
             // stop flight if need
-            if (target->IsInFlight())
+            if (targetPlayer->IsInFlight())
             {
-                target->GetMotionMaster()->MovementExpired();
-                target->CleanupAfterTaxiFlight();
+                targetPlayer->GetMotionMaster()->MovementExpired();
+                targetPlayer->CleanupAfterTaxiFlight();
             }
             // save only in non-flight case
             else
-                target->SaveRecallPosition();
+                targetPlayer->SaveRecallPosition();
 
             // before GM
             float x, y, z;
-            handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectSize());
-            target->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), 0, handler->GetSession()->GetPlayer());
+            handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, targetPlayer->GetObjectSize());
+            targetPlayer->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, targetPlayer->GetOrientation(), 0, handler->GetSession()->GetPlayer());
         }
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(nullptr, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
                 return false;
-
-            std::string nameLink = handler->playerLink(targetName);
 
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE));
 
@@ -789,25 +893,34 @@ public:
                                      handler->GetSession()->GetPlayer()->GetPositionZ(),
                                      handler->GetSession()->GetPlayer()->GetOrientation(),
                                      handler->GetSession()->GetPlayer()->GetZoneId(),
-                                     targetGuid);
+                                     target->GetGUID());
         }
 
         return true;
     }
+
     // Summon group of player
-    static bool HandleGroupSummonCommand(ChatHandler* handler, char const* args)
+    static bool HandleGroupSummonCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
             return false;
+        }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
             return false;
 
-        Group* group = target->GetGroup();
+        auto targetPlayer = target->GetConnectedPlayer();
 
-        std::string nameLink = handler->GetNameLink(target);
+        Group* group = targetPlayer->GetGroup();
+
+        std::string nameLink = handler->playerLink(target->GetName());
 
         if (!group)
         {
@@ -924,23 +1037,30 @@ public:
         return true;
     }
 
-    static bool HandleReviveCommand(ChatHandler* handler, char const* args)
+    static bool HandleReviveCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        ObjectGuid targetGuid;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
-            return false;
-
-        if (target)
+        if (!target)
         {
-            target->ResurrectPlayer(!AccountMgr::IsPlayerAccount(target->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
-            target->SpawnCorpseBones();
-            target->SaveToDB(false, false);
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target)
+        {
+            return false;
+        }
+
+        if (target->IsConnected())
+        {
+            auto targetPlayer = target->GetConnectedPlayer();
+
+            targetPlayer->ResurrectPlayer(!AccountMgr::IsPlayerAccount(targetPlayer->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
+            targetPlayer->SpawnCorpseBones();
+            targetPlayer->SaveToDB(false, false);
         }
         else
         {
             CharacterDatabaseTransaction trans(nullptr);
-            Player::OfflineResurrect(targetGuid, trans);
+            Player::OfflineResurrect(target->GetGUID(), trans);
         }
 
         return true;
@@ -992,28 +1112,16 @@ public:
         Acore::ChatCommands::SendCommandHelpFor(*handler, cmd);
 
         if (cmd.empty())
+        {
             Acore::ChatCommands::SendCommandHelpFor(*handler, "help");
+        }
 
         return true;
     }
 
     // move item to other slot
-    static bool HandleItemMoveCommand(ChatHandler* handler, char const* args)
+    static bool HandleItemMoveCommand(ChatHandler* handler, uint8 srcSlot, uint8 dstSlot)
     {
-        if (!*args)
-            return false;
-
-        char const* param1 = strtok((char*)args, " ");
-        if (!param1)
-            return false;
-
-        char const* param2 = strtok(nullptr, " ");
-        if (!param2)
-            return false;
-
-        uint8 srcSlot = uint8(atoi(param1));
-        uint8 dstSlot = uint8(atoi(param2));
-
         if (srcSlot == dstSlot)
             return true;
 
@@ -1031,7 +1139,7 @@ public:
         return true;
     }
 
-    static bool HandleCooldownCommand(ChatHandler* handler, char const* args)
+    static bool HandleCooldownCommand(ChatHandler* handler, Optional<SpellInfo const*> spell)
     {
         Player* target = handler->getSelectedPlayer();
         if (!target)
@@ -1043,27 +1151,22 @@ public:
 
         std::string nameLink = handler->GetNameLink(target);
 
-        if (!*args)
+        if (!spell)
         {
             target->RemoveAllSpellCooldown();
             handler->PSendSysMessage(LANG_REMOVEALL_COOLDOWN, nameLink.c_str());
         }
         else
         {
-            // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-            uint32 spellIid = handler->extractSpellIdFromLink((char*)args);
-            if (!spellIid)
-                return false;
-
-            if (!sSpellMgr->GetSpellInfo(spellIid))
+            if (!SpellMgr::IsSpellValid(*spell))
             {
-                handler->PSendSysMessage(LANG_UNKNOWN_SPELL, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink.c_str());
+                handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell.value()->Id);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
-            target->RemoveSpellCooldown(spellIid, true);
-            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spellIid, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink.c_str());
+            target->RemoveSpellCooldown(spell.value()->Id, true);
+            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spell.value()->Id, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink.c_str());
         }
         return true;
     }
@@ -1132,31 +1235,41 @@ public:
         return true;
     }
     // Teleport player to last position
-    static bool HandleRecallCommand(ChatHandler* handler, char const* args)
+    static bool HandleRecallCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        Player* target;
-        if (!handler->extractPlayerTarget((char*)args, &target))
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
             return false;
+        }
+
+        auto targetPlayer = target->GetConnectedPlayer();
 
         // check online security
-        if (handler->HasLowerSecurity(target))
-            return false;
-
-        if (target->IsBeingTeleported())
+        if (handler->HasLowerSecurity(targetPlayer))
         {
-            handler->PSendSysMessage(LANG_IS_TELEPORTED, handler->GetNameLink(target).c_str());
+            return false;
+        }
+
+        if (targetPlayer->IsBeingTeleported())
+        {
+            handler->PSendSysMessage(LANG_IS_TELEPORTED, handler->playerLink(target->GetName()).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         // stop flight if need
-        if (target->IsInFlight())
+        if (targetPlayer->IsInFlight())
         {
-            target->GetMotionMaster()->MovementExpired();
-            target->CleanupAfterTaxiFlight();
+            targetPlayer->GetMotionMaster()->MovementExpired();
+            targetPlayer->CleanupAfterTaxiFlight();
         }
 
-        target->TeleportTo(target->m_recallMap, target->m_recallX, target->m_recallY, target->m_recallZ, target->m_recallO);
+        targetPlayer->TeleportTo(targetPlayer->m_recallMap, targetPlayer->m_recallX, targetPlayer->m_recallY, targetPlayer->m_recallZ, targetPlayer->m_recallO);
         return true;
     }
 
@@ -1175,6 +1288,7 @@ public:
             {
                 player->SaveToDB(false, false);
             }
+
             handler->SendSysMessage(LANG_PLAYER_SAVED);
             return true;
         }
@@ -1198,14 +1312,21 @@ public:
     }
 
     // kick player
-    static bool HandleKickPlayerCommand(ChatHandler* handler, char const* args)
+    static bool HandleKickPlayerCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<std::string_view> reason)
     {
-        Player* target = nullptr;
-        std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
-            return false;
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
 
-        if (handler->GetSession() && target == handler->GetSession()->GetPlayer())
+        if (!target || !target->IsConnected())
+        {
+            return false;
+        }
+
+        auto targetPlayer = target->GetConnectedPlayer();
+
+        if (handler->GetSession() && target->GetGUID() == handler->GetSession()->GetPlayer()->GetGUID())
         {
             handler->SendSysMessage(LANG_COMMAND_KICKSELF);
             handler->SetSentErrorMessage(true);
@@ -1213,23 +1334,21 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(targetPlayer))
             return false;
 
         std::string kickReasonStr = handler->GetAcoreString(LANG_NO_REASON);
-        if (*args != '\0')
+        if (reason && !reason->empty())
         {
-            char const* kickReason = strtok(nullptr, "\r");
-            if (kickReason != nullptr)
-                kickReasonStr = kickReason;
+            kickReasonStr = *reason->data();
         }
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
-            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), playerName.c_str(), kickReasonStr.c_str());
+            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), target->GetName().c_str(), kickReasonStr.c_str());
         else
-            handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, playerName.c_str());
+            handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, target->GetName().c_str());
 
-        target->GetSession()->KickPlayer("HandleKickPlayerCommand");
+        targetPlayer->GetSession()->KickPlayer("HandleKickPlayerCommand");
 
         return true;
     }
