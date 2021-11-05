@@ -239,7 +239,7 @@ endfunction()
 # Generates the actual script projects
 # Fills the STATIC_SCRIPT_MODULES and DYNAMIC_SCRIPT_MODULE_PROJECTS variables
 # which contain the names which scripts are linked statically/dynamically and
-# adds the sources of the static modules to the PRIVATE_SOURCES variable.
+# adds the sources of the static modules to the PRIVATE_SOURCES_SCRIPTS variable.
 foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
   GetPathToScriptModule(${SCRIPT_MODULE} SCRIPT_MODULE_PATH)
   ScriptModuleNameToVariable(${SCRIPT_MODULE} SCRIPT_MODULE_VARIABLE)
@@ -254,7 +254,7 @@ foreach(SCRIPT_MODULE ${SCRIPT_MODULE_LIST})
       # Add the module name to STATIC_SCRIPT_MODULES
       list(APPEND STATIC_SCRIPT_MODULES ${SCRIPT_MODULE})
       # Add the module content to the whole static module
-      CollectSourceFiles(${SCRIPT_MODULE_PATH} PRIVATE_SOURCES)
+      CollectSourceFiles(${SCRIPT_MODULE_PATH} PRIVATE_SOURCES_SCRIPTS)
     endif()
   elseif(${SCRIPT_MODULE_VARIABLE} STREQUAL "dynamic")
 
@@ -313,7 +313,7 @@ endforeach()
 # Generates the actual module projects
 # Fills the STATIC_SCRIPT_MODULES and DYNAMIC_SCRIPT_MODULE_PROJECTS variables
 # which contain the names which scripts are linked statically/dynamically and
-# adds the sources of the static modules to the PRIVATE_SOURCES variable.
+# adds the sources of the static modules to the PRIVATE_SOURCES_MODULES variable.
 foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
   GetPathToModuleSource(${SOURCE_MODULE} MODULE_SOURCE_PATH)
   ModuleNameToVariable(${SOURCE_MODULE} MODULE_MODULE_VARIABLE)
@@ -328,7 +328,8 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     if(${MODULE_MODULE_VARIABLE} STREQUAL "static")
 
       # Add the module content to the whole static module
-      CollectSourceFiles(${MODULE_SOURCE_PATH} PRIVATE_SOURCES)
+      CollectSourceFiles(${MODULE_SOURCE_PATH} PRIVATE_SOURCES_MODULES)
+      CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES)
 
       # Skip deprecated api loaders
       if (AC_SCRIPTS_INCLUDES MATCHES "${SOURCE_MODULE}")
@@ -351,6 +352,7 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     # Add the module content to the whole static module
     unset(MODULE_SOURCE_PRIVATE_SOURCES)
     CollectSourceFiles(${MODULE_SOURCE_PATH} MODULE_SOURCE_PRIVATE_SOURCES)
+    CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES)
 
     # Configure the scriptloader
     ConfigureScriptLoader(${SOURCE_MODULE} SCRIPT_MODULE_PRIVATE_SCRIPTLOADER ON ${SOURCE_MODULE})
@@ -372,7 +374,8 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
 
     target_include_directories(${MODULE_SOURCE_PROJECT_NAME}
       PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR})
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PUBLIC_INCLUDES})
 
     set_target_properties(${MODULE_SOURCE_PROJECT_NAME}
       PROPERTIES
@@ -409,7 +412,8 @@ list(REMOVE_DUPLICATES SCRIPT_MODULE_PRIVATE_SCRIPTLOADER)
 add_library(scripts STATIC
   ScriptLoader.h
   ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER}
-  ${PRIVATE_SOURCES})
+  ${PRIVATE_SOURCES_SCRIPTS}
+  ${PRIVATE_SOURCES_MODULES})
 
 target_link_libraries(scripts
   PRIVATE
@@ -419,7 +423,8 @@ target_link_libraries(scripts
 
 target_include_directories(scripts
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PUBLIC_INCLUDES})
 
 set_target_properties(scripts
   PROPERTIES
