@@ -15,9 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class PlayerCommand
+#ifndef _PLAYER_COMMAND_H
+#define _PLAYER_COMMAND_H
+
+namespace Acore
 {
-public:
-    static bool Learn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
-    static bool UnLearn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
+    // Used in player/character commands
+    namespace PlayerCommand
+    {
+        bool HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
+        bool HandleUnlearnSpellCommand(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
+    };
 };
+
+#endif // _PLAYER_COMMAND_H
