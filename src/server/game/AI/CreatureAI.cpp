@@ -89,10 +89,14 @@ inline bool IsValidCombatTarget(Creature* source, Player* target)
 void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRangeToNearestTarget /*= 250.0f*/)
 {
     if (!creature)
+    {
         creature = me;
+    }
 
     if (creature->IsInEvadeMode())
+    {
         return;
+    }
 
     Map* map = creature->GetMap();
     if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
@@ -103,7 +107,9 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
 
     Map::PlayerList const& playerList = map->GetPlayers();
     if (playerList.isEmpty())
+    {
         return;
+    }
 
     for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
     {
