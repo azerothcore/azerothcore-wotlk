@@ -164,6 +164,7 @@ public:
 
         void EnterCombat(Unit* who) override
         {
+            _events.Reset();
             _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
             _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
             _events.ScheduleEvent(EVENT_STRIKE, urand(12000, 20800));
@@ -190,7 +191,7 @@ public:
 
             _events.Update(diff);
 
-            switch (_events.ExecuteEvent())
+            switch (uint32 eventId = _events.ExecuteEvent())
             {
                 case EVENT_MORTAL_STRIKE:
                     DoCastVictim(SPELL_MORTAL_STRIKE);
