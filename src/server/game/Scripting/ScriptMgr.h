@@ -1989,7 +1989,7 @@ private:
         }
         else
         {
-            return nullptr
+            return nullptr;
         }
     }
 
