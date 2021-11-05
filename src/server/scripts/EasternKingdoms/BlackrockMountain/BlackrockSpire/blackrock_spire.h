@@ -74,7 +74,8 @@ enum CreaturesIds
     NPC_BLACKHAND_INCARCERATOR      = 10316,
     NPC_LORD_VICTOR_NEFARIUS        = 10162,
     NPC_UROK_MAGUS                  = 10602,
-    NPC_UROK_ENFORCER               = 10601
+    NPC_UROK_ENFORCER               = 10601,
+    NPC_FINKLE_EINHORN              = 10776
 };
 
 enum AdditionalData
@@ -84,7 +85,8 @@ enum AdditionalData
     EVENT_PYROGUARD_EMBERSEER       = 4884,
     AREATRIGGER                     = 1,
     AREATRIGGER_DRAGONSPIRE_HALL    = 2046,
-    AREATRIGGER_BLACKROCK_STADIUM   = 2026
+    AREATRIGGER_BLACKROCK_STADIUM   = 2026,
+    SAY_FINKLE_GANG                 = 0
 };
 
 enum GameObjectsIds

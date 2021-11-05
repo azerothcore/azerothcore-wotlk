@@ -130,6 +130,9 @@ public:
                     if (GetBossState(DATA_GYTH) == DONE)
                         creature->DisappearAndDie();
                     break;
+                case NPC_FINKLE_EINHORN:
+                    creature->AI()->Talk(SAY_FINKLE_GANG);
+                    break;
             }
         }
 
