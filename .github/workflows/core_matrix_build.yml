@@ -1,4 +1,4 @@
-name: core-modules-build
+name: core-build
 on:
   push:
     branches:
@@ -10,32 +10,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-modules:
+  build:
     strategy:
       fail-fast: false
       matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
-        os: [ubuntu-20.04]
-        compiler: [clang]
-        modules: [with]
+        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
+        include:
+          - os: ubuntu-20.04
+            compiler: clang12
+          - os: ubuntu-20.04
+            compiler: clang11
+          - os: ubuntu-18.04
+            compiler: clang10
+          - os: ubuntu-18.04
+            compiler: gcc8
+          - os: ubuntu-20.04
+            compiler: gcc # default in 20.04 is gcc 9
+          - os: ubuntu-20.04
+            compiler: gcc10
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
+    name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.event.label.name == 'cpp' || github.event.label.name == 'run-build' || github.ref == 'refs/heads/master')
     steps:
       - uses: actions/checkout@v2
-      - name: Checkout modules
-        run: ./apps/ci/ci-install-modules.sh
-        if: matrix.modules == 'with'
       - name: Cache
         uses: actions/cache@v2
         with:
           path: var/ccache
-          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}
       - name: Configure OS
         run: source ./acore.sh install-deps
         env:
