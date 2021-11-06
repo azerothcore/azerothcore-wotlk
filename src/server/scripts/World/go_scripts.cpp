@@ -170,12 +170,22 @@ class go_arena_ready_marker : public GameObjectScript
 public:
     go_arena_ready_marker() : GameObjectScript("go_arena_ready_marker") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    struct go_arena_ready_markerAI : GameObjectAI
     {
-        if (Battleground* bg = player->GetBattleground())
-            bg->ReadyMarkerClicked(player);
+        go_arena_ready_markerAI(GameObject* go) : GameObjectAI(go) { }
 
-        return false;
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (Battleground* bg = player->GetBattleground())
+                bg->ReadyMarkerClicked(player);
+
+            return false;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_arena_ready_markerAI(go);
     }
 };
 
@@ -204,19 +214,22 @@ class go_ethereum_prison : public GameObjectScript
 public:
     go_ethereum_prison() : GameObjectScript("go_ethereum_prison") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_ethereum_prisonAI : GameObjectAI
     {
-        int Random = rand() % (sizeof(NpcPrisonEntry) / sizeof(uint32));
+        go_ethereum_prisonAI(GameObject* go) : GameObjectAI(go) { }
 
-        if (Creature* creature = player->SummonCreature(NpcPrisonEntry[Random], go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player),
-                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            if (!creature->IsHostileTo(player))
-            {
-                uint32 Spell = 0;
+            int Random = rand() % (sizeof(NpcPrisonEntry) / sizeof(uint32));
 
-                switch (creature->GetEntry())
+            if (Creature* creature = player->SummonCreature(NpcPrisonEntry[Random], go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            {
+                if (!creature->IsHostileTo(player))
                 {
+                    uint32 Spell = 0;
+
+                    switch (creature->GetEntry())
+                    {
                     case 22811:
                         Spell = SPELL_REP_LC;
                         break;
@@ -235,14 +248,20 @@ public:
                     case 22814:
                         Spell = SPELL_REP_SPOR;
                         break;
+                    }
+
+                    if (Spell)
+                        creature->CastSpell(player, Spell, false);
                 }
-
-                if (Spell)
-                    creature->CastSpell(player, Spell, false);
             }
-        }
 
-        return false;
+            return false;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_ethereum_prisonAI(go);
     }
 };
 
@@ -1387,27 +1406,31 @@ class go_jotunheim_cage : public GameObjectScript
 public:
     go_jotunheim_cage() : GameObjectScript("go_jotunheim_cage") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_jotunheim_cageAI : GameObjectAI
     {
-        go->UseDoorOrButton();
-        Creature* pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_HUMAN, 5.0f, true);
-        if (!pPrisoner)
+        go_jotunheim_cageAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_TROLL, 5.0f, true);
+            go->UseDoorOrButton();
+            Creature* pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_HUMAN, 5.0f, true);
             if (!pPrisoner)
             {
-                pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_ORC, 5.0f, true);
+                pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_TROLL, 5.0f, true);
                 if (!pPrisoner)
-                    pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_NE, 5.0f, true);
+                {
+                    pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_ORC, 5.0f, true);
+                    if (!pPrisoner)
+                        pPrisoner = go->FindNearestCreature(NPC_EBON_BLADE_PRISONER_NE, 5.0f, true);
+                }
             }
-        }
-        if (!pPrisoner || !pPrisoner->IsAlive())
-            return false;
+            if (!pPrisoner || !pPrisoner->IsAlive())
+                return false;
 
-        pPrisoner->DespawnOrUnsummon();
-        player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN);
-        switch (pPrisoner->GetEntry())
-        {
+            pPrisoner->DespawnOrUnsummon();
+            player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN);
+            switch (pPrisoner->GetEntry())
+            {
             case NPC_EBON_BLADE_PRISONER_HUMAN:
                 player->CastSpell(player, SPELL_SUMMON_BLADE_KNIGHT_H, true);
                 break;
@@ -1420,8 +1443,14 @@ public:
             case NPC_EBON_BLADE_PRISONER_ORC:
                 player->CastSpell(player, SPELL_SUMMON_BLADE_KNIGHT_ORC, true);
                 break;
+            }
+            return true;
         }
-        return true;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_jotunheim_cageAI(go);
     }
 };
 
@@ -1437,14 +1466,24 @@ class go_table_theka : public GameObjectScript
 public:
     go_table_theka() : GameObjectScript("go_table_theka") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_table_thekaAI : public GameObjectAI
     {
-        if (player->GetQuestStatus(QUEST_SPIDER_GOLD) == QUEST_STATUS_INCOMPLETE)
-            player->AreaExploredOrEventHappens(QUEST_SPIDER_GOLD);
+        go_table_thekaAI(GameObject* go) : GameObjectAI(go) { }
 
-        SendGossipMenuFor(player, GOSSIP_TABLE_THEKA, go->GetGUID());
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (player->GetQuestStatus(QUEST_SPIDER_GOLD) == QUEST_STATUS_INCOMPLETE)
+                player->AreaExploredOrEventHappens(QUEST_SPIDER_GOLD);
 
-        return true;
+            SendGossipMenuFor(player, GOSSIP_TABLE_THEKA, go->GetGUID());
+
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_table_thekaAI(go);
     }
 };
 

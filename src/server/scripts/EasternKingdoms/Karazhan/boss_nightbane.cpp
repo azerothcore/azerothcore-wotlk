@@ -23,6 +23,7 @@ SDCategory: Karazhan
 EndScriptData */
 
 #include "karazhan.h"
+#include "GameObjectAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
@@ -434,16 +435,26 @@ class go_blackened_urn : public GameObjectScript
 public:
     go_blackened_urn() : GameObjectScript("go_blackened_urn") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_blackened_urnAI : public GameObjectAI
     {
-        if (InstanceScript* pInstance = go->GetInstanceScript())
-        {
-            if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
-                if (Creature* cr = ObjectAccessor::GetCreature(*player, pInstance->GetGuidData(DATA_NIGHTBANE)))
-                    cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
-        }
+        go_blackened_urnAI(GameObject* go) : GameObjectAI(go) { }
 
-        return false;
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (InstanceScript* pInstance = go->GetInstanceScript())
+            {
+                if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*player, pInstance->GetGuidData(DATA_NIGHTBANE)))
+                        cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
+            }
+
+            return false;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_blackened_urnAI(go);
     }
 };
 

@@ -55,17 +55,6 @@ public:
         return GetGnomereganAI<npc_kernobeeAI>(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_A_FINE_MESS)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->AI()->SetGUID(player->GetGUID(), 0);
-            creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, M_PI, MOTION_SLOT_CONTROLLED);
-        }
-        return true;
-    }
-
     struct npc_kernobeeAI : public PassiveAI
     {
         npc_kernobeeAI(Creature* creature) : PassiveAI(creature)
@@ -79,6 +68,16 @@ public:
         void SetGUID(ObjectGuid guid, int32) override
         {
             playerGUID = guid;
+        }
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_A_FINE_MESS)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                SetGUID(player->GetGUID(), 0);
+                me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, M_PI, MOTION_SLOT_CONTROLLED);
+            }
         }
 
         void UpdateAI(uint32 diff) override

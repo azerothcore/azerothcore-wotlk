@@ -47,7 +47,7 @@ public:
     {
         npc_maredis_firestarAI(Creature* creature) : CreatureAI(creature) {}
 
-        void sGossipHello(Player* player) override
+        bool GossipHello(Player* player) override
         {
             // If player has 2 different librams on him he will only see top most one.
             // Count is default 1. In bank is default false.
@@ -76,13 +76,16 @@ public:
                 player->PrepareGossipMenu(me, GOSSIP_LIBRAM_OF_VORACITY);
                 player->SendPreparedGossip(me);
             }
+
+            return false;
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             // All gossip menus only have one option. Conditions are handled in db.
             player->PrepareQuestMenu(me->GetGUID());
             player->SendPreparedQuest(me->GetGUID());
+            return false;
         }
     };
 };

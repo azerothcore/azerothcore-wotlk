@@ -335,72 +335,68 @@ public:
                 }
             }
         }
-    };
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        npc_barnesAI* pBarnesAI = CAST_AI(npc_barnes::npc_barnesAI, creature->AI());
-
-        switch (action)
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
+            ClearGossipMenuFor(player);
+
+            switch (action)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, OZ_GOSSIP2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 8971, creature->GetGUID());
+                SendGossipMenuFor(player, 8971, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+2:
+            case GOSSIP_ACTION_INFO_DEF + 2:
                 CloseGossipMenuFor(player);
-                pBarnesAI->m_uiEventId = urand(EVENT_OZ, EVENT_RAJ);
-                pBarnesAI->StartEvent();
+                m_uiEventId = urand(EVENT_OZ, EVENT_RAJ);
+                StartEvent();
                 break;
-            case GOSSIP_ACTION_INFO_DEF+3:
+            case GOSSIP_ACTION_INFO_DEF + 3:
                 CloseGossipMenuFor(player);
-                pBarnesAI->m_uiEventId = EVENT_OZ;
+                m_uiEventId = EVENT_OZ;
                 break;
-            case GOSSIP_ACTION_INFO_DEF+4:
+            case GOSSIP_ACTION_INFO_DEF + 4:
                 CloseGossipMenuFor(player);
-                pBarnesAI->m_uiEventId = EVENT_HOOD;
+                m_uiEventId = EVENT_HOOD;
                 break;
-            case GOSSIP_ACTION_INFO_DEF+5:
+            case GOSSIP_ACTION_INFO_DEF + 5:
                 CloseGossipMenuFor(player);
-                pBarnesAI->m_uiEventId = EVENT_RAJ;
+                m_uiEventId = EVENT_RAJ;
                 break;
+            }
+
+            return true;
         }
 
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (InstanceScript* instance = creature->GetInstanceScript())
+        bool GossipHello(Player* player) override
         {
-            // Check for death of Moroes and if opera event is not done already
-            if (instance->GetBossState(DATA_MOROES) == DONE &&  instance->GetBossState(DATA_OPERA_PERFORMANCE) != DONE)
+            if (InstanceScript* instance = me->GetInstanceScript())
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, OZ_GOSSIP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-                if (player->IsGameMaster())
+                // Check for death of Moroes and if opera event is not done already
+                if (instance->GetBossState(DATA_MOROES) == DONE && instance->GetBossState(DATA_OPERA_PERFORMANCE) != DONE)
                 {
-                    AddGossipItemFor(player, GOSSIP_ICON_DOT, OZ_GM_GOSSIP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    AddGossipItemFor(player, GOSSIP_ICON_DOT, OZ_GM_GOSSIP2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                    AddGossipItemFor(player, GOSSIP_ICON_DOT, OZ_GM_GOSSIP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                }
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, OZ_GOSSIP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-                if (npc_barnesAI* pBarnesAI = CAST_AI(npc_barnes::npc_barnesAI, creature->AI()))
-                {
-                    if (!pBarnesAI->RaidWiped)
-                        SendGossipMenuFor(player, 8970, creature->GetGUID());
+                    if (player->IsGameMaster())
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_DOT, OZ_GM_GOSSIP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                        AddGossipItemFor(player, GOSSIP_ICON_DOT, OZ_GM_GOSSIP2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                        AddGossipItemFor(player, GOSSIP_ICON_DOT, OZ_GM_GOSSIP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                    }
+
+                    if (!RaidWiped)
+                        SendGossipMenuFor(player, 8970, me->GetGUID());
                     else
-                        SendGossipMenuFor(player, 8975, creature->GetGUID());
+                        SendGossipMenuFor(player, 8975, me->GetGUID());
 
                     return true;
                 }
             }
-        }
 
-        SendGossipMenuFor(player, 8978, creature->GetGUID());
-        return true;
-    }
+            SendGossipMenuFor(player, 8978, me->GetGUID());
+            return true;
+        }
+    };
 
     CreatureAI* GetAI(Creature* creature) const override
     {

@@ -340,6 +340,75 @@ public:
             _state = param;
         }
 
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetGUID() != me->GetOwnerGUID())
+                return true;
+
+            if (!me->HasAura(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S))
+            {
+                uint8 _state = me->AI()->GetData(0 /*GET_DATA_STATE*/);
+                if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_VENDOR)
+                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Visit a trader.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_BANK)
+                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Visit a bank.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
+                if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_MAILBOX)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Visit a mailbox.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
+            }
+
+            for (uint8 i = RACE_HUMAN; i < MAX_RACES; ++i)
+                if (me->AI()->GetData(i) == uint32(true))
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, argentBanners[i].text, GOSSIP_SENDER_MAIN, argentBanners[i].spell);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 action) override
+        {
+            CloseGossipMenuFor(player);
+            uint32 spellId = 0;
+            switch (action)
+            {
+            case GOSSIP_ACTION_TRADE:
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
+                player->GetSession()->SendListInventory(me->GetGUID());
+                spellId = player->GetTeamId(true) ? SPELL_AURA_SHOP_G : SPELL_AURA_SHOP_S;
+                DoAction(ARGENT_PONY_STATE_VENDOR);
+                break;
+            case GOSSIP_ACTION_BANK:
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BANKER);
+                player->GetSession()->SendShowBank(player->GetGUID());
+                spellId = player->GetTeamId(true) ? SPELL_AURA_BANK_G : SPELL_AURA_BANK_S;
+                DoAction(ARGENT_PONY_STATE_BANK);
+                break;
+            case GOSSIP_ACTION_MAILBOX:
+            {
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
+                player->GetSession()->SendShowMailBox(me->GetGUID());
+                spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
+                DoAction(ARGENT_PONY_STATE_MAILBOX);
+                break;
+            }
+            default:
+                if (action > 60000)
+                {
+                    DoAction(action);
+                    me->CastSpell(me, action, true);
+                }
+                return true;
+            }
+
+            if (spellId && !me->HasAura(spellId))
+            {
+                me->CastSpell(me, spellId, true);
+                player->AddSpellCooldown(spellId, 0, 3 * MINUTE * IN_MILLISECONDS);
+                player->AddSpellCooldown(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S, 0, 3 * MINUTE * IN_MILLISECONDS + 4 * HOUR * IN_MILLISECONDS);
+                me->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+            }
+            return true;
+        }
+
     private:
         bool _init;
         uint8 _state;
@@ -347,75 +416,6 @@ public:
         bool _banners[MAX_RACES];
         uint32 _lastAura;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetGUID() != creature->GetOwnerGUID())
-            return true;
-
-        if (!creature->HasAura(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S))
-        {
-            uint8 _state = creature->AI()->GetData(0 /*GET_DATA_STATE*/);
-            if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_VENDOR)
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Visit a trader.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-            if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_BANK)
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Visit a bank.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
-            if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_MAILBOX)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Visit a mailbox.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
-        }
-
-        for (uint8 i = RACE_HUMAN; i < MAX_RACES; ++i)
-            if (creature->AI()->GetData(i) == uint32(true))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, argentBanners[i].text, GOSSIP_SENDER_MAIN, argentBanners[i].spell);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 action) override
-    {
-        CloseGossipMenuFor(player);
-        uint32 spellId = 0;
-        switch (action)
-        {
-            case GOSSIP_ACTION_TRADE:
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
-                player->GetSession()->SendListInventory(creature->GetGUID());
-                spellId = player->GetTeamId(true) ? SPELL_AURA_SHOP_G : SPELL_AURA_SHOP_S;
-                creature->AI()->DoAction(ARGENT_PONY_STATE_VENDOR);
-                break;
-            case GOSSIP_ACTION_BANK:
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BANKER);
-                player->GetSession()->SendShowBank(player->GetGUID());
-                spellId = player->GetTeamId(true) ? SPELL_AURA_BANK_G : SPELL_AURA_BANK_S;
-                creature->AI()->DoAction(ARGENT_PONY_STATE_BANK);
-                break;
-            case GOSSIP_ACTION_MAILBOX:
-                {
-                    creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
-                    player->GetSession()->SendShowMailBox(creature->GetGUID());
-                    spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
-                    creature->AI()->DoAction(ARGENT_PONY_STATE_MAILBOX);
-                    break;
-                }
-            default:
-                if (action > 60000)
-                {
-                    creature->AI()->DoAction(action);
-                    creature->CastSpell(creature, action, true);
-                }
-                return true;
-        }
-
-        if (spellId && !creature->HasAura(spellId))
-        {
-            creature->CastSpell(creature, spellId, true);
-            player->AddSpellCooldown(spellId, 0, 3 * MINUTE * IN_MILLISECONDS);
-            player->AddSpellCooldown(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S, 0, 3 * MINUTE * IN_MILLISECONDS + 4 * HOUR * IN_MILLISECONDS);
-            creature->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
-        }
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
