@@ -128,37 +128,37 @@ public:
                 }
             }
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_brewfest_keg_reciverAI(creature);
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction) override
-    {
-        switch (uiAction)
+        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 uiAction) override
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
+            switch (uiAction)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
                 player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
                 player->CastSpell(player, 43883, true);
                 player->CastSpell(player, 44262, true);
                 break;
+            }
+            return true;
         }
-        return true;
-    }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (!player->HasSpellCooldown(SPELL_COOLDOWN_CHECKER) && player->GetQuestRewardStatus(player->GetTeamId() == TEAM_ALLIANCE ? QUEST_THERE_AND_BACK_AGAIN_A : QUEST_THERE_AND_BACK_AGAIN_H))
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Do you have additional work?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, (me->GetEntry() == NPC_NEILL_RAMSTEIN ? 8934 : 8976), me->GetGUID());
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (!player->HasSpellCooldown(SPELL_COOLDOWN_CHECKER) && player->GetQuestRewardStatus(player->GetTeamId() == TEAM_ALLIANCE ? QUEST_THERE_AND_BACK_AGAIN_A : QUEST_THERE_AND_BACK_AGAIN_H))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Do you have additional work?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, (creature->GetEntry() == NPC_NEILL_RAMSTEIN ? 8934 : 8976), creature->GetGUID());
-        return true;
+        return new npc_brewfest_keg_reciverAI(creature);
     }
 };
 
@@ -1733,7 +1733,7 @@ public:
     {
         npc_coren_direbrewAI(Creature* creature) : ScriptedAI(creature), _summons(me) {}
 
-        void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
+        bool GossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
         {
             if (menuId != GOSSIP_ID)
             {
@@ -1749,6 +1749,8 @@ public:
             {
                 CloseGossipMenuFor(player);
             }
+
+            return false;
         }
 
         bool CanBeSeen(Player const* player) override

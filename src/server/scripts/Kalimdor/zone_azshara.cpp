@@ -255,12 +255,13 @@ public:
             }
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             CloseGossipMenuFor(player);
             me->CastSpell(player, SPELL_GIVE_SOUTHFURY_MOONSTONE, true);
             MustDieTimer = 3000;
             MustDie = true;
+            return true;
         }
 
         void MovementInform(uint32 type, uint32 id) override
