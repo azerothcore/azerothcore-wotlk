@@ -292,7 +292,7 @@ public:
                     ArenaSpectators.push_back(creature->GetGUID());
                     if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
                     {
-                        creature->setFaction(FACTION_NEUTRAL);
+                        creature->SetFaction(FACTION_NEUTRAL);
                         creature->SetReactState(REACT_DEFENSIVE);
                     }
                     break;
@@ -304,7 +304,7 @@ public:
                     }
                     if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
                     {
-                        creature->setFaction(FACTION_NEUTRAL);
+                        creature->SetFaction(FACTION_NEUTRAL);
                         creature->SetReactState(REACT_DEFENSIVE);
                     }
                     break;
@@ -473,7 +473,7 @@ public:
                         {
                             if (Creature* spectator = instance->GetCreature(itr))
                             {
-                                spectator->setFaction(FACTION_NEUTRAL);
+                                spectator->SetFaction(FACTION_NEUTRAL);
                                 spectator->SetReactState(REACT_DEFENSIVE);
                             }
                         }
