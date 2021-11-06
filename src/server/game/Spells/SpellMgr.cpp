@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlefieldMgr.h"
@@ -12,7 +23,7 @@
 #include "DBCStores.h"
 #include "GameGraveyard.h"
 #include "InstanceScript.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SharedDefines.h"
@@ -671,14 +682,24 @@ SpellGroupStackFlags SpellMgr::CheckSpellGroupStackRules(SpellInfo const* spellI
 {
     uint32 spellid_1 = spellInfo1->GetFirstRankSpell()->Id;
     uint32 spellid_2 = spellInfo2->GetFirstRankSpell()->Id;
-    // xinef: dunno why i added this
-    if (spellid_1 == spellid_2 && remove && !areaAura)
-        return SPELL_GROUP_STACK_FLAG_NONE;
 
     uint32 groupId = GetSpellGroup(spellid_1);
+
+    SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
+
+    // xinef: dunno why i added this
+    if (spellid_1 == spellid_2 && remove && !areaAura)
+    {
+        if (flag1 & SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK)
+        {
+            return SPELL_GROUP_STACK_FLAG_EXCLUSIVE;
+        }
+
+        return SPELL_GROUP_STACK_FLAG_NONE;
+    }
+
     if (groupId > 0 && groupId == GetSpellGroup(spellid_2))
     {
-        SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
         SpellGroupSpecialFlags flag2 = GetSpellGroupSpecialFlags(spellid_2);
         SpellGroupStackFlags additionFlag = SPELL_GROUP_STACK_FLAG_NONE;
         // xinef: first flags are used for elixir stacking rules
@@ -714,10 +735,14 @@ SpellProcEventEntry const* SpellMgr::GetSpellProcEvent(uint32 spellId) const
     return nullptr;
 }
 
-bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const
+bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const
 {
     // No extra req need
     uint32 procEvent_procEx = PROC_EX_NONE;
+
+    uint32 procFlags = eventInfo.GetTypeMask();
+    uint32 procExtra = eventInfo.GetHitMask();
+    SpellInfo const* procSpellInfo = eventInfo.GetSpellInfo();
 
     // check prockFlags for condition
     if ((procFlags & EventProcFlag) == 0)
@@ -776,7 +801,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
         procEvent_procEx = spellProcEvent->procEx;
 
         // For melee triggers
-        if (procSpell == nullptr)
+        if (!procSpellInfo)
         {
             // Check (if set) for school (melee attack have Normal school)
             if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0)
@@ -785,22 +810,34 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
         else // For spells need check school/spell family/family mask
         {
             // Check (if set) for school
-            if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & procSpell->SchoolMask) == 0)
+            if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & procSpellInfo->SchoolMask) == 0)
                 return false;
 
             // Check (if set) for spellFamilyName
-            if (spellProcEvent->spellFamilyName && (spellProcEvent->spellFamilyName != procSpell->SpellFamilyName))
+            if (spellProcEvent->spellFamilyName && (spellProcEvent->spellFamilyName != procSpellInfo->SpellFamilyName))
                 return false;
 
             // spellFamilyName is Ok need check for spellFamilyMask if present
             if (spellProcEvent->spellFamilyMask)
             {
-                if (!(spellProcEvent->spellFamilyMask & procSpell->SpellFamilyFlags))
+                if (!(spellProcEvent->spellFamilyMask & procSpellInfo->SpellFamilyFlags))
                     return false;
                 hasFamilyMask = true;
                 // Some spells are not considered as active even with have spellfamilyflags
                 if (!(procEvent_procEx & PROC_EX_ONLY_ACTIVE_SPELL))
                     active = true;
+            }
+
+            // Check tick numbers
+            if (procEvent_procEx & PROC_EX_ONLY_FIRST_TICK)
+            {
+                if (Spell const* procSpell = eventInfo.GetProcSpell())
+                {
+                    if (procSpell->GetTriggeredByAuraTickNumber() > 1)
+                    {
+                        return false;
+                    }
+                }
             }
         }
     }
@@ -2655,10 +2692,8 @@ void SpellMgr::LoadSpellInfoStore()
 void SpellMgr::UnloadSpellInfoStore()
 {
     for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
-    {
-        if (mSpellInfoMap[i])
-            delete mSpellInfoMap[i];
-    }
+        delete mSpellInfoMap[i];
+
     mSpellInfoMap.clear();
 }
 
@@ -2691,58 +2726,75 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
 
 void SpellMgr::LoadSpellCustomAttr()
 {
-    uint32 oldMSTime = getMSTime();
-    uint32 customAttrTime = getMSTime();
+    uint32 const oldMSTime = getMSTime();
+    uint32 const customAttrTime = getMSTime();
     uint32 count;
 
     QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes FROM spell_custom_attr");
 
     if (!result)
+    {
         LOG_INFO("server.loading", ">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
+    }
     else
     {
         for (count = 0; result->NextRow(); ++count)
         {
-            Field* fields = result->Fetch();
+            Field const* fields = result->Fetch();
 
-            uint32 spellId = fields[0].GetUInt32();
+            uint32 const spellId = fields[0].GetUInt32();
             uint32 attributes = fields[1].GetUInt32();
 
             SpellInfo* spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
             {
-                LOG_INFO("spells", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
+                LOG_INFO("sql.sql", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
                 continue;
             }
 
-            if ((attributes & SPELL_ATTR0_CU_NEGATIVE) != 0)
+            if (attributes & SPELL_ATTR0_CU_NEGATIVE)
             {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (spellInfo->Effects[i].IsEffect())
-                        continue;
-
-                    if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
                     {
-                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) && (attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
+                        {
+                            LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u and SPELL_ATTR0_CU_POSITIVE_EFF%u attributes for spell %u which cannot stack together. Attributes will not get applied", static_cast<uint32>(i), static_cast<uint32>(i), spellId);
+                            attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)|(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
+                        }
                         continue;
+                    }
+
+                    if (attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i))
+                    {
+                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", static_cast<uint32>(i), spellId, static_cast<uint32>(i));
+                        attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i);
                     }
                 }
             }
 
-            if ((attributes & SPELL_ATTR0_CU_POSITIVE) != 0)
+            if (attributes & SPELL_ATTR0_CU_POSITIVE)
             {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (spellInfo->Effects[i].IsEffect())
-                        continue;
-
-                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
                     {
-                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
                         continue;
                     }
+
+                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
+                    {
+                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        attributes &= ~(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
+                    }
                 }
+            }
+
+            if ((attributes & SPELL_ATTR0_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_REJECT_AURA_SAVING))
+            {
+                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u. Both attributes will get applied", spellId);
+                attributes &= ~(SPELL_ATTR0_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_REJECT_AURA_SAVING);
             }
 
             spellInfo->AttributesCu |= attributes;
@@ -2778,6 +2830,20 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             switch (spellInfo->Effects[j].ApplyAuraName)
             {
+                case SPELL_AURA_MOD_INVISIBILITY:
+                {
+                    switch (spellInfo->Id)
+                    {
+                        // Exceptions
+                        case 44801: // Spectral Invisibility (Kalecgos, SWP)
+                        case 46021: // Spectral Realm (SWP)
+                            break;
+                        default:
+                            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+                            break;
+                    }
+                }
+                break;
                 case SPELL_AURA_PERIODIC_HEAL:
                 case SPELL_AURA_PERIODIC_DAMAGE:
                 case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
@@ -2806,6 +2872,11 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_MOD_FEAR:
                 case SPELL_AURA_MOD_STUN:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                    break;
+                case SPELL_AURA_BIND_SIGHT:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                    break;
+                default:
                     break;
             }
 
@@ -3147,7 +3218,6 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
-            case 13877: // Blade Flurry (Rogue Spell) should ignore armor and share damage to 2nd mob
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
@@ -3220,6 +3290,12 @@ void SpellMgr::LoadSpellCustomAttr()
             case 6197: // Eagle Eye
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                 break;
+            case 50315: // Disco Ball
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                break;
+            case 14183: // Premeditation
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
+                break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
             // Envenom
@@ -3258,6 +3334,21 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
                 break;
         }
+
+        if (spellInfo->Speed > 0.0f)
+        {
+            if (SpellVisualEntry const* spellVisual = sSpellVisualStore.LookupEntry(spellInfo->SpellVisual[0]))
+            {
+                if (spellVisual->HasMissile)
+                {
+                    if (spellVisual->MissileModel == -4 || spellVisual->MissileModel == -5)
+                    {
+                        spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEEDS_AMMO_DATA;
+                    }
+                }
+            }
+        }
+       spellInfo->_InitializeExplicitTargetMask();
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
@@ -3326,7 +3417,9 @@ void SpellMgr::LoadDbcDataCorrections()
         9910,   // Thorns (Rank 6)
         26992,  // Thorns (Rank 7)
         53307,  // Thorns (Rank 8)
-        53352   // Explosive Shot (trigger)
+        53352,  // Explosive Shot (trigger)
+        50783,  // Slam (Triggered spell)
+        20647   // Execute (Triggered spell)
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
@@ -3379,16 +3472,6 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     ApplySpellFix({
-        45257,  // Using Steam Tonk Controller
-        45440,  // Steam Tonk Controller
-        60256,  // Collect Sample
-        45634   // Neural Needle
-        }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;    // Crashes client on pressing ESC
-    });
-
-    ApplySpellFix({
         40244,  // Simon Game Visual
         40245,  // Simon Game Visual
         40246,  // Simon Game Visual
@@ -3421,6 +3504,18 @@ void SpellMgr::LoadDbcDataCorrections()
         42818,  // Headless Horseman - Wisp Flight Port
         42821   // Headless Horseman - Wisp Flight Missile
         }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 6; // 100 yards
+    });
+
+    // Spirit of Kirith
+    ApplySpellFix({ 10853 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 3; // 1min
+    });
+
+    // Headless Horseman - Start Fire
+    ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
     {
         spellInfo->RangeIndex = 6; // 100 yards
     });
@@ -4448,13 +4543,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
     });
 
-    // Sunder Armor
-    ApplySpellFix({ 58567 }, [](SpellEntry* spellInfo)
-    {
-        // trigger, remove spellfamilyflags because of glyph of sunder armor
-        spellInfo->SpellFamilyFlags = flag96(0x0, 0x0, 0x0);
-    });
-
     // Sunder Armor - Old Ranks
     ApplySpellFix({ 7405, 8380, 11596, 11597, 25225, 47467 }, [](SpellEntry* spellInfo)
     {
@@ -4553,8 +4641,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx &= ~SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
     });
 
+    ApplySpellFix({ 49376 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_3_YARDS; // 3yd
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
     // Feral Charge - Cat
-    ApplySpellFix({ 49376, 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
@@ -6700,7 +6794,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
         spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Still At It
@@ -6948,12 +7041,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
     });
 
-    // Leading the Charge (13380), All Infra-Green bomber quests
-    ApplySpellFix({ 59059 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
-    });
-
     // Dark Horizon (12664), Reunited (12663)
     ApplySpellFix({ 52190 }, [](SpellEntry* spellInfo)
     {
@@ -7086,7 +7173,6 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Alchemist's Stone
@@ -7291,6 +7377,50 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
     });
 
+    // 16097 Shadow Hunter Vosh'gajin - Hex
+    ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->CastingTimeIndex = 16;
+    });
+
+    // Sacred Cleansing
+    ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 5; // 40yd
+    });
+
+    // 29519 - Silithyst
+    ApplySpellFix({ 29519 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_DECREASE_SPEED;
+        spellInfo->EffectBasePoints[EFFECT_0] = -25;
+    });
+
+    // Ulduar: Kologarn Focused Eyebeam Summon Trigger
+    ApplySpellFix({ 63342 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+    });
+
+    // Item: Luffa removes only 1 bleed effect
+    ApplySpellFix({ 23595 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[EFFECT_0] = 1;
+    });
+
+    // Eye of Kilrogg Passive
+    ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+    });
+
+    // Conflagration, Horseman's Cleave
+    ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
@@ -7351,6 +7481,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 if (spellInfo->SpellIconID == 2721 && spellInfo->SpellFamilyFlags[0] & 0x2)
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
                 break;
+        }
+
+        // Recklessness/Shield Wall/Retaliation
+        if (spellInfo->Category == 132 && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
+        {
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
         }
     }
 

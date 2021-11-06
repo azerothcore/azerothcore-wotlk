@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_MAP_H
@@ -14,8 +25,8 @@
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
 #include "GridDefines.h"
-#include "GridRefManager.h"
-#include "MapRefManager.h"
+#include "GridRefMgr.h"
+#include "MapRefMgr.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
@@ -76,6 +87,8 @@ struct map_fileheader
     uint32 heightMapSize;
     uint32 liquidMapOffset;
     uint32 liquidMapSize;
+    uint32 holesOffset;
+    uint32 holesSize;
 };
 
 #define MAP_AREA_NO_AREA      0x0001
@@ -115,7 +128,7 @@ struct map_liquidHeader
     float  liquidLevel;
 };
 
-enum ZLiquidStatus
+enum LiquidStatus
 {
     LIQUID_MAP_NO_WATER     = 0x00000000,
     LIQUID_MAP_ABOVE_WATER  = 0x00000001,
@@ -123,6 +136,9 @@ enum ZLiquidStatus
     LIQUID_MAP_IN_WATER     = 0x00000004,
     LIQUID_MAP_UNDER_WATER  = 0x00000008
 };
+
+#define MAP_LIQUID_STATUS_SWIMMING (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)
+#define MAP_LIQUID_STATUS_IN_CONTACT (MAP_LIQUID_STATUS_SWIMMING | LIQUID_MAP_WATER_WALK)
 
 #define MAP_LIQUID_TYPE_NO_WATER    0x00
 #define MAP_LIQUID_TYPE_WATER       0x01
@@ -135,12 +151,30 @@ enum ZLiquidStatus
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
 #define MAP_LIQUID_TYPE_WMO_WATER   0x20
 
+#define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
+#define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
+#define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
+#define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
+#define MIN_UNLOAD_DELAY      1                             // immediate unload
+
 struct LiquidData
 {
-    uint32 type_flags;
-    uint32 entry;
-    float  level;
-    float  depth_level;
+    LiquidData() : Entry(0), Flags(0), Level(INVALID_HEIGHT), DepthLevel(INVALID_HEIGHT), Status(LIQUID_MAP_NO_WATER) { }
+
+    uint32 Entry;
+    uint32 Flags;
+    float  Level;
+    float  DepthLevel;
+    LiquidStatus Status;
+};
+
+struct PositionFullTerrainStatus
+{
+    PositionFullTerrainStatus() : areaId(0), floorZ(INVALID_HEIGHT), outdoors(false) { }
+    uint32 areaId;
+    float floorZ;
+    bool outdoors;
+    LiquidData liquidInfo;
 };
 
 enum LineOfSightChecks
@@ -186,10 +220,13 @@ class GridMap
     uint8 _liquidOffY;
     uint8 _liquidWidth;
     uint8 _liquidHeight;
+    uint16* _holes;
 
     bool loadAreaData(FILE* in, uint32 offset, uint32 size);
     bool loadHeightData(FILE* in, uint32 offset, uint32 size);
     bool loadLiquidData(FILE* in, uint32 offset, uint32 size);
+    bool loadHolesData(FILE* in, uint32 offset, uint32 size);
+    bool isHole(int row, int col) const;
 
     // Get height functions and pointers
     typedef float (GridMap::*GetHeightPtr) (float x, float y) const;
@@ -209,8 +246,7 @@ public:
     [[nodiscard]] inline float getHeight(float x, float y) const {return (this->*_gridGetHeight)(x, y);}
     [[nodiscard]] float getMinHeight(float x, float y) const;
     [[nodiscard]] float getLiquidLevel(float x, float y) const;
-    [[nodiscard]] uint8 getTerrainType(float x, float y) const;
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, float collisionHeight, LiquidData* data = nullptr);
+    LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
@@ -249,12 +285,6 @@ struct ZoneDynamicInfo
 #pragma pack(pop)
 #endif
 
-#define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
-#define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
-#define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
-#define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
-#define MIN_UNLOAD_DELAY      1                             // immediate unload
-
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::set<MotionTransport*> TransportsContainer;
@@ -265,7 +295,7 @@ enum EncounterCreditType
     ENCOUNTER_CREDIT_CAST_SPELL     = 1,
 };
 
-class Map : public GridRefManager<NGridType>
+class Map : public GridRefMgr<NGridType>
 {
     friend class MapReference;
 public:
@@ -352,22 +382,19 @@ public:
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
+    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType = MAP_ALL_LIQUIDS);
+    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType);
 
-    uint32 GetAreaId(float x, float y, float z, bool* isOutdoors) const;
-    bool GetAreaInfo(float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
-    [[nodiscard]] uint32 GetAreaId(float x, float y, float z) const;
-    [[nodiscard]] uint32 GetZoneId(float x, float y, float z) const;
-    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, float x, float y, float z) const;
+    [[nodiscard]] bool GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
+    [[nodiscard]] uint32 GetAreaId(uint32 phaseMask, float x, float y, float z) const;
+    [[nodiscard]] uint32 GetZoneId(uint32 phaseMask, float x, float y, float z) const;
+    void GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, float x, float y, float z) const;
 
-    [[nodiscard]] bool IsOutdoors(float x, float y, float z) const;
-
-    [[nodiscard]] uint8 GetTerrainType(float x, float y) const;
     [[nodiscard]] float GetWaterLevel(float x, float y) const;
-    bool IsInWater(float x, float y, float z, LiquidData* data = nullptr) const;
-    [[nodiscard]] bool IsUnderWater(float x, float y, float z) const;
+    bool IsInWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
+    [[nodiscard]] bool IsUnderWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
     [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const;
-    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) const;
+    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData const& liquidData) const;
 
     void MoveAllCreaturesInMoveList();
     void MoveAllGameObjectsInMoveList();
@@ -431,7 +458,7 @@ public:
     bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
     void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
-    [[nodiscard]] bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
+    [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.isEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
 
     void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
@@ -439,8 +466,8 @@ public:
 
     void SendToPlayers(WorldPacket const* data) const;
 
-    typedef MapRefManager PlayerList;
-    [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefManager; }
+    typedef MapRefMgr PlayerList;
+    [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefMgr; }
 
     //per-map script storage
     void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
@@ -569,7 +596,7 @@ public:
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
     void SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade);
-    void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime);
+    void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
 
     // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
@@ -655,8 +682,8 @@ protected:
     DynamicMapTree _dynamicTree;
     time_t _instanceResetPeriod; // pussywizard
 
-    MapRefManager m_mapRefManager;
-    MapRefManager::iterator m_mapRefIter;
+    MapRefMgr m_mapRefMgr;
+    MapRefMgr::iterator m_mapRefIter;
 
     typedef std::set<WorldObject*> ActiveNonPlayers;
     ActiveNonPlayers m_activeNonPlayers;

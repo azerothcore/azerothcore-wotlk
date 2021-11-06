@@ -20,7 +20,7 @@ jobs:
     name: ${{ matrix.os }}-MSVC16
     env:
       BOOST_ROOT: C:\local\boost_1_74_0
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.event.label.name == 'run-build' || github.ref == 'refs/heads/master')
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
@@ -34,7 +34,7 @@ jobs:
       - name: Copy dll files
         shell: bash
         run: |
-          cp "/c/mysql-5.7.21-winx64/lib/libmysql.dll" "build/bin/Release/"
+          cp "/c/mysql/lib/libmysql.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
       - uses: actions/upload-artifact@v2

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 // TODO: Implement proper support for vehicle+player teleportation
@@ -9,7 +20,7 @@
 // TODO: Add proper implement of achievement
 
 #include "BattlefieldWG.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
@@ -227,7 +238,7 @@ void BattlefieldWG::OnBattleStart()
         if (Creature* creature = GetCreature(*itr))
         {
             ShowNpc(creature, true);
-            creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
+            creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
         }
     }
 
@@ -337,7 +348,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         if (Creature* creature = GetCreature(*itr))
         {
             if (!endByTimer)
-                creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
+                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
             HideNpc(creature);
         }
     }
@@ -531,7 +542,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
         case NPC_TAUNKA_SPIRIT_GUIDE:
             {
                 TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
-                uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId(true));
+                uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
                 // xinef: little workaround, there are 2 spirit guides in same area
                 if (creature->IsWithinDist2d(5103.0f, 3461.5f, 5.0f))
                     graveyardId = BATTLEFIELD_WG_GY_WORKSHOP_NW;
@@ -598,8 +609,8 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                     if (!creature->IsSummon() || !creature->ToTempSummon()->GetSummonerGUID())
                         return;
 
-                    if (Unit* owner = creature->ToTempSummon()->GetSummoner())
-                        creature->setFaction(owner->getFaction());
+                    if (Unit* owner = creature->ToTempSummon()->GetSummonerUnit())
+                        creature->SetFaction(owner->GetFaction());
                     break;
                 }
         }
@@ -619,9 +630,9 @@ void BattlefieldWG::OnCreatureRemove(Creature*  /*creature*/)
                 case NPC_WINTERGRASP_DEMOLISHER:
                 {
                     uint8 team;
-                    if (creature->getFaction() == WintergraspFaction[TEAM_ALLIANCE])
+                    if (creature->GetFaction() == WintergraspFaction[TEAM_ALLIANCE])
                         team = TEAM_ALLIANCE;
-                    else if (creature->getFaction() == WintergraspFaction[TEAM_HORDE])
+                    else if (creature->GetFaction() == WintergraspFaction[TEAM_HORDE])
                         team = TEAM_HORDE;
                     else
                         return;

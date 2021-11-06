@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "AccountMgr.h"
 #include "CreatureTextMgr.h"
@@ -760,7 +773,7 @@ public:
                 case GO_CACHE_OF_THE_DREAMWALKER_10H:
                 case GO_CACHE_OF_THE_DREAMWALKER_25H:
                     if (Creature* valithria = instance->GetCreature(ValithriaDreamwalkerGUID))
-                        go->SetLootRecipient(valithria->GetLootRecipient());
+                        go->SetLootRecipient(valithria);
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                     break;
                 case GO_SCOURGE_TRANSPORTER_LK:
@@ -1029,14 +1042,7 @@ public:
                     {
                         if (GameObject* loot = instance->GetGameObject(GunshipArmoryGUID))
                         {
-                            Map::PlayerList const& pl = instance->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                if (Player* p = itr->GetSource())
-                                    if (!p->IsGameMaster() && p->GetGroup() && p->GetGroup()->isRaidGroup())
-                                    {
-                                        loot->SetLootRecipient(p);
-                                        break;
-                                    }
+                            loot->SetLootRecipient(instance);
                             loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                         }
                     }
@@ -1050,7 +1056,7 @@ public:
                             if (GameObject* loot = instance->GetGameObject(DeathbringersCacheGUID))
                             {
                                 if (Creature* deathbringer = instance->GetCreature(DeathbringerSaurfangGUID))
-                                    loot->SetLootRecipient(deathbringer->GetLootRecipient());
+                                    loot->SetLootRecipient(deathbringer);
                                 loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                             }
                             [[fallthrough]];
@@ -1634,7 +1640,7 @@ public:
                             std::string const& text = sCreatureTextMgr->GetLocalizedChatString(NPC_THE_LICH_KING_LH, 0, 20 + id, 0, LOCALE_enUS);
                             WorldPacket data;
                             ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, ObjectGuid::Empty, player->GetGUID(), text, CHAT_TAG_NONE, "The Lich King");
-                            player->SendPlaySound(17235 + id, true);
+                            player->PlayDirectSound(17235 + id);
                             player->SendDirectMessage(&data);
                         }
             }

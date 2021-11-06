@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -315,7 +326,7 @@ public:
                 return;
 
             // Now lets get archimode threat list
-            ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
 
             if (t_list.empty())
                 return;
@@ -425,7 +436,7 @@ public:
                 if (victim && me->IsWithinMeleeRange(victim))
                     return false;
 
-                ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
                 if (threatlist.empty())
                     return false;
 
@@ -453,7 +464,7 @@ public:
                 summoned->AI()->AttackStart(me);
             else
             {
-                summoned->setFaction(me->getFaction());
+                summoned->SetFaction(me->GetFaction());
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
@@ -542,15 +553,15 @@ public:
             if (!me->IsInCombat())
             {
                 // Do not let the raid skip straight to Archimonde. Visible and hostile ONLY if Azagalor is finished.
-                if ((instance->GetData(DATA_AZGALOREVENT) < DONE) && (me->IsVisible() || (me->getFaction() != 35)))
+                if ((instance->GetData(DATA_AZGALOREVENT) < DONE) && (me->IsVisible() || (me->GetFaction() != FACTION_FRIENDLY)))
                 {
                     me->SetVisible(false);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                 }
 
-                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->getFaction() == 35)))
+                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->GetFaction() == FACTION_FRIENDLY)))
                 {
-                    me->setFaction(1720);
+                    me->SetFaction(FACTION_DRAGONKIN);
                     me->SetVisible(true);
                 }
 

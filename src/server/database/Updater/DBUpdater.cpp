@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DBUpdater.h"
@@ -273,6 +285,67 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
         LOG_INFO("sql.updates", ">> Applied " SZFMTD " %s. %s", result.updated, result.updated == 1 ? "query" : "queries", info.c_str());
 
     LOG_INFO("sql.updates", " ");
+
+    return true;
+}
+
+template<class T>
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
+{
+    if (!DBUpdaterUtil::CheckExecutable())
+    {
+        return false;
+    }
+
+    Path const sourceDirectory(BuiltInConfig::GetSourceDirectory());
+    if (!is_directory(sourceDirectory))
+    {
+        return false;
+    }
+
+    auto CheckUpdateTable = [&](std::string const& tableName)
+    {
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '%s'", tableName.c_str()));
+        if (!checkTable)
+        {
+            Path const temp(GetBaseFilesDirectory() + tableName + ".sql");
+            try
+            {
+                DBUpdater<T>::ApplyFile(pool, temp);
+            }
+            catch (UpdateException&)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    };
+
+    if (!CheckUpdateTable("updates") || !CheckUpdateTable("updates_include"))
+    {
+        return false;
+    }
+
+    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
+    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
+    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), setDirectories);
+
+    UpdateResult result;
+    try
+    {
+        result = updateFetcher.Update(
+                     sConfigMgr->GetOption<bool>("Updates.Redundancy", true),
+                     sConfigMgr->GetOption<bool>("Updates.AllowRehash", true),
+                     sConfigMgr->GetOption<bool>("Updates.ArchivedRedundancy", false),
+                     sConfigMgr->GetOption<int32>("Updates.CleanDeadRefMaxCount", 3));
+    }
+    catch (UpdateException&)
+    {
+        return false;
+    }
 
     return true;
 }

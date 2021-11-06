@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Cell.h"
@@ -59,10 +70,12 @@ void SmartWaypointMgr::LoadFromDB()
         Field* fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
         uint32 id = fields[1].GetUInt32();
-        float x, y, z;
+        float x, y, z, o;
         x = fields[2].GetFloat();
         y = fields[3].GetFloat();
         z = fields[4].GetFloat();
+        o = fields[5].GetFloat();
+        uint32 delay = fields[6].GetUInt32();
 
         if (last_entry != entry)
         {
@@ -75,7 +88,7 @@ void SmartWaypointMgr::LoadFromDB()
             LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry %u, unexpected point id %u, expected %u.", entry, id, last_id);
 
         last_id++;
-        (*waypoint_map[entry])[id] = new WayPoint(id, x, y, z);
+        (*waypoint_map[entry])[id] = new WayPoint(id, x, y, z, o, delay);
 
         last_entry = entry;
         total++;
@@ -1136,6 +1149,23 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 }
                 break;
             }
+        case SMART_ACTION_SET_INST_DATA:
+            {
+                if (e.action.setInstanceData.type == 1)
+                {
+                    if (e.action.setInstanceData.data >= EncounterState::TO_BE_DECIDED)
+                    {
+                        LOG_ERROR("sql.sql", "SmartScript: SMART_ACTION_SET_INST_DATA with type 1 (bossState) uses invalid encounter state %u. Source entry %u, type %u", e.action.setInstanceData.data, e.entryOrGuid, e.GetScriptType());
+                        return false;
+                    }
+                }
+                else if (e.action.setInstanceData.type > 1)
+                {
+                    LOG_ERROR("sql.sql", "SmartScript: SMART_ACTION_SET_INST_DATA uses unsupported data type %u. Source entry %u, type %u", e.action.setInstanceData.type, e.entryOrGuid, e.GetScriptType());
+                    return false;
+                }
+                break;
+            }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
         case SMART_ACTION_SET_ORIENTATION:
@@ -1152,7 +1182,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_ATTACK_START:
         case SMART_ACTION_THREAT_ALL_PCT:
         case SMART_ACTION_THREAT_SINGLE_PCT:
-        case SMART_ACTION_SET_INST_DATA:
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_AUTO_ATTACK:
         case SMART_ACTION_ALLOW_COMBAT_MOVEMENT:
@@ -1231,6 +1260,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_VORTEX_SUMMON:
         case SMART_ACTION_PLAYER_TALK:
         case SMART_ACTION_CU_ENCOUNTER_START:
+        case SMART_ACTION_DO_ACTION:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
@@ -239,7 +252,7 @@ public:
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
             }
 
-            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 900.0f))
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
@@ -334,7 +347,7 @@ public:
                     }
 
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->Clear();
                     me->AttackStop();
                     me->CombatStop();
@@ -375,8 +388,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
+                boss_hodirAI::EnterEvadeMode();
                 return;
             }
 
@@ -508,7 +522,7 @@ public:
 
                         if( Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].x, hhd[k][i].y, 432.69f, M_PI / 2) )
                         {
-                            h_p->setFaction(1665);
+                            h_p->SetFaction(1665);
                             if( cnt < 8 )
                                 Helpers[cnt++] = h_p->GetGUID();
 
@@ -662,7 +676,7 @@ public:
                 timer = 2500;
                 if (me->IsSummon())
                 {
-                    if (Unit* s = me->ToTempSummon()->GetSummoner())
+                    if (Unit* s = me->ToTempSummon()->GetSummonerUnit())
                     {
                         if ((s->GetTypeId() == TYPEID_PLAYER && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER)) || (s->GetTypeId() == TYPEID_UNIT && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC)))
                             me->DespawnOrUnsummon(2000);

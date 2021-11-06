@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -36,7 +47,10 @@ enum PriestSpells
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
 
     SPELL_GENERIC_ARENA_DAMPENING                   = 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING            = 74411
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING            = 74411,
+    SPELL_PRIEST_TWIN_DISCIPLINE_R1                 = 47586,
+    SPELL_PRIEST_SPIRITUAL_HEALING_R1               = 14898,
+    SPELL_PRIEST_DIVINE_PROVIDENCE_R1               = 47562
 };
 
 enum PriestSpellIcons
@@ -277,8 +291,14 @@ public:
         {
             PreventDefaultAction();
 
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (!healInfo || healInfo->GetHeal())
+            {
+                return;
+            }
+
             SpellInfo const* triggeredSpellInfo = sSpellMgr->AssertSpellInfo(SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL);
-            int32 heal = int32(CalculatePct(int32(eventInfo.GetHealInfo()->GetHeal()), aurEff->GetAmount()) / triggeredSpellInfo->GetMaxTicks());
+            int32 heal = int32(CalculatePct(int32(healInfo->GetHeal()), aurEff->GetAmount()) / triggeredSpellInfo->GetMaxTicks());
             GetTarget()->CastCustomSpell(SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL, SPELLVALUE_BASE_POINT0, heal, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
@@ -580,7 +600,7 @@ public:
             if (Unit* unitTarget = GetHitUnit())
                 if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0, 0, GetCaster()->GetGUID()))
                 {
-                    aur->GetBase()->RefreshTimersWithMods();
+                    aur->GetBase()->RefreshTimers();
                     aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
                 }
         }
@@ -815,22 +835,47 @@ public:
     {
         PrepareSpellScript(spell_pri_prayer_of_mending_heal_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo(
+                {
+                    SPELL_PRIEST_T9_HEALING_2P,
+                    SPELL_PRIEST_TWIN_DISCIPLINE_R1,
+                    SPELL_PRIEST_SPIRITUAL_HEALING_R1,
+                    SPELL_PRIEST_DIVINE_PROVIDENCE_R1
+                });
+        }
+
         void HandleHeal(SpellEffIndex /*effIndex*/)
         {
             if (Unit* caster = GetOriginalCaster())
             {
+                int32 heal = GetEffectValue();
                 if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_PRIEST_T9_HEALING_2P, EFFECT_0))
                 {
-                    int32 heal = GetHitHeal();
                     AddPct(heal, aurEff->GetAmount());
-                    SetHitHeal(heal);
                 }
+
+                if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PRIEST_TWIN_DISCIPLINE_R1, EFFECT_0))
+                {
+                    AddPct(heal, aurEff->GetAmount());
+                }
+                if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PRIEST_SPIRITUAL_HEALING_R1, EFFECT_0))
+                {
+                    AddPct(heal, aurEff->GetAmount());
+                }
+                if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_PRIEST_DIVINE_PROVIDENCE_R1, EFFECT_0))
+                {
+                    AddPct(heal, aurEff->GetAmount());
+                }
+
+                SetEffectValue(heal);
             }
         }
 
         void Register() override
         {
-            OnEffectHitTarget += SpellEffectFn(spell_pri_prayer_of_mending_heal_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+            OnEffectLaunchTarget += SpellEffectFn(spell_pri_prayer_of_mending_heal_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
         }
     };
 
@@ -853,6 +898,11 @@ public:
         bool Load() override
         {
             return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({SPELL_PRIEST_EMPOWERED_RENEW});
         }
 
         void HandleApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
