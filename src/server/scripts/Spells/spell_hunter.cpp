@@ -1184,6 +1184,12 @@ public:
                     player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                     return SPELL_FAILED_DONT_REPORT;
                 }
+
+                if (target->GetOwnerGUID())
+                {
+                    player->SendTameFailure(PET_TAME_CREATURE_ALREADY_OWNED);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
             }
             else
             {
