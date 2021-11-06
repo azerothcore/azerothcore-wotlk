@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObjectAI.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
@@ -323,47 +324,57 @@ class go_ahune_ice_stone : public GameObjectScript
 public:
     go_ahune_ice_stone() : GameObjectScript("go_ahune_ice_stone") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_ahune_ice_stoneAI : GameObjectAI
     {
-        if (!player || !go)
-            return true;
-        if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
-            return true;
-        if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
-            return true;
+        go_ahune_ice_stoneAI(GameObject* go) : GameObjectAI(go) { }
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
-        SendGossipMenuFor(player, GOSSIP_TEXT_ID, go->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action) override
-    {
-        if (!player || !go)
-            return true;
-        if (action != GOSSIP_ACTION_INFO_DEF + 1337)
-            return true;
-        if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
-            return true;
-        if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
-            return true;
-
-        if (Creature* c = go->SummonCreature(NPC_AHUNE, AhuneSummonPos, TEMPSUMMON_MANUAL_DESPAWN))
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            player->DestroyItemCount(ITEM_MAGMA_TOTEM, 1, true, false);
-            player->AreaExploredOrEventHappens(QUEST_SUMMON_AHUNE); // auto rewarded
+            if (!player || !go)
+                return true;
+            if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
+                return true;
+            if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
+                return true;
 
-            c->SetVisible(false);
-            c->SetDisplayId(AHUNE_DEFAULT_MODEL);
-            c->SetFloatValue(UNIT_FIELD_COMBATREACH, 18.0f);
-            CAST_AI(boss_ahune::boss_ahuneAI, c->AI())->InvokerGUID = player->GetGUID();
-            if (Creature* bunny = go->SummonCreature(NPC_AHUNE_SUMMON_LOC_BUNNY, AhuneSummonPos, TEMPSUMMON_TIMED_DESPAWN, 12000))
-                if (Creature* crystal_trigger = go->SummonCreature(WORLD_TRIGGER, go->GetPositionX(), go->GetPositionY(), 5.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000))
-                    crystal_trigger->CastSpell(bunny, SPELL_STARTING_BEAM, false);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+            SendGossipMenuFor(player, GOSSIP_TEXT_ID, go->GetGUID());
+            return true;
         }
 
-        CloseGossipMenuFor(player);
-        return true;
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            if (!player || !go)
+                return true;
+            if (action != GOSSIP_ACTION_INFO_DEF + 1337)
+                return true;
+            if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
+                return true;
+            if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
+                return true;
+
+            if (Creature* c = go->SummonCreature(NPC_AHUNE, AhuneSummonPos, TEMPSUMMON_MANUAL_DESPAWN))
+            {
+                player->DestroyItemCount(ITEM_MAGMA_TOTEM, 1, true, false);
+                player->AreaExploredOrEventHappens(QUEST_SUMMON_AHUNE); // auto rewarded
+
+                c->SetVisible(false);
+                c->SetDisplayId(AHUNE_DEFAULT_MODEL);
+                c->SetFloatValue(UNIT_FIELD_COMBATREACH, 18.0f);
+                CAST_AI(boss_ahune::boss_ahuneAI, c->AI())->InvokerGUID = player->GetGUID();
+                if (Creature* bunny = go->SummonCreature(NPC_AHUNE_SUMMON_LOC_BUNNY, AhuneSummonPos, TEMPSUMMON_TIMED_DESPAWN, 12000))
+                    if (Creature* crystal_trigger = go->SummonCreature(WORLD_TRIGGER, go->GetPositionX(), go->GetPositionY(), 5.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000))
+                        crystal_trigger->CastSpell(bunny, SPELL_STARTING_BEAM, false);
+            }
+
+            CloseGossipMenuFor(player);
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_ahune_ice_stoneAI(go);
     }
 };
 

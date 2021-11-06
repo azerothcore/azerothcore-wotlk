@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObjectAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "serpent_shrine.h"
@@ -212,18 +213,30 @@ class go_strange_pool : public GameObjectScript
 public:
     go_strange_pool() : GameObjectScript("go_strange_pool") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_strange_poolAI : public GameObjectAI
     {
-        if (InstanceScript* instance = go->GetInstanceScript())
-            if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
+        go_strange_poolAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (InstanceScript* instance = go->GetInstanceScript())
             {
-                player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
-                if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetGuidData(NPC_THE_LURKER_BELOW)))
-                    lurker->AI()->DoAction(ACTION_START_EVENT);
-                return true;
+                if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
+                {
+                    player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
+                    if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetGuidData(NPC_THE_LURKER_BELOW)))
+                        lurker->AI()->DoAction(ACTION_START_EVENT);
+                    return true;
+                }
             }
 
-        return false;
+            return false;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_strange_poolAI(go);
     }
 };
 

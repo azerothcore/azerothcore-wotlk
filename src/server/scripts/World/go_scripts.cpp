@@ -1665,35 +1665,45 @@ class go_dragonflayer_cage : public GameObjectScript
 public:
     go_dragonflayer_cage() : GameObjectScript("go_dragonflayer_cage") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_dragonflayer_cageAI : GameObjectAI
     {
-        go->UseDoorOrButton();
-        if (player->GetQuestStatus(QUEST_PRISONERS_OF_WYRMSKULL) != QUEST_STATUS_INCOMPLETE)
-            return true;
+        go_dragonflayer_cageAI(GameObject* go) : GameObjectAI(go) { }
 
-        Creature* pPrisoner = go->FindNearestCreature(NPC_PRISONER_PRIEST, 2.0f);
-        if (!pPrisoner)
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            pPrisoner = go->FindNearestCreature(NPC_PRISONER_MAGE, 2.0f);
+            go->UseDoorOrButton();
+            if (player->GetQuestStatus(QUEST_PRISONERS_OF_WYRMSKULL) != QUEST_STATUS_INCOMPLETE)
+                return true;
+
+            Creature* pPrisoner = go->FindNearestCreature(NPC_PRISONER_PRIEST, 2.0f);
             if (!pPrisoner)
             {
-                pPrisoner = go->FindNearestCreature(NPC_PRISONER_WARRIOR, 2.0f);
+                pPrisoner = go->FindNearestCreature(NPC_PRISONER_MAGE, 2.0f);
                 if (!pPrisoner)
-                    pPrisoner = go->FindNearestCreature(NPC_PRISONER_PALADIN, 2.0f);
+                {
+                    pPrisoner = go->FindNearestCreature(NPC_PRISONER_WARRIOR, 2.0f);
+                    if (!pPrisoner)
+                        pPrisoner = go->FindNearestCreature(NPC_PRISONER_PALADIN, 2.0f);
+                }
             }
-        }
 
-        if (!pPrisoner || !pPrisoner->IsAlive())
+            if (!pPrisoner || !pPrisoner->IsAlive())
+                return true;
+
+            Quest const* qInfo = sObjectMgr->GetQuestTemplate(QUEST_PRISONERS_OF_WYRMSKULL);
+            if (qInfo)
+            {
+                /// @todo prisoner should help player for a short period of time
+                player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0]);
+                pPrisoner->DisappearAndDie();
+            }
             return true;
-
-        Quest const* qInfo = sObjectMgr->GetQuestTemplate(QUEST_PRISONERS_OF_WYRMSKULL);
-        if (qInfo)
-        {
-            /// @todo prisoner should help player for a short period of time
-            player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0]);
-            pPrisoner->DisappearAndDie();
         }
-        return true;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_dragonflayer_cageAI(go);
     }
 };
 
@@ -1721,43 +1731,53 @@ class go_amberpine_outhouse : public GameObjectScript
 public:
     go_amberpine_outhouse() : GameObjectScript("go_amberpine_outhouse") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_amberpine_outhouseAI : public GameObjectAI
     {
-        QuestStatus status = player->GetQuestStatus(QUEST_DOING_YOUR_DUTY);
-        if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_USE_OUTHOUSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, GOSSIP_OUTHOUSE_VACANT, go->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, GOSSIP_OUTHOUSE_INUSE, go->GetGUID());
+        go_amberpine_outhouseAI(GameObject* go) : GameObjectAI(go) { }
 
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            CloseGossipMenuFor(player);
-            Creature* target = GetClosestCreatureWithEntry(player, NPC_OUTHOUSE_BUNNY, 3.0f);
-            if (target)
+            QuestStatus status = player->GetQuestStatus(QUEST_DOING_YOUR_DUTY);
+            if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
             {
-                target->AI()->SetData(1, player->getGender());
-                go->CastSpell(target, SPELL_INDISPOSED_III);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_USE_OUTHOUSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, GOSSIP_OUTHOUSE_VACANT, go->GetGUID());
             }
-            go->CastSpell(player, SPELL_INDISPOSED);
-            if (player->HasItemCount(ITEM_ANDERHOLS_SLIDER_CIDER))
-                player->CastSpell(player, SPELL_CREATE_AMBERSEEDS, true);
+            else
+                SendGossipMenuFor(player, GOSSIP_OUTHOUSE_INUSE, go->GetGUID());
+
             return true;
         }
-        else
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
-            CloseGossipMenuFor(player);
-            player->GetSession()->SendNotification(GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND);
-            return false;
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            {
+                CloseGossipMenuFor(player);
+                Creature* target = GetClosestCreatureWithEntry(player, NPC_OUTHOUSE_BUNNY, 3.0f);
+                if (target)
+                {
+                    target->AI()->SetData(1, player->getGender());
+                    go->CastSpell(target, SPELL_INDISPOSED_III);
+                }
+                go->CastSpell(player, SPELL_INDISPOSED);
+                if (player->HasItemCount(ITEM_ANDERHOLS_SLIDER_CIDER))
+                    player->CastSpell(player, SPELL_CREATE_AMBERSEEDS, true);
+                return true;
+            }
+            else
+            {
+                CloseGossipMenuFor(player);
+                player->GetSession()->SendNotification(GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND);
+                return false;
+            }
         }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_amberpine_outhouseAI(go);
     }
 };
 
@@ -1777,17 +1797,27 @@ class go_hive_pod : public GameObjectScript
 public:
     go_hive_pod() : GameObjectScript("go_hive_pod") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_hive_podAI : public GameObjectAI
     {
-        player->SendLoot(go->GetGUID(), LOOT_CORPSE);
+        go_hive_podAI(GameObject* go) : GameObjectAI(go) { }
 
-        // xinef: prevent spawning hundreds of them
-        if (go->FindNearestCreature(NPC_HIVE_AMBUSHER, 20.0f))
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            player->SendLoot(go->GetGUID(), LOOT_CORPSE);
+
+            // xinef: prevent spawning hundreds of them
+            if (go->FindNearestCreature(NPC_HIVE_AMBUSHER, 20.0f))
+                return true;
+
+            go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX() + 1, go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+            go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX(), go->GetPositionY() + 1, go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
             return true;
+        }
+    };
 
-        go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX() + 1, go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
-        go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX(), go->GetPositionY() + 1, go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
-        return true;
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_hive_podAI(go);
     }
 };
 
@@ -1796,10 +1826,20 @@ class go_massive_seaforium_charge : public GameObjectScript
 public:
     go_massive_seaforium_charge() : GameObjectScript("go_massive_seaforium_charge") { }
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    struct go_massive_seaforium_chageAI : GameObjectAI
     {
-        go->SetLootState(GO_JUST_DEACTIVATED);
-        return true;
+        go_massive_seaforium_chageAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* /*player*/, bool /*reportUse*/) override
+        {
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_massive_seaforium_chageAI(go);
     }
 };
 
@@ -1819,23 +1859,33 @@ class go_veil_skith_cage : public GameObjectScript
 public:
     go_veil_skith_cage() : GameObjectScript("go_veil_skith_cage") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_veil_skith_cageAI : GameObjectAI
     {
-        go->UseDoorOrButton();
-        if (player->GetQuestStatus(QUEST_MISSING_FRIENDS) == QUEST_STATUS_INCOMPLETE)
+        go_veil_skith_cageAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            std::list<Creature*> childrenList;
-            GetCreatureListWithEntryInGrid(childrenList, go, NPC_CAPTIVE_CHILD, INTERACTION_DISTANCE);
-            for (std::list<Creature*>::const_iterator itr = childrenList.begin(); itr != childrenList.end(); ++itr)
+            go->UseDoorOrButton();
+            if (player->GetQuestStatus(QUEST_MISSING_FRIENDS) == QUEST_STATUS_INCOMPLETE)
             {
-                player->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
-                (*itr)->DespawnOrUnsummon(5000);
-                (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
-                (*itr)->AI()->Talk(SAY_FREE_0);
-                (*itr)->GetMotionMaster()->Clear();
+                std::list<Creature*> childrenList;
+                GetCreatureListWithEntryInGrid(childrenList, go, NPC_CAPTIVE_CHILD, INTERACTION_DISTANCE);
+                for (std::list<Creature*>::const_iterator itr = childrenList.begin(); itr != childrenList.end(); ++itr)
+                {
+                    player->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
+                    (*itr)->DespawnOrUnsummon(5000);
+                    (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
+                    (*itr)->AI()->Talk(SAY_FREE_0);
+                    (*itr)->GetMotionMaster()->Clear();
+                }
             }
+            return false;
         }
-        return false;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_veil_skith_cageAI(go);
     }
 };
 

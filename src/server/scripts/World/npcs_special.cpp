@@ -2446,13 +2446,12 @@ public:
                 case 6:
                     player->CastSpell(player, SPELL_WOLPERTINGER, false);
                     break;
-                default:
-                    return;
             }
 
             player->PlayerTalkClass->SendCloseGossip();
             return false;
         }
+
     };
 
     CreatureAI* GetAI(Creature* creature) const override

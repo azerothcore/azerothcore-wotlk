@@ -55,27 +55,6 @@ class npc_raliq_the_drunk : public CreatureScript
 public:
     npc_raliq_the_drunk() : CreatureScript("npc_raliq_the_drunk") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-            creature->SetFaction(FACTION_OGRE);
-            creature->AI()->AttackStart(player);
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_CRACK_SKULLS) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_RALIQ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, 9440, creature->GetGUID());
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_raliq_the_drunkAI(creature);
@@ -95,6 +74,27 @@ public:
         {
             Uppercut_Timer = 5000;
             me->RestoreFaction();
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            {
+                CloseGossipMenuFor(player);
+                me->SetFaction(FACTION_OGRE);
+                AttackStart(player);
+            }
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_CRACK_SKULLS) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_RALIQ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, 9440, me->GetGUID());
+            return true;
         }
 
         void UpdateAI(uint32 diff) override
@@ -132,22 +132,6 @@ class npc_salsalabim : public CreatureScript
 public:
     npc_salsalabim() : CreatureScript("npc_salsalabim") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_10004) == QUEST_STATUS_INCOMPLETE)
-        {
-            creature->SetFaction(FACTION_DEMON);
-            creature->AI()->AttackStart(player);
-        }
-        else
-        {
-            if (creature->IsQuestGiver())
-                player->PrepareQuestMenu(creature->GetGUID());
-            SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_salsalabimAI(creature);
@@ -163,6 +147,22 @@ public:
         {
             MagneticPull_Timer = 15000;
             me->RestoreFaction();
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_10004) == QUEST_STATUS_INCOMPLETE)
+            {
+                me->SetFaction(FACTION_DEMON);
+                AttackStart(player);
+            }
+            else
+            {
+                if (me->IsQuestGiver())
+                    player->PrepareQuestMenu(me->GetGUID());
+                SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            }
+            return true;
         }
 
         void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -211,46 +211,56 @@ class npc_shattrathflaskvendors : public CreatureScript
 public:
     npc_shattrathflaskvendors() : CreatureScript("npc_shattrathflaskvendors") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct npc_shattrathflaskvendorsAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
+        npc_shattrathflaskvendorsAI(Creature* c) : ScriptedAI(c) { }
 
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->GetEntry() == 23484)
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
-            // Aldor vendor
-            if (creature->IsVendor() && (player->GetReputationRank(932) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-                SendGossipMenuFor(player, 11085, creature->GetGUID());
-            }
-            else
-            {
-                SendGossipMenuFor(player, 11083, creature->GetGUID());
-            }
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_TRADE)
+                player->GetSession()->SendListInventory(me->GetGUID());
+
+            return true;
         }
 
-        if (creature->GetEntry() == 23483)
+        bool GossipHello(Player* player) override
         {
-            // Scryers vendor
-            if (creature->IsVendor() && (player->GetReputationRank(934) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
+            if (me->GetEntry() == 23484)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-                SendGossipMenuFor(player, 11085, creature->GetGUID());
+                // Aldor vendor
+                if (me->IsVendor() && (player->GetReputationRank(932) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                    SendGossipMenuFor(player, 11085, me->GetGUID());
+                }
+                else
+                {
+                    SendGossipMenuFor(player, 11083, me->GetGUID());
+                }
             }
-            else
-            {
-                SendGossipMenuFor(player, 11084, creature->GetGUID());
-            }
-        }
 
-        return true;
+            if (me->GetEntry() == 23483)
+            {
+                // Scryers vendor
+                if (me->IsVendor() && (player->GetReputationRank(934) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                    SendGossipMenuFor(player, 11085, me->GetGUID());
+                }
+                else
+                {
+                    SendGossipMenuFor(player, 11084, me->GetGUID());
+                }
+            }
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_shattrathflaskvendorsAI(creature);
     }
 };
 
@@ -265,23 +275,33 @@ class npc_zephyr : public CreatureScript
 public:
     npc_zephyr() : CreatureScript("npc_zephyr") { }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
+    struct npc_zephyrAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            player->CastSpell(player, 37778, false);
+        npc_zephyrAI(Creature* c) : ScriptedAI(c) { }
 
-        return true;
-    }
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+                player->CastSpell(player, 37778, false);
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetReputationRank(989) >= REP_REVERED)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HZ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (player->GetReputationRank(989) >= REP_REVERED)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HZ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
+        return new npc_zephyrAI(creature);
     }
 };
 
@@ -448,30 +468,6 @@ class npc_ishanah : public CreatureScript
 public:
     npc_ishanah() : CreatureScript("npc_ishanah") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            SendGossipMenuFor(player, 9458, creature->GetGUID());
-        else if (action == GOSSIP_ACTION_INFO_DEF + 2)
-            SendGossipMenuFor(player, 9459, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-
     struct ishanahAI : public ScriptedAI
     {
         ishanahAI(Creature* creature) : ScriptedAI(creature) { }
@@ -483,6 +479,31 @@ public:
             AttackStart(who);
             _events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2000);
             _events.ScheduleEvent(EVENT_SPELL_POWER_WORD_SHIELD, 1000);
+        }
+
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+                SendGossipMenuFor(player, 9458, me->GetGUID());
+            else if (action == GOSSIP_ACTION_INFO_DEF + 2)
+                SendGossipMenuFor(player, 9459, me->GetGUID());
+
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
         }
 
         void MovementInform(uint32 type, uint32 point) override
