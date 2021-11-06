@@ -1304,7 +1304,7 @@ public:
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);
-            me->setFaction(summoner->getFaction());
+            me->SetFaction(summoner->GetFaction());
         }
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override

@@ -580,7 +580,7 @@ public:
                 if (Creature* boss = instance->GetCreature(TombBossGUIDs[TombEventCounter]))
                 {
                     ++TombEventCounter;
-                    boss->setFaction(FACTION_HOSTILE);
+                    boss->SetFaction(FACTION_DARK_IRON_DWARVES);
                     boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
 
                     // find suitable target here.
@@ -614,7 +614,7 @@ public:
                         boss->GetMotionMaster()->MoveTargetedHome();
                         boss->SetLootRecipient(nullptr);
                     }
-                    boss->setFaction(FACTION_FRIEND);
+                    boss->SetFaction(FACTION_FRIENDLY);
                     boss->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC); // think this is useless
                     if (i == 6) // doomrel needs explicit reset
                     {

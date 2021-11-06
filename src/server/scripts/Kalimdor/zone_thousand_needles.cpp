@@ -50,7 +50,6 @@ enum Lakota
 
     QUEST_FREE_AT_LAST          = 4904,
     NPC_GRIM_BANDIT             = 10758,
-    FACTION_ESCORTEE_LAKO       = 232,                      //guessed
 
     ID_AMBUSH_1                 = 0,
     ID_AMBUSH_2                 = 2,
@@ -77,7 +76,7 @@ public:
         if (quest->GetQuestId() == QUEST_FREE_AT_LAST)
         {
             creature->AI()->Talk(SAY_LAKO_START, player);
-            creature->setFaction(FACTION_ESCORTEE_LAKO);
+            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); //guessed
 
             if (npc_lakota_windsongAI* pEscortAI = CAST_AI(npc_lakota_windsong::npc_lakota_windsongAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -138,8 +137,7 @@ enum Packa
     SAY_COMPLETE        = 2,
 
     QUEST_HOMEWARD      = 4770,
-    NPC_WYVERN          = 4107,
-    FACTION_ESCORTEE    = 232                               //guessed
+    NPC_WYVERN          = 4107
 };
 
 Position const WyvernLoc[3] =
@@ -159,7 +157,7 @@ public:
         if (quest->GetQuestId() == QUEST_HOMEWARD)
         {
             creature->AI()->Talk(SAY_START, player);
-            creature->setFaction(FACTION_ESCORTEE);
+            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); // guessed
 
             if (npc_paoka_swiftmountainAI* pEscortAI = CAST_AI(npc_paoka_swiftmountain::npc_paoka_swiftmountainAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -212,7 +210,6 @@ public:
 
 enum Plucky
 {
-    FACTION_FRIENDLY        = 35,
     QUEST_SCOOP             = 1950,
     SPELL_PLUCKY_HUMAN      = 9192,
     SPELL_PLUCKY_CHICKEN    = 9220
@@ -253,7 +250,7 @@ public:
 
     struct npc_pluckyAI : public ScriptedAI
     {
-        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->getFaction(); }
+        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->GetFaction(); }
 
         uint32 NormFaction;
         uint32 ResetTimer;
@@ -262,8 +259,8 @@ public:
         {
             ResetTimer = 120000;
 
-            if (me->getFaction() != NormFaction)
-                me->setFaction(NormFaction);
+            if (me->GetFaction() != NormFaction)
+                me->SetFaction(NormFaction);
 
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -277,7 +274,7 @@ public:
             {
                 if (TextEmote == TEXT_EMOTE_BECKON)
                 {
-                    me->setFaction(FACTION_FRIENDLY);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                 }
@@ -289,7 +286,7 @@ public:
                     return;
                 else
                 {
-                    me->setFaction(FACTION_FRIENDLY);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
