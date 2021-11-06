@@ -1842,13 +1842,23 @@ class npc_alchemist_adrianna : public CreatureScript
 public:
     npc_alchemist_adrianna() : CreatureScript("npc_alchemist_adrianna") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    struct npc_alchemist_adriannaAI : public ScriptedAI
     {
-        if (InstanceScript* instance = creature->GetInstanceScript())
-            if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
-                if (player->HasAura(SPELL_ORANGE_BLIGHT_RESIDUE) && player->HasAura(SPELL_GREEN_BLIGHT_RESIDUE))
-                    creature->CastSpell(creature, SPELL_HARVEST_BLIGHT_SPECIMEN, false);
-        return false;
+        npc_alchemist_adriannaAI(Creature* c) : ScriptedAI(c) { }
+
+        bool GossipHello(Player* player) override
+        {
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !me->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
+                    if (player->HasAura(SPELL_ORANGE_BLIGHT_RESIDUE) && player->HasAura(SPELL_GREEN_BLIGHT_RESIDUE))
+                        creature->CastSpell(creature, SPELL_HARVEST_BLIGHT_SPECIMEN, false);
+            return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetIcecrownCitadelAI<npc_alchemist_adriannaAI>(creature);
     }
 };
 

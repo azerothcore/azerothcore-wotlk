@@ -24,6 +24,7 @@ TCComment: Can't test LOS until mmaps.
 TCCategory: Zul'Gurub
 EndScriptData */
 
+#include "GameObjectAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
@@ -424,16 +425,26 @@ class go_gong_of_bethekk : public GameObjectScript
 public:
     go_gong_of_bethekk() : GameObjectScript("go_gong_of_bethekk") { }
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    struct go_gong_of_bethekkAI : public GameObjectAI
     {
-        if (go->GetInstanceScript())
-        {
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-            go->SendCustomAnim(0);
-            go->SummonCreature(NPC_ARLOKK, PosSummonArlokk[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
-        }
+        go_gong_of_bethekkAI(GameObject* go) : GameObjectAI(go) { }
 
-        return true;
+        bool GossipHello(Player* /*player*/, bool /*reportUse*/) override
+        {
+            if (go->GetInstanceScript())
+            {
+                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                go->SendCustomAnim(0);
+                go->SummonCreature(NPC_ARLOKK, PosSummonArlokk[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
+            }
+
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_gong_of_bethekkAI(go);
     }
 };
 

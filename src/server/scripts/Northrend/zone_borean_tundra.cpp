@@ -1939,6 +1939,8 @@ public:
             {
                 DoCastSelf(SPELL_BLOOD_PRESENCE);
             }
+
+            return false;
         }
 
         bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
@@ -1950,6 +1952,8 @@ public:
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
             }
+
+            return false;
         }
 
     private:

@@ -61,47 +61,57 @@ class npc_bunthen_plainswind : public CreatureScript
 public:
     npc_bunthen_plainswind() : CreatureScript("npc_bunthen_plainswind") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct npc_bunthen_plainswindAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        switch (action)
+        npc_bunthen_plainswindAI(Creature* c) : ScriptedAI(c) { }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
+            ClearGossipMenuFor(player);
+            switch (action)
+            {
             case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
                 if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
                     player->ActivateTaxiPathTo(TAXI_PATH_ID_HORDE);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                SendGossipMenuFor(player, 5373, creature->GetGUID());
+                SendGossipMenuFor(player, 5373, me->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                SendGossipMenuFor(player, 5376, creature->GetGUID());
+                SendGossipMenuFor(player, 5376, me->GetGUID());
                 break;
+            }
+            return true;
         }
-        return true;
-    }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+        bool GossipHello(Player* player) override
+        {
+            if (player->getClass() != CLASS_DRUID)
+                SendGossipMenuFor(player, 4916, me->GetGUID());
+            else if (player->GetTeamId() != TEAM_HORDE)
+            {
+                if (player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+
+                SendGossipMenuFor(player, 4917, me->GetGUID());
+            }
+            else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_THUNDER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+                if (player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+
+                SendGossipMenuFor(player, 4918, me->GetGUID());
+            }
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (player->getClass() != CLASS_DRUID)
-            SendGossipMenuFor(player, 4916, creature->GetGUID());
-        else if (player->GetTeamId() != TEAM_HORDE)
-        {
-            if (player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-            SendGossipMenuFor(player, 4917, creature->GetGUID());
-        }
-        else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_THUNDER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-            if (player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-
-            SendGossipMenuFor(player, 4918, creature->GetGUID());
-        }
-        return true;
+        return new npc_bunthen_plainswindAI(creature);
     }
 };
 

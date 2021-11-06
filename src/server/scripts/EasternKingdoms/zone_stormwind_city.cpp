@@ -528,18 +528,26 @@ class npc_tyrion : public CreatureScript
 public:
     npc_tyrion() : CreatureScript("npc_tyrion") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    struct npc_tyrionAI : public ScriptedAI
     {
-        if (quest->GetQuestId() == QUEST_THE_ATTACK)
+        npc_tyrionAI(Creature* c) : ScriptedAI(c) { }
+
+        void QuestAccept(Player* player, Quest const* quest) override
         {
-            if (Creature* pSpybot = creature->FindNearestCreature(NPC_TYRION_SPYBOT, 5.0f, true))
+            if (quest->GetQuestId() == QUEST_THE_ATTACK)
             {
-                CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->Start(false, false, player->GetGUID());
-                CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->SetMaxPlayerDistance(200.0f);
+                if (Creature* pSpybot = me->FindNearestCreature(NPC_TYRION_SPYBOT, 5.0f, true))
+                {
+                    CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->Start(false, false, player->GetGUID());
+                    CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->SetMaxPlayerDistance(200.0f);
+                }
             }
-            return true;
         }
-        return false;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tyrionAI(creature);
     }
 };
 

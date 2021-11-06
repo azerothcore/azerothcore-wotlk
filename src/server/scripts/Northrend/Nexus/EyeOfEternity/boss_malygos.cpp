@@ -17,6 +17,7 @@
 
 #include "CombatAI.h"
 #include "eye_of_eternity.h"
+#include "GameObjectAI.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
@@ -1467,15 +1468,26 @@ class go_the_focusing_iris : public GameObjectScript
 public:
     go_the_focusing_iris() : GameObjectScript("go_the_focusing_iris") { }
 
-    bool OnGossipHello(Player* user, GameObject* go) override
+    struct go_the_focusing_irisAI : public GameObjectAI
     {
-        if (!user || !go)
+        go_the_focusing_irisAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipHello(Player* user, bool /*reportUse*/) override
+        {
+            if (!user || !go)
+                return true;
+
+            if (InstanceScript* pInstance = go->GetInstanceScript())
+                pInstance->SetData(DATA_IRIS_ACTIVATED, 0);
+
             return true;
+        }
+    };
 
-        if (InstanceScript* pInstance = go->GetInstanceScript())
-            pInstance->SetData(DATA_IRIS_ACTIVATED, 0);
-
-        return true;
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_the_focusing_irisAI(go);
+    }
     }
 };
 
