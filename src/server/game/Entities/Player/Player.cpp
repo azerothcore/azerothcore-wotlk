@@ -7541,6 +7541,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     {
         RemoveAurasByType(aura);
     }
+    // remove stealth if not pickpocketing or opening an item from bags
     if (!(loot_type == LOOT_PICKPOCKETING || guid.IsItem()))
     {
         RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
