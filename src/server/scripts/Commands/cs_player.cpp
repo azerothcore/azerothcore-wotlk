@@ -15,11 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Chat.h"
-#include "Language.h"
-#include "Player.h"
-#include "PlayerCommand.h"
 #include "ScriptMgr.h"
+#include "Language.h"
+#include "PlayerCommand.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -27,7 +25,7 @@
 
 using namespace Acore::ChatCommands;
 
-class player_commandscript : public CommandScript, public PlayerCommand
+class player_commandscript : public CommandScript
 {
 public:
     player_commandscript() : CommandScript("player_commandscript") { }
@@ -68,7 +66,7 @@ public:
             return false;
         }
 
-        return Learn(handler, targetPlayer, spell, all);
+        return Acore::PlayerCommand::HandleLearnSpellCommand(handler, targetPlayer, spell, all);
     }
 
     static bool HandlePlayerUnLearnCommand(ChatHandler* handler, char const* args)
@@ -93,7 +91,7 @@ public:
             return false;
         }
 
-        return UnLearn(handler, targetPlayer, spell, all);
+        return Acore::PlayerCommand::HandleUnlearnSpellCommand(handler, targetPlayer, spell, all);
     }
 
 private:
