@@ -32,7 +32,7 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.event.label.name == 'cpp' || github.ref == 'refs/heads/master')
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Cache
