@@ -7404,6 +7404,24 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Serverside - Summon Arcane Disruptor
+    ApplySpellFix({ 49591 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 37889;
+    });
+
+    // Serverside - Create Rocket Pack
+    ApplySpellFix({ 70055 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 49278;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);

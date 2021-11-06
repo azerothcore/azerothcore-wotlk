@@ -1404,6 +1404,7 @@ enum chromie
     ITEM_ARCANE_DISRUPTOR               = 37888,
     QUEST_DISPELLING_ILLUSIONS          = 13149,
     QUEST_A_ROYAL_ESCORT                = 13151,
+    SPELL_SUMMON_ARCANE_DISRUPTOR       = 49591
 };
 
 class npc_cos_chromie_start : public CreatureScript
@@ -1430,7 +1431,9 @@ public:
                     pInstance->SetData(DATA_SHOW_CRATES, 1);
 
             if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
-                player->AddItem(ITEM_ARCANE_DISRUPTOR, 1);
+            {
+                me->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+            }
         }
         // Skip Event
         else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
