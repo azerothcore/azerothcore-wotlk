@@ -137,22 +137,31 @@ class npc_mikhail : public CreatureScript
 public:
     npc_mikhail() : CreatureScript("npc_mikhail") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
+    struct npc_mikhailAI : public ScriptedAI
     {
-        if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT11)
+        npc_mikhailAI(Creature* c) : ScriptedAI(c) { }
+
+        void QuestAccept(Player* player, const Quest* quest) override
         {
-            Creature* pSlim = creature->FindNearestCreature(NPC_TAPOKE_SLIM_JAHN, 25.0f);
+            if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT11)
+            {
+                Creature* pSlim = me->FindNearestCreature(NPC_TAPOKE_SLIM_JAHN, 25.0f);
 
-            if (!pSlim)
-                return false;
+                if (!pSlim)
+                    return;
 
-            if (!pSlim->HasStealthAura())
-                pSlim->CastSpell(pSlim, SPELL_STEALTH, true);
+                if (!pSlim->HasStealthAura())
+                    pSlim->CastSpell(pSlim, SPELL_STEALTH, true);
 
-            if (npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI* pEscortAI = CAST_AI(npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI, pSlim->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
+                if (npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI* pEscortAI = CAST_AI(npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI, pSlim->AI()))
+                    pEscortAI->Start(false, false, player->GetGUID(), quest);
+            }
         }
-        return false;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_mikhailAI(creature);
     }
 };
 

@@ -482,51 +482,50 @@ public:
             if (IsLoot)
                 DoCast(me, 7, false);
         }
+
+        bool GossipHello(Player* player) override
+        {
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HOSTAGE1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+                CloseGossipMenuFor(player);
+
+            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                return true;
+
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+            if (InstanceScript* instance = me->GetInstanceScript())
+            {
+                // uint8 progress = instance->GetData(DATA_CHESTLOOTED);
+                instance->SetData(DATA_CHESTLOOTED, 0);
+                float x, y, z;
+                me->GetPosition(x, y, z);
+                uint32 entry = me->GetEntry();
+                for (uint8 i = 0; i < 4; ++i)
+                {
+                    if (HostageEntry[i] == entry)
+                    {
+                        me->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
+                        break;
+                    }
+                }
+            }
+
+            return true;
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetZulAmanAI<npc_zulaman_hostageAI>(creature);
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HOSTAGE1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            CloseGossipMenuFor(player);
-
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            return true;
-
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (instance)
-        {
-            //uint8 progress = instance->GetData(DATA_CHESTLOOTED);
-            instance->SetData(DATA_CHESTLOOTED, 0);
-            float x, y, z;
-            creature->GetPosition(x, y, z);
-            uint32 entry = creature->GetEntry();
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                if (HostageEntry[i] == entry)
-                {
-                    creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
-                    break;
-                }
-            }
-        }
-
-        return true;
     }
 };
 
@@ -620,7 +619,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
+        bool GossipSelect(Player* player, uint32 sender, uint32 action) override
         {
             if (me->GetCreatureTemplate()->GossipMenuId == sender && !action)
             {
@@ -631,6 +630,7 @@ public:
                 _gongEvent = GONG_EVENT_1;
                 _gongTimer = 4000;
             }
+            return false;
         }
 
         void SpellHit(Unit*, const SpellInfo* spell) override

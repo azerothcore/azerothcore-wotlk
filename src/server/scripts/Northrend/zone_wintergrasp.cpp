@@ -200,40 +200,6 @@ class npc_wg_spirit_guide : public CreatureScript
 public:
     npc_wg_spirit_guide() : CreatureScript("npc_wg_spirit_guide") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-        if (!wintergrasp)
-            return true;
-
-        GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
-        for (uint8 i = 0; i < graveyard.size(); i++)
-            if (graveyard[i]->GetControlTeamId() == player->GetTeamId())
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, sObjectMgr->GetAcoreStringForDBCLocale(((BfGraveyardWG*)graveyard[i])->GetTextId()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + i);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature */, uint32 /*sender */, uint32 action) override
-    {
-        CloseGossipMenuFor(player);
-
-        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-        if (wintergrasp)
-        {
-            GraveyardVect gy = wintergrasp->GetGraveyardVector();
-            for (uint8 i = 0; i < gy.size(); i++)
-                if (action - GOSSIP_ACTION_INFO_DEF == i && gy[i]->GetControlTeamId() == player->GetTeamId())
-                    if (GraveyardStruct const* safeLoc = sGraveyard->GetGraveyard(gy[i]->GetGraveyardId()))
-                        player->TeleportTo(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, 0);
-        }
-        return true;
-    }
-
     struct npc_wg_spirit_guideAI : public ScriptedAI
     {
         npc_wg_spirit_guideAI(Creature* creature) : ScriptedAI(creature)
@@ -245,6 +211,40 @@ public:
         {
             if (!me->HasUnitState(UNIT_STATE_CASTING))
                 DoCast(me, SPELL_CHANNEL_SPIRIT_HEAL);
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+            if (!wintergrasp)
+                return true;
+
+            GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
+            for (uint8 i = 0; i < graveyard.size(); i++)
+                if (graveyard[i]->GetControlTeamId() == player->GetTeamId())
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, sObjectMgr->GetAcoreStringForDBCLocale(((BfGraveyardWG*) graveyard[i])->GetTextId()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + i);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender */, uint32 action) override
+        {
+            CloseGossipMenuFor(player);
+
+            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+            if (wintergrasp)
+            {
+                GraveyardVect gy = wintergrasp->GetGraveyardVector();
+                for (uint8 i = 0; i < gy.size(); i++)
+                    if (action - GOSSIP_ACTION_INFO_DEF == i && gy[i]->GetControlTeamId() == player->GetTeamId())
+                        if (GraveyardStruct const* safeLoc = sGraveyard->GetGraveyard(gy[i]->GetGraveyardId()))
+                            player->TeleportTo(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, 0);
+            }
+            return true;
         }
     };
 
