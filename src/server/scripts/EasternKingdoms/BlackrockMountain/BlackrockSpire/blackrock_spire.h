@@ -72,7 +72,10 @@ enum CreaturesIds
     NPC_BLACKHAND_SUMMONER          = 9818,
     NPC_BLACKHAND_VETERAN           = 9819,
     NPC_BLACKHAND_INCARCERATOR      = 10316,
-    NPC_LORD_VICTOR_NEFARIUS        = 10162
+    NPC_LORD_VICTOR_NEFARIUS        = 10162,
+    NPC_UROK_MAGUS                  = 10602,
+    NPC_UROK_ENFORCER               = 10601,
+    NPC_FINKLE_EINHORN              = 10776
 };
 
 enum AdditionalData
@@ -82,7 +85,8 @@ enum AdditionalData
     EVENT_PYROGUARD_EMBERSEER       = 4884,
     AREATRIGGER                     = 1,
     AREATRIGGER_DRAGONSPIRE_HALL    = 2046,
-    AREATRIGGER_BLACKROCK_STADIUM   = 2026
+    AREATRIGGER_BLACKROCK_STADIUM   = 2026,
+    SAY_FINKLE_GANG                 = 0
 };
 
 enum GameObjectsIds
@@ -119,6 +123,8 @@ enum GameObjectsIds
     GO_PORTCULLIS_TOBOSSROOMS       = 175186,
     // Urok Doomhowl
     GO_UROK_PILE                    = 175621,
+    GO_UROK_CHALLENGE               = 175584,
+    GO_UROK_CIRCLE                  = 175571
 };
 
 enum npcspells
