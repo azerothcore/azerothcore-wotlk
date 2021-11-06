@@ -113,7 +113,6 @@ public:
                     return GandlingGatesGUID[6];
                 case NPC_DARKMASTER_GANDLING:
                     return GandlingGUID;
-
             }
             return ObjectGuid::Empty;
         }
@@ -191,8 +190,7 @@ public:
                 case DATA_RAS_HUMAN:
                     _rasHuman = data;
                     break;
-                }
-
+            }
             SaveToDB();
         }
 
