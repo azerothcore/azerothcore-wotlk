@@ -40,8 +40,7 @@ enum Calvin
 {
     SAY_COMPLETE        = 0,
     SPELL_DRINK         = 2639,                             // possibly not correct spell (but iconId is correct)
-    QUEST_590           = 590,
-    FACTION_HOSTILE     = 168
+    QUEST_590           = 590
 };
 
 class npc_calvin_montague : public CreatureScript
@@ -53,7 +52,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_590)
         {
-            creature->setFaction(FACTION_HOSTILE);
+            creature->SetFaction(FACTION_ENEMY);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             CAST_AI(npc_calvin_montague::npc_calvin_montagueAI, creature->AI())->AttackStart(player);
         }

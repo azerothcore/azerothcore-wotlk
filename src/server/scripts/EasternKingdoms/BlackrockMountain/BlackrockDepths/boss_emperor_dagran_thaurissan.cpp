@@ -93,7 +93,7 @@ public:
             {
                 Moira->AI()->EnterEvadeMode();
                 Moira->AI()->Talk(0);
-                Moira->setFaction(35);
+                Moira->SetFaction(FACTION_FRIENDLY);
             }
         }
 

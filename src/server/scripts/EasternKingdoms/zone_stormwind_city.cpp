@@ -43,7 +43,6 @@ EndContentData */
 
 enum Bartleby
 {
-    FACTION_ENEMY       = 168,
     QUEST_BEAT          = 1640
 };
 
@@ -56,7 +55,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_BEAT)
         {
-            creature->setFaction(FACTION_ENEMY);
+            creature->SetFaction(FACTION_ENEMY);
             creature->AI()->AttackStart(player);
         }
         return true;
@@ -71,15 +70,15 @@ public:
     {
         npc_bartlebyAI(Creature* creature) : ScriptedAI(creature)
         {
-            m_uiNormalFaction = creature->getFaction();
+            m_uiNormalFaction = creature->GetFaction();
         }
 
         uint32 m_uiNormalFaction;
 
         void Reset() override
         {
-            if (me->getFaction() != m_uiNormalFaction)
-                me->setFaction(m_uiNormalFaction);
+            if (me->GetFaction() != m_uiNormalFaction)
+                me->SetFaction(m_uiNormalFaction);
         }
 
         void AttackedBy(Unit* pAttacker) override
@@ -259,8 +258,8 @@ public:
                             if (Creature* pTyrion = me->FindNearestCreature(NPC_TYRION, 20.0f, true))
                                 pTyrion->AI()->Talk(SAY_TYRION_2);
                             if (Creature* pMarzon = ObjectAccessor::GetCreature(*me, MarzonGUID))
-                                pMarzon->setFaction(14);
-                            me->setFaction(14);
+                                pMarzon->SetFaction(FACTION_MONSTER);
+                            me->SetFaction(FACTION_MONSTER);
                             uiTimer = 0;
                             uiPhase = 0;
                             break;
