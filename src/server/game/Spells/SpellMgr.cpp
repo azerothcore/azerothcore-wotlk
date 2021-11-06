@@ -2726,58 +2726,75 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
 
 void SpellMgr::LoadSpellCustomAttr()
 {
-    uint32 oldMSTime = getMSTime();
-    uint32 customAttrTime = getMSTime();
+    uint32 const oldMSTime = getMSTime();
+    uint32 const customAttrTime = getMSTime();
     uint32 count;
 
     QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes FROM spell_custom_attr");
 
     if (!result)
+    {
         LOG_INFO("server.loading", ">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
+    }
     else
     {
         for (count = 0; result->NextRow(); ++count)
         {
-            Field* fields = result->Fetch();
+            Field const* fields = result->Fetch();
 
-            uint32 spellId = fields[0].GetUInt32();
+            uint32 const spellId = fields[0].GetUInt32();
             uint32 attributes = fields[1].GetUInt32();
 
             SpellInfo* spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
             {
-                LOG_INFO("spells", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
+                LOG_INFO("sql.sql", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
                 continue;
             }
 
-            if ((attributes & SPELL_ATTR0_CU_NEGATIVE) != 0)
+            if (attributes & SPELL_ATTR0_CU_NEGATIVE)
             {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (spellInfo->Effects[i].IsEffect())
-                        continue;
-
-                    if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
                     {
-                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) && (attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
+                        {
+                            LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u and SPELL_ATTR0_CU_POSITIVE_EFF%u attributes for spell %u which cannot stack together. Attributes will not get applied", static_cast<uint32>(i), static_cast<uint32>(i), spellId);
+                            attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)|(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
+                        }
                         continue;
+                    }
+
+                    if (attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i))
+                    {
+                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", static_cast<uint32>(i), spellId, static_cast<uint32>(i));
+                        attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i);
                     }
                 }
             }
 
-            if ((attributes & SPELL_ATTR0_CU_POSITIVE) != 0)
+            if (attributes & SPELL_ATTR0_CU_POSITIVE)
             {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (spellInfo->Effects[i].IsEffect())
-                        continue;
-
-                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
                     {
-                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
                         continue;
                     }
+
+                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
+                    {
+                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        attributes &= ~(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
+                    }
                 }
+            }
+
+            if ((attributes & SPELL_ATTR0_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_REJECT_AURA_SAVING))
+            {
+                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u. Both attributes will get applied", spellId);
+                attributes &= ~(SPELL_ATTR0_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_REJECT_AURA_SAVING);
             }
 
             spellInfo->AttributesCu |= attributes;

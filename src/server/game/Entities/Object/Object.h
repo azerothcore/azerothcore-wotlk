@@ -853,7 +853,7 @@ public:
     [[nodiscard]] bool IsOutdoors() const;
     LiquidData const& GetLiquidData() const;
 
-    InstanceScript* GetInstanceScript();
+    InstanceScript* GetInstanceScript() const;
 
     [[nodiscard]] std::string const& GetName() const { return m_name; }
     void SetName(std::string const& newname) { m_name = newname; }
