@@ -707,7 +707,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             if (Player* target = GetHitUnit()->ToPlayer())
             {
-               target->CastSpell(target, Trinity::Containers::SelectRandomContainerElement(CreateHeartCandySpells), true);
+               target->CastSpell(target, Acore::Containers::SelectRandomContainerElement(CreateHeartCandySpells), true);
             }
 
         }
