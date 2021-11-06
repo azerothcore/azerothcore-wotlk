@@ -22,13 +22,11 @@ Comment: All learn related commands
 Category: commandscripts
 EndScriptData */
 
-#include "Chat.h"
+#include "ScriptMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
-#include "Player.h"
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -38,7 +36,7 @@ EndScriptData */
 
 using namespace Acore::ChatCommands;
 
-class learn_commandscript : public CommandScript, public PlayerCommand
+class learn_commandscript : public CommandScript
 {
 public:
     learn_commandscript() : CommandScript("learn_commandscript") { }
@@ -94,7 +92,7 @@ public:
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
         uint32 spell = handler->extractSpellIdFromLink((char*)args);
         char const* all = strtok(nullptr, " ");
-        return Learn(handler, targetPlayer, spell, all);
+        return Acore::PlayerCommand::HandleLearnSpellCommand(handler, targetPlayer, spell, all);
     }
 
     static bool HandleLearnAllGMCommand(ChatHandler* handler, char const* /*args*/)
@@ -461,7 +459,7 @@ public:
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
         uint32 spellId = handler->extractSpellIdFromLink((char*)args);
         char const* allStr = strtok(nullptr, " ");
-        return UnLearn(handler, target, spellId, allStr);
+        return Acore::PlayerCommand::HandleUnlearnSpellCommand(handler, target, spellId, allStr);
     }
 };
 
