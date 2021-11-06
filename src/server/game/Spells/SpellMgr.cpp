@@ -4110,8 +4110,8 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
-    // Killing Spree
-    ApplySpellFix({ 51690 }, [](SpellEntry* spellInfo)
+    // Killing Spree, disenchant, prospect
+    ApplySpellFix({51690, 13262, 31252}, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_ALLOW_WHILE_STEALTHED;
     });
@@ -7419,11 +7419,6 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
-    });
-
-    ApplySpellFix({ 13262, 31252 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx |= SPELL_ATTR1_ALLOW_WHILE_STEALTHED;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
