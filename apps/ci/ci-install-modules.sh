@@ -8,7 +8,7 @@ echo "install modules"
 #git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ah-bot.git modules/mod-ah-bot
 #git clone --depth=1 --branch=master https://github.com/azerothcore/mod-anticheat.git modules/mod-anticheat
 #git clone --depth=1 --branch=master https://github.com/azerothcore/mod-azerothshard.git modules/mod-azerothshard
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-cfbg.git modules/mod-cfbg
+#git clone --depth=1 --branch=master https://github.com/azerothcore/mod-cfbg.git modules/mod-cfbg
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chat-transmitter modules/mod-chat-transmitter
 #git clone --depth=1 --branch=master https://github.com/azerothcore/mod-desertion-warnings.git modules/mod-desertion-warnings
 #git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset.git modules/mod-duel-reset
