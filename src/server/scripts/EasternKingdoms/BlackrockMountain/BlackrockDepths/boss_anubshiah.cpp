@@ -54,11 +54,11 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(SPELL_SHADOWBOLT, 0.2*TIMER_SHADOWBOLT);
-            events.ScheduleEvent(SPELL_CURSE_TONGUES, 0.2*TIMER_CURSE_TONGUES);
-            events.ScheduleEvent(SPELL_CURSE_WEAKNESS, 0.2*TIMER_CURSE_WEAKNESS);
+            events.ScheduleEvent(SPELL_SHADOWBOLT, 0.2 * (int)TIMER_SHADOWBOLT);
+            events.ScheduleEvent(SPELL_CURSE_TONGUES, 0.2 * (int)TIMER_CURSE_TONGUES);
+            events.ScheduleEvent(SPELL_CURSE_WEAKNESS, 0.2 * (int)TIMER_CURSE_WEAKNESS);
             events.ScheduleEvent(SPELL_DEMON_ARMOR, 500);
-            events.ScheduleEvent(SPELL_ENVELOPING_WEB, 0.2*TIMER_ENVELOPING_WEB);
+            events.ScheduleEvent(SPELL_ENVELOPING_WEB, 0.2 * (int)TIMER_ENVELOPING_WEB);
         }
 
         void UpdateAI(uint32 diff) override

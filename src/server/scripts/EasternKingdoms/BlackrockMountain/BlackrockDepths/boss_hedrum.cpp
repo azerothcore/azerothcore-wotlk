@@ -50,9 +50,9 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(SPELL_PARALYZING, 0.2 * TIMER_PARALYZING);
-            events.ScheduleEvent(SPELL_BANEFUL, 0.2 * TIMER_BANEFUL);
-            events.ScheduleEvent(SPELL_WEB_EXPLOSION, 0.2 * TIMER_WEB_EXPLOSION);
+            events.ScheduleEvent(SPELL_PARALYZING, 0.2 * (int) TIMER_PARALYZING);
+            events.ScheduleEvent(SPELL_BANEFUL, 0.2 * (int) TIMER_BANEFUL);
+            events.ScheduleEvent(SPELL_WEB_EXPLOSION, 0.2 * (int) TIMER_WEB_EXPLOSION);
         }
 
         void UpdateAI(uint32 diff) override

@@ -50,8 +50,8 @@ public:
 
         void EnterCombat(Unit* /*who*/) override {
 
-            events.ScheduleEvent(SPELL_GROUNDTREMOR, 0.2 * TIMER_GROUNDTREMOR);
-            events.ScheduleEvent(SPELL_FRENZY, 0.2 * TIMER_FRENZY);
+            events.ScheduleEvent(SPELL_GROUNDTREMOR, 0.2 * (int) TIMER_GROUNDTREMOR);
+            events.ScheduleEvent(SPELL_FRENZY, 0.2 * (int) TIMER_FRENZY);
         }
 
         void UpdateAI(uint32 diff) override

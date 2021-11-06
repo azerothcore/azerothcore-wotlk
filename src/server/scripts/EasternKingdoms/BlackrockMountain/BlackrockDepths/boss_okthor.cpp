@@ -54,9 +54,9 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(SPELL_ARCANE_BOLT, 0.2 * TIMER_ARCANE_BOLT);
-            events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, 0.2 * TIMER_ARCANE_EXPLOSION);
-            events.ScheduleEvent(SPELL_POLYMORPH, 0.2 * TIMER_POLYMORPH);
+            events.ScheduleEvent(SPELL_ARCANE_BOLT, 0.2 * (int) TIMER_ARCANE_BOLT);
+            events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, 0.2 * (int) TIMER_ARCANE_EXPLOSION);
+            events.ScheduleEvent(SPELL_POLYMORPH, 0.2 * (int) TIMER_POLYMORPH);
             events.ScheduleEvent(SPELL_SLOW, 500);
         }
 
