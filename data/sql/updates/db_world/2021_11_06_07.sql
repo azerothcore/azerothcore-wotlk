@@ -1,3 +1,19 @@
+-- DB update 2021_11_06_06 -> 2021_11_06_07
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_06_06';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_06_06 2021_11_06_07 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1635936745734477829'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1635936745734477829');
 
 -- Add SAI for Witch Doctor Uzer'i
@@ -41,3 +57,13 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (8115, 4, -4378.28, 255.898, 26.3856, 'Witch Doctor Uzer''i'),
 (8115, 5, -4375.1, 259.339, 26.584, 'Witch Doctor Uzer''i'),
 (8115, 6, -4375.68, 269.717, 25.4947, 'Witch Doctor Uzer''i');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_06_07' WHERE sql_rev = '1635936745734477829';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
