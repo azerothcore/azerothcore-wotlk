@@ -1,3 +1,19 @@
+-- DB update 2021_11_06_00 -> 2021_11_06_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_06_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_06_00 2021_11_06_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1636050414423889017'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636050414423889017');
 
 -- Condition for Wind Stone Gossip menu option
@@ -45,3 +61,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15, 6543, 4, 0, 0, 1, 0, 24748, 0, 0, 0, 0, 0, '', 'Show gossip menu 6543 option id 4 if target has aura Twilight Cultist Disguise (effect 0).'),
 (15, 6543, 4, 0, 0, 1, 0, 24782, 0, 0, 0, 0, 0, '', 'Show gossip menu 6543 option id 4 if target has aura Twilight Cultist Disguise (effect 0).'),
 (15, 6543, 4, 0, 0, 2, 0, 20448, 1, 0, 0, 0, 0, '', 'Show gossip menu 6543 option id 4 if player has 1 of Scepter of Beckoning: Thunder. Item cannot be in bank.');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_06_01' WHERE sql_rev = '1636050414423889017';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
