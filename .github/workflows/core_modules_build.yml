@@ -42,13 +42,13 @@ jobs:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
         run: source ./apps/ci/ci-conf.sh
-      - name: Import db
-        run: source ./apps/ci/ci-import-db.sh
+#      - name: Import db
+#        run: source ./apps/ci/ci-import-db.sh
       - name: Build
         run: source ./apps/ci/ci-compile.sh
-      - name: Dry run
-        run: source ./apps/ci/ci-worldserver-dry-run.sh
-      - name: Check startup errors
-        run: source ./apps/ci/ci-error-check.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh
+#      - name: Dry run
+#        run: source ./apps/ci/ci-worldserver-dry-run.sh
+#      - name: Check startup errors
+#        run: source ./apps/ci/ci-error-check.sh
+#      - name: Run unit tests
+#        run: source ./apps/ci/ci-run-unit-tests.sh
