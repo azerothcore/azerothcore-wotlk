@@ -552,6 +552,19 @@ public:
     [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
+class OnlyOnceAreaTriggerScript : public AreaTriggerScript
+{
+    using AreaTriggerScript::AreaTriggerScript;
+
+public:
+    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) override;
+
+protected:
+    virtual bool _OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) = 0;
+    void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
+    void ResetAreaTriggerDone(Player const* /*player*/, AreaTrigger const* /*trigger*/);
+};
+
 class BattlegroundScript : public ScriptObject
 {
 protected:
@@ -1440,7 +1453,20 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+     virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+};
+
+class DatabaseScript : public ScriptObject
+{
+protected:
+
+    DatabaseScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) {}
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1925,6 +1951,10 @@ public: /* AchievementScript */
 
         void OnHandleDevCommand(Player* player, std::string& argstr);
 
+    public: /* DatabaseScript */
+
+        void OnAfterDatabasesLoaded(uint32 updateFlags);
+
 private:
     uint32 _scriptCount;
 
@@ -1994,31 +2024,31 @@ public:
                 if (id)
                 {
                     // Try to find an existing script.
-                    bool existing = false;
+                    TScript const* oldScript = nullptr;
                     for (auto iterator = ScriptPointerList.begin(); iterator != ScriptPointerList.end(); ++iterator)
                     {
                         // If the script names match...
                         if (iterator->second->GetName() == script->GetName())
                         {
                             // ... It exists.
-                            existing = true;
+                            oldScript = iterator->second;
                             break;
                         }
                     }
 
-                    // If the script isn't assigned -> assign it!
-                    if (!existing)
+                    // If the script is already assigned -> delete it!
+                    if (oldScript)
                     {
-                        ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
+                        delete oldScript;
                     }
-                    else
-                    {
-                        // If the script is already assigned -> delete it!
-                        LOG_ERROR("scripts", "Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
-                                       script->GetName().c_str());
 
-                        ABORT(); // Error that should be fixed ASAP.
+                    // Assign new script!
+                    ScriptPointerList[id] = script;
+
+                    // Increment script count only with new scripts
+                    if (!oldScript)
+                    {
+                        sScriptMgr->IncrementScriptCount();
                     }
                 }
                 else
