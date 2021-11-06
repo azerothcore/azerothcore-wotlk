@@ -298,7 +298,7 @@ public:
                     break;
                 case NPC_SHADOWFORGE_PEASANT:
                 case NPC_SHADOWFORCE_CITIZEN: // both do the same
-                    if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < RADIUS_RING_OF_LAW)
+                    if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < (float)RADIUS_RING_OF_LAW)
                     {
                         ArenaSpectators.push_back(creature->GetGUID());
                     }
@@ -311,7 +311,7 @@ public:
                 case NPC_SHADOWFORGE_SENATOR:
                     // keep track of Senators that are not too far from emperor. Can't really use emperor as creature due to him possibly not being spawned.
                     // some senators spawn at ring of law
-                    if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < DISTANCE_EMPEROR_ROOM)
+                    if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < (float)DISTANCE_EMPEROR_ROOM)
                     {
                         EmperorSenatorsVector.push_back(creature->GetGUID());
                     }
