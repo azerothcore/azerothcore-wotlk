@@ -41,6 +41,11 @@ enum Adds
     NPC_SMOLDERTHORN_BERSERKER      = 9268
 };
 
+enum Misc
+{
+    CALL_HELP   = 0,
+};
+
 const Position SummonLocation1 = {-49.43f, -455.82f, 77.82f, 4.61f};
 const Position SummonLocation2 = {-58.48f, -456.29f, 77.82f, 4.613f};
 
@@ -78,11 +83,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
-            if (instance)
-            {
-                instance->SetBossState(DATA_OVERLORD_WYRMTHALAK, DONE);
-                instance->SaveToDB();
-            }
+            instance->SetBossState(DATA_OVERLORD_WYRMTHALAK, DONE);
         }
 
         void UpdateAI(uint32 diff) override
@@ -92,8 +93,7 @@ public:
 
             if (!Summoned && HealthBelowPct(51))
             {
-                Talk(0); // let's see if I have a talk.
-                me->CallForHelp(1);
+                Talk(CALL_HELP);
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                 {
                     if (Creature* warlord = me->SummonCreature(NPC_SPIRESTONE_WARLORD, SummonLocation1, TEMPSUMMON_TIMED_DESPAWN, 300 * IN_MILLISECONDS))
