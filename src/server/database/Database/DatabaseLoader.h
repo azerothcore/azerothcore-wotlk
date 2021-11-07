@@ -52,7 +52,12 @@ public:
         DATABASE_MASK_ALL   = DATABASE_LOGIN | DATABASE_CHARACTER | DATABASE_WORLD
     };
 
-private:
+    [[nodiscard]] uint32 GetUpdateFlags() const
+    {
+        return _updateFlags;
+    }
+
+private :
     bool OpenDatabases();
     bool PopulateDatabases();
     bool UpdateDatabases();
