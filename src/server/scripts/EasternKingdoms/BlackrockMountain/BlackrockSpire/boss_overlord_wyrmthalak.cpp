@@ -82,7 +82,6 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            events.Reset();
             instance->SetBossState(DATA_OVERLORD_WYRMTHALAK, DONE);
         }
 
