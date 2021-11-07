@@ -175,12 +175,14 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     ItemTemplate const* pProto = pSrcItem->GetTemplate();
     if (!pProto)
     {
+        _player->SendEquipError(pSrcItem->IsBag() ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem);
         return;
     }
 
     uint8 eslot = _player->FindEquipSlot(pProto, NULL_SLOT, !pSrcItem->IsBag());
     if (eslot == NULL_SLOT)
     {
+        _player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
     }
 
@@ -188,6 +190,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     uint16 dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
     if (dest == src) // prevent equip in same slot, only at cheat
     {
+        _player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
     }
 
@@ -329,7 +332,10 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         _player->DestroyItemCount(pItem, i_count, true);
     }
     else
+    {
         _player->DestroyItem(bag, slot, true);
+    }
+    _player->SendQuestGiverStatusMultiple();
 }
 
 bool ItemTemplate::HasStat(ItemModType stat) const
@@ -1252,9 +1258,10 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
             return;
         }
 
+        uint32 count = pItem->GetCount();
         _player->RemoveItem(srcbag, srcslot, true);
         if (Item const* storedItem = _player->StoreItem(dest, pItem, true))
-            _player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
+            _player->ItemAddedQuestCheck(storedItem->GetEntry(), count);
     }
     else                                                    // moving from inventory to bank
     {
@@ -1267,6 +1274,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
         }
 
         _player->RemoveItem(srcbag, srcslot, true);
+        _player->ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
         _player->BankItem(dest, pItem, true);
         _player->UpdateTitansGrip();
     }

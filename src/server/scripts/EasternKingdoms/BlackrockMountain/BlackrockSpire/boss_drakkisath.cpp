@@ -21,18 +21,22 @@
 
 enum Spells
 {
-    SPELL_FIRENOVA                  = 23462,
-    SPELL_CLEAVE                    = 20691,
-    SPELL_CONFLIGURATION            = 16805,
+    SPELL_FLAMESTRIKE               = 16419,
+    SPELL_CLEAVE                    = 15284,
+    SPELL_CONFLAGRATION             = 16805,
     SPELL_THUNDERCLAP               = 15548, //Not sure if right ID. 23931 would be a harder possibility.
+    SPELL_RAGE                      = 16789,
+    SPELL_PIERCE_ARMOR              = 12097
 };
 
 enum Events
 {
-    EVENT_FIRE_NOVA                = 1,
-    EVENT_CLEAVE                   = 2,
-    EVENT_CONFLIGURATION           = 3,
-    EVENT_THUNDERCLAP              = 4,
+    EVENT_FLAMESTRIKE               = 1,
+    EVENT_CLEAVE,
+    EVENT_CONFLAGRATION,
+    EVENT_THUNDERCLAP,
+    EVENT_PIERCE_ARMOR,
+    EVENT_RAGE
 };
 
 enum ChromaticEliteGuardEvents
@@ -49,8 +53,8 @@ enum ChromaticEliteGuardSpells
     SPELL_STRIKE        = 15580
 };
 
-int const ChromaticEliteGuardEntry  = 10814;
-int const GeneralDrakkisathEntry    = 10814;
+constexpr uint32 ChromaticEliteGuardEntry  = 10814;
+constexpr uint32 GeneralDrakkisathEntry    = 10814;
 
 class boss_drakkisath : public CreatureScript
 {
@@ -70,10 +74,12 @@ public:
         {
             _EnterCombat();
             CallForHelp();
-            events.ScheduleEvent(EVENT_FIRE_NOVA, 6000);
+            events.ScheduleEvent(EVENT_FLAMESTRIKE, 6000);
             events.ScheduleEvent(EVENT_CLEAVE,    8000);
-            events.ScheduleEvent(EVENT_CONFLIGURATION, 15000);
+            events.ScheduleEvent(EVENT_CONFLAGRATION, 15000);
             events.ScheduleEvent(EVENT_THUNDERCLAP,    17000);
+            events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5000);
+            events.ScheduleEvent(EVENT_RAGE, 1000);
         }
 
         // Will make his two adds engage combat
@@ -106,21 +112,32 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_FIRE_NOVA:
-                        DoCastVictim(SPELL_FIRENOVA);
-                        events.ScheduleEvent(EVENT_FIRE_NOVA, 10000);
+                    case EVENT_FLAMESTRIKE:
+                        DoCastAOE(SPELL_FLAMESTRIKE);
+                        events.ScheduleEvent(EVENT_FLAMESTRIKE, 10000);
                         break;
                     case EVENT_CLEAVE:
                         DoCastVictim(SPELL_CLEAVE);
                         events.ScheduleEvent(EVENT_CLEAVE, 8000);
                         break;
-                    case EVENT_CONFLIGURATION:
-                        DoCastVictim(SPELL_CONFLIGURATION);
-                        events.ScheduleEvent(EVENT_CONFLIGURATION, 18000);
+                    case EVENT_CONFLAGRATION:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                        {
+                            DoCast(target, SPELL_CONFLAGRATION);
+                        }
+                        events.ScheduleEvent(EVENT_CONFLAGRATION, 18000);
                         break;
                     case EVENT_THUNDERCLAP:
                         DoCastVictim(SPELL_THUNDERCLAP);
                         events.ScheduleEvent(EVENT_THUNDERCLAP, 20000);
+                        break;
+                    case EVENT_PIERCE_ARMOR:
+                        DoCastVictim(SPELL_PIERCE_ARMOR);
+                        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 40000);
+                        break;
+                    case EVENT_RAGE:
+                        DoCastSelf(SPELL_RAGE);
+                        events.ScheduleEvent(EVENT_RAGE, 35000);
                         break;
                 }
             }
@@ -181,11 +198,11 @@ public:
                     break;
                 case EVENT_KNOCKDOWN:
                     DoCastVictim(SPELL_KNOCKDOWN);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(11200, 25700));
+                    _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(11200, 25700));
                     break;
                 case EVENT_STRIKE:
                     DoCastVictim(SPELL_STRIKE);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 9000);
+                    _events.ScheduleEvent(EVENT_STRIKE, 9000);
                     break;
             }
 
