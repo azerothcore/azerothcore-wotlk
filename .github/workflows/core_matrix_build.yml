@@ -1,9 +1,10 @@
-name: main
+name: core
 on:
   push:
     branches:
       - 'master'
   pull_request:
+    types: ['labeled']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -15,13 +16,24 @@ jobs:
       fail-fast: false
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
-        os: [ubuntu-20.04]
-        compiler: [clang]
+        include:
+          - os: ubuntu-20.04
+            compiler: clang12
+          - os: ubuntu-20.04
+            compiler: clang11
+          - os: ubuntu-18.04
+            compiler: clang10
+          - os: ubuntu-18.04
+            compiler: gcc8
+          - os: ubuntu-20.04
+            compiler: gcc # default in 20.04 is gcc 9
+          - os: ubuntu-20.04
+            compiler: gcc10
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.event.label.name == 'run-build' || github.event.label.name == 'file-cpp' || github.ref == 'refs/heads/master')
     steps:
       - uses: actions/checkout@v2
       - name: Cache
