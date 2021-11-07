@@ -77,7 +77,12 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
+            events.Reset();
+            if (instance)
+            {
+                instance->SetBossState(DATA_OVERLORD_WYRMTHALAK, DONE);
+                instance->SaveToDB();
+            }
         }
 
         void UpdateAI(uint32 diff) override
