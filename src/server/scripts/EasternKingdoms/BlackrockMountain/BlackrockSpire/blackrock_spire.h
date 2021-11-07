@@ -49,7 +49,8 @@ enum DataTypes
     DATA_HALL_RUNE_4                = 19,
     DATA_HALL_RUNE_5                = 20,
     DATA_HALL_RUNE_6                = 21,
-    DATA_HALL_RUNE_7                = 22
+    DATA_HALL_RUNE_7                = 22,
+    DATA_SOLAKAR_FLAMEWREATH        = 23
 };
 
 enum CreaturesIds
@@ -73,6 +74,14 @@ enum CreaturesIds
     NPC_BLACKHAND_VETERAN           = 9819,
     NPC_BLACKHAND_INCARCERATOR      = 10316,
     NPC_LORD_VICTOR_NEFARIUS        = 10162,
+
+    NPC_SOLAKAR                     = 10264,
+    NPC_ROOKERY_GUARDIAN            = 10258,
+    NPC_ROOKERY_HATCHER             = 10683,
+    NPC_ROOKERY_WHELP               = 10161,
+
+    NPC_UROK_MAGUS                  = 10602,
+    NPC_UROK_ENFORCER               = 10601,
     NPC_FINKLE_EINHORN              = 10776
 };
 
@@ -89,7 +98,7 @@ enum AdditionalData
 
 enum GameObjectsIds
 {
-    GO_WHELP_SPAWNER                = 175622, // trap spawned by go id 175124
+    GO_ROOKERY_EGG                  = 175124,
     // Doors
     GO_EMBERSEER_IN                 = 175244, // First door to Pyroguard Emberseer
     GO_DOORS                        = 175705, // Second door to Pyroguard Emberseer
@@ -121,6 +130,8 @@ enum GameObjectsIds
     GO_PORTCULLIS_TOBOSSROOMS       = 175186,
     // Urok Doomhowl
     GO_UROK_PILE                    = 175621,
+    GO_UROK_CHALLENGE               = 175584,
+    GO_UROK_CIRCLE                  = 175571
 };
 
 enum npcspells
