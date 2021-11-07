@@ -1,3 +1,7 @@
+file-cpp:
+  - ./*.cpp
+  - ./*.h
+
 DB:
   - data/**/*.sql
 

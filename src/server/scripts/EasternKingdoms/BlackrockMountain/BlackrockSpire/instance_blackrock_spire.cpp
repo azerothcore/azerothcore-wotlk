@@ -26,19 +26,34 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
-//uint32 const DragonspireRunes[7] = { GO_HALL_RUNE_1, GO_HALL_RUNE_2, GO_HALL_RUNE_3, GO_HALL_RUNE_4, GO_HALL_RUNE_5, GO_HALL_RUNE_6, GO_HALL_RUNE_7 };
-
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
 
 enum EventIds
 {
     EVENT_DARGONSPIRE_ROOM_STORE           = 1,
-    EVENT_DARGONSPIRE_ROOM_CHECK           = 2
+    EVENT_DARGONSPIRE_ROOM_CHECK           = 2,
+
+    EVENT_SOLAKAR_WAVE                     = 3
 };
+
+enum Timers
+{
+    TIMER_SOLAKAR_WAVE = 30000
+};
+
+enum SolakarWaves
+{
+    MAX_WAVE_COUNT = 5
+};
+
+Position SolakarPosLeft  = Position(78.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
+Position SolakarPosRight = Position(84.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
+Position SolakarPosBoss  = Position(80.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
 
 enum Texts
 {
-    SAY_NEFARIUS_REND_WIPE                 = 11
+    SAY_NEFARIUS_REND_WIPE      = 11,
+    SAY_SOLAKAR_FIRST_HATCHER   = 0
 };
 
 class instance_blackrock_spire : public InstanceMapScript
@@ -48,9 +63,16 @@ public:
 
     struct instance_blackrock_spireMapScript : public InstanceScript
     {
+        uint32 CurrentSolakarWave = 0;
+        uint32 SolakarState       = NOT_STARTED; // there should be a global instance encounter state, where is it?
+        std::vector<TempSummon*> SolakarSummons;
+
         instance_blackrock_spireMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetBossNumber(EncounterCount);
+            CurrentSolakarWave = 0;
+            SolakarState       = NOT_STARTED;
+            SolakarSummons.clear();
         }
 
         void CreatureLooted(Creature* creature, LootType loot) override
@@ -140,9 +162,6 @@ public:
         {
             switch (go->GetEntry())
             {
-                case GO_WHELP_SPAWNER:
-                    go->CastSpell(nullptr, SPELL_SUMMON_ROOKERY_WHELP);
-                    break;
                 case GO_EMBERSEER_IN:
                     go_emberseerin = go->GetGUID();
                     HandleGameObject(ObjectGuid::Empty, GetBossState(DATA_DRAGONSPIRE_ROOM) == DONE, go);
@@ -331,6 +350,29 @@ public:
                             Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1000);
                     }
                     break;
+                case DATA_SOLAKAR_FLAMEWREATH:
+                    switch(data)
+                    {
+                        case IN_PROGRESS:
+                            if (SolakarState == NOT_STARTED)
+                            {
+                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
+                            }
+                            break;
+                        case FAIL:
+                            for (const auto& creature : SolakarSummons)
+                            {
+                                creature->RemoveFromWorld();
+                            }
+                            SolakarSummons.clear();
+                            CurrentSolakarWave = 0;
+                            SetData(DATA_SOLAKAR_FLAMEWREATH, NOT_STARTED);
+                            break;
+                        case DONE:
+                            break;
+                    }
+                    SolakarState = data;
+                    break;
                 case DATA_UROK_DOOMHOWL:
                     if (data == FAIL)
                     {
@@ -365,6 +407,38 @@ public:
                     break;
                 default:
                     break;
+            }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_SOLAKAR_FLAMEWREATH)
+            {
+                return SolakarState;
+            }
+            else
+            {
+                return InstanceScript::GetData(type);
+            }
+        }
+
+        void SummonSolakarWave(uint8 number)
+        {
+            if (number < MAX_WAVE_COUNT)
+            {
+                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_GUARDIAN, SolakarPosLeft));
+                SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_HATCHER, SolakarPosRight));
+                if (number == 0)
+                {
+                    if (Creature* FirstHatcher = SolakarSummons.back()) // works because we spawned a hatcher second
+                    {
+                        FirstHatcher->AI()->Talk(SAY_SOLAKAR_FIRST_HATCHER);
+                    }
+                }
+            }
+            else if (number == MAX_WAVE_COUNT)
+            {
+                SolakarSummons.push_back(instance->SummonCreature(NPC_SOLAKAR, SolakarPosBoss));
             }
         }
 
@@ -461,6 +535,14 @@ public:
                         Dragonspireroomcheck();
                         if ((GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE))
                             Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
+                        break;
+                    case EVENT_SOLAKAR_WAVE:
+                        SummonSolakarWave(CurrentSolakarWave);
+                        if (CurrentSolakarWave < MAX_WAVE_COUNT)
+                        {
+                            Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, TIMER_SOLAKAR_WAVE);
+                            CurrentSolakarWave++;
+                        }
                         break;
                     default:
                         break;
@@ -704,9 +786,32 @@ public:
     }
 };
 
+class go_father_flame : public GameObjectScript
+{
+public:
+    go_father_flame() : GameObjectScript("go_father_flame") {}
+
+    void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*/) override
+    {
+        if (InstanceScript* instance = go->GetInstanceScript())
+        {
+            if (state == GO_ACTIVATED)
+            {
+                if (instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == IN_PROGRESS || instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == DONE)
+                {
+                    return;
+                }
+
+                instance->SetData(DATA_SOLAKAR_FLAMEWREATH, IN_PROGRESS);
+            }
+        }
+    }
+};
+
 void AddSC_instance_blackrock_spire()
 {
     new instance_blackrock_spire();
     new at_dragonspire_hall();
     new at_blackrock_stadium();
+    new go_father_flame();
 }
