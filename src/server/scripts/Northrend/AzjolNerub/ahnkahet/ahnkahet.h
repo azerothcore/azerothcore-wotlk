@@ -71,4 +71,7 @@ inline AI* GetAhnkahetAI(T* obj)
     return GetInstanceAI<AI>(obj, AhnahetScriptName);
 }
 
+#define RegisterAhnKahetCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetAhnkahetAI)
+#define RegisterAhnKahetGameObjectAI(ai_name) RegisterGameObjectAIWithFactory(ai_name, GetAhnkahetAI)
+
 #endif // DEF_AHNKAHET_H
