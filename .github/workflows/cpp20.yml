@@ -16,7 +16,7 @@ jobs:
     env:
       COMPILER: clang
       ENABLE_CPP_20: 1
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && (github.event.label.name == 'file-cpp' || github.event.label.name == 'run-build' || github.ref == 'refs/heads/master')
     steps:
       - uses: actions/checkout@v2
       - name: Cache
