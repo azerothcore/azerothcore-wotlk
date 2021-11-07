@@ -147,7 +147,7 @@ public:
 
         EventMap _events;
 
-        void EnterCombat(Unit* who) override
+        void EnterCombat(Unit* /*who*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
