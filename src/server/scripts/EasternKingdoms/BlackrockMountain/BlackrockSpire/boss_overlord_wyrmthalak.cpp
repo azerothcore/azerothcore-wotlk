@@ -41,10 +41,7 @@ enum Adds
     NPC_SMOLDERTHORN_BERSERKER      = 9268
 };
 
-enum Misc
-{
-    CALL_HELP   = 0,
-};
+constexpr uint32 CALL_HELP = 0;
 
 const Position SummonLocation1 = {-49.43f, -455.82f, 77.82f, 4.61f};
 const Position SummonLocation2 = {-58.48f, -456.29f, 77.82f, 4.613f};
