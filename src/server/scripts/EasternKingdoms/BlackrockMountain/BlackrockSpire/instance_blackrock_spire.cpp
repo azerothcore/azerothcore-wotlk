@@ -259,15 +259,25 @@ public:
             switch (type)
             {
                 case DATA_HIGHLORD_OMOKK:
+                    break;
                 case DATA_SHADOW_HUNTER_VOSHGAJIN:
+                    break;
                 case DATA_WARMASTER_VOONE:
+                    break;
                 case DATA_MOTHER_SMOLDERWEB:
+                    break;
                 case DATA_UROK_DOOMHOWL:
+                    break;
                 case DATA_QUARTERMASTER_ZIGRIS:
+                    break;
                 case DATA_GIZRUL_THE_SLAVENER:
+                    break;
                 case DATA_HALYCON:
+                    break;
                 case DATA_OVERLORD_WYRMTHALAK:
+                    break;
                 case DATA_PYROGAURD_EMBERSEER:
+                    break;
                 case DATA_WARCHIEF_REND_BLACKHAND:
                     if (state == FAIL)
                     {
@@ -283,8 +293,11 @@ public:
                     }
                     break;
                 case DATA_GYTH:
+                    break;
                 case DATA_THE_BEAST:
+                    break;
                 case DATA_GENERAL_DRAKKISATH:
+                    break;
                 case DATA_DRAGONSPIRE_ROOM:
                     break;
                 default:
