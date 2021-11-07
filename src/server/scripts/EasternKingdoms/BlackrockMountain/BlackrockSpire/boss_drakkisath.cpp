@@ -53,9 +53,6 @@ enum ChromaticEliteGuardSpells
     SPELL_STRIKE        = 15580
 };
 
-constexpr uint32 ChromaticEliteGuardEntry  = 10814;
-constexpr uint32 GeneralDrakkisathEntry    = 10814;
-
 class boss_drakkisath : public CreatureScript
 {
 public:
@@ -73,24 +70,12 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            CallForHelp();
             events.ScheduleEvent(EVENT_FLAMESTRIKE, 6000);
             events.ScheduleEvent(EVENT_CLEAVE,    8000);
             events.ScheduleEvent(EVENT_CONFLAGRATION, 15000);
             events.ScheduleEvent(EVENT_THUNDERCLAP,    17000);
             events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5000);
             events.ScheduleEvent(EVENT_RAGE, 1000);
-        }
-
-        // Will make his two adds engage combat
-        void CallForHelp()
-        {
-            std::list<Creature*> ChromaticEliteGuards;
-            me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
-            for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
-            {
-                (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
-            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -168,20 +153,6 @@ public:
             _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
             _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
             _events.ScheduleEvent(EVENT_STRIKE, urand(12000, 20800));
-
-            std::list<Creature*> GeneralDrakkisath;
-            me->GetCreaturesWithEntryInRange(GeneralDrakkisath, 15.0f, GeneralDrakkisathEntry);
-            for (std::list<Creature*>::const_iterator itr = GeneralDrakkisath.begin(); itr != GeneralDrakkisath.end(); ++itr)
-            {
-                (*itr)->ToCreature()->AI()->AttackStart(who);
-            }
-
-            std::list<Creature*> ChromaticEliteGuards;
-            me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
-            for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
-            {
-                (*itr)->ToCreature()->AI()->AttackStart(who);
-            }
         }
 
         void UpdateAI(uint32 diff) override

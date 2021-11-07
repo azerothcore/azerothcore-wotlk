@@ -41,6 +41,11 @@ enum Texts
     SAY_NEFARIUS_REND_WIPE                 = 11
 };
 
+MinionData const minionData[] =
+{
+    { NPC_CHROMATIC_ELITE_GUARD, DATA_GENERAL_DRAKKISATH }
+};
+
 class instance_blackrock_spire : public InstanceMapScript
 {
 public:
@@ -51,6 +56,7 @@ public:
         instance_blackrock_spireMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetBossNumber(EncounterCount);
+            LoadMinionData(minionData);
         }
 
         void CreatureLooted(Creature* creature, LootType loot) override
@@ -132,6 +138,9 @@ public:
                     break;
                 case NPC_FINKLE_EINHORN:
                     creature->AI()->Talk(SAY_FINKLE_GANG);
+                    break;
+                case NPC_CHROMATIC_ELITE_GUARD:
+                    AddMinion(creature, true);
                     break;
             }
         }
