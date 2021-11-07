@@ -92,6 +92,8 @@ public:
 
             if (!Summoned && HealthBelowPct(51))
             {
+                Talk(0); // let's see if I have a talk.
+                me->CallForHelp(1);
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                 {
                     if (Creature* warlord = me->SummonCreature(NPC_SPIRESTONE_WARLORD, SummonLocation1, TEMPSUMMON_TIMED_DESPAWN, 300 * IN_MILLISECONDS))
