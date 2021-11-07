@@ -1,0 +1,5 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636026426526412472');
+
+-- Removes Sayge's Fortunes from all NPCs
+DELETE FROM `creature_loot_template` WHERE `Comment` LIKE '%Sayge\'s Fortune%' AND `Item` IN (19229, 19237, 19238, 19239, 19240, 19241, 19242, 19243, 19244, 19245, 19246, 19247, 19248, 19249, 19250, 19251, 19252, 19253, 19254, 19255, 19256, 19266, 19423, 19424, 19443, 19451, 19452, 19453, 19454);
+
