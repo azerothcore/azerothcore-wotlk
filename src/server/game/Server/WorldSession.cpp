@@ -132,7 +132,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
-    timeWhoCommandAllowed(0),
     _calendarEventCreationCooldown(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
