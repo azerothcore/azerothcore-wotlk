@@ -915,7 +915,8 @@ enum SpellEffects
     TOTAL_SPELL_EFFECTS                             = 165
 };
 
-enum SpellCastResult
+// EnumUtils: DESCRIBE THIS
+enum SpellCastResult : uint8
 {
     SPELL_FAILED_SUCCESS = 0,
     SPELL_FAILED_AFFECTING_COMBAT = 1,
@@ -1254,6 +1255,7 @@ enum GhostVisibilityType
 };
 
 // Spell aura states
+// EnumUtils: DESCRIBE THIS
 enum AuraStateType
 {
     // (C) used in caster aura state     (T) used in target aura state
