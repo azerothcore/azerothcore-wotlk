@@ -410,9 +410,10 @@ enum TriggerCastFlags
     TRIGGERED_IGNORE_CASTER_AURAS                   = 0x00010000,   //! Will ignore caster aura restrictions or requirements
     TRIGGERED_DISALLOW_PROC_EVENTS                  = 0x00020000,   //! Disallows proc events from triggered spell (default)
     TRIGGERED_DONT_REPORT_CAST_ERROR                = 0x00040000,   //! Will return SPELL_FAILED_DONT_REPORT in CheckCast functions
+    TRIGGERED_FULL_MASK                             = 0x0007FFFF,   //! Used when doing CastSpell with triggered == true
     TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT      = 0x00080000,   //! Will ignore equipped item requirements
     TRIGGERED_NO_PERIODIC_RESET                     = 0x00100000,   //! Periodic aura tick wont be reset on override
-    TRIGGERED_FULL_MASK                             = 0xFFFFFFFF
+    TRIGGERED_FULL_DEBUG_MASK                       = 0xFFFFFFFF
 };
 
 enum UnitMods
@@ -599,6 +600,7 @@ enum DamageEffectType
 };
 
 // Value masks for UNIT_FIELD_FLAGS
+// EnumUtils: DESCRIBE THIS
 enum UnitFlags
 {
     UNIT_FLAG_SERVER_CONTROLLED             = 0x00000001,           // set only when unit movement is controlled by server - by SPLINE/MONSTER_MOVE packets, together with UNIT_FLAG_STUNNED; only set to units controlled by client; client function CGUnit_C::IsClientControlled returns false when set for owner
@@ -659,7 +661,8 @@ enum UnitFlags2
 };
 
 /// Non Player Character flags
-enum NPCFlags
+// EnumUtils: DESCRIBE THIS
+enum NPCFlags : uint32
 {
     UNIT_NPC_FLAG_NONE                  = 0x00000000,       // SKIP
     UNIT_NPC_FLAG_GOSSIP                = 0x00000001,       // TITLE has gossip menu DESCRIPTION 100%
