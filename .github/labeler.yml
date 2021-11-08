@@ -1,6 +1,8 @@
 file-cpp:
-  - ./*.cpp
-  - ./*.h
+  - src/**/*.cpp
+  - src/**/*.h
+  - deps/**/*.cpp
+  - deps/**/*.h
 
 DB:
   - data/**/*.sql

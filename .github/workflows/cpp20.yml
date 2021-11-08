@@ -4,6 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
+    types: ['labeled']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
