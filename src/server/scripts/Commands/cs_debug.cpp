@@ -56,7 +56,8 @@ public:
         {
             { "cinematic",      HandleDebugPlayCinematicCommand,       SEC_ADMINISTRATOR, Console::No },
             { "movie",          HandleDebugPlayMovieCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "sound",          HandleDebugPlaySoundCommand,           SEC_ADMINISTRATOR, Console::No }
+            { "sound",          HandleDebugPlaySoundCommand,           SEC_ADMINISTRATOR, Console::No },
+            { "music",          HandleDebugPlayMusicCommand,           SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable debugSendCommandTable =
         {
@@ -184,7 +185,25 @@ public:
         return true;
     }
 
-    static bool HandleDebugSendSpellFailCommand(ChatHandler* handler, uint8 result, Optional<uint32> failArg1, Optional<uint32> failArg2)
+    // musicId - ID from SoundEntries.dbc
+    static bool HandleDebugPlayMusicCommand(ChatHandler* handler, uint32 musicId)
+    {
+        if (!sSoundEntriesStore.LookupEntry(musicId))
+        {
+            handler->PSendSysMessage(LANG_SOUND_NOT_EXIST, musicId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* player = handler->GetPlayer();
+
+        player->PlayDirectMusic(musicId, player);
+
+        handler->PSendSysMessage(LANG_YOU_HEAR_SOUND, musicId);
+        return true;
+    }
+
+    static bool HandleDebugSendSpellFailCommand(ChatHandler* handler, SpellCastResult result, Optional<uint32> failArg1, Optional<uint32> failArg2)
     {
         WorldPacket data(SMSG_CAST_FAILED, 5);
         data << uint8(0);
@@ -205,19 +224,19 @@ public:
         return true;
     }
 
-    static bool HandleDebugSendEquipErrorCommand(ChatHandler* handler, uint16 error)
+    static bool HandleDebugSendEquipErrorCommand(ChatHandler* handler, InventoryResult error)
     {
         handler->GetPlayer()->SendEquipError(InventoryResult(error), nullptr, nullptr);
         return true;
     }
 
-    static bool HandleDebugSendSellErrorCommand(ChatHandler* handler, uint32 error)
+    static bool HandleDebugSendSellErrorCommand(ChatHandler* handler, SellResult error)
     {
         handler->GetPlayer()->SendSellError(SellResult(error), nullptr, ObjectGuid::Empty, 0);
         return true;
     }
 
-    static bool HandleDebugSendBuyErrorCommand(ChatHandler* handler, uint16 error)
+    static bool HandleDebugSendBuyErrorCommand(ChatHandler* handler, BuyResult error)
     {
         handler->GetPlayer()->SendBuyError(BuyResult(error), nullptr, 0, 0);
         return true;
@@ -432,7 +451,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugSendChannelNotifyCommand(ChatHandler* handler, uint8 type)
+    static bool HandleDebugSendChannelNotifyCommand(ChatHandler* handler, ChatNotify type)
     {
         WorldPacket data(SMSG_CHANNEL_NOTIFY, (1 + 10));
         data << type;
@@ -443,15 +462,15 @@ public:
         return true;
     }
 
-    static bool HandleDebugSendChatMsgCommand(ChatHandler* handler, uint8 type)
+    static bool HandleDebugSendChatMsgCommand(ChatHandler* handler, ChatMsg type)
     {
         WorldPacket data;
-        ChatHandler::BuildChatPacket(data, ChatMsg(type), LANG_UNIVERSAL, handler->GetPlayer(), handler->GetPlayer(), "testtest", 0, "chan");
+        ChatHandler::BuildChatPacket(data, type, LANG_UNIVERSAL, handler->GetPlayer(), handler->GetPlayer(), "testtest", 0, "chan");
         handler->GetSession()->SendPacket(&data);
         return true;
     }
 
-    static bool HandleDebugSendQuestPartyMsgCommand(ChatHandler* handler, uint32 msg)
+    static bool HandleDebugSendQuestPartyMsgCommand(ChatHandler* handler, QuestShareMessages msg)
     {
         handler->GetPlayer()->SendPushToPartyResponse(handler->GetPlayer(), msg);
         return true;
@@ -469,7 +488,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugSendQuestInvalidMsgCommand(ChatHandler* handler, uint32 msg)
+    static bool HandleDebugSendQuestInvalidMsgCommand(ChatHandler* handler, QuestFailedReason msg)
     {
         handler->GetPlayer()->SendCanTakeQuestResponse(msg);
         return true;
@@ -965,12 +984,12 @@ public:
     }
 
     // Play emote animation
-    static bool HandleDebugAnimCommand(ChatHandler* handler, uint32 emote)
+    static bool HandleDebugAnimCommand(ChatHandler* handler, Emote emote)
     {
         if (Unit* unit = handler->getSelectedUnit())
             unit->HandleEmoteCommand(emote);
 
-        handler->PSendSysMessage("Playing emote %s", emote);
+        handler->PSendSysMessage("Playing emote %s", EnumUtils::ToConstant(emote));
 
         return true;
     }
@@ -990,7 +1009,7 @@ public:
         return false;
     }
 
-    static bool HandleDebugSetAuraStateCommand(ChatHandler* handler, int32 state)
+    static bool HandleDebugSetAuraStateCommand(ChatHandler* handler, Optional<AuraStateType> state, bool apply)
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
@@ -1003,12 +1022,12 @@ public:
         if (!state)
         {
             // reset all states
-            for (int i = 1; i <= 32; ++i)
-                unit->ModifyAuraState(AuraStateType(i), false);
+            for (AuraStateType s : EnumUtils::Iterate<AuraStateType>())
+                unit->ModifyAuraState(s, false);
             return true;
         }
 
-        unit->ModifyAuraState(AuraStateType(abs(state)), state > 0);
+        unit->ModifyAuraState(*state, apply);
         return true;
     }
 
