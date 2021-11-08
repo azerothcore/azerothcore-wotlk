@@ -1625,7 +1625,6 @@ enum RedSnapperVeryTasty
     GO_SCHOOL_OF_RED_SNAPPER     = 181616
 };
 
-
 class spell_q9452_cast_net : public SpellScript
 {
     PrepareSpellScript(spell_q9452_cast_net);
