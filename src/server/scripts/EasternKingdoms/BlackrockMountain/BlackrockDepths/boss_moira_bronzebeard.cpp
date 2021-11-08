@@ -57,39 +57,42 @@ struct boss_moira_bronzebeardAI : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
+        {
             return;
-
+        }
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
             return;
-
+        }
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
             {
-            case SPELL_MINDBLAST:
-                DoCastVictim(SPELL_MINDBLAST);
-                events.ScheduleEvent(SPELL_MINDBLAST, urand(TIMER_MINDBLAST - 2000, TIMER_MINDBLAST + 2000));
-                break;
-            case SPELL_SHADOWWORDPAIN:
-                DoCastVictim(SPELL_SHADOWWORDPAIN);
-                events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(TIMER_SHADOW_WORD - 2000, TIMER_SHADOW_WORD + 2000));
-                break;
-            case SPELL_SMITE:
-                DoCastVictim(SPELL_SMITE);
-                events.ScheduleEvent(SPELL_SMITE, urand(TIMER_SMITE - 2000, TIMER_SMITE + 2000));
-                break;
-            case SPELL_HEAL:
-                CastOnEmperorIfPossible(SPELL_HEAL, TIMER_HEAL);
-                break;
-            case SPELL_SHIELD:
-                CastOnEmperorIfPossible(SPELL_SHIELD, TIMER_SHIELD);
-                break;
-            case SPELL_RENEW:
-                CastOnEmperorIfPossible(SPELL_RENEW, TIMER_RENEW);
-            default:
-                break;
+                case SPELL_MINDBLAST:
+                    DoCastVictim(SPELL_MINDBLAST);
+                    events.ScheduleEvent(SPELL_MINDBLAST, urand(TIMER_MINDBLAST - 2000, TIMER_MINDBLAST + 2000));
+                    break;
+                case SPELL_SHADOWWORDPAIN:
+                    DoCastVictim(SPELL_SHADOWWORDPAIN);
+                    events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(TIMER_SHADOW_WORD - 2000, TIMER_SHADOW_WORD + 2000));
+                    break;
+                case SPELL_SMITE:
+                    DoCastVictim(SPELL_SMITE);
+                    events.ScheduleEvent(SPELL_SMITE, urand(TIMER_SMITE - 2000, TIMER_SMITE + 2000));
+                    break;
+                case SPELL_HEAL:
+                    CastOnEmperorIfPossible(SPELL_HEAL, TIMER_HEAL);
+                    break;
+                case SPELL_SHIELD:
+                    CastOnEmperorIfPossible(SPELL_SHIELD, TIMER_SHIELD);
+                    break;
+                case SPELL_RENEW:
+                    CastOnEmperorIfPossible(SPELL_RENEW, TIMER_RENEW);
+                    break;
+                default:
+                    break;
             }
         }
         DoMeleeAttackIfReady();

@@ -48,8 +48,9 @@ public:
 
         uint32 nextTremorTime;
 
-        void EnterCombat(Unit* /*who*/) override {
-
+        void EnterCombat(Unit* /*who*/) override
+        {
+            _EnterCombat();
             events.ScheduleEvent(SPELL_GROUNDTREMOR, 0.2 * (int) TIMER_GROUNDTREMOR);
             events.ScheduleEvent(SPELL_FRENZY, 0.2 * (int) TIMER_FRENZY);
         }
@@ -58,11 +59,15 @@ public:
         {
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
+            }
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             while (uint32 eventId = events.ExecuteEvent())
             {

@@ -99,18 +99,19 @@ public:
             if (flames_enabled)
             {
                 if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
                     return;
-
+                }
                 while (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
-                    case SPELL_GOUT_OF_FLAMES:
-                        DoCast(SPELL_GOUT_OF_FLAMES);
-                        events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, urand(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
-                        break;
-                    default:
-                        break;
+                        case SPELL_GOUT_OF_FLAMES:
+                            DoCast(SPELL_GOUT_OF_FLAMES);
+                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, urand(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
+                            break;
+                        default:
+                            break;
                     }
                 }
             }

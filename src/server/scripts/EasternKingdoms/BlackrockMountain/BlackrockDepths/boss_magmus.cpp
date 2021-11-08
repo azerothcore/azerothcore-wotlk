@@ -66,8 +66,9 @@ public:
         {
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
-
+            }
             events.Update(diff);
 
             while (uint32 eventId = events.ExecuteEvent())

@@ -64,12 +64,15 @@ public:
         {
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
+            }
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
-
+            }
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
