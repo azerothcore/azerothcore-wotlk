@@ -1310,8 +1310,10 @@ public:
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if ((eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
+            if (!eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo() || (eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
+            {
                 return;
+            }
 
             const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
             int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
@@ -1465,7 +1467,7 @@ public:
                     continue;
 
                 summon->SetOwnerGUID(GetCaster()->GetGUID());
-                summon->setFaction(GetCaster()->getFaction());
+                summon->SetFaction(GetCaster()->GetFaction());
                 summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->GetMotionMaster()->MoveFollow(GetCaster(), PET_FOLLOW_DIST, GetCaster()->GetAngle(summon), MOTION_SLOT_CONTROLLED);
@@ -1867,7 +1869,13 @@ public:
         {
             PreventDefaultAction();
 
-            int32 absorb = int32(CalculatePct(eventInfo.GetHealInfo()->GetHeal(), 15.0f));
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (!healInfo)
+            {
+                return;
+            }
+
+            int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 15.0f));
             // xinef: all heals contribute to one bubble
             if (AuraEffect* protEff = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PROTECTION_OF_ANCIENT_KINGS, 0/*, eventInfo.GetActor()->GetGUID()*/))
             {

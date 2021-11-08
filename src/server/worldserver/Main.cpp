@@ -37,6 +37,7 @@
 #include "GitRevision.h"
 #include "IoContext.h"
 #include "MapMgr.h"
+#include "Metric.h"
 #include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
@@ -277,6 +278,16 @@ int main(int argc, char** argv)
     // Set process priority according to configuration settings
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
+    sScriptMgr->SetScriptLoader(AddScripts);
+    std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
+    {
+        sScriptMgr->Unload();
+        //sScriptReloadMgr->Unload();
+    });
+
+    LOG_INFO("server.loading", "Initializing Scripts...");
+    sScriptMgr->Initialize();
+
     // Start the databases
     if (!StartDB())
         return 1;
@@ -288,15 +299,24 @@ int main(int argc, char** argv)
 
     LoadRealmInfo(*ioContext);
 
+    sMetric->Initialize(realm.Name, *ioContext, []()
+    {
+        METRIC_VALUE("online_players", sWorld->GetPlayerCount());
+        METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
+        METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
+        METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
+    });
+
+    METRIC_EVENT("events", "Worldserver started", "");
+
+    std::shared_ptr<void> sMetricHandle(nullptr, [](void*)
+    {
+        METRIC_EVENT("events", "Worldserver shutdown", "");
+        sMetric->Unload();
+    });
+
     // Loading modules configs
     sConfigMgr->PrintLoadedModulesConfigs();
-
-    sScriptMgr->SetScriptLoader(AddScripts);
-    std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
-    {
-        sScriptMgr->Unload();
-        //sScriptReloadMgr->Unload();
-    });
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -468,6 +488,8 @@ bool StartDB()
     sWorld->LoadDBRevision();
 
     LOG_INFO("server.loading", "> Version DB world:     %s", sWorld->GetDBVersion());
+
+    sScriptMgr->OnAfterDatabasesLoaded(loader.GetUpdateFlags());
 
     return true;
 }
