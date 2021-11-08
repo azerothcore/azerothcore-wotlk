@@ -7439,6 +7439,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectItemType[1] = 49278;
     });
 
+    // Ashenvale Outrunner Sneak
+    // Stealth
+    ApplySpellFix({ 20540, 32199 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
