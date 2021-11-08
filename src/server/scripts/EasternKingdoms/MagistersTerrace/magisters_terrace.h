@@ -1,13 +1,29 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef DEF_MAGISTERS_TERRACE_H
 #define DEF_MAGISTERS_TERRACE_H
 
-#include "Player.h"
 #include "CreatureAI.h"
+#include "Player.h"
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
+
+#define MTScriptName "instance_magisters_terrace"
 
 enum MTData
 {
@@ -17,7 +33,6 @@ enum MTData
     DATA_KAELTHAS_EVENT         = 3,
     MAX_ENCOUNTER               = 4
 };
-
 
 enum MTCreatures
 {
@@ -38,5 +53,10 @@ enum MTGameObjects
     GO_ESCAPE_ORB               = 188173
 };
 
+template <class AI, class T>
+inline AI* GetMagistersTerraceAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, MTScriptName);
+}
 
 #endif

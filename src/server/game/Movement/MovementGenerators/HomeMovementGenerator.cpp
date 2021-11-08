@@ -1,15 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "HomeMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "WorldPacket.h"
+#include "DisableMgr.h"
 #include "MoveSplineInit.h"
-#include "MoveSpline.h"
+#include "WorldPacket.h"
 
 void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
@@ -26,8 +37,9 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
         owner->LoadCreaturesAddon(true);
         owner->AI()->JustReachedHome();
     }
-    owner->m_targetsNotAcceptable.clear();
-    owner->UpdateEnvironmentIfNeeded(2);
+
+    if (!owner->HasSwimmingFlagOutOfCombat())
+        owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
 }
 
 void HomeMovementGenerator<Creature>::DoReset(Creature*)
@@ -51,7 +63,8 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
         init.SetFacing(o);
     }
 
-    init.MoveTo(x, y, z, MMAP::MMapFactory::IsPathfindingEnabled(owner->FindMap()), true);
+    owner->UpdateAllowedPositionZ(x, y, z);
+    init.MoveTo(x, y, z, DisableMgr::IsPathfindingEnabled(owner->FindMap()), true);
     init.SetWalk(false);
     init.Launch();
 

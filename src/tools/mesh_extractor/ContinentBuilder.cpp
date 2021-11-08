@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ContinentBuilder.h"
@@ -10,11 +21,11 @@
 #include "Utils.h"
 #include "DetourNavMesh.h"
 #include "Cache.h"
-#include "ace/Task.h"
+#include <thread>
 #include "Recast.h"
 #include "DetourCommon.h"
 
-class BuilderThread : public ACE_Task_Base
+class BuilderThread
 {
 private:
     int X, Y, MapId;
@@ -23,13 +34,13 @@ private:
     ContinentBuilder* cBuilder;
 public:
     BuilderThread(ContinentBuilder* _cBuilder, dtNavMeshParams& params) : Params(params), cBuilder(_cBuilder), Free(true) {}
-    
-    void SetData(int x, int y, int map, const std::string& cont) 
-    { 
-        X = x; 
-        Y = y; 
-        MapId = map; 
-        Continent = cont; 
+
+    void SetData(int x, int y, int map, const std::string& cont)
+    {
+        X = x;
+        Y = y;
+        MapId = map;
+        Continent = cont;
     }
 
     int svc()
@@ -99,7 +110,7 @@ void ContinentBuilder::CalculateTileBounds()
         tileYMax = std::max(itr->Y, tileYMax);
         tileYMin = std::min(itr->Y, tileYMin);
     }
-    getTileBounds(tileXMax, tileYMax, NULL, 0, bmin, bmax);
+    getTileBounds(tileXMax, tileYMax, nullptr, 0, bmin, bmax);
 }
 
 void ContinentBuilder::Build()
@@ -116,13 +127,13 @@ void ContinentBuilder::Build()
     CalculateTileBounds();
 
     dtNavMeshParams params;
-    
+
     std::vector<BuilderThread*> Threads;
 
     if (TileMap->IsGlobalModel)
     {
         printf("Map %s ( %u ) is a WMO. Building with 1 thread.\n", Continent.c_str(), MapId);
-        
+
         TileBuilder* builder = new TileBuilder(this, Continent, 0, 0, MapId);
         builder->AddGeometry(TileMap->Model, TileMap->ModelDefinition);
         uint8* nav = builder->BuildInstance(params);
@@ -186,7 +197,7 @@ void ContinentBuilder::Build()
                     }
                 }
                 // Wait for 20 seconds
-                ACE_OS::sleep(ACE_Time_Value (0, 20000));
+                std::this_thread::sleep_for(std::chrono::seconds(20));
             }
         }
     }

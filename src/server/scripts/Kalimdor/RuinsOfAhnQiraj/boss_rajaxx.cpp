@@ -1,13 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "ruins_of_ahnqiraj.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -28,7 +38,7 @@ enum Yells
     SAY_CHANGEAGGRO           = 10,
     SAY_KILLS_ANDOROV         = 11,
     SAY_COMPLETE_QUEST        = 12    // Yell when realm complete quest 8743 for world event
-    // Warriors, Captains, continue the fight! Sound: 8640
+                                // Warriors, Captains, continue the fight! Sound: 8640
 };
 
 enum Spells
@@ -47,71 +57,71 @@ enum Events
 
 class boss_rajaxx : public CreatureScript
 {
-    public:
-        boss_rajaxx() : CreatureScript("boss_rajaxx") { }
+public:
+    boss_rajaxx() : CreatureScript("boss_rajaxx") { }
 
-        struct boss_rajaxxAI : public BossAI
+    struct boss_rajaxxAI : public BossAI
+    {
+        boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX)
         {
-            boss_rajaxxAI(Creature* creature) : BossAI(creature, DATA_RAJAXX)
-            {
-            }
-
-            void Reset()
-            {
-                _Reset();
-                enraged = false;
-                events.ScheduleEvent(EVENT_DISARM, 10000);
-                events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                //SAY_DEATH
-                _JustDied();
-            }
-
-            void EnterCombat(Unit* /*victim*/)
-            {
-                _EnterCombat();
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_DISARM:
-                            DoCastVictim(SPELL_DISARM);
-                            events.ScheduleEvent(EVENT_DISARM, 22000);
-                            break;
-                        case EVENT_THUNDERCRASH:
-                            DoCast(me, SPELL_THUNDERCRASH);
-                            events.ScheduleEvent(EVENT_THUNDERCRASH, 21000);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-            private:
-                bool enraged;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_rajaxxAI(creature);
         }
+
+        void Reset() override
+        {
+            _Reset();
+            enraged = false;
+            events.ScheduleEvent(EVENT_DISARM, 10000);
+            events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            //SAY_DEATH
+            _JustDied();
+        }
+
+        void EnterCombat(Unit* /*victim*/) override
+        {
+            _EnterCombat();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_DISARM:
+                        DoCastVictim(SPELL_DISARM);
+                        events.ScheduleEvent(EVENT_DISARM, 22000);
+                        break;
+                    case EVENT_THUNDERCRASH:
+                        DoCast(me, SPELL_THUNDERCRASH);
+                        events.ScheduleEvent(EVENT_THUNDERCRASH, 21000);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    private:
+        bool enraged;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetRuinsOfAhnQirajAI<boss_rajaxxAI>(creature);
+    }
 };
 
 void AddSC_boss_rajaxx()

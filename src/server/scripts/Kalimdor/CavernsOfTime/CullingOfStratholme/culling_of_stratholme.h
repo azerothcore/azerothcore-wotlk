@@ -1,9 +1,26 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef DEF_CULLING_OF_STRATHOLME_H
 #define DEF_CULLING_OF_STRATHOLME_H
+
+#include "CreatureAIImpl.h"
+
+#define CullingOfStratholmeScriptName "instance_culling_of_stratholme"
 
 enum Data
 {
@@ -139,7 +156,7 @@ const Position LeaderIntroPos4 = {2423.12f, 1119.43f, 148.07f, 0.0f};
 const Position LeaderIntroPos5 = {2540.48f, 1129.06f, 130.86f, 0.0f};
 const Position LeaderIntroPos6 = {2327.39f, 1412.47f, 127.69f, 0.0f};
 
-const Position EventPos[] = 
+const Position EventPos[] =
 {
     {1813.298f, 1283.578f, 142.326f, 3.878161f},    // chromie
     {1809.46f,  1286.05f,  142.62f,  4.8f},         // hourglass
@@ -167,5 +184,11 @@ const Position EventPos[] =
     {2329.07f,  1276.98f,  132.68f,  4.0f},         // infinite corruptor pos
     {2298.25f,  1500.56f,  128.37f,  4.95f}         // malganis final pos
 };
+
+template <class AI, class T>
+inline AI* GetCullingOfStratholmeAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, CullingOfStratholmeScriptName);
+}
 
 #endif

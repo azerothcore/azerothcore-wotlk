@@ -1,15 +1,31 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef DEF_SERPENT_SHRINE_H
 #define DEF_SERPENT_SHRINE_H
 
-#include "Player.h"
-#include "SpellScript.h"
 #include "CreatureAI.h"
-#include "SpellAuraEffects.h"
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+
+#define SerpentShrineScriptName "instance_serpent_shrine"
 
 enum DataTypes
 {
@@ -27,8 +43,6 @@ enum DataTypes
     DATA_ALIVE_KEEPERS                      = 22,
     DATA_BRIDGE_ACTIVATED                   = 23,
     DATA_ACTIVATE_SHIELD                    = 24,
-
-
 };
 
 enum SSNPCs
@@ -41,7 +55,7 @@ enum SSNPCs
 
     NPC_COILFANG_SHATTERER                  = 21301,
     NPC_COILFANG_PRIESTESS                  = 21220,
-    
+
     NPC_ENCHANTED_ELEMENTAL                 = 21958,
     NPC_COILFANG_ELITE                      = 22055,
     NPC_COILFANG_STRIDER                    = 22056,
@@ -67,5 +81,10 @@ enum SSSpells
     SPELL_FRENZY_WATER                      = 37026
 };
 
-#endif
+template <class AI, class T>
+inline AI* GetSerpentShrineAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, SerpentShrineScriptName);
+}
 
+#endif

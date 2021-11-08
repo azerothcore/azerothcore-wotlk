@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* Script Data Start
@@ -10,10 +21,10 @@ SD%Complete: 100%
 SDComment: Support for quest 219.
 Script Data End */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 enum CorporalKeeshan
 {
@@ -36,7 +47,7 @@ public:
     {
         npc_corporal_keeshanAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             timer = 0;
             phase = 0;
@@ -45,18 +56,18 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        void sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_MISSING_IN_ACTION)
             {
                 Talk(SAY_CORPORAL_1, player);
                 npc_escortAI::Start(true, false, player->GetGUID(), quest);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                me->setFaction(250);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -83,7 +94,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (HasEscortState(STATE_ESCORT_NONE))
                 return;
@@ -124,7 +135,8 @@ public:
                             phase = 0;
                             break;
                     }
-                } else timer -= diff;
+                }
+                else timer -= diff;
             }
 
             if (!UpdateVictim())
@@ -134,13 +146,15 @@ public:
             {
                 DoCastVictim(SPELL_MOCKING_BLOW);
                 mockingBlowTimer = 5000;
-            } else mockingBlowTimer -= diff;
+            }
+            else mockingBlowTimer -= diff;
 
             if (shieldBashTimer <= diff)
             {
                 DoCastVictim(SPELL_MOCKING_BLOW);
                 shieldBashTimer = 8000;
-            } else shieldBashTimer -= diff;
+            }
+            else shieldBashTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -152,7 +166,7 @@ public:
         uint32 shieldBashTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_corporal_keeshanAI(creature);
     }

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef MPQ_H
@@ -9,6 +20,7 @@
 
 #include "libmpq/mpq.h"
 #include "Define.h"
+#include "Errors.h"
 #include <string>
 #include <ctype.h>
 #include <vector>
@@ -17,18 +29,18 @@
 
 class MPQArchive
 {
-
 public:
-    mpq_archive_s *mpq_a;
+    mpq_archive_s* mpq_a;
 
     std::vector<std::string> Files;
 
     MPQArchive(const char* filename);
     void close();
 
-    void GetFileListTo(std::vector<std::string>& filelist) {
+    void GetFileListTo(std::vector<std::string>& filelist)
+    {
         uint32_t filenum;
-        if(libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
+        if (libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
         libmpq__off_t size, transferred;
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
 
@@ -42,13 +54,14 @@ public:
 
         token = strtok( buffer, seps );
         uint32 counter = 0;
-        while ((token != NULL) && (counter < size)) {
+        while ((token != nullptr) && (counter < size))
+        {
             //cout << token << endl;
             token[strlen(token) - 1] = 0;
             std::string s = token;
             filelist.push_back(s);
             counter += strlen(token) + 2;
-            token = strtok(NULL, seps);
+            token = strtok(nullptr, seps);
         }
 
         delete[] buffer;
@@ -59,8 +72,8 @@ class MPQFile
 {
     //MPQHANDLE handle;
     bool eof;
-    char *buffer;
-    libmpq__off_t pointer,size;
+    char* buffer;
+    libmpq__off_t pointer, size;
 
     // disable copying
     MPQFile(const MPQFile& /*f*/) {}
@@ -81,15 +94,15 @@ public:
     void close();
 };
 
-inline void flipcc(char *fcc)
+inline void flipcc(char* fcc)
 {
     char t;
-    t=fcc[0];
-    fcc[0]=fcc[3];
-    fcc[3]=t;
-    t=fcc[1];
-    fcc[1]=fcc[2];
-    fcc[2]=t;
+    t = fcc[0];
+    fcc[0] = fcc[3];
+    fcc[3] = t;
+    t = fcc[1];
+    fcc[1] = fcc[2];
+    fcc[2] = t;
 }
 
 #endif

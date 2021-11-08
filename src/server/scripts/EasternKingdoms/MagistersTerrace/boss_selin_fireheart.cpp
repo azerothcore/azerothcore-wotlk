@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magisters_terrace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Says
 {
@@ -44,9 +57,9 @@ class boss_selin_fireheart : public CreatureScript
 public:
     boss_selin_fireheart() : CreatureScript("boss_selin_fireheart") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_selin_fireheartAI>(creature);
+        return GetMagistersTerraceAI<boss_selin_fireheartAI>(creature);
     };
 
     struct boss_selin_fireheartAI : public ScriptedAI
@@ -59,9 +72,9 @@ public:
         InstanceScript* instance;
         EventMap events;
         SummonList summons;
-        uint64 CrystalGUID;
+        ObjectGuid CrystalGUID;
 
-        bool CanAIAttack(const Unit* who) const
+        bool CanAIAttack(const Unit* who) const override
         {
             return who->GetPositionX() > 216.0f;
         }
@@ -75,30 +88,30 @@ public:
             me->SummonCreature(NPC_FEL_CRYSTAL, 263.149f, 0.309245f, 1.32057f, 3.15905f, TEMPSUMMON_CORPSE_DESPAWN);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->SetReactState(REACT_PASSIVE);
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             if (events.GetPhaseMask() & 0x01)
                 events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
             SpawnCrystals();
             instance->SetData(DATA_SELIN_EVENT, NOT_STARTED);
-            CrystalGUID = 0;
+            CrystalGUID.Clear();
             me->SetPower(POWER_MANA, 0);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             instance->SetData(DATA_SELIN_EVENT, IN_PROGRESS);
@@ -106,18 +119,18 @@ public:
             events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, 2500, 1);
             events.ScheduleEvent(EVENT_SPELL_FEL_EXPLOSION, 2000);
             events.ScheduleEvent(EVENT_DRAIN_CRYSTAL, 14000);
-            
+
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 7500, 1);
-         }
+        }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -130,8 +143,8 @@ public:
             if (summons.empty())
                 return;
 
-            CrystalGUID = 0;
-            Unit* crystal = NULL;
+            CrystalGUID.Clear();
+            Unit* crystal = nullptr;
             for (SummonList::const_iterator i = summons.begin(); i != summons.end(); )
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *i++))
                     if (!crystal || me->GetDistanceOrder(summon, crystal, false))
@@ -147,7 +160,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 2)
             {
@@ -165,7 +178,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

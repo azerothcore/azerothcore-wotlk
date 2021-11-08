@@ -1,20 +1,29 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Common.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "UpdateData.h"
-#include "Player.h"
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     Player* player;
     Player* plTarget;
 
@@ -29,13 +38,10 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if (player == player->duel->initiator || !plTarget || player == plTarget || player->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
 
-    //sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: Received CMSG_DUEL_ACCEPTED");
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Player 1 is: %u (%s)", player->GetGUIDLow(), player->GetName().c_str());
-    sLog->outStaticDebug("Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName().c_str());
-#endif
+    LOG_DEBUG("network.opcode", "Player 1 is: %s (%s)", player->GetGUID().ToString().c_str(), player->GetName().c_str());
+    LOG_DEBUG("network.opcode", "Player 2 is: %s (%s)", plTarget->GetGUID().ToString().c_str(), plTarget->GetName().c_str());
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     player->duel->startTimer = now;
     plTarget->duel->startTimer = now;
 
@@ -45,10 +51,8 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_DUEL_CANCELLED");
-#endif
-    uint64 guid;
+    LOG_DEBUG("network", "WORLD: Received CMSG_DUEL_CANCELLED");
+    ObjectGuid guid;
     recvPacket >> guid;
 
     // no duel requested

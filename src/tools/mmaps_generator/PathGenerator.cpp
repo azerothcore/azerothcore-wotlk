@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "PathCommon.h"
@@ -48,22 +59,22 @@ bool checkDirectories(bool debugOutput)
 }
 
 bool handleArgs(int argc, char** argv,
-               int &mapnum,
-               int &tileX,
-               int &tileY,
-               float &maxAngle,
-               bool &skipLiquid,
-               bool &skipContinents,
-               bool &skipJunkMaps,
-               bool &skipBattlegrounds,
-               bool &debugOutput,
-               bool &silent,
-               bool &bigBaseUnit,
-               char* &offMeshInputPath,
-               char* &file,
-               int& threads)
+                int& mapnum,
+                int& tileX,
+                int& tileY,
+                float& maxAngle,
+                bool& skipLiquid,
+                bool& skipContinents,
+                bool& skipJunkMaps,
+                bool& skipBattlegrounds,
+                bool& debugOutput,
+                bool& silent,
+                bool& bigBaseUnit,
+                char*& offMeshInputPath,
+                char*& file,
+                unsigned int& threads)
 {
-    char* param = NULL;
+    char* param = nullptr;
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--maxAngle") == 0)
@@ -83,8 +94,7 @@ bool handleArgs(int argc, char** argv,
             param = argv[++i];
             if (!param)
                 return false;
-            threads = atoi(param);
-            printf("Using %i threads to extract mmaps\n", threads);
+            threads = static_cast<unsigned int>(std::max(0, atoi(param)));
         }
         else if (strcmp(argv[i], "--file") == 0)
         {
@@ -100,7 +110,7 @@ bool handleArgs(int argc, char** argv,
                 return false;
 
             char* stileX = strtok(param, ",");
-            char* stileY = strtok(NULL, ",");
+            char* stileY = strtok(nullptr, ",");
             int tilex = atoi(stileX);
             int tiley = atoi(stileY);
 
@@ -230,8 +240,9 @@ int finish(const char* message, int returnValue)
 
 int main(int argc, char** argv)
 {
-    int threads = 3, mapnum = -1;
-    float maxAngle = 70.0f;
+    unsigned int threads = std::thread::hardware_concurrency();
+    int mapnum = -1;
+    float maxAngle = 60.0f;
     int tileX = -1, tileY = -1;
     bool skipLiquid = false,
          skipContinents = false,
@@ -240,8 +251,8 @@ int main(int argc, char** argv)
          debugOutput = false,
          silent = false,
          bigBaseUnit = false;
-    char* offMeshInputPath = NULL;
-    char* file = NULL;
+    char* offMeshInputPath = nullptr;
+    char* file = nullptr;
 
     bool validParam = handleArgs(argc, argv, mapnum,
                                  tileX, tileY, maxAngle,

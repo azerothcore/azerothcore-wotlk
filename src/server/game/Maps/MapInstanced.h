@@ -1,47 +1,58 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_MAP_INSTANCED_H
 #define ACORE_MAP_INSTANCED_H
 
-#include "Map.h"
-#include "InstanceSaveMgr.h"
 #include "DBCEnums.h"
+#include "InstanceSaveMgr.h"
+#include "Map.h"
 
 class MapInstanced : public Map
 {
-    friend class MapManager;
-    public:
-        typedef std::unordered_map< uint32, Map*> InstancedMaps;
+    friend class MapMgr;
+public:
+    typedef std::unordered_map< uint32, Map*> InstancedMaps;
 
-        MapInstanced(uint32 id);
-        ~MapInstanced() {}
+    MapInstanced(uint32 id);
+    ~MapInstanced() override {}
 
-        // functions overwrite Map versions
-        void Update(const uint32, const uint32, bool thread = true);
-        void DelayedUpdate(const uint32 diff);
-        //void RelocationNotify();
-        void UnloadAll();
-        bool CanEnter(Player* player, bool loginCheck = false);
+    // functions overwrite Map versions
+    void Update(const uint32, const uint32, bool thread = true) override;
+    void DelayedUpdate(const uint32 diff) override;
+    //void RelocationNotify();
+    void UnloadAll() override;
+    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
 
-        Map* CreateInstanceForPlayer(const uint32 mapId, Player* player);
-        Map* FindInstanceMap(uint32 instanceId) const
-        {
-            InstancedMaps::const_iterator i = m_InstancedMaps.find(instanceId);
-            return(i == m_InstancedMaps.end() ? NULL : i->second);
-        }
-        bool DestroyInstance(InstancedMaps::iterator &itr);
+    Map* CreateInstanceForPlayer(const uint32 mapId, Player* player);
+    Map* FindInstanceMap(uint32 instanceId) const
+    {
+        InstancedMaps::const_iterator i = m_InstancedMaps.find(instanceId);
+        return(i == m_InstancedMaps.end() ? nullptr : i->second);
+    }
+    bool DestroyInstance(InstancedMaps::iterator& itr);
 
-        InstancedMaps &GetInstancedMaps() { return m_InstancedMaps; }
-        virtual void InitVisibilityDistance();
+    InstancedMaps& GetInstancedMaps() { return m_InstancedMaps; }
+    void InitVisibilityDistance() override;
 
-    private:
-        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);
-        BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
+private:
+    InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);
+    BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
-        InstancedMaps m_InstancedMaps;
+    InstancedMaps m_InstancedMaps;
 };
 #endif

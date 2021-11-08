@@ -1,11 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef DEF_PIT_OF_SARON_H
 #define DEF_PIT_OF_SARON_H
 
 #include "Chat.h"
+#include "CreatureAIImpl.h"
+
+#define PitOfSaronScriptName "instance_pit_of_saron"
 
 enum DataTypes
 {
@@ -191,7 +207,7 @@ enum eFBSTexts
     SAY_TYRANNUS_GARFROST                       = 20,
 };
 
-const Position FBSSpawnPos = {695.685f, -118.825f, 513.877f, 3*M_PI/2};
+const Position FBSSpawnPos = {695.685f, -118.825f, 513.877f, 3 * M_PI / 2};
 
 struct FBSPosition
 {
@@ -201,15 +217,15 @@ struct FBSPosition
 
 const FBSPosition FBSData[] =
 {
-    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE+0 },
-    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE+1 },
-    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE+2 },
-    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE+3 },
-    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE+4 },
-    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE+5 },
-    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE+6 },
-    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE+7 },
-    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE+8 },
+    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE + 0 },
+    { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE + 1 },
+    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE + 2 },
+    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE + 3 },
+    { NPC_HORDE_SLAVE_2, PATH_BEGIN_VALUE + 4 },
+    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE + 5 },
+    { NPC_HORDE_SLAVE_3, PATH_BEGIN_VALUE + 6 },
+    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE + 7 },
+    { NPC_HORDE_SLAVE_4, PATH_BEGIN_VALUE + 8 },
     { 0, 0 }
 };
 
@@ -269,7 +285,7 @@ const Position TSSindragosaPos2 = {948.39f, 215.47f, 653.71f, 5.51f};
 struct TSPosition
 {
     uint32 entry;
-    float x,y;
+    float x, y;
 };
 
 const TSPosition TSData[] =
@@ -310,5 +326,11 @@ enum eTSTexts
     SAY_GENERAL_ALLIANCE_OUTRO_1                = 68,
     SAY_GENERAL_ALLIANCE_TRASH                  = 69,
 };
+
+template <class AI, class T>
+inline AI* GetPitOfSaronAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, PitOfSaronScriptName);
+}
 
 #endif

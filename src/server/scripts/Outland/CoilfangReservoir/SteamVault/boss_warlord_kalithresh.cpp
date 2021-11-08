@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "steam_vault.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "steam_vault.h"
 
 enum NagaDistiller
 {
@@ -33,9 +46,9 @@ class boss_warlord_kalithresh : public CreatureScript
 public:
     boss_warlord_kalithresh() : CreatureScript("boss_warlord_kalithresh") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_warlord_kalithreshAI (creature);
+        return GetSteamVaultAI<boss_warlord_kalithreshAI>(creature);
     }
 
     struct boss_warlord_kalithreshAI : public ScriptedAI
@@ -48,14 +61,14 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (instance)
                 instance->SetData(TYPE_WARLORD_KALITHRESH, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_REFLECTION, 10000);
@@ -66,26 +79,26 @@ public:
                 instance->SetData(TYPE_WARLORD_KALITHRESH, IN_PROGRESS);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (instance)
                 instance->SetData(TYPE_WARLORD_KALITHRESH, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_REFLECTION:
                     me->CastSpell(me, SPELL_SPELL_REFLECTION, false);
@@ -110,7 +123,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_naga_distiller : public CreatureScript
@@ -118,9 +130,9 @@ class npc_naga_distiller : public CreatureScript
 public:
     npc_naga_distiller() : CreatureScript("npc_naga_distiller") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_naga_distillerAI (creature);
+        return GetSteamVaultAI<npc_naga_distillerAI>(creature);
     }
 
     struct npc_naga_distillerAI : public NullCreatureAI
@@ -133,14 +145,14 @@ public:
         InstanceScript* instance;
         uint32 spellTimer;
 
-        void Reset()
+        void Reset() override
         {
             spellTimer = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param != 1)
                 return;
@@ -151,7 +163,7 @@ public:
             spellTimer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (spellTimer)
             {
@@ -165,7 +177,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_boss_warlord_kalithresh()

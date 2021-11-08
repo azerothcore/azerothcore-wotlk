@@ -1,148 +1,255 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Garr
-SD%Complete: 50
-SDComment: Adds NYI
-SDCategory: Molten Core
-EndScriptData */
-
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "Containers.h"
+#include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
 #include "molten_core.h"
+
+enum Texts
+{
+    EMOTE_MASS_ERRUPTION                = 0,
+};
 
 enum Spells
 {
     // Garr
-    SPELL_ANTIMAGIC_PULSE   = 19492,
-    SPELL_MAGMA_SHACKLES    = 19496,
-    SPELL_ENRAGE            = 19516,
+    SPELL_ANTIMAGIC_PULSE               = 19492,    // Dispels magic on nearby enemies, removing 1 beneficial spell
+    SPELL_MAGMA_SHACKLES                = 19496,    // Reduces the movement speed of nearby enemies by 60%
+    SPELL_SEPARATION_ANXIETY            = 23487,    // Aura cast on himself by Garr, if adds move out of range, they will cast spell 23492 on themselves (server side)
+    SPELL_FRENZY                        = 19516,    // Increases the caster's attack speed by 9 + scale. Stacks up to 10 times
 
-    // Adds
-    SPELL_ERUPTION          = 19497,
-    SPELL_IMMOLATE          = 20294,
+    // Fireworn
+    SPELL_SEPARATION_ANXIETY_MINION     = 23492,    // Increases damage done by 300% and applied banish immunity
+    SPELL_ERUPTION                      = 19497,    // Deals fire aoe damage and knockbacks nearby enemies
+    SPELL_MASSIVE_ERUPTION              = 20483,    // Deals fire aoe damage, knockbacks nearby enemies and kills caster
+    SPELL_ERUPTION_TRIGGER              = 20482,    // Removes banish auras and applied immunity to banish (server side)
+    SPELL_ENRAGE_TRIGGER                = 19515,    // Server side. Triggers 19516 on hit
 };
 
 enum Events
 {
-    EVENT_ANTIMAGIC_PULSE    = 1,
-    EVENT_MAGMA_SHACKLES     = 2,
+    EVENT_ANTIMAGIC_PULSE               = 1,
+    EVENT_MAGMA_SHACKLES,
 };
 
 class boss_garr : public CreatureScript
 {
-    public:
-        boss_garr() : CreatureScript("boss_garr") { }
+public:
+    boss_garr() : CreatureScript("boss_garr") {}
 
-        struct boss_garrAI : public BossAI
+    struct boss_garrAI : public BossAI
+    {
+        boss_garrAI(Creature* creature) : BossAI(creature, DATA_GARR),
+            massEruptionTimer(600000)   // 10 mins
         {
-            boss_garrAI(Creature* creature) : BossAI(creature, BOSS_GARR)
+        }
+
+        void Reset() override
+        {
+            _Reset();
+            massEruptionTimer = 600000;
+        }
+
+        void EnterCombat(Unit* /*attacker*/) override
+        {
+            _EnterCombat();
+            DoCastSelf(SPELL_SEPARATION_ANXIETY, true);
+            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
+            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
+            massEruptionTimer = 600000; // 10 mins
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
             {
+                return;
             }
 
-            void EnterCombat(Unit* victim)
+            // This should always process
+            if (massEruptionTimer <= diff)
             {
-                BossAI::EnterCombat(victim);
-                events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 25000);
-                events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 15000);
+                Talk(EMOTE_MASS_ERRUPTION, me);
+                DoCastAOE(SPELL_ERUPTION_TRIGGER, true);
+                massEruptionTimer = 20000;
+            }
+            else
+            {
+                massEruptionTimer -= diff;
             }
 
-            void UpdateAI(uint32 diff)
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
             {
-                if (!UpdateVictim())
-                    return;
+                return;
+            }
 
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
                 {
-                    switch (eventId)
+                    case EVENT_ANTIMAGIC_PULSE:
                     {
-                        case EVENT_ANTIMAGIC_PULSE:
-                            DoCast(me, SPELL_ANTIMAGIC_PULSE);
-                            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, urand(10000, 15000));
-                            break;
-                        case EVENT_MAGMA_SHACKLES:
-                            DoCast(me, SPELL_MAGMA_SHACKLES);
-                            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, urand(8000, 12000));
-                            break;
-                        default:
-                            break;
+                        DoCastSelf(SPELL_ANTIMAGIC_PULSE);
+                        events.RepeatEvent(20000);
+                        break;
+                    }
+                    case EVENT_MAGMA_SHACKLES:
+                    {
+                        DoCastSelf(SPELL_MAGMA_SHACKLES);
+                        events.RepeatEvent(15000);
+                        break;
                     }
                 }
 
-                DoMeleeAttackIfReady();
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
+                }
             }
-        };
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_garrAI(creature);
+            DoMeleeAttackIfReady();
         }
+
+    private:
+        uint32 massEruptionTimer;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetMoltenCoreAI<boss_garrAI>(creature);
+    }
 };
 
-class npc_firesworn : public CreatureScript
+class npc_garr_firesworn : public CreatureScript
 {
-    public:
-        npc_firesworn() : CreatureScript("npc_firesworn") { }
+public:
+    npc_garr_firesworn() : CreatureScript("npc_garr_firesworn") {}
 
-        struct npc_fireswornAI : public ScriptedAI
+    struct npc_garr_fireswornAI : public ScriptedAI
+    {
+        npc_garr_fireswornAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/ ) override
         {
-            npc_fireswornAI(Creature* creature) : ScriptedAI(creature) { }
-
-            uint32 immolateTimer;
-
-            void Reset()
+            if (damage >= me->GetHealth())
             {
-                immolateTimer = 4000;                              //These times are probably wrong
-            }
-
-            void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
-            {
-                uint32 const health10pct = me->CountPctFromMaxHealth(10);
-                uint32 health = me->GetHealth();
-                if (int32(health) - int32(damage) < int32(health10pct))
+                // Prevent double damage because Firesworn can kill himself with Massive Erruption
+                if (me != attacker)
                 {
-                    damage = 0;
-                    DoCastVictim(SPELL_ERUPTION);
-                    me->DespawnOrUnsummon();
+                    DoCastSelf(SPELL_ERUPTION, true);
                 }
+
+                DoCastAOE(SPELL_ENRAGE_TRIGGER);
             }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (immolateTimer <= diff)
-                {
-                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(target, SPELL_IMMOLATE);
-                    immolateTimer = urand(5000, 10000);
-                }
-                else
-                    immolateTimer -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_fireswornAI(creature);
         }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetMoltenCoreAI<npc_garr_fireswornAI>(creature);
+    }
+};
+
+// 23487 Separation Anxiety (server side)
+class spell_garr_separation_nexiety : public SpellScriptLoader
+{
+public:
+    spell_garr_separation_nexiety() : SpellScriptLoader("spell_garr_separation_nexiety") {}
+
+    class spell_garr_separation_nexiety_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_garr_separation_nexiety_AuraScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
+        }
+
+        void HandlePeriodic(AuraEffect const* aurEff)
+        {
+            Unit const* caster = GetCaster();
+            Unit* target = GetTarget();
+            if (caster && target && target->GetDistance(caster) > 40.0f && !target->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
+            {
+                target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION, true, nullptr, aurEff);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_garr_separation_nexiety_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    // Should return a fully valid AuraScript pointer.
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_garr_separation_nexiety_AuraScript();
+    }
+};
+
+//19515 Frenzy (SERVERSIDE)
+class spell_garr_frenzy : public SpellScriptLoader
+{
+public:
+    spell_garr_frenzy() : SpellScriptLoader("spell_garr_frenzy") {}
+
+    class spell_garr_frenzy_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_garr_frenzy_SpellScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return ValidateSpellInfo({ SPELL_FRENZY });
+        }
+
+        void HandleHit(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                target->CastSpell(target, SPELL_FRENZY);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_garr_frenzy_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_garr_frenzy_SpellScript();
+    }
 };
 
 void AddSC_boss_garr()
 {
     new boss_garr();
-    new npc_firesworn();
+    new npc_garr_firesworn();
+
+    // Spells
+    new spell_garr_separation_nexiety();
+    new spell_garr_frenzy();
 }

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TRANSPORTS_H
@@ -18,8 +29,8 @@ class Transport : public GameObject, public TransportBase
 {
 public:
     Transport() : GameObject() {}
-    void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
-    void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
+    void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const override { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
+    void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const override { TransportBase::CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
 
     typedef std::set<WorldObject*> PassengerSet;
     virtual void AddPassenger(WorldObject* passenger, bool withAll = false) = 0;
@@ -35,23 +46,23 @@ protected:
 
 class MotionTransport : public Transport
 {
-    friend MotionTransport* TransportMgr::CreateTransport(uint32, uint32, Map*);
+    friend MotionTransport* TransportMgr::CreateTransport(uint32, ObjectGuid::LowType, Map*);
     MotionTransport();
 public:
-    ~MotionTransport();
+    ~MotionTransport() override;
 
-    bool CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
-    void CleanupsBeforeDelete(bool finalCleanup = true);
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&);
+    bool CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
+    void CleanupsBeforeDelete(bool finalCleanup = true) override;
+    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
 
-    void Update(uint32 diff);
+    void Update(uint32 diff) override;
     void DelayedUpdate(uint32 diff);
     void UpdatePosition(float x, float y, float z, float o);
 
-    void AddPassenger(WorldObject* passenger, bool withAll = false);
-    void RemovePassenger(WorldObject* passenger, bool withAll = false);
-    Creature* CreateNPCPassenger(uint32 guid, CreatureData const* data);
-    GameObject* CreateGOPassenger(uint32 guid, GameObjectData const* data);
+    void AddPassenger(WorldObject* passenger, bool withAll = false) override;
+    void RemovePassenger(WorldObject* passenger, bool withAll = false) override;
+    Creature* CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data);
+    GameObject* CreateGOPassenger(ObjectGuid::LowType guid, GameObjectData const* data);
 
     void LoadStaticPassengers();
     PassengerSet const& GetStaticPassengers() const { return _staticPassengers; }
@@ -91,7 +102,7 @@ private:
     bool _triggeredDepartureEvent;
 
     PassengerSet _staticPassengers;
-    mutable ACE_Thread_Mutex Lock;
+    mutable std::mutex Lock;
     bool _passengersLoaded;
     bool _delayedTeleport;
 };
@@ -100,23 +111,23 @@ class StaticTransport : public Transport
 {
 public:
     StaticTransport();
-    ~StaticTransport();
+    ~StaticTransport() override;
 
-    virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
-    void CleanupsBeforeDelete(bool finalCleanup = true);
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&);
+    bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
+    void CleanupsBeforeDelete(bool finalCleanup = true) override;
+    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
 
-    void Update(uint32 diff);
+    void Update(uint32 diff) override;
     void RelocateToProgress(uint32 progress);
     void UpdatePosition(float x, float y, float z, float o);
     void UpdatePassengerPositions();
 
-    void AddPassenger(WorldObject* passenger, bool withAll = false);
-    void RemovePassenger(WorldObject* passenger, bool withAll = false);
+    void AddPassenger(WorldObject* passenger, bool withAll = false) override;
+    void RemovePassenger(WorldObject* passenger, bool withAll = false) override;
 
     uint32 GetPauseTime() const { return GetUInt32Value(GAMEOBJECT_LEVEL); }
     void SetPauseTime(uint32 val) { SetUInt32Value(GAMEOBJECT_LEVEL, val); }
-    uint32 GetPeriod() const { return m_goValue.Transport.AnimationInfo ? m_goValue.Transport.AnimationInfo->TotalTime : GetPauseTime()+2; }
+    uint32 GetPeriod() const { return m_goValue.Transport.AnimationInfo ? m_goValue.Transport.AnimationInfo->TotalTime : GetPauseTime() + 2; }
 private:
     bool _needDoInitialRelocation;
 };

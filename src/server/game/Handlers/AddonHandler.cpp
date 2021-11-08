@@ -1,14 +1,25 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "zlib.h"
 #include "AddonHandler.h"
 #include "DatabaseEnv.h"
-#include "Opcodes.h"
 #include "Log.h"
+#include "Opcodes.h"
+#include "zlib.h"
 
 AddonHandler::AddonHandler()
 {
@@ -47,7 +58,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
     AddOnPacked.resize(AddonRealSize);                      // resize target for zlib action
 
-    if (uncompress(const_cast<uint8*>(AddOnPacked.contents()), &AddonRealSize, const_cast<uint8*>((*Source).contents() + CurrentPosition), (*Source).size() - CurrentPosition)== Z_OK)
+    if (uncompress(const_cast<uint8*>(AddOnPacked.contents()), &AddonRealSize, const_cast<uint8*>((*Source).contents() + CurrentPosition), (*Source).size() - CurrentPosition) == Z_OK)
     {
         Target->Initialize(SMSG_ADDON_INFO);
 
@@ -61,20 +72,18 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
             uint32 crc, unk2;
 
             // check next addon data format correctness
-            if (AddOnPacked.rpos()+1 > AddOnPacked.size())
+            if (AddOnPacked.rpos() + 1 > AddOnPacked.size())
                 return false;
 
             AddOnPacked >> addonName;
 
             // recheck next addon data format correctness
-            if (AddOnPacked.rpos()+1+4+4 > AddOnPacked.size())
+            if (AddOnPacked.rpos() + 1 + 4 + 4 > AddOnPacked.size())
                 return false;
 
             AddOnPacked >> enabled >> crc >> unk2;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk2);
-#endif
+            LOG_DEBUG("network", "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk2);
 
             uint8 state = (enabled ? 2 : 1);
             *Target << uint8(state);
@@ -127,14 +136,12 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
         uint32 count = 0;
         *Target << uint32(count);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         if (AddOnPacked.rpos() != AddOnPacked.size())
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under read!");
-#endif
+            LOG_DEBUG("network", "packet under read!");
     }
     else
     {
-        sLog->outError("Addon packet uncompress error :(");
+        LOG_ERROR("network", "Addon packet uncompress error :(");
         return false;
     }
     return true;

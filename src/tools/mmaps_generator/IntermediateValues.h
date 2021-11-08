@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _INTERMEDIATE_VALUES_H
@@ -17,14 +28,13 @@ namespace MMAP
     // this class gathers all debug info holding and output
     struct IntermediateValues
     {
-        rcHeightfield* heightfield;
-        rcCompactHeightfield* compactHeightfield;
-        rcContourSet* contours;
-        rcPolyMesh* polyMesh;
-        rcPolyMeshDetail* polyMeshDetail;
+        rcHeightfield* heightfield{nullptr};
+        rcCompactHeightfield* compactHeightfield{nullptr};
+        rcContourSet* contours{nullptr};
+        rcPolyMesh* polyMesh{nullptr};
+        rcPolyMeshDetail* polyMeshDetail{nullptr};
 
-        IntermediateValues() :  heightfield(NULL), compactHeightfield(NULL),
-                                contours(NULL), polyMesh(NULL), polyMeshDetail(NULL) {}
+        IntermediateValues()  {}
         ~IntermediateValues();
 
         void writeIV(uint32 mapID, uint32 tileX, uint32 tileY);
@@ -35,7 +45,7 @@ namespace MMAP
         void debugWrite(FILE* file, const rcPolyMesh* mesh);
         void debugWrite(FILE* file, const rcPolyMeshDetail* mesh);
 
-        void generateObjFile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData &meshData);
+        void generateObjFile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData);
     };
 }
 #endif

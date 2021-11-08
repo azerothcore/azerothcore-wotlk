@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -18,13 +29,13 @@ npc_darrowshire_spirit
 npc_tirion_fordring
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
-#include "WorldSession.h"
-#include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "WorldSession.h"
 
 // Ours
 
@@ -52,16 +63,16 @@ class npc_eris_hevenfire : public CreatureScript
 public:
     npc_eris_hevenfire() : CreatureScript("npc_eris_hevenfire") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_eris_hevenfireAI(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
         {
-            creature->AI()->SetData(player->getFaction(), 0);
+            creature->AI()->SetData(player->GetFaction(), 0);
             creature->AI()->SetGUID(player->GetGUID());
         }
 
@@ -74,32 +85,32 @@ public:
 
         SummonList summons;
         EventMap events;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
         uint8 _counter;
         uint8 _savedCount;
         uint8 _deathCount;
         bool _spoken;
         uint32 _faction;
 
-        void Reset()
+        void Reset() override
         {
             _faction = 0;
             _spoken = false;
             _savedCount = 0;
             _deathCount = 0;
             _counter = 0;
-            _playerGUID = 0;
+            _playerGUID.Clear();
             events.Reset();
             summons.DespawnAll();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void SetData(uint32 faction, uint32)
+        void SetData(uint32 faction, uint32) override
         {
             _faction = faction;
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(ObjectGuid guid, int32) override
         {
             _playerGUID = guid;
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -111,7 +122,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8000);
         }
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             // requires this trinket to be seen
             return player->HasItemOrGemWithIdEquipped(ITEM_EYE_OF_DIVINITY, 1);
@@ -140,16 +151,16 @@ public:
                 float y = -3049 + frand(-6.0f, 6.0f);
                 float z = 165.25;
                 float o = 2.0;
-                me->SummonCreature(roll_chance_i(5) ? NPC_PLAGUED_PEASANT : NPC_INJURED_PEASANT, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 2*MINUTE*IN_MILLISECONDS);
+                me->SummonCreature(roll_chance_i(5) ? NPC_PLAGUED_PEASANT : NPC_INJURED_PEASANT, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
             }
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             summons.Summon(creature);
             if (creature->GetEntry() == NPC_INJURED_PEASANT || creature->GetEntry() == NPC_PLAGUED_PEASANT)
             {
-                creature->setFaction(_faction);
+                creature->SetFaction(_faction);
                 if (!_spoken)
                 {
                     _spoken = true;
@@ -159,16 +170,16 @@ public:
                 if (creature->GetEntry() == NPC_PLAGUED_PEASANT)
                     creature->CastSpell(creature, SPELL_SEETHING_PLAGUE, true);
 
-                float x = 3324+frand(-3.0f, 3.0f);
-                float y = -2966+frand(-3.0f, 3.0f);
+                float x = 3324 + frand(-3.0f, 3.0f);
+                float y = -2966 + frand(-3.0f, 3.0f);
                 float z = 159.65f;
                 creature->SetWalk(true);
                 creature->GetMotionMaster()->MovePoint(0, x, y, z);
-                creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+                creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == 1)
                 _savedCount++;
@@ -200,31 +211,30 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_PLAYER:
-                {
-                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
-                    if (!player || me->GetDistance2d(player) > 100.0f)
                     {
-                        EnterEvadeMode();
-                        return;
+                        Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                        if (!player || me->GetDistance2d(player) > 100.0f)
+                        {
+                            EnterEvadeMode();
+                            return;
+                        }
+                        events.RepeatEvent(2000);
+                        break;
                     }
-                    events.RepeatEvent(2000);
-                    break;
-                }
                 case EVENT_SUMMON_ARCHERS:
                     SummonArchers();
-                    events.PopEvent();
                     break;
                 case EVENT_SUMMON_PEASANTS:
                     _spoken = false;
                     SummonPeasants();
                     _spoken = false;
-                    events.RepeatEvent(60*IN_MILLISECONDS);
+                    events.RepeatEvent(60 * IN_MILLISECONDS);
                     break;
             }
         }
@@ -236,50 +246,50 @@ class npc_balance_of_light_and_shadow : public CreatureScript
 public:
     npc_balance_of_light_and_shadow() : CreatureScript("npc_balance_of_light_and_shadow") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_balance_of_light_and_shadowAI (creature);
     }
 
     struct npc_balance_of_light_and_shadowAI : public NullCreatureAI
     {
-        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID = 0; }
+        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             // requires this trinket to be seen
             return player->HasItemOrGemWithIdEquipped(ITEM_EYE_OF_DIVINITY, 1);
         }
 
         uint32 timer;
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo)
+        void SpellHit(Unit*, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHOOT && roll_chance_i(7))
                 me->CastSpell(me, SPELL_DEATHS_DOOR, true);
         }
 
-        void MovementInform(uint32 type, uint32  /*pointId*/)
+        void MovementInform(uint32 type, uint32  /*pointId*/) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
 
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* creature = summon->GetSummoner())
+                if (Unit* creature = summon->GetSummonerUnit())
                     creature->GetAI()->DoAction(1);
 
             me->DespawnOrUnsummon(1);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* creature = summon->GetSummoner())
+                if (Unit* creature = summon->GetSummonerUnit())
                     creature->GetAI()->DoAction(2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->GetEntry() != NPC_SCOURGE_ARCHER)
                 return;
@@ -287,7 +297,7 @@ public:
             timer += diff;
             if (timer >= 4000)
             {
-                Unit* target = _targetGUID ? ObjectAccessor::GetUnit(*me, _targetGUID) : NULL;
+                Unit* target = _targetGUID ? ObjectAccessor::GetUnit(*me, _targetGUID) : nullptr;
                 if (!target)
                     target = me->FindNearestCreature(NPC_INJURED_PEASANT, 60.0f);
 
@@ -297,40 +307,13 @@ public:
                     me->CastSpell(target, SPELL_SHOOT, true);
                 }
 
-                timer = urand(0,3000);
+                timer = urand(0, 3000);
             }
         }
     };
 };
 
-
 // Theirs
-class npc_ghoul_flayer : public CreatureScript
-{
-public:
-    npc_ghoul_flayer() : CreatureScript("npc_ghoul_flayer") { }
-
-    struct npc_ghoul_flayerAI : public ScriptedAI
-    {
-        npc_ghoul_flayerAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() { }
-
-        void EnterCombat(Unit* /*who*/) { }
-
-        void JustDied(Unit* killer)
-        {
-            if (killer->GetTypeId() == TYPEID_PLAYER)
-                me->SummonCreature(11064, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_ghoul_flayerAI(creature);
-    }
-};
-
 /*######
 ## npc_augustus_the_touched
 ######*/
@@ -361,47 +344,6 @@ public:
     }
 };
 
-/*######
-## npc_darrowshire_spirit
-######*/
-
-enum DarrowshireSpirit
-{
-    SPELL_SPIRIT_SPAWNIN    = 17321
-};
-
-class npc_darrowshire_spirit : public CreatureScript
-{
-public:
-    npc_darrowshire_spirit() : CreatureScript("npc_darrowshire_spirit") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        SendGossipMenuFor(player, 3873, creature->GetGUID());
-        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_darrowshire_spiritAI(creature);
-    }
-
-    struct npc_darrowshire_spiritAI : public ScriptedAI
-    {
-        npc_darrowshire_spiritAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            DoCast(me, SPELL_SPIRIT_SPAWNIN);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-        void EnterCombat(Unit* /*who*/) override { }
-    };
-};
-
 void AddSC_eastern_plaguelands()
 {
     // Ours
@@ -409,7 +351,5 @@ void AddSC_eastern_plaguelands()
     new npc_balance_of_light_and_shadow();
 
     // Theirs
-    new npc_ghoul_flayer();
     new npc_augustus_the_touched();
-    new npc_darrowshire_spirit();
 }

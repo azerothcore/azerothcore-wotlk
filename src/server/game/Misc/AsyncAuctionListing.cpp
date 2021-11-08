@@ -1,17 +1,34 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "AsyncAuctionListing.h"
-#include "Player.h"
-#include "Creature.h"
 #include "AuctionHouseMgr.h"
+#include "Creature.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
+#include "Player.h"
 #include "SpellAuraEffects.h"
 
 uint32 AsyncAuctionListingMgr::auctionListingDiff = 0;
 bool AsyncAuctionListingMgr::auctionListingAllowed = false;
 std::list<AuctionListItemsDelayEvent> AsyncAuctionListingMgr::auctionListingList;
 std::list<AuctionListItemsDelayEvent> AsyncAuctionListingMgr::auctionListingListTemp;
-ACE_Thread_Mutex AsyncAuctionListingMgr::auctionListingLock;
-ACE_Thread_Mutex AsyncAuctionListingMgr::auctionListingTempLock;
+std::mutex AsyncAuctionListingMgr::auctionListingLock;
+std::mutex AsyncAuctionListingMgr::auctionListingTempLock;
 
 bool AuctionListOwnerItemsDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
@@ -30,12 +47,9 @@ bool AuctionListItemsDelayEvent::Execute()
     if (!creature)
         return true;
 
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
+    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
-    //sLog->outDebug("Auctionhouse search (GUID: %u TypeId: %u)",, list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u",
-    //  GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)), listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
-
-    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4+4+4)+50*((16+MAX_INSPECTED_ENCHANTMENT_SLOT*3)*4));
+    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4) + 50 * ((16 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3) * 4));
     uint32 count = 0;
     uint32 totalcount = 0;
     data << (uint32) 0;
@@ -48,9 +62,9 @@ bool AuctionListItemsDelayEvent::Execute()
     wstrToLower(wsearchedname);
 
     bool result = auctionHouse->BuildListAuctionItems(data, plr,
-        wsearchedname, _listfrom, _levelmin, _levelmax, _usable,
-        _auctionSlotID, _auctionMainCategory, _auctionSubCategory, _quality,
-        count, totalcount, _getAll);
+                  wsearchedname, _listfrom, _levelmin, _levelmax, _usable,
+                  _auctionSlotID, _auctionMainCategory, _auctionSubCategory, _quality,
+                  count, totalcount, _getAll);
 
     if (!result)
         return false;

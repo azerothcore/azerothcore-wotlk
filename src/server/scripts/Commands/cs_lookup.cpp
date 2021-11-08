@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -21,27 +32,33 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class lookup_commandscript : public CommandScript
 {
 public:
     lookup_commandscript() : CommandScript("lookup_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> lookupPlayerCommandTable =
+        static ChatCommandTable lookupPlayerCommandTable =
         {
             { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "" },
             { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "" },
             { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "" }
         };
 
-        static std::vector<ChatCommand> lookupSpellCommandTable =
+        static ChatCommandTable lookupSpellCommandTable =
         {
             { "id",             SEC_MODERATOR,      true,  &HandleLookupSpellIdCommand,         "" },
             { "",               SEC_MODERATOR,      true,  &HandleLookupSpellCommand,           "" }
         };
 
-        static std::vector<ChatCommand> lookupCommandTable =
+        static ChatCommandTable lookupCommandTable =
         {
             { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,        "" },
             { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,    "" },
@@ -61,7 +78,7 @@ public:
             { "spell",          SEC_MODERATOR,      true,  nullptr, "", lookupSpellCommandTable }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "lookup",         SEC_MODERATOR,  true,  nullptr,                                 "", lookupCommandTable }
         };
@@ -125,7 +142,7 @@ public:
                     // send area in "id - [name]" format
                     std::ostringstream ss;
                     if (handler->GetSession())
-                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale]<< "]|h|r";
+                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
                     else
                         ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
 
@@ -171,7 +188,7 @@ public:
                 if (creatureLocale->Name.size() > localeIndex && !creatureLocale->Name[localeIndex].empty())
                 {
                     std::string name = creatureLocale->Name[localeIndex];
-            
+
                     if (Utf8FitTo(name, wNamePart))
                     {
                         if (maxResults && count++ == maxResults)
@@ -179,15 +196,15 @@ public:
                             handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                             return true;
                         }
-            
+
                         if (handler->GetSession())
                             handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
                         else
                             handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
-            
+
                         if (!found)
                             found = true;
-            
+
                         continue;
                     }
                 }
@@ -409,7 +426,7 @@ public:
                     if (il->Name.size() > ulocaleIndex && !il->Name[ulocaleIndex].empty())
                     {
                         std::string name = il->Name[ulocaleIndex];
-            
+
                         if (Utf8FitTo(name, wNamePart))
                         {
                             if (maxResults && count++ == maxResults)
@@ -417,15 +434,15 @@ public:
                                 handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                                 return true;
                             }
-            
+
                             if (handler->GetSession())
                                 handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itr->second.ItemId, itr->second.ItemId, name.c_str());
                             else
                                 handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr->second.ItemId, name.c_str());
-            
+
                             if (!found)
                                 found = true;
-            
+
                             continue;
                         }
                     }
@@ -558,7 +575,7 @@ public:
                 if (objectLocalte->Name.size() > localeIndex && !objectLocalte->Name[localeIndex].empty())
                 {
                     std::string name = objectLocalte->Name[localeIndex];
-            
+
                     if (Utf8FitTo(name, wNamePart))
                     {
                         if (maxResults && count++ == maxResults)
@@ -566,15 +583,15 @@ public:
                             handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                             return true;
                         }
-            
+
                         if (handler->GetSession())
                             handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, itr->second.entry, itr->second.entry, name.c_str());
                         else
                             handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, itr->second.entry, name.c_str());
-            
+
                         if (!found)
                             found = true;
-            
+
                         continue;
                     }
                 }
@@ -633,6 +650,59 @@ public:
         for (ObjectMgr::QuestMap::const_iterator iter = qTemplates.begin(); iter != qTemplates.end(); ++iter)
         {
             Quest* qInfo = iter->second;
+
+            int localeIndex = handler->GetSessionDbLocaleIndex();
+            if (localeIndex >= 0)
+            {
+                uint8 ulocaleIndex = uint8(localeIndex);
+                if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(qInfo->GetQuestId()))
+                {
+                    if (questLocale->Title.size() > ulocaleIndex && !questLocale->Title[ulocaleIndex].empty())
+                    {
+                        std::string title = questLocale->Title[ulocaleIndex];
+
+                        if (Utf8FitTo(title, wNamePart))
+                        {
+                            if (maxResults && count++ == maxResults)
+                            {
+                                handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                                return true;
+                            }
+
+                            char const* statusStr = "";
+
+                            if (target)
+                            {
+                                QuestStatus status = target->GetQuestStatus(qInfo->GetQuestId());
+
+                                switch (status)
+                                {
+                                    case QUEST_STATUS_COMPLETE:
+                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_COMPLETE);
+                                        break;
+                                    case QUEST_STATUS_INCOMPLETE:
+                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_ACTIVE);
+                                        break;
+                                    case QUEST_STATUS_REWARDED:
+                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_REWARDED);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            if (handler->GetSession())
+                                handler->PSendSysMessage(LANG_QUEST_LIST_CHAT, qInfo->GetQuestId(), qInfo->GetQuestId(), qInfo->GetQuestLevel(), title.c_str(), statusStr);
+                            else
+                                handler->PSendSysMessage(LANG_QUEST_LIST_CONSOLE, qInfo->GetQuestId(), title.c_str(), statusStr);
+
+                            if (!found)
+                                found = true;
+                            continue;
+                        }
+                    }
+                }
+            }
 
             std::string title = qInfo->GetTitle();
             if (title.empty())
@@ -965,14 +1035,14 @@ public:
                     found = true;
             }
         }
-        
+
         if (!found)
             handler->SendSysMessage(LANG_COMMAND_NOSPELLFOUND);
 
         return true;
     }
 
-    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, const char * args)
+    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
@@ -1029,10 +1099,10 @@ public:
                     // send taxinode in "id - [name] (Map:m X:x Y:y Z:z)" format
                     if (handler->GetSession())
                         handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, id, id, name.c_str(), localeNames[locale],
-                            nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
+                                                 nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
                     else
                         handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, id, name.c_str(), localeNames[locale],
-                            nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
+                                                 nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
 
                     if (!found)
                         found = true;
@@ -1073,7 +1143,7 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
         bool limitReached = false;
 
-        GameTeleContainer const & teleMap = sObjectMgr->GetGameTeleMap();
+        GameTeleContainer const& teleMap = sObjectMgr->GetGameTeleMap();
         for (GameTeleContainer::const_iterator itr = teleMap.begin(); itr != teleMap.end(); ++itr)
         {
             GameTele const* tele = &itr->second;
@@ -1166,8 +1236,8 @@ public:
                     char const* knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
 
                     char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index
-                        ? handler->GetAcoreString(LANG_ACTIVE)
-                        : "";
+                                            ? handler->GetAcoreString(LANG_ACTIVE)
+                                            : "";
 
                     char titleNameStr[80];
                     snprintf(titleNameStr, 80, name.c_str(), targetName);
@@ -1280,7 +1350,7 @@ public:
             limit = limitStr ? atoi(limitStr) : -1;
         }
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
         stmt->setString(0, ip);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1297,10 +1367,10 @@ public:
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
         if (!Utf8ToUpperOnlyLatin
-            (account))
+                (account))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
         stmt->setString(0, account);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1316,7 +1386,7 @@ public:
         char* limitStr = strtok(nullptr, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
         stmt->setString(0, email);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1351,7 +1421,7 @@ public:
             uint32 accountId        = fields[0].GetUInt32();
             std::string accountName = fields[1].GetString();
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->setUInt32(0, accountId);
             PreparedQueryResult result2 = CharacterDatabase.Query(stmt);
 
@@ -1361,11 +1431,11 @@ public:
 
                 do
                 {
-                    Field* characterFields  = result2->Fetch();
-                    uint32 guid             = characterFields[0].GetUInt32();
-                    std::string name        = characterFields[1].GetString();
+                    Field* characterFields   = result2->Fetch();
+                    ObjectGuid::LowType guid = characterFields[0].GetUInt32();
+                    std::string name         = characterFields[1].GetString();
                     uint8 plevel = 0, prace = 0, pclass = 0;
-                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != nullptr);
+                    bool online = ObjectAccessor::FindPlayerByLowGUID(guid) != nullptr;
 
                     if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
                     {
@@ -1375,15 +1445,13 @@ public:
                     }
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
-                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - [ONLINE]" : ""));
+                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace - 1], name_classes[pclass - 1], plevel, (online ? " - [ONLINE]" : ""));
                     else
                         handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
                     ++counter;
-                }
-                while (result2->NextRow() && (limit == -1 || counter < limit));
+                } while (result2->NextRow() && (limit == -1 || counter < limit));
             }
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
 
         if (counter == 0) // empty accounts only
         {

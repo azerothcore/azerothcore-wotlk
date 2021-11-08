@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_botanica.h"
 
 enum Spells
@@ -44,92 +57,100 @@ enum Misc
 
 class boss_laj : public CreatureScript
 {
-    public:
+public:
+    boss_laj() : CreatureScript("boss_laj") { }
 
-        boss_laj() : CreatureScript("boss_laj") { }
+    struct boss_lajAI : public BossAI
+    {
+        boss_lajAI(Creature* creature) : BossAI(creature, DATA_LAJ) { }
 
-        struct boss_lajAI : public BossAI
+        void Reset() override
         {
-            boss_lajAI(Creature* creature) : BossAI(creature, DATA_LAJ) { }
-
-            void Reset()
-            {
-                _Reset();
-                me->SetDisplayId(MODEL_DEFAULT);
-                _lastTransform = SPELL_DAMAGE_IMMUNE_SHADOW;
-                me->CastSpell(me, SPELL_DAMAGE_IMMUNE_SHADOW, true);
-            }
-
-            void DoTransform()
-            {
-                me->RemoveAurasDueToSpell(_lastTransform);
-
-                switch (_lastTransform = RAND(SPELL_DAMAGE_IMMUNE_SHADOW, SPELL_DAMAGE_IMMUNE_FIRE, SPELL_DAMAGE_IMMUNE_FROST, SPELL_DAMAGE_IMMUNE_NATURE, SPELL_DAMAGE_IMMUNE_ARCANE))
-                {
-                    case SPELL_DAMAGE_IMMUNE_SHADOW: me->SetDisplayId(MODEL_DEFAULT); break;
-                    case SPELL_DAMAGE_IMMUNE_ARCANE: me->SetDisplayId(MODEL_ARCANE); break;
-                    case SPELL_DAMAGE_IMMUNE_FIRE: me->SetDisplayId(MODEL_FIRE); break;
-                    case SPELL_DAMAGE_IMMUNE_FROST: me->SetDisplayId(MODEL_FROST); break;
-                    case SPELL_DAMAGE_IMMUNE_NATURE: me->SetDisplayId(MODEL_NATURE); break;
-                }
-
-                me->CastSpell(me, _lastTransform, true);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                _EnterCombat();
-
-                events.ScheduleEvent(EVENT_ALERGIC_REACTION, 5000);
-                events.ScheduleEvent(EVENT_TRANSFORM, 30000);
-                events.ScheduleEvent(EVENT_TELEPORT, 20000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                switch (events.ExecuteEvent())
-                {
-                    case EVENT_ALERGIC_REACTION:
-                        me->CastSpell(me->GetVictim(), SPELL_ALLERGIC_REACTION, false);
-                        events.ScheduleEvent(EVENT_ALERGIC_REACTION, 25000);
-                        break;
-                    case EVENT_TELEPORT:
-                        me->CastSpell(me, SPELL_TELEPORT_SELF, false);
-                        events.ScheduleEvent(EVENT_SUMMON, 2500);
-                        events.ScheduleEvent(EVENT_TELEPORT, 30000);
-                        break;
-                    case EVENT_SUMMON:
-                        Talk(EMOTE_SUMMON);
-                        me->CastSpell(me, SPELL_SUMMON_LASHER_1, true);
-                        me->CastSpell(me, SPELL_SUMMON_FLAYER_1, true);
-                        break;
-                    case EVENT_TRANSFORM:
-                        DoTransform();
-                        events.ScheduleEvent(EVENT_TRANSFORM, 35000);
-                        break;
-                }
-
-                DoMeleeAttackIfReady();
-            }
-            private:
-                uint32 _lastTransform;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_lajAI(creature);
+            _Reset();
+            me->SetDisplayId(MODEL_DEFAULT);
+            _lastTransform = SPELL_DAMAGE_IMMUNE_SHADOW;
+            me->CastSpell(me, SPELL_DAMAGE_IMMUNE_SHADOW, true);
         }
+
+        void DoTransform()
+        {
+            me->RemoveAurasDueToSpell(_lastTransform);
+
+            switch (_lastTransform = RAND(SPELL_DAMAGE_IMMUNE_SHADOW, SPELL_DAMAGE_IMMUNE_FIRE, SPELL_DAMAGE_IMMUNE_FROST, SPELL_DAMAGE_IMMUNE_NATURE, SPELL_DAMAGE_IMMUNE_ARCANE))
+            {
+                case SPELL_DAMAGE_IMMUNE_SHADOW:
+                    me->SetDisplayId(MODEL_DEFAULT);
+                    break;
+                case SPELL_DAMAGE_IMMUNE_ARCANE:
+                    me->SetDisplayId(MODEL_ARCANE);
+                    break;
+                case SPELL_DAMAGE_IMMUNE_FIRE:
+                    me->SetDisplayId(MODEL_FIRE);
+                    break;
+                case SPELL_DAMAGE_IMMUNE_FROST:
+                    me->SetDisplayId(MODEL_FROST);
+                    break;
+                case SPELL_DAMAGE_IMMUNE_NATURE:
+                    me->SetDisplayId(MODEL_NATURE);
+                    break;
+            }
+
+            me->CastSpell(me, _lastTransform, true);
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            _EnterCombat();
+
+            events.ScheduleEvent(EVENT_ALERGIC_REACTION, 5000);
+            events.ScheduleEvent(EVENT_TRANSFORM, 30000);
+            events.ScheduleEvent(EVENT_TELEPORT, 20000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_ALERGIC_REACTION:
+                    me->CastSpell(me->GetVictim(), SPELL_ALLERGIC_REACTION, false);
+                    events.ScheduleEvent(EVENT_ALERGIC_REACTION, 25000);
+                    break;
+                case EVENT_TELEPORT:
+                    me->CastSpell(me, SPELL_TELEPORT_SELF, false);
+                    events.ScheduleEvent(EVENT_SUMMON, 2500);
+                    events.ScheduleEvent(EVENT_TELEPORT, 30000);
+                    break;
+                case EVENT_SUMMON:
+                    Talk(EMOTE_SUMMON);
+                    me->CastSpell(me, SPELL_SUMMON_LASHER_1, true);
+                    me->CastSpell(me, SPELL_SUMMON_FLAYER_1, true);
+                    break;
+                case EVENT_TRANSFORM:
+                    DoTransform();
+                    events.ScheduleEvent(EVENT_TRANSFORM, 35000);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    private:
+        uint32 _lastTransform;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetTheBotanicaAI<boss_lajAI>(creature);
+    }
 };
 
 void AddSC_boss_laj()
 {
     new boss_laj();
 }
-

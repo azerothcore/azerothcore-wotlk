@@ -1,11 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef UTILS_H
 #define UTILS_H
+
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -16,13 +28,11 @@
 #include "Define.h"
 #include "Constants.h"
 
-#include <ace/Stack_Trace.h>
-
 struct WorldModelDefinition;
 class DoodadDefinition;
 class DoodadInstance;
 
-#define ASSERT(assertion) { if (!(assertion)) { ACE_Stack_Trace st; fprintf(stderr, "\n%s:%i in %s ASSERTION FAILED:\n  %s\n%s\n", __FILE__, __LINE__, __FUNCTION__, #assertion, st.c_str()); *((volatile int*)NULL) = 0; } }
+#define ASSERT(assertion) { if (!(assertion)) {fprintf(stderr, "\n%s:%i in %s ASSERTION FAILED:\n  %s\n%s\n", __FILE__, __LINE__, __FUNCTION__, #assertion, st.c_str()); *((volatile int*)nullptr) = 0; } }
 
 struct Vector3
 {
@@ -338,9 +348,6 @@ public:
     Vector3 Rotation;
     virtual float Scale() const { return 1.0f; };
 };
-
-#define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 10
 
 struct MmapTileHeader
 {

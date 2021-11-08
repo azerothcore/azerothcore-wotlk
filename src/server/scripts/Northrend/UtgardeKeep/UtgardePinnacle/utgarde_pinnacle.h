@@ -1,7 +1,27 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef DEF_PINNACLE_H
 #define DEF_PINNACLE_H
 
 #include "Opcodes.h"
+#include "CreatureAIImpl.h"
+
+#define UtgardePinnacleScriptName "instance_utgarde_pinnacle"
 
 enum Data
 {
@@ -15,7 +35,7 @@ enum Data
     DATA_NPC_RAVENOUS_FURBOLG           = 11,
     DATA_NPC_MASSIVE_JORMUNGAR          = 12,
     DATA_NPC_FEROCIOUS_RHINO            = 13,
-    
+
     YMIRON_DOOR                         = 20,
     STATIS_GENERATOR                    = 21,
 
@@ -51,5 +71,11 @@ enum Objects
     NPC_FEROCIOUS_RHINO                 = 26686,
     NPC_GARUF                           = 26893,
 };
+
+template <class AI, class T>
+inline AI* GetUtgardePinnacleAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, UtgardePinnacleScriptName);
+}
 
 #endif

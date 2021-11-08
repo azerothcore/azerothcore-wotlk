@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _ITEMPROTOTYPE_H
@@ -10,6 +21,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
+#include <unordered_map>
 
 enum ItemModType
 {
@@ -555,9 +567,12 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
 {
     switch (ItemClass)
     {
-        case ITEM_CLASS_WEAPON: return ItemSubClass;
-        case ITEM_CLASS_ARMOR:  return ItemSubClass + 21;
-        default:                return 0;
+        case ITEM_CLASS_WEAPON:
+            return ItemSubClass;
+        case ITEM_CLASS_ARMOR:
+            return ItemSubClass + 21;
+        default:
+            return 0;
     }
 }
 
@@ -689,16 +704,16 @@ struct ItemTemplate
     WorldPacket queryData; // pussywizard
 
     // helpers
-    bool HasSignature() const
+    [[nodiscard]] bool HasSignature() const
     {
         return GetMaxStackSize() == 1 &&
-        Class != ITEM_CLASS_CONSUMABLE &&
-        Class != ITEM_CLASS_QUEST &&
-        (Flags & ITEM_FLAG_NO_CREATOR) == 0 &&
-        ItemId != 6948; /*Hearthstone*/
+               Class != ITEM_CLASS_CONSUMABLE &&
+               Class != ITEM_CLASS_QUEST &&
+               (Flags & ITEM_FLAG_NO_CREATOR) == 0 &&
+               ItemId != 6948; /*Hearthstone*/
     }
 
-    bool CanChangeEquipStateInCombat() const
+    [[nodiscard]] bool CanChangeEquipStateInCombat() const
     {
         switch (InventoryType)
         {
@@ -718,29 +733,29 @@ struct ItemTemplate
         return false;
     }
 
-    bool IsCurrencyToken() const { return BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS; }
+    [[nodiscard]] bool IsCurrencyToken() const { return BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS; }
 
-    uint32 GetMaxStackSize() const
+    [[nodiscard]] uint32 GetMaxStackSize() const
     {
-        return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF-1) : uint32(Stackable);
+        return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF - 1) : uint32(Stackable);
     }
 
-    float getDPS() const
+    [[nodiscard]] float getDPS() const
     {
         if (Delay == 0)
             return 0;
         float temp = 0;
         for (auto i : Damage)
-            temp+=i.DamageMin + i.DamageMax;
-        return temp*500/Delay;
+            temp += i.DamageMin + i.DamageMax;
+        return temp * 500 / Delay;
     }
 
-    int32 getFeralBonus(int32 extraDPS = 0) const
+    [[nodiscard]] int32 getFeralBonus(int32 extraDPS = 0) const
     {
         // 0x02A5F3 - is mask for Melee weapon from ItemSubClassMask.dbc
-        if (Class == ITEM_CLASS_WEAPON && (1<<SubClass)&0x02A5F3)
+        if (Class == ITEM_CLASS_WEAPON && (1 << SubClass) & 0x02A5F3)
         {
-            int32 bonus = int32((extraDPS + getDPS())*14.0f) - 767;
+            int32 bonus = int32((extraDPS + getDPS()) * 14.0f) - 767;
             if (bonus < 0)
                 return 0;
             return bonus;
@@ -748,7 +763,7 @@ struct ItemTemplate
         return 0;
     }
 
-    float GetItemLevelIncludingQuality(uint8 pLevel) const
+    [[nodiscard]] float GetItemLevelIncludingQuality(uint8 pLevel) const
     {
         auto itemLevel = (float)ItemLevel;
         switch (Quality)
@@ -762,7 +777,7 @@ struct ItemTemplate
                 itemLevel -= 13.0f;
                 break;
             case ITEM_QUALITY_HEIRLOOM:
-                itemLevel = pLevel*2.33f;
+                itemLevel = pLevel * 2.33f;
                 break;
             case ITEM_QUALITY_ARTIFACT:
             case ITEM_QUALITY_EPIC:
@@ -773,7 +788,7 @@ struct ItemTemplate
         return std::max<float>(0.f, itemLevel);
     }
 
-    uint32 GetSkill() const
+    [[nodiscard]] uint32 GetSkill() const
     {
         const static uint32 item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
         {
@@ -808,10 +823,13 @@ struct ItemTemplate
         }
     }
 
-    bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
-    bool IsWeaponVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT; }
-    bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
-    bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
+    [[nodiscard]] bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
+    [[nodiscard]] bool IsWeaponVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT; }
+    [[nodiscard]] bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
+    [[nodiscard]] bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
+
+    [[nodiscard]] bool HasStat(ItemModType stat) const;
+    [[nodiscard]] bool HasSpellPowerStat() const;
 
     void InitializeQueryData();
 };
@@ -821,8 +839,8 @@ typedef std::unordered_map<uint32, ItemTemplate> ItemTemplateContainer;
 
 struct ItemLocale
 {
-    StringVector Name;
-    StringVector Description;
+    std::vector<std::string> Name;
+    std::vector<std::string> Description;
 };
 
 struct ItemSetNameEntry
@@ -833,7 +851,7 @@ struct ItemSetNameEntry
 
 struct ItemSetNameLocale
 {
-    StringVector Name;
+    std::vector<std::string> Name;
 };
 
 #endif

@@ -1,18 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "OutdoorPvPGH.h"
-#include "Player.h"
-#include "ObjectMgr.h"
-#include "OutdoorPvPMgr.h"
-#include "WorldPacket.h"
-#include "Language.h"
-#include "World.h"
 #include "GameEventMgr.h"
+#include "MapMgr.h"
+#include "OutdoorPvPGH.h"
+#include "OutdoorPvPMgr.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
 
 OutdoorPvPGH::OutdoorPvPGH()
 {
@@ -22,12 +32,10 @@ OutdoorPvPGH::OutdoorPvPGH()
 bool OutdoorPvPGH::SetupOutdoorPvP()
 {
     RegisterZone(GH_ZONE);
-    if ((m_obj = new OPvPCapturePointGH(this)))
-    {
-        AddCapturePoint(m_obj);
-        return true;
-    }
-    return false;
+    SetMapFromZone(GH_ZONE);
+
+    AddCapturePoint(new OPvPCapturePointGH(this));
+    return true;
 }
 
 void OutdoorPvPGH::SendRemoveWorldStates(Player* player)
@@ -42,7 +50,7 @@ OPvPCapturePointGH::OPvPCapturePointGH(OutdoorPvP* pvp) : OPvPCapturePoint(pvp)
     SetCapturePointData(189310, 571, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void OPvPCapturePointGH::FillInitialWorldStates(WorldPacket &data)
+void OPvPCapturePointGH::FillInitialWorldStates(WorldPacket& data)
 {
     data << GH_UI_SLIDER_DISPLAY << uint32(0);
     data << GH_UI_SLIDER_POS << uint32(50);
@@ -99,23 +107,24 @@ void OPvPCapturePointGH::ChangeState()
             break;
     }
 
-    if (GameObject* flag = HashMapHolder<GameObject>::Find(m_capturePointGUID))
-        flag->SetGoArtKit(artkit);
+    Map* map = sMapMgr->FindMap(571, 0);
+    auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+        itr->second->SetGoArtKit(artkit);
 }
 
 class OutdoorPvP_grizzly_hills : public OutdoorPvPScript
 {
-    public:
+public:
+    OutdoorPvP_grizzly_hills()
+        : OutdoorPvPScript("outdoorpvp_gh")
+    {
+    }
 
-        OutdoorPvP_grizzly_hills()
-            : OutdoorPvPScript("outdoorpvp_gh")
-        {
-        }
-
-        OutdoorPvP* GetOutdoorPvP() const
-        {
-            return new OutdoorPvPGH();
-        }
+    OutdoorPvP* GetOutdoorPvP() const override
+    {
+        return new OutdoorPvPGH();
+    }
 };
 
 void AddSC_outdoorpvp_gh()

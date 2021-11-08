@@ -1,22 +1,32 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- /* ScriptData
- SDName: Boss_Archimonde
- SD%Complete: 85
- SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
- SDCategory: Caverns of Time, Mount Hyjal
- EndScriptData */
+/* ScriptData
+SDName: Boss_Archimonde
+SD%Complete: 85
+SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
+SDCategory: Caverns of Time, Mount Hyjal
+EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "hyjal.h"
-#include "SpellAuras.h"
-#include "hyjal_trash.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 
 enum Texts
@@ -91,9 +101,9 @@ class npc_ancient_wisp : public CreatureScript
 public:
     npc_ancient_wisp() : CreatureScript("npc_ancient_wisp") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_ancient_wispAI>(creature);
+        return GetHyjalAI<npc_ancient_wispAI>(creature);
     }
 
     struct npc_ancient_wispAI : public ScriptedAI
@@ -101,30 +111,30 @@ public:
         npc_ancient_wispAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            ArchimondeGUID = 0;
+            ArchimondeGUID.Clear();
         }
 
         InstanceScript* instance;
-        uint64 ArchimondeGUID;
+        ObjectGuid ArchimondeGUID;
         uint32 CheckTimer;
 
-        void Reset()
+        void Reset() override
         {
             CheckTimer = 1000;
 
-            ArchimondeGUID = instance->GetData64(DATA_ARCHIMONDE);
+            ArchimondeGUID = instance->GetGuidData(DATA_ARCHIMONDE);
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CheckTimer <= diff)
             {
@@ -149,22 +159,22 @@ class npc_doomfire : public CreatureScript
 public:
     npc_doomfire() : CreatureScript("npc_doomfire") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_doomfireAI(creature);
+        return GetHyjalAI<npc_doomfireAI>(creature);
     }
 
     struct npc_doomfireAI : public ScriptedAI
     {
         npc_doomfireAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
@@ -178,25 +188,25 @@ class npc_doomfire_targetting : public CreatureScript
 public:
     npc_doomfire_targetting() : CreatureScript("npc_doomfire_targetting") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_doomfire_targettingAI(creature);
+        return GetHyjalAI<npc_doomfire_targettingAI>(creature);
     }
 
     struct npc_doomfire_targettingAI : public ScriptedAI
     {
         npc_doomfire_targettingAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
         uint32 ChangeTargetTimer;
 
-        void Reset()
+        void Reset() override
         {
-            TargetGUID = 0;
+            TargetGUID.Clear();
             ChangeTargetTimer = 5000;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             //will update once TargetGUID is 0. In case noone actually moves(not likely) and this is 0
@@ -205,21 +215,21 @@ public:
                 TargetGUID = who->GetGUID();
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (ChangeTargetTimer <= diff)
             {
                 if (Unit* temp = ObjectAccessor::GetUnit(*me, TargetGUID))
                 {
                     me->GetMotionMaster()->MoveFollow(temp, 0.0f, 0.0f);
-                    TargetGUID = 0;
+                    TargetGUID.Clear();
                 }
                 else
                 {
@@ -248,15 +258,15 @@ class boss_archimonde : public CreatureScript
 public:
     boss_archimonde() : CreatureScript("boss_archimonde") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_archimondeAI>(creature);
+        return GetHyjalAI<boss_archimondeAI>(creature);
     }
 
     struct boss_archimondeAI : public BossAI
     {
         boss_archimondeAI(Creature* creature) : BossAI(creature, BOSS_ARCHIMONDE), summons(me),
-        Enraged(false), BelowTenPercent(false), HasProtected(false), IsChanneling(false)
+            Enraged(false), BelowTenPercent(false), HasProtected(false), IsChanneling(false)
         {
             instance = creature->GetInstanceScript();
         }
@@ -264,8 +274,8 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        uint64 DoomfireSpiritGUID;
-        uint64 WorldTreeGUID;
+        ObjectGuid DoomfireSpiritGUID;
+        ObjectGuid WorldTreeGUID;
 
         uint8 SoulChargeCount;
         uint8 WispCount;
@@ -283,8 +293,8 @@ public:
         {
             instance->SetData(DATA_ARCHIMONDEEVENT, NOT_STARTED);
 
-            DoomfireSpiritGUID = 0;
-            WorldTreeGUID = 0;
+            DoomfireSpiritGUID.Clear();
+            WorldTreeGUID.Clear();
             WispCount = 0;
             Enraged = false;
             BelowTenPercent = false;
@@ -316,7 +326,7 @@ public:
                 return;
 
             // Now lets get archimode threat list
-            ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
 
             if (t_list.empty())
                 return;
@@ -426,7 +436,7 @@ public:
                 if (victim && me->IsWithinMeleeRange(victim))
                     return false;
 
-                ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
                 if (threatlist.empty())
                     return false;
 
@@ -454,7 +464,7 @@ public:
                 summoned->AI()->AttackStart(me);
             else
             {
-                summoned->setFaction(me->getFaction());
+                summoned->SetFaction(me->GetFaction());
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
@@ -472,7 +482,7 @@ public:
                 if (Unit* DoomfireSpirit = ObjectAccessor::GetUnit(*me, DoomfireSpiritGUID))
                 {
                     summoned->GetMotionMaster()->MoveFollow(DoomfireSpirit, 0.0f, 0.0f);
-                    DoomfireSpiritGUID = 0;
+                    DoomfireSpiritGUID.Clear();
                 }
             }
         }
@@ -493,12 +503,12 @@ public:
         void SummonDoomfire(Unit* target)
         {
             Unit* doomfire1 = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT,
-                target->GetPositionX() + 15.0f, target->GetPositionY() + 15.0f, target->GetPositionZ(), 0,
-                TEMPSUMMON_TIMED_DESPAWN, 27000);
+                                                 target->GetPositionX() + 15.0f, target->GetPositionY() + 15.0f, target->GetPositionZ(), 0,
+                                                 TEMPSUMMON_TIMED_DESPAWN, 27000);
 
             Unit* doomfire2 = me->SummonCreature(CREATURE_DOOMFIRE,
-                target->GetPositionX() - 15.0f, target->GetPositionY() - 15.0f, target->GetPositionZ(), 0,
-                TEMPSUMMON_TIMED_DESPAWN, 27000);
+                                                 target->GetPositionX() - 15.0f, target->GetPositionY() - 15.0f, target->GetPositionZ(), 0,
+                                                 TEMPSUMMON_TIMED_DESPAWN, 27000);
 
             doomfire1->SetVisible(false);
             doomfire2->SetVisible(false);
@@ -543,15 +553,15 @@ public:
             if (!me->IsInCombat())
             {
                 // Do not let the raid skip straight to Archimonde. Visible and hostile ONLY if Azagalor is finished.
-                if ((instance->GetData(DATA_AZGALOREVENT) < DONE) && (me->IsVisible() || (me->getFaction() != 35)))
+                if ((instance->GetData(DATA_AZGALOREVENT) < DONE) && (me->IsVisible() || (me->GetFaction() != FACTION_FRIENDLY)))
                 {
                     me->SetVisible(false);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                 }
-                
-                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->getFaction() == 35)))
+
+                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->GetFaction() == FACTION_FRIENDLY)))
                 {
-                    me->setFaction(1720);
+                    me->SetFaction(FACTION_DRAGONKIN);
                     me->SetVisible(true);
                 }
 
@@ -592,22 +602,22 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_WORLD_TREE_DISTANCE:
-                {
-                    // If Archimonde is too close to the world tree this will ENRAGE him
-                    Creature* Check = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 2000);
-                    if (Check)
                     {
-                        Check->SetVisible(false);
-
-                        if (me->IsWithinDistInMap(Check, 75))
+                        // If Archimonde is too close to the world tree this will ENRAGE him
+                        Creature* Check = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 2000);
+                        if (Check)
                         {
-                            events.ScheduleEvent(EVENT_TOO_CLOSE_TO_WORLD_TREE, 0);
-                            break;
+                            Check->SetVisible(false);
+
+                            if (me->IsWithinDistInMap(Check, 75))
+                            {
+                                events.ScheduleEvent(EVENT_TOO_CLOSE_TO_WORLD_TREE, 0);
+                                break;
+                            }
                         }
+                        events.RepeatEvent(5000);
+                        break;
                     }
-                    events.RepeatEvent(5000);
-                    break;
-                }
                 case EVENT_BELOW_10_PERCENT_HP:
                     DoCastProtection();     // Protection of Elune against Finger and Hand of Death
                     BelowTenPercent = true;
@@ -623,7 +633,7 @@ public:
                     // If there are more than 30 Wisps then kill Archimonde
                     if (WispCount >= 30)
                     {
-                        Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                        Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                         return;     // Finish the encounter and no more event repeat
                     }
                     DoSpawnCreature(CREATURE_ANCIENT_WISP, float(rand() % 40), float(rand() % 40), 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
@@ -685,29 +695,29 @@ public:
 
 class spell_red_sky_effect : public SpellScriptLoader
 {
-    public:
-        spell_red_sky_effect() : SpellScriptLoader("spell_red_sky_effect") { }
+public:
+    spell_red_sky_effect() : SpellScriptLoader("spell_red_sky_effect") { }
 
-        class spell_red_sky_effect_SpellScript : public SpellScript
+    class spell_red_sky_effect_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_red_sky_effect_SpellScript);
+
+        void HandleHit(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_red_sky_effect_SpellScript);
-
-            void HandleHit(SpellEffIndex /*effIndex*/)
-            {
-                if (GetHitUnit())
-                    PreventHitDamage();
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_red_sky_effect_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_red_sky_effect_SpellScript();
+            if (GetHitUnit())
+                PreventHitDamage();
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_red_sky_effect_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_red_sky_effect_SpellScript();
+    }
 };
 
 class spell_finger_of_death : public SpellScriptLoader
@@ -733,7 +743,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_finger_of_death_SpellScript();
     }
@@ -762,7 +772,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hand_of_death_SpellScript();
     }

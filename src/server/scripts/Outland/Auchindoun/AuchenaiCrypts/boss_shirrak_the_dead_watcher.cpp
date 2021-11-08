@@ -1,16 +1,29 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "auchenai_crypts.h"
 #include "Player.h"
-#include "SpellScript.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum eShirrak
 {
-
     SPELL_INHIBIT_MAGIC                 = 32264,
     SPELL_ATTRACT_MAGIC                 = 32265,
     SPELL_CARNIVOROUS_BITE_N            = 36383,
@@ -38,9 +51,9 @@ class boss_shirrak_the_dead_watcher : public CreatureScript
 public:
     boss_shirrak_the_dead_watcher() : CreatureScript("boss_shirrak_the_dead_watcher") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_shirrak_the_dead_watcherAI (creature);
+        return GetAuchenaiCryptsAI<boss_shirrak_the_dead_watcherAI>(creature);
     }
 
     struct boss_shirrak_the_dead_watcherAI : public ScriptedAI
@@ -50,22 +63,22 @@ public:
         }
 
         EventMap events;
-        uint64 focusGUID;
+        ObjectGuid focusGUID;
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
-            focusGUID = 0;
+            focusGUID.Clear();
             me->SetControlled(false, UNIT_STATE_ROOT);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_SPELL_INHIBIT_MAGIC, 0);
             events.ScheduleEvent(EVENT_SPELL_ATTRACT_MAGIC, 28000);
@@ -73,12 +86,12 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FOCUS_FIRE, 17000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->CastSpell(summon, SPELL_FOCUS_FIRE_VISUAL, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_FOCUS_CAST)
                 target->CastSpell(target, DUNGEON_MODE(SPELL_FIERY_BLAST_N, SPELL_FIERY_BLAST_H), false);
@@ -95,14 +108,14 @@ public:
             return 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            uint32 eventId = events.GetEvent();
+            uint32 eventId = events.ExecuteEvent();
 
             if (eventId == EVENT_SPELL_INHIBIT_MAGIC)
             {
-                Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+                Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     if (Player* player = i->GetSource())
                     {
@@ -127,7 +140,6 @@ public:
 
             if (!UpdateVictim())
                 return;
-
 
             switch (eventId)
             {
@@ -157,11 +169,9 @@ public:
                 case EVENT_SPELL_FOCUS_FIRE_2:
                     if (Unit* flare = ObjectAccessor::GetCreature(*me, focusGUID))
                         me->CastSpell(flare, SPELL_FOCUS_CAST, true);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_FOCUS_FIRE_3:
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    events.PopEvent();
                     break;
             }
 
@@ -172,51 +182,51 @@ public:
 
 class spell_auchenai_possess : public SpellScriptLoader
 {
-    public:
-        spell_auchenai_possess() : SpellScriptLoader("spell_auchenai_possess") { }
+public:
+    spell_auchenai_possess() : SpellScriptLoader("spell_auchenai_possess") { }
 
-        class spell_auchenai_possess_AuraScript : public AuraScript
+    class spell_auchenai_possess_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_auchenai_possess_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_auchenai_possess_AuraScript);
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* caster = GetCaster())
-                    if (Unit* target = GetTarget())
-                        caster->CastSpell(target, 32830 /*POSSESS*/, true);
-            }
-
-            void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-            {
-                isPeriodic = true;
-                amplitude = 2000;
-            }
-
-            void Update(AuraEffect*  /*effect*/)
-            {
-                // Xinef: Charm is removed when target is at or below 50%hp
-                if (Unit* owner = GetUnitOwner())
-                    if (owner->GetHealthPct() <= 50)
-                        SetDuration(0);
-            }
-
-            void Register()
-            {
-                // Base channel
-                if (m_scriptSpellId == 33401)
-                    OnEffectRemove += AuraEffectRemoveFn(spell_auchenai_possess_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-                else
-                {
-                    DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_auchenai_possess_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_CHARM);
-                    OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_auchenai_possess_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_CHARM);
-                }
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_auchenai_possess_AuraScript();
+            if (Unit* caster = GetCaster())
+                if (Unit* target = GetTarget())
+                    caster->CastSpell(target, 32830 /*POSSESS*/, true);
         }
+
+        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+        {
+            isPeriodic = true;
+            amplitude = 2000;
+        }
+
+        void Update(AuraEffect*  /*effect*/)
+        {
+            // Xinef: Charm is removed when target is at or below 50%hp
+            if (Unit* owner = GetUnitOwner())
+                if (owner->GetHealthPct() <= 50)
+                    SetDuration(0);
+        }
+
+        void Register() override
+        {
+            // Base channel
+            if (m_scriptSpellId == 33401)
+                OnEffectRemove += AuraEffectRemoveFn(spell_auchenai_possess_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            else
+            {
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_auchenai_possess_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_CHARM);
+                OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_auchenai_possess_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_CHARM);
+            }
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_auchenai_possess_AuraScript();
+    }
 };
 
 void AddSC_boss_shirrak_the_dead_watcher()

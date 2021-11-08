@@ -1,11 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "blackrock_depths.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -22,9 +34,9 @@ class boss_moira_bronzebeard : public CreatureScript
 public:
     boss_moira_bronzebeard() : CreatureScript("boss_moira_bronzebeard") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_moira_bronzebeardAI(creature);
+        return GetBlackrockDepthsAI<boss_moira_bronzebeardAI>(creature);
     }
 
     struct boss_moira_bronzebeardAI : public ScriptedAI
@@ -36,7 +48,7 @@ public:
         uint32 ShadowWordPain_Timer;
         uint32 Smite_Timer;
 
-        void Reset()
+        void Reset() override
         {
             Heal_Timer = 12000;                                 //These times are probably wrong
             MindBlast_Timer = 16000;
@@ -44,9 +56,9 @@ public:
             Smite_Timer = 8000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -57,21 +69,24 @@ public:
             {
                 DoCastVictim(SPELL_MINDBLAST);
                 MindBlast_Timer = 14000;
-            } else MindBlast_Timer -= diff;
+            }
+            else MindBlast_Timer -= diff;
 
             //ShadowWordPain_Timer
             if (ShadowWordPain_Timer <= diff)
             {
                 DoCastVictim(SPELL_SHADOWWORDPAIN);
                 ShadowWordPain_Timer = 18000;
-            } else ShadowWordPain_Timer -= diff;
+            }
+            else ShadowWordPain_Timer -= diff;
 
             //Smite_Timer
             if (Smite_Timer <= diff)
             {
                 DoCastVictim(SPELL_SMITE);
                 Smite_Timer = 10000;
-            } else Smite_Timer -= diff;
+            }
+            else Smite_Timer -= diff;
         }
     };
 };

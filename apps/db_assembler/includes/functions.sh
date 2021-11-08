@@ -2,6 +2,21 @@
 PROMPT_USER=""
 PROMPT_PASS=""
 
+function dbasm_waitMysqlConn() {
+    DBHOST="$1"
+    DBPORT="$2"
+    COUNT=0
+    while ! mysqladmin ping -h"$DBHOST" --port="$DBPORT" --silent; do
+        ((COUNT++))
+        if [ $COUNT -gt $DBASM_WAIT_RETRIES ]; then
+            echo "DBASM Timeout: Cannot ping mysql!" 1>&2
+            exit 64
+        fi
+        echo "Cannot ping mysql on $DBHOST:$DBPORT, retry in $DBASM_WAIT_TIMEOUT seconds (remaining: $COUNT/$DBASM_WAIT_RETRIES)..."
+        sleep $DBASM_WAIT_TIMEOUT
+    done
+}
+
 # use in a subshell
 function dbasm_resetExitCode() {
 	exit 0
@@ -12,6 +27,8 @@ function dbasm_mysqlExec() {
 	command=$2
 	options=$3
 
+    # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
+    MYSQL_PORT=3306
 	eval $confs
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -19,30 +36,32 @@ function dbasm_mysqlExec() {
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
+    dbasm_waitMysqlConn $MYSQL_HOST $MYSQL_PORT
+
 	export MYSQL_PWD=$MYSQL_PASS
 
-	retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" $options -e "$command")
+	retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -P "$MYSQL_PORT" $options -e "$command")
 	if [[ $? -ne 0 ]]; then
-		err=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" $options -e "$command" 2>&1 )
+		err=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -P "$MYSQL_PORT" $options -e "$command" 2>&1 )
 		if [[ "$err" == *"Access denied"* ]]; then
 			read -p "Insert mysql user:" PROMPT_USER
 			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
 
-            retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command")
+            retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" -P "$MYSQL_PORT" $options -e "$command")
             if [[ $? -ne 0 ]]; then
-                err=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command" 2>&1 )
+                err=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" -P "$MYSQL_PORT" $options -e "$command" 2>&1 )
                 # it happens on new mysql 5.7 installations
                 # since mysql_native_password is explicit now
                 if [[ "$err" == *"Access denied"* ]]; then
                     echo "Setting mysql_native_password and  for  $PROMPT_USER ..."
-                    sudo -h "$MYSQL_HOST" "$DB_MYSQL_EXEC" -e "UPDATE mysql.user SET authentication_string=PASSWORD('${PROMPT_PASS}'), plugin='mysql_native_password' WHERE User='${PROMPT_USER}'; FLUSH PRIVILEGES;"
+                    sudo -h "$MYSQL_HOST" "$DB_MYSQL_EXEC" -P "$MYSQL_PORT" -e "UPDATE mysql.user SET authentication_string=PASSWORD('${PROMPT_PASS}'), plugin='mysql_native_password' WHERE User='${PROMPT_USER}'; FLUSH PRIVILEGES;"
                 fi
             fi
 
             # create configured account if not exists
-            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "CREATE USER '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"
-            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT CREATE ON *.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "GRANT CREATE ON *.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
             for db in ${DATABASES[@]}
             do
                 local _uc=${db^^}
@@ -54,7 +73,7 @@ function dbasm_mysqlExec() {
 
                 eval $_confs
                 echo "Grant permissions for ${MYSQL_USER}'@'${MYSQL_HOST} to ${_dbname}"
-                "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+                "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION; FLUSH PRIVILEGES;"
             done
 		else
 			exit
@@ -106,9 +125,13 @@ function dbasm_createDB() {
         echo "$dbname database exists"
     else
 		echo "Creating DB ${dbname} ..."
-        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
+        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`;" ""
+        echo "Creating User ${CONF_USER}@${MYSQL_HOST} identified by ${CONF_PASS}..."
         dbasm_mysqlExec "$confs" "CREATE USER IF NOT EXISTS '${CONF_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${CONF_PASS}';"
-        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
+        echo "Granting user privileges on: ${dbname} ..."
+        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}'"
+        echo "Flush privileges"
+        dbasm_mysqlExec "$confs" "FLUSH PRIVILEGES;"
     fi
 }
 
@@ -145,7 +168,7 @@ function dbasm_assemble() {
     shopt -s globstar
 
     if [ $with_base = true ]; then
-        echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
+        echo "" > "$OUTPUT_FOLDER$database$suffix_base.sql"
 
 
         if [ ! ${#base[@]} -eq 0 ]; then
@@ -154,11 +177,11 @@ function dbasm_assemble() {
             for d in "${base[@]}"
             do
                 echo "Searching on $d ..."
-                if [ ! -z $d ]; then
+                if [ ! -z "$d" ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ -e $entry ]]; then
-                            cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
+                            cat "$entry" >> "$OUTPUT_FOLDER$database$suffix_base.sql"
                         fi
                     done
                 fi
@@ -167,9 +190,9 @@ function dbasm_assemble() {
     fi
 
     if [ $with_updates = true ]; then
-        updFile=$OUTPUT_FOLDER$database$suffix_upd".sql"
+        updFile="$OUTPUT_FOLDER$database$suffix_upd.sql"
 
-        echo "" > $updFile
+        echo "" > "$updFile"
 
         if [ ! ${#updates[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
@@ -177,15 +200,15 @@ function dbasm_assemble() {
             for d in "${updates[@]}"
             do
                 echo "Searching on $d ..."
-                if [ ! -z $d ]; then
+                if [ ! -z "$d" ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
                             continue
                         fi
 
-                        echo "-- $file" >> $updFile
-                        cat "$entry" >> $updFile
+                        echo "-- $file" >> "$updFile"
+                        cat "$entry" >> "$updFile"
                     done
                 fi
             done
@@ -193,9 +216,9 @@ function dbasm_assemble() {
     fi
 
     if [ $with_custom = true ]; then
-        custFile=$OUTPUT_FOLDER$database$suffix_custom".sql"
+        custFile="$OUTPUT_FOLDER$database$suffix_custom.sql"
 
-        echo "" > $custFile
+        echo "" > "$custFile"
 
         if [ ! ${#custom[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
@@ -203,15 +226,15 @@ function dbasm_assemble() {
             for d in "${custom[@]}"
             do
                 echo "Searching on $d ..."
-                if [ ! -z $d ]; then
+                if [ ! -z "$d" ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
                             continue
                         fi
 
-                        echo "-- $file" >> $custFile
-                        cat "$entry" >> $custFile
+                        echo "-- $file" >> "$custFile"
+                        cat "$entry" >> "$custFile"
                     done
                 fi
             done
@@ -245,6 +268,8 @@ function dbasm_db_backup() {
     name="DB_"$uc"_NAME"
     dbname=${!name}
 
+    # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
+    MYSQL_PORT=3306
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -252,19 +277,20 @@ function dbasm_db_backup() {
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
+
     export MYSQL_PWD=$MYSQL_PASS
 
     now=`date +%s`
 
-	"$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
+	"$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" --port="$MYSQL_PORT" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
 	if [[ $? -ne 0 ]]; then
-		err=$("$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" 2>&1 )
+		err=$("$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" --port="$MYSQL_PORT" "$dbname" 2>&1 )
 		if [[ "$err" == *"Access denied"* ]]; then
 			read -p "Insert mysql user:" PROMPT_USER
 			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
 
-			"$DB_MYSQL_DUMP_EXEC" --opt --user="$PROMPT_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
+			"$DB_MYSQL_DUMP_EXEC" --opt --user="$PROMPT_USER" --host="$MYSQL_HOST" --port="$MYSQL_PORT" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
 		else
 			exit
 		fi
@@ -294,6 +320,8 @@ function dbasm_db_import() {
 
     echo "importing $1 - $2 ..."
 
+    # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
+    MYSQL_PORT=3306
     eval $confs;
 
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
@@ -301,22 +329,24 @@ function dbasm_db_import() {
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
+    dbasm_waitMysqlConn $MYSQL_HOST $MYSQL_PORT
+
     export MYSQL_PWD=$MYSQL_PASS
 
 
     # TODO: remove this line after we squash our DB updates
-    "$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "SET GLOBAL max_allowed_packet=128*1024*1024;"
+    "$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" --port="$MYSQL_PORT" -e "SET GLOBAL max_allowed_packet=128*1024*1024;"
 
-	"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" --default-character-set=utf8 "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+	"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" --port="$MYSQL_PORT" --default-character-set=utf8 "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
 
 	if [[ $? -ne 0 ]]; then
-		err=$("$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" 2>&1 )
+		err=$("$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" -P "$MYSQL_PORT" "$dbname" 2>&1 )
 		if [[ "$err" == *"Access denied"* ]]; then
 			read -p "Insert mysql user:" PROMPT_USER
 			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
 
-			"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$PROMPT_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+			"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$PROMPT_USER" -P "$MYSQL_PORT" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
 		else
 			exit
 		fi

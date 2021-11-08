@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "MPQ.h"
-#include "MPQManager.h"
+#include "MPQMgr.h"
 #include <deque>
 #include <cstdio>
 
@@ -46,20 +57,21 @@ void MPQArchive::close()
 }
 
 MPQFile::MPQFile(const char* filename):
-eof(false), buffer(0), pointer(0), size(0)
+    eof(false), buffer(0), pointer(0), size(0)
 {
-    for (std::deque<MPQArchive*>::iterator i = MPQHandler->Archives.begin(); i != MPQHandler->Archives.end();++i)
+    for (std::deque<MPQArchive*>::iterator i = MPQHandler->Archives.begin(); i != MPQHandler->Archives.end(); ++i)
     {
         mpq_archive* mpq_a = (*i)->mpq_a;
 
         uint32_t filenum;
-        if(libmpq__file_number(mpq_a, filename, &filenum))
+        if (libmpq__file_number(mpq_a, filename, &filenum))
             continue;
         libmpq__off_t transferred;
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
 
         // HACK: in patch.mpq some files don't want to open and give 1 for filesize
-        if (size<=1) {
+        if (size <= 1)
+        {
             //            printf("warning: file %s has size %d; cannot Read.\n", filename, size);
             eof = true;
             buffer = 0;
@@ -71,7 +83,6 @@ eof(false), buffer(0), pointer(0), size(0)
         libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
         /*libmpq_file_getdata(&mpq_a, hash, fileno, (unsigned char*)buffer);*/
         return;
-
     }
     eof = true;
     buffer = 0;
@@ -83,7 +94,8 @@ size_t MPQFile::Read(void* dest, size_t bytes)
         return 0;
 
     size_t rpos = pointer + bytes;
-    if (rpos > size_t(size)) {
+    if (rpos > size_t(size))
+    {
         bytes = size - pointer;
         eof = true;
     }

@@ -1,11 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
-
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum EpochHunter
 {
@@ -30,9 +42,9 @@ class boss_epoch_hunter : public CreatureScript
 public:
     boss_epoch_hunter() : CreatureScript("boss_epoch_hunter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_epoch_hunterAI>(creature);
+        return GetOldHillsbradAI<boss_epoch_hunterAI>(creature);
     }
 
     struct boss_epoch_hunterAI : public ScriptedAI
@@ -41,11 +53,11 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -55,23 +67,23 @@ public:
             events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, 14000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (killer == me)
                 return;
             Talk(SAY_DEATH);
             me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_EPOCH_KILLED);
-            if (Creature* taretha = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_TARETHA_GUID)))
+            if (Creature* taretha = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_TARETHA_GUID)))
                 taretha->AI()->DoAction(me->GetEntry());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -105,7 +117,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_epoch_hunter()

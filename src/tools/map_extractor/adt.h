@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ADT_H
@@ -33,13 +44,14 @@ enum LiquidType
 //
 class adt_MCVT
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
     uint32 size;
 public:
-    float height_map[(ADT_CELL_SIZE+1)*(ADT_CELL_SIZE+1)+ADT_CELL_SIZE*ADT_CELL_SIZE];
+    float height_map[(ADT_CELL_SIZE + 1) * (ADT_CELL_SIZE + 1) + ADT_CELL_SIZE * ADT_CELL_SIZE];
 
     bool  prepareLoadedData();
 };
@@ -49,7 +61,8 @@ public:
 //
 class adt_MCLQ
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -57,10 +70,11 @@ public:
     uint32 size;
     float height1;
     float height2;
-    struct liquid_data{
+    struct liquid_data
+    {
         uint32 light;
         float  height;
-    } liquid[ADT_CELL_SIZE+1][ADT_CELL_SIZE+1];
+    } liquid[ADT_CELL_SIZE + 1][ADT_CELL_SIZE + 1];
 
     // 1<<0 - ochen
     // 1<<1 - lava/slime
@@ -78,7 +92,8 @@ public:
 //
 class adt_MCNK
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -118,17 +133,17 @@ public:
     uint32 effectId;
 
     bool   prepareLoadedData();
-    adt_MCVT *getMCVT()
+    adt_MCVT* getMCVT()
     {
         if (offsMCVT)
-            return (adt_MCVT *)((uint8 *)this + offsMCVT);
-        return 0;
+            return (adt_MCVT*)((uint8*)this + offsMCVT);
+        return nullptr;
     }
-    adt_MCLQ *getMCLQ()
+    adt_MCLQ* getMCLQ()
     {
         if (offsMCLQ)
-            return (adt_MCLQ *)((uint8 *)this + offsMCLQ);
-        return 0;
+            return (adt_MCLQ*)((uint8*)this + offsMCLQ);
+        return nullptr;
     }
 };
 
@@ -137,13 +152,15 @@ public:
 //
 class adt_MCIN
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
 public:
     uint32 size;
-    struct adt_CELLS{
+    struct adt_CELLS
+    {
         uint32 offsMCNK;
         uint32 size;
         uint32 flags;
@@ -152,18 +169,19 @@ public:
 
     bool   prepareLoadedData();
     // offset from begin file (used this-84)
-    adt_MCNK *getMCNK(int x, int y)
+    adt_MCNK* getMCNK(int x, int y)
     {
         if (cells[x][y].offsMCNK)
-            return (adt_MCNK *)((uint8 *)this + cells[x][y].offsMCNK - 84);
-        return 0;
+            return (adt_MCNK*)((uint8*)this + cells[x][y].offsMCNK - 84);
+        return nullptr;
     }
 };
 
 #define ADT_LIQUID_HEADER_FULL_LIGHT   0x01
 #define ADT_LIQUID_HEADER_NO_HIGHT     0x02
 
-struct adt_liquid_header{
+struct adt_liquid_header
+{
     uint16 liquidType;             // Index from LiquidType.dbc
     uint16 formatFlags;
     float  heightLevel1;
@@ -182,13 +200,15 @@ struct adt_liquid_header{
 class adt_MH2O
 {
 public:
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
     uint32 size;
 
-    struct adt_LIQUID{
+    struct adt_LIQUID
+    {
         uint32 offsData1;
         uint32 used;
         uint32 offsData2;
@@ -196,56 +216,55 @@ public:
 
     bool   prepareLoadedData();
 
-    adt_liquid_header *getLiquidData(int x, int y)
+    adt_liquid_header* getLiquidData(int x, int y)
     {
         if (liquid[x][y].used && liquid[x][y].offsData1)
-            return (adt_liquid_header *)((uint8*)this + 8 + liquid[x][y].offsData1);
-        return 0;
+            return (adt_liquid_header*)((uint8*)this + 8 + liquid[x][y].offsData1);
+        return nullptr;
     }
 
-    float *getLiquidHeightMap(adt_liquid_header *h)
+    float* getLiquidHeightMap(adt_liquid_header* h)
     {
         if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
-            return 0;
+            return nullptr;
         if (h->offsData2b)
-            return (float *)((uint8*)this + 8 + h->offsData2b);
-        return 0;
+            return (float*)((uint8*)this + 8 + h->offsData2b);
+        return nullptr;
     }
 
-    uint8 *getLiquidLightMap(adt_liquid_header *h)
+    uint8* getLiquidLightMap(adt_liquid_header* h)
     {
-        if (h->formatFlags&ADT_LIQUID_HEADER_FULL_LIGHT)
-            return 0;
+        if (h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT)
+            return nullptr;
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
-                return (uint8 *)((uint8*)this + 8 + h->offsData2b);
-            return (uint8 *)((uint8*)this + 8 + h->offsData2b + (h->width+1)*(h->height+1)*4);
+                return (uint8*)((uint8*)this + 8 + h->offsData2b);
+            return (uint8*)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
-        return 0;
+        return nullptr;
     }
 
-    uint32 *getLiquidFullLightMap(adt_liquid_header *h)
+    uint32* getLiquidFullLightMap(adt_liquid_header* h)
     {
-        if (!(h->formatFlags&ADT_LIQUID_HEADER_FULL_LIGHT))
-            return 0;
+        if (!(h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT))
+            return nullptr;
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
-                return (uint32 *)((uint8*)this + 8 + h->offsData2b);
-            return (uint32 *)((uint8*)this + 8 + h->offsData2b + (h->width+1)*(h->height+1)*4);
+                return (uint32*)((uint8*)this + 8 + h->offsData2b);
+            return (uint32*)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
-        return 0;
+        return nullptr;
     }
 
-    uint64 getLiquidShowMap(adt_liquid_header *h)
+    uint64 getLiquidShowMap(adt_liquid_header* h)
     {
         if (h->offsData2a)
-            return *((uint64 *)((uint8*)this + 8 + h->offsData2a));
+            return *((uint64*)((uint8*)this + 8 + h->offsData2a));
         else
             return 0xFFFFFFFFFFFFFFFFuLL;
     }
-
 };
 
 // Adt file min/max height chunk
@@ -274,7 +293,8 @@ public:
 //
 class adt_MHDR
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -317,14 +337,15 @@ public:
     }
 };
 
-class ADT_file : public FileLoader{
+class ADT_file : public FileLoader
+{
 public:
-    bool prepareLoadedData();
+    bool prepareLoadedData() override;
     ADT_file();
     ~ADT_file();
-    void free();
+    void free() override;
 
-    adt_MHDR *a_grid;
+    adt_MHDR* a_grid;
 };
 
 #endif

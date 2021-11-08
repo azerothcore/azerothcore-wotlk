@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -12,20 +23,26 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "Language.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "Language.h"
 #include "ObjectAccessor.h"
 #include "ScriptMgr.h"
+
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
 
 class guild_commandscript : public CommandScript
 {
 public:
     guild_commandscript() : CommandScript("guild_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> guildCommandTable =
+        static ChatCommandTable guildCommandTable =
         {
             { "create",         SEC_GAMEMASTER,     true,  &HandleGuildCreateCommand,           "" },
             { "delete",         SEC_GAMEMASTER,     true,  &HandleGuildDeleteCommand,           "" },
@@ -34,7 +51,7 @@ public:
             { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" },
             { "info",           SEC_GAMEMASTER,     true,  &HandleGuildInfoCommand,             "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "guild",          SEC_GAMEMASTER,  true, nullptr,                                 "", guildCommandTable }
         };
@@ -131,7 +148,7 @@ public:
             return false;
 
         // if not guild name only (in "") then player name
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : nullptr, nullptr, &targetGuid))
             return false;
 
@@ -155,11 +172,11 @@ public:
     static bool HandleGuildUninviteCommand(ChatHandler* handler, char const* args)
     {
         Player* target;
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(GUID_LOPART(targetGuid));
+        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
         if (!guildId)
             return false;
 
@@ -171,21 +188,15 @@ public:
         return true;
     }
 
-    static bool HandleGuildRankCommand(ChatHandler* handler, char const* args)
+    static bool HandleGuildRankCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, uint8 rank)
     {
-        char* nameStr;
-        char* rankStr;
-        handler->extractOptFirstArg((char*)args, &nameStr, &rankStr);
-        if (!rankStr)
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!player)
             return false;
 
-        Player* target;
-        uint64 targetGuid;
-        std::string target_name;
-        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &target_name))
-            return false;
-
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(GUID_LOPART(targetGuid));
+        uint32 guildId = player->IsConnected() ? player->GetConnectedPlayer()->GetGuildId() : Player::GetGuildIdFromStorage(player->GetGUID().GetCounter());
         if (!guildId)
             return false;
 
@@ -193,8 +204,7 @@ public:
         if (!targetGuild)
             return false;
 
-        uint8 newRank = uint8(atoi(rankStr));
-        return targetGuild->ChangeMemberRank(targetGuid, newRank);
+        return targetGuild->ChangeMemberRank(player->GetGUID(), rank);
     }
 
     static bool HandleGuildInfoCommand(ChatHandler* handler, char const* args)
@@ -217,14 +227,14 @@ public:
         // Display Guild Information
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
         std::string guildMasterName;
-        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID(), guildMasterName))
-            handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), GUID_LOPART(guild->GetLeaderGUID())); // Guild Master
+        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID().GetCounter(), guildMasterName))
+            handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
 
         // Format creation date
         char createdDateStr[20];
         time_t createdDate = guild->GetCreatedDate();
         tm localTm;
-        ACE_OS::localtime_r(&createdDate, &localTm);
+        localtime_r(&createdDate, &localTm);
         strftime(createdDateStr, 20, "%Y-%m-%d %H:%M:%S", &localTm);
 
         handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, createdDateStr); // Creation Date

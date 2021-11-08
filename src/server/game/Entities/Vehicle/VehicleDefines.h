@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __ACORE_VEHICLEDEFINES_H
@@ -10,8 +21,8 @@
 #include "Define.h"
 #include "Map.h"
 #include "Object.h"
-#include <vector>
 #include <map>
+#include <vector>
 
 struct VehicleSeatEntry;
 
@@ -54,12 +65,12 @@ enum VehicleNPCs
 
 struct PassengerInfo
 {
-    uint64 Guid;
+    ObjectGuid Guid;
     bool IsUnselectable;
 
     void Reset()
     {
-        Guid = 0;
+        Guid.Clear();
         IsUnselectable = false;
     }
 };
@@ -71,7 +82,7 @@ struct VehicleSeat
         Passenger.Reset();
     }
 
-    bool IsEmpty() const { return !Passenger.Guid; }
+    [[nodiscard]] bool IsEmpty() const { return !Passenger.Guid; }
 
     VehicleSeatEntry const* SeatInfo;
     PassengerInfo Passenger;
@@ -95,15 +106,15 @@ typedef std::map<int8, VehicleSeat> SeatMap;
 class TransportBase
 {
 protected:
-    TransportBase() { }
-    virtual ~TransportBase() { }
+    TransportBase() = default;
+    virtual ~TransportBase() = default;
 
 public:
     /// This method transforms supplied transport offsets into global coordinates
-    virtual void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const = 0;
+    virtual void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const = 0;
 
     /// This method transforms supplied global coordinates into local offsets
-    virtual void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const = 0;
+    virtual void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const = 0;
 
 protected:
     static void CalculatePassengerPosition(float& x, float& y, float& z, float* o, float transX, float transY, float transZ, float transO)

@@ -1,13 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __UPDATEDATA_H
 #define __UPDATEDATA_H
 
 #include "ByteBuffer.h"
+#include "ObjectGuid.h"
+
 class WorldPacket;
 
 enum OBJECT_UPDATE_TYPE
@@ -37,22 +50,21 @@ enum OBJECT_UPDATE_FLAGS
 
 class UpdateData
 {
-    public:
-        UpdateData();
+public:
+    UpdateData();
 
-        void AddOutOfRangeGUID(uint64 guid);
-        void AddUpdateBlock(const ByteBuffer &block);
-        void AddUpdateBlock(const UpdateData &block);
-        bool BuildPacket(WorldPacket* packet);
-        bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
-        void Clear();
+    void AddOutOfRangeGUID(ObjectGuid guid);
+    void AddUpdateBlock(const ByteBuffer& block);
+    void AddUpdateBlock(const UpdateData& block);
+    bool BuildPacket(WorldPacket* packet);
+    [[nodiscard]] bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
+    void Clear();
 
-    protected:
-        uint32 m_blockCount;
-        std::vector<uint64> m_outOfRangeGUIDs;
-        ByteBuffer m_data;
+protected:
+    uint32 m_blockCount;
+    GuidVector m_outOfRangeGUIDs;
+    ByteBuffer m_data;
 
-        void Compress(void* dst, uint32 *dst_size, void* src, int src_size);
+    void Compress(void* dst, uint32* dst_size, void* src, int src_size);
 };
 #endif
-

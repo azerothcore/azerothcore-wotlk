@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "trial_of_the_champion.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "trial_of_the_champion.h"
 
 enum Spells
 {
@@ -84,7 +97,6 @@ enum Models
     MODEL_GHOST                     = 21300
 };
 
-
 class boss_black_knight : public CreatureScript
 {
 public:
@@ -102,7 +114,7 @@ public:
         SummonList summons;
         uint8 Phase;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -116,13 +128,13 @@ public:
             //me->SetLootMode(0); // [LOOT]
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon(1);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
             {
@@ -142,15 +154,14 @@ public:
                 summons.clear();
 
                 me->CastSpell(me, SPELL_BK_FEIGN_DEATH, true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 me->AddUnitState(UNIT_STATE_DIED);
-
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == -1 )
             {
@@ -163,20 +174,20 @@ public:
 
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(TEXT_BK_AGGRO);
-                me->CastSpell((Unit*)NULL, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE)==TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
-                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ANNOUNCER)) )
+                me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
+                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)) )
                     announcer->DespawnOrUnsummon();
 
                 events.Reset();
                 events.ScheduleEvent(EVENT_ANNOUNCER_SAY_ZOMBIE, 2500);
-                events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, urand(7000,9000));
-                events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, urand(3500,7000));
-                events.ScheduleEvent(EVENT_SPELL_DEATH_RESPITE, urand(13000,15000));
-                events.ScheduleEvent(EVENT_SPELL_OBLITERATE, urand(11000,19000));
+                events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, urand(7000, 9000));
+                events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, urand(3500, 7000));
+                events.ScheduleEvent(EVENT_SPELL_DEATH_RESPITE, urand(13000, 15000));
+                events.ScheduleEvent(EVENT_SPELL_OBLITERATE, urand(11000, 19000));
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -184,8 +195,8 @@ public:
                     me->SetHealth(me->GetMaxHealth());
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
-                    
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->ClearUnitState(UNIT_STATE_DIED);
@@ -200,10 +211,10 @@ public:
                             me->CastSpell(me, SPELL_ARMY_DEAD, false);
 
                             events.Reset();
-                            events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, urand(7000,9000));
-                            events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, urand(3500,7000));
-                            events.ScheduleEvent(EVENT_SPELL_OBLITERATE, urand(11000,19000));
-                            events.ScheduleEvent(EVENT_SPELL_DESECRATION, urand(2000,3000));
+                            events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, urand(7000, 9000));
+                            events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, urand(3500, 7000));
+                            events.ScheduleEvent(EVENT_SPELL_OBLITERATE, urand(11000, 19000));
+                            events.ScheduleEvent(EVENT_SPELL_DESECRATION, urand(2000, 3000));
                             break;
                         case 3:
                             me->SetDisplayId(MODEL_GHOST);
@@ -221,7 +232,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -231,44 +242,44 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_ANNOUNCER_SAY_ZOMBIE:
                     if( pInstance && !summons.empty() )
                         if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
-                            ghoul->MonsterYell("[Zombie] .... . Brains ....", LANG_UNIVERSAL, 0);
-                    events.PopEvent();
+                            ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL);
+
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_PLAGUE_STRIKE, false);
-                    events.RepeatEvent(urand(10000,12000));
+                    events.RepeatEvent(urand(10000, 12000));
                     break;
                 case EVENT_SPELL_ICY_TOUCH:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_ICY_TOUCH, false);
-                    events.RepeatEvent(urand(5000,6000));
+                    events.RepeatEvent(urand(5000, 6000));
                     break;
                 case EVENT_SPELL_DEATH_RESPITE:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DEATH_RESPITE, false);
-                    events.RepeatEvent(urand(13000,15000));
+                    events.RepeatEvent(urand(13000, 15000));
                     break;
                 case EVENT_SPELL_OBLITERATE:
                     if( me->GetVictim() )
                         me->CastSpell(me->GetVictim(), SPELL_OBLITERATE, false);
-                    events.RepeatEvent(urand(15000,17000));
+                    events.RepeatEvent(urand(15000, 17000));
                     break;
                 case EVENT_SPELL_DESECRATION:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_DESECRATION, false);
-                    events.RepeatEvent(urand(14000,17000));
+                    events.RepeatEvent(urand(14000, 17000));
                     break;
                 case EVENT_SPELL_DEATH_BITE:
-                    me->CastSpell((Unit*)NULL, SPELL_DEATH_BITE, false);
-                    events.RepeatEvent(urand(2000,4000));
+                    me->CastSpell((Unit*)nullptr, SPELL_DEATH_BITE, false);
+                    events.RepeatEvent(urand(2000, 4000));
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.000000f, true) )
@@ -280,7 +291,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if( Unit* target = summon->SelectNearestTarget(200.0f) )
@@ -290,20 +301,20 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if( victim->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0,1) )
+                if( urand(0, 1) )
                     Talk(TEXT_BK_SLAIN_1);
                 else
                     Talk(TEXT_BK_SLAIN_2);
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_BK_KILL_CREDIT, true);
+            me->CastSpell((Unit*)nullptr, SPELL_BK_KILL_CREDIT, true);
             Talk(TEXT_BK_DEATH);
             if( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
@@ -312,9 +323,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_black_knightAI (pCreature);
+        return GetTrialOfTheChampionAI<boss_black_knightAI>(pCreature);
     }
 };
 
@@ -327,13 +338,13 @@ public:
     {
         npc_black_knight_skeletal_gryphonAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
-        void Reset()
+        void Reset() override
         {
-            Start(false,true,0,NULL);
+            Start(false, true, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
             {
@@ -344,7 +355,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 i)
+        void WaypointReached(uint32 i) override
         {
             if( i == 12 )
             {
@@ -359,16 +370,15 @@ public:
             }
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             npc_escortAI::UpdateAI(uiDiff);
         }
-
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_black_knight_skeletal_gryphonAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_black_knight_skeletal_gryphonAI>(pCreature);
     }
 };
 
@@ -387,20 +397,20 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             if (me->GetEntry() == NPC_RISEN_JAEREN || me->GetEntry() == NPC_RISEN_ARELAS)
                 events.RescheduleEvent(1, 1000); // leap
-            events.RescheduleEvent(2, urand(3000,4000)); // claw
+            events.RescheduleEvent(2, urand(3000, 4000)); // claw
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
             {
@@ -409,7 +419,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             switch(spell->Id)
             {
@@ -430,7 +440,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -440,7 +450,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -449,7 +459,7 @@ public:
                         if (me->GetDistance(target) > 5.0f && me->GetDistance(target) < 30.0f)
                         {
                             me->CastSpell(target, SPELL_LEAP, false);
-                            events.PopEvent();
+
                             break;
                         }
                     events.RepeatEvent(1000);
@@ -457,7 +467,7 @@ public:
                 case 2: // claw
                     if (Unit* target = me->GetVictim())
                         me->CastSpell(target, SPELL_CLAW_N, false);
-                    events.RepeatEvent(urand(6000,8000));
+                    events.RepeatEvent(urand(6000, 8000));
                     break;
             }
 
@@ -465,9 +475,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_black_knight_ghoulAI (pCreature);
+        return GetTrialOfTheChampionAI<npc_black_knight_ghoulAI>(pCreature);
     }
 };
 

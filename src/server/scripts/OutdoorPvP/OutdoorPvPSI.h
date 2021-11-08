@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef OUTDOOR_PVP_SI_
@@ -42,35 +53,33 @@ enum SI_WorldStates
 
 class OutdoorPvPSI : public OutdoorPvP
 {
-    public:
+public:
+    OutdoorPvPSI();
 
-        OutdoorPvPSI();
+    bool SetupOutdoorPvP() override;
 
-        bool SetupOutdoorPvP();
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-        void HandlePlayerEnterZone(Player* player, uint32 zone);
-        void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    bool Update(uint32 diff) override;
 
-        bool Update(uint32 diff);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket &data);
+    void SendRemoveWorldStates(Player* player) override;
 
-        void SendRemoveWorldStates(Player* player);
+    bool HandleAreaTrigger(Player* player, uint32 trigger) override;
 
-        bool HandleAreaTrigger(Player* player, uint32 trigger);
+    bool HandleDropFlag(Player* player, uint32 spellId) override;
 
-        bool HandleDropFlag(Player* player, uint32 spellId);
+    bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go) override;
 
-        bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
+    void UpdateWorldState();
 
-        void UpdateWorldState();
+private:
+    uint32 m_Gathered_A;
+    uint32 m_Gathered_H;
 
-    private:
-
-        uint32 m_Gathered_A;
-        uint32 m_Gathered_H;
-
-        TeamId m_LastController;
+    TeamId m_LastController;
 };
 
 #endif

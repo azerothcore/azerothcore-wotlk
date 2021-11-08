@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -38,7 +49,7 @@ public:
         uint32 MortalStrikeTimer;
         uint32 ResetTimer;
 
-        void Reset()
+        void Reset() override
         {
             CleaveTimer                     = urand(1 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
             FrighteningShoutTimer           = urand(2 * IN_MILLISECONDS, 19 * IN_MILLISECONDS);
@@ -48,17 +59,17 @@ public:
             ResetTimer                      = 5 * IN_MILLISECONDS;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -67,31 +78,36 @@ public:
             {
                 DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer =  urand(10 * IN_MILLISECONDS, 16 * IN_MILLISECONDS);
-            } else CleaveTimer -= diff;
+            }
+            else CleaveTimer -= diff;
 
             if (FrighteningShoutTimer <= diff)
             {
                 DoCastVictim(SPELL_FRIGHTENING_SHOUT);
                 FrighteningShoutTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else FrighteningShoutTimer -= diff;
+            }
+            else FrighteningShoutTimer -= diff;
 
             if (Whirlwind1Timer <= diff)
             {
                 DoCastVictim(SPELL_WHIRLWIND1);
                 Whirlwind1Timer = urand(6 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
-            } else Whirlwind1Timer -= diff;
+            }
+            else Whirlwind1Timer -= diff;
 
             if (Whirlwind2Timer <= diff)
             {
                 DoCastVictim(SPELL_WHIRLWIND2);
                 Whirlwind2Timer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-            } else Whirlwind2Timer -= diff;
+            }
+            else Whirlwind2Timer -= diff;
 
             if (MortalStrikeTimer <= diff)
             {
                 DoCastVictim(SPELL_MORTAL_STRIKE);
                 MortalStrikeTimer = urand(10 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
-            } else MortalStrikeTimer -= diff;
+            }
+            else MortalStrikeTimer -= diff;
 
             // check if creature is not outside of building
             if (ResetTimer <= diff)
@@ -102,13 +118,14 @@ public:
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;
-            } else ResetTimer -= diff;
+            }
+            else ResetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_galvangarAI(creature);
     }

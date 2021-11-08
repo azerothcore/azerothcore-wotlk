@@ -1,15 +1,32 @@
-// Scripted by Xinef
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "GridNotifiers.h"
+#include "CellImpl.h"
+#include "GameObjectAI.h"
 #include "GossipDef.h"
-#include "SpellScript.h"
+#include "GridNotifiers.h"
+#include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "Group.h"
-#include "CellImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "TaskScheduler.h"
 
 ///////////////////////////////////////
 ////// ITEMS FIXES, BASIC STUFF
@@ -33,7 +50,7 @@ enum eTrickSpells
 
 class spell_hallows_end_trick : public SpellScriptLoader
 {
-    public:
+public:
     spell_hallows_end_trick() : SpellScriptLoader("spell_hallows_end_trick") {}
 
     class spell_hallows_end_trick_SpellScript : public SpellScript
@@ -77,13 +94,13 @@ class spell_hallows_end_trick : public SpellScriptLoader
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_trick_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_trick_SpellScript();
     }
@@ -91,12 +108,12 @@ class spell_hallows_end_trick : public SpellScriptLoader
 
 class spell_hallows_end_put_costume : public SpellScriptLoader
 {
-    public:
+public:
     spell_hallows_end_put_costume(const char* name, uint32 maleSpell, uint32 femaleSpell) : SpellScriptLoader(name), _maleSpell(maleSpell), _femaleSpell(femaleSpell) {}
 
     class spell_hallows_end_put_costume_SpellScript : public SpellScript
     {
-        public:
+    public:
         spell_hallows_end_put_costume_SpellScript(uint32 maleSpell, uint32 femaleSpell) : _maleSpell(maleSpell), _femaleSpell(femaleSpell) { }
 
         PrepareSpellScript(spell_hallows_end_put_costume_SpellScript);
@@ -107,24 +124,24 @@ class spell_hallows_end_put_costume : public SpellScriptLoader
                 GetCaster()->CastSpell(target, target->getGender() ? _femaleSpell : _maleSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_put_costume_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
 
-        private:
-            uint32 _maleSpell;
-            uint32 _femaleSpell;
+    private:
+        uint32 _maleSpell;
+        uint32 _femaleSpell;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_put_costume_SpellScript(_maleSpell, _femaleSpell);
     }
 
-    private:
-        uint32 _maleSpell;
-        uint32 _femaleSpell;
+private:
+    uint32 _maleSpell;
+    uint32 _femaleSpell;
 };
 
 // 24751 Trick or Treat
@@ -137,7 +154,7 @@ enum eTrickOrTreatSpells
 
 class spell_hallows_end_trick_or_treat : public SpellScriptLoader
 {
-    public:
+public:
     spell_hallows_end_trick_or_treat() : SpellScriptLoader("spell_hallows_end_trick_or_treat") {}
 
     class spell_hallows_end_trick_or_treat_SpellScript : public SpellScript
@@ -148,18 +165,18 @@ class spell_hallows_end_trick_or_treat : public SpellScriptLoader
         {
             if (Player* target = GetHitPlayer())
             {
-                GetCaster()->CastSpell(target, roll_chance_i(50) ? SPELL_TRICK : SPELL_TREAT, true, NULL);
-                GetCaster()->CastSpell(target, SPELL_TRICKED_OR_TREATED, true, NULL);
+                GetCaster()->CastSpell(target, roll_chance_i(50) ? SPELL_TRICK : SPELL_TREAT, true, nullptr);
+                GetCaster()->CastSpell(target, SPELL_TRICKED_OR_TREATED, true, nullptr);
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_trick_or_treat_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_trick_or_treat_SpellScript();
     }
@@ -175,7 +192,7 @@ enum eHallowsEndCandy
 
 class spell_hallows_end_candy : public SpellScriptLoader
 {
-    public:
+public:
     spell_hallows_end_candy() : SpellScriptLoader("spell_hallows_end_candy") {}
 
     class spell_hallows_end_candy_SpellScript : public SpellScript
@@ -186,18 +203,18 @@ class spell_hallows_end_candy : public SpellScriptLoader
         {
             if (Player* target = GetHitPlayer())
             {
-                uint32 spellId = SPELL_HALLOWS_END_CANDY_1+urand(0,3);
-                GetCaster()->CastSpell(target, spellId, true, NULL);
+                uint32 spellId = SPELL_HALLOWS_END_CANDY_1 + urand(0, 3);
+                GetCaster()->CastSpell(target, spellId, true, nullptr);
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_candy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_candy_SpellScript();
     }
@@ -210,7 +227,7 @@ enum trickyTreat
 
 class spell_hallows_end_tricky_treat : public SpellScriptLoader
 {
-    public:
+public:
     spell_hallows_end_tricky_treat() : SpellScriptLoader("spell_hallows_end_tricky_treat") {}
 
     class spell_hallows_end_tricky_treat_SpellScript : public SpellScript
@@ -226,13 +243,13 @@ class spell_hallows_end_tricky_treat : public SpellScriptLoader
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_tricky_treat_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_tricky_treat_SpellScript();
     }
@@ -258,6 +275,9 @@ enum costumedOrphan
     SPELL_CREATE_BUCKET                     = 42349,
     SPELL_WATER_SPLASH                      = 42348,
     SPELL_SUMMON_LANTERN                    = 44255,
+    SPELL_HORSEMAN_CONFLAGRATION            = 42380,
+    SPELL_HORSEMAN_CONFLAGRATION_SOUND      = 48149,
+    SPELL_HORSEMAN_CLEAVE                   = 42587,
 
     // NPCs
     NPC_SHADE_OF_HORSEMAN                   = 23543,
@@ -268,11 +288,20 @@ enum costumedOrphan
     ACTION_START_EVENT                      = 1,
     DATA_EVENT                              = 1,
     DATA_ALLOW_START                        = 2,
+
+    // Talks
+    TALK_SHADE_CONFLAGRATION                = 0,
+    TALK_SHADE_PREPARE                      = 1,
+    TALK_SHADE_START_EVENT                  = 2,
+    TALK_SHADE_MORE_FIRES                   = 3,
+    TALK_SHADE_FAILED                       = 4,
+    TALK_SHADE_DEFEATED                     = 5,
+    TALK_SHADE_DEATH                        = 6,
 };
 
 class spell_hallows_end_bucket_lands : public SpellScriptLoader
 {
-    public:
+public:
     spell_hallows_end_bucket_lands() : SpellScriptLoader("spell_hallows_end_bucket_lands") {}
 
     class spell_hallows_end_bucket_lands_SpellScript : public SpellScript
@@ -280,7 +309,7 @@ class spell_hallows_end_bucket_lands : public SpellScriptLoader
         PrepareSpellScript(spell_hallows_end_bucket_lands_SpellScript);
 
         bool handled;
-        bool Load() { handled = false; return true; }
+        bool Load() override { handled = false; return true; }
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (handled || !GetCaster())
@@ -293,13 +322,13 @@ class spell_hallows_end_bucket_lands : public SpellScriptLoader
                 GetCaster()->CastSpell(tgt, SPELL_WATER_SPLASH, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_bucket_lands_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_bucket_lands_SpellScript();
     }
@@ -307,12 +336,23 @@ class spell_hallows_end_bucket_lands : public SpellScriptLoader
 
 class spell_hallows_end_base_fire : public SpellScriptLoader
 {
-    public:
+public:
     spell_hallows_end_base_fire() : SpellScriptLoader("spell_hallows_end_base_fire") { }
 
     class spell_hallows_end_base_fire_AuraScript : public AuraScript
     {
         PrepareAuraScript(spell_hallows_end_base_fire_AuraScript);
+
+        void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
+        {
+            if (Creature* creature = GetCaster()->ToCreature())
+            {
+                if (!(creature->AI()->GetData(0) % 3))
+                {
+                    amplitude = static_cast<int32>(amplitude * 1.5f);
+                }
+            }
+        }
 
         void HandleEffectPeriodicUpdate(AuraEffect* aurEff)
         {
@@ -321,15 +361,15 @@ class spell_hallows_end_base_fire : public SpellScriptLoader
 
             if (amount < 3)
                 amount++;
-            else if (aurEff->GetTickNumber()%3 != 2)
+            else if (aurEff->GetTickNumber() % 3 != 2)
                 return;
 
             aurEff->SetAmount(amount);
             if (Unit* owner = GetUnitOwner())
             {
                 if (amount <= 3)
-                    owner->SetObjectScale(amount/2.0f);
-                if (amount >=3)
+                    owner->SetObjectScale(amount / 2.0f);
+                if (amount >= 3)
                     owner->CastSpell(owner, SPELL_SPREAD_FIRE, true);
             }
         }
@@ -337,19 +377,20 @@ class spell_hallows_end_base_fire : public SpellScriptLoader
         void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            target->SetObjectScale(0.5f);
+            target->SetObjectScale(1.0f);
             if (AuraEffect* aEff = GetEffect(EFFECT_0))
                 aEff->SetAmount(1);
         }
 
-        void Register()
+        void Register() override
         {
+            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_hallows_end_base_fire_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_hallows_end_base_fire_AuraScript::HandleEffectPeriodicUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectApply += AuraEffectApplyFn(spell_hallows_end_base_fire_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hallows_end_base_fire_AuraScript();
     }
@@ -362,42 +403,66 @@ public:
 
     struct npc_costumed_orphan_matronAI : public ScriptedAI
     {
-        npc_costumed_orphan_matronAI(Creature *c) : ScriptedAI(c)
+        npc_costumed_orphan_matronAI(Creature* c) : ScriptedAI(c)
         {
         }
 
         uint32 eventStarted;
         bool allowQuest;
-        uint64 horseGUID;
+        ObjectGuid horseGUID;
 
         void Reset() override
         {
             eventStarted = 0;
             allowQuest = false;
-            horseGUID = 0;
+            horseGUID.Clear();
         }
 
-        void GetInitXYZ(float &x, float &y, float &z, float &o, uint32 &path)
+        void GetInitXYZ(float& x, float& y, float& z, float& o, uint32& path)
         {
             switch (me->GetAreaId())
             {
                 case 87: // Goldshire
-                    x = -9494.4f; y = 48.53f; z = 70.5f; o = 0.5f; path = 235431;
+                    x = -9494.4f;
+                    y = 48.53f;
+                    z = 70.5f;
+                    o = 0.5f;
+                    path = 235431;
                     break;
                 case 131: // Kharanos
-                    x = -5558.34f; y = -499.46f; z = 414.12f; o = 2.08f; path = 235432;
+                    x = -5558.34f;
+                    y = -499.46f;
+                    z = 414.12f;
+                    o = 2.08f;
+                    path = 235432;
                     break;
                 case 3576: // Azure Watch
-                    x = -4163.58f; y = -12460.30f; z = 63.02f; o = 4.31f; path = 235433;
+                    x = -4163.58f;
+                    y = -12460.30f;
+                    z = 63.02f;
+                    o = 4.31f;
+                    path = 235433;
                     break;
                 case 362: // Razor Hill
-                    x = 373.2f; y = -4723.4f; z = 31.2f; o = 3.2f; path = 235434;
+                    x = 373.2f;
+                    y = -4723.4f;
+                    z = 31.2f;
+                    o = 3.2f;
+                    path = 235434;
                     break;
                 case 159: // Brill
-                    x = 2195.2f; y = 264.0f; z = 55.62f; o = 0.15f; path = 235435;
+                    x = 2195.2f;
+                    y = 264.0f;
+                    z = 55.62f;
+                    o = 0.15f;
+                    path = 235435;
                     break;
                 case 3665: // Falcon Wing Square
-                    x = 9547.91f; y = -6809.9f; z = 27.96f; o = 3.4f; path = 235436;
+                    x = 9547.91f;
+                    y = -6809.9f;
+                    z = 27.96f;
+                    o = 3.4f;
+                    path = 235436;
                     break;
             }
         }
@@ -408,12 +473,12 @@ public:
             {
                 allowQuest = true;
                 eventStarted = 1;
-                float x, y, z, o;
-                uint32 path;
+                float x = 0, y = 0, z = 0, o = 0;
+                uint32 path = 0;
                 GetInitXYZ(x, y, z, o, path);
                 if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 {
-                    cr->GetMotionMaster()->MovePath(path, false);
+                    cr->GetMotionMaster()->MovePath(path, true);
                     cr->AI()->DoAction(path);
                     horseGUID = cr->GetGUID();
                 }
@@ -433,7 +498,7 @@ public:
             if (eventStarted)
             {
                 eventStarted += diff;
-                if (eventStarted >= 5*MINUTE*IN_MILLISECONDS)
+                if (eventStarted >= 400 * IN_MILLISECONDS)
                 {
                     allowQuest = false;
                     eventStarted = 0;
@@ -447,7 +512,7 @@ public:
         QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
         QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
 
-        QuestMenu &qm = player->PlayerTalkClass->GetQuestMenu();
+        QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
         qm.ClearMenu();
 
         for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
@@ -510,323 +575,454 @@ public:
 
 class npc_soh_fire_trigger : public CreatureScript
 {
-    public:
-        npc_soh_fire_trigger() : CreatureScript("npc_soh_fire_trigger") { }
+public:
+    npc_soh_fire_trigger() : CreatureScript("npc_soh_fire_trigger") { }
 
-        struct npc_soh_fire_triggerAI : public NullCreatureAI
+    struct npc_soh_fire_triggerAI : public NullCreatureAI
+    {
+        npc_soh_fire_triggerAI(Creature* creature) : NullCreatureAI(creature)
         {
-            npc_soh_fire_triggerAI(Creature* creature) : NullCreatureAI(creature)
-            {
-            }
-
-            void Reset()
-            {
-                me->SetDisableGravity(true);
-            }
-
-            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
-            {
-                if (spellInfo->Id == SPELL_START_FIRE)
-                {
-                    me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
-                    if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
-                    {
-                        me->SetObjectScale(1.5f);
-                        aurEff->SetAmount(2);
-                    }
-                }
-                else if (spellInfo->Id == SPELL_SPREAD_FIRE)
-                {
-                    me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
-                }
-                else if (spellInfo->Id == SPELL_WATER_SPLASH)
-                {
-                    if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
-                    {
-                        int32 amt = aurEff->GetAmount();
-                        if (amt > 2)
-                        {
-                            aurEff->ResetPeriodic(true);
-                            aurEff->SetAmount(amt-2);
-                        }
-                        else
-                            me->RemoveAllAuras();
-                    }
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_soh_fire_triggerAI(creature);
         }
+
+        void Reset() override
+        {
+            me->SetDisableGravity(true);
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_START_FIRE)
+            {
+                me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
+                if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
+                {
+                    int32 amount = 1;
+                    if (Creature* creature = caster->ToCreature())
+                    {
+                        if ((creature->AI()->GetData(0) % 3) > 0)
+                        {
+                            amount = 2;
+                        }
+                    }
+
+                    me->SetObjectScale(0.5f + 0.5f * amount);
+                    aurEff->SetAmount(amount);
+                }
+            }
+            else if (spellInfo->Id == SPELL_SPREAD_FIRE)
+            {
+                me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
+                if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
+                {
+                    int32 amount = 0;
+                    if (Creature* creature = caster->ToCreature())
+                    {
+                        if ((creature->AI()->GetData(0) % 3) > 1)
+                        {
+                            amount = 1;
+                        }
+                    }
+
+                    me->SetObjectScale(0.5f + 0.5f * amount);
+                    aurEff->SetAmount(amount);
+                }
+            }
+            else if (spellInfo->Id == SPELL_WATER_SPLASH)
+            {
+                if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
+                {
+                    int32 amt = aurEff->GetAmount();
+                    if (amt > 2)
+                    {
+                        aurEff->ResetPeriodic(true);
+                        aurEff->SetAmount(amt - 2);
+                    }
+                    else
+                        me->RemoveAllAuras();
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_soh_fire_triggerAI(creature);
+    }
 };
 
 class npc_hallows_end_soh : public CreatureScript
 {
-    public:
-        npc_hallows_end_soh() : CreatureScript("npc_hallows_end_soh") { }
+public:
+    npc_hallows_end_soh() : CreatureScript("npc_hallows_end_soh") { }
 
-        struct npc_hallows_end_sohAI : public ScriptedAI
+    struct npc_hallows_end_sohAI : public ScriptedAI
+    {
+        npc_hallows_end_sohAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_hallows_end_sohAI(Creature* creature) : ScriptedAI(creature)
-            {
-                pos = 0;
-                counter = 0;
-                unitList.clear();
-                me->CastSpell(me, SPELL_HORSEMAN_MOUNT, true);
-                me->SetSpeed(MOVE_WALK, 3.0f, true);
-                Unmount = false;
-            }
+            pos = 0;
+            counter = 0;
+            unitList.clear();
+            me->CastSpell(me, SPELL_HORSEMAN_MOUNT, true);
+            me->SetSpeed(MOVE_WALK, 3.0f, true);
+        }
 
-            bool Unmount;
-            EventMap events;
-            uint32 counter;
-            std::list<uint64> unitList;
-            int32 pos;
-            void EnterCombat(Unit*) {}
-            void MoveInLineOfSight(Unit*  /*who*/){}
+        EventMap events;
+        uint32 playerCount;
+        uint32 counter;
+        GuidList unitList;
+        int32 pos;
+        TaskScheduler scheduler;
 
-            void DoAction(int32 param)
+        void EnterCombat(Unit*) override
+        {
+            scheduler.Schedule(6s, [this](TaskContext context)
             {
-                pos = param;
-            }
-
-            void GetPosToLand(float &x, float &y, float &z)
-            {
-                switch (pos)
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.f, true))
                 {
-                    case 235431: x = -9445.1f; y = 63.27f; z = 58.16f; break;
-                    case 235432: x = -5616.30f; y = -481.89f; z = 398.99f; break;
-                    case 235433: x = -4198.1f; y = -12509.13f; z = 46.6f; break;
-                    case 235434: x = 360.9f; y = -4735.5f; z = 11.773f; break;
-                    case 235435: x = 2229.4f; y = 263.1f; z = 36.13f; break;
-                    case 235436: x = 9532.9f; y = -6833.8f; z = 18.5f; break;
+                    me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
+                    target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
+                    Talk(TALK_SHADE_CONFLAGRATION);
                 }
+
+                context.Repeat(12s);
+            })
+            .Schedule(7s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_HORSEMAN_CLEAVE, true);
+
+                context.Repeat(8s);
+            });
+        }
+
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+
+        void DoAction(int32 param) override
+        {
+            pos = param;
+        }
+
+        void GetPosToLand(float& x, float& y, float& z)
+        {
+            switch (pos)
+            {
+                case 235431:
+                    x = -9445.1f;
+                    y = 63.27f;
+                    z = 58.16f;
+                    break;
+                case 235432:
+                    x = -5616.30f;
+                    y = -481.89f;
+                    z = 398.99f;
+                    break;
+                case 235433:
+                    x = -4198.1f;
+                    y = -12509.13f;
+                    z = 46.6f;
+                    break;
+                case 235434:
+                    x = 360.9f;
+                    y = -4735.5f;
+                    z = 11.773f;
+                    break;
+                case 235435:
+                    x = 2229.4f;
+                    y = 263.1f;
+                    z = 36.13f;
+                    break;
+                case 235436:
+                    x = 9532.9f;
+                    y = -6833.8f;
+                    z = 18.5f;
+                    break;
+                default:
+                    x = 0;
+                    y = 0;
+                    z = 0;
+                    break;
+            }
+        }
+
+        void Reset() override
+        {
+            playerCount = 0;
+            unitList.clear();
+            std::list<Creature*> temp;
+            me->GetCreaturesWithEntryInRange(temp, 100.0f, NPC_FIRE_TRIGGER);
+            for (std::list<Creature*>::const_iterator itr = temp.begin(); itr != temp.end(); ++itr)
+            {
+                unitList.push_back((*itr)->GetGUID());
             }
 
-            void Reset()
+            events.ScheduleEvent(1, 3000);
+            events.ScheduleEvent(2, 25000);
+            events.ScheduleEvent(2, 43000);
+            events.ScheduleEvent(3, 63000);
+
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+        }
+
+        void EnterEvadeMode() override
+        {
+            me->DespawnOrUnsummon(1);
+        }
+
+        uint32 GetData(uint32 /*type*/) const override
+        {
+            return playerCount;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
             {
-                unitList.clear();
-                std::list<Creature*> temp;
-                me->GetCreaturesWithEntryInRange(temp, 100.0f, NPC_FIRE_TRIGGER);
-                for (std::list<Creature*>::const_iterator itr = temp.begin(); itr != temp.end(); ++itr)
-                    unitList.push_back((*itr)->GetGUID());
-
-                events.ScheduleEvent(1, 3000);
-                events.ScheduleEvent(2, 5000);
-                events.ScheduleEvent(2, 7000);
-                events.ScheduleEvent(2, 10000);
-                events.ScheduleEvent(3, 15000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                events.Update(diff);
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                switch (events.GetEvent())
-                {
-                    case 1:
-                        me->MonsterYell("Prepare yourselves, the bells have tolled! Shelter your weak, your young and your old! Each of you shall pay the final sum! Cry for mercy; the reckoning has come!", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(11966);
-                        events.PopEvent();
-                        break;
-                    case 2:
+                case 1:
+                    Talk(TALK_SHADE_PREPARE);
+                    break;
+                case 2:
                     {
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
-                        events.PopEvent();
+                        CastFires(true);
                         break;
                     }
-                    case 3:
+                case 3:
                     {
-                        counter++;
-                        if (counter > 10)
-                        {
-                            if (counter > 12)
-                            {
-                                bool failed = false;
-                                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
-                                        if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
-                                        {
-                                            failed = true;
-                                            break;
-                                        }
+                        bool checkBurningTriggers = false;
+                        for (ObjectGuid const& guid : unitList)
+                            if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                                if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                {
+                                    checkBurningTriggers = true;
+                                    break;
+                                }
 
-                                FinishEvent(failed);
-                                events.PopEvent();
-                            }
+                        if (!checkBurningTriggers)
+                        {
+                            FinishEvent(false);
+                            return;
+                        }
+
+                        counter++;
+                        if (counter > 21)
+                        {
+                            bool failed = false;
+                            for (ObjectGuid const& guid : unitList)
+                                if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                                    if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                    {
+                                        failed = true;
+                                        break;
+                                    }
+
+                            FinishEvent(failed);
                             return;
                         }
                         if (counter == 5)
                         {
-                            me->MonsterYell("The sky is dark. The fire burns. You strive in vain as Fate's wheel turns.", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(12570);
+                            Talk(TALK_SHADE_START_EVENT);
                         }
-                        else if (counter == 10)
+                        else if (counter == 15)
                         {
-                            me->MonsterYell("The town still burns. A cleansing fire! Time is short, I'll soon retire!", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(12571);
+                            Talk(TALK_SHADE_MORE_FIRES);
                         }
 
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
-                        events.RepeatEvent(12000);
+                        CastFires(false);
+                        events.RepeatEvent(15000);
                         break;
                     }
-                }
+                    case 4:
+                    {
+                        me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        if (Unit* target = me->SelectNearestPlayer(30.0f))
+                            AttackStart(target);
+                        break;
+                    }
+            }
 
-                if (Unmount)
-                {
-                    me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
-                    me->RemoveAllAuras();
-                    me->Dismount();
-                    if (Unit* target = me->SelectNearestPlayer(30.0f))
-                        AttackStart(target);
-                }
-                if (me->IsMounted())
-                    return;
+            if (!UpdateVictim())
+                return;
 
-                if (!UpdateVictim())
-                    return;
-
-                // cleave
-                if (!urand(0,29))
-                    me->CastSpell(me->GetVictim(), 15496, false);
-
+            scheduler.Update(diff, [this]
+            {
                 DoMeleeAttackIfReady();
-            }
+            });
+        }
 
-            Unit* getTrigger()
+        void CastFires(bool intial)
+        {
+            std::vector<Unit*> tmpList;
+            for (ObjectGuid const& guid : unitList)
             {
-                std::list<Unit*> tmpList;
-                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
-                        if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
-                            tmpList.push_back(c);
-
-                if (tmpList.empty())
-                    return NULL;
-
-                std::list<Unit*>::const_iterator it2 = tmpList.begin();
-                std::advance(it2, urand(0, tmpList.size() - 1));
-                return (*it2);
-            }
-
-            void FinishEvent(bool failed)
-            {
-                if (failed)
+                if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                 {
-                    me->MonsterYell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(11967);
-                    for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                        if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
-                            c->RemoveAllAuras();
-
-                    me->DespawnOrUnsummon(1);
-                }
-                else
-                {
-                    me->MonsterYell("My flames have died, left not a spark! I shall send you now to the lifeless dark!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(11968);
-                    float x, y, z;
-                    GetPosToLand(x, y, z);
-                    me->GetMotionMaster()->MovePoint(8, x, y, z);
+                    if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                    {
+                        tmpList.push_back(c);
+                    }
                 }
             }
 
-            void MovementInform(uint32 type, uint32 point)
+            if (tmpList.empty())
             {
-                if (type == POINT_MOTION_TYPE && point == 8)
-                {
-                    Unmount = true;
-                }
+                return;
             }
 
-            void JustDied(Unit*  /*killer*/)
+            std::list<Player*> players;
+            Acore::AnyPlayerInObjectRangeCheck checker(me, 60.f);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Cell::VisitWorldObjects(me, searcher, 60.f);
+            if (players.empty())
             {
-                me->MonsterYell("So eager you are, for my blood to spill. Yet to vanquish me, 'tis my head you must kill!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(11969);
+                return;
+            }
+
+            playerCount = static_cast<uint32>(players.size()) - 1;
+
+            if (!intial)
+            {
+                float playerRate = std::max(0.f, 0.5f - playerCount * 0.25f);
+
+                // If there are more burning triggers than players, do not cast next fire
+                if (tmpList.size() < unitList.size() * playerRate)
+                {
+                    return;
+                }
+            }
+            else
+                playerCount += 1;
+
+            uint32 sizeCount = (playerCount / 3) + 1;
+            if (intial && playerCount > 0)
+            {
+                sizeCount += playerCount % 2;
+            }
+
+            Acore::Containers::RandomResize(tmpList, sizeCount);
+            for (Unit* trigger : tmpList)
+                me->CastSpell(trigger, SPELL_START_FIRE, true);
+        }
+
+        void FinishEvent(bool failed)
+        {
+            if (failed)
+            {
+                Talk(TALK_SHADE_FAILED);
+                for (ObjectGuid const& guid : unitList)
+                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                        c->RemoveAllAuras();
+
+                me->DespawnOrUnsummon(1);
+            }
+            else
+            {
+                Talk(TALK_SHADE_DEFEATED);
                 float x, y, z;
                 GetPosToLand(x, y, z);
-                me->CastSpell(x, y, z, SPELL_SUMMON_LANTERN, true);
-                CompleteQuest();
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                me->GetMotionMaster()->MovePoint(8, x, y, z);
             }
-
-            void CompleteQuest()
-            {
-                float radius = 100.0f;
-                std::list<Player*> players;
-                acore::AnyPlayerInObjectRangeCheck checker(me, radius);
-                acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-                me->VisitNearbyWorldObject(radius, searcher);
-
-                for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                {
-                    (*itr)->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_H);
-                    (*itr)->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_A);
-                    (*itr)->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_H);
-                    (*itr)->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_A);
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_hallows_end_sohAI(creature);
         }
+
+        void MovementInform(uint32 type, uint32 point) override
+        {
+            if (type == POINT_MOTION_TYPE && point == 8)
+            {
+                me->RemoveAllAuras();
+                me->SetCanFly(false);
+                me->SetDisableGravity(false);
+                events.ScheduleEvent(4, 2000);
+            }
+        }
+
+        void JustDied(Unit*  /*killer*/) override
+        {
+            Talk(TALK_SHADE_DEATH);
+            float x, y, z;
+            GetPosToLand(x, y, z);
+            me->CastSpell(x, y, z, SPELL_SUMMON_LANTERN, true);
+            CompleteQuest();
+        }
+
+        void CompleteQuest()
+        {
+            float radius = 100.0f;
+            std::list<Player*> players;
+            Acore::AnyPlayerInObjectRangeCheck checker(me, radius);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Cell::VisitWorldObjects(me, searcher, radius);
+
+            for (Player* player : players)
+            {
+                player->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_H);
+                player->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_A);
+                player->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_H);
+                player->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_A);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hallows_end_sohAI(creature);
+    }
 };
 
 class npc_hallows_end_train_fire : public CreatureScript
 {
-    public:
-        npc_hallows_end_train_fire() : CreatureScript("npc_hallows_end_train_fire") { }
+public:
+    npc_hallows_end_train_fire() : CreatureScript("npc_hallows_end_train_fire") { }
 
-        struct npc_hallows_end_train_fireAI : public NullCreatureAI
+    struct npc_hallows_end_train_fireAI : public NullCreatureAI
+    {
+        npc_hallows_end_train_fireAI(Creature* creature) : NullCreatureAI(creature)
         {
-            npc_hallows_end_train_fireAI(Creature* creature) : NullCreatureAI(creature)
-            {
-            }
+        }
 
-            uint32 timer;
-            void Reset()
-            {
-                timer = 0;
-            }
+        uint32 timer;
+        void Reset() override
+        {
+            timer = 0;
+        }
 
-            void UpdateAI(uint32 diff)
-            {
-                timer += diff;
-                if (timer >= 5000)
-                    if (!me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
-                        me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
-            }
+        void UpdateAI(uint32 diff) override
+        {
+            timer += diff;
+            if (timer >= 5000)
+                if (!me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
+                    me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
+        }
 
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_WATER_SPLASH && caster->ToPlayer())
             {
-                if (spellInfo->Id == SPELL_WATER_SPLASH && caster->ToPlayer())
+                if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
                 {
-                    if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
-                    {
-                        int32 amt = aurEff->GetAmount();
-                        if (amt > 1)
-                            aurEff->SetAmount(amt-1);
-                        else
-                            me->RemoveAllAuras();
+                    int32 amt = aurEff->GetAmount();
+                    if (amt > 1)
+                        aurEff->SetAmount(amt - 1);
+                    else
+                        me->RemoveAllAuras();
 
-                        caster->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
-                    }
+                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry());
                 }
             }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_hallows_end_train_fireAI(creature);
         }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_hallows_end_train_fireAI(creature);
+    }
 };
 
 ///////////////////////////////////////
@@ -848,7 +1044,6 @@ enum headlessHorseman
     SPELL_SUMMONING_RHYME_TARGET                    = 42878,
     SPELL_HEAD_VISUAL                               = 42413,
     SPELL_EARTH_EXPLOSION                           = 42427,
-    SPELL_HORSEMAN_CLEAVE                           = 42587,
     SPELL_HORSEMAN_BODY_REGEN                       = 42403,
     SPELL_HORSEMAN_BODY_REGEN_CONFUSE               = 43105,
     SPELL_HORSEMAN_IMMUNITY                         = 42556,
@@ -860,14 +1055,12 @@ enum headlessHorseman
     SPELL_HORSEMAN_BODY_PHASE                       = 42547,
     SPELL_HORSEMAN_SPEAKS                           = 43129,
     SPELL_HORSEMAN_WHIRLWIND                        = 43116,
-    SPELL_HORSEMAN_CONFLAGRATION                    = 42380,
     SPELL_SUMMON_PUMPKIN                            = 42552,
     SPELL_PUMPKIN_VISUAL                            = 42280,
     SPELL_SQUASH_SOUL                               = 42514,
     SPELL_SPROUTING                                 = 42281,
     SPELL_PUMPKIN_AURA                              = 42294,
     SPELL_BURNING_BODY                              = 43184,
-
 
     // NP
     SPELL_HORSEMAN_SMOKE                            = 42355,
@@ -894,165 +1087,164 @@ enum hhSounds
 
 class boss_headless_horseman : public CreatureScript
 {
-    public:
-        boss_headless_horseman() : CreatureScript("boss_headless_horseman") { }
+public:
+    boss_headless_horseman() : CreatureScript("boss_headless_horseman") { }
 
-        struct boss_headless_horsemanAI : public ScriptedAI
+    struct boss_headless_horsemanAI : public ScriptedAI
+    {
+        boss_headless_horsemanAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
-            boss_headless_horsemanAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        }
+
+        EventMap events;
+        SummonList summons;
+        ObjectGuid playerGUID;
+        uint8 talkCount;
+        bool inFight;
+        uint8 phase;
+        uint32 health;
+
+        void JustDied(Unit*  /*killer*/) override
+        {
+            summons.DespawnAll();
+            me->Say("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL);
+            me->PlayDirectSound(SOUND_DEATH);
+            std::list<Creature*> unitList;
+            me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
+            for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
+                (*itr)->ToCreature()->DespawnOrUnsummon(500);
+
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
+        }
+
+        void KilledUnit(Unit*  /*who*/) override
+        {
+            me->Yell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL);
+            me->PlayDirectSound(SOUND_SLAY);
+        }
+
+        void DoAction(int32 param) override
+        {
+            health = param;
+        }
+
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
             {
+                playerGUID = target->GetGUID();
+                events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2000);
             }
+        }
 
-            EventMap events;
-            SummonList summons;
-            uint64 playerGUID;
-            uint8 talkCount;
-            bool inFight;
-            uint8 phase;
-            uint32 health;
-
-            void JustDied(Unit*  /*killer*/)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
             {
-                summons.DespawnAll();
-                me->MonsterSay("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_DEATH);
-                std::list<Creature*> unitList;
-                me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
-                for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                    (*itr)->ToCreature()->DespawnOrUnsummon(500);
+                me->SetHealth(me->GetMaxHealth());
+                me->CastSpell(me, SPELL_HEAD_VISUAL, true);
+                me->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
+                me->RemoveAura(SPELL_HORSEMAN_BODY_REGEN);
+                me->RemoveAura(SPELL_HORSEMAN_BODY_REGEN_CONFUSE);
+                me->RemoveAura(SPELL_HORSEMAN_WHIRLWIND);
+                events.CancelEvent(EVENT_HORSEMAN_CHECK_HEALTH);
+                events.CancelEvent(EVENT_HORSEMAN_WHIRLWIND);
+                events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
+                events.CancelEvent(EVENT_SUMMON_PUMPKIN);
+                me->Yell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL);
 
-
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
-                    sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 285, me->FindMap());
+                if (phase == 1)
+                    events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
+                else if (phase == 2)
+                    events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6000);
             }
+        }
 
-            void KilledUnit(Unit*  /*who*/)
+        void MovementInform(uint32 type, uint32 point) override
+        {
+            if (type == WAYPOINT_MOTION_TYPE)
             {
-                me->MonsterYell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SLAY);
-            }
-
-            void DoAction(int32 param)
-            {
-                health = param;
-            }
-
-            void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
-            {
-                if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
-                {
-                    playerGUID = target->GetGUID();
-                    events.ScheduleEvent(EVENT_HH_PLAYER_TALK, 2000);
-                }
-            }
-
-            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
-            {
-                if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
-                {
-                    me->SetHealth(me->GetMaxHealth());
+                if (point == 0)
                     me->CastSpell(me, SPELL_HEAD_VISUAL, true);
-                    me->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
-                    me->RemoveAura(SPELL_HORSEMAN_BODY_REGEN);
-                    me->RemoveAura(SPELL_HORSEMAN_BODY_REGEN_CONFUSE);
-                    me->RemoveAura(SPELL_HORSEMAN_WHIRLWIND);
-                    events.CancelEvent(EVENT_HORSEMAN_CHECK_HEALTH);
-                    events.CancelEvent(EVENT_HORSEMAN_WHIRLWIND);
-                    events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
-                    events.CancelEvent(EVENT_SUMMON_PUMPKIN);
-                    me->MonsterYell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL, 0);
+                else if (point == 11)
+                {
+                    me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                    me->StopMoving();
 
-                    if (phase == 1)
-                        events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
-                    else if (phase == 2)
-                        events.ScheduleEvent(EVENT_SUMMON_PUMPKIN, 6000);
+                    me->SetInCombatWithZone();
+                    inFight = true;
+                    events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500);
+                    events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7000);
                 }
             }
+        }
 
-            void MovementInform(uint32 type, uint32 point)
+        Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : nullptr; }
+
+        void EnterCombat(Unit*) override { me->SetInCombatWithZone(); }
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            // We die... :(
+            if (damage >= me->GetHealth())
             {
-                if (type == WAYPOINT_MOTION_TYPE)
-                {
-                    if (point == 0)
-                        me->CastSpell(me, SPELL_HEAD_VISUAL, true);
-                    else if (point == 11)
-                    {
-                        me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
-                        me->StopMoving();
+                damage = 0;
+                me->RemoveAura(SPELL_HEAD_VISUAL);
+                me->CastSpell(me, SPELL_HORSEMAN_IMMUNITY, true);
+                me->CastSpell(me, SPELL_HORSEMAN_BODY_REGEN, true);
+                me->CastSpell(me, SPELL_HORSEMAN_BODY_REGEN_CONFUSE, true);
+                events.CancelEvent(EVENT_HORSEMAN_CLEAVE);
 
-                        me->SetInCombatWithZone();
-                        inFight = true;
-                        events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500);
-                        events.ScheduleEvent(EVENT_HORSEMAN_CLEAVE, 7000);
-                    }
+                // Summon Head
+                Position pos;
+                me->GetNearPosition(pos, 15.0f, rand_norm() * 2 * M_PI);
+                if (Creature* cr = me->SummonCreature(NPC_HORSEMAN_HEAD, pos))
+                {
+                    if (health)
+                        cr->SetHealth(health);
+
+                    me->CastSpell(cr, SPELL_THROW_HEAD, true);
+                    cr->CastSpell(cr, SPELL_HORSEMAN_BODY_PHASE + phase, true);
+                    if (phase < 2)
+                        phase++;
+
+                    events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6000);
+                    events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1000);
                 }
             }
+        }
 
-            Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : NULL; }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-            void EnterCombat(Unit*) { me->SetInCombatWithZone(); }
-            void MoveInLineOfSight(Unit*  /*who*/) {}
+        void Reset() override
+        {
+            events.Reset();
+            summons.DespawnAll();
+            playerGUID.Clear();
+            talkCount = 0;
+            phase = 0;
+            inFight = false;
+            health = 0;
 
-            void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+            me->SetDisableGravity(true);
+            me->SetSpeed(MOVE_WALK, 5.0f, true);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (inFight && !UpdateVictim())
+                return;
+
+            switch (events.ExecuteEvent())
             {
-                // We die... :(
-                if (damage >= me->GetHealth())
-                {
-                    damage = 0;
-                    me->RemoveAura(SPELL_HEAD_VISUAL);
-                    me->CastSpell(me, SPELL_HORSEMAN_IMMUNITY, true);
-                    me->CastSpell(me, SPELL_HORSEMAN_BODY_REGEN, true);
-                    me->CastSpell(me, SPELL_HORSEMAN_BODY_REGEN_CONFUSE, true);
-                    events.CancelEvent(EVENT_HORSEMAN_CLEAVE);
-
-                    // Summon Head
-                    Position pos;
-                    me->GetNearPosition(pos, 15.0f, rand_norm()*2*M_PI);
-                    if (Creature* cr = me->SummonCreature(NPC_HORSEMAN_HEAD, pos))
-                    {
-                        if (health)
-                            cr->SetHealth(health);
-
-                        me->CastSpell(cr, SPELL_THROW_HEAD, true);
-                        cr->CastSpell(cr, SPELL_HORSEMAN_BODY_PHASE+phase, true);
-                        if (phase < 2)
-                            phase++;
-
-                        events.ScheduleEvent(EVENT_HORSEMAN_WHIRLWIND, 6000);
-                        events.ScheduleEvent(EVENT_HORSEMAN_CHECK_HEALTH, 1000);
-                    }
-                }
-            }
-
-            void JustSummoned(Creature* cr) { summons.Summon(cr); }
-
-            void Reset()
-            {
-                events.Reset();
-                summons.DespawnAll();
-                playerGUID = 0;
-                talkCount = 0;
-                phase = 0;
-                inFight = false;
-                health = 0;
-
-                me->SetDisableGravity(true);
-                me->SetSpeed(MOVE_WALK, 5.0f, true);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                events.Update(diff);
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                if (inFight && !UpdateVictim())
-                    return;
-
-                switch (events.GetEvent())
-                {
-                    case EVENT_HH_PLAYER_TALK:
+                case EVENT_HH_PLAYER_TALK:
                     {
                         talkCount++;
                         Player* player = GetRhymePlayer();
@@ -1061,32 +1253,31 @@ class boss_headless_horseman : public CreatureScript
 
                         switch (talkCount)
                         {
-                        case 1:
-                            player->MonsterSay("Horseman rise...", LANG_UNIVERSAL, 0);
-                            break;
-                        case 2:
-                            player->MonsterSay("Your time is nigh...", LANG_UNIVERSAL, 0);
-                            if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15*IN_MILLISECONDS))
-                                trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
-                            break;
-                        case 3:
-                            me->GetMotionMaster()->MovePath(236820, false);
-                            me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
-                            player->MonsterSay("You felt death once...", LANG_UNIVERSAL, 0);
-                            me->MonsterSay("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(SOUND_AGGRO);
-                            break;
-                        case 4:
-                            me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
-                            player->MonsterSay("Now, know demise!", LANG_UNIVERSAL, 0);
-                            events.PopEvent();
-                            talkCount = 0;
-                            return; // pop and return, skip repeat
+                            case 1:
+                                player->Say("Horseman rise...", LANG_UNIVERSAL);
+                                break;
+                            case 2:
+                                player->Say("Your time is nigh...", LANG_UNIVERSAL);
+                                if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
+                                    trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
+                                break;
+                            case 3:
+                                me->GetMotionMaster()->MovePath(236820, false);
+                                me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
+                                player->Say("You felt death once...", LANG_UNIVERSAL);
+                                me->Say("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL);
+                                me->PlayDirectSound(SOUND_AGGRO);
+                                break;
+                            case 4:
+                                me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
+                                player->Say("Now, know demise!", LANG_UNIVERSAL);
+                                talkCount = 0;
+                                return; // pop and return, skip repeat
                         }
                         events.RepeatEvent(2000);
                         break;
                     }
-                    case EVENT_HORSEMAN_FOLLOW:
+                case EVENT_HORSEMAN_FOLLOW:
                     {
                         if (Player* player = GetRhymePlayer())
                         {
@@ -1094,16 +1285,15 @@ class boss_headless_horseman : public CreatureScript
                             AttackStart(player);
                             me->GetMotionMaster()->MoveChase(player);
                         }
-                        events.PopEvent();
                         break;
                     }
-                    case EVENT_HORSEMAN_CLEAVE:
+                case EVENT_HORSEMAN_CLEAVE:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_HORSEMAN_CLEAVE, false);
                         events.RepeatEvent(8000);
                         break;
                     }
-                    case EVENT_HORSEMAN_WHIRLWIND:
+                case EVENT_HORSEMAN_WHIRLWIND:
                     {
                         if (me->HasAuraEffect(SPELL_HORSEMAN_WHIRLWIND, EFFECT_0))
                         {
@@ -1115,27 +1305,30 @@ class boss_headless_horseman : public CreatureScript
                         events.RepeatEvent(6000);
                         break;
                     }
-                    case EVENT_HORSEMAN_CHECK_HEALTH:
+                case EVENT_HORSEMAN_CHECK_HEALTH:
                     {
                         if (me->GetHealth() == me->GetMaxHealth())
                         {
                             me->CastSpell(me, SPELL_BODY_RESTORED_INFO, true);
-                            events.PopEvent();
                             return;
                         }
 
                         events.RepeatEvent(1000);
                         break;
                     }
-                    case EVENT_HORSEMAN_CONFLAGRATION:
+                case EVENT_HORSEMAN_CONFLAGRATION:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        {
                             me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
+                            target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
+                            me->Say("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                        }
 
                         events.RepeatEvent(12500);
                         break;
                     }
-                    case EVENT_SUMMON_PUMPKIN:
+                case EVENT_SUMMON_PUMPKIN:
                     {
                         if (talkCount < 4)
                         {
@@ -1145,7 +1338,7 @@ class boss_headless_horseman : public CreatureScript
                         }
                         else
                         {
-                            me->MonsterSay("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL, 0);
+                            me->Say("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL);
                             me->PlayDirectSound(SOUND_SPROUT);
                             events.RepeatEvent(15000);
                             talkCount = 0;
@@ -1153,56 +1346,56 @@ class boss_headless_horseman : public CreatureScript
 
                         break;
                     }
-                }
-
-                if (inFight)
-                    DoMeleeAttackIfReady();
             }
-        };
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_headless_horsemanAI(creature);
+            if (inFight)
+                DoMeleeAttackIfReady();
         }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new boss_headless_horsemanAI(creature);
+    }
 };
 
 class boss_headless_horseman_head : public CreatureScript
 {
-    public:
-        boss_headless_horseman_head() : CreatureScript("boss_headless_horseman_head") { }
+public:
+    boss_headless_horseman_head() : CreatureScript("boss_headless_horseman_head") { }
 
-        struct boss_headless_horseman_headAI : public ScriptedAI
+    struct boss_headless_horseman_headAI : public ScriptedAI
+    {
+        boss_headless_horseman_headAI(Creature* creature) : ScriptedAI(creature)
         {
-            boss_headless_horseman_headAI(Creature* creature) : ScriptedAI(creature)
+        }
+
+        uint8 pct;
+        uint32 timer;
+        bool handled;
+
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
             {
+                if (Unit* owner = GetOwner())
+                    owner->ToCreature()->AI()->DoAction(me->GetHealth());
+
+                me->DespawnOrUnsummon();
             }
+        }
 
-            uint8 pct;
-            uint32 timer;
-            bool handled;
-
-            void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        {
+            switch (spellInfo->Id)
             {
-                if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
-                {
+                case SPELL_BODY_RESTORED_INFO:
+                    me->RemoveAllAuras();
                     if (Unit* owner = GetOwner())
-                        owner->ToCreature()->AI()->DoAction(me->GetHealth());
-
-                    me->DespawnOrUnsummon();
-                }
-            }
-
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
-            {
-                switch (spellInfo->Id)
-                {
-                    case SPELL_BODY_RESTORED_INFO:
-                        me->RemoveAllAuras();
-                        if (Unit* owner = GetOwner())
-                            owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
-                        me->CastSpell(caster, SPELL_THROW_HEAD_BACK, true);
-                        break;
-                    case SPELL_THROW_HEAD:
+                        owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
+                    me->CastSpell(caster, SPELL_THROW_HEAD_BACK, true);
+                    break;
+                case SPELL_THROW_HEAD:
                     {
                         me->CastSpell(me, SPELL_HEAD_VISUAL_LAND, true);
                         if (Player* player = me->SelectNearestPlayer(50.0f))
@@ -1212,141 +1405,145 @@ class boss_headless_horseman_head : public CreatureScript
                         timer = 26000;
                         break;
                     }
-                    case SPELL_HORSEMAN_BODY_PHASE:
-                        pct = 67;
-                        break;
-                    case SPELL_HORSEMAN_BODY_PHASE+1:
-                        pct = 34;
-                        break;
-                    case SPELL_HORSEMAN_BODY_PHASE+2:
-                        pct = 0;
-                        break;
-                }
+                case SPELL_HORSEMAN_BODY_PHASE:
+                    pct = 67;
+                    break;
+                case SPELL_HORSEMAN_BODY_PHASE+1:
+                    pct = 34;
+                    break;
+                case SPELL_HORSEMAN_BODY_PHASE+2:
+                    pct = 0;
+                    break;
             }
-
-            Unit* GetOwner()
-            {
-                if (me->ToTempSummon())
-                    return me->ToTempSummon()->GetSummoner();
-
-                return NULL;
-            }
-
-            void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
-            {
-                // We die... :(
-                if (damage >= me->GetHealth())
-                {
-                    if (Unit* owner = GetOwner())
-                    {
-                        owner->CastSpell(owner, SPELL_BURNING_BODY, true);
-                        Unit::Kill(me, owner);
-                    }
-                    damage = 0;
-                    me->DespawnOrUnsummon();
-                    return;
-                }
-
-                if (me->HealthBelowPctDamaged(pct, damage) && !handled)
-                {
-                    handled = true;
-                    damage = 0;
-                    me->RemoveAllAuras();
-                    me->CastSpell(me, SPELL_HEAD_DAMAGED_INFO, true);
-                    me->CastSpell(me, SPELL_THROW_HEAD_BACK, true);
-                    if (Unit* owner = GetOwner())
-                        owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
-                }
-            }
-
-            void Reset()
-            {
-                pct = 0;
-                timer = 0;
-                handled = false;
-                me->SetInCombatWithZone();
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                timer += diff;
-                if (timer >= 30000)
-                {
-                    timer = urand(0, 15000);
-                    uint32 sound = 11965;
-                    switch (urand(0,2))
-                    {
-                    case 1: sound = 11975; break;
-                    case 2: sound = 11976; break;
-                    }
-
-                    me->CastSpell(me, SPELL_HORSEMAN_SPEAKS, true);
-                    me->MonsterTextEmote("Headless Horseman laughs", 0);
-                    me->PlayDirectSound(sound);
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_headless_horseman_headAI(creature);
         }
+
+        Unit* GetOwner()
+        {
+            if (me->ToTempSummon())
+                return me->ToTempSummon()->GetSummonerUnit();
+
+            return nullptr;
+        }
+
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            // We die... :(
+            if (damage >= me->GetHealth())
+            {
+                if (Unit* owner = GetOwner())
+                {
+                    owner->CastSpell(owner, SPELL_BURNING_BODY, true);
+                    Unit::Kill(me, owner);
+                }
+                damage = 0;
+                me->DespawnOrUnsummon();
+                return;
+            }
+
+            if (me->HealthBelowPctDamaged(pct, damage) && !handled)
+            {
+                handled = true;
+                damage = 0;
+                me->RemoveAllAuras();
+                me->CastSpell(me, SPELL_HEAD_DAMAGED_INFO, true);
+                me->CastSpell(me, SPELL_THROW_HEAD_BACK, true);
+                if (Unit* owner = GetOwner())
+                    owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
+            }
+        }
+
+        void Reset() override
+        {
+            pct = 0;
+            timer = 0;
+            handled = false;
+            me->SetInCombatWithZone();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            timer += diff;
+            if (timer >= 30000)
+            {
+                timer = urand(0, 15000);
+                uint32 sound = 11965;
+                switch (urand(0, 2))
+                {
+                    case 1:
+                        sound = 11975;
+                        break;
+                    case 2:
+                        sound = 11976;
+                        break;
+                }
+
+                me->CastSpell(me, SPELL_HORSEMAN_SPEAKS, true);
+                me->TextEmote("Headless Horseman laughs");
+                me->PlayDirectSound(sound);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new boss_headless_horseman_headAI(creature);
+    }
 };
 
 class boss_headless_horseman_pumpkin : public CreatureScript
 {
-    public:
-        boss_headless_horseman_pumpkin() : CreatureScript("boss_headless_horseman_pumpkin") { }
+public:
+    boss_headless_horseman_pumpkin() : CreatureScript("boss_headless_horseman_pumpkin") { }
 
-        struct boss_headless_horseman_pumpkinAI : public ScriptedAI
+    struct boss_headless_horseman_pumpkinAI : public ScriptedAI
+    {
+        boss_headless_horseman_pumpkinAI(Creature* creature) : ScriptedAI(creature)
         {
-            boss_headless_horseman_pumpkinAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
-
-            uint32 timer;
-
-            void AttackStart(Unit* ) { }
-            void MoveInLineOfSight(Unit* ) { }
-
-            void Reset()
-            {
-                if (Player* player = me->SelectNearestPlayer(3.0f))
-                    me->CastSpell(player, SPELL_SQUASH_SOUL, true);
-                timer = 1;
-                me->CastSpell(me, SPELL_PUMPKIN_AURA, true);
-                me->CastSpell(me, SPELL_PUMPKIN_VISUAL, true);
-            }
-
-            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
-            {
-                if (spellInfo->Id == SPELL_SPROUTING)
-                {
-                    if (Creature* cr = me->SummonCreature(NPC_PUMPKIN_FIEND, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                        cr->SetInCombatWithZone();
-
-                    me->DespawnOrUnsummon();
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (timer)
-                {
-                    timer += diff;
-                    if (timer >= 3000)
-                    {
-                        me->CastSpell(me, SPELL_SPROUTING, false);
-                        timer = 0;
-                    }
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_headless_horseman_pumpkinAI(creature);
         }
+
+        uint32 timer;
+
+        void AttackStart(Unit* ) override { }
+        void MoveInLineOfSight(Unit* ) override { }
+
+        void Reset() override
+        {
+            if (Player* player = me->SelectNearestPlayer(3.0f))
+                me->CastSpell(player, SPELL_SQUASH_SOUL, true);
+            timer = 1;
+            me->CastSpell(me, SPELL_PUMPKIN_AURA, true);
+            me->CastSpell(me, SPELL_PUMPKIN_VISUAL, true);
+        }
+
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_SPROUTING)
+            {
+                if (Creature* cr = me->SummonCreature(NPC_PUMPKIN_FIEND, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                    cr->SetInCombatWithZone();
+
+                me->DespawnOrUnsummon();
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (timer)
+            {
+                timer += diff;
+                if (timer >= 3000)
+                {
+                    me->CastSpell(me, SPELL_SPROUTING, false);
+                    timer = 0;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new boss_headless_horseman_pumpkinAI(creature);
+    }
 };
 
 class go_loosely_turned_soil : public GameObjectScript
@@ -1354,7 +1551,7 @@ class go_loosely_turned_soil : public GameObjectScript
 public:
     go_loosely_turned_soil() : GameObjectScript("go_loosely_turned_soil") { }
 
-    bool OnQuestReward(Player* player, GameObject* go, Quest const* /*quest*/, uint32 /*opt*/)
+    bool OnQuestReward(Player* player, GameObject* go, Quest const* /*quest*/, uint32 /*opt*/) override
     {
         if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
             return true;
@@ -1363,6 +1560,27 @@ public:
             horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
 
         return true;
+    }
+
+    struct go_loosely_turned_soilAI : public GameObjectAI
+    {
+        go_loosely_turned_soilAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_HEADLESS_HORSEMAN;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_loosely_turned_soilAI(go);
     }
 };
 

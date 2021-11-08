@@ -1,11 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef DEF_BLACKROCK_SPIRE_H
 #define DEF_BLACKROCK_SPIRE_H
+
+#include "CreatureAIImpl.h"
 
 uint32 const EncounterCount         = 23;
 
@@ -36,7 +49,8 @@ enum DataTypes
     DATA_HALL_RUNE_4                = 19,
     DATA_HALL_RUNE_5                = 20,
     DATA_HALL_RUNE_6                = 21,
-    DATA_HALL_RUNE_7                = 22
+    DATA_HALL_RUNE_7                = 22,
+    DATA_SOLAKAR_FLAMEWREATH        = 23
 };
 
 enum CreaturesIds
@@ -59,7 +73,17 @@ enum CreaturesIds
     NPC_BLACKHAND_SUMMONER          = 9818,
     NPC_BLACKHAND_VETERAN           = 9819,
     NPC_BLACKHAND_INCARCERATOR      = 10316,
-    NPC_LORD_VICTOR_NEFARIUS        = 10162
+    NPC_LORD_VICTOR_NEFARIUS        = 10162,
+
+    NPC_SOLAKAR                     = 10264,
+    NPC_ROOKERY_GUARDIAN            = 10258,
+    NPC_ROOKERY_HATCHER             = 10683,
+    NPC_ROOKERY_WHELP               = 10161,
+
+    NPC_UROK_MAGUS                  = 10602,
+    NPC_UROK_ENFORCER               = 10601,
+    NPC_FINKLE_EINHORN              = 10776,
+    NPC_CHROMATIC_ELITE_GUARD       = 10814
 };
 
 enum AdditionalData
@@ -69,12 +93,13 @@ enum AdditionalData
     EVENT_PYROGUARD_EMBERSEER       = 4884,
     AREATRIGGER                     = 1,
     AREATRIGGER_DRAGONSPIRE_HALL    = 2046,
-    AREATRIGGER_BLACKROCK_STADIUM   = 2026
+    AREATRIGGER_BLACKROCK_STADIUM   = 2026,
+    SAY_FINKLE_GANG                 = 0
 };
 
 enum GameObjectsIds
 {
-    GO_WHELP_SPAWNER                = 175622, // trap spawned by go id 175124
+    GO_ROOKERY_EGG                  = 175124,
     // Doors
     GO_EMBERSEER_IN                 = 175244, // First door to Pyroguard Emberseer
     GO_DOORS                        = 175705, // Second door to Pyroguard Emberseer
@@ -106,11 +131,19 @@ enum GameObjectsIds
     GO_PORTCULLIS_TOBOSSROOMS       = 175186,
     // Urok Doomhowl
     GO_UROK_PILE                    = 175621,
+    GO_UROK_CHALLENGE               = 175584,
+    GO_UROK_CIRCLE                  = 175571
 };
 
 enum npcspells
 {
     SPELL_FINKLE_IS_EINHORN         = 16710
 };
+
+template <class AI, class T>
+inline AI* GetBlackrockSpireAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, BRSScriptName);
+}
 
 #endif

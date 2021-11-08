@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -42,17 +53,17 @@ public:
         npc_water_elementalAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 waterBoltTimer;
-        uint64 balindaGUID;
+        ObjectGuid balindaGUID;
         uint32 resetTimer;
 
-        void Reset()
+        void Reset() override
         {
             waterBoltTimer            = 3 * IN_MILLISECONDS;
             resetTimer                = 5 * IN_MILLISECONDS;
-            balindaGUID = 0;
+            balindaGUID.Clear();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -61,7 +72,8 @@ public:
             {
                 DoCastVictim(SPELL_WATERBOLT);
                 waterBoltTimer = 5 * IN_MILLISECONDS;
-            } else waterBoltTimer -= diff;
+            }
+            else waterBoltTimer -= diff;
 
             // check if creature is not outside of building
             if (resetTimer < diff)
@@ -70,13 +82,14 @@ public:
                     if (me->GetDistance2d(pBalinda->GetHomePosition().GetPositionX(), pBalinda->GetHomePosition().GetPositionY()) > 50)
                         EnterEvadeMode();
                 resetTimer = 5 * IN_MILLISECONDS;
-            } else resetTimer -= diff;
+            }
+            else resetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_water_elementalAI(creature);
     }
@@ -100,7 +113,7 @@ public:
 
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             arcaneExplosionTimer      = urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
             coneOfColdTimer           = 8 * IN_MILLISECONDS;
@@ -112,30 +125,30 @@ public:
             summons.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             CAST_AI(npc_water_elemental::npc_water_elementalAI, summoned->AI())->balindaGUID = me->GetGUID();
             summoned->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0, 50, true));
-            summoned->setFaction(me->getFaction());
+            summoned->SetFaction(me->GetFaction());
             summons.Summon(summoned);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -145,31 +158,36 @@ public:
                 if (summons.empty())
                     me->SummonCreature(NPC_WATER_ELEMENTAL, 0, 0, 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45 * IN_MILLISECONDS);
                 waterElementalTimer = 50 * IN_MILLISECONDS;
-            } else waterElementalTimer -= diff;
+            }
+            else waterElementalTimer -= diff;
 
             if (arcaneExplosionTimer < diff)
             {
                 DoCastVictim(SPELL_ARCANE_EXPLOSION);
                 arcaneExplosionTimer =  urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else arcaneExplosionTimer -= diff;
+            }
+            else arcaneExplosionTimer -= diff;
 
             if (coneOfColdTimer < diff)
             {
                 DoCastVictim(SPELL_CONE_OF_COLD);
                 coneOfColdTimer = urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            } else coneOfColdTimer -= diff;
+            }
+            else coneOfColdTimer -= diff;
 
             if (fireBoltTimer < diff)
             {
                 DoCastVictim(SPELL_FIREBALL);
                 fireBoltTimer = urand(5 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
-            } else fireBoltTimer -= diff;
+            }
+            else fireBoltTimer -= diff;
 
             if (frostboltTimer < diff)
             {
                 DoCastVictim(SPELL_FROSTBOLT);
                 frostboltTimer = urand(4 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
-            } else frostboltTimer -= diff;
+            }
+            else frostboltTimer -= diff;
 
             // check if creature is not outside of building
             if (resetTimer < diff)
@@ -180,13 +198,14 @@ public:
                     Talk(YELL_EVADE);
                 }
                 resetTimer = 5 * IN_MILLISECONDS;
-            } else resetTimer -= diff;
+            }
+            else resetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_balindaAI(creature);
     }
@@ -196,4 +215,4 @@ void AddSC_boss_balinda()
 {
     new boss_balinda;
     new npc_water_elemental;
-};
+}

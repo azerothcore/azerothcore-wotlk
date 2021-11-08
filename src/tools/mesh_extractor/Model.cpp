@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Model.h"
-#include "MPQManager.h"
+#include "MPQMgr.h"
 #include "Utils.h"
 
 Model::Model( std::string path ) : IsCollidable(false), IsBad(false)
@@ -18,7 +29,7 @@ Model::Model( std::string path ) : IsCollidable(false), IsBad(false)
     }
     Header.Read(Stream);
     if (Header.OffsetBoundingNormals > 0 && Header.OffsetBoundingVertices > 0 &&
-        Header.OffsetBoundingTriangles > 0 && Header.BoundingRadius > 0.0f)
+            Header.OffsetBoundingTriangles > 0 && Header.BoundingRadius > 0.0f)
     {
         IsCollidable = true;
         ReadVertices();
@@ -70,4 +81,3 @@ void Model::ReadBoundingNormals()
     for (uint32 i = 0; i < Header.CountBoundingNormals; i++)
         Normals.push_back(Vector3::Read(Stream));
 }
-

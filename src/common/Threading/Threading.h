@@ -1,34 +1,44 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef THREADING_H
 #define THREADING_H
 
-#include <thread>
 #include <atomic>
-
 #include <thread>
-#include <atomic>
 
-namespace acore
+namespace Acore
 {
     class Runnable
     {
-        public:
-            virtual ~Runnable() {}
-            virtual void run() = 0;
+    public:
+        virtual ~Runnable() = default;
+        virtual void run() = 0;
 
-            void incReference() { ++m_refs; }
-            void decReference()
+        void incReference() { ++m_refs; }
+        void decReference()
+        {
+            if (!--m_refs)
             {
-                if (!--m_refs)
-                    delete this;
+                delete this;
             }
-        private:
-            std::atomic_long m_refs;
+        }
+    private:
+        std::atomic_long m_refs;
     };
 
     enum Priority
@@ -44,28 +54,28 @@ namespace acore
 
     class Thread
     {
-        public:
-            Thread();
-            explicit Thread(Runnable* instance);
-            ~Thread();
+    public:
+        Thread();
+        explicit Thread(Runnable* instance);
+        ~Thread();
 
-            bool wait();
-            void destroy();
+        bool wait();
+        void destroy();
 
-            void setPriority(Priority type);
+        void setPriority(Priority type);
 
-            static void Sleep(unsigned long msecs);
-            static std::thread::id currentId();
+        static void Sleep(unsigned long msecs);
+        static std::thread::id currentId();
 
-        private:
-            Thread(const Thread&);
-            Thread& operator=(const Thread&);
+    private:
+        Thread(const Thread&);
+        Thread& operator=(const Thread&);
 
-            static void ThreadTask(void* param);
+        static void ThreadTask(void* param);
 
-            Runnable* const m_task;
-            std::thread::id m_iThreadId;
-            std::thread m_ThreadImp;
+        Runnable* const m_task;
+        std::thread::id m_iThreadId;
+        std::thread m_ThreadImp;
     };
 }
 #endif

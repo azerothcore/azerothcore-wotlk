@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef OUTDOOR_PVP_NA_
@@ -241,85 +252,80 @@ class OutdoorPvPNA;
 
 class OPvPCapturePointNA : public OPvPCapturePoint
 {
-    public:
+public:
+    OPvPCapturePointNA(OutdoorPvP* pvp);
 
-        OPvPCapturePointNA(OutdoorPvP* pvp);
+    bool Update(uint32 diff) override;
 
-        bool Update(uint32 diff);
+    void ChangeState() override;
 
-        void ChangeState();
+    void SendChangePhase() override;
 
-        void SendChangePhase();
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+    bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go) override;
 
-        bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
+    int32 HandleOpenGo(Player* player, GameObject* go) override;
 
-        int32 HandleOpenGo(Player* player, uint64 guid);
+    uint32 GetAliveGuardsCount();
+    TeamId GetControllingFaction() const;
 
-        uint32 GetAliveGuardsCount();
-        TeamId GetControllingFaction() const;
+protected:
+    // called when a faction takes control
+    void FactionTakeOver(TeamId teamId);
 
-    protected:
+    void DeSpawnNPCs();
+    void DeSpawnGOs();
 
-        // called when a faction takes control
-        void FactionTakeOver(TeamId teamId);
+    void SpawnNPCsForTeam(TeamId teamId);
+    void SpawnGOsForTeam(TeamId teamId);
 
-        void DeSpawnNPCs();
-        void DeSpawnGOs();
+    void UpdateWyvernRoostWorldState(uint32 roost);
+    void UpdateHalaaWorldState();
 
-        void SpawnNPCsForTeam(TeamId teamId);
-        void SpawnGOsForTeam(TeamId teamId);
+private:
+    bool m_capturable;
 
-        void UpdateWyvernRoostWorldState(uint32 roost);
-        void UpdateHalaaWorldState();
+    uint32 m_GuardsAlive;
 
-    private:
+    TeamId m_ControllingFaction;
 
-        bool m_capturable;
+    uint32 m_WyvernStateNorth;
+    uint32 m_WyvernStateSouth;
+    uint32 m_WyvernStateEast;
+    uint32 m_WyvernStateWest;
 
-        uint32 m_GuardsAlive;
+    uint32 m_HalaaState;
 
-        TeamId m_ControllingFaction;
+    uint32 m_RespawnTimer;
 
-        uint32 m_WyvernStateNorth;
-        uint32 m_WyvernStateSouth;
-        uint32 m_WyvernStateEast;
-        uint32 m_WyvernStateWest;
-
-        uint32 m_HalaaState;
-
-        uint32 m_RespawnTimer;
-
-        uint32 m_GuardCheckTimer;
+    uint32 m_GuardCheckTimer;
 };
 
 class OutdoorPvPNA : public OutdoorPvP
 {
-    public:
+public:
+    OutdoorPvPNA();
 
-        OutdoorPvPNA();
+    bool SetupOutdoorPvP() override;
 
-        bool SetupOutdoorPvP();
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-        void HandlePlayerEnterZone(Player* player, uint32 zone);
-        void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    bool Update(uint32 diff) override;
 
-        bool Update(uint32 diff);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket &data);
+    void SendRemoveWorldStates(Player* player) override;
 
-        void SendRemoveWorldStates(Player* player);
+    void HandleKillImpl(Player* player, Unit* killed) override;
 
-        void HandleKillImpl(Player* player, Unit* killed);
-
-    private:
-
-        OPvPCapturePointNA * m_obj;
+private:
+    OPvPCapturePointNA* m_obj;
 };
 
 #endif

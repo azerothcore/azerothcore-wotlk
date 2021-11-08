@@ -1,19 +1,33 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DBCStores.h"
+#include "BattlegroundMgr.h"
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
+#include "DBCStores.h"
 #include "Errors.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
 #include "TransportMgr.h"
-#include "BattlegroundMgr.h"
 #include "World.h"
+#include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <map>
 
 typedef std::map<uint16, uint32> AreaFlagByAreaID;
@@ -41,6 +55,7 @@ DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
+DBCStorage <CinematicCameraEntry> sCinematicCameraStore(CinematicCameraEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
 DBCStorage <CreatureFamilyEntry> sCreatureFamilyStore(CreatureFamilyfmt);
@@ -119,6 +134,9 @@ DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt
 
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
+DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
+SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
+DBCStorage <SkillTiersEntry> sSkillTiersStore(SkillTiersfmt);
 
 DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
 
@@ -137,6 +155,7 @@ DBCStorage <SpellRadiusEntry> sSpellRadiusStore(SpellRadiusfmt);
 DBCStorage <SpellRangeEntry> sSpellRangeStore(SpellRangefmt);
 DBCStorage <SpellRuneCostEntry> sSpellRuneCostStore(SpellRuneCostfmt);
 DBCStorage <SpellShapeshiftEntry> sSpellShapeshiftStore(SpellShapeshiftfmt);
+DBCStorage <SpellVisualEntry> sSpellVisualStore(SpellVisualfmt);
 DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
 DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
 DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
@@ -171,13 +190,15 @@ DBCStorage <WMOAreaTableEntry> sWMOAreaTableStore(WMOAreaTableEntryfmt);
 DBCStorage <WorldMapAreaEntry> sWorldMapAreaStore(WorldMapAreaEntryfmt);
 DBCStorage <WorldMapOverlayEntry> sWorldMapOverlayStore(WorldMapOverlayEntryfmt);
 
+std::unordered_map<uint32, FlyByCameraCollection> sFlyByCameraStore;
+
 typedef std::list<std::string> StoreProblemList;
 
 uint32 DBCFileCount = 0;
 
 static bool LoadDBC_assert_print(uint32 fsize, uint32 rsize, const std::string& filename)
 {
-    sLog->outError("Size of '%s' set by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
+    LOG_ERROR("dbc", "Size of '%s' set by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
 
     // ASSERT must fail after function call
     return false;
@@ -258,6 +279,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sChatChannelsStore,                    "ChatChannels.dbc",                     "chatchannels_dbc");
     LOAD_DBC(sChrClassesStore,                      "ChrClasses.dbc",                       "chrclasses_dbc");
     LOAD_DBC(sChrRacesStore,                        "ChrRaces.dbc",                         "chrraces_dbc");
+    LOAD_DBC(sCinematicCameraStore,                 "CinematicCamera.dbc",                  "cinematiccamera_dbc");
     LOAD_DBC(sCinematicSequencesStore,              "CinematicSequences.dbc",               "cinematicsequences_dbc");
     LOAD_DBC(sCreatureDisplayInfoStore,             "CreatureDisplayInfo.dbc",              "creaturedisplayinfo_dbc");
     LOAD_DBC(sCreatureFamilyStore,                  "CreatureFamily.dbc",                   "creaturefamily_dbc");
@@ -317,6 +339,8 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sScalingStatValuesStore,               "ScalingStatValues.dbc",                "scalingstatvalues_dbc");
     LOAD_DBC(sSkillLineStore,                       "SkillLine.dbc",                        "skillline_dbc");
     LOAD_DBC(sSkillLineAbilityStore,                "SkillLineAbility.dbc",                 "skilllineability_dbc");
+    LOAD_DBC(sSkillRaceClassInfoStore,              "SkillRaceClassInfo.dbc",               "skillraceclassinfo_dbc");
+    LOAD_DBC(sSkillTiersStore,                      "SkillTiers.dbc",                       nullptr); // TODO: add the SQL table!
     LOAD_DBC(sSoundEntriesStore,                    "SoundEntries.dbc",                     "soundentries_dbc");
     LOAD_DBC(sSpellStore,                           "Spell.dbc",                            "spell_dbc");
     LOAD_DBC(sSpellCastTimesStore,                  "SpellCastTimes.dbc",                   "spellcasttimes_dbc");
@@ -330,6 +354,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sSpellRangeStore,                      "SpellRange.dbc",                       "spellrange_dbc");
     LOAD_DBC(sSpellRuneCostStore,                   "SpellRuneCost.dbc",                    "spellrunecost_dbc");
     LOAD_DBC(sSpellShapeshiftStore,                 "SpellShapeshiftForm.dbc",              "spellshapeshiftform_dbc");
+    LOAD_DBC(sSpellVisualStore,                     "SpellVisual.dbc",                      "spellvisual_dbc");
     LOAD_DBC(sStableSlotPricesStore,                "StableSlotPrices.dbc",                 "stableslotprices_dbc");
     LOAD_DBC(sSummonPropertiesStore,                "SummonProperties.dbc",                 "summonproperties_dbc");
     LOAD_DBC(sTalentStore,                          "Talent.dbc",                           "talent_dbc");
@@ -345,13 +370,13 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sVehicleSeatStore,                     "VehicleSeat.dbc",                      "vehicleseat_dbc");
     LOAD_DBC(sWMOAreaTableStore,                    "WMOAreaTable.dbc",                     "wmoareatable_dbc");
     LOAD_DBC(sWorldMapAreaStore,                    "WorldMapArea.dbc",                     "worldmaparea_dbc");
-    LOAD_DBC(sWorldMapOverlayStore,                 "WorldMapOverlay.dbc",                  "worldmapoverlay_dbc"); 
+    LOAD_DBC(sWorldMapOverlayStore,                 "WorldMapOverlay.dbc",                  "worldmapoverlay_dbc");
 
 #undef LOAD_DBC
 
     for (CharStartOutfitEntry const* outfit : sCharStartOutfitStore)
         sCharStartOutfitMap[outfit->Race | (outfit->Class << 8) | (outfit->Gender << 16)] = outfit;
-    
+
     for (FactionEntry const* faction : sFactionStore)
     {
         if (faction->team)
@@ -360,7 +385,7 @@ void LoadDBCStores(const std::string& dataPath)
             flist.push_back(faction->ID);
         }
     }
-    
+
     for (GameObjectDisplayInfoEntry const* info : sGameObjectDisplayInfoStore)
     {
         if (info->maxX < info->minX)
@@ -372,7 +397,7 @@ void LoadDBCStores(const std::string& dataPath)
         if (info->maxZ < info->minZ)
             std::swap(*(float*)(&info->maxZ), *(float*)(&info->minZ));
     }
-    
+
     // fill data
     for (MapDifficultyEntry const* entry : sMapDifficultyStore)
         sMapDifficultyMap[MAKE_PAIR32(entry->MapId, entry->Difficulty)] = MapDifficulty(entry->resetTime, entry->maxPlayers, entry->areaTriggerText[0] != '\0');
@@ -380,26 +405,40 @@ void LoadDBCStores(const std::string& dataPath)
     for (PvPDifficultyEntry const* entry : sPvPDifficultyStore)
         if (entry->bracketId > MAX_BATTLEGROUND_BRACKETS)
             ASSERT(false && "Need update MAX_BATTLEGROUND_BRACKETS by DBC data");
-    
+
     for (auto i : sSpellStore)
         if (i->Category)
-            sSpellsByCategoryStore[i->Category].insert(i->Id);
+            sSpellsByCategoryStore[i->Category].emplace(false, i->Id);
+
+    for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
+    {
+        if (sSkillLineStore.LookupEntry(entry->SkillID))
+        {
+            SkillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
+        }
+    }
 
     for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)
     {
-        SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->spellId);
+        SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->Spell);
         if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
         {
             for (CreatureFamilyEntry const* cFamily : sCreatureFamilyStore)
             {
-                if (skillLine->skillId != cFamily->skillLine[0] && skillLine->skillId != cFamily->skillLine[1])
+                if (skillLine->SkillLine != cFamily->skillLine[0] && skillLine->SkillLine != cFamily->skillLine[1])
+                {
                     continue;
+                }
 
-                if (spellInfo->spellLevel)
+                if (spellInfo->SpellLevel)
+                {
                     continue;
+                }
 
-                if (skillLine->learnOnGetSkill != ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL)
+                if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                {
                     continue;
+                }
 
                 sPetFamilySpellsStore[cFamily->ID].insert(spellInfo->Id);
             }
@@ -418,7 +457,7 @@ void LoadDBCStores(const std::string& dataPath)
             if (spellDiff->SpellID[x] <= 0 || !sSpellStore.LookupEntry(spellDiff->SpellID[x]))
             {
                 if (spellDiff->SpellID[x] > 0) //don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
-                    sLog->outErrorDb("spelldifficulty_dbc: spell %i at field id: %u at spellid %i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->SpellID[x], spellDiff->ID, x);
+                    LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id: %u at spellid %i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->SpellID[x], spellDiff->ID, x);
 
                 newEntry.SpellID[x] = 0; // spell was <= 0 or invalid, set to 0
             }
@@ -459,12 +498,10 @@ void LoadDBCStores(const std::string& dataPath)
                     sTalentTabPages[cls][talentTabInfo->tabpage] = talentTabId;
         }
     }
-    
+
     for (uint32 i = 1; i < sTaxiPathStore.GetNumRows(); ++i)
         if (TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(i))
             sTaxiPathSetBySource[entry->from][entry->to] = TaxiPathBySourceAndDestination(entry->ID, entry->price);
-
-    
 
     // Calculate path nodes count
     uint32 pathCount = sTaxiPathStore.GetNumRows();
@@ -499,7 +536,7 @@ void LoadDBCStores(const std::string& dataPath)
         memset(sHordeTaxiNodesMask, 0, sizeof(sHordeTaxiNodesMask));
         memset(sAllianceTaxiNodesMask, 0, sizeof(sAllianceTaxiNodesMask));
         memset(sDeathKnightTaxiNodesMask, 0, sizeof(sDeathKnightTaxiNodesMask));
-        
+
         for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
         {
             TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
@@ -526,7 +563,7 @@ void LoadDBCStores(const std::string& dataPath)
 
             // valid taxi network node
             uint8  field   = (uint8)((i - 1) / 32);
-            uint32 submask = 1<<((i-1)%32);
+            uint32 submask = 1 << ((i - 1) % 32);
             sTaxiNodesMask[field] |= submask;
 
             if (node->MountCreatureID[0] && node->MountCreatureID[0] != 32981)
@@ -550,7 +587,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     for (TransportAnimationEntry const* anim : sTransportAnimationStore)
         sTransportMgr->AddPathNodeToTransport(anim->TransportEntry, anim->TimeSeg, anim);
-    
+
     for (TransportRotationEntry const* rot : sTransportRotationStore)
         sTransportMgr->AddPathRotationToTransport(rot->TransportEntry, rot->TimeSeg, rot);
 
@@ -560,7 +597,7 @@ void LoadDBCStores(const std::string& dataPath)
     // error checks
     if (bad_dbc_files.size() >= DBCFileCount)
     {
-        sLog->outError("Incorrect DataDir value in worldserver.conf or ALL required *.dbc files (%d) not found by path: %sdbc", DBCFileCount, dataPath.c_str());
+        LOG_ERROR("dbc", "Incorrect DataDir value in worldserver.conf or ALL required *.dbc files (%d) not found by path: %sdbc", DBCFileCount, dataPath.c_str());
         exit(1);
     }
     else if (!bad_dbc_files.empty())
@@ -569,24 +606,292 @@ void LoadDBCStores(const std::string& dataPath)
         for (StoreProblemList::iterator i = bad_dbc_files.begin(); i != bad_dbc_files.end(); ++i)
             str += *i + "\n";
 
-        sLog->outError("Some required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFileCount, str.c_str());
+        LOG_ERROR("dbc", "Some required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFileCount, str.c_str());
         exit(1);
     }
 
     // Check loaded DBC files proper version
     if (!sAreaTableStore.LookupEntry(4987)         ||       // last area added in 3.3.5a
-        !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
-        !sGemPropertiesStore.LookupEntry(1629)     ||       // last added spell in 3.3.5a
-        !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
-        !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
-        !sSpellStore.LookupEntry(80864)            )        // last client known item added in 3.3.5a
+            !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
+            !sGemPropertiesStore.LookupEntry(1629)     ||       // last added spell in 3.3.5a
+            !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
+            !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
+            !sSpellStore.LookupEntry(80864)            )        // last client known item added in 3.3.5a
     {
-        sLog->outError("You have _outdated_ DBC data. Please extract correct versions from current using client.");
+        LOG_ERROR("dbc", "You have _outdated_ DBC data. Please extract correct versions from current using client.");
         exit(1);
     }
 
-    sLog->outString(">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LoadM2Cameras(dataPath);
+
+    LOG_INFO("server.loading", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+// Convert the geomoetry from a spline value, to an actual WoW XYZ
+G3D::Vector3 TranslateLocation(G3D::Vector4 const* DBCPosition, G3D::Vector3 const* basePosition, G3D::Vector3 const* splineVector)
+{
+    G3D::Vector3 work;
+    float x = basePosition->x + splineVector->x;
+    float y = basePosition->y + splineVector->y;
+    float z = basePosition->z + splineVector->z;
+    float const distance = sqrt((x * x) + (y * y));
+    float angle = std::atan2(x, y) - DBCPosition->w;
+
+    if (angle < 0)
+    {
+        angle += 2 * float(M_PI);
+    }
+
+    work.x = DBCPosition->x + (distance * sin(angle));
+    work.y = DBCPosition->y + (distance * cos(angle));
+    work.z = DBCPosition->z + z;
+    return work;
+}
+
+// Number of cameras not used. Multiple cameras never used in 3.3.5
+bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, CinematicCameraEntry const* dbcentry)
+{
+    char const* buffer = reinterpret_cast<char const*>(header);
+
+    FlyByCameraCollection cameras;
+    FlyByCameraCollection targetcam;
+
+    G3D::Vector4 DBCData;
+    DBCData.x = dbcentry->base_x;
+    DBCData.y = dbcentry->base_y;
+    DBCData.z = dbcentry->base_z;
+    DBCData.w = dbcentry->base_o;
+
+    // Read target locations, only so that we can calculate orientation
+    for (uint32 k = 0; k < cam->target_positions.timestamps.number; ++k)
+    {
+        // Extract Target positions
+        if (cam->target_positions.timestamps.offset_elements + sizeof(M2Array) > buffSize)
+        {
+            return false;
+        }
+        M2Array const* targTsArray = reinterpret_cast<M2Array const*>(buffer + cam->target_positions.timestamps.offset_elements);
+        if (targTsArray->offset_elements + sizeof(uint32) > buffSize || cam->target_positions.values.offset_elements + sizeof(M2Array) > buffSize)
+        {
+            return false;
+        }
+        uint32 const* targTimestamps = reinterpret_cast<uint32 const*>(buffer + targTsArray->offset_elements);
+        M2Array const* targArray = reinterpret_cast<M2Array const*>(buffer + cam->target_positions.values.offset_elements);
+
+        if (targArray->offset_elements + sizeof(M2SplineKey<G3D::Vector3>) > buffSize)
+        {
+            return false;
+        }
+        M2SplineKey<G3D::Vector3> const* targPositions = reinterpret_cast<M2SplineKey<G3D::Vector3> const*>(buffer + targArray->offset_elements);
+
+        // Read the data for this set
+        uint32 currPos = targArray->offset_elements;
+        for (uint32 i = 0; i < targTsArray->number; ++i)
+        {
+            if (currPos + sizeof(M2SplineKey<G3D::Vector3>) > buffSize)
+            {
+                return false;
+            }
+            // Translate co-ordinates
+            G3D::Vector3 newPos = TranslateLocation(&DBCData, &cam->target_position_base, &targPositions->p0);
+
+            // Add to vector
+            FlyByCamera thisCam;
+            thisCam.timeStamp = targTimestamps[i];
+            thisCam.locations.x = newPos.x;
+            thisCam.locations.y = newPos.y;
+            thisCam.locations.z = newPos.z;
+            thisCam.locations.w = 0.0f;
+            targetcam.push_back(thisCam);
+            targPositions++;
+            currPos += sizeof(M2SplineKey<G3D::Vector3>);
+        }
+    }
+
+    // Read camera positions and timestamps (translating first position of 3 only, we don't need to translate the whole spline)
+    for (uint32 k = 0; k < cam->positions.timestamps.number; ++k)
+    {
+        // Extract Camera positions for this set
+        if (cam->positions.timestamps.offset_elements + sizeof(M2Array) > buffSize)
+        {
+            return false;
+        }
+        M2Array const* posTsArray = reinterpret_cast<M2Array const*>(buffer + cam->positions.timestamps.offset_elements);
+        if (posTsArray->offset_elements + sizeof(uint32) > buffSize || cam->positions.values.offset_elements + sizeof(M2Array) > buffSize)
+        {
+            return false;
+        }
+        uint32 const* posTimestamps = reinterpret_cast<uint32 const*>(buffer + posTsArray->offset_elements);
+        M2Array const* posArray = reinterpret_cast<M2Array const*>(buffer + cam->positions.values.offset_elements);
+        if (posArray->offset_elements + sizeof(M2SplineKey<G3D::Vector3>) > buffSize)
+        {
+            return false;
+        }
+        M2SplineKey<G3D::Vector3> const* positions = reinterpret_cast<M2SplineKey<G3D::Vector3> const*>(buffer + posArray->offset_elements);
+
+        // Read the data for this set
+        uint32 currPos = posArray->offset_elements;
+        for (uint32 i = 0; i < posTsArray->number; ++i)
+        {
+            if (currPos + sizeof(M2SplineKey<G3D::Vector3>) > buffSize)
+            {
+                return false;
+            }
+            // Translate co-ordinates
+            G3D::Vector3 newPos = TranslateLocation(&DBCData, &cam->position_base, &positions->p0);
+
+            // Add to vector
+            FlyByCamera thisCam;
+            thisCam.timeStamp = posTimestamps[i];
+            thisCam.locations.x = newPos.x;
+            thisCam.locations.y = newPos.y;
+            thisCam.locations.z = newPos.z;
+
+            if (targetcam.size() > 0)
+            {
+                // Find the target camera before and after this camera
+                FlyByCamera lastTarget;
+                FlyByCamera nextTarget;
+
+                // Pre-load first item
+                lastTarget = targetcam[0];
+                nextTarget = targetcam[0];
+                for (uint32 j = 0; j < targetcam.size(); ++j)
+                {
+                    nextTarget = targetcam[j];
+                    if (targetcam[j].timeStamp > posTimestamps[i])
+                    {
+                        break;
+                    }
+
+                    lastTarget = targetcam[j];
+                }
+
+                float x = lastTarget.locations.x;
+                float y = lastTarget.locations.y;
+                // float z = lastTarget.locations.z;
+
+                // Now, the timestamps for target cam and position can be different. So, if they differ we interpolate
+                if (lastTarget.timeStamp != posTimestamps[i])
+                {
+                    uint32 timeDiffTarget = nextTarget.timeStamp - lastTarget.timeStamp;
+                    uint32 timeDiffThis = posTimestamps[i] - lastTarget.timeStamp;
+                    float xDiff = nextTarget.locations.x - lastTarget.locations.x;
+                    float yDiff = nextTarget.locations.y - lastTarget.locations.y;
+                    // float zDiff = nextTarget.locations.z - lastTarget.locations.z;
+                    x = lastTarget.locations.x + (xDiff * (float(timeDiffThis) / float(timeDiffTarget)));
+                    y = lastTarget.locations.y + (yDiff * (float(timeDiffThis) / float(timeDiffTarget)));
+                    // z = lastTarget.locations.z + (zDiff * (float(timeDiffThis) / float(timeDiffTarget)));
+                }
+                float xDiff = x - thisCam.locations.x;
+                float yDiff = y - thisCam.locations.y;
+                thisCam.locations.w = std::atan2(yDiff, xDiff);
+
+                if (thisCam.locations.w < 0)
+                {
+                    thisCam.locations.w += 2 * float(M_PI);
+                }
+            }
+
+            cameras.push_back(thisCam);
+            positions++;
+            currPos += sizeof(M2SplineKey<G3D::Vector3>);
+        }
+    }
+
+    sFlyByCameraStore[dbcentry->id] = cameras;
+    return true;
+}
+
+void LoadM2Cameras(const std::string& dataPath)
+{
+    sFlyByCameraStore.clear();
+    LOG_INFO("server.loading", ">> Loading Cinematic Camera files");
+
+    uint32 oldMSTime = getMSTime();
+    for (uint32 i = 0; i < sCinematicCameraStore.GetNumRows(); ++i)
+    {
+        if (CinematicCameraEntry const* dbcentry = sCinematicCameraStore.LookupEntry(i))
+        {
+            std::string filename = dataPath.c_str();
+            filename.append(dbcentry->filename);
+
+            // Replace slashes
+            size_t loc = filename.find("\\");
+            while (loc != std::string::npos)
+            {
+                filename.replace(loc, 1, "/");
+                loc = filename.find("\\");
+            }
+
+            // Replace mdx to .m2
+            loc = filename.find(".mdx");
+            if (loc != std::string::npos)
+            {
+                filename.replace(loc, 4, ".m2");
+            }
+
+            std::ifstream m2file(filename.c_str(), std::ios::in | std::ios::binary);
+            if (!m2file.is_open())
+            {
+                continue;
+            }
+
+            // Get file size
+            m2file.seekg(0, std::ios::end);
+            std::streamoff const fileSize = m2file.tellg();
+
+            // Reject if not at least the size of the header
+            if (static_cast<uint32>(fileSize) < sizeof(M2Header))
+            {
+                LOG_ERROR("dbc", "Camera file %s is damaged. File is smaller than header size", filename.c_str());
+                m2file.close();
+                continue;
+            }
+
+            // Read 4 bytes (signature)
+            m2file.seekg(0, std::ios::beg);
+            char fileCheck[5];
+            m2file.read(fileCheck, 4);
+            fileCheck[4] = 0;
+
+            // Check file has correct magic (MD20)
+            if (strcmp(fileCheck, "MD20"))
+            {
+                LOG_ERROR("dbc", "Camera file %s is damaged. File identifier not found", filename.c_str());
+                m2file.close();
+                continue;
+            }
+
+            // Now we have a good file, read it all into a vector of char's, then close the file.
+            std::vector<char> buffer(fileSize);
+            m2file.seekg(0, std::ios::beg);
+            if (!m2file.read(buffer.data(), fileSize))
+            {
+                m2file.close();
+                continue;
+            }
+            m2file.close();
+
+            // Read header
+            M2Header const* header = reinterpret_cast<M2Header const*>(buffer.data());
+
+            if (header->ofsCameras + sizeof(M2Camera) > static_cast<uint32>(fileSize))
+            {
+                LOG_ERROR("dbc", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
+                continue;
+            }
+
+            // Get camera(s) - Main header, then dump them.
+            M2Camera const* cam = reinterpret_cast<M2Camera const*>(buffer.data() + header->ofsCameras);
+            if (!readCamera(cam, fileSize, header, dbcentry))
+            {
+                LOG_ERROR("dbc", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
+            }
+        }
+    }
+    LOG_INFO("server.loading", ">> Loaded %u cinematic waypoint sets in %u ms", (uint32)sFlyByCameraStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 SimpleFactionsList const* GetFactionTeamList(uint32 faction)
@@ -598,7 +903,7 @@ SimpleFactionsList const* GetFactionTeamList(uint32 faction)
     return nullptr;
 }
 
-char* GetPetName(uint32 petfamily, uint32 dbclang)
+char const* GetPetName(uint32 petfamily, uint32 dbclang)
 {
     if (!petfamily)
         return nullptr;
@@ -607,7 +912,7 @@ char* GetPetName(uint32 petfamily, uint32 dbclang)
     if (!pet_family)
         return nullptr;
 
-    return pet_family->Name[dbclang] ? pet_family->Name[dbclang] : nullptr;
+    return pet_family->Name[dbclang];
 }
 
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId)
@@ -622,7 +927,7 @@ TalentSpellPos const* GetTalentSpellPos(uint32 spellId)
 uint32 GetTalentSpellCost(uint32 spellId)
 {
     if (TalentSpellPos const* pos = GetTalentSpellPos(spellId))
-        return pos->rank+1;
+        return pos->rank + 1;
 
     return 0;
 }
@@ -633,7 +938,7 @@ WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid
     if (i != sWMOAreaInfoByTripple.end())
         return i->second;
 
-    return i->second;
+    return nullptr;
 }
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
@@ -659,9 +964,12 @@ ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId)
 
     switch (mapEntry->Expansion())
     {
-        default: return CONTENT_1_60;
-        case 1:  return CONTENT_61_70;
-        case 2:  return CONTENT_71_80;
+        default:
+            return CONTENT_1_60;
+        case 1:
+            return CONTENT_61_70;
+        case 2:
+            return CONTENT_71_80;
     }
 }
 
@@ -674,8 +982,8 @@ void Zone2MapCoordinates(float& x, float& y, uint32 zone)
         return;
 
     std::swap(x, y);                                         // at client map coords swapped
-    x = x*((maEntry->x2-maEntry->x1)/100)+maEntry->x1;
-    y = y*((maEntry->y2-maEntry->y1)/100)+maEntry->y1;      // client y coord from top to down
+    x = x * ((maEntry->x2 - maEntry->x1) / 100) + maEntry->x1;
+    y = y * ((maEntry->y2 - maEntry->y1) / 100) + maEntry->y1; // client y coord from top to down
 }
 
 void Map2ZoneCoordinates(float& x, float& y, uint32 zone)
@@ -686,8 +994,8 @@ void Map2ZoneCoordinates(float& x, float& y, uint32 zone)
     if (!maEntry)
         return;
 
-    x = (x-maEntry->x1)/((maEntry->x2-maEntry->x1)/100);
-    y = (y-maEntry->y1)/((maEntry->y2-maEntry->y1)/100);    // client y coord from top to down
+    x = (x - maEntry->x1) / ((maEntry->x2 - maEntry->x1) / 100);
+    y = (y - maEntry->y1) / ((maEntry->y2 - maEntry->y1) / 100); // client y coord from top to down
     std::swap(x, y);                                         // client have map coords swapped
 }
 
@@ -697,7 +1005,7 @@ MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
     return itr != sMapDifficultyMap.end() ? &itr->second : nullptr;
 }
 
-MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &difficulty)
+MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty& difficulty)
 {
     uint32 tmpDiff = difficulty;
 
@@ -760,7 +1068,7 @@ uint32 const* GetTalentTabPages(uint8 cls)
 }
 
 bool IsSharedDifficultyMap(uint32 mapid)
-{ 
+{
     return sWorld->getBoolConfig(CONFIG_INSTANCE_SHARED_ID) && (mapid == 631 || mapid == 724);
 }
 
@@ -804,4 +1112,25 @@ uint32 GetDefaultMapLight(uint32 mapId)
     }
 
     return 0;
+}
+
+SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
+{
+    SkillRaceClassInfoBounds bounds = SkillRaceClassInfoBySkill.equal_range(skill);
+    for (SkillRaceClassInfoMap::iterator itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        if (itr->second->RaceMask && !(itr->second->RaceMask & (1 << (race - 1))))
+        {
+            continue;
+        }
+
+        if (itr->second->ClassMask && !(itr->second->ClassMask & (1 << (class_ - 1))))
+        {
+            continue;
+        }
+
+        return itr->second;
+    }
+
+    return nullptr;
 }

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_DBCSTORES_H
@@ -11,11 +22,14 @@
 #include "DBCStore.h"
 #include "DBCStructure.h"
 #include <list>
+#include <unordered_map>
 
 typedef std::list<uint32> SimpleFactionsList;
+typedef std::vector<FlyByCamera> FlyByCameraCollection;
+
 SimpleFactionsList const* GetFactionTeamList(uint32 faction);
 
-char* GetPetName(uint32 petfamily, uint32 dbclang);
+char const* GetPetName(uint32 petfamily, uint32 dbclang);
 uint32 GetTalentSpellCost(uint32 spellId);
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
@@ -31,12 +45,12 @@ enum ContentLevels
 };
 ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId);
 
-void Zone2MapCoordinates(float &x, float &y, uint32 zone);
-void Map2ZoneCoordinates(float &x, float &y, uint32 zone);
+void Zone2MapCoordinates(float& x, float& y, uint32 zone);
+void Map2ZoneCoordinates(float& x, float& y, uint32 zone);
 
 typedef std::map<uint32/*pair32(map, diff)*/, MapDifficulty> MapDifficultyMap;
 MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty);
-MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &difficulty);
+MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty& difficulty);
 
 bool IsSharedDifficultyMap(uint32 mapid);
 
@@ -51,6 +65,10 @@ CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, ui
 
 LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty);
 uint32 GetDefaultMapLight(uint32 mapId);
+
+typedef std::unordered_multimap<uint32, SkillRaceClassInfoEntry const*> SkillRaceClassInfoMap;
+typedef std::pair<SkillRaceClassInfoMap::iterator, SkillRaceClassInfoMap::iterator> SkillRaceClassInfoBounds;
+SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_);
 
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
@@ -67,6 +85,7 @@ extern DBCStorage <CharStartOutfitEntry>         sCharStartOutfitStore;
 extern DBCStorage <CharTitlesEntry>              sCharTitlesStore;
 extern DBCStorage <ChrClassesEntry>              sChrClassesStore;
 extern DBCStorage <ChrRacesEntry>                sChrRacesStore;
+extern DBCStorage <CinematicCameraEntry>         sCinematicCameraStore;
 extern DBCStorage <CinematicSequencesEntry>      sCinematicSequencesStore;
 extern DBCStorage <CreatureDisplayInfoEntry>     sCreatureDisplayInfoStore;
 extern DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore;
@@ -125,6 +144,7 @@ extern DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore;
 extern DBCStorage <ScalingStatValuesEntry>       sScalingStatValuesStore;
 extern DBCStorage <SkillLineEntry>               sSkillLineStore;
 extern DBCStorage <SkillLineAbilityEntry>        sSkillLineAbilityStore;
+extern DBCStorage <SkillTiersEntry>              sSkillTiersStore;
 extern DBCStorage <SoundEntriesEntry>            sSoundEntriesStore;
 extern DBCStorage <SpellCastTimesEntry>          sSpellCastTimesStore;
 extern DBCStorage <SpellCategoryEntry>           sSpellCategoryStore;
@@ -140,6 +160,7 @@ extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;
 extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;
 extern DBCStorage <SpellShapeshiftEntry>         sSpellShapeshiftStore;
 extern DBCStorage <SpellEntry>                   sSpellStore;
+extern DBCStorage <SpellVisualEntry>             sSpellVisualStore;
 extern DBCStorage <StableSlotPricesEntry>        sStableSlotPricesStore;
 extern DBCStorage <SummonPropertiesEntry>        sSummonPropertiesStore;
 extern DBCStorage <TalentEntry>                  sTalentStore;
@@ -160,7 +181,9 @@ extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;
 extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 //extern DBCStorage <WorldMapAreaEntry>           sWorldMapAreaStore; -- use Zone2MapCoordinates and Map2ZoneCoordinates
 extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
+extern std::unordered_map<uint32, FlyByCameraCollection> sFlyByCameraStore;
 
 void LoadDBCStores(const std::string& dataPath);
+void LoadM2Cameras(const std::string& dataPath);
 
 #endif

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _UNITEVENTS
@@ -10,7 +21,7 @@
 #include "Common.h"
 
 class ThreatContainer;
-class ThreatManager;
+class ThreatMgr;
 class HostileReference;
 
 //==============================================================
@@ -19,25 +30,25 @@ class HostileReference;
 enum UNIT_EVENT_TYPE
 {
     // Player/Pet changed on/offline status
-    UEV_THREAT_REF_ONLINE_STATUS        = 1<<0,
+    UEV_THREAT_REF_ONLINE_STATUS        = 1 << 0,
 
     // Threat for Player/Pet changed
-    UEV_THREAT_REF_THREAT_CHANGE        = 1<<1,
+    UEV_THREAT_REF_THREAT_CHANGE        = 1 << 1,
 
     // Player/Pet will be removed from list (dead) [for internal use]
-    UEV_THREAT_REF_REMOVE_FROM_LIST     = 1<<2,
+    UEV_THREAT_REF_REMOVE_FROM_LIST     = 1 << 2,
 
     // Player/Pet entered/left  water or some other place where it is/was not accessible for the creature
-    UEV_THREAT_REF_ASSECCIBLE_STATUS    = 1<<3,
+    UEV_THREAT_REF_ASSECCIBLE_STATUS    = 1 << 3,
 
     // Threat list is going to be sorted (if dirty flag is set)
-    UEV_THREAT_SORT_LIST                = 1<<4,
+    UEV_THREAT_SORT_LIST                = 1 << 4,
 
     // New target should be fetched, could tbe the current target as well
-    UEV_THREAT_SET_NEXT_TARGET          = 1<<5,
+    UEV_THREAT_SET_NEXT_TARGET          = 1 << 5,
 
-    // A new victim (target) was set. Could be NULL
-    UEV_THREAT_VICTIM_CHANGED           = 1<<6,
+    // A new victim (target) was set. Could be nullptr
+    UEV_THREAT_VICTIM_CHANGED           = 1 << 6,
 
     // Future use
     //UEV_UNIT_KILLED                   = 1<<7,
@@ -57,69 +68,67 @@ enum UNIT_EVENT_TYPE
 
 class UnitBaseEvent
 {
-    private:
-        uint32 iType;
-    public:
-        UnitBaseEvent(uint32 pType) { iType = pType; }
-        uint32 getType() const { return iType; }
-        bool matchesTypeMask(uint32 pMask) const { return iType & pMask; }
+private:
+    uint32 iType;
+public:
+    UnitBaseEvent(uint32 pType) { iType = pType; }
+    [[nodiscard]] uint32 getType() const { return iType; }
+    [[nodiscard]] bool matchesTypeMask(uint32 pMask) const { return iType & pMask; }
 
-        void setType(uint32 pType) { iType = pType; }
-
+    void setType(uint32 pType) { iType = pType; }
 };
 
 //==============================================================
 
 class ThreatRefStatusChangeEvent : public UnitBaseEvent
 {
-    private:
-        HostileReference* iHostileReference;
-        union
-        {
-            float iFValue;
-            int32 iIValue;
-            bool iBValue;
-        };
-        ThreatManager* iThreatManager;
-    public:
-        ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType), iThreatManager(NULL) { iHostileReference = NULL; }
+private:
+    HostileReference* iHostileReference;
+    union
+    {
+        float iFValue;
+        int32 iIValue;
+        bool iBValue;
+    };
+    ThreatMgr* iThreatMgr;
+public:
+    ThreatRefStatusChangeEvent(uint32 pType) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = nullptr; }
 
-        ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference) : UnitBaseEvent(pType), iThreatManager(NULL) { iHostileReference = pHostileReference; }
+    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = pHostileReference; }
 
-        ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, float pValue) : UnitBaseEvent(pType), iThreatManager(NULL) { iHostileReference = pHostileReference; iFValue = pValue; }
+    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, float pValue) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = pHostileReference; iFValue = pValue; }
 
-        ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, bool pValue) : UnitBaseEvent(pType), iThreatManager(NULL) { iHostileReference = pHostileReference; iBValue = pValue; }
+    ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, bool pValue) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = pHostileReference; iBValue = pValue; }
 
-        int32 getIValue() const { return iIValue; }
+    [[nodiscard]] int32 getIValue() const { return iIValue; }
 
-        float getFValue() const { return iFValue; }
+    [[nodiscard]] float getFValue() const { return iFValue; }
 
-        bool getBValue() const { return iBValue; }
+    [[nodiscard]] bool getBValue() const { return iBValue; }
 
-        void setBValue(bool pValue) { iBValue = pValue; }
+    void setBValue(bool pValue) { iBValue = pValue; }
 
-        HostileReference* getReference() const { return iHostileReference; }
+    [[nodiscard]] HostileReference* getReference() const { return iHostileReference; }
 
-        void setThreatManager(ThreatManager* pThreatManager) { iThreatManager = pThreatManager; }
+    void setThreatMgr(ThreatMgr* pThreatMgr) { iThreatMgr = pThreatMgr; }
 
-        ThreatManager* getThreatManager() const { return iThreatManager; }
+    [[nodiscard]] ThreatMgr* getThreatMgr() const { return iThreatMgr; }
 };
 
 //==============================================================
 
-class ThreatManagerEvent : public ThreatRefStatusChangeEvent
+class ThreatMgrEvent : public ThreatRefStatusChangeEvent
 {
-    private:
-        ThreatContainer* iThreatContainer;
-    public:
-        ThreatManagerEvent(uint32 pType) : ThreatRefStatusChangeEvent(pType), iThreatContainer(NULL) {}
-        ThreatManagerEvent(uint32 pType, HostileReference* pHostileReference) : ThreatRefStatusChangeEvent(pType, pHostileReference), iThreatContainer(NULL) {}
+private:
+    ThreatContainer* iThreatContainer;
+public:
+    ThreatMgrEvent(uint32 pType) : ThreatRefStatusChangeEvent(pType), iThreatContainer(nullptr) {}
+    ThreatMgrEvent(uint32 pType, HostileReference* pHostileReference) : ThreatRefStatusChangeEvent(pType, pHostileReference), iThreatContainer(nullptr) {}
 
-        void setThreatContainer(ThreatContainer* pThreatContainer) { iThreatContainer = pThreatContainer; }
+    void setThreatContainer(ThreatContainer* pThreatContainer) { iThreatContainer = pThreatContainer; }
 
-        ThreatContainer* getThreatContainer() const { return iThreatContainer; }
+    [[nodiscard]] ThreatContainer* getThreatContainer() const { return iThreatContainer; }
 };
 
 //==============================================================
 #endif
-

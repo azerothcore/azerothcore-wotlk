@@ -1,29 +1,43 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "ScriptMgr.h"
+#include "gnomeregan.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 class instance_gnomeregan : public InstanceMapScript
 {
-    public:
-        instance_gnomeregan() : InstanceMapScript("instance_gnomeregan", 90) { }
+public:
+    instance_gnomeregan() : InstanceMapScript("instance_gnomeregan", 90) { }
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_gnomeregan_InstanceMapScript(map);
+    }
+
+    struct instance_gnomeregan_InstanceMapScript : public InstanceScript
+    {
+        instance_gnomeregan_InstanceMapScript(Map* map) : InstanceScript(map)
         {
-            return new instance_gnomeregan_InstanceMapScript(map);
         }
-
-        struct instance_gnomeregan_InstanceMapScript : public InstanceScript
-        {
-            instance_gnomeregan_InstanceMapScript(Map* map) : InstanceScript(map)
-            {
-            }
-        };
+    };
 };
 
 enum eKernobee
@@ -33,83 +47,82 @@ enum eKernobee
 
 class npc_kernobee : public CreatureScript
 {
-    public:
-        npc_kernobee() : CreatureScript("npc_kernobee") { }
+public:
+    npc_kernobee() : CreatureScript("npc_kernobee") { }
 
-        CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetGnomereganAI<npc_kernobeeAI>(creature);
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
+    {
+        if (quest->GetQuestId() == QUEST_A_FINE_MESS)
         {
-            return new npc_kernobeeAI(creature);
+            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            creature->AI()->SetGUID(player->GetGUID(), 0);
+            creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, M_PI, MOTION_SLOT_CONTROLLED);
+        }
+        return true;
+    }
+
+    struct npc_kernobeeAI : public PassiveAI
+    {
+        npc_kernobeeAI(Creature* creature) : PassiveAI(creature)
+        {
+            checkTimer = 0;
         }
 
-        bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+        uint32 checkTimer;
+        ObjectGuid playerGUID;
+
+        void SetGUID(ObjectGuid guid, int32) override
         {
-            if (quest->GetQuestId() == QUEST_A_FINE_MESS)
-            {
-                creature->SetStandState(UNIT_STAND_STATE_STAND);
-                creature->AI()->SetGUID(player->GetGUID(), 0);
-                creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, M_PI, MOTION_SLOT_CONTROLLED);
-            }
-            return true;
+            playerGUID = guid;
         }
 
-        struct npc_kernobeeAI : public PassiveAI
+        void UpdateAI(uint32 diff) override
         {
-            npc_kernobeeAI(Creature* creature) : PassiveAI(creature)
+            checkTimer += diff;
+            if (checkTimer >= 2000)
             {
-                playerGUID = 0;
                 checkTimer = 0;
-            }
-
-            uint32 checkTimer;
-            uint64 playerGUID;
-
-            void SetGUID(uint64 guid, int32)
-            {
-                playerGUID = guid;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                checkTimer += diff;
-                if (checkTimer >= 2000)
+                if (me->GetDistance(-332.2f, -2.8f, -152.8f) < 5.0f)
                 {
-                    checkTimer = 0;
-                    if (me->GetDistance(-332.2f, -2.8f, -152.8f) < 5.0f)
-                    {
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            player->GroupEventHappens(QUEST_A_FINE_MESS, me);
-                        me->DespawnOrUnsummon(1000);
-                    }
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                        player->GroupEventHappens(QUEST_A_FINE_MESS, me);
+                    me->DespawnOrUnsummon(1000);
                 }
             }
-        };
+        }
+    };
 };
 
 class spell_gnomeregan_radiation_bolt : public SpellScriptLoader
 {
-    public:
-        spell_gnomeregan_radiation_bolt() : SpellScriptLoader("spell_gnomeregan_radiation_bolt") { }
+public:
+    spell_gnomeregan_radiation_bolt() : SpellScriptLoader("spell_gnomeregan_radiation_bolt") { }
 
-        class spell_gnomeregan_radiation_bolt_SpellScript : public SpellScript
+    class spell_gnomeregan_radiation_bolt_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gnomeregan_radiation_bolt_SpellScript);
+
+        void HandleTriggerSpell(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_gnomeregan_radiation_bolt_SpellScript);
-
-            void HandleTriggerSpell(SpellEffIndex effIndex)
-            {
-                if (roll_chance_i(80))
-                    PreventHitDefaultEffect(effIndex);
-            }
-
-            void Register()
-            {
-                OnEffectHit += SpellEffectFn(spell_gnomeregan_radiation_bolt_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gnomeregan_radiation_bolt_SpellScript;
+            if (roll_chance_i(80))
+                PreventHitDefaultEffect(effIndex);
         }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_gnomeregan_radiation_bolt_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gnomeregan_radiation_bolt_SpellScript;
+    }
 };
 
 void AddSC_instance_gnomeregan()

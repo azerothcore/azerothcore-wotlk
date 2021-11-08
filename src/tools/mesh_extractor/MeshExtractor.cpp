@@ -1,10 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MPQManager.h"
+#include "MPQMgr.h"
 #include "WDT.h"
 #include "ContinentBuilder.h"
 #include "Cache.h"
@@ -20,7 +31,7 @@
 
 #include <set>
 
-MPQManager* MPQHandler;
+MPQMgr* MPQHandler;
 CacheClass* Cache;
 
 void ExtractMMaps(std::set<uint32>& mapIds, uint32 threads)
@@ -72,15 +83,15 @@ void ExtractDBCs()
     // Iterate over all available locales
     for (std::set<uint32>::iterator itr = MPQHandler->AvailableLocales.begin(); itr != MPQHandler->AvailableLocales.end(); ++itr)
     {
-        printf("Extracting DBCs for locale %s\n", MPQManager::Languages[*itr]);
+        printf("Extracting DBCs for locale %s\n", MPQMgr::Languages[*itr]);
         std::string path = baseDBCPath;
         if (*itr != uint32(MPQHandler->BaseLocale))
         {
-            path += std::string(MPQManager::Languages[*itr]) + "/";
+            path += std::string(MPQMgr::Languages[*itr]) + "/";
             Utils::CreateDir(path);
         }
 
-        std::string component = "component.wow-" + std::string(MPQManager::Languages[*itr]) + ".txt";
+        std::string component = "component.wow-" + std::string(MPQMgr::Languages[*itr]) + ".txt";
         // Extract the component file
         Utils::SaveToDisk(MPQHandler->GetFileFrom(component, MPQHandler->LocaleFiles[*itr]), path + component);
         // Extract the DBC files for the given locale
@@ -137,7 +148,7 @@ void ExtractGameobjectModels()
             fwrite(&numVerts, sizeof(uint32), 1, output);
             uint32 numGroups = 1;
             fwrite(&numGroups, sizeof(uint32), 1, output);
-            fwrite(Nop, 4 * 3 , 1, output); // rootwmoid, flags, groupid
+            fwrite(Nop, 4 * 3, 1, output);  // rootwmoid, flags, groupid
             fwrite(Nop, sizeof(float), 3 * 2, output);//bbox, only needed for WMO currently
             fwrite(Nop, 4, 1, output);// liquidflags
             fwrite("GRP ", 4, 1, output);
@@ -157,7 +168,7 @@ void ExtractGameobjectModels()
             if (numTris > 0)
             {
                 uint32 i = 0;
-                for (std::vector<Triangle<uint16> >::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
+                for (std::vector<Triangle<uint16>>::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
                 {
                     indices[i * 3 + 0] = itr2->V0;
                     indices[i * 3 + 1] = itr2->V1;
@@ -166,12 +177,11 @@ void ExtractGameobjectModels()
                 fwrite(indices, sizeof(uint16), numTris, output);
             }
 
-
             fwrite("VERT", 4, 1, output);
             wsize = sizeof(int) + sizeof(float) * 3 * numVerts;
             fwrite(&wsize, sizeof(int), 1, output);
             fwrite(&numVerts, sizeof(int), 1, output);
-            float* vertices = new float[numVerts*3];
+            float* vertices = new float[numVerts * 3];
 
             if (numVerts > 0)
             {
@@ -213,7 +223,7 @@ void ExtractGameobjectModels()
             fwrite(&model.Header.CountGroups, sizeof(uint32), 1, output);
             fwrite(&model.Header.WmoId, sizeof(uint32), 1, output);
 
-            const char grp[] = { 'G' , 'R' , 'P', ' ' };
+            const char grp[] = { 'G', 'R', 'P', ' ' };
             for (std::vector<WorldModelGroup>::iterator itr2 = model.Groups.begin(); itr2 != model.Groups.end(); ++itr2)
             {
                 const WMOGroupHeader& header = itr2->Header;
@@ -227,9 +237,9 @@ void ExtractGameobjectModels()
                 fwrite(grp, sizeof(char), sizeof(grp), output);
                 uint32 k = 0;
                 uint32 mobaBatch = itr2->MOBALength / 12;
-                uint32* MobaEx = new uint32[mobaBatch*4];
+                uint32* MobaEx = new uint32[mobaBatch * 4];
 
-                for(uint32 i = 8; i < itr2->MOBALength; i += 12)
+                for (uint32 i = 8; i < itr2->MOBALength; i += 12)
                     MobaEx[k++] = itr2->MOBA[i];
 
                 int mobaSizeGrp = mobaBatch * 4 + 4;
@@ -252,7 +262,7 @@ void ExtractGameobjectModels()
 
 bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapList, bool& debugOutput, uint32& extractFlags)
 {
-    char* param = NULL;
+    char* param = nullptr;
     extractFlags = 0;
 
     for (int i = 1; i < argc; ++i)
@@ -277,9 +287,9 @@ bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapLis
             while (token)
             {
                 mapList.insert(atoi(token));
-                token = strtok(NULL, ",");
+                token = strtok(nullptr, ",");
             }
-            
+
             free(copy);
 
             printf("Extracting only provided list of maps (%u).\n", uint32(mapList.size()));
@@ -345,7 +355,7 @@ void LoadTile(dtNavMesh*& navMesh, const char* tile)
     if (fread(nav, header.size, 1, f) != 1)
         return;
 
-    navMesh->addTile(nav, header.size, DT_TILE_FREE_DATA, 0, NULL);
+    navMesh->addTile(nav, header.size, DT_TILE_FREE_DATA, 0, nullptr);
 
     fclose(f);
 }
@@ -370,7 +380,7 @@ int main(int argc, char* argv[])
     }
 
     Cache = new CacheClass();
-    MPQHandler = new MPQManager();
+    MPQHandler = new MPQMgr();
     MPQHandler->Initialize();
 
     if (extractFlags & Constants::EXTRACT_FLAG_DBC)
@@ -400,7 +410,7 @@ int main(int argc, char* argv[])
         m_epos[2] = -end[0];
 
         //
-        dtQueryFilter m_filter;
+        dtQueryFilterExt m_filter;
         m_filter.setIncludeFlags(Constants::POLY_AREA_ROAD | Constants::POLY_AREA_TERRAIN);
         m_filter.setExcludeFlags(Constants::POLY_AREA_WATER);
 
@@ -437,7 +447,7 @@ int main(int argc, char* argv[])
                 LoadTile(navMesh, buff);
             }
         }
-        
+
         navMeshQuery->init(navMesh, 2048);
 
         float nearestPt[3];
@@ -454,9 +464,9 @@ int main(int argc, char* argv[])
         int hops;
         dtPolyRef* hopBuffer = new dtPolyRef[8192];
         dtStatus status = navMeshQuery->findPath(m_startRef, m_endRef, m_spos, m_epos, &m_filter, hopBuffer, &hops, 8192);
-        
+
         int resultHopCount;
-        float* straightPath = new float[2048*3];
+        float* straightPath = new float[2048 * 3];
         unsigned char* pathFlags = new unsigned char[2048];
         dtPolyRef* pathRefs = new dtPolyRef[2048];
 

@@ -1,7 +1,18 @@
- /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,11 +28,11 @@ npc_thrall
 npc_tyrande_whisperwind
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "hyjalAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 #define GOSSIP_ITEM_BEGIN_ALLY      "My companions and I are with you, Lady Proudmoore."
 #define GOSSIP_ITEM_ANETHERON       "We are ready for whatever Archimonde might send our way, Lady Proudmoore."
@@ -58,7 +69,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 3:
                 ai->Retreat();
                 break;
-             case GOSSIP_ACTION_INFO_DEF:
+            case GOSSIP_ACTION_INFO_DEF:
                 ai->Debug = !ai->Debug;
                 //TC_LOG_DEBUG("scripts", "HyjalAI - Debug mode has been toggled");
                 break;
@@ -91,7 +102,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         if (!creature->GetInstanceScript())
-            return NULL;
+            return nullptr;
 
         hyjalAI* ai = new hyjalAI(creature);
 
@@ -112,7 +123,6 @@ public:
 
         return ai;
     }
-
 };
 
 class npc_thrall : public CreatureScript
@@ -176,7 +186,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         if (!creature->GetInstanceScript())
-            return NULL;
+            return nullptr;
 
         hyjalAI* ai = new hyjalAI(creature);
 
@@ -193,7 +203,6 @@ public:
 
         return ai;
     }
-
 };
 
 class npc_tyrande_whisperwind : public CreatureScript
@@ -204,7 +213,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         if (!creature->GetInstanceScript())
-            return NULL;
+            return nullptr;
 
         hyjalAI* ai = new hyjalAI(creature);
         ai->Reset();
@@ -217,13 +226,13 @@ public:
         ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF)
         {
-                ItemPosCountVec dest;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_TEAR_OF_GODDESS, 1);
-                if (msg == EQUIP_ERR_OK)
-                     if (Item* item = player->StoreNewItem(dest, ITEM_TEAR_OF_GODDESS, true))
-                         player->SendNewItem(item, 1, true, false, true);
+            ItemPosCountVec dest;
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_TEAR_OF_GODDESS, 1);
+            if (msg == EQUIP_ERR_OK)
+                if (Item* item = player->StoreNewItem(dest, ITEM_TEAR_OF_GODDESS, true))
+                    player->SendNewItem(item, 1, true, false, true);
 
-                SendGossipMenuFor(player, 907, creature->GetGUID());
+            SendGossipMenuFor(player, 907, creature->GetGUID());
         }
         return true;
     }
@@ -239,7 +248,6 @@ public:
         SendGossipMenuFor(player, 907, creature->GetGUID());
         return true;
     }
-
 };
 
 void AddSC_hyjal()

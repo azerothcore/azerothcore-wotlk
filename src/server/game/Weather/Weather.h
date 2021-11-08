@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /// \addtogroup world
@@ -52,29 +63,27 @@ enum WeatherState
 /// Weather for one zone
 class Weather
 {
-    public:
+public:
+    Weather(uint32 zone, WeatherData const* weatherChances);
+    ~Weather() = default;
 
-        Weather(uint32 zone, WeatherData const* weatherChances);
-        ~Weather() { };
+    bool Update(uint32 diff);
+    bool ReGenerate();
+    bool UpdateWeather();
 
-        bool Update(uint32 diff);
-        bool ReGenerate();
-        bool UpdateWeather();
+    void SendWeatherUpdateToPlayer(Player* player);
+    void SetWeather(WeatherType type, float grade);
 
-        void SendWeatherUpdateToPlayer(Player* player);
-        void SetWeather(WeatherType type, float grade);
+    /// For which zone is this weather?
+    [[nodiscard]] uint32 GetZone() const { return m_zone; };
+    [[nodiscard]] uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
 
-        /// For which zone is this weather?
-        uint32 GetZone() const { return m_zone; };
-        uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
-
-    private:
-
-        WeatherState GetWeatherState() const;
-        uint32 m_zone;
-        WeatherType m_type;
-        float m_grade;
-        IntervalTimer m_timer;
-        WeatherData const* m_weatherChances;
+private:
+    [[nodiscard]] WeatherState GetWeatherState() const;
+    uint32 m_zone;
+    WeatherType m_type;
+    float m_grade;
+    IntervalTimer m_timer;
+    WeatherData const* m_weatherChances;
 };
 #endif

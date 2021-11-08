@@ -1,9 +1,26 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef DEF_ONYXIAS_LAIR_H
 #define DEF_ONYXIAS_LAIR_H
+
+#include "CreatureAIImpl.h"
+
+#define OnyxiasLairScriptName "instance_onyxias_lair"
 
 enum eInstanceData
 {
@@ -34,5 +51,11 @@ enum eAchievementData
     ACHIEV_CRITERIA_DEEP_BREATH_25_PLAYER                   = 12569, // Criteria for achievement 4407: She Deep Breaths More (25 player) Everybody evade Deep Breath
     ACHIEV_TIMED_START_EVENT                                =  6601, // Timed event for achievement 4402, 4005: More Dots! (10,25 player) 5 min kill
 };
+
+template <class AI, class T>
+inline AI* GetOnyxiasLairAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, OnyxiasLairScriptName);
+}
 
 #endif

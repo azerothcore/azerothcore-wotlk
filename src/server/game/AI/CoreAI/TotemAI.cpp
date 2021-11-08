@@ -1,19 +1,29 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "TotemAI.h"
-#include "Totem.h"
+#include "CellImpl.h"
 #include "Creature.h"
 #include "DBCStores.h"
-#include "ObjectAccessor.h"
-#include "SpellMgr.h"
-
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "ObjectAccessor.h"
+#include "SpellMgr.h"
+#include "Totem.h"
+#include "TotemAI.h"
 
 int TotemAI::Permissible(Creature const* creature)
 {
@@ -23,7 +33,7 @@ int TotemAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature* c) : CreatureAI(c), i_victimGuid(0)
+TotemAI::TotemAI(Creature* c) : CreatureAI(c)
 {
     ASSERT(c->IsTotem());
 }
@@ -64,17 +74,22 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
     // SPELLMOD_RANGE not applied in this place just because not existence range mods for attacking totems
 
     // pointer to appropriate target if found any
-    Unit* victim = i_victimGuid ? ObjectAccessor::GetUnit(*me, i_victimGuid) : NULL;
+    Unit* victim = i_victimGuid ? ObjectAccessor::GetUnit(*me, i_victimGuid) : nullptr;
 
     // Search victim if no, not attackable, or out of range, or friendly (possible in case duel end)
     if (!victim ||
-        !victim->isTargetableForAttack(true, me) || !me->IsWithinDistInMap(victim, max_range) ||
-        me->IsFriendlyTo(victim) || !me->CanSeeOrDetect(victim))
+            !victim->isTargetableForAttack(true, me) || !me->IsWithinDistInMap(victim, max_range) ||
+            me->IsFriendlyTo(victim) || !me->CanSeeOrDetect(victim))
     {
-        victim = NULL;
-        acore::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
-        acore::UnitLastSearcher<acore::NearestAttackableUnitInObjectRangeCheck> checker(me, victim, u_check);
-        me->VisitNearbyObject(max_range, checker);
+        victim = nullptr;
+        Acore::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
+        Acore::UnitLastSearcher<Acore::NearestAttackableUnitInObjectRangeCheck> checker(me, victim, u_check);
+        Cell::VisitAllObjects(me, checker, max_range);
+    }
+
+    if (!victim && me->GetCharmerOrOwnerOrSelf()->IsInCombat())
+    {
+        victim = me->GetCharmerOrOwnerOrSelf()->getAttackerForHelper();
     }
 
     // If have target
@@ -88,7 +103,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         me->CastSpell(victim, me->ToTotem()->GetSpell(), false);
     }
     else
-        i_victimGuid = 0;
+        i_victimGuid.Clear();
 }
 
 void TotemAI::AttackStart(Unit* /*victim*/)
@@ -96,7 +111,7 @@ void TotemAI::AttackStart(Unit* /*victim*/)
     // Sentry totem sends ping on attack
     if (me->GetEntry() == SENTRY_TOTEM_ENTRY && me->GetOwner()->GetTypeId() == TYPEID_PLAYER)
     {
-        WorldPacket data(MSG_MINIMAP_PING, (8+4+4));
+        WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
         data << me->GetGUID();
         data << me->GetPositionX();
         data << me->GetPositionY();

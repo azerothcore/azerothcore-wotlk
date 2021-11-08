@@ -1,22 +1,36 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef ICECROWN_CITADEL_H_
 #define ICECROWN_CITADEL_H_
 
-#include "Player.h"
 #include "Chat.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "Map.h"
 #include "Creature.h"
-#include "SpellMgr.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "InstanceScript.h"
-#include "ScriptedGossip.h"
+#include "Map.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
 
 #define ICCScriptName "instance_icecrown_citadel"
 
@@ -346,7 +360,7 @@ enum CreaturesIds
     NPC_SPIRIT_BOMB                             = 39189,
     NPC_FROSTMOURNE_TRIGGER                     = 38584,
     NPC_TERENAS_MENETHIL_OUTRO                  = 38579,
-    
+
     // Generic
     NPC_INVISIBLE_STALKER                       = 30298,
     NPC_SPIRE_FROSTWYRM                         = 37230,
@@ -373,7 +387,7 @@ enum GameObjectsIds
     // Lady Deathwhisper
     GO_ORATORY_OF_THE_DAMNED_ENTRANCE       = 201563,
     GO_LADY_DEATHWHISPER_ELEVATOR           = 202220,
-  
+
     // Icecrown Gunship Battle - Horde raid
     GO_ORGRIMS_HAMMER_H                     = 201812,
     GO_THE_SKYBREAKER_H                     = 201811,
@@ -569,53 +583,49 @@ enum ItemIds
 
 class spell_trigger_spell_from_caster : public SpellScriptLoader
 {
+public:
+    spell_trigger_spell_from_caster(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId) { }
+
+    class spell_trigger_spell_from_caster_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_trigger_spell_from_caster_SpellScript);
+
     public:
-        spell_trigger_spell_from_caster(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId) { }
+        spell_trigger_spell_from_caster_SpellScript(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
 
-        class spell_trigger_spell_from_caster_SpellScript : public SpellScript
+        bool Validate(SpellInfo const* /*spell*/) override
         {
-            PrepareSpellScript(spell_trigger_spell_from_caster_SpellScript);
-
-        public:
-            spell_trigger_spell_from_caster_SpellScript(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(_triggerId))
-                    return false;
-                return true;
-            }
-
-            void HandleTrigger()
-            {
-                GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
-            }
-
-            void Register()
-            {
-                AfterHit += SpellHitFn(spell_trigger_spell_from_caster_SpellScript::HandleTrigger);
-            }
-
-            uint32 _triggerId;
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_trigger_spell_from_caster_SpellScript(_triggerId);
+            return ValidateSpellInfo({ _triggerId });
         }
 
-    private:
+        void HandleTrigger()
+        {
+            GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_trigger_spell_from_caster_SpellScript::HandleTrigger);
+        }
+
         uint32 _triggerId;
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_trigger_spell_from_caster_SpellScript(_triggerId);
+    }
+
+private:
+    uint32 _triggerId;
 };
 
-template<class AI>
-CreatureAI* GetIcecrownCitadelAI(Creature* creature)
+template <class AI, class T>
+inline AI* GetIcecrownCitadelAI(T* obj)
 {
-    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
-        if (instance->GetInstanceScript())
-            if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
-                return new AI(creature);
-    return NULL;
+    return GetInstanceAI<AI>(obj, ICCScriptName);
 }
+
+#define RegisterIcecrownCitadelCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetIcecrownCitadelAI)
 
 #endif // ICECROWN_CITADEL_H_

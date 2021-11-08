@@ -1,13 +1,33 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef DEF_OCULUS_H
 #define DEF_OCULUS_H
 
-#include "SpellScript.h"
-#include "SpellAuras.h"
+#include "CreatureAIImpl.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+
+#define OculusScriptName "instance_oculus"
+
+Position const VerdisaPOS = { 949.056f, 1032.97f, 359.967f, 1.035795f };
+Position const BelgaristraszPOS = { 941.355f, 1044.26f,  359.967f, 0.222459f };
+Position const EternosPOS = { 943.202f, 1059.35f, 359.967f, 5.757278f };
 
 enum Data
 {
@@ -45,6 +65,11 @@ enum NPCs
     NPC_IMAGE_OF_BELGARISTRASZ = 28012,
 };
 
+enum Talks
+{
+    SAY_BELGARISTRASZ = 0,
+};
+
 enum Items
 {
     ITEM_EMERALD_ESSENCE    = 37815,
@@ -77,5 +102,16 @@ enum OculusWorldStates
     WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW   = 3524,
     WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT = 3486
 };
+
+enum MISC
+{
+    POINT_MOVE_DRAKES
+};
+
+template <class AI, class T>
+inline AI* GetOculusAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, OculusScriptName);
+}
 
 #endif

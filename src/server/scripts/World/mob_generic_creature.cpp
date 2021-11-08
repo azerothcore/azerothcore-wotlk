@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,9 +22,9 @@ SDComment: Should be replaced with core based AI
 SDCategory: Creatures
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 #define GENERIC_CREATURE_COOLDOWN   5000
 
@@ -30,20 +41,20 @@ public:
         uint32 BuffTimer;           //This variable keeps track of buffs
         bool IsSelfRooted;
 
-        void Reset()
+        void Reset() override
         {
             GlobalCooldown = 0;
             BuffTimer = 0;          //Rebuff as soon as we can
             IsSelfRooted = false;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (!me->IsWithinMeleeRange(who))
                 IsSelfRooted = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Always decrease our global cooldown first
             if (GlobalCooldown > diff)
@@ -70,7 +81,8 @@ public:
                         BuffTimer = 600000;
                     }//Try agian in 30 seconds
                     else BuffTimer = 30000;
-                } else BuffTimer -= diff;
+                }
+                else BuffTimer -= diff;
             }
 
             //Return since we have no target
@@ -84,7 +96,7 @@ public:
                 if (me->isAttackReady() && !me->IsNonMeleeSpellCast(false))
                 {
                     bool Healing = false;
-                    SpellInfo const* info = NULL;
+                    SpellInfo const* info = nullptr;
 
                     //Select a healing spell if less than 30% hp
                     if (HealthBelowPct(30))
@@ -115,7 +127,7 @@ public:
                 if (!me->IsNonMeleeSpellCast(false))
                 {
                     bool Healing = false;
-                    SpellInfo const* info = NULL;
+                    SpellInfo const* info = nullptr;
 
                     //Select a healing spell if less than 30% hp ONLY 33% of the time
                     if (HealthBelowPct(30) && rand() % 3 == 0)
@@ -138,7 +150,6 @@ public:
 
                         //Set our global cooldown
                         GlobalCooldown = GENERIC_CREATURE_COOLDOWN;
-
                     }//If no spells available and we arn't moving run to target
                     else if (IsSelfRooted)
                     {
@@ -151,7 +162,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new generic_creatureAI(creature);
     }
@@ -166,7 +177,7 @@ public:
     {
         trigger_periodicAI(Creature* creature) : NullCreatureAI(creature)
         {
-            spell = me->m_spells[0] ? sSpellMgr->GetSpellInfo(me->m_spells[0]) : NULL;
+            spell = me->m_spells[0] ? sSpellMgr->GetSpellInfo(me->m_spells[0]) : nullptr;
             interval = me->GetAttackTime(BASE_ATTACK);
             timer = interval;
         }
@@ -174,7 +185,7 @@ public:
         uint32 timer, interval;
         const SpellInfo* spell;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer <= diff)
             {
@@ -187,7 +198,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new trigger_periodicAI(creature);
     }
@@ -201,14 +212,14 @@ public:
     struct trigger_deathAI : public NullCreatureAI
     {
         trigger_deathAI(Creature* creature) : NullCreatureAI(creature) { }
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (me->m_spells[0])
                 me->CastSpell(killer, me->m_spells[0], true);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new trigger_deathAI(creature);
     }

@@ -1,12 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blackrock_spire.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -36,28 +47,28 @@ public:
     {
         boss_halyconAI(Creature* creature) : BossAI(creature, DATA_HALYCON) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             Summoned = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_REND, urand(17000,20000));
-            events.ScheduleEvent(EVENT_THRASH, urand(10000,12000));
+            events.ScheduleEvent(EVENT_REND, urand(17000, 20000));
+            events.ScheduleEvent(EVENT_THRASH, urand(10000, 12000));
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
-            me->SummonCreature(NPC_GIZRUL_THE_SLAVENER, SummonLocation, TEMPSUMMON_TIMED_DESPAWN, 300000);
+            me->SummonCreature(NPC_GIZRUL_THE_SLAVENER, SummonLocation, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
             Talk(EMOTE_DEATH);
 
             Summoned = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -73,7 +84,7 @@ public:
                 {
                     case EVENT_REND:
                         DoCastVictim(SPELL_REND);
-                        events.ScheduleEvent(EVENT_REND, urand(8000,10000));
+                        events.ScheduleEvent(EVENT_REND, urand(8000, 10000));
                         break;
                     case EVENT_THRASH:
                         DoCast(me, SPELL_THRASH);
@@ -84,13 +95,13 @@ public:
             }
             DoMeleeAttackIfReady();
         }
-        private:
-            bool Summoned;
+    private:
+        bool Summoned;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_halyconAI(creature);
+        return GetBlackrockSpireAI<boss_halyconAI>(creature);
     }
 };
 

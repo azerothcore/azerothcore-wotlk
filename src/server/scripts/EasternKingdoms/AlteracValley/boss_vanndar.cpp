@@ -1,18 +1,29 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
     YELL_AGGRO                                    = 0,
     YELL_EVADE                                    = 1,
-  //YELL_RESPAWN1                                 = -1810010, // Missing in database
-  //YELL_RESPAWN2                                 = -1810011, // Missing in database
+    //YELL_RESPAWN1                                 = -1810010, // Missing in database
+    //YELL_RESPAWN2                                 = -1810011, // Missing in database
     YELL_RANDOM                                   = 2,
     YELL_SPELL                                    = 3,
 };
@@ -39,7 +50,7 @@ public:
         uint32 ResetTimer;
         uint32 YellTimer;
 
-        void Reset()
+        void Reset() override
         {
             AvatarTimer        = 3 * IN_MILLISECONDS;
             ThunderclapTimer   = 4 * IN_MILLISECONDS;
@@ -48,12 +59,12 @@ public:
             YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -62,25 +73,29 @@ public:
             {
                 DoCastVictim(SPELL_AVATAR);
                 AvatarTimer =  urand(15 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            } else AvatarTimer -= diff;
+            }
+            else AvatarTimer -= diff;
 
             if (ThunderclapTimer <= diff)
             {
                 DoCastVictim(SPELL_THUNDERCLAP);
                 ThunderclapTimer = urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else ThunderclapTimer -= diff;
+            }
+            else ThunderclapTimer -= diff;
 
             if (StormboltTimer <= diff)
             {
                 DoCastVictim(SPELL_STORMBOLT);
                 StormboltTimer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-            } else StormboltTimer -= diff;
+            }
+            else StormboltTimer -= diff;
 
             if (YellTimer <= diff)
             {
                 Talk(YELL_RANDOM);
                 YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
-            } else YellTimer -= diff;
+            }
+            else YellTimer -= diff;
 
             // check if creature is not outside of building
             if (ResetTimer <= diff)
@@ -91,13 +106,14 @@ public:
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;
-            } else ResetTimer -= diff;
+            }
+            else ResetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_vanndarAI(creature);
     }

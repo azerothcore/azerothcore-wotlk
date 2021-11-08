@@ -1,27 +1,44 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "Chat.h"
 #include "ScriptMgr.h"
 #include "Language.h"
-#include "Player.h"
 #include "PlayerCommand.h"
 
-class player_commandscript : public CommandScript, public PlayerCommand
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
+class player_commandscript : public CommandScript
 {
 public:
     player_commandscript() : CommandScript("player_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> playerCommandTable =
+        static ChatCommandTable playerCommandTable =
         {
             { "learn",               SEC_GAMEMASTER,  true, &HandlePlayerLearnCommand,           "" },
             { "unlearn",             SEC_GAMEMASTER,  true, &HandlePlayerUnLearnCommand,         "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "player",              SEC_GAMEMASTER,  true, nullptr,                             "", playerCommandTable }
         };
@@ -34,17 +51,22 @@ public:
             return false;
 
         char* playerName = strtok((char*)args, " ");
-        char* spellid = strtok(nullptr, " ");
+        char* spellId = strtok(nullptr, " ");
         char const* all = strtok(nullptr, " ");
         Player* targetPlayer = FindPlayer(handler, playerName);
-        if (!spellid || !targetPlayer)
+        if (!spellId || !targetPlayer)
+        {
             return false;
+        }
 
-        uint32 spell = handler->extractSpellIdFromLink(spellid);
+        uint32 spell = handler->extractSpellIdFromLink(spellId);
+
         if (!spell)
+        {
             return false;
+        }
 
-        return Learn(handler, targetPlayer, spell, all);
+        return Acore::PlayerCommand::HandleLearnSpellCommand(handler, targetPlayer, spell, all);
     }
 
     static bool HandlePlayerUnLearnCommand(ChatHandler* handler, char const* args)
@@ -53,17 +75,23 @@ public:
             return false;
 
         char* playerName = strtok((char*)args, " ");
-        char* spellid = strtok(nullptr, " ");
+        char* spellId = strtok(nullptr, " ");
         char const* all = strtok(nullptr, " ");
         Player* targetPlayer = FindPlayer(handler, playerName);
-        if (!spellid || !targetPlayer)
-            return false;
 
-        uint32 spell = handler->extractSpellIdFromLink(spellid);
+        if (!spellId || !targetPlayer)
+        {
+            return false;
+        }
+
+        uint32 spell = handler->extractSpellIdFromLink(spellId);
+
         if (!spell)
+        {
             return false;
+        }
 
-        return UnLearn(handler, targetPlayer, spell, all);
+        return Acore::PlayerCommand::HandleUnlearnSpellCommand(handler, targetPlayer, spell, all);
     }
 
 private:

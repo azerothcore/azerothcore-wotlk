@@ -1,19 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_GAMEOBJECT_H
 #define AZEROTHCORE_GAMEOBJECT_H
 
 #include "Common.h"
-#include "SharedDefines.h"
-#include "Unit.h"
-#include "Object.h"
-#include "LootMgr.h"
 #include "DatabaseEnv.h"
 #include "G3D/Quat.h"
+#include "LootMgr.h"
+#include "Object.h"
+#include "SharedDefines.h"
+#include "Unit.h"
 
 class GameObjectAI;
 class Transport;
@@ -392,157 +403,228 @@ struct GameObjectTemplate
     bool IsForQuests; // pussywizard
 
     // helpers
-    bool IsDespawnAtAction() const
+    [[nodiscard]] bool IsDespawnAtAction() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_CHEST:  return chest.consumable;
-            case GAMEOBJECT_TYPE_GOOBER: return goober.consumable;
-            default: return false;
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.consumable;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.consumable;
+            default:
+                return false;
         }
     }
 
-    bool IsUsableMounted() const
+    [[nodiscard]] bool IsUsableMounted() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.allowMounted;
-            case GAMEOBJECT_TYPE_TEXT: return text.allowMounted;
-            case GAMEOBJECT_TYPE_GOOBER: return goober.allowMounted;
-            case GAMEOBJECT_TYPE_SPELLCASTER: return spellcaster.allowMounted;
-            default: return false;
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+                return questgiver.allowMounted;
+            case GAMEOBJECT_TYPE_TEXT:
+                return text.allowMounted;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.allowMounted;
+            case GAMEOBJECT_TYPE_SPELLCASTER:
+                return spellcaster.allowMounted;
+            default:
+                return false;
         }
     }
 
-    uint32 GetLockId() const
+    [[nodiscard]] uint32 GetLockId() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_DOOR:       return door.lockId;
-            case GAMEOBJECT_TYPE_BUTTON:     return button.lockId;
-            case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.lockId;
-            case GAMEOBJECT_TYPE_CHEST:      return chest.lockId;
-            case GAMEOBJECT_TYPE_TRAP:       return trap.lockId;
-            case GAMEOBJECT_TYPE_GOOBER:     return goober.lockId;
-            case GAMEOBJECT_TYPE_AREADAMAGE: return areadamage.lockId;
-            case GAMEOBJECT_TYPE_CAMERA:     return camera.lockId;
-            case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.lockId;
-            case GAMEOBJECT_TYPE_FISHINGHOLE:return fishinghole.lockId;
-            case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.lockId;
-            default: return 0;
+            case GAMEOBJECT_TYPE_DOOR:
+                return door.lockId;
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.lockId;
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+                return questgiver.lockId;
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.lockId;
+            case GAMEOBJECT_TYPE_TRAP:
+                return trap.lockId;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.lockId;
+            case GAMEOBJECT_TYPE_AREADAMAGE:
+                return areadamage.lockId;
+            case GAMEOBJECT_TYPE_CAMERA:
+                return camera.lockId;
+            case GAMEOBJECT_TYPE_FLAGSTAND:
+                return flagstand.lockId;
+            case GAMEOBJECT_TYPE_FISHINGHOLE:
+                return fishinghole.lockId;
+            case GAMEOBJECT_TYPE_FLAGDROP:
+                return flagdrop.lockId;
+            default:
+                return 0;
         }
     }
 
-    bool GetDespawnPossibility() const                      // despawn at targeting of cast?
+    [[nodiscard]] bool GetDespawnPossibility() const                      // despawn at targeting of cast?
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_DOOR:       return door.noDamageImmune;
-            case GAMEOBJECT_TYPE_BUTTON:     return button.noDamageImmune;
-            case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.noDamageImmune;
-            case GAMEOBJECT_TYPE_GOOBER:     return goober.noDamageImmune;
-            case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.noDamageImmune;
-            case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.noDamageImmune;
-            default: return true;
+            case GAMEOBJECT_TYPE_DOOR:
+                return door.noDamageImmune;
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.noDamageImmune;
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+                return questgiver.noDamageImmune;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.noDamageImmune;
+            case GAMEOBJECT_TYPE_FLAGSTAND:
+                return flagstand.noDamageImmune;
+            case GAMEOBJECT_TYPE_FLAGDROP:
+                return flagdrop.noDamageImmune;
+            default:
+                return true;
         }
     }
 
-    uint32 GetCharges() const                               // despawn at uses amount
+    [[nodiscard]] uint32 GetCharges() const                               // despawn at uses amount
     {
         switch (type)
         {
             //case GAMEOBJECT_TYPE_TRAP:        return trap.charges;
-            case GAMEOBJECT_TYPE_GUARDPOST:   return guardpost.charges;
-            case GAMEOBJECT_TYPE_SPELLCASTER: return spellcaster.charges;
-            default: return 0;
+            case GAMEOBJECT_TYPE_GUARDPOST:
+                return guardpost.charges;
+            case GAMEOBJECT_TYPE_SPELLCASTER:
+                return spellcaster.charges;
+            default:
+                return 0;
         }
     }
 
-    uint32 GetLinkedGameObjectEntry() const
+    [[nodiscard]] uint32 GetLinkedGameObjectEntry() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_CHEST:       return chest.linkedTrapId;
-            case GAMEOBJECT_TYPE_SPELL_FOCUS: return spellFocus.linkedTrapId;
-            case GAMEOBJECT_TYPE_GOOBER:      return goober.linkedTrapId;
-            default: return 0;
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.linkedTrap;
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.linkedTrapId;
+            case GAMEOBJECT_TYPE_SPELL_FOCUS:
+                return spellFocus.linkedTrapId;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.linkedTrapId;
+            default:
+                return 0;
         }
     }
 
-    uint32 GetAutoCloseTime() const
+    [[nodiscard]] uint32 GetAutoCloseTime() const
     {
         uint32 autoCloseTime = 0;
         switch (type)
         {
-            case GAMEOBJECT_TYPE_DOOR:          autoCloseTime = door.autoCloseTime; break;
-            case GAMEOBJECT_TYPE_BUTTON:        autoCloseTime = button.autoCloseTime; break;
-            case GAMEOBJECT_TYPE_TRAP:          autoCloseTime = trap.autoCloseTime; break;
-            case GAMEOBJECT_TYPE_GOOBER:        autoCloseTime = goober.autoCloseTime; break;
-            case GAMEOBJECT_TYPE_TRANSPORT:     autoCloseTime = transport.autoCloseTime; break;
-            case GAMEOBJECT_TYPE_AREADAMAGE:    autoCloseTime = areadamage.autoCloseTime; break;
-            default: break;
+            case GAMEOBJECT_TYPE_DOOR:
+                autoCloseTime = door.autoCloseTime;
+                break;
+            case GAMEOBJECT_TYPE_BUTTON:
+                autoCloseTime = button.autoCloseTime;
+                break;
+            case GAMEOBJECT_TYPE_TRAP:
+                autoCloseTime = trap.autoCloseTime;
+                break;
+            case GAMEOBJECT_TYPE_GOOBER:
+                autoCloseTime = goober.autoCloseTime;
+                break;
+            case GAMEOBJECT_TYPE_TRANSPORT:
+                autoCloseTime = transport.autoCloseTime;
+                break;
+            case GAMEOBJECT_TYPE_AREADAMAGE:
+                autoCloseTime = areadamage.autoCloseTime;
+                break;
+            default:
+                break;
         }
         return autoCloseTime /* xinef: changed to milliseconds/ IN_MILLISECONDS*/;              // prior to 3.0.3, conversion was / 0x10000;
     }
 
-    uint32 GetLootId() const
+    [[nodiscard]] uint32 GetLootId() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_CHEST:       return chest.lootId;
-            case GAMEOBJECT_TYPE_FISHINGHOLE: return fishinghole.lootId;
-            default: return 0;
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.lootId;
+            case GAMEOBJECT_TYPE_FISHINGHOLE:
+                return fishinghole.lootId;
+            default:
+                return 0;
         }
     }
 
-    uint32 GetGossipMenuId() const
+    [[nodiscard]] uint32 GetGossipMenuId() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_QUESTGIVER:    return questgiver.gossipID;
-            case GAMEOBJECT_TYPE_GOOBER:        return goober.gossipID;
-            default: return 0;
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+                return questgiver.gossipID;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.gossipID;
+            default:
+                return 0;
         }
     }
 
-    uint32 GetEventScriptId() const
+    [[nodiscard]] uint32 GetEventScriptId() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_GOOBER:        return goober.eventId;
-            case GAMEOBJECT_TYPE_CHEST:         return chest.eventId;
-            case GAMEOBJECT_TYPE_CAMERA:        return camera.eventID;
-            default: return 0;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.eventId;
+            case GAMEOBJECT_TYPE_CHEST:
+                return chest.eventId;
+            case GAMEOBJECT_TYPE_CAMERA:
+                return camera.eventID;
+            default:
+                return 0;
         }
     }
 
-    uint32 GetCooldown() const                              // Cooldown preventing goober and traps to cast spell
+    [[nodiscard]] uint32 GetCooldown() const                              // Cooldown preventing goober and traps to cast spell
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_TRAP:        return trap.cooldown;
-            case GAMEOBJECT_TYPE_GOOBER:      return goober.cooldown;
-            default: return 0;
+            case GAMEOBJECT_TYPE_TRAP:
+                return trap.cooldown;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.cooldown;
+            default:
+                return 0;
         }
     }
 
-    bool IsLargeGameObject() const
+    [[nodiscard]] bool IsLargeGameObject() const
     {
         switch (type)
         {
-            case GAMEOBJECT_TYPE_BUTTON:            return button.large != 0;
-            case GAMEOBJECT_TYPE_QUESTGIVER:        return questgiver.large != 0;
-            case GAMEOBJECT_TYPE_GENERIC:           return _generic.large != 0;
-            case GAMEOBJECT_TYPE_TRAP:              return trap.large != 0;
-            case GAMEOBJECT_TYPE_SPELL_FOCUS:       return spellFocus.large != 0;
-            case GAMEOBJECT_TYPE_GOOBER:            return goober.large != 0;
-            case GAMEOBJECT_TYPE_SPELLCASTER:       return spellcaster.large != 0;
-            case GAMEOBJECT_TYPE_CAPTURE_POINT:     return capturePoint.large != 0;
-            default: return false;
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.large != 0;
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+                return questgiver.large != 0;
+            case GAMEOBJECT_TYPE_GENERIC:
+                return _generic.large != 0;
+            case GAMEOBJECT_TYPE_TRAP:
+                return trap.large != 0;
+            case GAMEOBJECT_TYPE_SPELL_FOCUS:
+                return spellFocus.large != 0;
+            case GAMEOBJECT_TYPE_GOOBER:
+                return goober.large != 0;
+            case GAMEOBJECT_TYPE_SPELLCASTER:
+                return spellcaster.large != 0;
+            case GAMEOBJECT_TYPE_CAPTURE_POINT:
+                return capturePoint.large != 0;
+            default:
+                return false;
         }
     }
 
-    bool IsGameObjectForQuests() const
+    [[nodiscard]] bool IsGameObjectForQuests() const
     {
         return IsForQuests;
     }
@@ -581,7 +663,7 @@ union GameObjectValue
     //29 GAMEOBJECT_TYPE_CAPTURE_POINT
     struct
     {
-        OPvPCapturePoint *OPvPObj;
+        OPvPCapturePoint* OPvPObj;
     } CapturePoint;
     //33 GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING
     struct
@@ -593,8 +675,8 @@ union GameObjectValue
 
 struct GameObjectLocale
 {
-    StringVector Name;
-    StringVector CastBarCaption;
+    std::vector<std::string> Name;
+    std::vector<std::string> CastBarCaption;
 };
 
 // `gameobject_addon` table
@@ -619,22 +701,22 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData() : id(0), mapid(0), phaseMask(0), posX(0.0f), posY(0.0f), posZ(0.0f), orientation(0.0f), spawntimesecs(0),
-                                animprogress(0), go_state(GO_STATE_ACTIVE), spawnMask(0), artKit(0), dbData(true) { }
-    uint32 id;                                              // entry in gamobject_template
-    uint16 mapid;
-    uint32 phaseMask;
-    float posX;
-    float posY;
-    float posZ;
-    float orientation;
+    explicit GameObjectData()  { }
+    uint32 id{0};                                              // entry in gamobject_template
+    uint16 mapid{0};
+    uint32 phaseMask{0};
+    float posX{0.0f};
+    float posY{0.0f};
+    float posZ{0.0f};
+    float orientation{0.0f};
     G3D::Quat rotation;
-    int32  spawntimesecs;
-    uint32 animprogress;
-    GOState go_state;
-    uint8 spawnMask;
-    uint8 artKit;
-    bool dbData;
+    int32  spawntimesecs{0};
+    uint32 ScriptId;
+    uint32 animprogress{0};
+    GOState go_state{GO_STATE_ACTIVE};
+    uint8 spawnMask{0};
+    uint8 artKit{0};
+    bool dbData{true};
 };
 
 typedef std::vector<uint32> GameObjectQuestItemList;
@@ -660,276 +742,295 @@ class GameObjectModel;
 
 class GameObject : public WorldObject, public GridObject<GameObject>, public MovableMapObject
 {
-    public:
-        explicit GameObject();
-        ~GameObject();
+public:
+    explicit GameObject();
+    ~GameObject() override;
 
-        void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const override;
+    void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const override;
 
-        void AddToWorld() override;
-        void RemoveFromWorld() override;
-        void CleanupsBeforeDelete(bool finalCleanup = true) override;
+    void AddToWorld() override;
+    void RemoveFromWorld() override;
+    void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
-        virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
-        void Update(uint32 p_time) override;
-        GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
-        GameObjectTemplateAddon const* GetTemplateAddon() const;
-        GameObjectData const* GetGOData() const { return m_goData; }
-        GameObjectValue const* GetGOValue() const { return &m_goValue; }
+    virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
+    void Update(uint32 p_time) override;
+    [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
+    [[nodiscard]] GameObjectTemplateAddon const* GetTemplateAddon() const;
+    [[nodiscard]] GameObjectData const* GetGOData() const { return m_goData; }
+    [[nodiscard]] GameObjectValue const* GetGOValue() const { return &m_goValue; }
 
-        bool IsTransport() const;
-        bool IsDestructibleBuilding() const;
+    [[nodiscard]] bool IsTransport() const;
+    [[nodiscard]] bool IsDestructibleBuilding() const;
 
-        uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
-        // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
-        void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
-        void SetWorldRotation(G3D::Quat const& rot);
-        void SetTransportPathRotation(float qx, float qy, float qz, float qw);
-        int64 GetPackedWorldRotation() const { return m_packedRotation; }
+    // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
+    void SetLocalRotationAngles(float z_rot, float y_rot, float x_rot);
+    void SetLocalRotation(G3D::Quat const& rot);
+    void SetTransportPathRotation(float qx, float qy, float qz, float qw);
+    [[nodiscard]] G3D::Quat const& GetLocalRotation() const { return m_localRotation; }
+    [[nodiscard]] int64 GetPackedLocalRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat GetWorldRotation() const;
 
-        // overwrite WorldObject function for proper name localization
-        std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
+    // overwrite WorldObject function for proper name localization
+    [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
 
-        void SaveToDB();
-        void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
-        bool LoadFromDB(uint32 guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
-        bool LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap = true);
-        void DeleteFromDB();
+    void SaveToDB(bool saveAddon = false);
+    void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon = false);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
+    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
+    void DeleteFromDB();
 
-        void SetOwnerGUID(uint64 owner)
+    void SetOwnerGUID(ObjectGuid owner)
+    {
+        // Owner already found and different than expected owner - remove object from old owner
+        if (owner && GetOwnerGUID() && GetOwnerGUID() != owner)
         {
-            // Owner already found and different than expected owner - remove object from old owner
-            if (owner && GetOwnerGUID() && GetOwnerGUID() != owner)
-            {
-                ABORT();
-            }
-            m_spawnedByDefault = false;                     // all object with owner is despawned after delay
-            SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
+            ABORT();
         }
-        uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
-        Unit* GetOwner() const;
+        m_spawnedByDefault = false;                     // all object with owner is despawned after delay
+        SetGuidValue(OBJECT_FIELD_CREATED_BY, owner);
+    }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] Unit* GetOwner() const;
 
-        void SetSpellId(uint32 id)
-        {
-            m_spawnedByDefault = false;                     // all summoned object is despawned after delay
-            m_spellId = id;
-        }
-        uint32 GetSpellId() const { return m_spellId;}
+    void SetSpellId(uint32 id)
+    {
+        m_spawnedByDefault = false;                     // all summoned object is despawned after delay
+        m_spellId = id;
+    }
+    [[nodiscard]] uint32 GetSpellId() const { return m_spellId;}
 
-        time_t GetRespawnTime() const { return m_respawnTime; }
-        time_t GetRespawnTimeEx() const
-        {
-            time_t now = time(NULL);
-            if (m_respawnTime > now)
-                return m_respawnTime;
-            else
-                return now;
-        }
+    [[nodiscard]] time_t GetRespawnTime() const { return m_respawnTime; }
+    [[nodiscard]] time_t GetRespawnTimeEx() const
+    {
+        time_t now = time(nullptr);
+        if (m_respawnTime > now)
+            return m_respawnTime;
+        else
+            return now;
+    }
 
-        void SetRespawnTime(int32 respawn)
-        {
-            m_respawnTime = respawn > 0 ? time(NULL) + respawn : 0;
-            m_respawnDelayTime = respawn > 0 ? respawn : 0;
-        }
-        void Respawn();
-        bool isSpawned() const
-        {
-            return m_respawnDelayTime == 0 ||
-                (m_respawnTime > 0 && !m_spawnedByDefault) ||
-                (m_respawnTime == 0 && m_spawnedByDefault);
-        }
-        bool isSpawnedByDefault() const { return m_spawnedByDefault; }
-        void SetSpawnedByDefault(bool b) { m_spawnedByDefault = b; }
-        uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
-        void Refresh();
-        void Delete();
-        void getFishLoot(Loot* loot, Player* loot_owner);
-        void getFishLootJunk(Loot* loot, Player* loot_owner);
-        GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
-        void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
-        GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
-        void SetGoState(GOState state);
-        uint8 GetGoArtKit() const { return GetByteValue(GAMEOBJECT_BYTES_1, 2); }
-        void SetGoArtKit(uint8 artkit);
-        uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
-        void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
-        static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
+    void SetRespawnTime(int32 respawn);
+    void SetRespawnDelay(int32 respawn);
+    void Respawn();
+    [[nodiscard]] bool isSpawned() const
+    {
+        return m_respawnDelayTime == 0 ||
+               (m_respawnTime > 0 && !m_spawnedByDefault) ||
+               (m_respawnTime == 0 && m_spawnedByDefault);
+    }
+    [[nodiscard]] bool isSpawnedByDefault() const { return m_spawnedByDefault; }
+    void SetSpawnedByDefault(bool b) { m_spawnedByDefault = b; }
+    [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
+    void Refresh();
+    void DespawnOrUnsummon(Milliseconds delay = 0ms, Seconds forcedRespawnTime = 0s);
+    void Delete();
+    void GetFishLoot(Loot* loot, Player* loot_owner);
+    void GetFishLootJunk(Loot* loot, Player* loot_owner);
+    [[nodiscard]] GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
+    void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
+    [[nodiscard]] GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
+    void SetGoState(GOState state);
+    [[nodiscard]] uint8 GetGoArtKit() const { return GetByteValue(GAMEOBJECT_BYTES_1, 2); }
+    void SetGoArtKit(uint8 artkit);
+    [[nodiscard]] uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
+    void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
+    static void SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid = 0);
 
-        void SetPhaseMask(uint32 newPhaseMask, bool update) override;
-        void EnableCollision(bool enable);
+    void SetPhaseMask(uint32 newPhaseMask, bool update) override;
+    void EnableCollision(bool enable);
 
-        void Use(Unit* user);
+    void Use(Unit* user);
 
-        LootState getLootState() const { return m_lootState; }
-        // Note: unit is only used when s = GO_ACTIVATED
-        void SetLootState(LootState s, Unit* unit = NULL);
+    [[nodiscard]] LootState getLootState() const { return m_lootState; }
+    // Note: unit is only used when s = GO_ACTIVATED
+    void SetLootState(LootState s, Unit* unit = nullptr);
 
-        uint16 GetLootMode() const { return m_LootMode; }
-        bool HasLootMode(uint16 lootMode) const { return m_LootMode & lootMode; }
-        void SetLootMode(uint16 lootMode) { m_LootMode = lootMode; }
-        void AddLootMode(uint16 lootMode) { m_LootMode |= lootMode; }
-        void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
-        void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
+    [[nodiscard]] uint16 GetLootMode() const { return m_LootMode; }
+    [[nodiscard]] bool HasLootMode(uint16 lootMode) const { return m_LootMode & lootMode; }
+    void SetLootMode(uint16 lootMode) { m_LootMode = lootMode; }
+    void AddLootMode(uint16 lootMode) { m_LootMode |= lootMode; }
+    void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
+    void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-        void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
-        bool IsInSkillupList(uint32 PlayerGuidLow) const
-        {
-            for (std::list<uint32>::const_iterator i = m_SkillupList.begin(); i != m_SkillupList.end(); ++i)
-                if (*i == PlayerGuidLow)
-                    return true;
+    void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
+    {
+        for (ObjectGuid const& guid : m_SkillupList)
+            if (guid == playerGuid)
+                return true;
 
-            return false;
-        }
-        void ClearSkillupList() { m_SkillupList.clear(); }
+        return false;
+    }
+    void ClearSkillupList() { m_SkillupList.clear(); }
 
-        void AddUniqueUse(Player* player);
-        void AddUse() { ++m_usetimes; }
+    void AddUniqueUse(Player* player);
+    void AddUse() { ++m_usetimes; }
 
-        uint32 GetUseCount() const { return m_usetimes; }
-        uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
+    [[nodiscard]] uint32 GetUseCount() const { return m_usetimes; }
+    [[nodiscard]] uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
 
-        void SaveRespawnTime() override;
+    void SaveRespawnTime() override { SaveRespawnTime(0); }
+    void SaveRespawnTime(uint32 forceDelay);
 
-        Loot        loot;
+    Loot        loot;
 
-        Player* GetLootRecipient() const;
-        Group* GetLootRecipientGroup() const;
-        void SetLootRecipient(Unit* unit);
-        bool IsLootAllowedFor(Player const* player) const;
-        bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
-        uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
-        uint32 lootingGroupLowGUID;                         // used to find group which is looting
-        void SetLootGenerationTime() { m_lootGenerationTime = time(NULL); }
-        uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
+    [[nodiscard]] Player* GetLootRecipient() const;
+    [[nodiscard]] Group* GetLootRecipientGroup() const;
+    void SetLootRecipient(Creature* creature);
+    void SetLootRecipient(Map* map);
+    bool IsLootAllowedFor(Player const* player) const;
+    [[nodiscard]] bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
+    uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
+    uint32 lootingGroupLowGUID;                         // used to find group which is looting
+    void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
+    [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
-        bool hasQuest(uint32 quest_id) const override;
-        bool hasInvolvedQuest(uint32 quest_id) const override;
-        bool ActivateToQuest(Player* target) const;
-        void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false, Unit* user = NULL);
-                                                            // 0 = use `gameobject`.`spawntimesecs`
-        void ResetDoorOrButton();
+    [[nodiscard]] GameObject* GetLinkedTrap();
+    void SetLinkedTrap(GameObject* linkedTrap) { m_linkedTrap = linkedTrap->GetGUID(); }
 
-        void TriggeringLinkedGameObject(uint32 trapEntry, Unit* target);
+    [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
+    [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id) const override;
+    bool ActivateToQuest(Player* target) const;
+    void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false, Unit* user = nullptr);
+    // 0 = use `gameobject`.`spawntimesecs`
+    void ResetDoorOrButton();
 
-        bool IsNeverVisible() const override;
-        bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
-        bool IsInvisibleDueToDespawn() const override;
+    void TriggeringLinkedGameObject(uint32 trapEntry, Unit* target);
 
-        uint8 getLevelForTarget(WorldObject const* target) const override
-        {
-            if (Unit* owner = GetOwner())
-                return owner->getLevelForTarget(target);
+    [[nodiscard]] bool IsNeverVisible() const override;
+    bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
+    [[nodiscard]] bool IsInvisibleDueToDespawn() const override;
 
-            return 1;
-        }
+    uint8 getLevelForTarget(WorldObject const* target) const override
+    {
+        if (Unit* owner = GetOwner())
+            return owner->getLevelForTarget(target);
 
-        GameObject* LookupFishingHoleAround(float range);
+        return 1;
+    }
 
-        void CastSpell(Unit* target, uint32 spell);
-        void SendCustomAnim(uint32 anim);
-        bool IsInRange(float x, float y, float z, float radius) const;
+    GameObject* LookupFishingHoleAround(float range);
 
-        void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = NULL) override; // pussywizard!
+    void CastSpell(Unit* target, uint32 spell);
+    void SendCustomAnim(uint32 anim);
+    [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
 
-        void ModifyHealth(int32 change, Unit* attackerOrHealer = NULL, uint32 spellId = 0);
-        void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
-        // sets GameObject type 33 destruction flags and optionally default health for that state
-        void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = NULL, bool setHealth = false);
-        GameObjectDestructibleState GetDestructibleState() const
-        {
-            if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
-                return GO_DESTRUCTIBLE_DESTROYED;
-            if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED))
-                return GO_DESTRUCTIBLE_DAMAGED;
-            return GO_DESTRUCTIBLE_INTACT;
-        }
+    void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
 
-        void EventInform(uint32 eventId);
+    void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
+    void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
+    // sets GameObject type 33 destruction flags and optionally default health for that state
+    void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = nullptr, bool setHealth = false);
+    [[nodiscard]] GameObjectDestructibleState GetDestructibleState() const
+    {
+        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED))
+            return GO_DESTRUCTIBLE_DESTROYED;
+        if (HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED))
+            return GO_DESTRUCTIBLE_DAMAGED;
+        return GO_DESTRUCTIBLE_INTACT;
+    }
 
-        virtual uint32 GetScriptId() const { return GetGOInfo()->ScriptId; }
-        GameObjectAI* AI() const { return m_AI; }
+    void EventInform(uint32 eventId);
 
-        std::string GetAIName() const;
-        void SetDisplayId(uint32 displayid);
-        uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
+    [[nodiscard]] virtual uint32 GetScriptId() const;
+    [[nodiscard]] GameObjectAI* AI() const { return m_AI; }
 
-        GameObjectModel* m_model;
-        void GetRespawnPosition(float &x, float &y, float &z, float* ori = NULL) const;
+    [[nodiscard]] std::string GetAIName() const;
+    void SetDisplayId(uint32 displayid);
+    [[nodiscard]] uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
 
-        void SetPosition(float x, float y, float z, float o);
-        void SetPosition(const Position &pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
+    GameObjectModel* m_model;
+    void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr) const;
 
-        bool IsStaticTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT; }
-        bool IsMotionTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT; }
+    void SetPosition(float x, float y, float z, float o);
+    void SetPosition(const Position& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
 
-        Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport*>(this); else return NULL; }
-        Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return NULL; }
+    [[nodiscard]] bool IsStaticTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT; }
+    [[nodiscard]] bool IsMotionTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT; }
 
-        StaticTransport* ToStaticTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport*>(this); else return NULL; }
-        StaticTransport const* ToStaticTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport const*>(this); else return NULL; }
+    Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport*>(this); else return nullptr; }
+    [[nodiscard]] Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return nullptr; }
 
-        MotionTransport* ToMotionTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport*>(this); else return NULL; }
-        MotionTransport const* ToMotionTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport const*>(this); else return NULL; }
+    StaticTransport* ToStaticTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport*>(this); else return nullptr; }
+    [[nodiscard]] StaticTransport const* ToStaticTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<StaticTransport const*>(this); else return nullptr; }
 
-        float GetStationaryX() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionX(); return GetPositionX(); }
-        float GetStationaryY() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
-        float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
-        float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
+    MotionTransport* ToMotionTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport*>(this); else return nullptr; }
+    [[nodiscard]] MotionTransport const* ToMotionTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<MotionTransport const*>(this); else return nullptr; }
 
-        float GetInteractionDistance();
-  
-        void UpdateModelPosition();
+    [[nodiscard]] float GetStationaryX() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionX(); return GetPositionX(); }
+    [[nodiscard]] float GetStationaryY() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionY(); return GetPositionY(); }
+    [[nodiscard]] float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
+    [[nodiscard]] float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
 
-        static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
+    [[nodiscard]] float GetInteractionDistance() const;
 
-    protected:
-        bool AIM_Initialize();
-        void UpdateModel();                                 // updates model in case displayId were changed
-        uint32      m_spellId;
-        time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
-        uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
-        LootState   m_lootState;
-        bool        m_spawnedByDefault;
-        uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
-                                                            // For traps this: spell casting cooldown, for doors/buttons: reset time.
-        std::list<uint32> m_SkillupList;
+    void UpdateModelPosition();
 
-        uint32 m_ritualOwnerGUIDLow;                              // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
-        std::set<uint64> m_unique_users;
-        uint32 m_usetimes;
+    [[nodiscard]] bool IsAtInteractDistance(Position const& pos, float radius) const;
+    [[nodiscard]] bool IsAtInteractDistance(Player const* player, SpellInfo const* spell = nullptr) const;
 
-        typedef std::map<uint32, uint64> ChairSlotAndUser;
-        ChairSlotAndUser ChairListSlots;
+    [[nodiscard]] bool IsWithinDistInMap(Player const* player) const;
+    using WorldObject::IsWithinDistInMap;
 
-        uint32 m_DBTableGuid;                               ///< For new or temporary gameobjects is 0 for saved it is lowguid
-        GameObjectTemplate const* m_goInfo;
-        GameObjectData const* m_goData;
-        GameObjectValue m_goValue;
-        bool m_allowModifyDestructibleBuilding;
+    [[nodiscard]] SpellInfo const* GetSpellForLock(Player const* player) const;
 
-        int64 m_packedRotation;
-        G3D::Quat m_worldRotation;
-        Position m_stationaryPosition;
+    static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
-        uint64 m_lootRecipient;
-        uint32 m_lootRecipientGroup;
-        uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
-        uint32 m_lootGenerationTime;
-    private:
-        void CheckRitualList();
-        void ClearRitualList();
-        void RemoveFromOwner();
-        void SwitchDoorOrButton(bool activate, bool alternative = false);
-        void UpdatePackedRotation();
+protected:
+    bool AIM_Initialize();
+    GameObjectModel* CreateModel();
+    void UpdateModel();                                 // updates model in case displayId were changed
+    uint32      m_spellId;
+    time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
+    uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
+    uint32      m_despawnDelay;
+    Seconds     m_despawnRespawnTime;                   // override respawn time after delayed despawn
+    LootState   m_lootState;
+    bool        m_spawnedByDefault;
+    uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
+    // For traps this: spell casting cooldown, for doors/buttons: reset time.
+    GuidList m_SkillupList;
 
-        //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const override
-        {
-            //! Following check does check 3d distance
-            dist2compare += obj->GetObjectSize();
-            return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
-        }
-        GameObjectAI* m_AI;
+    ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
+    GuidSet m_unique_users;
+    uint32 m_usetimes;
+
+    typedef std::map<uint32, ObjectGuid> ChairSlotAndUser;
+    ChairSlotAndUser ChairListSlots;
+
+    ObjectGuid::LowType m_spawnId;                            ///< For new or temporary gameobjects is 0 for saved it is lowguid
+    GameObjectTemplate const* m_goInfo;
+    GameObjectData const* m_goData;
+    GameObjectValue m_goValue;
+    bool m_allowModifyDestructibleBuilding;
+
+    int64 m_packedRotation;
+    G3D::Quat m_localRotation;
+    Position m_stationaryPosition;
+
+    ObjectGuid m_lootRecipient;
+    ObjectGuid::LowType m_lootRecipientGroup;
+    uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
+    uint32 m_lootGenerationTime;
+
+    ObjectGuid m_linkedTrap;
+
+private:
+    void CheckRitualList();
+    void ClearRitualList();
+    void RemoveFromOwner();
+    void SwitchDoorOrButton(bool activate, bool alternative = false);
+    void UpdatePackedRotation();
+
+    //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
+    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*useBoundingRadius = true*/) const override
+    {
+        //! Following check does check 3d distance
+        dist2compare += obj->GetObjectSize();
+        return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
+    }
+    GameObjectAI* m_AI;
 };
 #endif

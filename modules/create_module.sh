@@ -31,7 +31,7 @@ then
     git init && git add -A && git commit -m "Initial commit - $MODULE_NAME"
 
     echo "--- Configure git for nice commit messages"
-    source $GIT_COMMIT_MSG_SETUP || bash $GIT_COMMIT_MSG_SETUP
+    source "$GIT_COMMIT_MSG_SETUP" || bash "$GIT_COMMIT_MSG_SETUP"
 
     echo "--- Ready to code"
 fi

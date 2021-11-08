@@ -1,23 +1,31 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DBCDatabaseLoader.h"
-#include "Common.h"
 #include "DatabaseEnv.h"
+#include "DBCDatabaseLoader.h"
 #include "Errors.h"
-#include "Log.h"
 #include "StringFormat.h"
-#include <sstream>
 
 DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcFormatString, std::vector<char*>& stringPool)
     : _sqlTableName(tableName),
-    _dbcFormat(dbcFormatString),
-    _sqlIndexPos(0),
-    _recordSize(0),
-    _stringPool(stringPool)
+      _dbcFormat(dbcFormatString),
+      _sqlIndexPos(0),
+      _recordSize(0),
+      _stringPool(stringPool)
 {
     // Get sql index position
     int32 indexPos = -1;
@@ -28,7 +36,7 @@ DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcForma
 
 char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 {
-    std::string query = acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
+    std::string query = Acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
 
     // no error if empty set
     QueryResult result = WorldDatabase.Query(query.c_str());
@@ -47,7 +55,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     uint32 indexTableSize = std::max(records, (*result)[_sqlIndexPos].GetUInt32() + 1);
     if (indexTableSize > records)
     {
-        char** tmpIdxTable = new char*[indexTableSize];
+        char** tmpIdxTable = new char* [indexTableSize];
         memset(tmpIdxTable, 0, indexTableSize * sizeof(char*));
         memcpy(tmpIdxTable, indexTable, records * sizeof(char*));
         delete[] indexTable;
@@ -77,29 +85,29 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
         {
             switch (*dbcFormat)
             {
-            case FT_FLOAT:
-                *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetFloat();
-                dataOffset += sizeof(float);
-                break;
-            case FT_IND:
-            case FT_INT:
-                *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt32();
-                dataOffset += sizeof(uint32);
-                break;
-            case FT_BYTE:
-                *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt8();
-                dataOffset += sizeof(uint8);
-                break;
-            case FT_STRING:
-                *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].GetString());
-                dataOffset += sizeof(char*);
-                break;
-            case FT_SORT:
-            case FT_NA:
-                break;
-            default:
-                ASSERT(false, "Unsupported data type '%c' in table '%s'", *dbcFormat, _sqlTableName);
-                return nullptr;
+                case FT_FLOAT:
+                    *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetFloat();
+                    dataOffset += sizeof(float);
+                    break;
+                case FT_IND:
+                case FT_INT:
+                    *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt32();
+                    dataOffset += sizeof(uint32);
+                    break;
+                case FT_BYTE:
+                    *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt8();
+                    dataOffset += sizeof(uint8);
+                    break;
+                case FT_STRING:
+                    *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].GetString());
+                    dataOffset += sizeof(char*);
+                    break;
+                case FT_SORT:
+                case FT_NA:
+                    break;
+                default:
+                    ASSERT(false, "Unsupported data type '%c' in table '%s'", *dbcFormat, _sqlTableName);
+                    return nullptr;
             }
 
             ++sqlColumnNumber;

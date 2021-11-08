@@ -1,13 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _ARENATEAMMGR_H
 #define _ARENATEAMMGR_H
 
 #include "ArenaTeam.h"
+
+constexpr uint32 MAX_ARENA_TEAM_ID = 0xFFF00000;
+constexpr uint32 MAX_TEMP_ARENA_TEAM_ID = 0xFFFFFFFE;
 
 class ArenaTeamMgr
 {
@@ -21,7 +35,9 @@ public:
 
     ArenaTeam* GetArenaTeamById(uint32 arenaTeamId) const;
     ArenaTeam* GetArenaTeamByName(std::string const& arenaTeamName) const;
-    ArenaTeam* GetArenaTeamByCaptain(uint64 guid) const;
+    ArenaTeam* GetArenaTeamByCaptain(ObjectGuid guid) const;
+    ArenaTeam* GetArenaTeamByName(std::string const& arenaTeamName, const uint32 type) const;
+    ArenaTeam* GetArenaTeamByCaptain(ObjectGuid guid, const uint32 type) const;
 
     void LoadArenaTeams();
     void AddArenaTeam(ArenaTeam* arenaTeam);
@@ -29,6 +45,7 @@ public:
 
     ArenaTeamContainer::iterator GetArenaTeamMapBegin() { return ArenaTeamStore.begin(); }
     ArenaTeamContainer::iterator GetArenaTeamMapEnd()   { return ArenaTeamStore.end(); }
+    ArenaTeamContainer& GetArenaTeams() { return ArenaTeamStore; }
 
     void DistributeArenaPoints();
 
@@ -38,8 +55,11 @@ public:
     uint32 GetNextArenaLogId() { return ++LastArenaLogId; }
     void SetLastArenaLogId(uint32 id) { LastArenaLogId = id; }
 
+    uint32 GenerateTempArenaTeamId();
+
 protected:
     uint32 NextArenaTeamId;
+    uint32 NextTempArenaTeamId;
     ArenaTeamContainer ArenaTeamStore;
     uint32 LastArenaLogId;
 };

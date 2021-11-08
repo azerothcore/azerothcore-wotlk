@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SC_SYSTEM_H
@@ -48,32 +60,32 @@ typedef std::vector<ScriptPointMove> ScriptPointVector;
 
 class SystemMgr
 {
-        SystemMgr() {}
-        ~SystemMgr() {}
+    SystemMgr() {}
+    ~SystemMgr() {}
 
-    public:
-        static SystemMgr* instance();
+public:
+    static SystemMgr* instance();
 
-        typedef std::unordered_map<uint32, ScriptPointVector> PointMoveMap;
+    typedef std::unordered_map<uint32, ScriptPointVector> PointMoveMap;
 
-        //Database
-        void LoadScriptWaypoints();
+    //Database
+    void LoadScriptWaypoints();
 
-        ScriptPointVector const& GetPointMoveList(uint32 creatureEntry) const
-        {
-            PointMoveMap::const_iterator itr = m_mPointMoveMap.find(creatureEntry);
+    ScriptPointVector const& GetPointMoveList(uint32 creatureEntry) const
+    {
+        PointMoveMap::const_iterator itr = m_mPointMoveMap.find(creatureEntry);
 
-            if (itr == m_mPointMoveMap.end())
-                return _empty;
+        if (itr == m_mPointMoveMap.end())
+            return _empty;
 
-            return itr->second;
-        }
+        return itr->second;
+    }
 
-    protected:
-        PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
+protected:
+    PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
 
-    private:
-        static ScriptPointVector const _empty;
+private:
+    static ScriptPointVector const _empty;
 };
 
 #define sScriptSystemMgr SystemMgr::instance()

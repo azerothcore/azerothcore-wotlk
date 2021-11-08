@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Geometry.h"
@@ -70,13 +81,13 @@ void Geometry::CalculateMinMaxHeight( float& min, float& max )
     }
 }
 
-void Geometry::AddData( std::vector<Vector3>& verts, std::vector<Triangle<uint32> >& tris )
+void Geometry::AddData( std::vector<Vector3>& verts, std::vector<Triangle<uint32>>& tris )
 {
     uint32 vertOffset = Vertices.size();
     for (std::vector<Vector3>::iterator itr = verts.begin(); itr != verts.end(); ++itr)
         Vertices.push_back(Transform ? Utils::ToRecast(*itr) : *itr);
 
-    for (std::vector<Triangle<uint32> >::iterator itr = tris.begin(); itr != tris.end(); ++itr)
+    for (std::vector<Triangle<uint32>>::iterator itr = tris.begin(); itr != tris.end(); ++itr)
         Triangles.push_back(Triangle<uint32>(itr->Type, itr->V0 + vertOffset, itr->V1 + vertOffset, itr->V2 + vertOffset));
 }
 
@@ -119,9 +130,9 @@ void Geometry::AddAdt( ADT* adt )
 {
     for (std::vector<MapChunk*>::iterator itr = adt->MapChunks.begin(); itr != adt->MapChunks.end(); ++itr)
     {
-        std::vector<Triangle<uint32> > tmp;
+        std::vector<Triangle<uint32>> tmp;
         tmp.reserve((*itr)->Triangles.size());
-        for (std::vector<Triangle<uint8> >::iterator itr2 = (*itr)->Triangles.begin(); itr2 != (*itr)->Triangles.end(); ++itr2)
+        for (std::vector<Triangle<uint8>>::iterator itr2 = (*itr)->Triangles.begin(); itr2 != (*itr)->Triangles.end(); ++itr2)
             tmp.push_back(Triangle<uint32>(itr2->Type, itr2->V0, itr2->V1, itr2->V2));
         AddData((*itr)->Vertices, tmp);
     }
@@ -132,4 +143,3 @@ void Geometry::AddAdt( ADT* adt )
     if (!adt->_WorldModelHandler->Triangles.empty())
         AddData(adt->_WorldModelHandler->Vertices, adt->_WorldModelHandler->Triangles);
 }
-

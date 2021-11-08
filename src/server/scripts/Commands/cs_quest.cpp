@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,21 +28,27 @@ EndScriptData */
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class quest_commandscript : public CommandScript
 {
 public:
     quest_commandscript() : CommandScript("quest_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> questCommandTable =
+        static ChatCommandTable questCommandTable =
         {
             { "add",            SEC_GAMEMASTER,  false, &HandleQuestAdd,                    "" },
             { "complete",       SEC_GAMEMASTER,  false, &HandleQuestComplete,               "" },
             { "remove",         SEC_GAMEMASTER,  false, &HandleQuestRemove,                 "" },
             { "reward",         SEC_GAMEMASTER,  false, &HandleQuestReward,                 "" },
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "quest",          SEC_GAMEMASTER,  false, nullptr, "", questCommandTable },
         };
@@ -64,8 +81,8 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-		
-		if (player->IsActiveQuest(entry))
+
+        if (player->IsActiveQuest(entry))
         {
             handler->PSendSysMessage("This quest is already active!");
             return false;
@@ -181,11 +198,11 @@ public:
             uint32 curItemCount = player->GetItemCount(id, true);
 
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count-curItemCount);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
             if (msg == EQUIP_ERR_OK)
             {
                 Item* item = player->StoreNewItem(dest, id, true);
-                player->SendNewItem(item, count-curItemCount, true, false);
+                player->SendNewItem(item, count - curItemCount, true, false);
             }
         }
 
@@ -199,11 +216,11 @@ public:
             {
                 if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creature))
                     for (uint16 z = 0; z < creatureCount; ++z)
-                        player->KilledMonster(creatureInfo, 0);
+                        player->KilledMonster(creatureInfo, ObjectGuid::Empty);
             }
             else if (creature < 0)
                 for (uint16 z = 0; z < creatureCount; ++z)
-                    player->KillCreditGO(creature, 0);
+                    player->KillCreditGO(creature);
         }
 
         // If the quest requires reputation to complete
@@ -227,7 +244,7 @@ public:
         }
 
         // If the quest requires money
-        int32 ReqOrRewMoney = quest->GetRewOrReqMoney();
+        int32 ReqOrRewMoney = quest->GetRewOrReqMoney(player);
         if (ReqOrRewMoney < 0)
             player->ModifyMoney(-ReqOrRewMoney);
 
@@ -235,9 +252,9 @@ public:
         if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
         {
             // prepare Quest Tracker datas
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
+            auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
             stmt->setUInt32(0, quest->GetQuestId());
-            stmt->setUInt32(1, player->GetGUIDLow());
+            stmt->setUInt32(1, player->GetGUID().GetCounter());
 
             // add to Quest Tracker
             CharacterDatabase.Execute(stmt);

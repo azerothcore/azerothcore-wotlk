@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,189 +28,12 @@ npc_ranshalla
 go_elune_fire
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
-
-// Ours
-enum eStaveQuest
-{
-    QUEST_STAVE_OF_THE_ANCIENTS             = 7636,
-
-    NPC_SIMONE_NORMAL                       = 14527,
-    NPC_FRANKLIN_NORMAL                     = 14529,
-    NPC_ARTORIUS_NORMAL                     = 14531,
-    NPC_NELSON_NORMAL                       = 14536,
-    NPC_PRECIOUS                            = 14528,
-
-    NPC_SIMONE_EVIL                         = 14533,
-    NPC_FRANKLIN_EVIL                       = 14534,
-    NPC_ARTORIUS_EVIL                       = 14535,
-    NPC_NELSON_EVIL                         = 14530,
-    NPC_PRECIOUS_EVIL                       = 14538,
-
-    EVENT_CHECK_PLAYER                      = 1,
-    EVENT_SPELL_CHAIN_LIGHTNING             = 23206,
-    EVENT_SPELL_TEMPTRESS_KISS              = 23205,
-    EVENT_SPELL_DEMONIC_ENRAGE              = 23257,
-    EVENT_SPELL_ENTROPIC_STING              = 23260,
-    EVENT_SPELL_DEMONIC_DOOM                = 23298,
-    EVENT_SPELL_STINGING_TRAUMA             = 23299,
-    EVENT_SPELL_DREADFUL_FRIGHT             = 23275,
-
-    SPELL_FOOLS_PLIGHT                      = 23504,
-    SPELL_SOUL_FLAME                        = 23272,
-};
-
-class npc_stave_of_the_ancients : public CreatureScript
-{
-public:
-    npc_stave_of_the_ancients() : CreatureScript("npc_stave_of_the_ancients") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_stave_of_the_ancientsAI(creature);
-    }
-
-    struct npc_stave_of_the_ancientsAI : public ScriptedAI
-    {
-        npc_stave_of_the_ancientsAI(Creature* creature) : ScriptedAI(creature)
-        {
-            changeEntry = me->GetEntry();
-            switch (me->GetEntry())
-            {
-                case NPC_SIMONE_NORMAL: changeEntry = NPC_SIMONE_EVIL; break;
-                case NPC_FRANKLIN_NORMAL: changeEntry = NPC_FRANKLIN_EVIL; break;
-                case NPC_ARTORIUS_NORMAL: changeEntry = NPC_ARTORIUS_EVIL; break;
-                case NPC_NELSON_NORMAL: changeEntry = NPC_NELSON_EVIL; break;
-                case NPC_PRECIOUS: changeEntry = NPC_PRECIOUS_EVIL; break;
-            }
-        }
-
-        uint64 playerGUID;
-        EventMap events;
-        uint32 changeEntry;
-        bool damaged;
-
-        void Reset()
-        {
-            if (me->GetOriginalEntry() != me->GetEntry())
-                me->UpdateEntry(me->GetOriginalEntry());
-
-            events.Reset();
-            playerGUID = 0;
-            damaged = false;
-        }
-
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
-        {
-            if (!damaged)
-            {
-                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
-                {
-                    damaged = true;
-                    me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
-                }
-            }
-            else
-                damaged = false;
-        }
-
-        void EnterCombat(Unit*)
-        {
-            switch (changeEntry)
-            {
-                case NPC_SIMONE_EVIL:
-                    events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_TEMPTRESS_KISS, 1000);
-                    break;
-                case NPC_FRANKLIN_EVIL:
-                    events.ScheduleEvent(EVENT_SPELL_DEMONIC_ENRAGE, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_ENTROPIC_STING, 5000);
-                    break;
-                case NPC_ARTORIUS_EVIL:
-                    events.ScheduleEvent(EVENT_SPELL_DEMONIC_DOOM, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_STINGING_TRAUMA, 5000);
-                    break;
-                case NPC_NELSON_EVIL:
-                    me->CastSpell(me, SPELL_SOUL_FLAME, true);
-                    events.ScheduleEvent(EVENT_SPELL_DREADFUL_FRIGHT, 5000);
-                    break;
-            }
-        }
-
-        void MoveInLineOfSight(Unit* who)
-        {
-            if (me->GetEntry() != changeEntry && who->GetTypeId() == TYPEID_PLAYER && who->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
-            {
-                playerGUID = who->GetGUID();
-                me->UpdateEntry(changeEntry);
-                events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
-                return;
-            }
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            events.Update(diff);
-            uint32 eventId = events.GetEvent();
-            if (eventId == EVENT_CHECK_PLAYER)
-            {
-                Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-                if (!player || !player->IsWithinDist2d(me, 60.0f))
-                    EnterEvadeMode();
-                else
-                    events.RepeatEvent(5000);
-                return;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (eventId)
-            {
-                case EVENT_SPELL_CHAIN_LIGHTNING:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(7000);
-                    break;
-                case EVENT_SPELL_TEMPTRESS_KISS:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(45000);
-                    break;
-                case EVENT_SPELL_DEMONIC_ENRAGE:
-                    me->CastSpell(me, eventId, false);
-                    events.RepeatEvent(20000);
-                    break;
-                case EVENT_SPELL_ENTROPIC_STING:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(20000);
-                    break;
-                case EVENT_SPELL_DEMONIC_DOOM:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(50000);
-                    break;
-                case EVENT_SPELL_STINGING_TRAUMA:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(20000);
-                    break;
-                case EVENT_SPELL_DREADFUL_FRIGHT:
-                    me->CastSpell(me->GetVictim(), eventId, false);
-                    events.RepeatEvent(15000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
 
 // Theirs
 /*######
@@ -322,52 +156,52 @@ class DialogueHelper
 public:
     // The array MUST be terminated by {0, 0, 0}
     DialogueHelper(DialogueEntry const* dialogueArray) :
-      _dialogueArray(dialogueArray),
-          _currentEntry(NULL),
-          _actionTimer(0)
-      { }
-      // The array MUST be terminated by {0, 0, 0, 0, 0}
+        _dialogueArray(dialogueArray),
+        _currentEntry(nullptr),
+        _actionTimer(0)
+    { }
+    // The array MUST be terminated by {0, 0, 0, 0, 0}
 
-      /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
-      /// Set if take first entries or second entries
+    /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
+    /// Set if take first entries or second entries
 
-      void StartNextDialogueText(int32 textEntry)
-      {
-          // Find textEntry
-          bool found = false;
+    void StartNextDialogueText(int32 textEntry)
+    {
+        // Find textEntry
+        bool found = false;
 
-          for (DialogueEntry const* entry = _dialogueArray; entry->TextEntry; ++entry)
-          {
-              if (entry->TextEntry == textEntry)
-              {
-                  _currentEntry = entry;
-                  found = true;
-                  break;
-              }
-          }
+        for (DialogueEntry const* entry = _dialogueArray; entry->TextEntry; ++entry)
+        {
+            if (entry->TextEntry == textEntry)
+            {
+                _currentEntry = entry;
+                found = true;
+                break;
+            }
+        }
 
-          if (!found)
-              return;
+        if (!found)
+            return;
 
-          DoNextDialogueStep();
-      }
+        DoNextDialogueStep();
+    }
 
-      void DialogueUpdate(uint32 diff)
-      {
-          if (_actionTimer)
-          {
-              if (_actionTimer <= diff)
-                  DoNextDialogueStep();
-              else
-                  _actionTimer -= diff;
-          }
-      }
+    void DialogueUpdate(uint32 diff)
+    {
+        if (_actionTimer)
+        {
+            if (_actionTimer <= diff)
+                DoNextDialogueStep();
+            else
+                _actionTimer -= diff;
+        }
+    }
 
 protected:
     /// Will be called when a dialogue step was done
     virtual void JustDidDialogueStep(int32 /*entry*/) { }
     /// Will be called to get a speaker, MUST be implemented if not used in instances
-    virtual Creature* GetSpeakerByEntry(int32 /*entry*/) { return NULL; }
+    virtual Creature* GetSpeakerByEntry(int32 /*entry*/) { return nullptr; }
 
 private:
     void DoNextDialogueStep()
@@ -458,12 +292,12 @@ class npc_ranshalla : public CreatureScript
 {
 public:
     npc_ranshalla() : CreatureScript("npc_ranshalla") { }
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
         {
             creature->AI()->Talk(SAY_QUEST_START);
-            creature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+            creature->SetFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
             if (npc_ranshallaAI* escortAI = dynamic_cast<npc_ranshallaAI*>(creature->AI()))
                 escortAI->Start(false, false, player->GetGUID(), quest);
@@ -473,7 +307,7 @@ public:
 
         return false;
     }
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ranshallaAI(creature);
     }
@@ -488,13 +322,13 @@ public:
 
         uint32 _delayTimer;
 
-        uint64 _firstPriestessGUID;
-        uint64 _secondPriestessGUID;
-        uint64 _guardEluneGUID;
-        uint64 _voiceEluneGUID;
-        uint64 _altarGUID;
+        ObjectGuid _firstPriestessGUID;
+        ObjectGuid _secondPriestessGUID;
+        ObjectGuid _guardEluneGUID;
+        ObjectGuid _voiceEluneGUID;
+        ObjectGuid _altarGUID;
 
-        void Reset()
+        void Reset() override
         {
             _delayTimer = 0;
         }
@@ -560,7 +394,7 @@ public:
             StartNextDialogueText(SAY_PRIESTESS_ALTAR_3);
         }
 
-        void WaypointReached(uint32 pointId)
+        void WaypointReached(uint32 pointId) override
         {
             switch (pointId)
             {
@@ -579,23 +413,23 @@ public:
                     SetEscortPaused(true);
                     break;
                 case 41:
-                {
-                    // Search for all nearest lights and respawn them
-                    std::list<GameObject*> eluneLights;
-                    GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
-                    for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
                     {
-                        if ((*itr)->isSpawned())
-                            continue;
+                        // Search for all nearest lights and respawn them
+                        std::list<GameObject*> eluneLights;
+                        GetGameObjectListWithEntryInGrid(eluneLights, me, GO_ELUNE_LIGHT, 20.0f);
+                        for (std::list<GameObject*>::const_iterator itr = eluneLights.begin(); itr != eluneLights.end(); ++itr)
+                        {
+                            if ((*itr)->isSpawned())
+                                continue;
 
-                        (*itr)->SetRespawnTime(115);
-                        (*itr)->Refresh();
+                            (*itr)->SetRespawnTime(115);
+                            (*itr)->Refresh();
+                        }
+
+                        if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
+                            me->SetFacingToObject(altar);
+                        break;
                     }
-
-                    if (GameObject* altar = me->GetMap()->GetGameObject(_altarGUID))
-                        me->SetFacingToObject(altar);
-                    break;
-                }
                 case 42:
                     // Summon the 2 priestess
                     SetEscortPaused(true);
@@ -612,7 +446,7 @@ public:
             }
         }
 
-        void JustDidDialogueStep(int32 entry)
+        void JustDidDialogueStep(int32 entry) override
         {
             switch (entry)
             {
@@ -711,7 +545,7 @@ public:
             }
         }
 
-        Creature* GetSpeakerByEntry(int32 entry)
+        Creature* GetSpeakerByEntry(int32 entry) override
         {
             switch (entry)
             {
@@ -724,12 +558,11 @@ public:
                 case NPC_PRIESTESS_DATA_2:
                     return me->GetMap()->GetCreature(_secondPriestessGUID);
                 default:
-                    return NULL;
+                    return nullptr;
             }
-
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             DialogueUpdate(diff);
 
@@ -785,9 +618,6 @@ public:
 
 void AddSC_winterspring()
 {
-    // Ours
-    new npc_stave_of_the_ancients();
-
     // Theirs
     new npc_rivern_frostwind();
     new npc_ranshalla();

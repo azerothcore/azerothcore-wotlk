@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
@@ -12,13 +23,13 @@
 
 class MPQFile;
 
-u_map_fcc MverMagic = { {'R','E','V','M'} };
+u_map_fcc MverMagic = { {'R', 'E', 'V', 'M'} };
 
 FileLoader::FileLoader()
 {
-    data = 0;
+    data = nullptr;
     data_size = 0;
-    version = 0;
+    version = nullptr;
 }
 
 FileLoader::~FileLoader()
@@ -30,7 +41,7 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
 {
     free();
     MPQFile mf(fileName.c_str());
-    if(mf.isEof())
+    if (mf.isEof())
     {
         if (log)
             printf("No such file %s\n", fileName.c_str());
@@ -54,7 +65,7 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
 bool FileLoader::prepareLoadedData()
 {
     // Check version
-    version = (file_MVER *) data;
+    version = (file_MVER*) data;
     if (version->fcc != MverMagic.fcc)
         return false;
     if (version->ver != FILE_FORMAT_VERSION)
@@ -65,7 +76,7 @@ bool FileLoader::prepareLoadedData()
 void FileLoader::free()
 {
     delete[] data;
-    data = 0;
+    data = nullptr;
     data_size = 0;
-    version = 0;
+    version = nullptr;
 }

@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "halls_of_reflection.h"
 
@@ -47,7 +60,7 @@ public:
         EventMap events;
         uint16 startFightTimer;
 
-        void Reset()
+        void Reset() override
         {
             startFightTimer = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -56,7 +69,7 @@ public:
                 pInstance->SetData(DATA_MARWYN, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
@@ -66,7 +79,7 @@ public:
             events.ScheduleEvent(EVENT_SHARED_SUFFERING, 5000);
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -75,7 +88,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (startFightTimer)
             {
@@ -114,7 +127,7 @@ public:
                     break;
                 case EVENT_CORRUPTED_FLESH:
                     Talk(RAND(SAY_CORRUPTED_FLESH_1, SAY_CORRUPTED_FLESH_2));
-                    me->CastSpell((Unit*)NULL, SPELL_CORRUPTED_FLESH, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_CORRUPTED_FLESH, false);
                     events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20000);
                     break;
                 case EVENT_SHARED_SUFFERING:
@@ -127,20 +140,20 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_MARWYN, DONE);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (startFightTimer)
@@ -148,9 +161,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_marwynAI(creature);
+        return GetHallsOfReflectionAI<boss_marwynAI>(creature);
     }
 };
 
@@ -179,18 +192,18 @@ public:
                                     if (p->IsAlive())
                                         ++count;
                             ticks = (a->GetDuration() / int32(a->GetSpellInfo()->Effects[0].Amplitude)) + 1;
-                            int32 dmg = (ticks*dmgPerTick)/count;
-                            caster->CastCustomSpell(GetTarget(), 72373, NULL, &dmg, NULL, true);
+                            int32 dmg = (ticks * dmgPerTick) / count;
+                            caster->CastCustomSpell(GetTarget(), 72373, nullptr, &dmg, nullptr, true);
                         }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_hor_shared_sufferingAuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hor_shared_sufferingAuraScript();
     }

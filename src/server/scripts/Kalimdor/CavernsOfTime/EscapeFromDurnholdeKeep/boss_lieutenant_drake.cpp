@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "old_hillsbrad.h"
 #include "MoveSplineInit.h"
+#include "old_hillsbrad.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SmartScriptMgr.h"
 
 enum LieutenantDrake
@@ -35,9 +48,9 @@ class boss_lieutenant_drake : public CreatureScript
 public:
     boss_lieutenant_drake() : CreatureScript("boss_lieutenant_drake") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_lieutenant_drakeAI(creature);
+        return GetOldHillsbradAI<boss_lieutenant_drakeAI>(creature);
     }
 
     struct boss_lieutenant_drakeAI : public ScriptedAI
@@ -60,14 +73,14 @@ public:
             }
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             //Talk(SAY_ENTER);
             JustReachedHome();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->SetWalk(true);
             Movement::MoveSplineInit init(me);
@@ -76,12 +89,12 @@ public:
             init.Launch();
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -92,20 +105,20 @@ public:
             events.ScheduleEvent(EVENT_EXPLODING_SHOT, 1000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (InstanceScript* instance = me->GetInstanceScript())
                 instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_DRAKE_KILLED);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -146,11 +159,10 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        private:
-            EventMap events;
-            Movement::PointsArray pathPoints;
+    private:
+        EventMap events;
+        Movement::PointsArray pathPoints;
     };
-
 };
 
 void AddSC_boss_lieutenant_drake()

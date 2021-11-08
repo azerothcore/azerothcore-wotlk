@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "LiquidHandler.h"
@@ -33,7 +44,7 @@ void LiquidHandler::HandleNewLiquid()
         if (h.LayerCount == 0)
         {
             // Need to fill in missing data with dummies.
-            MCNKData.push_back(MCNKLiquidData(NULL, H2ORenderMask()));
+            MCNKData.push_back(MCNKLiquidData(nullptr, H2ORenderMask()));
             continue;
         }
         fseek(stream, chunk->Offset + h.OffsetInformation, SEEK_SET);
@@ -100,7 +111,7 @@ void LiquidHandler::HandleNewLiquid()
                 Vertices.push_back(Vector3(location.x, location.y - Constants::UnitSize, location.z));
                 Vertices.push_back(Vector3(location.x - Constants::UnitSize, location.y - Constants::UnitSize, location.z));
 
-                Triangles.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset, vertOffset+2, vertOffset + 1));
+                Triangles.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset, vertOffset + 2, vertOffset + 1));
                 Triangles.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset + 2, vertOffset + 3, vertOffset + 1));
             }
         }

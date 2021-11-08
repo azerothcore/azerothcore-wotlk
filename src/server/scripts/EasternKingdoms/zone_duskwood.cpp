@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,9 +22,9 @@ SDComment: Quest Support:8735
 SDCategory: Duskwood
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum TwilightCorrupter
 {
@@ -27,8 +38,7 @@ enum TwilightCorrupter
     SPELL_LEVEL_UP                  = 24312,
 
     EVENT_SOUL_CORRUPTION           = 1,
-    EVENT_CREATURE_OF_NIGHTMARE     = 2,
-    FACTION_HOSTILE                 = 14
+    EVENT_CREATURE_OF_NIGHTMARE     = 2
 };
 
 /*######
@@ -44,12 +54,12 @@ public:
     {
         boss_twilight_corrupterAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             KillCount                 = 0;
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             // Xinef: check if copy is summoned
             std::list<Creature*> cList;
@@ -66,18 +76,18 @@ public:
             ScriptedAI::InitializeAI();
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!_introSpoken && who->GetTypeId() == TYPEID_PLAYER)
             {
                 _introSpoken = true;
                 Talk(YELL_TWILIGHTCORRUPTOR_RESPAWN, who);
-                me->setFaction(FACTION_HOSTILE);
+                me->SetFaction(FACTION_MONSTER);
             }
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_TWILIGHTCORRUPTOR_AGGRO);
             _events.Reset();
@@ -85,7 +95,7 @@ public:
             _events.ScheduleEvent(EVENT_CREATURE_OF_NIGHTMARE, 30000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
             {
@@ -100,7 +110,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -113,7 +123,7 @@ public:
                 {
                     case EVENT_SOUL_CORRUPTION:
                         DoCastVictim(SPELL_SOUL_CORRUPTION);
-                        _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, rand()%4000+15000);
+                        _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, rand() % 4000 + 15000);
                         break;
                     case EVENT_CREATURE_OF_NIGHTMARE:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
@@ -127,13 +137,13 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        private:
-            EventMap _events;
-            uint8 KillCount;
-            bool _introSpoken;
+    private:
+        EventMap _events;
+        uint8 KillCount;
+        bool _introSpoken;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_twilight_corrupterAI(creature);
     }
@@ -148,7 +158,7 @@ class at_twilight_grove : public AreaTriggerScript
 public:
     at_twilight_grove() : AreaTriggerScript("at_twilight_grove") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (player->HasQuestForItem(ITEM_FRAGMENT) && !player->HasItemCount(ITEM_FRAGMENT))
             player->SummonCreature(NPC_TWILIGHT_CORRUPTER, -10328.16f, -489.57f, 49.95f, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 240000);

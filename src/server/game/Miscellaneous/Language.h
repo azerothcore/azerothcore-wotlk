@@ -1,12 +1,29 @@
 /*
- * Copyright (C) MaNGOS, TrinityCore, AzerothCore
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __ACORE_LANGUAGE_H
 #define __ACORE_LANGUAGE_H
+
+enum BroadcastTextIds
+{
+    BROADCAST_TEXT_ACHIEVEMENT_EARNED   = 29245,
+    BROADCAST_TEXT_CALL_FOR_HELP        = 2541,
+    BROADCAST_TEXT_FLEE_FOR_ASSIST      = 1150
+};
 
 enum AcoreStrings
 {
@@ -18,10 +35,10 @@ enum AcoreStrings
     LANG_SYSTEMMESSAGE                  = 3,
     LANG_EVENTMESSAGE                   = 4,
     LANG_NO_HELP_CMD                    = 5,
-    LANG_NO_CMD                         = 6,
-    LANG_NO_SUBCMD                      = 7,
+    LANG_CMD_INVALID                    = 6,
+    LANG_SUBCMD_AMBIGUOUS               = 7,
     LANG_SUBCMDS_LIST                   = 8,
-    LANG_AVIABLE_CMD                    = 9,
+    LANG_AVAILABLE_CMDS                 = 9,
     LANG_CMD_SYNTAX                     = 10,
     LANG_ACCOUNT_LEVEL                  = 11,
     LANG_CONNECTED_USERS                = 12,
@@ -94,8 +111,17 @@ enum AcoreStrings
     LANG_RBAC_PERM_REVOKED_NOT_IN_LIST  = 79,
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
-    // Free 82 - 95
+    // Free 82 - 86
 
+    LANG_UNKNOWN_ERROR                  = 87,
+    LANG_2FA_COMMANDS_NOT_SETUP         = 88,
+    LANG_2FA_ALREADY_SETUP              = 89,
+    LANG_2FA_INVALID_TOKEN              = 90,
+    LANG_2FA_SECRET_SUGGESTION          = 91,
+    LANG_2FA_SETUP_COMPLETE             = 92,
+    LANG_2FA_NOT_SETUP                  = 93,
+    LANG_2FA_REMOVE_NEED_TOKEN          = 94,
+    LANG_2FA_REMOVE_COMPLETE            = 95,
 
     LANG_GUILD_RENAME_ALREADY_EXISTS    = 96,
     LANG_GUILD_RENAME_DONE              = 97,
@@ -192,7 +218,17 @@ enum AcoreStrings
     LANG_GRID_POSITION                  = 178,
     // 179-185 used in other client versions
     LANG_TRANSPORT_POSITION             = 186,
-    // Room for more level 1              187-199 not used
+    // 187
+    LANG_2FA_SECRET_TOO_LONG            = 188,
+    LANG_2FA_SECRET_INVALID             = 189,
+    LANG_2FA_SECRET_SET_COMPLETE        = 190,
+    LANG_SUBCMDS_LIST_ENTRY             = 191,
+    LANG_SUBCMDS_LIST_ENTRY_ELLIPSIS    = 192,
+    LANG_SUBCMD_INVALID                 = 193,
+    LANG_CMD_AMBIGUOUS                  = 194,
+    LANG_CMD_HELP_GENERIC               = 195,
+    LANG_CMD_NO_HELP_AVAILABLE          = 196,
+    // Room for more level 1                197-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -291,9 +327,9 @@ enum AcoreStrings
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
     LANG_COMMAND_CREATGUIDNOTFOUND      = 287,
-      // TICKET STRINGS NEED REWRITE // 288-296 FREE
+    // TICKET STRINGS NEED REWRITE // 288-296 FREE
 
-      // END
+    // END
     LANG_COMMAND_WANDER_DISTANCE        = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
@@ -687,15 +723,20 @@ enum AcoreStrings
     LANG_PLAYER_DND_DEFAULT             = 709,
     LANG_PLAYER_AFK_DEFAULT             = 710,
 
+    // BG announce
     LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
     LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
-//                                      = 713, not used
-//                                      = 714, see LANG_PINFO_MAP_ONLINE
+
+    // Arena announce
+    LANG_ARENA_QUEUE_ANNOUNCE_SELF      = 713,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD     = 726,
+
+    //                                      = 714, see LANG_PINFO_MAP_ONLINE
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
-//                                      = 716, see LANG_PINFO_MAP_OFFLINE
+    //                                      = 716, see LANG_PINFO_MAP_OFFLINE
     LANG_BG_STARTED_ANNOUNCE_WORLD      = 717,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN= 718,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT= 719,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN = 718,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT = 719,
 
     LANG_BG_GROUP_TOO_LARGE             = 720,              // "Your group is too large for this battleground. Please regroup to join."
     LANG_ARENA_GROUP_TOO_LARGE          = 721,              // "Your group is too large for this arena. Please regroup to join."
@@ -703,7 +744,7 @@ enum AcoreStrings
     LANG_ARENA_NOT_ENOUGH_PLAYERS       = 723,              // "Your group does not have enough players to join this match."
     LANG_ARENA_GOLD_WINS                = 724,              // "The Gold Team wins!"
     LANG_ARENA_GREEN_WINS               = 725,              // "The Green Team wins!"
-//                                      = 726, not used
+    // = 726, see LANG_ARENA_QUEUE_ANNOUNCE_WORLD
     LANG_BG_GROUP_OFFLINE_MEMBER        = 727,              // "Your group has an offline member. Please remove him before joining."
     LANG_BG_GROUP_MIXED_FACTION         = 728,              // "Your group has players from the opposing faction. You can't join the battleground as a group."
     LANG_BG_GROUP_MIXED_LEVELS          = 729,              // "Your group has players from different battleground brakets. You can't join as group."
@@ -727,13 +768,13 @@ enum AcoreStrings
     LANG_DIST_ARENA_POINTS_END          = 746,
     LANG_BG_DISABLED                    = 747,
     LANG_ARENA_DISABLED                 = 748,
-//                                      = 749, see LANG_PINFO_ACC_OS
+    //                                      = 749, see LANG_PINFO_ACC_OS
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 750,       // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-//                                      = 752, see LANG_PINFO_ACC_IP
-//  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
-//  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
-//  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
+    //                                      = 752, see LANG_PINFO_ACC_IP
+    //  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
+    //  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
+    //  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
 
     // Room for BG/ARENA                = 773-784, 788-799 not used
     LANG_ARENA_TESTING                  = 785,
@@ -751,7 +792,7 @@ enum AcoreStrings
     LANG_NEED_CHARACTER_NAME            = 807,
     LANG_PLAYER_NOT_EXIST_OR_OFFLINE    = 808,
     LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND   = 809,
-    LANG_ACHIEVEMENT_EARNED             = 810,
+    // unused                           = 810,
     LANG_GUILD_MASTER                   = 811,
     LANG_GUILD_OFFICER                  = 812,
     LANG_GUILD_VETERAN                  = 813,
@@ -822,7 +863,7 @@ enum AcoreStrings
     LANG_ARENA_ERROR_NAME_EXISTS        = 858,
     LANG_ARENA_ERROR_SIZE               = 859,
     LANG_ARENA_ERROR_COMBAT             = 860,
-    LANG_AREAN_ERROR_NAME_NOT_FOUND     = 861,
+    LANG_ARENA_ERROR_NAME_NOT_FOUND     = 861,
     LANG_ARENA_ERROR_NOT_MEMBER         = 862,
     LANG_ARENA_ERROR_CAPTAIN            = 863,
     LANG_ARENA_CREATE                   = 864,
@@ -844,6 +885,18 @@ enum AcoreStrings
     LANG_ACCOUNT_SEC_TYPE               = 880,
     LANG_RBAC_EMAIL_REQUIRED            = 881,
     // Room for in-game strings           882-999 not used
+
+    //Access Requirements
+    LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS = 882,
+    LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS = 883,
+    LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS = 884,
+    LANG_ACCESS_REQUIREMENT_NOTE = 885,
+    LANG_ACCESS_REQUIREMENT_NOT_MET = 886,
+    LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET = 887,
+    LANG_ACCESS_REQUIREMENT_MAX_LEVEL = 888,
+    LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS = 889,
+    LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS = 890,
+    LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS = 891,
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
@@ -878,7 +931,6 @@ enum AcoreStrings
     // 1029-1030 used in other client versions
     // Room for more level 4              1031-1099 not used
     LANG_ACCOUNT_PASS_TOO_LONG            = 1031,
-
 
     // Level 3 (continue)
     LANG_ACCOUNT_SETADDON               = 1100,
@@ -1043,7 +1095,26 @@ enum AcoreStrings
     //Player Ticket Strings
     LANG_TICKET_CLOSED                  = 1334,
     LANG_TICKET_COMPLETED               = 1335,
-    // FREE IDS                           1336-1999
+    // FREE IDS                           1336-1499
+
+    // Command argument parsers
+    LANG_CMDPARSER_EITHER                 = 1500,
+    LANG_CMDPARSER_OR                     = 1501,
+    LANG_CMDPARSER_STRING_VALUE_INVALID   = 1502,
+    LANG_CMDPARSER_INVALID_UTF8           = 1503,
+    LANG_CMDPARSER_LINKDATA_INVALID       = 1504,
+    LANG_CMDPARSER_ACCOUNT_NAME_NO_EXIST  = 1505,
+    LANG_CMDPARSER_ACCOUNT_ID_NO_EXIST    = 1506,
+    LANG_CMDPARSER_CHAR_GUID_NO_EXIST     = 1507,
+    LANG_CMDPARSER_CHAR_NAME_NO_EXIST     = 1508,
+    LANG_CMDPARSER_CHAR_NAME_INVALID      = 1509,
+    LANG_CMDPARSER_ACHIEVEMENT_NO_EXIST   = 1510,
+    LANG_CMDPARSER_GAME_TELE_ID_NO_EXIST  = 1511,
+    LANG_CMDPARSER_GAME_TELE_NO_EXIST     = 1512,
+    LANG_CMDPARSER_ITEM_NO_EXIST          = 1513,
+    LANG_CMDPARSER_SPELL_NO_EXIST         = 1514,
+    LANG_CMDPARSER_EXACT_SEQ_MISMATCH     = 1515,
+    // FREE IDS                             1516-1499
 
     // Ticket Strings 2000-2030
     LANG_COMMAND_TICKETNEW              = 2000,
@@ -1098,7 +1169,7 @@ enum AcoreStrings
     LANG_BATTLEGROUND                   = 5015,
     LANG_ARENA                          = 5016,
     LANG_RAID                           = 5017,
-                                        //= 5018,
+    // unused                           = 5018,
     LANG_COMMAND_TEMP_FROZEN_PLAYER     = 5019,
     LANG_NPCINFO_PHASEMASK              = 5020,
     LANG_NPCINFO_ARMOR                  = 5021,
@@ -1110,12 +1181,12 @@ enum AcoreStrings
     LANG_GOINFO_NAME                    = 5027,
     LANG_GOINFO_LOOTID                  = 5028,
     LANG_COMMAND_LOOKUP_MAX_RESULTS     = 5029,
-    LANG_FLEE                           = 5030,
+    // unused                           = 5030,
     LANG_NPCINFO_AIINFO                 = 5031,
     LANG_COMMAND_NO_BATTLEGROUND_FOUND  = 5032,
     LANG_COMMAND_NO_ACHIEVEMENT_CRITERIA_FOUND = 5033,
     LANG_COMMAND_NO_OUTDOOR_PVP_FORUND  = 5034,
-    LANG_CALL_FOR_HELP                  = 5035,
+    // unused                           = 5035,
     LANG_NPCINFO_EQUIPMENT              = 5036,
     LANG_NPCINFO_MECHANIC_IMMUNE        = 5037,
     LANG_NPCINFO_UNIT_FIELD_FLAGS       = 5038,
@@ -1147,7 +1218,9 @@ enum AcoreStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Room for more Trinity strings    5062-9999
+    LANG_NPCINFO_SPELL_SCHOOL_IMMUNE    = 5062,
+
+    // Room for more strings    5063-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1166,6 +1239,9 @@ enum AcoreStrings
     LANG_GM_ANNOUNCE_COLOR               = 6615,
 
     LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
+
+    // Used for .string command
+    LANG_NO_ACORE_STRING_FOUND           = 6617,
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,
@@ -1290,7 +1366,6 @@ enum AcoreStrings
     LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD = 11005,
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
     LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
-    
 
     LANG_NPCINFO_INHABIT_TYPE                     = 11008,
     LANG_NPCINFO_FLAGS_EXTRA                      = 11009,
@@ -1304,8 +1379,8 @@ enum AcoreStrings
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
 
     // Continue show Ban in world (ip)
-    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD       	    = 11017,	
-    LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD   	    = 11018,
+    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD            = 11017,
+    LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD        = 11018,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 
@@ -1323,6 +1398,11 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086
+    LANG_DEBUG_ARENA_CONF                         = 30086,
+
+    // 30087-30095 reserved for passive anticheat
+
+    LANG_DEBUG_LFG_ON                             = 30096,
+    LANG_DEBUG_LFG_OFF                            = 30097
 };
 #endif

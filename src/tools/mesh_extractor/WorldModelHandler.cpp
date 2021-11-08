@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "WorldModelHandler.h"
@@ -30,12 +41,11 @@ WorldModelDefinition WorldModelDefinition::Read( FILE* file )
     count += fread(&discard, sizeof(uint32), 1, file);
 
     if (count != 5)
-         printf("WorldModelDefinition::Read: Error reading data, expected 5, read %d\n", count);
+        printf("WorldModelDefinition::Read: Error reading data, expected 5, read %d\n", count);
     return ret;
 }
 
-
-WorldModelHandler::WorldModelHandler( ADT* adt ) : ObjectDataHandler(adt), _definitions(NULL), _paths(NULL)
+WorldModelHandler::WorldModelHandler( ADT* adt ) : ObjectDataHandler(adt), _definitions(nullptr), _paths(nullptr)
 {
     ReadModelPaths();
     ReadDefinitions();
@@ -45,7 +55,7 @@ void WorldModelHandler::ProcessInternal( MapChunk* mcnk )
 {
     if (!IsSane())
         return;
-    
+
     uint32 refCount = mcnk->Header.MapObjectRefs;
     FILE* stream = mcnk->Source->GetStream();
     fseek(stream, mcnk->Source->Offset + mcnk->Header.OffsetMCRF, SEEK_SET);
@@ -85,7 +95,7 @@ void WorldModelHandler::ProcessInternal( MapChunk* mcnk )
     fseek(stream, mcnk->Source->Offset, SEEK_SET);
 }
 
-void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::vector<Triangle<uint32> >& tris, const WorldModelDefinition& def, WorldModelRoot* root, bool translate )
+void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::vector<Triangle<uint32>>& tris, const WorldModelDefinition& def, WorldModelRoot* root, bool translate )
 {
     for (std::vector<WorldModelGroup>::iterator group =  root->Groups.begin(); group != root->Groups.end(); ++group)
     {
@@ -136,7 +146,7 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
                 Vector3 v = Utils::TransformDoodadVertex(def, Utils::TransformWmoDoodad(*instance, def, *itr2, false), translate);
                 verts.push_back(translate ? v : Utils::ToRecast(v));
             }
-            for (std::vector<Triangle<uint16> >::iterator itr2 = model->Triangles.begin(); itr2 != model->Triangles.end(); ++itr2)
+            for (std::vector<Triangle<uint16>>::iterator itr2 = model->Triangles.begin(); itr2 != model->Triangles.end(); ++itr2)
                 tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WMO, itr2->V0 + vertOffset, itr2->V1 + vertOffset, itr2->V2 + vertOffset));
         }
 
@@ -152,20 +162,19 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
             {
                 for (uint32 x = 0; x < liquidHeader.Width; x++)
                 {
-
                     if (!liquidDataGeometry.ShouldRender(x, y))
                         continue;
 
                     uint32 vertOffset = verts.size();
 
                     Vector3 v1 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x][y], x, y, translate);
+                                                      liquidDataGeometry.HeightMap[x][y], x, y, translate);
                     Vector3 v2 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x + 1][y], x + 1, y, translate);
+                                                      liquidDataGeometry.HeightMap[x + 1][y], x + 1, y, translate);
                     Vector3 v3 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x][y + 1], x, y + 1, translate);
+                                                      liquidDataGeometry.HeightMap[x][y + 1], x, y + 1, translate);
                     Vector3 v4 = Utils::GetLiquidVert(def, liquidHeader.BaseLocation,
-                        liquidDataGeometry.HeightMap[x + 1][y + 1], x + 1, y + 1, translate);
+                                                      liquidDataGeometry.HeightMap[x + 1][y + 1], x + 1, y + 1, translate);
 
                     verts.push_back(translate ? v1 : Utils::ToRecast(v1));
                     verts.push_back(translate ? v2 : Utils::ToRecast(v2));
@@ -174,7 +183,6 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
 
                     tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset, vertOffset + 2, vertOffset + 1));
                     tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset + 2, vertOffset + 3, vertOffset + 1));
-
                 }
             }
         }

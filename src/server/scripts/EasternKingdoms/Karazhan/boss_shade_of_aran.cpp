@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "karazhan.h"
 #include "GameObject.h"
+#include "karazhan.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum ShadeOfAran
@@ -78,7 +91,7 @@ public:
 
         uint32 FlameWreathTimer;
         uint32 FlameWreathCheckTime;
-        uint64 FlameWreathTarget[3];
+        ObjectGuid FlameWreathTarget[3];
         float FWTargPosX[3];
         float FWTargPosY[3];
 
@@ -92,7 +105,7 @@ public:
         bool ElementalsSpawned;
         bool Drinking;
         bool DrinkInturrupted;
-        void Reset()
+        void Reset() override
         {
             SecondarySpellTimer = 5000;
             NormalCastTimer = 0;
@@ -104,6 +117,9 @@ public:
 
             FlameWreathTimer = 0;
             FlameWreathCheckTime = 0;
+
+            for (uint8 i = 0; i < 3; ++i)
+                FlameWreathTarget[i].Clear();
 
             CurrentNormalSpell = 0;
             ArcaneCooldown = 0;
@@ -118,37 +134,35 @@ public:
 
             // Not in progress
             instance->SetData(DATA_ARAN, NOT_STARTED);
-            instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), true);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
             instance->SetData(DATA_ARAN, DONE);
-            instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
-
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
             instance->SetData(DATA_ARAN, IN_PROGRESS);
-            instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), false);
             DoZoneInCombat();
-
         }
 
         void FlameWreathEffect()
         {
             std::vector<Unit*> targets;
-            ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
 
             if (t_list.empty())
                 return;
@@ -180,7 +194,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -189,10 +203,10 @@ public:
             {
                 if (CloseDoorTimer <= diff)
                 {
-                    instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR), false);
                     CloseDoorTimer = 0;
                 }
-                else 
+                else
                     CloseDoorTimer -= diff;
             }
 
@@ -201,7 +215,7 @@ public:
             {
                 if (ArcaneCooldown >= diff)
                     ArcaneCooldown -= diff;
-                else 
+                else
                     ArcaneCooldown = 0;
             }
 
@@ -209,7 +223,7 @@ public:
             {
                 if (FireCooldown >= diff)
                     FireCooldown -= diff;
-                else 
+                else
                     FireCooldown = 0;
             }
 
@@ -217,7 +231,7 @@ public:
             {
                 if (FrostCooldown >= diff)
                     FrostCooldown -= diff;
-                else 
+                else
                     FrostCooldown = 0;
             }
 
@@ -305,24 +319,24 @@ public:
                 }
                 NormalCastTimer = 1000;
             }
-            else 
+            else
                 NormalCastTimer -= diff;
 
             if (SecondarySpellTimer <= diff)
             {
                 switch (urand(0, 1))
                 {
-                case 0:
-                    DoCast(me, SPELL_AOE_CS);
-                    break;
-                case 1:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        DoCast(target, SPELL_CHAINSOFICE);
-                    break;
+                    case 0:
+                        DoCast(me, SPELL_AOE_CS);
+                        break;
+                    case 1:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            DoCast(target, SPELL_CHAINSOFICE);
+                        break;
                 }
                 SecondarySpellTimer = urand(5000, 20000);
             }
-            else 
+            else
                 SecondarySpellTimer -= diff;
 
             if (SuperCastTimer <= diff)
@@ -331,75 +345,70 @@ public:
 
                 switch (LastSuperSpell)
                 {
-                case SUPER_AE:
-                    Available[0] = SUPER_FLAME;
-                    Available[1] = SUPER_BLIZZARD;
-                    break;
-                case SUPER_FLAME:
-                    Available[0] = SUPER_AE;
-                    Available[1] = SUPER_BLIZZARD;
-                    break;
-                case SUPER_BLIZZARD:
-                    Available[0] = SUPER_FLAME;
-                    Available[1] = SUPER_AE;
-                    break;
+                    case SUPER_AE:
+                        Available[0] = SUPER_FLAME;
+                        Available[1] = SUPER_BLIZZARD;
+                        break;
+                    case SUPER_FLAME:
+                        Available[0] = SUPER_AE;
+                        Available[1] = SUPER_BLIZZARD;
+                        break;
+                    case SUPER_BLIZZARD:
+                        Available[0] = SUPER_FLAME;
+                        Available[1] = SUPER_AE;
+                        break;
                 }
 
                 LastSuperSpell = Available[urand(0, 1)];
 
                 switch (LastSuperSpell)
                 {
-                case SUPER_AE:
-                    Talk(SAY_EXPLOSION);
+                    case SUPER_AE:
+                        Talk(SAY_EXPLOSION);
 
-                    DoCast(me, SPELL_BLINK_CENTER, true);
-                    DoCast(me, SPELL_PLAYERPULL, true);
-                    DoCast(me, SPELL_MASSSLOW, true);
-                    DoCast(me, SPELL_AEXPLOSION, false);
-                    break;
+                        DoCast(me, SPELL_BLINK_CENTER, true);
+                        DoCast(me, SPELL_PLAYERPULL, true);
+                        DoCast(me, SPELL_MASSSLOW, true);
+                        DoCast(me, SPELL_AEXPLOSION, false);
+                        break;
 
-                case SUPER_FLAME:
-                    Talk(SAY_FLAMEWREATH);
+                    case SUPER_FLAME:
+                        Talk(SAY_FLAMEWREATH);
 
-                    FlameWreathTimer = 20000;
-                    FlameWreathCheckTime = 500;
+                        FlameWreathTimer = 20000;
+                        FlameWreathCheckTime = 500;
 
-                    FlameWreathTarget[0] = 0;
-                    FlameWreathTarget[1] = 0;
-                    FlameWreathTarget[2] = 0;
+                        FlameWreathTarget[0].Clear();
+                        FlameWreathTarget[1].Clear();
+                        FlameWreathTarget[2].Clear();
 
-                    FlameWreathEffect();
-                    break;
+                        FlameWreathEffect();
+                        break;
 
-                case SUPER_BLIZZARD:
-                    Talk(SAY_BLIZZARD);
+                    case SUPER_BLIZZARD:
+                        Talk(SAY_BLIZZARD);
 
-                    if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
-                    {
-                        pSpawn->setFaction(me->getFaction());
-                        pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
-                    }
-                    break;
+                        if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
+                        {
+                            pSpawn->SetFaction(me->GetFaction());
+                            pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
+                        }
+                        break;
                 }
 
                 SuperCastTimer = urand(35000, 40000);
             }
-            else 
+            else
                 SuperCastTimer -= diff;
 
             if (!ElementalsSpawned && HealthBelowPct(40))
             {
                 ElementalsSpawned = true;
 
-                Creature* ElementalOne = NULL;
-                Creature* ElementalTwo = NULL;
-                Creature* ElementalThree = NULL;
-                Creature* ElementalFour = NULL;
-
-                ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                ElementalThree = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11161.7f, -1885.36f, 232.092f, 4.59f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
-                ElementalFour = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11192.4f, -1909.36f, 232.092f, 6.19f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalThree = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11161.7f, -1885.36f, 232.092f, 4.59f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                Creature* ElementalFour = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11192.4f, -1909.36f, 232.092f, 6.19f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
 
                 if (ElementalOne)
                 {
@@ -410,9 +419,8 @@ public:
                     DoStartNoMovement(target);
                     ElementalOne->SetInCombatWithZone();
                     ElementalOne->CombatStart(target);
-                    ElementalOne->setFaction(me->getFaction());
+                    ElementalOne->SetFaction(me->GetFaction());
                     ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalOne->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -425,9 +433,8 @@ public:
                     DoStartNoMovement(target);
                     ElementalTwo->SetInCombatWithZone();
                     ElementalTwo->CombatStart(target);
-                    ElementalTwo->setFaction(me->getFaction());
+                    ElementalTwo->SetFaction(me->GetFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalTwo->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -440,9 +447,8 @@ public:
                     DoStartNoMovement(target);
                     ElementalThree->SetInCombatWithZone();
                     ElementalThree->CombatStart(target);
-                    ElementalThree->setFaction(me->getFaction());
+                    ElementalThree->SetFaction(me->GetFaction());
                     ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalThree->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -455,9 +461,8 @@ public:
                     DoStartNoMovement(target);
                     ElementalFour->SetInCombatWithZone();
                     ElementalFour->CombatStart(target);
-                    ElementalFour->setFaction(me->getFaction());
+                    ElementalFour->SetFaction(me->GetFaction());
                     ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalFour->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -471,7 +476,7 @@ public:
                     if (Creature* unit = me->SummonCreature(CREATURE_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                     {
                         unit->Attack(me->GetVictim(), true);
-                        unit->setFaction(me->getFaction());
+                        unit->SetFaction(me->GetFaction());
                     }
                 }
 
@@ -479,7 +484,7 @@ public:
 
                 BerserkTimer = 60000;
             }
-            else 
+            else
                 BerserkTimer -= diff;
 
             //Flame Wreath check
@@ -487,7 +492,7 @@ public:
             {
                 if (FlameWreathTimer >= diff)
                     FlameWreathTimer -= diff;
-                else 
+                else
                     FlameWreathTimer = 0;
 
                 if (FlameWreathCheckTime <= diff)
@@ -502,12 +507,12 @@ public:
                         {
                             unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
                             unit->CastSpell(unit, 11027, true);
-                            FlameWreathTarget[i] = 0;
+                            FlameWreathTarget[i].Clear();
                         }
                     }
                     FlameWreathCheckTime = 500;
                 }
-                else 
+                else
                     FlameWreathCheckTime -= diff;
             }
 
@@ -515,18 +520,18 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!DrinkInturrupted && Drinking && damage)
                 DrinkInturrupted = true;
         }
 
-        void SpellHit(Unit* /*pAttacker*/, const SpellInfo* Spell)
+        void SpellHit(Unit* /*pAttacker*/, const SpellInfo* Spell) override
         {
             //We only care about interrupt effects and only if they are durring a spell currently being cast
             if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
-                Spell->Effects[1].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
-                Spell->Effects[2].Effect != SPELL_EFFECT_INTERRUPT_CAST) || !me->IsNonMeleeSpellCast(false))
+                    Spell->Effects[1].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
+                    Spell->Effects[2].Effect != SPELL_EFFECT_INTERRUPT_CAST) || !me->IsNonMeleeSpellCast(false))
                 return;
 
             //Interrupt effect
@@ -537,16 +542,22 @@ public:
 
             switch (CurrentNormalSpell)
             {
-            case SPELL_ARCMISSLE: ArcaneCooldown = 5000; break;
-            case SPELL_FIREBALL: FireCooldown = 5000; break;
-            case SPELL_FROSTBOLT: FrostCooldown = 5000; break;
+                case SPELL_ARCMISSLE:
+                    ArcaneCooldown = 5000;
+                    break;
+                case SPELL_FIREBALL:
+                    FireCooldown = 5000;
+                    break;
+                case SPELL_FROSTBOLT:
+                    FrostCooldown = 5000;
+                    break;
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_aranAI>(creature);
+        return GetKarazhanAI<boss_aranAI>(creature);
     }
 };
 
@@ -555,7 +566,7 @@ class npc_aran_elemental : public CreatureScript
 public:
     npc_aran_elemental() : CreatureScript("npc_aran_elemental") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new water_elementalAI(creature);
     }
@@ -564,19 +575,18 @@ public:
     {
         water_elementalAI(Creature* creature) : ScriptedAI(creature)
         {
-
         }
 
         uint32 CastTimer;
 
-        void Reset()
+        void Reset() override
         {
             CastTimer = 2000 + (rand() % 3000);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

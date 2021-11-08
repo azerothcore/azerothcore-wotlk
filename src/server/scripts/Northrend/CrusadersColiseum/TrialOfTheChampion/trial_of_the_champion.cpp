@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_champion.h"
-#include "Player.h"
 
 #define GOSSIP_START_EVENT1a "I am ready."
 #define GOSSIP_START_EVENT1b "I am ready. However I'd like to skip the pageantry."
@@ -30,31 +43,31 @@ public:
         uint32 gossipTextId = 0;
         switch (pInstance->GetData(DATA_INSTANCE_PROGRESS))
         {
-        case INSTANCE_PROGRESS_INITIAL:
-            if (!player->GetVehicle())
-            {
-                if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
-                    gossipTextId = 15043; //Horde text
+            case INSTANCE_PROGRESS_INITIAL:
+                if (!player->GetVehicle())
+                {
+                    if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
+                        gossipTextId = 15043; //Horde text
+                    else
+                        gossipTextId = 14757; //Alliance text
+                }
                 else
-                    gossipTextId = 14757; //Alliance text
-            }
-            else
-            {
-                gossipTextId = 14688;
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
-            }
-            break;
-        case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
-            gossipTextId = 14737;
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
-            break;
-        case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
-            gossipTextId = 14738;
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
-            break;
-        default:
-            return true;
+                {
+                    gossipTextId = 14688;
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
+                }
+                break;
+            case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
+                gossipTextId = 14737;
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
+                break;
+            case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
+                gossipTextId = 14738;
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
+                break;
+            default:
+                return true;
         }
 
         SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
@@ -70,9 +83,9 @@ public:
         if(!pInstance)
             return true;
 
-        if(uiAction == GOSSIP_ACTION_INFO_DEF+1338 || uiAction == GOSSIP_ACTION_INFO_DEF+1341 || uiAction == GOSSIP_ACTION_INFO_DEF+1339 || uiAction == GOSSIP_ACTION_INFO_DEF+1340)
+        if(uiAction == GOSSIP_ACTION_INFO_DEF + 1338 || uiAction == GOSSIP_ACTION_INFO_DEF + 1341 || uiAction == GOSSIP_ACTION_INFO_DEF + 1339 || uiAction == GOSSIP_ACTION_INFO_DEF + 1340)
         {
-            pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF+1341 ? 1 : 0));
+            pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF + 1341 ? 1 : 0));
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
@@ -82,12 +95,12 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_announcer_toc5AI(creature);
+        return GetTrialOfTheChampionAI<npc_announcer_toc5AI>(creature);
     }
 
     struct npc_announcer_toc5AI : public CreatureAI
     {
-        npc_announcer_toc5AI(Creature *creature) : CreatureAI(creature) {}
+        npc_announcer_toc5AI(Creature* creature) : CreatureAI(creature) {}
 
         void Reset() override
         {
@@ -102,7 +115,7 @@ public:
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth()) // for bk scene so strangulate doesn't kill him
-                damage = me->GetHealth()-1;
+                damage = me->GetHealth() - 1;
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override

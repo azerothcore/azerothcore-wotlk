@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -15,12 +26,11 @@ EndScriptData */
 npc_ranger_lilatha
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_ranger_lilatha
@@ -39,8 +49,7 @@ enum RangerLilatha
     GO_CAGE                             = 181152,
     NPC_CAPTAIN_HELIOS                  = 16220,
     NPC_MUMMIFIED_HEADHUNTER            = 16342,
-    NPC_SHADOWPINE_ORACLE               = 16343,
-    FACTION_QUEST_ESCAPE                = 113
+    NPC_SHADOWPINE_ORACLE               = 16343
 };
 
 class npc_ranger_lilatha : public CreatureScript
@@ -52,7 +61,7 @@ public:
     {
         npc_ranger_lilathaAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -109,18 +118,18 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 20))
                 Cage->SetGoState(GO_STATE_READY);
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCAPE_FROM_THE_CATACOMBS)
         {
-            creature->setFaction(FACTION_QUEST_ESCAPE);
+            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_ranger_lilatha::npc_ranger_lilathaAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
@@ -128,11 +137,10 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ranger_lilathaAI(creature);
     }
-
 };
 
 void AddSC_ghostlands()

@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "culling_of_stratholme.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -44,9 +57,9 @@ class boss_mal_ganis : public CreatureScript
 public:
     boss_mal_ganis() : CreatureScript("boss_mal_ganis") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_mal_ganisAI (creature);
+        return GetCullingOfStratholmeAI<boss_mal_ganisAI>(creature);
     }
 
     struct boss_mal_ganisAI : public ScriptedAI
@@ -59,7 +72,7 @@ public:
         EventMap events;
         bool finished;
 
-        void Reset() 
+        void Reset() override
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
@@ -71,7 +84,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_CARRION_SWARM, 6000);
@@ -80,19 +93,19 @@ public:
             events.ScheduleEvent(EVENT_SPELL_VAMPIRIC_TOUCH, 15000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!urand(0,1))
+            if (!urand(0, 1))
                 return;
 
             Talk(SAY_SLAY);
         }
 
-        void DamageTaken(Unit* who, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!finished && damage >= me->GetHealth())
             {
@@ -104,7 +117,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                 {
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_ARTHAS)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_ARTHAS)))
                         cr->AI()->DoAction(ACTION_KILLED_MALGANIS);
 
                     // give credit to players
@@ -120,7 +133,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -129,7 +142,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CARRION_SWARM:
                     me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_CARRION_SWARM_N, SPELL_CARRION_SWARM_H), false);
@@ -155,7 +168,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_mal_ganis()

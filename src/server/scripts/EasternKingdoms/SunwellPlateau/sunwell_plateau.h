@@ -1,15 +1,30 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SUNWELL_PLATEAU_H
 #define SUNWELL_PLATEAU_H
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAIImpl.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+
+#define SWPScriptName "instance_sunwell_plateau"
 
 enum DataTypes
 {
@@ -53,7 +68,6 @@ enum CreatureIds
     NPC_VOID_SENTINEL                       = 25772,
     NPC_VOID_SPAWN                          = 25824,
 
-    
     NPC_KILJAEDEN_CONTROLLER                = 25608,
     NPC_KILJAEDEN                           = 25315,
     NPC_ANVEENA                             = 26046,
@@ -86,5 +100,11 @@ enum SpellIds
 {
     SPELL_SUNWELL_RADIANCE                  = 45769,
 };
+
+template <class AI, class T>
+inline AI* GetSunwellPlateauAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, SWPScriptName);
+}
 
 #endif // SUNWELL_PLATEAU_H

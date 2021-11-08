@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -16,10 +27,10 @@ npc_shenthul
 npc_thrall_warchief
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_shenthul
@@ -35,7 +46,7 @@ class npc_shenthul : public CreatureScript
 public:
     npc_shenthul() : CreatureScript("npc_shenthul") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_SHATTERED_SALUTE)
         {
@@ -45,7 +56,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_shenthulAI(creature);
     }
@@ -58,20 +69,20 @@ public:
         bool CanEmote;
         uint32 SaluteTimer;
         uint32 ResetTimer;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
-        void Reset()
+        void Reset() override
         {
             CanTalk = false;
             CanEmote = false;
             SaluteTimer = 6000;
             ResetTimer = 0;
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CanEmote)
             {
@@ -83,7 +94,8 @@ public:
                             player->FailQuest(QUEST_SHATTERED_SALUTE);
                     }
                     Reset();
-                } else ResetTimer -= diff;
+                }
+                else ResetTimer -= diff;
             }
 
             if (CanTalk && !CanEmote)
@@ -93,7 +105,8 @@ public:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                     CanEmote = true;
                     ResetTimer = 60000;
-                } else SaluteTimer -= diff;
+                }
+                else SaluteTimer -= diff;
             }
 
             if (!UpdateVictim())
@@ -102,7 +115,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void ReceiveEmote(Player* player, uint32 emote)
+        void ReceiveEmote(Player* player, uint32 emote) override
         {
             if (emote == TEXT_EMOTE_SALUTE && player->GetQuestStatus(QUEST_SHATTERED_SALUTE) == QUEST_STATUS_INCOMPLETE)
             {
@@ -114,7 +127,6 @@ public:
             }
         }
     };
-
 };
 
 /*######
@@ -149,27 +161,27 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 5733, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, 5734, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 SendGossipMenuFor(player, 5735, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 5736, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
                 SendGossipMenuFor(player, 5737, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+6:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
                 SendGossipMenuFor(player, 5738, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+7:
@@ -186,7 +198,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_6566) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HTW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HTW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -221,13 +233,15 @@ public:
             {
                 DoCastVictim(SPELL_CHAIN_LIGHTNING);
                 ChainLightningTimer = 9000;
-            } else ChainLightningTimer -= diff;
+            }
+            else ChainLightningTimer -= diff;
 
             if (ShockTimer <= diff)
             {
                 DoCastVictim(SPELL_SHOCK);
                 ShockTimer = 15000;
-            } else ShockTimer -= diff;
+            }
+            else ShockTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

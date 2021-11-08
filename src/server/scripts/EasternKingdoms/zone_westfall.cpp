@@ -1,7 +1,18 @@
 ﻿/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -15,10 +26,10 @@ EndScriptData */
 npc_daphne_stilwell
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_daphne_stilwell
@@ -51,7 +62,7 @@ class npc_daphne_stilwell : public CreatureScript
 public:
     npc_daphne_stilwell() : CreatureScript("npc_daphne_stilwell") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_TOME_VALOR)
         {
@@ -64,7 +75,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_daphne_stilwellAI(creature);
     }
@@ -76,13 +87,13 @@ public:
         SummonList summons;
         uint8 textCounter;
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             textCounter = SAY_DS_DOWN_1;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
 
@@ -136,7 +147,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->Attack(who, false))
             {
@@ -145,7 +156,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             creature->SetHomePosition(me->GetHomePosition());
             creature->GetMotionMaster()->MoveChase(me);
@@ -155,7 +166,7 @@ public:
             summons.Summon(creature);
         }
 
-        void SummonedCreatureDies(Creature* creature, Unit*)
+        void SummonedCreatureDies(Creature* creature, Unit*) override
         {
             summons.Despawn(creature);
             if (summons.empty())

@@ -1,18 +1,31 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "forge_of_souls.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 class instance_forge_of_souls : public InstanceMapScript
 {
 public:
     instance_forge_of_souls() : InstanceMapScript("instance_forge_of_souls", 632) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap *map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_forge_of_souls_InstanceScript(map);
     }
@@ -24,28 +37,21 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         TeamId teamIdInInstance;
         std::string str_data;
-        uint64 NPC_BronjahmGUID;
-        uint64 NPC_DevourerGUID;
+        ObjectGuid NPC_BronjahmGUID;
+        ObjectGuid NPC_DevourerGUID;
 
-        uint64 NPC_LeaderFirstGUID;
-        uint64 NPC_LeaderSecondGUID;
-        uint64 NPC_GuardFirstGUID;
-        uint64 NPC_GuardSecondGUID;
+        ObjectGuid NPC_LeaderFirstGUID;
+        ObjectGuid NPC_LeaderSecondGUID;
+        ObjectGuid NPC_GuardFirstGUID;
+        ObjectGuid NPC_GuardSecondGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             teamIdInInstance = TEAM_NEUTRAL;
-            NPC_BronjahmGUID = 0;
-            NPC_DevourerGUID = 0;
-
-            NPC_LeaderFirstGUID = 0;
-            NPC_LeaderSecondGUID = 0;
-            NPC_GuardFirstGUID = 0;
-            NPC_GuardSecondGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
@@ -53,7 +59,7 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* /*plr*/)
+        void OnPlayerEnter(Player* /*plr*/) override
         {
             // this will happen only after crash and loading the instance from db
             if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID)))
@@ -63,11 +69,11 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const &players = instance->GetPlayers();
+                Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
@@ -124,7 +130,7 @@ public:
                     if (Creature* boss = instance->GetCreature(NPC_DevourerGUID))
                     {
                         float angle = boss->GetAngle(leader);
-                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX()+10.0f*cos(angle), boss->GetPositionY()+10.0f*sin(angle), boss->GetPositionZ());
+                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * sin(angle), boss->GetPositionZ());
                     }
 
             for (int8 i = 0; outroPositions[i].entry[teamIdInInstance] != 0; ++i)
@@ -132,7 +138,7 @@ public:
                     summon->GetMotionMaster()->MovePath(outroPositions[i].pathId, false);
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -150,17 +156,18 @@ public:
                 SaveToDB();
         }
 
-        uint64 GetData64(uint32 type) const
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
-                case DATA_BRONJAHM: return NPC_BronjahmGUID;
+                case DATA_BRONJAHM:
+                    return NPC_BronjahmGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -184,7 +191,7 @@ public:
             return false;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -196,7 +203,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {

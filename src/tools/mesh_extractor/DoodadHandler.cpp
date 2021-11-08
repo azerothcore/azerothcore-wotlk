@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DoodadHandler.h"
@@ -10,8 +21,8 @@
 #include "Model.h"
 #include "G3D/Matrix4.h"
 
-DoodadHandler::DoodadHandler( ADT* adt ) : 
-    ObjectDataHandler(adt), _definitions(NULL), _paths(NULL)
+DoodadHandler::DoodadHandler( ADT* adt ) :
+    ObjectDataHandler(adt), _definitions(nullptr), _paths(nullptr)
 {
     Chunk* mddf = adt->ObjectData->GetChunkByName("MDDF");
     if (mddf)
@@ -27,7 +38,7 @@ void DoodadHandler::ProcessInternal( MapChunk* mcnk )
 {
     if (!IsSane())
         return;
-    
+
     uint32 refCount = mcnk->Header.DoodadRefs;
     FILE* stream = mcnk->Source->GetStream();
     fseek(stream, mcnk->Source->Offset + mcnk->Header.OffsetMCRF, SEEK_SET);
@@ -100,11 +111,11 @@ void DoodadHandler::ReadDoodadPaths( Chunk* id, Chunk* data )
 void DoodadHandler::InsertModelGeometry(const DoodadDefinition& def, Model* model)
 {
     uint32 vertOffset = Vertices.size();
-    
+
     for (std::vector<Vector3>::iterator itr = model->Vertices.begin(); itr != model->Vertices.end(); ++itr)
         Vertices.push_back(Utils::TransformDoodadVertex(def, *itr)); // Vertices have to be converted based on the information from the DoodadDefinition struct
 
-    for (std::vector<Triangle<uint16> >::iterator itr = model->Triangles.begin(); itr != model->Triangles.end(); ++itr)
+    for (std::vector<Triangle<uint16>>::iterator itr = model->Triangles.begin(); itr != model->Triangles.end(); ++itr)
         Triangles.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_DOODAD, itr->V0 + vertOffset, itr->V1 + vertOffset, itr->V2 + vertOffset));
 }
 

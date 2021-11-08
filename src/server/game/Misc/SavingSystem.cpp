@@ -1,3 +1,20 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "SavingSystem.h"
 #include "World.h"
 
@@ -5,7 +22,7 @@ uint32 SavingSystemMgr::m_savingCurrentValue = 0;
 uint32 SavingSystemMgr::m_savingMaxValueAssigned = 0;
 uint32 SavingSystemMgr::m_savingDiffSum = 0;
 std::list<uint32> SavingSystemMgr::m_savingSkipList;
-ACE_Thread_Mutex SavingSystemMgr::_savingLock;
+std::mutex SavingSystemMgr::_savingLock;
 
 void SavingSystemMgr::Update(uint32 diff)
 {
@@ -24,8 +41,8 @@ void SavingSystemMgr::Update(uint32 diff)
             return;
         }
 
-        if (GetSavingMaxValue()-GetSavingCurrentValue() > playerCount+m_savingSkipList.size()) // this should not happen, but just in case
-            m_savingMaxValueAssigned = m_savingCurrentValue+playerCount+m_savingSkipList.size();
+        if (GetSavingMaxValue() - GetSavingCurrentValue() > playerCount + m_savingSkipList.size()) // this should not happen, but just in case
+            m_savingMaxValueAssigned = m_savingCurrentValue + playerCount + m_savingSkipList.size();
 
         if (playerCount <= 1500) // every 2min
             multiplicator = 1000.0f / playerCount;
@@ -41,7 +58,7 @@ void SavingSystemMgr::Update(uint32 diff)
             multiplicator = 4000.0f / playerCount;
 
         m_savingDiffSum += diff;
-        while (m_savingDiffSum >= (uint32)(step*multiplicator))
+        while (m_savingDiffSum >= (uint32)(step * multiplicator))
         {
             IncreaseSavingCurrentValue(1);
 
@@ -51,7 +68,7 @@ void SavingSystemMgr::Update(uint32 diff)
                 m_savingSkipList.pop_front();
             }
 
-            m_savingDiffSum -= (uint32)(step*multiplicator);
+            m_savingDiffSum -= (uint32)(step * multiplicator);
 
             if (GetSavingCurrentValue() > GetSavingMaxValue())
             {

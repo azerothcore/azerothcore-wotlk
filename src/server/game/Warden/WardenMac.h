@@ -1,34 +1,44 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _WARDEN_MAC_H
 #define _WARDEN_MAC_H
 
-#include "Cryptography/ARC4.h"
-#include <map>
-#include "Cryptography/BigNumber.h"
 #include "ByteBuffer.h"
+#include "ARC4.h"
 #include "Warden.h"
+#include <map>
 
 class WorldSession;
 class Warden;
 
 class WardenMac : public Warden
 {
-    public:
-        WardenMac();
-        ~WardenMac();
+public:
+    WardenMac();
+    ~WardenMac() override;
 
-        void Init(WorldSession* session, BigNumber* k);
-        ClientWardenModule* GetModuleForClient();
-        void InitializeModule();
-        void RequestHash();
-        void HandleHashResult(ByteBuffer& buff);
-        void RequestData();
-        void HandleData(ByteBuffer& buff);
+    void Init(WorldSession* session, SessionKey const& k) override;
+    ClientWardenModule* GetModuleForClient() override;
+    void InitializeModule() override;
+    void RequestHash() override;
+    void HandleHashResult(ByteBuffer& buff) override;
+    void RequestChecks() override;
+    void HandleData(ByteBuffer& buff) override;
 };
 
 #endif

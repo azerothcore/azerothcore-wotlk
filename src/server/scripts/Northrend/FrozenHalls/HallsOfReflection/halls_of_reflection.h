@@ -1,18 +1,34 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef DEF_HALLS_OF_REFLECTION_H
 #define DEF_HALLS_OF_REFLECTION_H
 
-#include "Player.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "ScriptedCreature.h"
+#include "CreatureAIImpl.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellScript.h"
 #include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+
+#define HallsOfReflectionScriptName "instance_halls_of_reflection"
 
 enum Data
 {
@@ -319,7 +335,7 @@ const Position CannonFirePos[2][3] =
     }
 };
 
-const Position StairsPos[2][3] = 
+const Position StairsPos[2][3] =
 {
     {
         {5226.36f, 1640.87f, 785.737f, 5.56137f},
@@ -332,5 +348,11 @@ const Position StairsPos[2][3] =
         {5243.42f, 1624.8f, 784.361f, 5.76592f}
     }
 };
+
+template <class AI, class T>
+inline AI* GetHallsOfReflectionAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, HallsOfReflectionScriptName);
+}
 
 #endif

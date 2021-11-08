@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -19,11 +30,11 @@ npc_enraged_panther
 go_panther_cage
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 /*######
 # npc_lakota_windsong
@@ -39,7 +50,6 @@ enum Lakota
 
     QUEST_FREE_AT_LAST          = 4904,
     NPC_GRIM_BANDIT             = 10758,
-    FACTION_ESCORTEE_LAKO       = 232,                      //guessed
 
     ID_AMBUSH_1                 = 0,
     ID_AMBUSH_2                 = 2,
@@ -61,12 +71,12 @@ class npc_lakota_windsong : public CreatureScript
 public:
     npc_lakota_windsong() : CreatureScript("npc_lakota_windsong") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_FREE_AT_LAST)
         {
             creature->AI()->Talk(SAY_LAKO_START, player);
-            creature->setFaction(FACTION_ESCORTEE_LAKO);
+            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); //guessed
 
             if (npc_lakota_windsongAI* pEscortAI = CAST_AI(npc_lakota_windsong::npc_lakota_windsongAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -74,7 +84,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lakota_windsongAI(creature);
     }
@@ -83,9 +93,9 @@ public:
     {
         npc_lakota_windsongAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -111,10 +121,9 @@ public:
         void DoSpawnBandits(int AmbushId)
         {
             for (int i = 0; i < 2; ++i)
-                me->SummonCreature(NPC_GRIM_BANDIT, BanditLoc[i+AmbushId], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+                me->SummonCreature(NPC_GRIM_BANDIT, BanditLoc[i + AmbushId], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         }
     };
-
 };
 
 /*######
@@ -128,8 +137,7 @@ enum Packa
     SAY_COMPLETE        = 2,
 
     QUEST_HOMEWARD      = 4770,
-    NPC_WYVERN          = 4107,
-    FACTION_ESCORTEE    = 232                               //guessed
+    NPC_WYVERN          = 4107
 };
 
 Position const WyvernLoc[3] =
@@ -144,12 +152,12 @@ class npc_paoka_swiftmountain : public CreatureScript
 public:
     npc_paoka_swiftmountain() : CreatureScript("npc_paoka_swiftmountain") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_HOMEWARD)
         {
             creature->AI()->Talk(SAY_START, player);
-            creature->setFaction(FACTION_ESCORTEE);
+            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); // guessed
 
             if (npc_paoka_swiftmountainAI* pEscortAI = CAST_AI(npc_paoka_swiftmountain::npc_paoka_swiftmountainAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -157,7 +165,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_paoka_swiftmountainAI(creature);
     }
@@ -166,9 +174,9 @@ public:
     {
         npc_paoka_swiftmountainAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -202,7 +210,6 @@ public:
 
 enum Plucky
 {
-    FACTION_FRIENDLY        = 35,
     QUEST_SCOOP             = 1950,
     SPELL_PLUCKY_HUMAN      = 9192,
     SPELL_PLUCKY_CHICKEN    = 9220
@@ -221,7 +228,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF+1:
                 CloseGossipMenuFor(player);
                 player->CompleteQuest(QUEST_SCOOP);
-            break;
+                break;
         }
         return true;
     }
@@ -229,7 +236,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, 738, creature->GetGUID());
 
@@ -243,7 +250,7 @@ public:
 
     struct npc_pluckyAI : public ScriptedAI
     {
-        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->getFaction(); }
+        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->GetFaction(); }
 
         uint32 NormFaction;
         uint32 ResetTimer;
@@ -252,8 +259,8 @@ public:
         {
             ResetTimer = 120000;
 
-            if (me->getFaction() != NormFaction)
-                me->setFaction(NormFaction);
+            if (me->GetFaction() != NormFaction)
+                me->SetFaction(NormFaction);
 
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -267,7 +274,7 @@ public:
             {
                 if (TextEmote == TEXT_EMOTE_BECKON)
                 {
-                    me->setFaction(FACTION_FRIENDLY);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                 }
@@ -279,7 +286,7 @@ public:
                     return;
                 else
                 {
-                    me->setFaction(FACTION_FRIENDLY);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
@@ -310,7 +317,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 enum PantherCage
@@ -345,7 +351,7 @@ class npc_enraged_panther : public CreatureScript
 public:
     npc_enraged_panther() : CreatureScript("npc_enraged_panther") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_enraged_pantherAI(creature);
     }
@@ -354,13 +360,13 @@ public:
     {
         npc_enraged_pantherAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -368,7 +374,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_thousand_needles()
