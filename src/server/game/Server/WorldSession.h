@@ -1085,7 +1085,6 @@ private:
     LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
     ObjectGuid m_currentBankerGUID;
-    time_t timeWhoCommandAllowed;
     uint32 _offlineTime;
     bool _kicked;
     bool _shouldSetOfflineInDB;
