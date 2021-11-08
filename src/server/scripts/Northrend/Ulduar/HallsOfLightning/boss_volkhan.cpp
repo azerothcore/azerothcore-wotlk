@@ -203,7 +203,7 @@ public:
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_MOLTEN_GOLEM)
             {
-                summon->setFaction(me->getFaction());
+                summon->SetFaction(me->GetFaction());
 
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                     summon->AI()->AttackStart(target);
