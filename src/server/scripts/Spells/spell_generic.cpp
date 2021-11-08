@@ -583,7 +583,7 @@ class spell_gen_disabled_above_63 : public AuraScript
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_disabled_above_63::CalculateAmount, EFFECT_ALL, SPELL_AURA_ANY);
     }
-}; 
+};
 
 // 59630 - Black Magic
 class spell_gen_black_magic_enchant : public AuraScript
