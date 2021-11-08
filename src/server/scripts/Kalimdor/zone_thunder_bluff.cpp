@@ -53,12 +53,14 @@ public:
             _uppercutTimer        = 10000;
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
             if (action == 0)
             {
                 player->CastSpell(player, SPELL_CAIRNES_HOOFPRINT, false);
             }
+
+            return true;
         }
 
         void UpdateAI(uint32 diff) override

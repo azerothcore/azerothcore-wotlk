@@ -75,7 +75,6 @@ enum DrakeGiverTexts
 class npc_oculus_drakegiver : public CreatureScript
 {
 public:
-    std::unordered_map<ObjectGuid, bool>openedMenu;
 
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
@@ -103,6 +102,7 @@ public:
         InstanceScript* m_pInstance;
         bool resetPosition, moved;
         uint32 timer;
+        std::unordered_map<ObjectGuid, bool> openedMenu;
 
         void UpdateAI(uint32 diff) override
         {
@@ -163,171 +163,171 @@ public:
             }
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
-    };
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if(creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if(creature->GetInstanceScript()->GetData(DATA_DRAKOS) == DONE)
+        bool GossipHello(Player* player) override
         {
-            switch (creature->GetEntry())
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (me->GetInstanceScript()->GetData(DATA_DRAKOS) == DONE)
+            {
+                switch (me->GetEntry())
+                {
+                case NPC_VERDISA:
+                    AddGossipItemFor(player, 9573, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    if (player->HasItemCount(ITEM_AMBER_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9573, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    }
+                    else if (player->HasItemCount(ITEM_RUBY_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9573, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    }
+                    else if (!player->HasItemCount(ITEM_EMERALD_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9573, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    }
+                    AddGossipItemFor(player, 9573, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA1, me->GetGUID());
+                    break;
+                case NPC_BELGARISTRASZ:
+                    if (HAS_ESSENCE(player))
+                    {
+                        openedMenu[player->GetGUID()] = true;
+                    }
+
+                    if (!openedMenu[player->GetGUID()])
+                    {
+                        AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                        SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, me->GetGUID());
+                    }
+                    else
+                    {
+                        ScriptedAI::GossipSelect(player, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    }
+                    break;
+                case NPC_ETERNOS:
+                    AddGossipItemFor(player, 9574, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    if (player->HasItemCount(ITEM_EMERALD_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9574, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    }
+                    else if (player->HasItemCount(ITEM_RUBY_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9574, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    }
+                    else if (!player->HasItemCount(ITEM_AMBER_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9574, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    }
+                    AddGossipItemFor(player, 9574, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS1, me->GetGUID());
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+        void StoreEssence(Player* player, uint32 itemId)
+        {
+            ItemPosCountVec dest;
+            uint8           msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+            if (msg == EQUIP_ERR_OK)
+            {
+                if (Item* item = player->StoreNewItem(dest, itemId, true))
+                {
+                    player->SendNewItem(item, 1, true, true);
+                }
+            }
+        }
+
+        void RemoveEssence(Player* player, uint32 itemId)
+        {
+            player->DestroyItemCount(itemId, 1, true);
+        }
+
+        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 uiAction) override
+        {
+            ClearGossipMenuFor(player);
+            switch (me->GetEntry())
             {
             case NPC_VERDISA:
-                AddGossipItemFor(player, 9573, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                if (player->HasItemCount(ITEM_AMBER_ESSENCE))
+                switch (uiAction)
                 {
-                    AddGossipItemFor(player, 9573, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                case GOSSIP_ACTION_INFO_DEF:
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA2, me->GetGUID());
+                    return true;
+                case GOSSIP_ACTION_INFO_DEF + 4:
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA3, me->GetGUID());
+                    return true;
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                    RemoveEssence(player, ITEM_AMBER_ESSENCE);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 2:
+                    RemoveEssence(player, ITEM_RUBY_ESSENCE);
+                    break;
                 }
-                else if (player->HasItemCount(ITEM_RUBY_ESSENCE))
-                {
-                    AddGossipItemFor(player, 9573, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-                else if (!player->HasItemCount(ITEM_EMERALD_ESSENCE))
-                {
-                    AddGossipItemFor(player, 9573, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                }
-                AddGossipItemFor(player, 9573, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA1, creature->GetGUID());
+                StoreEssence(player, ITEM_EMERALD_ESSENCE);
+                CloseGossipMenuFor(player);
                 break;
             case NPC_BELGARISTRASZ:
-                if (HAS_ESSENCE(player))
+                switch (uiAction)
                 {
+                case GOSSIP_ACTION_INFO_DEF:
                     openedMenu[player->GetGUID()] = true;
+                    if (player->HasItemCount(ITEM_AMBER_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9575, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    }
+                    else if (player->HasItemCount(ITEM_EMERALD_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9575, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    }
+                    else if (!player->HasItemCount(ITEM_RUBY_ESSENCE))
+                    {
+                        AddGossipItemFor(player, 9575, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    }
+                    AddGossipItemFor(player, 9575, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ1, me->GetGUID());
+                    return true;
+                case GOSSIP_ACTION_INFO_DEF + 4:
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ2, me->GetGUID());
+                    return true;
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                    RemoveEssence(player, ITEM_AMBER_ESSENCE);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 2:
+                    RemoveEssence(player, ITEM_EMERALD_ESSENCE);
+                    break;
                 }
-
-                if (!openedMenu[player->GetGUID()])
-                {
-                    AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, creature->GetGUID());
-                }
-                else
-                {
-                    OnGossipSelect(player, creature, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                }
+                StoreEssence(player, ITEM_RUBY_ESSENCE);
+                CloseGossipMenuFor(player);
                 break;
             case NPC_ETERNOS:
-                AddGossipItemFor(player, 9574, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                if (player->HasItemCount(ITEM_EMERALD_ESSENCE))
+                switch (uiAction)
                 {
-                    AddGossipItemFor(player, 9574, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                case GOSSIP_ACTION_INFO_DEF:
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS2, me->GetGUID());
+                    return true;
+                case GOSSIP_ACTION_INFO_DEF + 4:
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS3, me->GetGUID());
+                    return true;
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                    RemoveEssence(player, ITEM_EMERALD_ESSENCE);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 2:
+                    RemoveEssence(player, ITEM_RUBY_ESSENCE);
+                    break;
                 }
-                else if (player->HasItemCount(ITEM_RUBY_ESSENCE))
-                {
-                    AddGossipItemFor(player, 9574, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-                else if (!player->HasItemCount(ITEM_AMBER_ESSENCE))
-                {
-                    AddGossipItemFor(player, 9574, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                }
-                AddGossipItemFor(player, 9574, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS1, creature->GetGUID());
+                StoreEssence(player, ITEM_AMBER_ESSENCE);
+                CloseGossipMenuFor(player);
                 break;
             }
+
+            return true;
         }
-
-        return true;
-    }
-
-    void StoreEssence(Player* player, uint32 itemId)
-    {
-        ItemPosCountVec dest;
-        uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
-        if (msg == EQUIP_ERR_OK)
-        {
-            if (Item* item = player->StoreNewItem(dest, itemId, true))
-            {
-                player->SendNewItem(item, 1, true, true);
-            }
-        }
-    }
-
-    void RemoveEssence(Player* player, uint32 itemId)
-    {
-        player->DestroyItemCount(itemId, 1, true);
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
-    {
-        ClearGossipMenuFor(player);
-        switch(creature->GetEntry())
-        {
-        case NPC_VERDISA:
-            switch(uiAction)
-            {
-            case GOSSIP_ACTION_INFO_DEF:
-                SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA2, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA3, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                RemoveEssence(player, ITEM_AMBER_ESSENCE);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                RemoveEssence(player, ITEM_RUBY_ESSENCE);
-                break;
-            }
-            StoreEssence(player, ITEM_EMERALD_ESSENCE);
-            CloseGossipMenuFor(player);
-            break;
-        case NPC_BELGARISTRASZ:
-            switch(uiAction)
-            {
-            case GOSSIP_ACTION_INFO_DEF:
-                openedMenu[player->GetGUID()] = true;
-                if (player->HasItemCount(ITEM_AMBER_ESSENCE))
-                {
-                    AddGossipItemFor(player, 9575, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                }
-                else if (player->HasItemCount(ITEM_EMERALD_ESSENCE))
-                {
-                    AddGossipItemFor(player, 9575, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-                else if (!player->HasItemCount(ITEM_RUBY_ESSENCE))
-                {
-                    AddGossipItemFor(player, 9575, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                }
-                AddGossipItemFor(player, 9575, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ1, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                SendGossipMenuFor(player, GOSSIP_TEXTID_BELGARISTRASZ2, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                RemoveEssence(player, ITEM_AMBER_ESSENCE);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                RemoveEssence(player, ITEM_EMERALD_ESSENCE);
-                break;
-            }
-            StoreEssence(player, ITEM_RUBY_ESSENCE);
-            CloseGossipMenuFor(player);
-            break;
-        case NPC_ETERNOS:
-            switch (uiAction)
-            {
-            case GOSSIP_ACTION_INFO_DEF:
-                SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS2, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                SendGossipMenuFor(player, GOSSIP_TEXTID_ETERNOS3, creature->GetGUID());
-                return true;
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                RemoveEssence(player, ITEM_EMERALD_ESSENCE);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                RemoveEssence(player, ITEM_RUBY_ESSENCE);
-                break;
-            }
-            StoreEssence(player, ITEM_AMBER_ESSENCE);
-            CloseGossipMenuFor(player);
-            break;
-        }
-
-        return true;
-    }
+    };
 };
 
 class npc_oculus_drake : public CreatureScript
