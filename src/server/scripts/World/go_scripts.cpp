@@ -119,8 +119,8 @@ public:
                 _timer += diff;
                 if (_timer > 5000)
                 {
-                    go->CastSpell(nullptr, 9056);
-                    go->DestroyForNearbyPlayers();
+                    me->CastSpell(nullptr, 9056);
+                    me->DestroyForNearbyPlayers();
                     _timer = 0;
                 }
             }
@@ -295,7 +295,7 @@ public:
             requireSummon = 0;
             int8 count = urand(1, 3);
             for (int8 i = 0; i < count; ++i)
-                go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionZ(), go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
         void OnStateChanged(uint32 state, Unit*  /*unit*/) override
@@ -306,7 +306,7 @@ public:
 
         void UpdateAI(uint32  /*diff*/) override
         {
-            if (go->isSpawned() && requireSummon == 2)
+            if (me->isSpawned() && requireSummon == 2)
                 SummonTadpoles();
         }
 
@@ -319,7 +319,7 @@ public:
             if (player->GetQuestStatus(QUEST_OH_NOES_THE_TADPOLES) == QUEST_STATUS_INCOMPLETE)
             {
                 std::list<Creature*> cList;
-                GetCreatureListWithEntryInGrid(cList, go, NPC_WINTERFIN_TADPOLE, 5.0f);
+                GetCreatureListWithEntryInGrid(cList, me, NPC_WINTERFIN_TADPOLE, 5.0f);
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                 {
                     player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE);
@@ -360,15 +360,15 @@ public:
             {
                 timer = 0;
                 std::list<Player*> players;
-                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                Cell::VisitWorldObjects(go, searcher, 0.3f);
+                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
+                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
+                Cell::VisitWorldObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
                     std::list<Player*>::iterator itr = players.begin();
                     std::advance(itr, urand(0, players.size() - 1));
-                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
+                    if (Creature* trigger = me->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
                         trigger->CastSpell(trigger, SPELL_FLAMES);
                 }
             }
@@ -407,15 +407,15 @@ public:
             {
                 timer = 0;
                 std::list<Player*> players;
-                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                Cell::VisitWorldObjects(go, searcher, 0.3f);
+                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
+                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
+                Cell::VisitWorldObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
                     std::list<Player*>::iterator itr = players.begin();
                     std::advance(itr, urand(0, players.size() - 1));
-                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
+                    if (Creature* trigger = me->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
                         trigger->CastSpell(trigger, SPELL_HEAT);
                 }
             }
@@ -509,7 +509,7 @@ public:
                             //Restart the current selected music
                             _currentMusicEvent = 0;
                             //Check zone to play correct music
-                            if (go->GetAreaId() == SILVERMOON || go->GetAreaId() == UNDERCITY || go->GetAreaId() == ORGRIMMAR_1 || go->GetAreaId() == ORGRIMMAR_2 || go->GetAreaId() == THUNDERBLUFF)
+                            if (me->GetAreaId() == SILVERMOON || me->GetAreaId() == UNDERCITY || me->GetAreaId() == ORGRIMMAR_1 || me->GetAreaId() == ORGRIMMAR_2 || me->GetAreaId() == THUNDERBLUFF)
                             {
                                 switch (rnd)
                                 {
@@ -529,7 +529,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (go->GetAreaId() == IRONFORGE_1 || go->GetAreaId() == IRONFORGE_2 || go->GetAreaId() == STORMWIND || go->GetAreaId() == EXODAR || go->GetAreaId() == DARNASSUS)
+                            else if (me->GetAreaId() == IRONFORGE_1 || me->GetAreaId() == IRONFORGE_2 || me->GetAreaId() == STORMWIND || me->GetAreaId() == EXODAR || me->GetAreaId() == DARNASSUS)
                             {
                                 switch (rnd)
                                 {
@@ -549,7 +549,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (go->GetAreaId() == SHATTRATH)
+                            else if (me->GetAreaId() == SHATTRATH)
                             {
                                 rnd = urand(0, 5);
                                 switch (rnd)
@@ -591,7 +591,7 @@ public:
                         // Play selected music
                         if (_currentMusicEvent != 0)
                         {
-                            go->PlayDirectMusic(_currentMusicEvent);
+                            me->PlayDirectMusic(_currentMusicEvent);
                         }
                         _events.ScheduleEvent(EVENT_BM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client
                         break;
@@ -649,7 +649,7 @@ public:
                     case EVENT_PDM_START_MUSIC:
                         if (!IsHolidayActive(HOLIDAY_PIRATES_DAY))
                             break;
-                        go->PlayDirectMusic(MUSIC_PIRATE_DAY_MUSIC);
+                        me->PlayDirectMusic(MUSIC_PIRATE_DAY_MUSIC);
                         _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                         break;
                     default:
@@ -704,7 +704,7 @@ public:
                     case EVENT_DFM_START_MUSIC:
                         if (!IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_ELWYNN) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_THUNDER) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_SHATTRATH))
                             break;
-                        go->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
+                        me->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
                         _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                         break;
                     default:
@@ -761,18 +761,18 @@ public:
                             if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
                                 break;
 
-                            Map::PlayerList const& players = go->GetMap()->GetPlayers();
+                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource())
                                 {
                                     if (player->GetTeamId() == TEAM_HORDE)
                                     {
-                                        go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
                                     }
                                     else
                                     {
-                                        go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
+                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
                                     }
                                 }
                             }
@@ -1389,7 +1389,7 @@ public:
             if (reportUse)
                 return false;
 
-            Unit* owner = go->GetOwner();
+            Unit* owner = me->GetOwner();
             if (_stoneSpell == 0 || _stoneId == 0)
             {
                 if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
@@ -1416,7 +1416,7 @@ public:
 
             // Item has to actually be created to remove a charge on the well.
             if (player->HasItemCount(_stoneId))
-                go->AddUse();
+                me->AddUse();
 
             return true;
         }
