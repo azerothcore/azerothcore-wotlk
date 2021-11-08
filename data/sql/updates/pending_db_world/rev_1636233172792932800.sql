@@ -1,0 +1,3 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636233172792932800');
+
+DELETE FROM `spell_dbc` WHERE `Id` IN (78142, 78951, 79342, 79579);
