@@ -52,28 +52,38 @@ class npc_lady_jaina_proudmoore : public CreatureScript
 public:
     npc_lady_jaina_proudmoore() : CreatureScript("npc_lady_jaina_proudmoore") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct npc_lady_jaina_proudmooreAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_SENDER_INFO)
+        npc_lady_jaina_proudmooreAI(Creature* c) : ScriptedAI(c) { }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
-            SendGossipMenuFor(player, 7012, creature->GetGUID());
-            player->CastSpell(player, SPELL_JAINAS_AUTOGRAPH, false);
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_SENDER_INFO)
+            {
+                SendGossipMenuFor(player, 7012, me->GetGUID());
+                player->CastSpell(player, SPELL_JAINAS_AUTOGRAPH, false);
+            }
+            return true;
         }
-        return true;
-    }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(QUEST_JAINAS_AUTOGRAPH) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_JAINA, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_JAINAS_AUTOGRAPH) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_JAINA, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
+        return new npc_lady_jaina_proudmooreAI(creature);
     }
 };
 
@@ -91,29 +101,39 @@ class npc_nat_pagle : public CreatureScript
 public:
     npc_nat_pagle() : CreatureScript("npc_nat_pagle") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct npc_nat_pagleAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
+        npc_nat_pagleAI(Creature* c) : ScriptedAI(c) { }
 
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (creature->IsVendor() && player->GetQuestRewardStatus(QUEST_NATS_MEASURING_TAPE))
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-            SendGossipMenuFor(player, 7640, creature->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, 7638, creature->GetGUID());
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_TRADE)
+                player->GetSession()->SendListInventory(me->GetGUID());
 
-        return true;
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (me->IsVendor() && player->GetQuestRewardStatus(QUEST_NATS_MEASURING_TAPE))
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                SendGossipMenuFor(player, 7640, me->GetGUID());
+            }
+            else
+                SendGossipMenuFor(player, 7638, me->GetGUID());
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_nat_pagleAI(creature);
     }
 };
 

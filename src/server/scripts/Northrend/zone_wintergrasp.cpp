@@ -274,57 +274,6 @@ class npc_wg_queue : public CreatureScript
 public:
     npc_wg_queue() : CreatureScript("npc_wg_queue") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
-            return false;
-
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-        if (!wintergrasp)
-            return true;
-
-        if (wintergrasp->IsWarTime())
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT_19, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_WAR : WG_NPCQUEUE_TEXT_A_WAR, creature->GetGUID());
-        }
-        else
-        {
-            uint32 timer = wintergrasp->GetTimer() / 1000;
-            player->SendUpdateWorldState(4354, time(nullptr) + timer);
-            if (timer < 15 * MINUTE)
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_QUEUE : WG_NPCQUEUE_TEXT_A_QUEUE, creature->GetGUID());
-            }
-            else
-                SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_NOWAR : WG_NPCQUEUE_TEXT_A_NOWAR, creature->GetGUID());
-        }
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature */, uint32 /*sender */, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-
-        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-        if (!wintergrasp)
-            return true;
-
-        if (wintergrasp->IsWarTime())
-            wintergrasp->InvitePlayerToWar(player);
-        else
-        {
-            uint32 timer = wintergrasp->GetTimer() / 1000;
-            if (timer < 15 * MINUTE)
-                wintergrasp->InvitePlayerToQueue(player);
-        }
-        return true;
-    }
-
     struct npc_wg_queueAI : public ScriptedAI
     {
         npc_wg_queueAI(Creature* creature) : ScriptedAI(creature)
@@ -379,6 +328,57 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FROST_ARMOR, 900000);
                     break;
             }
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
+                return false;
+
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+            if (!wintergrasp)
+                return true;
+
+            if (wintergrasp->IsWarTime())
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT_19, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_WAR : WG_NPCQUEUE_TEXT_A_WAR, me->GetGUID());
+            }
+            else
+            {
+                uint32 timer = wintergrasp->GetTimer() / 1000;
+                player->SendUpdateWorldState(4354, time(nullptr) + timer);
+                if (timer < 15 * MINUTE)
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_QUEUE : WG_NPCQUEUE_TEXT_A_QUEUE, me->GetGUID());
+                }
+                else
+                    SendGossipMenuFor(player, wintergrasp->GetDefenderTeam() ? WG_NPCQUEUE_TEXT_H_NOWAR : WG_NPCQUEUE_TEXT_A_NOWAR, me->GetGUID());
+            }
+            return true;
+        }
+
+        bool GossipSelect(Player* player,  uint32 /*sender */, uint32 /*action*/) override
+        {
+            CloseGossipMenuFor(player);
+
+            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+            if (!wintergrasp)
+                return true;
+
+            if (wintergrasp->IsWarTime())
+                wintergrasp->InvitePlayerToWar(player);
+            else
+            {
+                uint32 timer = wintergrasp->GetTimer() / 1000;
+                if (timer < 15 * MINUTE)
+                    wintergrasp->InvitePlayerToQueue(player);
+            }
+            return true;
         }
     };
 

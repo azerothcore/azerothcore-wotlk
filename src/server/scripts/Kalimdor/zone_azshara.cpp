@@ -279,6 +279,17 @@ public:
             ContinueWP = true;
         }
 
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_CHASING_THE_MOONSTONE) != QUEST_STATUS_INCOMPLETE)
+                return true;
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GET_MOONSTONE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            SendGossipMenuFor(player, 10811, me->GetGUID());
+
+            return true;
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (MustDie)
@@ -381,17 +392,6 @@ public:
         bool ContinueWP;
         bool Reached;
     };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_CHASING_THE_MOONSTONE) != QUEST_STATUS_INCOMPLETE)
-            return true;
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GET_MOONSTONE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, 10811, creature->GetGUID());
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {

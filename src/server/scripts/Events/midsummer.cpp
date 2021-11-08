@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObjectAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -36,12 +37,22 @@ class go_midsummer_bonfire : public GameObjectScript
 public:
     go_midsummer_bonfire() : GameObjectScript("go_midsummer_bonfire") { }
 
-    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 /*sender*/, uint32  /*action*/) override
+    struct go_midsummer_bonfireAI : public GameObjectAI
     {
-        CloseGossipMenuFor(player);
-        // we know that there is only one gossip.
-        player->CastSpell(player, SPELL_STAMP_OUT_BONFIRE, true);
-        return true;
+        go_midsummer_bonfireAI(GameObject* go) : GameObjectAI(go) { }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+        {
+            CloseGossipMenuFor(player);
+            // we know that there is only one gossip.
+            player->CastSpell(player, SPELL_STAMP_OUT_BONFIRE, true);
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_midsummer_bonfireAI(go);
     }
 };
 

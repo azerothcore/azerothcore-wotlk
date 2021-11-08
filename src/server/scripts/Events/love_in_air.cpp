@@ -458,19 +458,17 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+        void QuestReward(Player* /*player*/, const Quest* _Quest, uint32 /*slot*/) override
+        {
+            if (_Quest->GetQuestId() == QUEST_YOUVE_BEEN_SERVED)
+                DoAction(ACTION_START_EVENT);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_hummelAI(creature);
-    }
-
-    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* _Quest, uint32 /*slot*/) override
-    {
-        if (_Quest->GetQuestId() == QUEST_YOUVE_BEEN_SERVED)
-            creature->AI()->DoAction(ACTION_START_EVENT);
-
-        return true;
     }
 };
 

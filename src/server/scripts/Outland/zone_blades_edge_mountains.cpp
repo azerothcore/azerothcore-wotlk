@@ -30,6 +30,7 @@ EndContentData */
 
 #include "Cell.h"
 #include "CellImpl.h"
+#include "GameObjectAI.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
@@ -1013,14 +1014,24 @@ class go_simon_cluster : public GameObjectScript
 public:
     go_simon_cluster() : GameObjectScript("go_simon_cluster") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_simon_clusterAI : public GameObjectAI
     {
-        if (Creature* bunny = go->FindNearestCreature(NPC_SIMON_BUNNY, 12.0f, true))
-            bunny->AI()->SetData(go->GetEntry(), 0);
+        go_simon_clusterAI(GameObject* go) : GameObjectAI(go) { }
 
-        player->CastSpell(player, go->GetGOInfo()->goober.spellId, true);
-        go->AddUse();
-        return true;
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (Creature* bunny = go->FindNearestCreature(NPC_SIMON_BUNNY, 12.0f, true))
+                bunny->AI()->SetData(go->GetEntry(), 0);
+
+            player->CastSpell(player, go->GetGOInfo()->goober.spellId, true);
+            go->AddUse();
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_simon_clusterAI(go);
     }
 };
 
@@ -1039,27 +1050,37 @@ class go_apexis_relic : public GameObjectScript
 public:
     go_apexis_relic() : GameObjectScript("go_apexis_relic") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_apexis_relicAI : public GameObjectAI
     {
-        player->PrepareGossipMenu(go, go->GetGOInfo()->questgiver.gossipID);
-        player->SendPreparedGossip(go);
-        return true;
-    }
+        go_apexis_relicAI(GameObject* go) : GameObjectAI(go) { }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-
-        bool large = (go->GetEntry() == GO_APEXIS_MONUMENT);
-        if (player->HasItemCount(ITEM_APEXIS_SHARD, large ? 35 : 1))
+        bool GossipHello(Player* player, bool /*reportUse*/) override
         {
-            player->CastSpell(player, large ? SPELL_TAKE_REAGENTS_GROUP : SPELL_TAKE_REAGENTS_SOLO, false);
-
-            if (Creature* bunny = player->SummonCreature(NPC_SIMON_BUNNY, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ()))
-                bunny->AI()->SetGUID(player->GetGUID(), large);
+            player->PrepareGossipMenu(go, go->GetGOInfo()->questgiver.gossipID);
+            player->SendPreparedGossip(go);
+            return true;
         }
 
-        return true;
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+        {
+            CloseGossipMenuFor(player);
+
+            bool large = (go->GetEntry() == GO_APEXIS_MONUMENT);
+            if (player->HasItemCount(ITEM_APEXIS_SHARD, large ? 35 : 1))
+            {
+                player->CastSpell(player, large ? SPELL_TAKE_REAGENTS_GROUP : SPELL_TAKE_REAGENTS_SOLO, false);
+
+                if (Creature* bunny = player->SummonCreature(NPC_SIMON_BUNNY, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ()))
+                    bunny->AI()->SetGUID(player->GetGUID(), large);
+            }
+
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_apexis_relicAI(go);
     }
 };
 

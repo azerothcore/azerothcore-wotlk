@@ -1488,7 +1488,6 @@ public:
     {
         return new go_the_focusing_irisAI(go);
     }
-    }
 };
 
 class spell_eoe_ph3_surge_of_power : public SpellScriptLoader

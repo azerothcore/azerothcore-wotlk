@@ -411,14 +411,6 @@ class npc_kurenai_captive : public CreatureScript
 public:
     npc_kurenai_captive() : CreatureScript("npc_kurenai_captive") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_TOTEM_KARDASH_A)
-            creature->AI()->SetGUID(player->GetGUID(), quest->GetQuestId());
-
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kurenai_captiveAI(creature);
@@ -431,6 +423,12 @@ public:
         uint32 ChainLightningTimer;
         uint32 HealTimer;
         uint32 FrostShockTimer;
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_TOTEM_KARDASH_A)
+                SetGUID(player->GetGUID(), quest->GetQuestId());
+        }
 
         void SetGUID(ObjectGuid guid, int32  /*questId*/) override
         {

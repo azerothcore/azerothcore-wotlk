@@ -30,6 +30,7 @@ npc_enraged_panther
 go_panther_cage
 EndContentData */
 
+#include "GameObjectAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
@@ -71,19 +72,6 @@ class npc_lakota_windsong : public CreatureScript
 public:
     npc_lakota_windsong() : CreatureScript("npc_lakota_windsong") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_FREE_AT_LAST)
-        {
-            creature->AI()->Talk(SAY_LAKO_START, player);
-            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); //guessed
-
-            if (npc_lakota_windsongAI* pEscortAI = CAST_AI(npc_lakota_windsong::npc_lakota_windsongAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lakota_windsongAI(creature);
@@ -123,6 +111,17 @@ public:
             for (int i = 0; i < 2; ++i)
                 me->SummonCreature(NPC_GRIM_BANDIT, BanditLoc[i + AmbushId], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         }
+
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_FREE_AT_LAST)
+            {
+                Talk(SAY_LAKO_START, player);
+                me->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); // guessed
+                Start(false, false, player->GetGUID(), quest);
+            }
+        }
     };
 };
 
@@ -151,19 +150,6 @@ class npc_paoka_swiftmountain : public CreatureScript
 {
 public:
     npc_paoka_swiftmountain() : CreatureScript("npc_paoka_swiftmountain") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_HOMEWARD)
-        {
-            creature->AI()->Talk(SAY_START, player);
-            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); // guessed
-
-            if (npc_paoka_swiftmountainAI* pEscortAI = CAST_AI(npc_paoka_swiftmountain::npc_paoka_swiftmountainAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
-        }
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -194,6 +180,16 @@ public:
             }
         }
 
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_HOMEWARD)
+            {
+                Talk(SAY_START, player);
+                me->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); // guessed
+                Start(false, false, player->GetGUID(), quest);
+            }
+        }
+
         void DoSpawnWyvern()
         {
             for (int i = 0; i < 3; ++i)
@@ -220,29 +216,6 @@ class npc_plucky : public CreatureScript
 public:
     npc_plucky() : CreatureScript("npc_plucky") { }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                CloseGossipMenuFor(player);
-                player->CompleteQuest(QUEST_SCOOP);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, 738, creature->GetGUID());
-
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pluckyAI(creature);
@@ -266,6 +239,29 @@ public:
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
             DoCast(me, SPELL_PLUCKY_CHICKEN, false);
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            switch (action)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                CloseGossipMenuFor(player);
+                player->CompleteQuest(QUEST_SCOOP);
+                break;
+            }
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, 738, me->GetGUID());
+
+            return true;
         }
 
         void ReceiveEmote(Player* player, uint32 TextEmote) override
@@ -329,20 +325,30 @@ class go_panther_cage : public GameObjectScript
 public:
     go_panther_cage() : GameObjectScript("go_panther_cage") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_panther_cageAI : public GameObjectAI
     {
-        go->UseDoorOrButton();
-        if (player->GetQuestStatus(5151) == QUEST_STATUS_INCOMPLETE)
-        {
-            if (Creature* panther = go->FindNearestCreature(ENRAGED_PANTHER, 5, true))
-            {
-                panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                panther->SetReactState(REACT_AGGRESSIVE);
-                panther->AI()->AttackStart(player);
-            }
-        }
+        go_panther_cageAI(GameObject* go) : GameObjectAI(go) { }
 
-        return true;
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            go->UseDoorOrButton();
+            if (player->GetQuestStatus(5151) == QUEST_STATUS_INCOMPLETE)
+            {
+                if (Creature* panther = go->FindNearestCreature(ENRAGED_PANTHER, 5, true))
+                {
+                    panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    panther->SetReactState(REACT_AGGRESSIVE);
+                    panther->AI()->AttackStart(player);
+                }
+            }
+
+            return true;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_panther_cageAI(go);
     }
 };
 

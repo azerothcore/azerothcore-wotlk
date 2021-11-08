@@ -46,16 +46,6 @@ class npc_shenthul : public CreatureScript
 public:
     npc_shenthul() : CreatureScript("npc_shenthul") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_SHATTERED_SALUTE)
-        {
-            CAST_AI(npc_shenthul::npc_shenthulAI, creature->AI())->CanTalk = true;
-            CAST_AI(npc_shenthul::npc_shenthulAI, creature->AI())->PlayerGUID = player->GetGUID();
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_shenthulAI(creature);
@@ -78,6 +68,15 @@ public:
             SaluteTimer = 6000;
             ResetTimer = 0;
             PlayerGUID.Clear();
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_SHATTERED_SALUTE)
+            {
+                CanTalk = true;
+                PlayerGUID = player->GetGUID();
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -155,55 +154,6 @@ class npc_thrall_warchief : public CreatureScript
 public:
     npc_thrall_warchief() : CreatureScript("npc_thrall_warchief") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 5733, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 5734, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, 5735, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                SendGossipMenuFor(player, 5736, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+5:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                SendGossipMenuFor(player, 5737, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+6:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-                SendGossipMenuFor(player, 5738, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+7:
-                CloseGossipMenuFor(player);
-                player->AreaExploredOrEventHappens(QUEST_6566);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_6566) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HTW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_thrall_warchiefAI(creature);
@@ -220,6 +170,55 @@ public:
         {
             ChainLightningTimer = 2000;
             ShockTimer = 8000;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            switch (action)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, 5733, me->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 2:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                SendGossipMenuFor(player, 5734, me->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 3:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                SendGossipMenuFor(player, 5735, me->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 4:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                SendGossipMenuFor(player, 5736, me->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 5:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+                SendGossipMenuFor(player, 5737, me->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 6:
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_STW6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+                SendGossipMenuFor(player, 5738, me->GetGUID());
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 7:
+                CloseGossipMenuFor(player);
+                player->AreaExploredOrEventHappens(QUEST_6566);
+                break;
+            }
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(QUEST_6566) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HTW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
+            return true;
         }
 
         void EnterCombat(Unit* /*who*/) override { }

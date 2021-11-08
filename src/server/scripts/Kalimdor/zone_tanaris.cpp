@@ -291,37 +291,45 @@ class npc_steward_of_time : public CreatureScript
 public:
     npc_steward_of_time() : CreatureScript("npc_steward_of_time") { }
 
-    bool OnQuestAccept(Player* player, Creature* /*creature*/, Quest const* quest) override
+    struct npc_steward_of_timeAI : public ScriptedAI
     {
-        if (quest->GetQuestId() == 10279)                      //Quest: To The Master's Lair
-            player->CastSpell(player, 34891, true);               //(Flight through Caverns)
+        npc_steward_of_timeAI(Creature* c) : ScriptedAI(c) { }
 
-        return false;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            player->CastSpell(player, 34891, true);               //(Flight through Caverns)
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(10279) == QUEST_STATUS_INCOMPLETE || player->GetQuestRewardStatus(10279))
+        void QuestAccept(Player* player, Quest const* quest) override
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_FLIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, 9978, creature->GetGUID());
+            if (quest->GetQuestId() == 10279)           // Quest: To The Master's Lair
+                player->CastSpell(player, 34891, true); //(Flight through Caverns)
         }
-        else
-            SendGossipMenuFor(player, 9977, creature->GetGUID());
 
-        return true;
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+                player->CastSpell(player, 34891, true); //(Flight through Caverns)
+
+            return true;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(10279) == QUEST_STATUS_INCOMPLETE || player->GetQuestRewardStatus(10279))
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_FLIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, 9978, me->GetGUID());
+            }
+            else
+                SendGossipMenuFor(player, 9977, me->GetGUID());
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_steward_of_timeAI(creature);
     }
 };
 
@@ -341,50 +349,60 @@ class npc_stone_watcher_of_norgannon : public CreatureScript
 public:
     npc_stone_watcher_of_norgannon() : CreatureScript("npc_stone_watcher_of_norgannon") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    struct npc_stone_watcher_of_norgannonAI : public ScriptedAI
     {
-        ClearGossipMenuFor(player);
-        switch (action)
+        npc_stone_watcher_of_norgannonAI(Creature* c) : ScriptedAI(c) { }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
+            ClearGossipMenuFor(player);
+            switch (action)
+            {
             case GOSSIP_ACTION_INFO_DEF:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 1675, creature->GetGUID());
+                SendGossipMenuFor(player, 1675, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+1:
+            case GOSSIP_ACTION_INFO_DEF + 1:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 1676, creature->GetGUID());
+                SendGossipMenuFor(player, 1676, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+2:
+            case GOSSIP_ACTION_INFO_DEF + 2:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 1677, creature->GetGUID());
+                SendGossipMenuFor(player, 1677, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+3:
+            case GOSSIP_ACTION_INFO_DEF + 3:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                SendGossipMenuFor(player, 1678, creature->GetGUID());
+                SendGossipMenuFor(player, 1678, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+4:
+            case GOSSIP_ACTION_INFO_DEF + 4:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                SendGossipMenuFor(player, 1679, creature->GetGUID());
+                SendGossipMenuFor(player, 1679, me->GetGUID());
                 break;
-            case GOSSIP_ACTION_INFO_DEF+5:
+            case GOSSIP_ACTION_INFO_DEF + 5:
                 CloseGossipMenuFor(player);
                 player->AreaExploredOrEventHappens(2954);
                 break;
+            }
+            return true;
         }
-        return true;
-    }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+        bool GossipHello(Player* player) override
+        {
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            if (player->GetQuestStatus(2954) == QUEST_STATUS_INCOMPLETE)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+
+            SendGossipMenuFor(player, 1674, me->GetGUID());
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(2954) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-        SendGossipMenuFor(player, 1674, creature->GetGUID());
-
-        return true;
+        return new npc_stone_watcher_of_norgannonAI(creature);
     }
 };
 
@@ -416,17 +434,6 @@ class npc_tooga : public CreatureScript
 public:
     npc_tooga() : CreatureScript("npc_tooga") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_TOOGA)
-        {
-            if (npc_toogaAI* pToogaAI = CAST_AI(npc_tooga::npc_toogaAI, creature->AI()))
-                pToogaAI->StartFollow(player, FACTION_TOOG_ESCORTEE, quest);
-        }
-
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_toogaAI(creature);
@@ -449,6 +456,14 @@ public:
             PhasePostEvent = 0;
 
             TortaGUID.Clear();
+        }
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_TOOGA)
+            {
+                StartFollow(player, FACTION_TOOG_ESCORTEE, quest);
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override

@@ -505,67 +505,65 @@ public:
                 }
             }
         }
-    };
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
-        QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
-
-        QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
-        qm.ClearMenu();
-
-        for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
+        bool GossipHello(Player* player) override
         {
-            uint32 quest_id = i->second;
-            QuestStatus status = player->GetQuestStatus(quest_id);
-            if (status == QUEST_STATUS_COMPLETE)
-                qm.AddMenuItem(quest_id, 4);
-            else if (status == QUEST_STATUS_INCOMPLETE)
-                qm.AddMenuItem(quest_id, 4);
-        }
+            QuestRelationBounds pObjectQR  = sObjectMgr->GetCreatureQuestRelationBounds(me->GetEntry());
+            QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(me->GetEntry());
 
-        for (QuestRelations::const_iterator i = pObjectQR.first; i != pObjectQR.second; ++i)
-        {
-            uint32 quest_id = i->second;
-            Quest const* pQuest = sObjectMgr->GetQuestTemplate(quest_id);
-            if (!pQuest)
-                continue;
+            QuestMenu& qm = player->PlayerTalkClass->GetQuestMenu();
+            qm.ClearMenu();
 
-            if (!player->CanTakeQuest(pQuest, false))
-                continue;
-            else if (player->GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
+            for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
             {
-                switch (quest_id)
+                uint32      quest_id = i->second;
+                QuestStatus status   = player->GetQuestStatus(quest_id);
+                if (status == QUEST_STATUS_COMPLETE)
+                    qm.AddMenuItem(quest_id, 4);
+                else if (status == QUEST_STATUS_INCOMPLETE)
+                    qm.AddMenuItem(quest_id, 4);
+            }
+
+            for (QuestRelations::const_iterator i = pObjectQR.first; i != pObjectQR.second; ++i)
+            {
+                uint32       quest_id = i->second;
+                Quest const* pQuest   = sObjectMgr->GetQuestTemplate(quest_id);
+                if (!pQuest)
+                    continue;
+
+                if (!player->CanTakeQuest(pQuest, false))
+                    continue;
+                else if (player->GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
                 {
+                    switch (quest_id)
+                    {
                     case QUEST_LET_THE_FIRES_COME_A:
                     case QUEST_LET_THE_FIRES_COME_H:
-                        if (!creature->AI()->GetData(DATA_ALLOW_START))
+                        if (!GetData(DATA_ALLOW_START))
                             qm.AddMenuItem(quest_id, 2);
                         break;
                     case QUEST_STOP_THE_FIRES_A:
                     case QUEST_STOP_THE_FIRES_H:
-                        if (creature->AI()->GetData(DATA_ALLOW_START))
+                        if (GetData(DATA_ALLOW_START))
                             qm.AddMenuItem(quest_id, 2);
                         break;
                     default:
                         qm.AddMenuItem(quest_id, 2);
                         break;
+                    }
                 }
             }
+
+            player->SendPreparedQuest(me->GetGUID());
+            return true;
         }
 
-        player->SendPreparedQuest(creature->GetGUID());
-        return true;
-    }
-
-    bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest) override
-    {
-        if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !creature->AI()->GetData(DATA_ALLOW_START))
-            creature->AI()->DoAction(ACTION_START_EVENT);
-
-        return true;
-    }
+        void QuestAccept(Player* /*player*/, Quest const* quest) override
+        {
+            if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !GetData(DATA_ALLOW_START))
+                DoAction(ACTION_START_EVENT);
+        }
+    };
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
@@ -1551,17 +1549,6 @@ class go_loosely_turned_soil : public GameObjectScript
 public:
     go_loosely_turned_soil() : GameObjectScript("go_loosely_turned_soil") { }
 
-    bool OnQuestReward(Player* player, GameObject* go, Quest const* /*quest*/, uint32 /*opt*/) override
-    {
-        if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
-            return true;
-
-        if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
-            horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
-
-        return true;
-    }
-
     struct go_loosely_turned_soilAI : public GameObjectAI
     {
         go_loosely_turned_soilAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
@@ -1575,6 +1562,15 @@ public:
 
             Group const* group = player->GetGroup();
             return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_HEADLESS_HORSEMAN;
+        }
+
+        void QuestReward(Player* player, Quest const* /*quest*/, uint32 /*opt*/) override
+        {
+            if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
+                return;
+
+            if (Creature* horseman = go->SummonCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 1754.00f, 1346.00f, 17.50f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
         }
     };
 

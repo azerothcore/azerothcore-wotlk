@@ -1737,7 +1737,7 @@ public:
         {
             if (menuId != GOSSIP_ID)
             {
-                return;
+                return false;
             }
 
             if (gossipListId == GOSSIP_OPTION_FIGHT)
@@ -1750,7 +1750,7 @@ public:
                 CloseGossipMenuFor(player);
             }
 
-            return false;
+            return true;
         }
 
         bool CanBeSeen(Player const* player) override

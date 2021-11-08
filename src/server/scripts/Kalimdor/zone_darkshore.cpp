@@ -269,22 +269,17 @@ public:
 
             DoMeleeAttackIfReady();
         }
-    };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_SLEEPER_AWAKENED)
+        void QuestAccept(Player* player, const Quest* quest) override
         {
-            if (npc_kerlonianAI* pKerlonianAI = CAST_AI(npc_kerlonian::npc_kerlonianAI, creature->AI()))
+            if (quest->GetQuestId() == QUEST_SLEEPER_AWAKENED)
             {
-                creature->SetStandState(UNIT_STAND_STATE_STAND);
-                creature->AI()->Talk(SAY_KER_START, player);
-                pKerlonianAI->StartFollow(player, FACTION_ESCORTEE_N_NEUTRAL_PASSIVE, quest);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                Talk(SAY_KER_START, player);
+                StartFollow(player, FACTION_ESCORTEE_N_NEUTRAL_PASSIVE, quest);
             }
         }
-
-        return true;
-    }
+    };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -333,6 +328,15 @@ public:
         {
             if (urand(0, 1))
                 Talk(SAY_REM_AGGRO, who);
+        }
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
+            {
+                Start(false, false, player->GetGUID());
+                me->SetFaction(FACTION_ESCORTEE_A_NEUTRAL_PASSIVE);
+            }
         }
 
         void JustSummoned(Creature* /*pSummoned*/) override
@@ -402,19 +406,6 @@ public:
             }
         }
     };
-
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
-        {
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_prospector_remtravel::npc_prospector_remtravelAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
-
-            creature->SetFaction(FACTION_ESCORTEE_A_NEUTRAL_PASSIVE);
-        }
-
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {

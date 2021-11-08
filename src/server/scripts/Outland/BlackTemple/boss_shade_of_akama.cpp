@@ -420,7 +420,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
         {
             if (action == 0)
             {
@@ -428,6 +428,8 @@ public:
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 events2.ScheduleEvent(EVENT_AKAMA_START_ENCOUNTER, 0);
             }
+
+            return true;
         }
     };
 

@@ -34,18 +34,22 @@ class npc_announcer_toc10 : public CreatureScript
 public:
     npc_announcer_toc10() : CreatureScript("npc_announcer_toc10") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    struct npc_announcer_toc10AI : public ScriptedAI
     {
-        if(!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            return true;
+        npc_announcer_toc10AI(Creature* c) : ScriptedAI(c) { }
 
-        InstanceScript* pInstance = creature->GetInstanceScript();
-        if(!pInstance)
-            return true;
-
-        uint32 gossipTextId = 0;
-        switch(pInstance->GetData(TYPE_INSTANCE_PROGRESS))
+        bool OnGossipHello(Player* player) override
         {
+            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                return true;
+
+            InstanceScript* pInstance = me->GetInstanceScript();
+            if (!pInstance)
+                return true;
+
+            uint32 gossipTextId = 0;
+            switch (pInstance->GetData(TYPE_INSTANCE_PROGRESS))
+            {
             case INSTANCE_PROGRESS_INITIAL:
                 gossipTextId = MSG_TESTED;
                 break;
@@ -59,34 +63,40 @@ public:
                 gossipTextId = MSG_CRUSADERS;
                 break;
             case INSTANCE_PROGRESS_DONE:
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 return true;
             default:
                 return true;
+            }
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
+            SendGossipMenuFor(player, gossipTextId, me->GetGUID());
+            return true;
         }
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
-        SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 uiAction) override
-    {
-        if( !creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) )
-            return true;
-
-        InstanceScript* pInstance = creature->GetInstanceScript();
-        if( !pInstance )
-            return true;
-
-        if( uiAction == GOSSIP_ACTION_INFO_DEF + 1337 )
+        bool OnGossipSelect(Player* player, uint32 /*sender*/, uint32 uiAction) override
         {
-            pInstance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
-            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        }
+            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                return true;
 
-        CloseGossipMenuFor(player);
-        return true;
+            InstanceScript* pInstance = me->GetInstanceScript();
+            if (!pInstance)
+                return true;
+
+            if (uiAction == GOSSIP_ACTION_INFO_DEF + 1337)
+            {
+                pInstance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+
+            CloseGossipMenuFor(player);
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_announcer_toc10AI;
     }
 };
 

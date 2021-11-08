@@ -232,7 +232,7 @@ public:
 class npc_balance_of_light_and_shadow : public CreatureScript
 {
 public:
-    npc_balance_of_light_and_shadow(Creature* c) : CreatureScript("npc_balance_of_light_and_shadow") { }
+    npc_balance_of_light_and_shadow() : CreatureScript("npc_balance_of_light_and_shadow") { }
 
     struct npc_balance_of_light_and_shadowAI : public NullCreatureAI
     {

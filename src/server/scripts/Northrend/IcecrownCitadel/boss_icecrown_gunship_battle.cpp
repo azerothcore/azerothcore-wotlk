@@ -754,10 +754,10 @@ public:
             checkTimer = 1000;
         }
 
-        void GossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
+        bool GossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
             if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-                return;
+                return false;
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
@@ -766,6 +766,7 @@ public:
             _events.ScheduleEvent(EVENT_INTRO_SUMMON_SKYBREAKER, 24600);
             _events.ScheduleEvent(EVENT_INTRO_H_3, 29600);
             _events.ScheduleEvent(EVENT_INTRO_H_4, 39200);
+            return true;
         }
 
         void EnterCombat(Unit* /*target*/) override
@@ -1089,10 +1090,10 @@ public:
             checkTimer = 1000;
         }
 
-        void GossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
+        bool GossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
         {
             if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-                return;
+                return false;
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->GetTransport()->setActive(true);
             me->GetTransport()->ToMotionTransport()->EnableMovement(true);
@@ -1421,10 +1422,11 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             player->AddItem(ITEM_GOBLIN_ROCKET_PACK, 1);
             player->PlayerTalkClass->SendCloseGossip();
+            return true;
         }
     };
 

@@ -89,84 +89,6 @@ class npc_hor_leader : public CreatureScript
 public:
     npc_hor_leader() : CreatureScript("npc_hor_leader") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            return true;
-
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        bool canStart = true;
-        if (InstanceScript* instance = creature->GetInstanceScript())
-            if (uint32 bhd = instance->GetData(DATA_BATTERED_HILT))
-                if ((bhd & BHSF_FINISHED) == 0)
-                    canStart = false;
-
-        if (canStart)
-        {
-            QuestStatus status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
-            if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-                AddGossipItemFor(player, 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-            // once last quest is completed, she offers this shortcut of the starting event
-            status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
-            if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-            {
-                if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-                    AddGossipItemFor(player, 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                else
-                    AddGossipItemFor(player, 0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            }
-        }
-
-        if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-        {
-            SendGossipMenuFor(player, 15215, creature->GetGUID());
-        }
-        else if (creature->GetEntry() == NPC_JAINA_PART1)
-        {
-            SendGossipMenuFor(player, 15339, creature->GetGUID());
-        }
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
-    {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            return true;
-
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (!instance)
-            return true;
-
-        if (uint32 bhd = instance->GetData(DATA_BATTERED_HILT))
-            if ((bhd & BHSF_FINISHED) == 0)
-                return true;
-
-        instance->SetData(DATA_BATTERED_HILT, 1);
-
-        ClearGossipMenuFor(player);
-        switch (uiAction)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                CloseGossipMenuFor(player);
-                if (creature->AI())
-                    creature->AI()->DoAction(ACTION_START_INTRO);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                CloseGossipMenuFor(player);
-                if (creature->AI())
-                    creature->AI()->DoAction(ACTION_SKIP_INTRO);
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                break;
-        }
-
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetHallsOfReflectionAI<npc_hor_leaderAI>(creature);
@@ -199,6 +121,82 @@ public:
                 events.ScheduleEvent(EVENT_PRE_INTRO_2, 11000);
                 events.ScheduleEvent(EVENT_PRE_INTRO_3, 17000);
             }
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                return true;
+
+            if (me->IsQuestGiver())
+                player->PrepareQuestMenu(me->GetGUID());
+
+            bool canStart = true;
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (uint32 bhd = instance->GetData(DATA_BATTERED_HILT))
+                    if ((bhd & BHSF_FINISHED) == 0)
+                        canStart = false;
+
+            if (canStart)
+            {
+                QuestStatus status = player->GetQuestStatus(me->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
+                if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
+                    AddGossipItemFor(player, 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+                // once last quest is completed, she offers this shortcut of the starting event
+                status = player->GetQuestStatus(me->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
+                if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
+                {
+                    if (me->GetEntry() == NPC_SYLVANAS_PART1)
+                        AddGossipItemFor(player, 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    else
+                        AddGossipItemFor(player, 0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                }
+            }
+
+            if (me->GetEntry() == NPC_SYLVANAS_PART1)
+            {
+                SendGossipMenuFor(player, 15215, me->GetGUID());
+            }
+            else if (me->GetEntry() == NPC_JAINA_PART1)
+            {
+                SendGossipMenuFor(player, 15339, me->GetGUID());
+            }
+
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 uiAction) override
+        {
+            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                return true;
+
+            InstanceScript* instance = me->GetInstanceScript();
+            if (!instance)
+                return true;
+
+            if (uint32 bhd = instance->GetData(DATA_BATTERED_HILT))
+                if ((bhd & BHSF_FINISHED) == 0)
+                    return true;
+
+            instance->SetData(DATA_BATTERED_HILT, 1);
+
+            ClearGossipMenuFor(player);
+            switch (uiAction)
+            {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                CloseGossipMenuFor(player);
+                DoAction(ACTION_START_INTRO);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 2:
+                CloseGossipMenuFor(player);
+                DoAction(ACTION_SKIP_INTRO);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                break;
+            }
+
+            return true;
         }
 
         void DoAction(int32 actionId) override
@@ -1617,24 +1615,6 @@ class npc_hor_leader_second : public CreatureScript
 public:
     npc_hor_leader_second() : CreatureScript("npc_hor_leader_second") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/) override
-    {
-        if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            return true;
-
-        ClearGossipMenuFor(player);
-
-        if (InstanceScript* pInstance = creature->GetInstanceScript())
-            if (!pInstance->GetData(DATA_LICH_KING))
-            {
-                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                creature->AI()->DoAction(ACTION_START_LK_FIGHT_REAL);
-                return true;
-            }
-
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetHallsOfReflectionAI<npc_hor_leader_secondAI>(creature);
@@ -1657,6 +1637,24 @@ public:
         {
             currentStopPoint = 0;
             events.Reset();
+        }
+
+        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 /*uiAction*/) override
+        {
+            if (!me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
+                return true;
+
+            ClearGossipMenuFor(player);
+
+            if (InstanceScript* pInstance = me->GetInstanceScript())
+                if (!pInstance->GetData(DATA_LICH_KING))
+                {
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    DoAction(ACTION_START_LK_FIGHT_REAL);
+                    return true;
+                }
+
+            return true;
         }
 
         void DoAction(int32 actionId) override

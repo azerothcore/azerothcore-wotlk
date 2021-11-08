@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObjectAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -603,59 +604,6 @@ class npc_ulduar_expedition_commander : public CreatureScript
 public:
     npc_ulduar_expedition_commander() : CreatureScript("npc_ulduar_expedition_commander") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (!player || !creature)
-            return true;
-
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (!instance)
-            return true;
-
-        if (instance->GetData(TYPE_RAZORSCALE) == DONE)
-            return true;
-
-        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
-        if (!razorscale || razorscale->IsInCombat())
-            return true;
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, TEXT_GOSSIP_ACTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, 40100, creature);
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction) override
-    {
-        if (!player || !creature)
-            return true;
-
-        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            InstanceScript* instance = creature->GetInstanceScript();
-            if (!instance || instance->GetData(TYPE_RAZORSCALE) == DONE)
-                return true;
-
-            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
-            if (razorscale && !razorscale->IsInCombat())
-            {
-                // reset npcs NPC_HARPOON_FIRE_STATE
-                for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i)))
-                        hfs->AI()->SetData(1, 0);
-
-                if (razorscale->AI())
-                {
-                    razorscale->AI()->AttackStart(player);
-                    razorscale->GetMotionMaster()->MoveIdle();
-                    razorscale->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_INIT, 588.0f, -178.0f, 490.0f, false, false);
-                }
-            }
-        }
-
-        player->PlayerTalkClass->SendCloseGossip();
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetUlduarAI<npc_ulduar_expedition_commanderAI>(creature);
@@ -668,6 +616,53 @@ public:
             _instance = creature->GetInstanceScript();
             _introSpoken = _instance->GetData(TYPE_RAZORSCALE) == DONE;
             me->SetReactState(REACT_AGGRESSIVE);
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            InstanceScript* instance = me->GetInstanceScript();
+            if (!instance)
+                return true;
+
+            if (instance->GetData(TYPE_RAZORSCALE) == DONE)
+                return true;
+
+            Creature* razorscale = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_RAZORSCALE));
+            if (!razorscale || razorscale->IsInCombat())
+                return true;
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, TEXT_GOSSIP_ACTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            SendGossipMenuFor(player, 40100, me);
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*uiSender*/, uint32 uiAction) override
+        {
+            if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+            {
+                InstanceScript* instance = me->GetInstanceScript();
+                if (!instance || instance->GetData(TYPE_RAZORSCALE) == DONE)
+                    return true;
+
+                Creature* razorscale = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_RAZORSCALE));
+                if (razorscale && !razorscale->IsInCombat())
+                {
+                    // reset npcs NPC_HARPOON_FIRE_STATE
+                    for (uint8 i = 0; i < 4; ++i)
+                        if (Creature* hfs = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i)))
+                            hfs->AI()->SetData(1, 0);
+
+                    if (razorscale->AI())
+                    {
+                        razorscale->AI()->AttackStart(player);
+                        razorscale->GetMotionMaster()->MoveIdle();
+                        razorscale->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_INIT, 588.0f, -178.0f, 490.0f, false, false);
+                    }
+                }
+            }
+
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -901,54 +896,61 @@ class go_ulduar_working_harpoon : public GameObjectScript
 public:
     go_ulduar_working_harpoon() : GameObjectScript("go_ulduar_working_harpoon") { }
 
-    bool OnGossipHello(Player* user, GameObject* go) override
+    struct go_ulduar_working_harpoonAI : public GameObjectAI
     {
-        if( !user || !go )
-            return true;
+        go_ulduar_working_harpoonAI(GameObject* go) : GameObjectAI(go) { }
 
-        InstanceScript* pInstance = go->GetInstanceScript();
-        if( !pInstance )
-            return true;
-
-        Creature* rs = nullptr;
-        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
-            rs = ObjectAccessor::GetCreature(*go, rsGUID);
-
-        if( !rs || !rs->IsInCombat() )
+        bool GossipHello(Player* user, bool /*reportUse*/) override
         {
-            go->SetRespawnTime(0);
-            go->Delete();
-            return true;
-        }
+            InstanceScript* pInstance = go->GetInstanceScript();
+            if (!pInstance)
+                return true;
 
-        uint32 npc = 0;
-        uint32 spell = 0;
-        switch( go->GetEntry() )
-        {
+            Creature* rs = nullptr;
+            if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE))
+                rs = ObjectAccessor::GetCreature(*go, rsGUID);
+
+            if (!rs || !rs->IsInCombat())
+            {
+                go->SetRespawnTime(0);
+                go->Delete();
+                return true;
+            }
+
+            uint32 npc   = 0;
+            uint32 spell = 0;
+            switch (go->GetEntry())
+            {
             case GO_HARPOON_GUN_1:
-                npc = DATA_HARPOON_FIRE_STATE_1;
+                npc   = DATA_HARPOON_FIRE_STATE_1;
                 spell = SPELL_CHAIN_1;
                 break;
             case GO_HARPOON_GUN_2:
-                npc = DATA_HARPOON_FIRE_STATE_2;
+                npc   = DATA_HARPOON_FIRE_STATE_2;
                 spell = SPELL_CHAIN_2;
                 break;
             case GO_HARPOON_GUN_3:
-                npc = DATA_HARPOON_FIRE_STATE_3;
+                npc   = DATA_HARPOON_FIRE_STATE_3;
                 spell = SPELL_CHAIN_3;
                 break;
             case GO_HARPOON_GUN_4:
-                npc = DATA_HARPOON_FIRE_STATE_4;
+                npc   = DATA_HARPOON_FIRE_STATE_4;
                 spell = SPELL_CHAIN_4;
                 break;
+            }
+
+            if (ObjectGuid g = pInstance->GetGuidData(npc))
+                if (Creature* hfs = ObjectAccessor::GetCreature(*go, g))
+                    hfs->AI()->SetData(3, spell);
+
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            return true;
         }
+    };
 
-        if( ObjectGuid g = pInstance->GetGuidData(npc) )
-            if( Creature* hfs = ObjectAccessor::GetCreature(*go, g) )
-                hfs->AI()->SetData(3, spell);
-
-        go->SetLootState(GO_JUST_DEACTIVATED);
-        return true;
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_ulduar_working_harpoonAI(go);
     }
 };
 

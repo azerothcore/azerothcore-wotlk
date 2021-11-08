@@ -196,19 +196,6 @@ class npc_koltira_deathweaver : public CreatureScript
 public:
     npc_koltira_deathweaver() : CreatureScript("npc_koltira_deathweaver") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_BREAKOUT)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->setActive(true);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_koltira_deathweaver::npc_koltira_deathweaverAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_koltira_deathweaverAI(creature);
@@ -237,6 +224,16 @@ public:
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
                 summons.DespawnAll();
+            }
+        }
+
+        void QuestAccept(Player* player, const Quest* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_BREAKOUT)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->setActive(true);
+                Start(false, false, player->GetGUID());
             }
         }
 

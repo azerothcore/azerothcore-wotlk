@@ -162,71 +162,6 @@ class brann_bronzebeard : public CreatureScript
 public:
     brann_bronzebeard() : CreatureScript("brann_bronzebeard") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        InstanceScript* pInstance = (creature->GetInstanceScript());
-
-        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        player->PrepareGossipMenu(creature, 0, true);
-        if (pInstance)
-        {
-            uint32 brann = pInstance->GetData(BRANN_BRONZEBEARD);
-            switch (brann)
-            {
-                case 1:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    break;
-                case 2:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    break;
-                case 3:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    break;
-                case 4:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                    break;
-                case 5:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                    break;
-                default:
-                    break;
-            }
-        }
-        SendGossipMenuFor(player, TEXT_ID_START, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32 action) override
-    {
-        if (action)
-        {
-            switch (action)
-            {
-                case GOSSIP_ACTION_INFO_DEF+1:
-                    creature->AI()->DoAction(ACTION_START_EVENT);
-                    CloseGossipMenuFor(player);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF+2:
-                    creature->AI()->DoAction(ACTION_START_TRIBUNAL);
-                    CloseGossipMenuFor(player);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF+3:
-                    creature->AI()->DoAction(ACTION_GO_TO_SJONNIR);
-                    CloseGossipMenuFor(player);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF+4:
-                    creature->AI()->DoAction(ACTION_WIPE_START);
-                    CloseGossipMenuFor(player);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF+5:
-                    creature->AI()->DoAction(ACTION_OPEN_DOOR);
-                    CloseGossipMenuFor(player);
-                    break;
-            }
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new brann_bronzebeardAI (creature);
@@ -257,6 +192,71 @@ public:
             if ((cr = GetMarnak())) cr->DespawnOrUnsummon();
             if ((cr = GetKaddrak())) cr->DespawnOrUnsummon();
             SwitchHeadVisaul(0x7, false);
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            InstanceScript* pInstance = (me->GetInstanceScript());
+
+            player->TalkedToCreature(me->GetEntry(), me->GetGUID());
+            player->PrepareGossipMenu(me, 0, true);
+            if (pInstance)
+            {
+                uint32 brann = pInstance->GetData(BRANN_BRONZEBEARD);
+                switch (brann)
+                {
+                case 1:
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    break;
+                case 2:
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    break;
+                case 3:
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    break;
+                case 4:
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                    break;
+                case 5:
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                    break;
+                default:
+                    break;
+                }
+            }
+            SendGossipMenuFor(player, TEXT_ID_START, me->GetGUID());
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+        {
+            if (action)
+            {
+                switch (action)
+                {
+                case GOSSIP_ACTION_INFO_DEF + 1:
+                    DoAction(ACTION_START_EVENT);
+                    CloseGossipMenuFor(player);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 2:
+                    DoAction(ACTION_START_TRIBUNAL);
+                    CloseGossipMenuFor(player);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 3:
+                    DoAction(ACTION_GO_TO_SJONNIR);
+                    CloseGossipMenuFor(player);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 4:
+                    DoAction(ACTION_WIPE_START);
+                    CloseGossipMenuFor(player);
+                    break;
+                case GOSSIP_ACTION_INFO_DEF + 5:
+                    DoAction(ACTION_OPEN_DOOR);
+                    CloseGossipMenuFor(player);
+                    break;
+                }
+            }
+            return true;
         }
 
         void SwitchHeadVisaul(uint8 headMask, bool activate)

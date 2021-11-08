@@ -665,106 +665,6 @@ class npc_fairbanks : public CreatureScript
 public:
     npc_fairbanks() : CreatureScript("npc_fairbanks") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        AddGossipItemFor(player, 0, "Curse? What's going on here, Fairbanks?", GOSSIP_SENDER_MAIN, 1);
-        SendGossipMenuFor(player, 100100, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*Sender*/, uint32 uiAction) override
-    {
-        ClearGossipMenuFor(player);
-
-        switch (uiAction)
-        {
-            case 1:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "Mograine?", GOSSIP_SENDER_MAIN, 2);
-                SendGossipMenuFor(player, 100101, creature->GetGUID());
-                return true;
-            case 2:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "What do you mean?", GOSSIP_SENDER_MAIN, 3);
-                SendGossipMenuFor(player, 100102, creature->GetGUID());
-                return true;
-            case 3:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "I still do not fully understand.", GOSSIP_SENDER_MAIN, 4);
-                SendGossipMenuFor(player, 100103, creature->GetGUID());
-                return true;
-            case 4:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "Incredible story. So how did he die?", GOSSIP_SENDER_MAIN, 5);
-                SendGossipMenuFor(player, 100104, creature->GetGUID());
-                return true;
-            case 5:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 6);
-                SendGossipMenuFor(player, 100105, creature->GetGUID());
-                return true;
-            case 6:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "How do you know all of this?", GOSSIP_SENDER_MAIN, 7);
-                SendGossipMenuFor(player, 100106, creature->GetGUID());
-                return true;
-            case 7:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "A thousand? For one man?", GOSSIP_SENDER_MAIN, 8);
-                SendGossipMenuFor(player, 100107, creature->GetGUID());
-                return true;
-            case 8:
-                creature->HandleEmoteCommand(5);
-                AddGossipItemFor(player, 0, "Yet? Yet what?", GOSSIP_SENDER_MAIN, 9);
-                SendGossipMenuFor(player, 100108, creature->GetGUID());
-                return true;
-            case 9:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "And did he?", GOSSIP_SENDER_MAIN, 10);
-                SendGossipMenuFor(player, 100109, creature->GetGUID());
-                return true;
-            case 10:
-                creature->HandleEmoteCommand(274);
-                AddGossipItemFor(player, 0, "Continue please, Fairbanks.", GOSSIP_SENDER_MAIN, 11);
-                SendGossipMenuFor(player, 100110, creature->GetGUID());
-                return true;
-            case 11:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 12);
-                SendGossipMenuFor(player, 100111, creature->GetGUID());
-                return true;
-            case 12:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You were right, Fairbanks. That is tragic.", GOSSIP_SENDER_MAIN, 13);
-                SendGossipMenuFor(player, 100112, creature->GetGUID());
-                return true;
-            case 13:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "And you did...", GOSSIP_SENDER_MAIN, 14);
-                SendGossipMenuFor(player, 100113, creature->GetGUID());
-                return true;
-            case 14:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?", GOSSIP_SENDER_MAIN, 15);
-                SendGossipMenuFor(player, 100114, creature->GetGUID());
-                return true;
-            case 15:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "But his son is dead.", GOSSIP_SENDER_MAIN, 16);
-                SendGossipMenuFor(player, 100115, creature->GetGUID());
-                return true;
-            case 16:
-                SendGossipMenuFor(player, 100116, creature->GetGUID());
-                // todo: we need to play these 3 emote in sequence, we play only the last one right now.
-                creature->HandleEmoteCommand(274);
-                creature->HandleEmoteCommand(1);
-                creature->HandleEmoteCommand(397);
-                return true;
-        }
-
-        return true;
-    }
-
     struct npc_fairbanksAI : public SmartAI
     {
         npc_fairbanksAI(Creature* creature) : SmartAI(creature) { }
@@ -772,6 +672,106 @@ public:
         void Reset() override
         {
             SayAshbringer = false;
+        }
+
+        bool GossipHello(Player* player) override
+        {
+            AddGossipItemFor(player, 0, "Curse? What's going on here, Fairbanks?", GOSSIP_SENDER_MAIN, 1);
+            SendGossipMenuFor(player, 100100, me->GetGUID());
+            return true;
+        }
+
+        bool GossipSelect(Player* player, uint32 /*Sender*/, uint32 uiAction) override
+        {
+            ClearGossipMenuFor(player);
+
+            switch (uiAction)
+            {
+            case 1:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "Mograine?", GOSSIP_SENDER_MAIN, 2);
+                SendGossipMenuFor(player, 100101, me->GetGUID());
+                return true;
+            case 2:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "What do you mean?", GOSSIP_SENDER_MAIN, 3);
+                SendGossipMenuFor(player, 100102, me->GetGUID());
+                return true;
+            case 3:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "I still do not fully understand.", GOSSIP_SENDER_MAIN, 4);
+                SendGossipMenuFor(player, 100103, me->GetGUID());
+                return true;
+            case 4:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "Incredible story. So how did he die?", GOSSIP_SENDER_MAIN, 5);
+                SendGossipMenuFor(player, 100104, me->GetGUID());
+                return true;
+            case 5:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 6);
+                SendGossipMenuFor(player, 100105, me->GetGUID());
+                return true;
+            case 6:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "How do you know all of this?", GOSSIP_SENDER_MAIN, 7);
+                SendGossipMenuFor(player, 100106, me->GetGUID());
+                return true;
+            case 7:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "A thousand? For one man?", GOSSIP_SENDER_MAIN, 8);
+                SendGossipMenuFor(player, 100107, me->GetGUID());
+                return true;
+            case 8:
+                me->HandleEmoteCommand(5);
+                AddGossipItemFor(player, 0, "Yet? Yet what?", GOSSIP_SENDER_MAIN, 9);
+                SendGossipMenuFor(player, 100108, me->GetGUID());
+                return true;
+            case 9:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "And did he?", GOSSIP_SENDER_MAIN, 10);
+                SendGossipMenuFor(player, 100109, me->GetGUID());
+                return true;
+            case 10:
+                me->HandleEmoteCommand(274);
+                AddGossipItemFor(player, 0, "Continue please, Fairbanks.", GOSSIP_SENDER_MAIN, 11);
+                SendGossipMenuFor(player, 100110, me->GetGUID());
+                return true;
+            case 11:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 12);
+                SendGossipMenuFor(player, 100111, me->GetGUID());
+                return true;
+            case 12:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "You were right, Fairbanks. That is tragic.", GOSSIP_SENDER_MAIN, 13);
+                SendGossipMenuFor(player, 100112, me->GetGUID());
+                return true;
+            case 13:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "And you did...", GOSSIP_SENDER_MAIN, 14);
+                SendGossipMenuFor(player, 100113, me->GetGUID());
+                return true;
+            case 14:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?", GOSSIP_SENDER_MAIN, 15);
+                SendGossipMenuFor(player, 100114, me->GetGUID());
+                return true;
+            case 15:
+                me->HandleEmoteCommand(1);
+                AddGossipItemFor(player, 0, "But his son is dead.", GOSSIP_SENDER_MAIN, 16);
+                SendGossipMenuFor(player, 100115, me->GetGUID());
+                return true;
+            case 16:
+                SendGossipMenuFor(player, 100116, me->GetGUID());
+                // todo: we need to play these 3 emote in sequence, we play only the last one right now.
+                me->HandleEmoteCommand(274);
+                me->HandleEmoteCommand(1);
+                me->HandleEmoteCommand(397);
+                return true;
+            }
+
+            return true;
         }
 
         void MoveInLineOfSight(Unit* who) override

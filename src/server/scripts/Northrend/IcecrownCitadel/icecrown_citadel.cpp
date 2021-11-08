@@ -1849,9 +1849,9 @@ public:
         bool GossipHello(Player* player) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !me->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
+                if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !me->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !me->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
                     if (player->HasAura(SPELL_ORANGE_BLIGHT_RESIDUE) && player->HasAura(SPELL_GREEN_BLIGHT_RESIDUE))
-                        creature->CastSpell(creature, SPELL_HARVEST_BLIGHT_SPECIMEN, false);
+                        me->CastSpell(me, SPELL_HARVEST_BLIGHT_SPECIMEN, false);
             return false;
         }
     };

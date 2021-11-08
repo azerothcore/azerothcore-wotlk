@@ -292,21 +292,7 @@ class npc_ranshalla : public CreatureScript
 {
 public:
     npc_ranshalla() : CreatureScript("npc_ranshalla") { }
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
-        {
-            creature->AI()->Talk(SAY_QUEST_START);
-            creature->SetFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
-            if (npc_ranshallaAI* escortAI = dynamic_cast<npc_ranshallaAI*>(creature->AI()))
-                escortAI->Start(false, false, player->GetGUID(), quest);
-
-            return true;
-        }
-
-        return false;
-    }
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ranshallaAI(creature);
@@ -331,6 +317,16 @@ public:
         void Reset() override
         {
             _delayTimer = 0;
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
+            {
+                Talk(SAY_QUEST_START);
+                me->SetFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+                Start(false, false, player->GetGUID(), quest);
+            }
         }
 
         // Called when the player activates the torch / altar
