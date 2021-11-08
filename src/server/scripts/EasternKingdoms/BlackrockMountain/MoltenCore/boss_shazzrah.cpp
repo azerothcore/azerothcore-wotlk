@@ -143,7 +143,7 @@ public:
                     }
 
                     // Should not target enemies within melee range
-                    if (plrTarget->IsWithinDistInMap(caster, caster->GetMeleeRange(plrTarget)))
+                    if (plrTarget->IsWithinMeleeRange(caster))
                     {
                         return true;
                     }
@@ -163,14 +163,15 @@ public:
             Unit* caster = GetCaster();
             Unit* target = GetHitUnit();
 
-            if (!caster || !target)
+            if (caster && target)
             {
-                target->CastSpell(caster, SPELL_SHAZZRAH_GATE, true, nullptr, nullptr, caster->GetGUID());
+                caster->CastSpell(target, SPELL_SHAZZRAH_GATE, true);
                 caster->CastSpell(caster, SPELL_ARCANE_EXPLOSION);
 
                 if (Creature* creatureCaster = caster->ToCreature())
                 {
                     creatureCaster->getThreatMgr().resetAllAggro();
+                    creatureCaster->getThreatMgr().addThreat(target, 1);
                     creatureCaster->AI()->AttackStart(target); // Attack the target which caster will teleport to.
                 }
             }
