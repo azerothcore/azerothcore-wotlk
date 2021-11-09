@@ -692,7 +692,6 @@ public:
     {
         PrepareSpellScript(spell_item_create_heart_candy_SpellScript);
 
-
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo(CreateHeartCandySpells);
