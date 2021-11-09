@@ -277,6 +277,16 @@ int main(int argc, char** argv)
     // Set process priority according to configuration settings
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
+    sScriptMgr->SetScriptLoader(AddScripts);
+    std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
+    {
+        sScriptMgr->Unload();
+        //sScriptReloadMgr->Unload();
+    });
+
+    LOG_INFO("server.loading", "Initializing Scripts...");
+    sScriptMgr->Initialize();
+
     // Start the databases
     if (!StartDB())
         return 1;
@@ -306,13 +316,6 @@ int main(int argc, char** argv)
 
     // Loading modules configs
     sConfigMgr->PrintLoadedModulesConfigs();
-
-    sScriptMgr->SetScriptLoader(AddScripts);
-    std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
-    {
-        sScriptMgr->Unload();
-        //sScriptReloadMgr->Unload();
-    });
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -484,6 +487,8 @@ bool StartDB()
     sWorld->LoadDBRevision();
 
     LOG_INFO("server.loading", "> Version DB world:     %s", sWorld->GetDBVersion());
+
+    sScriptMgr->OnAfterDatabasesLoaded(loader.GetUpdateFlags());
 
     return true;
 }

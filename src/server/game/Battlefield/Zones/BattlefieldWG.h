@@ -1413,7 +1413,7 @@ struct BfWGGameObjectBuilding
         {
             if (Creature* creature = m_WG->GetCreature(*itr))
             {
-                creature->setFaction(faction);
+                creature->SetFaction(faction);
                 if (disable)
                     m_WG->HideNpc(creature);
                 else
@@ -1425,7 +1425,7 @@ struct BfWGGameObjectBuilding
         {
             if (Creature* creature = m_WG->GetCreature(*itr))
             {
-                creature->setFaction(faction);
+                creature->SetFaction(faction);
                 if (disable)
                     m_WG->HideNpc(creature);
                 else

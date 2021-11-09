@@ -319,7 +319,7 @@ public:
                         {
                             trigger->SetDisplayId(11686);
                             trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            trigger->setFaction(14);
+                            trigger->SetFaction(FACTION_MONSTER);
                             trigger->SetInCombatWithZone();
                         }
 
@@ -341,7 +341,7 @@ public:
                             {
                                 trigger->SetDisplayId(11686);
                                 trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                trigger->setFaction(14);
+                                trigger->SetFaction(FACTION_MONSTER);
                                 trigger->SetInCombatWithZone();
                             }
 

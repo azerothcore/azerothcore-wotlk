@@ -240,7 +240,7 @@ void BattlefieldWG::OnBattleStart()
         if (Creature* creature = GetCreature(*itr))
         {
             ShowNpc(creature, true);
-            creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
+            creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
         }
     }
 
@@ -350,7 +350,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         if (Creature* creature = GetCreature(*itr))
         {
             if (!endByTimer)
-                creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
+                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
             HideNpc(creature);
         }
     }
@@ -612,7 +612,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                         return;
 
                     if (Unit* owner = creature->ToTempSummon()->GetSummonerUnit())
-                        creature->setFaction(owner->getFaction());
+                        creature->SetFaction(owner->GetFaction());
                     break;
                 }
         }
@@ -632,9 +632,9 @@ void BattlefieldWG::OnCreatureRemove(Creature*  /*creature*/)
                 case NPC_WINTERGRASP_DEMOLISHER:
                 {
                     uint8 team;
-                    if (creature->getFaction() == WintergraspFaction[TEAM_ALLIANCE])
+                    if (creature->GetFaction() == WintergraspFaction[TEAM_ALLIANCE])
                         team = TEAM_ALLIANCE;
-                    else if (creature->getFaction() == WintergraspFaction[TEAM_HORDE])
+                    else if (creature->GetFaction() == WintergraspFaction[TEAM_HORDE])
                         team = TEAM_HORDE;
                     else
                         return;

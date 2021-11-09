@@ -82,8 +82,6 @@ struct MechanicImmune
     char const* text;
 };
 
-constexpr auto MAX_MECHANIC = 32;
-
 MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 {
     { MECHANIC_NONE,            "MECHANIC_NONE"               },
@@ -459,7 +457,7 @@ public:
             return false;
         }
 
-        creature->setFaction(factionId);
+        creature->SetFaction(factionId);
 
         // Faction is set in creature_template - not inside creature
 
@@ -492,7 +490,8 @@ public:
         if (!creature)
             return false;
 
-        creature->setFaction(tempfaction);
+        creature->SetFaction(tempfaction);
+
         return true;
     }
 
@@ -590,7 +589,7 @@ public:
         }
 
         CreatureTemplate const* cInfo = target->GetCreatureTemplate();
-        uint32 faction = target->getFaction();
+        uint32 faction = target->GetFaction();
         uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
         uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
         uint32 spellSchoolImmuneMask = cInfo->SpellSchoolImmuneMask;
@@ -608,7 +607,7 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->getLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
         handler->PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
-        handler->PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUInt32Value(UNIT_FIELD_FLAGS), target->GetUInt32Value(UNIT_FIELD_FLAGS_2), target->GetUInt32Value(UNIT_DYNAMIC_FLAGS), target->getFaction());
+        handler->PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUInt32Value(UNIT_FIELD_FLAGS), target->GetUInt32Value(UNIT_FIELD_FLAGS_2), target->GetUInt32Value(UNIT_DYNAMIC_FLAGS), target->GetFaction());
         handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr.c_str(), curRespawnDelayStr.c_str());
         handler->PSendSysMessage(LANG_NPCINFO_LOOT,  cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
         handler->PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());

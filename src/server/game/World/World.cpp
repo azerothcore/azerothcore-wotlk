@@ -85,8 +85,7 @@
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
-#include "WhoListCache.h"
-#include "World.h"
+#include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "UpdateTime.h"
@@ -1429,7 +1428,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     // Realm Availability
-    m_bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", false);
+    m_bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", true);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1446,9 +1445,6 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize detour memory management
     dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
-
-    LOG_INFO("server.loading", "Initializing Scripts...");
-    sScriptMgr->Initialize();
 
     ///- Initialize VMapMgr function pointers (to untangle game/collision circular deps)
     VMAP::VMapMgr2* vmmgr2 = VMAP::VMapFactory::createOrGetVMapMgr();
@@ -1983,6 +1979,8 @@ void World::SetInitialWorldSettings()
     // our speed up
     m_timers[WUPDATE_5_SECS].SetInterval(5 * IN_MILLISECONDS);
 
+    m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
+
     mail_expire_check_timer = GameTime::GetGameTime() + 6h;
 
     ///- Initilize static helper structures
@@ -2227,9 +2225,14 @@ void World::Update(uint32 diff)
         // moved here from HandleCharEnumOpcode
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
         CharacterDatabase.Execute(stmt);
+    }
 
-        // copy players hashmapholder to avoid mutex
-        WhoListCacheMgr::Update();
+    ///- Update Who List Cache
+    if (m_timers[WUPDATE_WHO_LIST].Passed())
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update who list"));
+        m_timers[WUPDATE_WHO_LIST].Reset();
+        sWhoListCacheMgr->Update();
     }
 
     {

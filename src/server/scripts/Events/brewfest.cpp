@@ -1546,7 +1546,6 @@ enum BrewfestRevelerEnum
 {
     FACTION_ALLIANCE    = 1934,
     FACTION_HORDE       = 1935,
-    FACTION_FRIENDLY    = 35,
 
     SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE    = 44003,
     SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE  = 44004,
@@ -1586,7 +1585,7 @@ public:
                     break;
             }
 
-            GetTarget()->setFaction(factionId);
+            GetTarget()->SetFaction(factionId);
         }
 
         void Register() override
@@ -1715,7 +1714,6 @@ enum DirebrewMisc
     GOSSIP_OPTION_APOLOGIZE             = 1,
     DATA_TARGET_GUID                    = 1,
     MAX_ANTAGONISTS                     = 3,
-    FACTION_GOBLIN_DARK_IRON_BAR_PATRON = 736,
     DATA_COREN                          = 33,
     GO_MACHINE_SUMMONER                 = 188508
 };
@@ -1770,7 +1768,7 @@ public:
             _events.Reset();
             _summons.DespawnAll();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-            me->setFaction(FACTION_FRIENDLY);
+            me->SetFaction(FACTION_FRIENDLY);
             _events.SetPhase(PHASE_ALL);
 
             for (uint8 i = 0; i < MAX_ANTAGONISTS; ++i)
@@ -1809,7 +1807,7 @@ public:
             {
                 _events.SetPhase(PHASE_ONE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                me->setFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
+                me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
                 DoZoneInCombat();
 
                 EntryCheckPredicate pred(NPC_ANTAGONIST);
@@ -2033,7 +2031,7 @@ public:
 
         void Reset() override
         {
-            me->setFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
+            me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
             DoZoneInCombat();
         }
 
@@ -2076,7 +2074,7 @@ public:
                     break;
                 case ACTION_ANTAGONIST_HOSTILE:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    me->setFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
+                    me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
                     DoZoneInCombat();
                     break;
                 default:
@@ -2108,16 +2106,16 @@ public:
 
         void Reset() override
         {
-            go->SetLootState(GO_READY);
+            me->SetLootState(GO_READY);
 
             _scheduler.Schedule(Seconds(1), [this](TaskContext /*context*/)
             {
-                go->UseDoorOrButton();
-                go->CastSpell(nullptr, SPELL_MOLE_MACHINE_EMERGE);
+                me->UseDoorOrButton();
+                me->CastSpell(nullptr, SPELL_MOLE_MACHINE_EMERGE);
             })
             .Schedule(Seconds(4), [this](TaskContext /*context*/)
             {
-                if (GameObject* trap = go->GetLinkedTrap())
+            if (GameObject* trap = me->GetLinkedTrap())
                 {
                     trap->UseDoorOrButton();
                     trap->SetLootState(GO_READY);

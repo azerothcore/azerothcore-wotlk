@@ -241,7 +241,7 @@ public:
             if (Unit* caster = GetCaster())
             {
                 caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
-                caster->setFaction(88);
+                caster->SetFaction(FACTION_BLACKFATHOM);
             }
         }
 
