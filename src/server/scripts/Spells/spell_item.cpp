@@ -2219,6 +2219,7 @@ class spell_item_shadowmourne : public AuraScript
                     return false;
             }
         }
+    }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
@@ -3018,6 +3019,11 @@ class spell_item_brewfest_mount_transformation : public SpellScript
 
         if (caster->HasAuraType(SPELL_AURA_MOUNTED))
         {
+            caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
+            uint32 spell_id;
+
+            switch (GetSpellInfo()->Id)
+            {
             case SPELL_BREWFEST_MOUNT_TRANSFORM:
                 if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
                     spell_id = caster->GetTeamId() == TEAM_ALLIANCE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
@@ -3032,8 +3038,9 @@ class spell_item_brewfest_mount_transformation : public SpellScript
                 break;
             default:
                 return;
+            }
+            caster->CastSpell(caster, spell_id, true);
         }
-        caster->CastSpell(caster, spell_id, true);
     }
 
     void Register() override
