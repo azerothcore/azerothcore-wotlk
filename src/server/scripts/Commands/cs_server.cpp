@@ -267,25 +267,11 @@ public:
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, int32 exitCode)
+    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
-        if (exitCode >= 0 && exitCode <= 125)
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, 0, exitCode);
-        }
-        else
-        {
-            sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE);
-        }
-
-        return true;
-    }
-
-    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, int32 exitCode)
-    {
-        if (exitCode >= 0 && exitCode <= 125)
-        {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, exitCode);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, *exitCode);
         }
         else
         {
@@ -295,11 +281,11 @@ public:
         return true;
     }
 
-    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, int32 time, int32 exitCode)
+    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
-        if (exitCode >= 0 && exitCode <= 125)
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, exitCode);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
@@ -309,11 +295,11 @@ public:
         return true;
     }
 
-    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, int32 time, int32 exitCode)
+    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
-        if (exitCode >= 0 && exitCode <= 125)
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, exitCode);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
