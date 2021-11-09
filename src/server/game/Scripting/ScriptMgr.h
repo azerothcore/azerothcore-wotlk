@@ -31,6 +31,8 @@
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SharedDefines.h"
+#include "Tuples.h"
+#include "Types.h"
 #include "Weather.h"
 #include "World.h"
 #include <atomic>
@@ -1963,6 +1965,85 @@ private:
 
     ScriptLoaderCallbackType _script_loader_callback;
 };
+
+namespace Acore::SpellScripts
+{
+    template<typename T>
+    using is_SpellScript = std::is_base_of<SpellScript, T>;
+
+    template<typename T>
+    using is_AuraScript = std::is_base_of<AuraScript, T>;
+}
+
+template <typename... Ts>
+class GenericSpellAndAuraScriptLoader : public SpellScriptLoader
+{
+    using SpellScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_SpellScript, Ts...>;
+    using AuraScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_AuraScript, Ts...>;
+    using ArgsType = typename Acore::find_type_if_t<Acore::is_tuple, Ts...>;
+
+public:
+    GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
+
+private:
+    SpellScript* GetSpellScript() const override
+    {
+        if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<SpellScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    AuraScript* GetAuraScript() const override
+    {
+        if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<AuraScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    ArgsType _args;
+};
+
+#define RegisterSpellScriptWithArgs(spell_script, script_name, ...) new GenericSpellAndAuraScriptLoader<spell_script, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellScript(spell_script) RegisterSpellScriptWithArgs(spell_script, #spell_script)
+#define RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, script_name, ...) new GenericSpellAndAuraScriptLoader<script_1, script_2, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellAndAuraScriptPair(script_1, script_2) RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, #script_1)
+
+template <class AI>
+class GenericCreatureScript : public CreatureScript
+{
+    public:
+        GenericCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return new AI(me); }
+};
+#define RegisterCreatureAI(ai_name) new GenericCreatureScript<ai_name>(#ai_name)
+
+template <class AI, AI*(*AIFactory)(Creature*)>
+class FactoryCreatureScript : public CreatureScript
+{
+    public:
+        FactoryCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return AIFactory(me); }
+};
+#define RegisterCreatureAIWithFactory(ai_name, factory_fn) new FactoryCreatureScript<ai_name, &factory_fn>(#ai_name)
+
+template <class AI>
+class GenericGameObjectScript : public GameObjectScript
+{
+    public:
+        GenericGameObjectScript(char const* name) : GameObjectScript(name) { }
+        GameObjectAI* GetAI(GameObject* go) const override { return new AI(go); }
+};
+#define RegisterGameObjectAI(ai_name) new GenericGameObjectScript<ai_name>(#ai_name)
 
 #define sScriptMgr ScriptMgr::instance()
 
