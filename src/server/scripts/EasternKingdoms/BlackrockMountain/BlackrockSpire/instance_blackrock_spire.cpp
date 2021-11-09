@@ -269,11 +269,6 @@ public:
                     if (GetBossState(DATA_GYTH) == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
-                case GO_PORTCULLIS_TOBOSSROOMS:
-                    go_portcullis_tobossrooms = go->GetGUID();
-                    if (GetBossState(DATA_GYTH) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
                 case GO_UROK_PILE:
                     go_urokPile = go->GetGUID();
                     break;
@@ -515,8 +510,6 @@ public:
                     return go_emberseerrunes[6];
                 case GO_PORTCULLIS_ACTIVE:
                     return go_portcullis_active;
-                case GO_PORTCULLIS_TOBOSSROOMS:
-                    return go_portcullis_tobossrooms;
                 default:
                     break;
             }
@@ -719,7 +712,6 @@ public:
         ObjectGuid go_emberseerrunes[7];
         GuidVector runecreaturelist[7];
         ObjectGuid go_portcullis_active;
-        ObjectGuid go_portcullis_tobossrooms;
         ObjectGuid go_urokPile;
         ObjectGuid go_urokChallenge;
         std::vector<ObjectGuid> go_urokOgreCirles;
