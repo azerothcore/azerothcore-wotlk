@@ -92,7 +92,9 @@ struct boss_quartermaster_zigris : public BossAI
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
             return;
+        }
 
         while (uint32 eventId = events.ExecuteEvent())
         {
