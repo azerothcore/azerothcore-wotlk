@@ -2379,8 +2379,10 @@ public:
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
         }
 
-        void CheckEnergy()
+
+        void PowerGain()
         {
+            GetCaster()->SetPower(POWER_ENERGY, GetCaster()->GetPower(POWER_ENERGY) + urand(6, 10));
             if (GetCaster()->GetPower(POWER_ENERGY) >= 100)
             {
                 GetCaster()->CastSpell(GetCaster(), SPELL_OVERHEAT, true);
@@ -2388,13 +2390,22 @@ public:
                     if (Unit* passenger = vehicle->GetPassenger(0))
                         sCreatureTextMgr->SendChat(GetCaster()->ToCreature(), SAY_OVERHEAT, passenger);
             }
+      
+               
         }
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_igb_cannon_blast_SpellScript::CheckEnergy);
+            OnCast += SpellCastFn(spell_igb_cannon_blast_SpellScript::PowerGain);
+   
         }
     };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_igb_cannon_blast_SpellScript();
+    }
+};
 
     SpellScript* GetSpellScript() const override
     {
