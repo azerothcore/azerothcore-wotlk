@@ -85,7 +85,9 @@ struct boss_quartermaster_zigris : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
+        {
             return;
+        }
 
         events.Update(diff);
 
