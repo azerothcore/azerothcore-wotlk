@@ -66,7 +66,7 @@ DoorData const doorData[] =
     { GO_GYTH_EXIT_DOOR,    DATA_WARCHIEF_REND_BLACKHAND,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
     { GO_DRAKKISATH_DOOR_1, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
     { GO_DRAKKISATH_DOOR_2, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
-    { 0,                   0,             DOOR_TYPE_ROOM,                     BOUNDARY_NONE } // END
+    { 0,                 0,          DOOR_TYPE_ROOM,                          BOUNDARY_NONE } // END
 };
 
 class instance_blackrock_spire : public InstanceMapScript
