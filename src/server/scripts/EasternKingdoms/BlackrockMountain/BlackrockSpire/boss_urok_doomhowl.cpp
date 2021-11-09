@@ -58,6 +58,8 @@ public:
         {
             me->CastSpell(me, SPELL_UROK_SPAWN, true);
             BossAI::InitializeAI();
+            Talk(SAY_SUMMON);
+            DoZoneInCombat(nullptr, 100.0f);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -65,7 +67,7 @@ public:
             _EnterCombat();
             events.ScheduleEvent(SPELL_REND, urand(17000, 20000));
             events.ScheduleEvent(SPELL_STRIKE, urand(10000, 12000));
-            Talk(SAY_AGGRO);
+            events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, urand(25000, 30000));
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -94,6 +96,10 @@ public:
                     case SPELL_STRIKE:
                         DoCastVictim(SPELL_STRIKE);
                         events.ScheduleEvent(SPELL_STRIKE, urand(8000, 10000));
+                        break;
+                    case SPELL_INTIMIDATING_ROAR:
+                        DoCastVictim(SPELL_INTIMIDATING_ROAR);
+                        events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, urand(40000, 45000));
                         break;
                     default:
                         break;

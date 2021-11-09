@@ -859,6 +859,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     SendQuestUpdate(quest_id);
 
+    SendQuestGiverStatusMultiple();
+
     //lets remove flag for delayed teleports
     SetMustDelayTeleport(false);
 

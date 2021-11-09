@@ -201,6 +201,8 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_POSITIVE_EFF0                 = 0x02000000,
     SPELL_ATTR0_CU_POSITIVE_EFF1                 = 0x04000000,
     SPELL_ATTR0_CU_POSITIVE_EFF2                 = 0x08000000,
+    SPELL_ATTR0_CU_REJECT_AURA_SAVING            = 0x10000000,
+    SPELL_ATTR0_CU_FORCE_AURA_SAVING             = 0x20000800,
 
     SPELL_ATTR0_CU_NEGATIVE                      = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2,
     SPELL_ATTR0_CU_POSITIVE                      = SPELL_ATTR0_CU_POSITIVE_EFF0 | SPELL_ATTR0_CU_POSITIVE_EFF1 | SPELL_ATTR0_CU_POSITIVE_EFF2,
@@ -403,15 +405,15 @@ public:
     bool HasAnyAura() const;
     bool HasAreaAuraEffect() const;
 
-    inline bool HasAttribute(SpellAttr0 attribute) const { return Attributes & attribute; }
-    inline bool HasAttribute(SpellAttr1 attribute) const { return AttributesEx & attribute; }
-    inline bool HasAttribute(SpellAttr2 attribute) const { return AttributesEx2 & attribute; }
-    inline bool HasAttribute(SpellAttr3 attribute) const { return AttributesEx3 & attribute; }
-    inline bool HasAttribute(SpellAttr4 attribute) const { return AttributesEx4 & attribute; }
-    inline bool HasAttribute(SpellAttr5 attribute) const { return AttributesEx5 & attribute; }
-    inline bool HasAttribute(SpellAttr6 attribute) const { return AttributesEx6 & attribute; }
-    inline bool HasAttribute(SpellAttr7 attribute) const { return AttributesEx7 & attribute; }
-    inline bool HasAttribute(SpellCustomAttributes customAttribute) const { return AttributesCu & customAttribute; }
+    inline bool HasAttribute(SpellAttr0 attribute) const { return (Attributes & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr1 attribute) const { return (AttributesEx & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr2 attribute) const { return (AttributesEx2 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr3 attribute) const { return (AttributesEx3 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr4 attribute) const { return (AttributesEx4 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr5 attribute) const { return (AttributesEx5 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr6 attribute) const { return (AttributesEx6 & attribute) != 0; }
+    inline bool HasAttribute(SpellAttr7 attribute) const { return (AttributesEx7 & attribute) != 0; }
+    inline bool HasAttribute(SpellCustomAttributes customAttribute) const { return (AttributesCu & customAttribute) != 0; }
 
     bool IsExplicitDiscovery() const;
     bool IsLootCrafting() const;
