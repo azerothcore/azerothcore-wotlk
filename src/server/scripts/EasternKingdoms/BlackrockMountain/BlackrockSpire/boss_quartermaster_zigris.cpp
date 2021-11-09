@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "blackrock_spire.h"
 #include "ScriptedCreature.h"
+#include "SpellInfo.h"
 
 enum Spells
 {
