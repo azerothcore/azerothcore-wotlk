@@ -105,6 +105,8 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+            LootType loot;
+
             switch (creature->GetEntry())
             {
                 case NPC_UROK_MAGUS:
@@ -168,7 +170,8 @@ public:
                         creature->DisappearAndDie();
                     break;
                 case NPC_FINKLE_EINHORN:
-                    creature->AI()->Talk(SAY_FINKLE_GANG);
+                    if (GetBossState(DATA_THE_BEAST) == DONE && loot == LOOT_SKINNING)
+                        creature->AI()->Talk(SAY_FINKLE_GANG);
                     break;
                 case NPC_CHROMATIC_ELITE_GUARD:
                     AddMinion(creature, true);
