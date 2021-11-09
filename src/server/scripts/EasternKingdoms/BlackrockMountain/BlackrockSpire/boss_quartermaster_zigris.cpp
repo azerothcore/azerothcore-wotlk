@@ -70,16 +70,8 @@ struct boss_quartermaster_zigris : public BossAI
         _JustDied();
     }
 
-    void UpdateAI(uint32 diff) override
+    void ExecuteEvent(uint32 eventId) override
     {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
@@ -120,12 +112,7 @@ struct boss_quartermaster_zigris : public BossAI
                     events.RepeatEvent(2000);
                     break;
             }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
         }
-
-        DoMeleeAttackIfReady();
     }
 
     private:
