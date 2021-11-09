@@ -868,15 +868,21 @@ void Object::RemoveFlag(uint16 index, uint32 oldFlag)
 void Object::ToggleFlag(uint16 index, uint32 flag)
 {
     if (HasFlag(index, flag))
+    {
         RemoveFlag(index, flag);
+    }
     else
+    {
         SetFlag(index, flag);
+    }
 }
 
 [[nodiscard]] bool Object::HasFlag(uint16 index, uint32 flag) const
 {
     if (index >= m_valuesCount && !PrintIndexError(index, false))
+    {
         return false;
+    }
 
     return (m_uint32Values[index] & flag) != 0;
 }
@@ -884,9 +890,13 @@ void Object::ToggleFlag(uint16 index, uint32 flag)
 void Object::ApplyModFlag(uint16 index, uint32 flag, bool apply)
 {
     if (apply)
+    {
         SetFlag(index, flag);
+    }
     else
+    {
         RemoveFlag(index, flag);
+    }
 }
 
 void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
@@ -951,9 +961,13 @@ void Object::RemoveFlag64(uint16 index, uint64 oldFlag)
 void Object::ToggleFlag64(uint16 index, uint64 flag)
 {
     if (HasFlag64(index, flag))
+    {
         RemoveFlag64(index, flag);
+    }
     else
+    {
         SetFlag64(index, flag);
+    }
 }
 
 [[nodiscard]] bool Object::HasFlag64(uint16 index, uint64 flag) const
@@ -965,9 +979,13 @@ void Object::ToggleFlag64(uint16 index, uint64 flag)
 void Object::ApplyModFlag64(uint16 index, uint64 flag, bool apply)
 {
     if (apply)
+    {
         SetFlag64(index, flag);
+    }
     else
+    {
         RemoveFlag64(index, flag);
+    }
 }
 
 bool Object::PrintIndexError(uint32 index, bool set) const
@@ -1305,14 +1323,20 @@ float WorldObject::GetDistance2d(const WorldObject* obj) const
 bool WorldObject::IsSelfOrInSameMap(const WorldObject* obj) const
 {
     if (this == obj)
+    {
         return true;
+    }
+
     return IsInMap(obj);
 }
 
 bool WorldObject::IsInMap(const WorldObject* obj) const
 {
     if (obj)
+    {
         return IsInWorld() && obj->IsInWorld() && (FindMap() == obj->FindMap());
+    }
+
     return false;
 }
 
