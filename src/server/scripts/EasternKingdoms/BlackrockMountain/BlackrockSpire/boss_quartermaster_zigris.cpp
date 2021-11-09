@@ -70,25 +70,39 @@ struct boss_quartermaster_zigris : public BossAI
         _JustDied();
     }
 
-    void ExecuteEvent(uint32 eventId) override
+    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
     {
+        if (spellInfo->Id == SPELL_STUNBOMB || spellInfo->Id == SPELL_HOOKEDNET)
+        {
+            if (me->IsWithinMeleeRange(me->GetVictim()))
+            {
+                me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
             {
                 case EVENT_STUN_BOMB:
                     DoCastVictim(SPELL_STUNBOMB);
-                    if (me->IsWithinMeleeRange(me->GetVictim()))
-                    {
-                        me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
-                    }
                     events.ScheduleEvent(EVENT_STUN_BOMB, 14000);
                     break;
                 case EVENT_HOOKED_NET:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         DoCastVictim(SPELL_HOOKEDNET);
-                        me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
                         events.RepeatEvent(16000);
                     }
                     else
@@ -112,7 +126,12 @@ struct boss_quartermaster_zigris : public BossAI
                     events.RepeatEvent(2000);
                     break;
             }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
         }
+
+        DoMeleeAttackIfReady();
     }
 
     private:
