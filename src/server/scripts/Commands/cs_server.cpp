@@ -176,11 +176,11 @@ public:
 
             auto end = std::filesystem::directory_iterator();
             std::size_t folderSize = std::accumulate(std::filesystem::directory_iterator(mapPath), end, std::size_t(0), [](std::size_t val, std::filesystem::path const& mapFile)
-                {
-                    if (std::filesystem::is_regular_file(mapFile))
-                        val += std::filesystem::file_size(mapFile);
-                    return val;
-                });
+            {
+                if (std::filesystem::is_regular_file(mapFile))
+                    val += std::filesystem::file_size(mapFile);
+                return val;
+            });
 
             handler->PSendSysMessage("%s directory located in %s. Total size: " SZFMTD " bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize);
         }
