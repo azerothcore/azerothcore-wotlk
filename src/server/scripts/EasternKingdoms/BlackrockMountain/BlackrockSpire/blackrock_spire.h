@@ -128,7 +128,6 @@ enum GameObjectsIds
     // For Gyth event
     GO_DR_PORTCULLIS                = 175185,
     GO_PORTCULLIS_ACTIVE            = 164726,
-    GO_PORTCULLIS_TOBOSSROOMS       = 175186,
     // Urok Doomhowl
     GO_UROK_PILE                    = 175621,
     GO_UROK_CHALLENGE               = 175584,

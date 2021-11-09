@@ -1101,7 +1101,7 @@ public:
         bool GossipHello(Player* player, bool  /*reportUse*/) override
         {
             bool hasKey = true;
-            if (LockEntry const* lock = sLockStore.LookupEntry(go->GetGOInfo()->goober.lockId))
+            if (LockEntry const* lock = sLockStore.LookupEntry(me->GetGOInfo()->goober.lockId))
             {
                 hasKey = false;
                 for (uint32 i = 0; i < MAX_LOCK_CASE; ++i)
@@ -1124,18 +1124,18 @@ public:
                 return false;
             _locked = true;
             // Start Algalon event
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
             events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5000);
-            if (Creature* brann = go->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
+            if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
                 brann->AI()->DoAction(ACTION_START_INTRO);
 
-            if (InstanceScript* instance = go->GetInstanceScript())
+            if (InstanceScript* instance = me->GetInstanceScript())
             {
                 instance->SetData(DATA_ALGALON_SUMMON_STATE, 1);
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -1151,7 +1151,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_DESPAWN_CONSOLE:
-                    go->Delete();
+                    me->Delete();
                     break;
             }
         }
