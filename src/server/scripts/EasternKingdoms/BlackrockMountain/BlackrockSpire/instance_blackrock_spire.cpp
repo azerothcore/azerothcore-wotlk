@@ -61,6 +61,14 @@ MinionData const minionData[] =
     { NPC_CHROMATIC_ELITE_GUARD, DATA_GENERAL_DRAKKISATH }
 };
 
+DoorData const doorData[] =
+{
+    { GO_GYTH_EXIT_DOOR,    DATA_WARCHIEF_REND_BLACKHAND,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_DRAKKISATH_DOOR_1, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_DRAKKISATH_DOOR_2, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { 0,                   0,             DOOR_TYPE_ROOM,                     BOUNDARY_NONE } // END
+};
+
 class instance_blackrock_spire : public InstanceMapScript
 {
 public:
@@ -76,6 +84,7 @@ public:
         {
             SetBossNumber(EncounterCount);
             LoadMinionData(minionData);
+            LoadDoorData(doorData);
             CurrentSolakarWave = 0;
             SolakarState       = NOT_STARTED;
             SolakarSummons.clear();
@@ -277,6 +286,8 @@ public:
                 default:
                     break;
             }
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
