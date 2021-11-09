@@ -36,12 +36,16 @@ enum Events
 
 struct boss_quartermaster_zigris : public BossAI
 {
-    boss_quartermaster_zigris(Creature* creature) : BossAI(creature, DATA_QUARTERMASTER_ZIGRIS) { }
+    boss_quartermaster_zigris(Creature* creature) : BossAI(creature, DATA_QUARTERMASTER_ZIGRIS)
+    {
+        _hasDrunkPotion = false;
+    }
 
     void Reset() override
     {
         _Reset();
         SetCombatMovement(false);
+        _hasDrunkPotion = false;
     }
 
     void EnterCombat(Unit* who) override
@@ -50,6 +54,15 @@ struct boss_quartermaster_zigris : public BossAI
         events.ScheduleEvent(EVENT_STUN_BOMB, 16000);
         events.ScheduleEvent(EVENT_HOOKED_NET, 14000);
         events.ScheduleEvent(EVENT_SHOOT, 1000);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*effType*/, SpellSchoolMask /*schoolMask*/) override
+    {
+        if (!_hasDrunkPotion && me->HealthBelowPctDamaged(50, damage))
+        {
+            _hasDrunkPotion = true;
+            DoCastSelf(SPELL_HEALING_POTION, true);
+        }
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -73,6 +86,10 @@ struct boss_quartermaster_zigris : public BossAI
             {
                 case EVENT_STUN_BOMB:
                     DoCastVictim(SPELL_STUNBOMB);
+                    if (me->IsWithinMeleeRange(me->GetVictim()))
+                    {
+                        me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+                    }
                     events.ScheduleEvent(EVENT_STUN_BOMB, 14000);
                     break;
                 case EVENT_HOOKED_NET:
@@ -110,6 +127,9 @@ struct boss_quartermaster_zigris : public BossAI
 
         DoMeleeAttackIfReady();
     }
+
+    private:
+        bool _hasDrunkPotion;
 };
 
 void AddSC_boss_quartermasterzigris()
