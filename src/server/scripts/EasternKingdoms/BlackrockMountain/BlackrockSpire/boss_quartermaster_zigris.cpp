@@ -70,7 +70,7 @@ struct boss_quartermaster_zigris : public BossAI
         _JustDied();
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* /*target*/, const SpellInfo* spellInfo) override
     {
         if (spellInfo->Id == SPELL_STUNBOMB || spellInfo->Id == SPELL_HOOKEDNET)
         {
