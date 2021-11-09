@@ -267,6 +267,20 @@ public:
         return true;
     }
 
+    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
+    {
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
+        {
+            sWorld->ShutdownServ(time, 0, *exitCode);
+        }
+        else
+        {
+            sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE);
+        }
+
+        return true;
+    }
+
     static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
