@@ -1464,12 +1464,6 @@ class spell_gen_moss_covered_feet : public AuraScript
         }
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
-    }
-
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_gen_moss_covered_feet::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
@@ -3668,16 +3662,6 @@ public:
         GetTarget()->CastSpell(GetTarget(), _spellId, true, nullptr, aurEff, GetCasterGUID());
     }
 
-    void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-    {
-        // Final heal only on duration end
-        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_ENEMY_SPELL)
-            return;
-
-        // final heal
-        GetTarget()->CastSpell(GetTarget(), _spellId, true, nullptr, aurEff, GetCasterGUID());
-    }
-
     void Register() override
     {
         AfterEffectRemove += AuraEffectRemoveFn(spell_gen_lifebloom::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
@@ -4224,20 +4208,6 @@ class spell_gen_eject_passenger : public SpellScript
         if (spellInfo->Effects[EFFECT_0].CalcValue() < 1)
             return false;
         return true;
-    }
-
-    void EjectPassenger(SpellEffIndex /*effIndex*/)
-    {
-        if (!GetHitUnit())
-        {
-            return;
-        }
-
-        if (Vehicle* vehicle = GetHitUnit()->GetVehicleKit())
-        {
-            if (Unit* passenger = vehicle->GetPassenger(GetEffectValue() - 1))
-                passenger->ExitVehicle();
-        }
     }
 
     void EjectPassenger(SpellEffIndex /*effIndex*/)
