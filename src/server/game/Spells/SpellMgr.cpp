@@ -4732,6 +4732,13 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectAmplitude[0] = 15000;
     });
+    
+     //canon fix icc
+    ApplySpellFix({69399, 70172}, [](SpellEntry* spellInfo)
+    {
+        //set spellefect power gain of cannon to 0 , to handle it in spellscript
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
 
     // Isle of Conquest
     ApplySpellFix({ 66551 }, [](SpellEntry* spellInfo)
