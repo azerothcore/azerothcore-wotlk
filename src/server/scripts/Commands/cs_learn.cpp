@@ -44,8 +44,7 @@ public:
             { "class",      HandleLearnAllMyClassCommand,      SEC_GAMEMASTER, Console::No },
             { "pettalents", HandleLearnAllMyPetTalentsCommand, SEC_GAMEMASTER, Console::No },
             { "spells",     HandleLearnAllMySpellsCommand,     SEC_GAMEMASTER, Console::No },
-            { "talents",    HandleLearnAllMyTalentsCommand,    SEC_GAMEMASTER, Console::No },
-
+            { "talents",    HandleLearnAllMyTalentsCommand,    SEC_GAMEMASTER, Console::No }
         };
 
         static ChatCommandTable learnAllCommandTable =
