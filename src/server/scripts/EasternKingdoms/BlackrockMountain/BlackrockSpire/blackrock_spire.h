@@ -82,7 +82,8 @@ enum CreaturesIds
 
     NPC_UROK_MAGUS                  = 10602,
     NPC_UROK_ENFORCER               = 10601,
-    NPC_FINKLE_EINHORN              = 10776
+    NPC_FINKLE_EINHORN              = 10776,
+    NPC_CHROMATIC_ELITE_GUARD       = 10814
 };
 
 enum AdditionalData
@@ -127,7 +128,6 @@ enum GameObjectsIds
     // For Gyth event
     GO_DR_PORTCULLIS                = 175185,
     GO_PORTCULLIS_ACTIVE            = 164726,
-    GO_PORTCULLIS_TOBOSSROOMS       = 175186,
     // Urok Doomhowl
     GO_UROK_PILE                    = 175621,
     GO_UROK_CHALLENGE               = 175584,

@@ -1458,6 +1458,15 @@ class spell_gen_moss_covered_feet : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+        if (eventInfo.GetActionTarget())
+        {
+            eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
+        }
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
         eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
     }
 
@@ -1996,7 +2005,10 @@ class spell_gen_clone : public SpellScript
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+        if (GetHitUnit())
+        {
+            GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+        }
     }
 
     void Register() override
@@ -2030,7 +2042,10 @@ class spell_gen_clone_weapon : public SpellScript
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+        if (GetHitUnit())
+        {
+            GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+        }
     }
 
     void Register() override
@@ -3595,6 +3610,10 @@ class spell_gen_blade_warding : public AuraScript
 
         Unit* caster = eventInfo.GetActionTarget();
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
+        if (!caster)
+        {
+            return;
+        }
 
         uint8 stacks = GetStackAmount();
         int32 bp = 0;
@@ -3635,6 +3654,18 @@ public:
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ _spellId });
+    }
+
+    void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        // Final heal only on duration end
+        if (GetTargetApplication() && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_ENEMY_SPELL)
+        {
+            return;
+        }
+
+        // final heal
+        GetTarget()->CastSpell(GetTarget(), _spellId, true, nullptr, aurEff, GetCasterGUID());
     }
 
     void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -4104,8 +4135,12 @@ class spell_gen_vendor_bark_trigger : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         if (Creature* vendor = GetCaster()->ToCreature())
-            if (vendor->GetEntry() == NPC_AMPHITHEATER_VENDOR)
+        {
+            if (vendor->GetEntry() == NPC_AMPHITHEATER_VENDOR && vendor->AI())
+            {
                 vendor->AI()->Talk(SAY_AMPHITHEATER_VENDOR);
+            }
+        }
     }
 
     void Register() override
@@ -4148,6 +4183,11 @@ class spell_gen_eject_all_passengers : public SpellScript
 
     void RemoveVehicleAuras()
     {
+        if (!GetHitUnit())
+        {
+            return;
+        }
+
         Unit* u = nullptr;
         if (Vehicle* vehicle = GetHitUnit()->GetVehicleKit())
         {
@@ -4184,6 +4224,20 @@ class spell_gen_eject_passenger : public SpellScript
         if (spellInfo->Effects[EFFECT_0].CalcValue() < 1)
             return false;
         return true;
+    }
+
+    void EjectPassenger(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetHitUnit())
+        {
+            return;
+        }
+
+        if (Vehicle* vehicle = GetHitUnit()->GetVehicleKit())
+        {
+            if (Unit* passenger = vehicle->GetPassenger(GetEffectValue() - 1))
+                passenger->ExitVehicle();
+        }
     }
 
     void EjectPassenger(SpellEffIndex /*effIndex*/)
