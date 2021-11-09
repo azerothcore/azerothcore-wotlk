@@ -2824,9 +2824,21 @@ void DynObjAura::FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* 
 
         for (Unit* unit : units)
         {
+            // xinef: check z level and los dependence
+            float zLevel = GetDynobjOwner()->GetPositionZ();
+            if (unit->GetPositionZ() + 3.0f < zLevel || unit->GetPositionZ() - 5.0f > zLevel)
+            {
+                if (!unit->IsWithinLOSInMap(GetDynobjOwner()))
+                {
+                    continue;
+                }
+            }
+
             auto itr = targets.find(unit);
             if (itr != targets.end())
+            {
                 itr->second |= 1 << effIndex;
+            }
             else
                 targets[unit] = 1 << effIndex;
         }
