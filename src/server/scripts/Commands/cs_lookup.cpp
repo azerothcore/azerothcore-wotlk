@@ -32,10 +32,6 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
 class lookup_commandscript : public CommandScript
@@ -47,50 +43,42 @@ public:
     {
         static ChatCommandTable lookupPlayerCommandTable =
         {
-            { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "" },
-            { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "" },
-            { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "" }
-        };
-
-        static ChatCommandTable lookupSpellCommandTable =
-        {
-            { "id",             SEC_MODERATOR,      true,  &HandleLookupSpellIdCommand,         "" },
-            { "",               SEC_MODERATOR,      true,  &HandleLookupSpellCommand,           "" }
+            { "ip",      HandleLookupPlayerIpCommand,      SEC_GAMEMASTER, Console::Yes  },
+            { "account", HandleLookupPlayerAccountCommand, SEC_GAMEMASTER, Console::Yes  },
+            { "email",   HandleLookupPlayerEmailCommand,   SEC_GAMEMASTER, Console::Yes  }
         };
 
         static ChatCommandTable lookupCommandTable =
         {
-            { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,        "" },
-            { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,    "" },
-            { "event",          SEC_MODERATOR,      true,  &HandleLookupEventCommand,       "" },
-            { "faction",        SEC_MODERATOR,      true,  &HandleLookupFactionCommand,     "" },
-            { "item",           SEC_MODERATOR,      true,  &HandleLookupItemCommand,        "" },
-            { "itemset",        SEC_MODERATOR,      true,  &HandleLookupItemSetCommand,     "" },
-            { "object",         SEC_MODERATOR,      true,  &HandleLookupObjectCommand,      "" },
-            { "gobject",        SEC_MODERATOR,      true,  &HandleLookupObjectCommand,      "" },
-            { "quest",          SEC_MODERATOR,      true,  &HandleLookupQuestCommand,       "" },
-            { "skill",          SEC_MODERATOR,      true,  &HandleLookupSkillCommand,       "" },
-            { "taxinode",       SEC_MODERATOR,      true,  &HandleLookupTaxiNodeCommand,    "" },
-            { "teleport",       SEC_MODERATOR,      true,  &HandleLookupTeleCommand,        "" },
-            { "title",          SEC_MODERATOR,      true,  &HandleLookupTitleCommand,       "" },
-            { "map",            SEC_MODERATOR,      true,  &HandleLookupMapCommand,         "" },
-            { "player",         SEC_GAMEMASTER,     true,  nullptr, "", lookupPlayerCommandTable },
-            { "spell",          SEC_MODERATOR,      true,  nullptr, "", lookupSpellCommandTable }
+            { "area",     HandleLookupAreaCommand,         SEC_MODERATOR, Console::Yes  },
+            { "creature", HandleLookupCreatureCommand,     SEC_MODERATOR, Console::Yes  },
+            { "event",    HandleLookupEventCommand,        SEC_MODERATOR, Console::Yes  },
+            { "faction",  HandleLookupFactionCommand,      SEC_MODERATOR, Console::Yes  },
+            { "item",     HandleLookupItemCommand,         SEC_MODERATOR, Console::Yes  },
+            { "itemset",  HandleLookupItemSetCommand,      SEC_MODERATOR, Console::Yes  },
+            { "map",      HandleLookupMapCommand,          SEC_MODERATOR, Console::Yes  },
+            { "object",   HandleLookupObjectCommand,       SEC_MODERATOR, Console::Yes  },
+            { "gobject",  HandleLookupObjectCommand,       SEC_MODERATOR, Console::Yes  },
+            { "quest",    HandleLookupQuestCommand,        SEC_MODERATOR, Console::Yes  },
+            { "skill",    HandleLookupSkillCommand,        SEC_MODERATOR, Console::Yes  },
+            { "taxinode", HandleLookupTaxiNodeCommand,     SEC_MODERATOR, Console::Yes  },
+            { "teleport", HandleLookupTeleCommand,         SEC_MODERATOR, Console::Yes  },
+            { "title",    HandleLookupTitleCommand,        SEC_MODERATOR, Console::Yes  },
+            { "player",   lookupPlayerCommandTable },
+            { "spell",    HandleLookupSpellCommand,        SEC_MODERATOR, Console::Yes  },
+            { "spell id", HandleLookupSpellIdCommand,      SEC_MODERATOR, Console::Yes  }
+
         };
 
         static ChatCommandTable commandTable =
         {
-            { "lookup",         SEC_MODERATOR,  true,  nullptr,                                 "", lookupCommandTable }
+            { "lookup", lookupCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleLookupAreaCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupAreaCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -160,12 +148,8 @@ public:
         return true;
     }
 
-    static bool HandleLookupCreatureCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupCreatureCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -238,12 +222,8 @@ public:
         return true;
     }
 
-    static bool HandleLookupEventCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupEventCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -293,15 +273,11 @@ public:
         return true;
     }
 
-    static bool HandleLookupFactionCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupFactionCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
         // Can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -395,12 +371,8 @@ public:
         return true;
     }
 
-    static bool HandleLookupItemCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupItemCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -477,12 +449,8 @@ public:
         return true;
     }
 
-    static bool HandleLookupItemSetCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupItemSetCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -548,12 +516,8 @@ public:
         return true;
     }
 
-    static bool HandleLookupObjectCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupObjectCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -625,15 +589,11 @@ public:
         return true;
     }
 
-    static bool HandleLookupQuestCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupQuestCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -754,15 +714,11 @@ public:
         return true;
     }
 
-    static bool HandleLookupSkillCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupSkillCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
         // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -842,15 +798,11 @@ public:
         return true;
     }
 
-    static bool HandleLookupSpellCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupSpellCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -954,21 +906,16 @@ public:
         return true;
     }
 
-    static bool HandleLookupSpellIdCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupSpellIdCommand(ChatHandler* handler, SpellInfo const* spell)
     {
-        if (!*args)
-            return false;
-
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
-
-        uint32 id = atoi((char*)args);
 
         bool found = false;
         uint32 count = 0;
         uint32 maxResults = 1;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell->Id);
         if (spellInfo)
         {
             int locale = handler->GetSessionDbcLocale();
@@ -987,16 +934,16 @@ public:
                     return true;
                 }
 
-                bool known = target && target->HasSpell(id);
+                bool known = target && target->HasSpell(spell->Id);
                 bool learn = (spellInfo->Effects[0].Effect == SPELL_EFFECT_LEARN_SPELL);
 
                 SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[0].TriggerSpell);
 
-                uint32 talentCost = GetTalentSpellCost(id);
+                uint32 talentCost = GetTalentSpellCost(spell->Id);
 
                 bool talent = (talentCost > 0);
                 bool passive = spellInfo->IsPassive();
-                bool active = target && target->HasAura(id);
+                bool active = target && target->HasAura(spell->Id);
 
                 // unit32 used to prevent interpreting uint8 as char at output
                 // find rank of learned spell for learning spell, or talent rank
@@ -1005,9 +952,9 @@ public:
                 // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
                 std::ostringstream ss;
                 if (handler->GetSession())
-                    ss << id << " - |cffffffff|Hspell:" << id << "|h[" << name;
+                    ss << spell->Id << " - |cffffffff|Hspell:" << spell->Id << "|h[" << name;
                 else
-                    ss << id << " - " << name;
+                    ss << spell->Id << " - " << name;
 
                 // include rank in link name
                 if (rank)
@@ -1042,12 +989,8 @@ public:
         return true;
     }
 
-    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, const char* args)
+    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -1116,20 +1059,8 @@ public:
     }
 
     // Find teleport in game_tele order by name
-    static bool HandleLookupTeleCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupTeleCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-        {
-            handler->SendSysMessage(LANG_COMMAND_TELE_PARAMETER);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        char const* str = strtok((char*)args, " ");
-        if (!str)
-            return false;
-
-        std::string namePart = str;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -1174,18 +1105,14 @@ public:
         return true;
     }
 
-    static bool HandleLookupTitleCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupTitleCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
         // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
         // title name have single string arg for player name
         char const* targetName = target ? target->GetName().c_str() : "NAME";
 
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -1258,12 +1185,8 @@ public:
         return true;
     }
 
-    static bool HandleLookupMapCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupMapCommand(ChatHandler* handler, std::string_view namePart)
     {
-        if (!*args)
-            return false;
-
-        std::string namePart = args;
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -1327,70 +1250,48 @@ public:
         return true;
     }
 
-    static bool HandleLookupPlayerIpCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupPlayerIpCommand(ChatHandler* handler, Optional<std::string> ip, Optional<int32> limit)
     {
-        std::string ip;
-        int32 limit;
-        char* limitStr;
-
-        Player* target = handler->getSelectedPlayer();
-        if (!*args)
+        Player* target = handler->getSelectedPlayerOrSelf();
+        if (!ip)
         {
             // nullptr only if used from console
             if (!target || target == handler->GetSession()->GetPlayer())
                 return false;
 
             ip = target->GetSession()->GetRemoteAddress();
-            limit = -1;
         }
         else
         {
-            ip = strtok((char*)args, " ");
-            limitStr = strtok(nullptr, " ");
-            limit = limitStr ? atoi(limitStr) : -1;
+            ip = *ip;
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
-        stmt->setString(0, ip);
+        stmt->setString(0, *ip);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return LookupPlayerSearchCommand(result, limit, handler);
+        return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
-    static bool HandleLookupPlayerAccountCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupPlayerAccountCommand(ChatHandler* handler, std::string account, Optional<int32> limit)
     {
-        if (!*args)
-            return false;
-
-        std::string account = strtok((char*)args, " ");
-        char* limitStr = strtok(nullptr, " ");
-        int32 limit = limitStr ? atoi(limitStr) : -1;
-
-        if (!Utf8ToUpperOnlyLatin
-                (account))
+        if (!Utf8ToUpperOnlyLatin(account))
             return false;
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
         stmt->setString(0, account);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return LookupPlayerSearchCommand(result, limit, handler);
+        return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
-    static bool HandleLookupPlayerEmailCommand(ChatHandler* handler, char const* args)
+    static bool HandleLookupPlayerEmailCommand(ChatHandler* handler, std::string email, Optional<int32> limit)
     {
-        if (!*args)
-            return false;
-
-        std::string email = strtok((char*)args, " ");
-        char* limitStr = strtok(nullptr, " ");
-        int32 limit = limitStr ? atoi(limitStr) : -1;
-
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
         stmt->setString(0, email);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return LookupPlayerSearchCommand(result, limit, handler);
+        return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
     static bool LookupPlayerSearchCommand(PreparedQueryResult result, int32 limit, ChatHandler* handler)
