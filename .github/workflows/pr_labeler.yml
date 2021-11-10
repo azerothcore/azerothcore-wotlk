@@ -1,0 +1,17 @@
+name: Pull Request Labeler
+on:
+  - pull_request_target
+
+jobs:
+  triage:
+    runs-on: ubuntu-20.04
+    steps:
+      # This delay is necessary to correctly trigger builds on label application
+      - name: Sleep for 30 seconds
+        run: sleep 30s
+        shell: bash
+      - uses: actions/labeler@v3
+        with:
+          repo-token: ${{ secrets.AC_GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
