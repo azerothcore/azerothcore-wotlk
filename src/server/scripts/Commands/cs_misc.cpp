@@ -762,7 +762,7 @@ public:
             {
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
-            }            
+            }
             else // save only in non-flight case
             {
                 _player->SaveRecallPosition();
@@ -775,7 +775,7 @@ public:
         {
             // check offline security
             if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
-                return false;            
+                return false;
 
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
@@ -1367,7 +1367,7 @@ public:
         std::string kickReasonStr = handler->GetAcoreString(LANG_NO_REASON);
         if (reason && !reason->empty())
         {
-            kickReasonStr = *reason->data();
+            kickReasonStr = std::string{ *reason };
         }
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
@@ -2788,7 +2788,7 @@ public:
         if (!target && !creatureTarget)
         {
             target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }        
+        }
 
         if (!target && !creatureTarget)
         {

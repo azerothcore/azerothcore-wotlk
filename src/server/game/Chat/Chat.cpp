@@ -303,7 +303,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
     return BuildChatPacket(data, chatType, language, senderGUID, receiverGUID, message, chatTag, senderName, receiverName, achievementId, gmMessage, channelName);
 }
 
-Player* ChatHandler::getSelectedPlayer()
+Player* ChatHandler::getSelectedPlayer() const
 {
     if (!m_session)
         return nullptr;
@@ -315,7 +315,7 @@ Player* ChatHandler::getSelectedPlayer()
     return ObjectAccessor::FindConnectedPlayer(selected);
 }
 
-Unit* ChatHandler::getSelectedUnit()
+Unit* ChatHandler::getSelectedUnit() const
 {
     if (!m_session)
         return nullptr;
@@ -326,7 +326,7 @@ Unit* ChatHandler::getSelectedUnit()
     return m_session->GetPlayer();
 }
 
-WorldObject* ChatHandler::getSelectedObject()
+WorldObject* ChatHandler::getSelectedObject() const
 {
     if (!m_session)
         return nullptr;
@@ -339,7 +339,7 @@ WorldObject* ChatHandler::getSelectedObject()
     return ObjectAccessor::GetUnit(*m_session->GetPlayer(), guid);
 }
 
-Creature* ChatHandler::getSelectedCreature()
+Creature* ChatHandler::getSelectedCreature() const
 {
     if (!m_session)
         return nullptr;
@@ -347,7 +347,7 @@ Creature* ChatHandler::getSelectedCreature()
     return ObjectAccessor::GetCreatureOrPetOrVehicle(*m_session->GetPlayer(), m_session->GetPlayer()->GetTarget());
 }
 
-Player* ChatHandler::getSelectedPlayerOrSelf()
+Player* ChatHandler::getSelectedPlayerOrSelf() const
 {
     if (!m_session)
         return nullptr;
@@ -477,7 +477,7 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
     return nullptr;
 }
 
-GameObject* ChatHandler::GetNearbyGameObject()
+GameObject* ChatHandler::GetNearbyGameObject() const
 {
     if (!m_session)
         return nullptr;
