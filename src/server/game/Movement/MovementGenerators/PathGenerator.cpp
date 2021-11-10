@@ -211,21 +211,20 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     {
         bool buildShotrcut = false;
 
-        bool isWaterStart = _source->GetMap()->IsInWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
-        bool isWaterEnd   = _source->GetMap()->IsInWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight());
-        bool isFarUnderWater = startFarFromPoly ? isWaterStart : isWaterEnd;
+        bool isUnderWaterStart = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
+        bool isUnderWaterEnd = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight());
+        bool isFarUnderWater = startFarFromPoly ? isUnderWaterStart : isUnderWaterEnd;
 
         Unit const* _sourceUnit = _source->ToUnit();
 
         if (_sourceUnit)
         {
-            bool isInWater = (_sourceUnit->CanSwim() && isWaterStart && isWaterEnd) || (isFarUnderWater && _useRaycast);
+            bool isUnderWater = (_sourceUnit->CanSwim() && isUnderWaterStart && isUnderWaterEnd) || (_sourceUnit->IsInWater() && isUnderWaterEnd) || (isFarUnderWater && _useRaycast);
 
-            if (isInWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
+            if (isUnderWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
             {
                 buildShotrcut = true;
             }
-
         }
 
         if (buildShotrcut)
