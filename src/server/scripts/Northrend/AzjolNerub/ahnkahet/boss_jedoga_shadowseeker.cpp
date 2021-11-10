@@ -572,7 +572,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<boss_jedoga_shadowseekerAI>(creature);
+        return GetAhnKahetAI<boss_jedoga_shadowseekerAI>(creature);
     }
 };
 
@@ -686,7 +686,7 @@ public:
 
     CreatureAI *GetAI(Creature *creature) const override
     {
-        return GetAhnkahetAI<npc_twilight_volunteerAI>(creature);
+        return GetAhnKahetAI<npc_twilight_volunteerAI>(creature);
     }
 };
 
