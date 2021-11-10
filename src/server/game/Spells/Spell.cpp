@@ -1246,10 +1246,14 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
-                if (Unit* unitTarget = (*itr)->ToUnit())
-                    AddUnitTarget(unitTarget, effMask, false);
+                if (Unit* unit = (*itr)->ToUnit())
+                {
+                    AddUnitTarget(unit, effMask, false);
+                }
                 else if (GameObject* gObjTarget = (*itr)->ToGameObject())
+                {
                     AddGOTarget(gObjTarget, effMask);
+                }
             }
         }
     }
