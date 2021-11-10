@@ -164,10 +164,10 @@ class go_suppression_device : public GameObjectScript
                     switch (eventId)
                     {
                         case EVENT_SUPPRESSION_CAST:
-                            if (go->GetGoState() == GO_STATE_READY)
+                            if (me->GetGoState() == GO_STATE_READY)
                             {
-                                go->CastSpell(nullptr, SPELL_SUPPRESSION_AURA);
-                                go->SendCustomAnim(0);
+                                me->CastSpell(nullptr, SPELL_SUPPRESSION_AURA);
+                                me->SendCustomAnim(0);
                             }
                             _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
                             break;
@@ -188,7 +188,7 @@ class go_suppression_device : public GameObjectScript
                         _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, 30000, 120000);
                         break;
                     case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
-                        go->SetLootState(GO_READY);
+                        me->SetLootState(GO_READY);
                         break;
                 }
             }
@@ -207,10 +207,10 @@ class go_suppression_device : public GameObjectScript
                 if (_active)
                     return;
                 _active = true;
-                if (go->GetGoState() == GO_STATE_ACTIVE)
-                    go->SetGoState(GO_STATE_READY);
-                go->SetLootState(GO_READY);
-                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                if (me->GetGoState() == GO_STATE_ACTIVE)
+                    me->SetGoState(GO_STATE_READY);
+                me->SetLootState(GO_READY);
+                me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
             }
 
@@ -219,8 +219,8 @@ class go_suppression_device : public GameObjectScript
                 if (!_active)
                     return;
                 _active = false;
-                go->SetGoState(GO_STATE_ACTIVE);
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                me->SetGoState(GO_STATE_ACTIVE);
+                me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 _events.CancelEvent(EVENT_SUPPRESSION_CAST);
             }
 

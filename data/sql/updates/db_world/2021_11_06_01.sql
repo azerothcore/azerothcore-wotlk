@@ -17,7 +17,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '163605041442388901
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636050414423889017');
 
 -- Condition for Wind Stone Gossip menu option
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=15 AND `SourceGroup` IN (6540,6542,6543) AND `SourceEntry` IN (0,1,2,3,4) AND `SourceId`=0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`= 15 AND `SourceGroup` IN (6540,6542,6543) AND `SourceEntry` IN (0,1,2,3,4) AND `SourceId`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 6540, 0, 0, 0, 1, 0, 24746, 0, 0, 0, 0, 0, '', 'Show gossip menu 6540 option id 0 if target has aura Twilight Cultist Disguise (effect 0).'),
 (15, 6540, 1, 0, 0, 1, 0, 24746, 0, 0, 0, 0, 0, '', 'Show gossip menu 6540 option id 1 if target has aura Twilight Cultist Disguise (effect 0).'),
@@ -61,6 +61,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15, 6543, 4, 0, 0, 1, 0, 24748, 0, 0, 0, 0, 0, '', 'Show gossip menu 6543 option id 4 if target has aura Twilight Cultist Disguise (effect 0).'),
 (15, 6543, 4, 0, 0, 1, 0, 24782, 0, 0, 0, 0, 0, '', 'Show gossip menu 6543 option id 4 if target has aura Twilight Cultist Disguise (effect 0).'),
 (15, 6543, 4, 0, 0, 2, 0, 20448, 1, 0, 0, 0, 0, '', 'Show gossip menu 6543 option id 4 if player has 1 of Scepter of Beckoning: Thunder. Item cannot be in bank.');
+
 
 --
 -- END UPDATING QUERIES

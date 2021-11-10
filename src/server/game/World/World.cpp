@@ -86,7 +86,7 @@
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
-#include "WhoListCache.h"
+#include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include <boost/asio/ip/address.hpp>
@@ -1990,6 +1990,8 @@ void World::SetInitialWorldSettings()
     // our speed up
     m_timers[WUPDATE_5_SECS].SetInterval(5 * IN_MILLISECONDS);
 
+    m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
+
     mail_expire_check_timer = time(nullptr) + 6 * 3600;
 
     ///- Initilize static helper structures
@@ -2237,13 +2239,18 @@ void World::Update(uint32 diff)
         // moved here from HandleCharEnumOpcode
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
         CharacterDatabase.Execute(stmt);
-
-        // copy players hashmapholder to avoid mutex
-        WhoListCacheMgr::Update();
     }
 
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
+
+    ///- Update Who List Cache
+    if (m_timers[WUPDATE_WHO_LIST].Passed())
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update who list"));
+        m_timers[WUPDATE_WHO_LIST].Reset();
+        sWhoListCacheMgr->Update();
+    }
 
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Check quest reset times"));
