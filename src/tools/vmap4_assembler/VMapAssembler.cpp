@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     Acore::Banner::Show("VMAP assembler", [](std::string_view text) { std::cout << text << std::endl; }, nullptr);
 
     std::string src = "Buildings";
-    std::string dest = "vmaps";       
+    std::string dest = "vmaps";
 
     if (argc > 3)
     {
