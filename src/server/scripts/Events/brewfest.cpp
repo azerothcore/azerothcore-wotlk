@@ -2105,16 +2105,16 @@ public:
 
         void Reset() override
         {
-            go->SetLootState(GO_READY);
+            me->SetLootState(GO_READY);
 
             _scheduler.Schedule(Seconds(1), [this](TaskContext /*context*/)
             {
-                go->UseDoorOrButton();
-                go->CastSpell(nullptr, SPELL_MOLE_MACHINE_EMERGE);
+                me->UseDoorOrButton();
+                me->CastSpell(nullptr, SPELL_MOLE_MACHINE_EMERGE);
             })
             .Schedule(Seconds(4), [this](TaskContext /*context*/)
             {
-                if (GameObject* trap = go->GetLinkedTrap())
+            if (GameObject* trap = me->GetLinkedTrap())
                 {
                     trap->UseDoorOrButton();
                     trap->SetLootState(GO_READY);

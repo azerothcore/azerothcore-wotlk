@@ -447,12 +447,37 @@ void Unit::Update(uint32 p_time)
     // not implemented before 3.0.2
     // xinef: if attack time > 0, reduce by diff
     // if on next update, attack time < 0 assume player didnt attack - set to 0
-    if (int32 base_attack = getAttackTimer(BASE_ATTACK))
-        setAttackTimer(BASE_ATTACK, base_attack > 0 ? base_attack - (int32)p_time : 0);
-    if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
-        setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32)p_time : 0);
-    if (int32 off_attack = getAttackTimer(OFF_ATTACK))
-        setAttackTimer(OFF_ATTACK, off_attack > 0 ? off_attack - (int32)p_time : 0);
+    bool suspendAttackTimer = false;
+    if (IsPlayer() && HasUnitState(UNIT_STATE_CASTING))
+    {
+        for (Spell* spell : m_currentSpells)
+        {
+            if (spell)
+            {
+                if (spell->GetSpellInfo()->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
+                {
+                    suspendAttackTimer = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!suspendAttackTimer)
+    {
+        if (int32 base_attack = getAttackTimer(BASE_ATTACK))
+        {
+            setAttackTimer(BASE_ATTACK, base_attack > 0 ? base_attack - (int32) p_time : 0);
+        }
+        if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
+        {
+            setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32) p_time : 0);
+        }
+        if (int32 off_attack = getAttackTimer(OFF_ATTACK))
+        {
+            setAttackTimer(OFF_ATTACK, off_attack > 0 ? off_attack - (int32) p_time : 0);
+        }
+    }
 
     // update abilities available only for fraction of time
     UpdateReactives(p_time);
@@ -2324,6 +2349,14 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
         else
             LOG_DEBUG("entities.unit", "AttackerStateUpdate: (NPC) %s attacked %s for %u dmg, absorbed %u, blocked %u, resisted %u.",
                                  GetGUID().ToString().c_str(), victim->GetGUID().ToString().c_str(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+
+        // Let the pet know we've started attacking someting. Handles melee attacks only
+        // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
+        if (GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
+            for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+                if (Unit* pet = *itr)
+                    if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
+                        pet->ToCreature()->AI()->OwnerAttacked(victim);
     }
 }
 
@@ -9715,7 +9748,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    if (creature && !IsControlledByPlayer())
+    if (creature && !(IsControllableGuardian() && IsControlledByPlayer()))
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -9736,14 +9769,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     if (meleeAttack)
         SendMeleeAttackStart(victim);
-
-    // Let the pet know we've started attacking someting. Handles melee attacks only
-    // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
-    if (GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
-        for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-            if (Unit* pet = *itr)
-                if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
-                    pet->ToCreature()->AI()->OwnerAttacked(victim);
 
     return true;
 }
