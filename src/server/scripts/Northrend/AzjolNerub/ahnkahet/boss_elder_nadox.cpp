@@ -303,7 +303,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<boss_elder_nadoxAI>(creature);
+        return GetAhnKahetAI<boss_elder_nadoxAI>(creature);
     }
 };
 
@@ -344,7 +344,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<npc_ahnkahar_nerubianAI>(creature);
+        return GetAhnKahetAI<npc_ahnkahar_nerubianAI>(creature);
     }
 };
 

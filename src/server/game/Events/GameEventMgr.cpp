@@ -16,6 +16,7 @@
  */
 
 #include "BattlegroundMgr.h"
+#include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "GossipDef.h"
@@ -136,6 +137,11 @@ void GameEventMgr::StartInternalEvent(uint16 event_id)
 
 bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
 {
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, event_id, nullptr) && !overwrite)
+    {
+        return false;
+    }
+
     GameEventData& data = mGameEvent[event_id];
     if (data.state == GAMEEVENT_NORMAL || data.state == GAMEEVENT_INTERNAL)
     {
@@ -251,6 +257,7 @@ void GameEventMgr::LoadFromDB()
             }
 
             GameEventData& pGameEvent = mGameEvent[event_id];
+            pGameEvent.eventId      = fields[0].GetUInt32();
             uint64 starttime        = fields[1].GetUInt64();
             pGameEvent.start        = time_t(starttime);
             uint64 endtime          = fields[2].GetUInt64();
@@ -1850,6 +1857,21 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
             // if none is found we don't modify start date and use the one in game_event
         }
     }
+}
+
+uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
+{
+    auto const events = sGameEventMgr->GetEventMap();
+
+    for (auto const& eventEntry : events)
+    {
+        if (eventEntry.holiday_id == holidayId)
+        {
+            return eventEntry.eventId;
+        }
+    }
+
+    return 0;
 }
 
 bool IsHolidayActive(HolidayIds id)
