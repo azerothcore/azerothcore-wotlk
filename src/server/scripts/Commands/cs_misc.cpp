@@ -1385,7 +1385,6 @@ public:
         // No args required for players
         if (handler->GetSession() && AccountMgr::IsPlayerAccount(handler->GetSession()->GetSecurity()))
         {
-            // 7355: "Stuck"
             if (Player* player = handler->GetSession()->GetPlayer())
             {
                 player->CastSpell(player, SPELL_STUCK, false);
@@ -2798,7 +2797,7 @@ public:
         }
 
         Player* playerTarget = target->GetConnectedPlayer();
-        if (playerTarget)
+        if (playerTarget && !creatureTarget)
         {
             handler->PSendSysMessage(LANG_COMMAND_FREEZE, target->GetName().c_str());
 
@@ -2844,7 +2843,7 @@ public:
 
         Player* playerTarget = target->GetConnectedPlayer();
 
-        if (playerTarget && playerTarget->HasAura(SPELL_FREEZE))
+        if (!creatureTarget && playerTarget && playerTarget->HasAura(SPELL_FREEZE))
         {
             handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, target->GetName().c_str());
             playerTarget->RemoveAurasDueToSpell(SPELL_FREEZE);
