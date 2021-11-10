@@ -36,10 +36,6 @@
 #include "ScriptMgr.h"
 #include "TargetedMovementGenerator.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
 class mmaps_commandscript : public CommandScript
@@ -51,21 +47,21 @@ public:
     {
         static ChatCommandTable mmapCommandTable =
         {
-            { "loadedtiles", SEC_ADMINISTRATOR, false, &HandleMmapLoadedTilesCommand, "" },
-            { "loc",         SEC_ADMINISTRATOR,         false, &HandleMmapLocCommand,         "" },
-            { "path",        SEC_ADMINISTRATOR,        false, &HandleMmapPathCommand,        "" },
-            { "stats",       SEC_ADMINISTRATOR,       false, &HandleMmapStatsCommand,       "" },
-            { "testarea",    SEC_ADMINISTRATOR,    false, &HandleMmapTestArea,           "" },
+            { "loadedtiles", HandleMmapLoadedTilesCommand, SEC_ADMINISTRATOR, Console::No },
+            { "loc",         HandleMmapLocCommand,         SEC_ADMINISTRATOR, Console::No },
+            { "path",        HandleMmapPathCommand,        SEC_ADMINISTRATOR, Console::No },
+            { "stats",       HandleMmapStatsCommand,       SEC_ADMINISTRATOR, Console::No },
+            { "testarea",    HandleMmapTestArea,           SEC_ADMINISTRATOR, Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "mmap", SEC_ADMINISTRATOR, true, nullptr, "", mmapCommandTable },
+            { "mmap", mmapCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleMmapPathCommand(ChatHandler* handler, char const* args)
+    static bool HandleMmapPathCommand(ChatHandler* handler, Optional<std::string> para)
     {
         if (!MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()))
         {
@@ -84,14 +80,12 @@ public:
             return true;
         }
 
-        char* para = strtok((char*)args, " ");
-
         bool useStraightPath = false;
-        if (para && strcmp(para, "true") == 0)
+        if (StringStartsWith("true", *para))
             useStraightPath = true;
 
         bool useRaycast = false;
-        if (para && (strcmp(para, "line") == 0 || strcmp(para, "ray") == 0 || strcmp(para, "raycast") == 0))
+        if (StringStartsWith("line", *para) || StringStartsWith("ray", *para) || StringStartsWith("raycast", *para))
         {
             useRaycast = true;
         }
@@ -122,13 +116,13 @@ public:
         if (!player->IsGameMaster())
             handler->PSendSysMessage("Enable GM mode to see the path points.");
 
-        for (uint32 i = 0; i < pointPath.size(); ++i)
-            player->SummonCreature(VISUAL_WAYPOINT, pointPath[i].x, pointPath[i].y, pointPath[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 9000);
+        for (auto i : pointPath)
+            player->SummonCreature(VISUAL_WAYPOINT, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN, 9000);
 
         return true;
     }
 
-    static bool HandleMmapLocCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMmapLocCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage("mmap tileloc:");
 
@@ -191,7 +185,7 @@ public:
         return true;
     }
 
-    static bool HandleMmapLoadedTilesCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMmapLoadedTilesCommand(ChatHandler* handler)
     {
         uint32 mapid = handler->GetSession()->GetPlayer()->GetMapId();
         dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(mapid);
@@ -216,7 +210,7 @@ public:
         return true;
     }
 
-    static bool HandleMmapStatsCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMmapStatsCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage("mmap stats:");
         //handler->PSendSysMessage("  global mmap pathfinding is %sabled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
@@ -263,7 +257,7 @@ public:
         return true;
     }
 
-    static bool HandleMmapTestArea(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMmapTestArea(ChatHandler* handler)
     {
         float radius = 40.0f;
         WorldObject* object = handler->GetSession()->GetPlayer();
