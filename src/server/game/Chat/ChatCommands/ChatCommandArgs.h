@@ -318,7 +318,6 @@ namespace Acore::Impl::ChatCommands
     {
         static ChatCommandResult TryConsume(SpellInfo const*&, ChatHandler const*, std::string_view);
     };
-
 }
 
 #endif
