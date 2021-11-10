@@ -1863,7 +1863,7 @@ uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
 {
     auto const events = sGameEventMgr->GetEventMap();
 
-    for (auto const eventEntry : events)
+    for (auto const& eventEntry : events)
     {
         if (eventEntry.holiday_id == holidayId)
         {
