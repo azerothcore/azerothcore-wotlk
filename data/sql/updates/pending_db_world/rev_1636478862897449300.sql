@@ -1,9 +1,0 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636478862897449300');
-
-DELETE FROM `creature_formations` WHERE `leaderguid`=137859;
-INSERT INTO `creature_formations` VALUES
-(137859,137859,0,0,2,0,0),
-(137859,137954,5,135,513,0,0),
-(137859,137865,5,45,513,0,0),
-(137859,137958,5,315,513,0,0),
-(137859,137952,5,225,513,0,0);
