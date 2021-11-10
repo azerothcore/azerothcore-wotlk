@@ -1389,8 +1389,7 @@ public:
             float dist = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
             float angle = frand(0.0f, 2 * M_PI);
 
-            Position pos;
-            GetCaster()->GetNearPosition(pos, dist, angle);
+            Position pos = GetCaster()->GetNearPosition(dist, angle);
             dest.Relocate(pos);
         }
 
@@ -1562,8 +1561,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                Position pos;
-                caster->GetRandomNearPosition(pos, 5.0f);
+                Position pos = caster->GetRandomNearPosition(5.0f);
                 if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
                 {
                     haunt->SetSpeed(MOVE_RUN, 0.5, true);
@@ -1602,8 +1600,7 @@ public:
 
             if (Unit* caster = GetCaster())
             {
-                Position pos;
-                caster->GetRandomNearPosition(pos, 5.0f);
+                Position pos = caster->GetRandomNearPosition(5.0f);
                 if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
                 {
                     haunt->SetSpeed(MOVE_RUN, 0.5, true);
