@@ -16,6 +16,7 @@
  */
 
 #include "BattlegroundMgr.h"
+#include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "GossipDef.h"
@@ -136,6 +137,11 @@ void GameEventMgr::StartInternalEvent(uint16 event_id)
 
 bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
 {
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, event_id, nullptr) && !overwrite)
+    {
+        return false;
+    }
+
     GameEventData& data = mGameEvent[event_id];
     if (data.state == GAMEEVENT_NORMAL || data.state == GAMEEVENT_INTERNAL)
     {
