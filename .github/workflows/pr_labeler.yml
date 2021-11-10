@@ -11,8 +11,8 @@ jobs:
         uses: juliangruber/sleep-action@v1
         with:
           time: 30s
-      - uses: actions/labeler@v3
-        with:
-          repo-token: ${{ secrets.AC_GITHUB_TOKEN }}
-          configuration-path: .github/labeler.yml
-          sync-labels: true
+#      - uses: actions/labeler@v3
+#        with:
+#          repo-token: ${{ secrets.AC_GITHUB_TOKEN }}
+#          configuration-path: .github/labeler.yml
+#          sync-labels: true
