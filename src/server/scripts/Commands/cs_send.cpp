@@ -173,53 +173,30 @@ public:
         }
 
         Player* player = target->GetConnectedPlayer();
-        auto msg = std::string{ message }.c_str();
+        std::string msg = std::string{ message };
 
         /// - Send the message
         // Use SendAreaTriggerMessage for fastest delivery.
-        player->GetSession()->SendAreaTriggerMessage("%s", msg);
+        player->GetSession()->SendAreaTriggerMessage("%s", msg.c_str());
         player->GetSession()->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
 
         // Confirmation message
-        handler->PSendSysMessage(LANG_SENDMESSAGE, handler->playerLink(target->GetName()).c_str(), msg);
+        handler->PSendSysMessage(LANG_SENDMESSAGE, handler->playerLink(target->GetName()).c_str(), msg.c_str());
 
         return true;
     }
 
-    static bool HandleSendMoneyCommand(ChatHandler* handler, char const* args)
+    static bool HandleSendMoneyCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString subject, QuotedString text, uint32 money)
     {
-        /// format: name "subject text" "mail text" money
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
 
-        Player* receiver;
-        ObjectGuid receiverGuid;
-        std::string receiverName;
-        if (!handler->extractPlayerTarget((char*)args, &receiver, &receiverGuid, &receiverName))
+        if (!target)
+        {
             return false;
-
-        char* tail1 = strtok(nullptr, "");
-        if (!tail1)
-            return false;
-
-        char* msgSubject = handler->extractQuotedArg(tail1);
-        if (!msgSubject)
-            return false;
-
-        char* tail2 = strtok(nullptr, "");
-        if (!tail2)
-            return false;
-
-        char* msgText = handler->extractQuotedArg(tail2);
-        if (!msgText)
-            return false;
-
-        char* moneyStr = strtok(nullptr, "");
-        int32 money = moneyStr ? atoi(moneyStr) : 0;
-        if (money <= 0)
-            return false;
-
-        // msgSubject, msgText isn't NUL after prev. check
-        std::string subject = msgSubject;
-        std::string text    = msgText;
+        }
 
         // from console show not existed sender
         MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
@@ -228,12 +205,11 @@ public:
 
         MailDraft(subject, text)
                 .AddMoney(money)
-                .SendMailTo(trans, MailReceiver(receiver, receiverGuid.GetCounter()), sender);
+                .SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
 
         CharacterDatabase.CommitTransaction(trans);
 
-        std::string nameLink = handler->playerLink(receiverName);
-        handler->PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()).c_str());
         return true;
     }
 };
