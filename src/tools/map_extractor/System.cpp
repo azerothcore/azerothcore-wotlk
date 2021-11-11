@@ -304,7 +304,6 @@ void ReadLiquidTypeTableDBC()
         liquidType.SoundBank        = dbc.getRecord(x).getUInt(3);
     }
 
-
     printf("Done! (%zu LiquidTypes loaded)\n", LiquidTypes.size());
 }
 
