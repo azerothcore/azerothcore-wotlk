@@ -145,8 +145,10 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     }
 
     // xinef: do not initialize motion if we got stunned in movementinform
-    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE))
+    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
+    {
         return true;
+    }
 
     WaypointData const* node = i_path->at(i_currentNode);
 
@@ -204,11 +206,12 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
 {
     // Waypoint movement can be switched on/off
     // This is quite handy for escort quests and other stuff
-    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE))
+    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
     {
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
         return true;
     }
+
     // prevent a crash at empty waypoint path.
     if (!i_path || i_path->empty())
         return false;

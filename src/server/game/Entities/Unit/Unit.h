@@ -2145,6 +2145,8 @@ public:
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     [[nodiscard]] int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
+    virtual bool IsMovementPreventedByCasting() const;
+
     ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
     ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
 
