@@ -152,7 +152,7 @@ public:
         // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
         MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);
         MailDraft draft(subject, text);
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();        
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         draft.SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
         CharacterDatabase.CommitTransaction(trans);
 
