@@ -13705,9 +13705,10 @@ void Unit::setDeathState(DeathState s, bool despawn)
 
     if (s == JUST_DIED)
     {
-        // xinef: needed for procs, this is refreshed in Unit::Update
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, false);
+
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
