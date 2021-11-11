@@ -477,68 +477,31 @@ public:
         return false;
     }
 
-    static bool HandleGPSCommand(ChatHandler* handler, char const* args)
+    static bool HandleGPSCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        WorldObject* object = nullptr;
-        if (*args)
+        if (!target)
         {
-            HighGuid guidHigh;
-            ObjectGuid::LowType guidLow = handler->extractLowGuidFromLink((char*)args, guidHigh);
-            if (!guidLow)
-                return false;
-
-            switch (guidHigh)
-            {
-                case HighGuid::Player:
-                {
-                    object = ObjectAccessor::FindPlayerByLowGUID(guidLow);
-                    if (!object)
-                    {
-                        handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::Unit:
-                {
-                    object = handler->GetCreatureFromPlayerMapByDbGuid(guidLow);
-                    if (!object)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOCREATUREFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::GameObject:
-                {
-                    object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
-                    if (!object)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                default:
-                    return false;
-            }
-            if (!object)
-                return false;
-        }
-        else
-        {
-            object = handler->getSelectedUnit();
-
-            if (!object)
-            {
-                handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
         }
 
-        CellCoord cellCoord = Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
-        Cell cell(cellCoord);
+        WorldObject* object = handler->getSelectedUnit();
+
+        if (!object && !target)
+        {
+            return false;
+        }
+
+        if (!object && target && target->IsConnected())
+        {
+            object = target->GetConnectedPlayer();
+        }
+
+        if (!object)
+        {
+            return false;
+        }
+
+        Cell cell(Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
 
         uint32 zoneId, areaId;
         object->GetZoneAndAreaId(zoneId, areaId);
@@ -1198,67 +1161,31 @@ public:
         return true;
     }
 
-    static bool HandleGetDistanceCommand(ChatHandler* handler, char const* args)
+    static bool HandleGetDistanceCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
-        WorldObject* obj = nullptr;
-        if (*args)
+        if (!target)
         {
-            HighGuid guidHigh;
-            ObjectGuid::LowType guidLow = handler->extractLowGuidFromLink((char*)args, guidHigh);
-            if (!guidLow)
-                return false;
-
-            switch (guidHigh)
-            {
-                case HighGuid::Player:
-                {
-                    obj = ObjectAccessor::FindPlayerByLowGUID(guidLow);
-                    if (!obj)
-                    {
-                        handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::Unit:
-                {
-                    obj = handler->GetCreatureFromPlayerMapByDbGuid(guidLow);
-                    if (!obj)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOCREATUREFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                case HighGuid::GameObject:
-                {
-                    obj = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
-                    if (!obj)
-                    {
-                        handler->SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
-                        handler->SetSentErrorMessage(true);
-                    }
-                    break;
-                }
-                default:
-                    return false;
-            }
-            if (!obj)
-                return false;
-        }
-        else
-        {
-            obj = handler->getSelectedUnit();
-
-            if (!obj)
-            {
-                handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
         }
 
-        handler->PSendSysMessage(LANG_DISTANCE, handler->GetSession()->GetPlayer()->GetDistance(obj), handler->GetSession()->GetPlayer()->GetDistance2d(obj), handler->GetSession()->GetPlayer()->GetExactDist(obj), handler->GetSession()->GetPlayer()->GetExactDist2d(obj));
+        WorldObject* object = handler->getSelectedUnit();
+
+        if (!object && !target)
+        {
+            return false;
+        }
+
+        if (!object && target && target->IsConnected())
+        {
+            object = target->GetConnectedPlayer();
+        }
+
+        if (!object)
+        {
+            return false;
+        }
+
+        handler->PSendSysMessage(LANG_DISTANCE, handler->GetSession()->GetPlayer()->GetDistance(object), handler->GetSession()->GetPlayer()->GetDistance2d(object), handler->GetSession()->GetPlayer()->GetExactDist(object), handler->GetSession()->GetPlayer()->GetExactDist2d(object));
         return true;
     }
     // Teleport player to last position
