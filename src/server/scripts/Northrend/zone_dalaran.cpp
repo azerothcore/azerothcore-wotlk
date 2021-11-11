@@ -585,8 +585,7 @@ public:
                     case EVENT_BLINK:
                         {
                             DoCast(me, SPELL_IMPROVED_BLINK);
-                            Position pos;
-                            me->GetRandomNearPosition(pos, (urand(15, 40)));
+                            Position pos = me->GetRandomNearPosition((urand(15, 40)));
                             me->GetMotionMaster()->MovePoint(0, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
                             events.ScheduleEvent(EVENT_DESPAWN, 3 * IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 2.5 * IN_MILLISECONDS);
