@@ -1281,9 +1281,16 @@ public:
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64442 /*SPELL_BLADE_WARDING*/);
-            int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+            if (!eventInfo.GetActionTarget())
+            {
+                return;
+            }
+
+            if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64442 /*SPELL_BLADE_WARDING*/))
+            {
+                int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
+                eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+            }
         }
 
         void Register() override
@@ -1310,13 +1317,17 @@ public:
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if ((eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
+            if (!eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo() || (eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
+            {
                 return;
+            }
 
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
-            int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-            eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
+            if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/))
+            {
+                int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
+                eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
+                eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
+            }
         }
 
         void Register() override
@@ -1465,7 +1476,7 @@ public:
                     continue;
 
                 summon->SetOwnerGUID(GetCaster()->GetGUID());
-                summon->setFaction(GetCaster()->getFaction());
+                summon->SetFaction(GetCaster()->GetFaction());
                 summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->GetMotionMaster()->MoveFollow(GetCaster(), PET_FOLLOW_DIST, GetCaster()->GetAngle(summon), MOTION_SLOT_CONTROLLED);
@@ -1867,7 +1878,13 @@ public:
         {
             PreventDefaultAction();
 
-            int32 absorb = int32(CalculatePct(eventInfo.GetHealInfo()->GetHeal(), 15.0f));
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (!healInfo)
+            {
+                return;
+            }
+
+            int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 15.0f));
             // xinef: all heals contribute to one bubble
             if (AuraEffect* protEff = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PROTECTION_OF_ANCIENT_KINGS, 0/*, eventInfo.GetActor()->GetGUID()*/))
             {
@@ -2879,7 +2896,8 @@ public:
                 return false;*/
 
             if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
-                if (!eventInfo.GetDamageInfo()->GetDamage())
+            {
+                if (eventInfo.GetDamageInfo() && !eventInfo.GetDamageInfo()->GetDamage())
                 {
                     if (procSpell->SpellFamilyName == SPELLFAMILY_WARRIOR)
                     {
@@ -2894,6 +2912,7 @@ public:
                     else
                         return false;
                 }
+            }
 
             return eventInfo.GetProcTarget() && eventInfo.GetActor() != eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->IsAlive();
         }
@@ -3908,6 +3927,12 @@ public:
         void HandleDummy(SpellEffIndex /* effIndex */)
         {
             Player* caster = GetCaster()->ToPlayer();
+
+            if (!caster)
+            {
+                return;
+            }
+
             if (caster->HasAuraType(SPELL_AURA_MOUNTED))
             {
                 caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
@@ -4197,6 +4222,7 @@ public:
         void HandleDummy(SpellEffIndex /* effIndex */)
         {
             Player* caster = GetCaster()->ToPlayer();
+
             if (Unit* target = GetHitUnit())
             {
                 if (!target->HasAura(SPELL_CHICKEN_NET) && (caster->GetQuestStatus(QUEST_CHICKEN_PARTY) == QUEST_STATUS_INCOMPLETE || caster->GetQuestStatus(QUEST_FLOWN_THE_COOP) == QUEST_STATUS_INCOMPLETE))
@@ -4462,6 +4488,52 @@ public:
     }
 };
 
+enum RecallSpellIds
+{
+    SPELL_RECALL_HORDE = 22563,
+    SPELL_RECALL_ALLIANCE = 22564
+};
+
+class spell_item_recall : public SpellScriptLoader
+{
+public:
+    spell_item_recall() : SpellScriptLoader("spell_item_recall") { }
+
+    class spell_item_recall_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_recall_SpellScript);
+
+        void SetDest(SpellDestination& dest)
+        {
+            Player* player = GetCaster()->ToPlayer();
+            if (!player)
+            {
+                return;
+            }
+
+            TeamId bgTeam = player->GetBgTeamId();
+            if (player->GetTeamId(true) != bgTeam)
+            {
+                if (SpellTargetPosition const* recallSpellTarget = sSpellMgr->GetSpellTargetPosition(bgTeam == TEAM_HORDE ? SPELL_RECALL_HORDE : SPELL_RECALL_ALLIANCE, EFFECT_0))
+                {
+                    Position pos = Position(recallSpellTarget->target_X, recallSpellTarget->target_Y, recallSpellTarget->target_Z, recallSpellTarget->target_Orientation);
+                    dest.Relocate(pos);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_item_recall_SpellScript::SetDest, EFFECT_0, TARGET_DEST_DB);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_recall_SpellScript();
+    };
+};
+
 void AddSC_item_spell_scripts()
 {
     // Ours
@@ -4572,4 +4644,5 @@ void AddSC_item_spell_scripts()
     new spell_item_eggnog();
     new spell_item_goblin_bomb();
     new spell_item_linken_boomerang();
+    new spell_item_recall();
 }

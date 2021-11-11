@@ -76,7 +76,7 @@ public:
             if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOIRA)))
             {
                 Moira->AI()->EnterEvadeMode();
-                Moira->setFaction(35);
+                Moira->SetFaction(FACTION_FRIENDLY);
             }
         }
 

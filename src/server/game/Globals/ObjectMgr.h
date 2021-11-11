@@ -1156,6 +1156,7 @@ public:
             return &itr->second;
         return nullptr;
     }
+    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
@@ -1172,6 +1173,7 @@ public:
         return itr->second;
     }
 
+    GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
@@ -1287,10 +1289,10 @@ public:
         if (itr == _gameTeleStore.end()) return nullptr;
         return &itr->second;
     }
-    [[nodiscard]] GameTele const* GetGameTele(std::string const& name) const;
+    [[nodiscard]] GameTele const* GetGameTele(std::string_view name) const;
     [[nodiscard]] GameTeleContainer const& GetGameTeleMap() const { return _gameTeleStore; }
     bool AddGameTele(GameTele& data);
-    bool DeleteGameTele(std::string const& name);
+    bool DeleteGameTele(std::string_view name);
 
     [[nodiscard]] TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
     {
@@ -1317,7 +1319,7 @@ public:
     void LoadScriptNames();
     ScriptNameContainer& GetScriptNames() { return _scriptNamesStore; }
     [[nodiscard]] std::string const& GetScriptName(uint32 id) const;
-    uint32 GetScriptId(const char* name);
+    uint32 GetScriptId(std::string const& name);
 
     [[nodiscard]] SpellClickInfoMapBounds GetSpellClickInfoMapBounds(uint32 creature_id) const
     {
@@ -1344,6 +1346,13 @@ public:
     }
 
     static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
+    static std::string_view GetLocaleString(std::vector<std::string> const& data, size_t locale)
+    {
+        if (locale < data.size())
+            return data[locale];
+        else
+            return {};
+    }
     static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
         if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())

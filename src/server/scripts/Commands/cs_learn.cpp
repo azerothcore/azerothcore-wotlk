@@ -22,24 +22,28 @@ Comment: All learn related commands
 Category: commandscripts
 EndScriptData */
 
-#include "Chat.h"
+#include "ScriptMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
-#include "Player.h"
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
-class learn_commandscript : public CommandScript, public PlayerCommand
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
+class learn_commandscript : public CommandScript
 {
 public:
     learn_commandscript() : CommandScript("learn_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> learnAllMyCommandTable =
+        static ChatCommandTable learnAllMyCommandTable =
         {
             { "class",          SEC_GAMEMASTER,  false, &HandleLearnAllMyClassCommand,       "" },
             { "pettalents",     SEC_GAMEMASTER,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
@@ -47,7 +51,7 @@ public:
             { "talents",        SEC_GAMEMASTER,  false, &HandleLearnAllMyTalentsCommand,     "" }
         };
 
-        static std::vector<ChatCommand> learnAllCommandTable =
+        static ChatCommandTable learnAllCommandTable =
         {
             { "my",             SEC_GAMEMASTER,  false, nullptr,                             "", learnAllMyCommandTable },
             { "gm",             SEC_GAMEMASTER,  false, &HandleLearnAllGMCommand,            "" },
@@ -57,13 +61,13 @@ public:
             { "recipes",        SEC_GAMEMASTER,  false, &HandleLearnAllRecipesCommand,       "" }
         };
 
-        static std::vector<ChatCommand> learnCommandTable =
+        static ChatCommandTable learnCommandTable =
         {
             { "all",            SEC_GAMEMASTER,  false, nullptr,                             "", learnAllCommandTable },
             { "",               SEC_GAMEMASTER,  false, &HandleLearnCommand,                 "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "learn",          SEC_GAMEMASTER,  false, nullptr,                             "", learnCommandTable },
             { "unlearn",        SEC_GAMEMASTER,  false, &HandleUnLearnCommand,               "" }
@@ -88,7 +92,7 @@ public:
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
         uint32 spell = handler->extractSpellIdFromLink((char*)args);
         char const* all = strtok(nullptr, " ");
-        return Learn(handler, targetPlayer, spell, all);
+        return Acore::PlayerCommand::HandleLearnSpellCommand(handler, targetPlayer, spell, all);
     }
 
     static bool HandleLearnAllGMCommand(ChatHandler* handler, char const* /*args*/)
@@ -455,7 +459,7 @@ public:
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
         uint32 spellId = handler->extractSpellIdFromLink((char*)args);
         char const* allStr = strtok(nullptr, " ");
-        return UnLearn(handler, target, spellId, allStr);
+        return Acore::PlayerCommand::HandleUnlearnSpellCommand(handler, target, spellId, allStr);
     }
 };
 

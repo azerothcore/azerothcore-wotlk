@@ -859,6 +859,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     SendQuestUpdate(quest_id);
 
+    SendQuestGiverStatusMultiple();
+
     //lets remove flag for delayed teleports
     SetMustDelayTeleport(false);
 
@@ -1604,16 +1606,32 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             continue;
 
         QuestStatus status = GetQuestStatus(questId);
-        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) ||
-            (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
+        if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
         {
-            if (quest->IsAutoComplete() && quest->IsRepeatable() && !quest->IsDailyOrWeekly())
-                result2 = DIALOG_STATUS_REWARD_REP;
+            if (quest->IsRepeatable() && quest->IsDailyOrWeekly())
+            {
+                if (quest->IsAutoComplete())
+                {
+                    result2 = DIALOG_STATUS_AVAILABLE_REP;
+                }
+                else
+                {
+                    result2 = DIALOG_STATUS_REWARD_REP;
+                }
+            }
+            else if (quest->IsAutoComplete())
+            {
+                result2 = DIALOG_STATUS_AVAILABLE;
+            }
             else
+            {
                 result2 = DIALOG_STATUS_REWARD;
+            }
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
+        {
             result2 = DIALOG_STATUS_INCOMPLETE;
+        }
 
         if (result2 > result)
             result = result2;

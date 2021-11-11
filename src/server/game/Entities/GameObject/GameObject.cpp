@@ -384,6 +384,20 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
     LastUsedScriptID = GetGOInfo()->ScriptId;
     AIM_Initialize();
 
+    if (uint32 linkedEntry = GetGOInfo()->GetLinkedGameObjectEntry())
+    {
+        GameObject* linkedGO = new GameObject();
+        if (linkedGO->Create(map->GenerateLowGuid<HighGuid::GameObject>(), linkedEntry, map, phaseMask, x, y, z, ang, rotation, 255, GO_STATE_READY))
+        {
+            SetLinkedTrap(linkedGO);
+            map->AddToMap(linkedGO);
+        }
+        else
+        {
+            delete linkedGO;
+        }
+    }
+
     // Check if GameObject is Large
     if (goinfo->IsLargeGameObject())
         SetVisibilityDistanceOverride(true);
@@ -735,7 +749,7 @@ void GameObject::Update(uint32 diff)
                 // If nearby linked trap exists, despawn it
                 if (GameObject* linkedTrap = GetLinkedTrap())
                 {
-                    linkedTrap->Delete();
+                    linkedTrap->DespawnOrUnsummon();
                 }
 
                 //if Gameobject should cast spell, then this, but some GOs (type = 10) should be destroyed
@@ -852,6 +866,11 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay, Seconds forceRespawnTime)
             SetLootState(GO_JUST_DEACTIVATED);
             SendObjectDeSpawnAnim(GetGUID());
             SetGoState(GO_STATE_READY);
+
+            if (GameObject* trap = GetLinkedTrap())
+            {
+                trap->DespawnOrUnsummon();
+            }
 
             if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
             {
@@ -2004,7 +2023,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     if (Unit* owner = GetOwner())
     {
         trigger->SetLevel(owner->getLevel(), false);
-        trigger->setFaction(owner->getFaction());
+        trigger->SetFaction(owner->GetFaction());
         // needed for GO casts for proper target validation checks
         trigger->SetOwnerGUID(owner->GetGUID());
         // xinef: fixes some duel bugs with traps]
@@ -2023,7 +2042,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     else
     {
         // xinef: set faction of gameobject, if no faction - assume hostile
-        trigger->setFaction(GetTemplateAddon() && GetTemplateAddon()->faction ? GetTemplateAddon()->faction : 14);
+        trigger->SetFaction(GetTemplateAddon() && GetTemplateAddon()->faction ? GetTemplateAddon()->faction : 14);
         // Set owner guid for target if no owner availble - needed by trigger auras
         // - trigger gets despawned and there's no caster avalible (see AuraEffect::TriggerSpell())
         // xinef: set proper orientation, fixes cast against stealthed targets
@@ -2088,6 +2107,14 @@ void GameObject::EventInform(uint32 eventId)
 
     if (m_zoneScript)
         m_zoneScript->ProcessEvent(this, eventId);
+}
+
+uint32 GameObject::GetScriptId() const
+{
+    if (GameObjectData const* gameObjectData = GetGOData())
+        return gameObjectData->ScriptId;
+
+    return GetGOInfo()->ScriptId;
 }
 
 // overwrite WorldObject function for proper name localization

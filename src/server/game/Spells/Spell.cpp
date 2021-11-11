@@ -562,6 +562,7 @@ SpellValue::SpellValue(SpellInfo const* proto)
     MaxAffectedTargets = proto->MaxAffectedTargets;
     RadiusMod = 1.0f;
     AuraStackAmount = 1;
+    AuraDuration = 0;
     ForcedCritResult = false;
 }
 
@@ -650,9 +651,6 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     m_cast_count = 0;
     m_glyphIndex = 0;
     m_preCastSpell = 0;
-    m_triggeredByAuraSpell  = nullptr;
-    m_triggeredByAuraEffectIndex = -1;
-    m_triggeredByAuraTickNumber = 0;
     m_spellAura = nullptr;
     m_pathFinder = nullptr; // pussywizard
     _scriptsLoaded = false;
@@ -936,13 +934,18 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
         case TARGET_SELECT_CATEGORY_NEARBY:
         case TARGET_SELECT_CATEGORY_CONE:
         case TARGET_SELECT_CATEGORY_AREA:
+        {
             // targets for effect already selected
             if (effectMask & processedEffectMask)
+            {
                 return;
+            }
+
+            auto const& effects = GetSpellInfo()->Effects;
+
             // choose which targets we can select at once
             for (uint32 j = effIndex + 1; j < MAX_SPELL_EFFECTS; ++j)
             {
-                SpellEffectInfo const* effects = GetSpellInfo()->Effects;
                 if (effects[j].IsEffect() &&
                     effects[effIndex].TargetA.GetTarget() == effects[j].TargetA.GetTarget() &&
                     effects[effIndex].TargetB.GetTarget() == effects[j].TargetB.GetTarget() &&
@@ -955,6 +958,7 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
             }
             processedEffectMask |= effectMask;
             break;
+        }
         default:
             break;
     }
@@ -1167,14 +1171,16 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
     {
         case TARGET_OBJECT_TYPE_UNIT:
             {
-                if (Unit* unitTarget = target->ToUnit())
+                if (Unit* unit = target->ToUnit())
                 {
-                    AddUnitTarget(unitTarget, effMask, true, false);
+                    AddUnitTarget(unit, effMask, true, false);
                     // xinef: important! if channeling spell have nearby entry, it has no unitTarget by default
                     // and if channeled spell has target 77, it requires unitTarget, set it here!
                     // xinef: if we have NO unit target
                     if (!m_targets.GetUnitTarget())
-                        m_targets.SetUnitTarget(unitTarget);
+                    {
+                        m_targets.SetUnitTarget(unit);
+                    }
                 }
                 else
                 {
@@ -1240,10 +1246,14 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
-                if (Unit* unitTarget = (*itr)->ToUnit())
-                    AddUnitTarget(unitTarget, effMask, false);
+                if (Unit* unit = (*itr)->ToUnit())
+                {
+                    AddUnitTarget(unit, effMask, false);
+                }
                 else if (GameObject* gObjTarget = (*itr)->ToGameObject())
+                {
                     AddGOTarget(gObjTarget, effMask);
+                }
             }
         }
     }
@@ -2590,8 +2600,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell,
-                m_triggeredByAuraEffectIndex, this, nullptr, &healInfo);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+                m_triggeredByAuraSpell.effectIndex, this, nullptr, &healInfo);
     }
     // Do damage and triggers
     else if (m_damage > 0)
@@ -2667,8 +2677,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (canEffectTrigger)
         {
             DamageInfo dmgInfo(damageInfo, SPELL_DIRECT_DAMAGE);
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell,
-                m_triggeredByAuraEffectIndex, this, &dmgInfo);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+                m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
 
             if (caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
                     m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
@@ -2687,8 +2697,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (canEffectTrigger)
         {
             DamageInfo dmgInfo(damageInfo, NODAMAGE);
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell,
-                m_triggeredByAuraEffectIndex, this, &dmgInfo);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+                m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
 
             // Xinef: eg. rogue poisons can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
@@ -2864,7 +2874,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
     // Get Data Needed for Diminishing Returns, some effects may have multiple auras, so this must be done on spell hit, not aura add
     // Xinef: Do not increase diminishing level for self cast
-    m_diminishGroup = GetDiminishingReturnsGroupForSpell(m_spellInfo, m_triggeredByAuraSpell);
+    m_diminishGroup = GetDiminishingReturnsGroupForSpell(m_spellInfo, m_triggeredByAuraSpell.spellInfo);
     // xinef: do not increase diminish level for bosses (eg. Void Reaver silence is never diminished)
     if (((m_spellFlags & SPELL_FLAG_REFLECTED) && !(unit->HasAuraType(SPELL_AURA_REFLECT_SPELLS))) || (aura_effmask && m_diminishGroup && unit != m_caster && (m_caster->GetTypeId() != TYPEID_UNIT || !m_caster->ToCreature()->isWorldBoss())))
     {
@@ -2963,7 +2973,16 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                     if (m_originalCaster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, aurSpellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
                         duration = int32(duration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
 
-                    if (duration != m_spellAura->GetMaxDuration())
+                    if (m_spellValue->AuraDuration != 0)
+                    {
+                        if (m_spellAura->GetMaxDuration() != -1)
+                        {
+                            m_spellAura->SetMaxDuration(m_spellValue->AuraDuration);
+                        }
+
+                        m_spellAura->SetDuration(m_spellValue->AuraDuration);
+                    }
+                    else if (duration != m_spellAura->GetMaxDuration())
                     {
                         m_spellAura->SetMaxDuration(duration);
                         m_spellAura->SetDuration(duration);
@@ -2973,6 +2992,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                     if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
                         m_caster->AddSpellCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), duration);
 
+                    m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
                     m_spellAura->_RegisterForTargets();
                 }
             }
@@ -3039,23 +3059,31 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
         {
             if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura) && roll_chance_i(i->chance))
             {
-                m_caster->CastSpell(unit, i->triggeredSpell, true);
                 LOG_DEBUG("spells.aura", "Spell %d triggered spell %d by SPELL_AURA_ADD_TARGET_TRIGGER aura", m_spellInfo->Id, i->triggeredSpell->Id);
 
                 // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
                 // set duration of current aura to the triggered spell
                 if (i->triggeredSpell->GetDuration() == -1)
                 {
+                    // get duration from aura-only once
+                    if (!_duration)
+                    {
+                        Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
+                        _duration = aur ? aur->GetDuration() : -1;
+                    }
+
                     if (Aura* triggeredAur = unit->GetAura(i->triggeredSpell->Id, m_caster->GetGUID()))
                     {
-                        // get duration from aura-only once
-                        if (!_duration)
-                        {
-                            Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
-                            _duration = aur ? aur->GetDuration() : -1;
-                        }
-                        triggeredAur->SetDuration(_duration);
+                        triggeredAur->SetDuration(std::max(triggeredAur->GetDuration(), _duration));
                     }
+                    else
+                    {
+                        m_caster->CastCustomSpell(i->triggeredSpell->Id, SPELLVALUE_AURA_DURATION, _duration, unit, true);
+                    }
+                }
+                else
+                {
+                    m_caster->CastSpell(unit, i->triggeredSpell, true);
                 }
             }
         }
@@ -3258,9 +3286,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     if (triggeredByAura)
     {
-        m_triggeredByAuraSpell  = triggeredByAura->GetSpellInfo();
-        m_triggeredByAuraEffectIndex = triggeredByAura->GetEffIndex();
-        m_triggeredByAuraTickNumber = triggeredByAura->GetTickNumber();
+        m_triggeredByAuraSpell.Init(triggeredByAura);
     }
 
     // create and add update event for this spell
@@ -3397,7 +3423,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     LOG_DEBUG("spells.aura", "Spell::prepare: spell id %u source %u caster %d customCastFlags %u mask %u", m_spellInfo->Id, m_caster->GetEntry(), m_originalCaster ? m_originalCaster->GetEntry() : -1, _triggeredCastFlags, m_targets.GetTargetMask());
 
-    if (!(m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && !(m_spellInfo->Attributes & SPELL_ATTR0_ALLOW_WHILE_SITTING) && m_caster->IsSitState())
+    if (!(m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && !(m_spellInfo->Attributes & SPELL_ATTR0_ALLOW_WHILE_SITTING) && !m_triggeredByAuraSpell && m_caster->IsSitState())
     {
         m_caster->SetStandState(UNIT_STAND_STATE_STAND);
     }
@@ -5480,7 +5506,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         {
             if (!m_caster->GetGuardianPet() && !m_caster->GetCharm())
             {
-                if (m_triggeredByAuraSpell)              // not report pet not existence for triggered spells
+                if (m_triggeredByAuraSpell.spellInfo) // not report pet not existence for triggered spells
                     return SPELL_FAILED_DONT_REPORT;
                 else
                     return SPELL_FAILED_NO_PET;
@@ -5553,7 +5579,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     }
 
     // xinef: do not skip triggered spells if they posses prevention type (eg. Bladestorm vs Hand of Protection)
-    if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_AURAS) || (m_spellInfo->PreventionType > SPELL_PREVENTION_TYPE_NONE && m_triggeredByAuraSpell && m_triggeredByAuraSpell->IsPositive()))
+    if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_AURAS) || (m_spellInfo->PreventionType > SPELL_PREVENTION_TYPE_NONE && m_triggeredByAuraSpell && m_triggeredByAuraSpell.spellInfo->IsPositive()))
     {
         castResult = CheckCasterAuras(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_AURAS);
         if (castResult != SPELL_CAST_OK)
@@ -7403,8 +7429,11 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
         return true;
 
      // if spell is triggered, need to check for LOS disable on the aura triggering it and inherit that behaviour
-    if (IsTriggered() && m_triggeredByAuraSpell && (m_triggeredByAuraSpell->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) || DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_triggeredByAuraSpell->Id, nullptr, SPELL_DISABLE_LOS)))
+    if (IsTriggered() && m_triggeredByAuraSpell && (m_triggeredByAuraSpell.spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) ||
+        DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_triggeredByAuraSpell.spellInfo->Id, nullptr, SPELL_DISABLE_LOS)))
+    {
         return true;
+    }
 
     // todo: shit below shouldn't be here, but it's temporary
     //Check targets for LOS visibility (except spells without range limitations)
@@ -7519,7 +7548,8 @@ bool Spell::IsAutoActionResetSpell() const
 bool Spell::IsNeedSendToClient(bool go) const
 {
     return m_spellInfo->SpellVisual[0] || m_spellInfo->SpellVisual[1] || m_spellInfo->IsChanneled() ||
-           m_spellInfo->Speed > 0.0f || (!m_triggeredByAuraSpell && !IsTriggered()) || (go && m_triggeredByAuraSpell && m_triggeredByAuraSpell->IsChanneled());
+           m_spellInfo->Speed > 0.0f || (!m_triggeredByAuraSpell && !IsTriggered()) ||
+           (go && m_triggeredByAuraSpell && m_triggeredByAuraSpell.spellInfo->IsChanneled());
 }
 
 bool Spell::HaveTargetsForEffect(uint8 effect) const
@@ -7909,6 +7939,9 @@ void Spell::SetSpellValue(SpellValueMod mod, int32 value)
             break;
         case SPELLVALUE_AURA_STACK:
             m_spellValue->AuraStackAmount = uint8(value);
+            break;
+        case SPELLVALUE_AURA_DURATION:
+            m_spellValue->AuraDuration = value;
             break;
         case SPELLVALUE_FORCED_CRIT_RESULT:
             m_spellValue->ForcedCritResult = (bool)value;
@@ -8369,6 +8402,13 @@ void Spell::OnSpellLaunch()
             }
         }
     }
+}
+
+void TriggeredByAuraSpellData::Init(AuraEffect const* aurEff)
+{
+    spellInfo = aurEff->GetSpellInfo();
+    effectIndex = aurEff->GetEffIndex();
+    tickNumber = aurEff->GetTickNumber();
 }
 
 namespace Acore

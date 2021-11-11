@@ -284,7 +284,7 @@ bool EquippedOk(Player* player, uint32 spellId)
             if (item && item->GetTemplate()->RequiredSpell == reqSpell)
             {
                 //player has item equipped that require specialty. Not allow to unlearn, player has to unequip first
-                LOG_DEBUG("scripts.ai", "TSCR: player attempt to unlearn spell %u, but item %u is equipped.", reqSpell, item->GetEntry());
+                LOG_DEBUG("scripts.ai", "Player attempt to unlearn spell %u, but item %u is equipped.", reqSpell, item->GetEntry());
                 return false;
             }
         }
@@ -614,9 +614,6 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
         uint32 creatureId = creature->GetEntry();
         //WEAPONSMITH & ARMORSMITH
         if (player->GetBaseSkillValue(SKILL_BLACKSMITHING) >= 225)
@@ -635,12 +632,18 @@ public:
                     case N_TRAINER_WEAPON1:                                     //Ironus Coldsteel
                     case N_TRAINER_WEAPON2:                                     //Borgosh Corebender
                         if (player->HasSpell(S_WEAPON))
+                        {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WEAPON_UNLEARN,    GOSSIP_SENDER_UNLEARN,   GOSSIP_ACTION_INFO_DEF + 3);
+                            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                        }
                         break;
                     case N_TRAINER_ARMOR1:                                      //Grumnus Steelshaper
                     case N_TRAINER_ARMOR2:                                     //Okothos Ironrager
                         if (player->HasSpell(S_ARMOR))
+                        {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ARMOR_UNLEARN,     GOSSIP_SENDER_UNLEARN,   GOSSIP_ACTION_INFO_DEF + 4);
+                            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                        }
                         break;
                 }
             }
@@ -654,19 +657,28 @@ public:
                     if (!HasWeaponSub(player))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_HAMMER,       GOSSIP_SENDER_LEARN,    GOSSIP_ACTION_INFO_DEF + 5);
                     if (player->HasSpell(S_HAMMER))
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_HAMMER,     GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 8);
+                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                    }
                     break;
                 case N_TRAINER_AXE:                                     //Kilram
                     if (!HasWeaponSub(player))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_AXE,          GOSSIP_SENDER_LEARN,    GOSSIP_ACTION_INFO_DEF + 6);
                     if (player->HasSpell(S_AXE))
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_AXE,        GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 9);
+                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                    }
                     break;
                 case N_TRAINER_SWORD:                                     //Seril Scourgebane
                     if (!HasWeaponSub(player))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_SWORD,        GOSSIP_SENDER_LEARN,    GOSSIP_ACTION_INFO_DEF + 7);
                     if (player->HasSpell(S_SWORD))
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_SWORD,      GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 10);
+                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                    }
                     break;
             }
         }
@@ -945,9 +957,6 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
         // pussywizard: NO UNLEARNING! LEATHERWORKING SPECIALTY IS A PERMANENT DECISION AND CANNOT BE CHANGED IN ANY WAY!
         // pussywizard: CAN RE-LEARN ONLY THE ONE FOR WHICH QUEST IS COMPLETED!
 
@@ -959,16 +968,28 @@ public:
                 case N_TRAINER_DRAGON2:                                      //Thorkaf Dragoneye
                     if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5145)))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_DRAGON,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    if (player->HasSpell(S_DRAGON))
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                    }
                     break;
                 case N_TRAINER_ELEMENTAL1:                                      //Sarah Tanner
                 case N_TRAINER_ELEMENTAL2:                                      //Brumn Winterhoof
                     if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5146)))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_ELEMENTAL,   GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    if (player->HasSpell(S_ELEMENTAL))
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                    }
                     break;
                 case N_TRAINER_TRIBAL1:                                      //Caryssia Moonhunter
                 case N_TRAINER_TRIBAL2:                                      //Se'Jib
                     if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5148)))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_TRIBAL,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    if (player->HasSpell(S_TRIBAL))
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                    }
                     break;
             }
         }
@@ -1035,9 +1056,6 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
         //TAILORING SPEC
         if (player->HasSkill(SKILL_TAILORING) && player->GetBaseSkillValue(SKILL_TAILORING) >= 350 && player->getLevel() > 59)
         {
@@ -1049,19 +1067,28 @@ public:
                         if (!HasTailorSpell(player))
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_SPELLFIRE,    GOSSIP_SENDER_LEARN,    GOSSIP_ACTION_INFO_DEF + 1);
                         if (player->HasSpell(S_SPELLFIRE))
+                        {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_SPELLFIRE,  GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 4);
+                            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                        }
                         break;
                     case N_TRAINER_MOONCLOTH:                                 //Nasmara Moonsong
                         if (!HasTailorSpell(player))
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_MOONCLOTH,    GOSSIP_SENDER_LEARN,    GOSSIP_ACTION_INFO_DEF + 2);
                         if (player->HasSpell(S_MOONCLOTH))
+                        {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_MOONCLOTH,  GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 5);
+                            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                        }
                         break;
                     case N_TRAINER_SHADOWEAVE:                                 //Andrion Darkspinner
                         if (!HasTailorSpell(player))
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_SHADOWEAVE,   GOSSIP_SENDER_LEARN,    GOSSIP_ACTION_INFO_DEF + 3);
                         if (player->HasSpell(S_SHADOWEAVE))
+                        {
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_SHADOWEAVE, GOSSIP_SENDER_UNLEARN,  GOSSIP_ACTION_INFO_DEF + 6);
+                            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN,      GOSSIP_SENDER_MAIN,     GOSSIP_ACTION_TRAIN);
+                        }
                         break;
                 }
             }

@@ -1199,8 +1199,7 @@ public:
                 events.CancelEvent(EVENT_HORSEMAN_CLEAVE);
 
                 // Summon Head
-                Position pos;
-                me->GetNearPosition(pos, 15.0f, rand_norm() * 2 * M_PI);
+                Position pos = me->GetNearPosition(15.0f, rand_norm() * 2 * M_PI);
                 if (Creature* cr = me->SummonCreature(NPC_HORSEMAN_HEAD, pos))
                 {
                     if (health)

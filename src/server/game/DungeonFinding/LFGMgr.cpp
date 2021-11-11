@@ -806,12 +806,20 @@ namespace lfg
                 {
                     LFGQueue& queue = GetQueue(gguid);
                     queue.RemoveFromQueue(gguid);
+                    uint32 dungeonId = GetDungeon(gguid);
                     SetState(gguid, LFG_STATE_NONE);
                     const LfgGuidSet& players = GetPlayers(gguid);
                     for (LfgGuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
                     {
                         SetState(*it, LFG_STATE_NONE);
                         SendLfgUpdateParty(*it, LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
+                    }
+                    if (Group* group = sGroupMgr->GetGroupByGUID(gguid.GetCounter()))
+                    {
+                        if (group->isLFGGroup())
+                        {
+                            SetDungeon(gguid, dungeonId);
+                        }
                     }
                 }
                 else
@@ -1719,6 +1727,14 @@ namespace lfg
 
                     // Remove bind to that map
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+                }
+                else
+                {
+                    // RDF removes all binds to that map
+                    if (randomDungeon && !sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                    {
+                        sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+                    }
                 }
 
                 playersTeleported.push_back(player);
