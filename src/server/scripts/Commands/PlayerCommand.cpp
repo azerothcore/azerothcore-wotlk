@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellInfo.h"
 #include "PlayerCommand.h"
 #include "Language.h"
 
