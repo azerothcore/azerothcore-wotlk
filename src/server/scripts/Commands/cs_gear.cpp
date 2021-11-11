@@ -64,13 +64,13 @@ public:
         // Repair items
         target->GetConnectedPlayer()->DurabilityRepairAll(false, 0, false);
 
-        auto nameLink = handler->playerLink(target->GetName()).c_str();
+        std::string nameLink = handler->playerLink(target->GetName());
 
-        handler->PSendSysMessage(LANG_YOU_REPAIR_ITEMS, nameLink);
+        handler->PSendSysMessage(LANG_YOU_REPAIR_ITEMS, nameLink.c_str());
 
         if (handler->needReportToTarget(target->GetConnectedPlayer()))
         {
-            ChatHandler(target->GetConnectedPlayer()->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, nameLink);
+            ChatHandler(target->GetConnectedPlayer()->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, nameLink.c_str());
         }
 
         return true;
