@@ -2394,6 +2394,7 @@ public:
             SpellCastTargets targets;
             Position         dest;
             GetExplTargetDest()->GetPosition(&dest);
+            Position dest = GetExplTargetDest()->GetPosition();
             targets.SetDst(dest);
             CustomSpellValues values;
             int32             damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
