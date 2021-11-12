@@ -219,7 +219,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
         if (_sourceUnit)
         {
-            bool isUnderWater = (_sourceUnit->CanSwim() && isUnderWaterStart && isUnderWaterEnd) || (_sourceUnit->IsInWater() && isUnderWaterEnd) || (isFarUnderWater && _useRaycast);
+            bool isUnderWater = (_sourceUnit->CanSwim() && isUnderWaterStart && isUnderWaterEnd) || (isFarUnderWater && _useRaycast);
 
             if (isUnderWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
             {
