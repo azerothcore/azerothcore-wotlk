@@ -85,6 +85,16 @@ void CharacterCache::LoadCharacterCacheStorage()
             fields[4].GetUInt8() /*gender*/, fields[3].GetUInt8() /*race*/, fields[5].GetUInt8() /*class*/, fields[6].GetUInt8() /*level*/);
     } while (result->NextRow());
 
+    QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail GROUP BY receiver");
+    if (mailCountResult)
+    {
+        do
+        {
+            Field* fields = mailCountResult->Fetch();
+            UpdateCharacterMailCount(ObjectGuid(HighGuid::Player, fields[0].GetUInt32()), static_cast<int8>(fields[1].GetUInt64()), true);
+        } while (mailCountResult->NextRow());
+    }
+
     LOG_INFO("server.loading", "Loaded character infos for " SZFMTD " characters in %u ms", _characterCacheStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
@@ -198,7 +208,19 @@ void CharacterCache::UpdateCharacterMailCount(ObjectGuid const& guid, int8 count
         return;
     }
 
-    update ? itr->second.MailCount = count : itr->second.MailCount += count;
+    if (update)
+    {
+        itr->second.MailCount = count;
+        return;
+    }
+
+    // Let's be safe and prevent overflow
+    if (!itr->second.MailCount && count < 0)
+    {
+        return;
+    }
+
+    itr->second.MailCount += count;
 }
 
 void CharacterCache::UpdateCharacterGroup(ObjectGuid const& guid, ObjectGuid groupGUID)
