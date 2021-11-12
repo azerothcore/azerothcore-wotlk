@@ -669,13 +669,13 @@ public:
 
         if (target->IsConnected())
         {
+            auto targetPlayer = target->GetConnectedPlayer();
+
             // check online security
-            if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+            if (handler->HasLowerSecurity(targetPlayer))
             {
                 return false;
-            }
-
-            auto targetPlayer = target->GetConnectedPlayer();
+            }            
 
             Map* map = targetPlayer->GetMap();
             if (map->IsBattlegroundOrArena())
