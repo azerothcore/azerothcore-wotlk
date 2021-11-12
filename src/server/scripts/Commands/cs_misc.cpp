@@ -825,7 +825,7 @@ public:
             auto targetPlayer = target->GetConnectedPlayer();
 
             // check online security
-            if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+            if (handler->HasLowerSecurity(targetPlayer))
             {
                 return false;
             }
