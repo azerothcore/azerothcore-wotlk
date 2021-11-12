@@ -376,13 +376,42 @@ public:
         {
             if (Unit* target = GetHitUnit())
             {
+                uint32 spellId = 0;
+                switch (GetSpellInfo()->Id)
+                {
+                    case SPELL_PASS_TURKEY:
+                        spellId = SPELL_STORE_TURKEY;
+                        break;
+                    case SPELL_PASS_STUFFING:
+                        spellId = SPELL_STORE_STUFFING;
+                        break;
+                    case SPELL_PASS_PIE:
+                        spellId = SPELL_STORE_PIE;
+                        break;
+                    case SPELL_PASS_CRANBERRY:
+                        spellId = SPELL_STORE_CRANBERRY;
+                        break;
+                    case SPELL_PASS_SWEET_POTATO:
+                        spellId = SPELL_STORE_SWEET_POTATO;
+                        break;
+                }
+
                 // player case
                 if (target->IsVehicle() && target->ToCreature())
                 {
                     if (Player* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
                         GetCaster()->CastSpell(player, GetVisualThrow(GetSpellInfo()->Id, true), true);
-                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, GetVisualThrow(GetSpellInfo()->Id, true));
+                        if (AuraEffect* aur = target->GetAuraEffectDummy(spellId))
+                        {
+                            if (aur->GetBase()->GetStackAmount() >= 5)
+                            {
+                                if (Player* casterPlayer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())
+                                {
+                                    casterPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, GetVisualThrow(GetSpellInfo()->Id, true));
+                                }
+                            }
+                        }
                     }
                 }
                 // normal case
