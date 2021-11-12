@@ -235,8 +235,8 @@ namespace VMAP
             check = fread(&mapID, sizeof(uint32), 1, dirf);
             if (check == 0) // EoF...
                 break;
-            fread(&tileX, sizeof(uint32), 1, dirf);
-            fread(&tileY, sizeof(uint32), 1, dirf);
+            check = fread(&tileX, sizeof(uint32), 1, dirf);
+            check = fread(&tileY, sizeof(uint32), 1, dirf);
             if (!ModelSpawn::readFromFile(dirf, spawn))
             {
                 break;
