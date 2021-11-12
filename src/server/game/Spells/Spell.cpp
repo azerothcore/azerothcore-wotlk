@@ -1171,14 +1171,16 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
     {
         case TARGET_OBJECT_TYPE_UNIT:
             {
-                if (Unit* unitTarget = target->ToUnit())
+                if (Unit* unit = target->ToUnit())
                 {
-                    AddUnitTarget(unitTarget, effMask, true, false);
+                    AddUnitTarget(unit, effMask, true, false);
                     // xinef: important! if channeling spell have nearby entry, it has no unitTarget by default
                     // and if channeled spell has target 77, it requires unitTarget, set it here!
                     // xinef: if we have NO unit target
                     if (!m_targets.GetUnitTarget())
-                        m_targets.SetUnitTarget(unitTarget);
+                    {
+                        m_targets.SetUnitTarget(unit);
+                    }
                 }
                 else
                 {
@@ -1244,10 +1246,14 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
-                if (Unit* unitTarget = (*itr)->ToUnit())
-                    AddUnitTarget(unitTarget, effMask, false);
+                if (Unit* unit = (*itr)->ToUnit())
+                {
+                    AddUnitTarget(unit, effMask, false);
+                }
                 else if (GameObject* gObjTarget = (*itr)->ToGameObject())
+                {
                     AddGOTarget(gObjTarget, effMask);
+                }
             }
         }
     }

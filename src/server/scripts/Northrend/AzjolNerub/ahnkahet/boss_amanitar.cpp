@@ -101,7 +101,7 @@ Position const MushroomPositions[MAX_MUSHROOMS_COUNT] =
 
 struct boss_amanitar : public BossAI
 {
-    boss_amanitar(Creature *creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
+    boss_amanitar(Creature* creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
     {
         creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
         creature->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
