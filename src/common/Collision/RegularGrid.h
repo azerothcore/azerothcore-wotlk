@@ -83,7 +83,7 @@ public:
             {
                 Node& node = getGrid(x, y);
                 node.insert(value);
-                memberTable.emplace(&value, &node));
+                memberTable.emplace(&value, &node);
             }
         }
     }
