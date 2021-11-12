@@ -677,7 +677,7 @@ public:
 
             auto targetPlayer = target->GetConnectedPlayer();
 
-            Map* map = target->GetConnectedPlayer()->GetMap();
+            Map* map = targetPlayer->GetMap();
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
