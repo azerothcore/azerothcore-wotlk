@@ -252,37 +252,44 @@ public:
 
             if (!plr)
             {
-                error = 1; break;
+                error = 1;
+                break;
             }
 
             if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported())
             {
-                error = 2; break;
+                error = 2;
+                break;
             }
 
             if (plr->GetMap()->GetEntry()->Instanceable())
             {
-                error = 3; break;
+                error = 3;
+                break;
             }
 
             if (plr->isUsingLfg())
             {
-                error = 4; break;
+                error = 4;
+                break;
             }
 
             if (plr->InBattlegroundQueue())
             {
-                error = 5; break;
+                error = 5;
+                break;
             }
 
             if (plr->IsInFlight())
             {
-                error = 10; break;
+                error = 10;
+                break;
             }
 
             if (!plr->IsAlive())
             {
-                error = 11; break;
+                error = 11;
+                break;
             }
 
             const Group* g = plr->GetGroup();
@@ -297,18 +304,21 @@ public:
 
                 if (g->isRaidGroup() || g->isBGGroup() || g->isBFGroup() || g->isLFGGroup())
                 {
-                    error = 7; break;
+                    error = 7;
+                    break;
                 }
 
                 if (g->GetMembersCount() != hcnt)
                 {
-                    error = 8; break;
+                    error = 8;
+                    break;
                 }
 
                 uint8 sti = (cnt < hcnt ? 0 : hcnt);
                 if (sti != cnt && players[sti]->GetGroup() != plr->GetGroup())
                 {
-                    error = 9; last_name += " and " + players[sti]->GetName();
+                    error = 9;
+                    last_name += " and " + players[sti]->GetName();
                     break;
                 }
             }
@@ -316,7 +326,8 @@ public:
             {
                 if (g)
                 {
-                    error = 12; break;
+                    error = 12;
+                    break;
                 }
             }
 
@@ -531,12 +542,18 @@ public:
         if (haveVMap)
         {
             if (object->IsOutdoors())
+            {
                 handler->PSendSysMessage("You are outdoors");
+            }
             else
+            {
                 handler->PSendSysMessage("You are indoors");
+            }
         }
         else
+        {
             handler->PSendSysMessage("no VMAP available for area info");
+        }
 
         handler->PSendSysMessage(LANG_MAP_POSITION,
                                  object->GetMapId(), (mapEntry ? mapEntry->name[handler->GetSessionDbcLocale()] : "<unknown>"),
@@ -550,10 +567,14 @@ public:
         LiquidData const& liquidData = object->GetLiquidData();
 
         if (liquidData.Status)
+        {
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidData.Level, liquidData.DepthLevel, liquidData.Entry, liquidData.Flags, liquidData.Status);
+        }
 
         if (object->GetTransport())
+        {
             handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
+        }
 
         return true;
     }
@@ -650,7 +671,9 @@ public:
         {
             // check online security
             if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+            {
                 return false;
+            }
 
             auto targetPlayer = target->GetConnectedPlayer();
 
@@ -732,13 +755,17 @@ public:
             }
 
             if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            {
                 _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+            }
         }
         else
         {
             // check offline security
             if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
+            {
                 return false;
+            }
 
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink.c_str());
 
@@ -835,7 +862,9 @@ public:
                 Map* destMap = targetPlayer->GetMap();
 
                 if (destMap->Instanceable() && destMap->GetInstanceId() != map->GetInstanceId())
+                {
                     sInstanceSaveMgr->PlayerUnbindInstance(target->GetGUID(), map->GetInstanceId(), targetPlayer->GetDungeonDifficulty(), true, targetPlayer);
+                }
 
                 // we are in an instance, and can only summon players in our group with us as leader
                 if (!handler->GetSession()->GetPlayer()->GetGroup() || !targetPlayer->GetGroup() ||
@@ -851,7 +880,9 @@ public:
 
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
             if (handler->needReportToTarget(targetPlayer))
+            {
                 ChatHandler(targetPlayer->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()).c_str());
+            }
 
             // stop flight if need
             if (targetPlayer->IsInFlight())
@@ -861,7 +892,9 @@ public:
             }
             // save only in non-flight case
             else
+            {
                 targetPlayer->SaveRecallPosition();
+            }
 
             // before GM
             float x, y, z;
@@ -872,7 +905,9 @@ public:
         {
             // check offline security
             if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
+            {
                 return false;
+            }
 
             handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE));
 
@@ -904,7 +939,9 @@ public:
 
         // check online security
         if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+        {
             return false;
+        }
 
         auto targetPlayer = target->GetConnectedPlayer();
 
@@ -938,11 +975,15 @@ public:
             Player* player = itr->GetSource();
 
             if (!player || player == handler->GetSession()->GetPlayer() || !player->GetSession())
+            {
                 continue;
+            }
 
             // check online security
             if (handler->HasLowerSecurity(player))
+            {
                 return false;
+            }
 
             std::string plNameLink = handler->GetNameLink(player);
 
@@ -968,7 +1009,9 @@ public:
 
             handler->PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
             if (handler->needReportToTarget(player))
+            {
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink().c_str());
+            }
 
             // stop flight if need
             if (player->IsInFlight())
@@ -978,7 +1021,9 @@ public:
             }
             // save only in non-flight case
             else
+            {
                 player->SaveRecallPosition();
+            }
 
             // before GM
             float x, y, z;
@@ -1009,7 +1054,9 @@ public:
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
             if (handler->HasLowerSecurity(target->ToPlayer()))
+            {
                 return false;
+            }
         }
 
         if (target->IsAlive())
@@ -1017,11 +1064,15 @@ public:
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
             {
                 if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+                {
                     target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
+                }
                 Unit::Kill(handler->GetSession()->GetPlayer(), target);
             }
             else
+            {
                 Unit::DealDamage(handler->GetSession()->GetPlayer(), target, target->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+            }
         }
 
         return true;
@@ -1113,13 +1164,19 @@ public:
     static bool HandleItemMoveCommand(ChatHandler* handler, uint8 srcSlot, uint8 dstSlot)
     {
         if (srcSlot == dstSlot)
+        {
             return true;
+        }
 
         if (!handler->GetSession()->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0, srcSlot, true))
+        {
             return false;
+        }
 
         if (!handler->GetSession()->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0, dstSlot, false))
+        {
             return false;
+        }
 
         uint16 src = ((INVENTORY_SLOT_BAG_0 << 8) | srcSlot);
         uint16 dst = ((INVENTORY_SLOT_BAG_0 << 8) | dstSlot);
@@ -1289,7 +1346,9 @@ public:
 
         // check online security
         if (handler->HasLowerSecurity(targetPlayer))
+        {
             return false;
+        }
 
         std::string kickReasonStr = handler->GetAcoreString(LANG_NO_REASON);
         if (reason && !reason->empty())
@@ -1298,9 +1357,13 @@ public:
         }
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
+        {
             sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), target->GetName().c_str(), kickReasonStr.c_str());
+        }
         else
+        {
             handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, target->GetName().c_str());
+        }
 
         targetPlayer->GetSession()->KickPlayer("HandleKickPlayerCommand");
 
@@ -1336,10 +1399,14 @@ public:
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(7355);
             if (!spellInfo)
+            {
                 return false;
+            }
 
             if (Player* caster = handler->GetSession()->GetPlayer())
+            {
                 Spell::SendCastResult(caster, spellInfo, 0, SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
+            }
 
             return false;
         }
@@ -1817,7 +1884,9 @@ public:
         uint16 max = maxPureSkill ? *maxPureSkill : targetHasSkill ? target->GetPureMaxSkillValue(skillID) : uint16(level);
 
         if (level <= 0 || level > max || max <= 0)
+        {
             return false;
+        }
 
         // If the player has the skill, we get the current skill step. If they don't have the skill, we
         // add the skill to the player's book with step 1 (which is the first rank, in most cases something
@@ -2192,7 +2261,9 @@ public:
 
         // Output XIII. LANG_PINFO_CHR_PHASE if player is not in GM mode (GM is in every phase)
         if (playerTarget && !playerTarget->IsGameMaster()) // IsInWorld() returns false on loadingscreen, so it's more
-            handler->PSendSysMessage(LANG_PINFO_CHR_PHASE, phase); // precise than just target (safer ?).
+        {
+            handler->PSendSysMessage(LANG_PINFO_CHR_PHASE, phase);    // precise than just target (safer ?).
+        }
 
         // However, as we usually just require a target here, we use target instead.
         // Output XIV. LANG_PINFO_CHR_MONEY
@@ -2289,7 +2360,9 @@ public:
             }
 
             if (target->isDead())
+            {
                 target->ToCreature()->Respawn();
+            }
             return true;
         }
 
@@ -2310,10 +2383,14 @@ public:
         std::string muteReasonStr{ muteReason };
 
         if (muteReason.empty())
+        {
             muteReasonStr = handler->GetAcoreString(LANG_NO_REASON);
+        }
 
         if (!player)
+        {
             player = PlayerIdentifier::FromTarget(handler);
+        }
 
         if (!player)
         {
@@ -2328,18 +2405,26 @@ public:
         // find only player from same account if any
         if (!target)
             if (WorldSession* session = sWorld->FindSession(accountId))
+            {
                 target = session->GetPlayer();
+            }
 
         // must have strong lesser security level
         if (handler->HasLowerSecurity(target, player->GetGUID(), true))
+        {
             return false;
+        }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         std::string muteBy = "";
         if (handler->GetSession())
+        {
             muteBy = handler->GetSession()->GetPlayerName();
+        }
         else
+        {
             muteBy = handler->GetAcoreString(LANG_CONSOLE);
+        }
 
         if (target)
         {
@@ -2350,7 +2435,9 @@ public:
             std::string nameLink = handler->playerLink(player->GetName());
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
+            {
                 sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+            }
 
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReasonStr.c_str());
         }
@@ -2375,7 +2462,9 @@ public:
         std::string nameLink = handler->playerLink(player->GetName());
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
+        {
             sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+        }
         else
         {
             // pussywizard: notify all online GMs
@@ -2384,7 +2473,7 @@ public:
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->second->GetSession()->GetSecurity())
                     ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
-                        (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+                            (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
         }
 
         return true;
@@ -2546,53 +2635,77 @@ public:
                     handler->SendSysMessage(LANG_MOVEGENS_CONFUSED);
                     break;
                 case CHASE_MOTION_TYPE:
+                {
+                    Unit* target = nullptr;
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
                     {
-                        Unit* target = nullptr;
-                        if (unit->GetTypeId() == TYPEID_PLAYER)
-                            target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
-                        else
-                            target = static_cast<ChaseMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
-
-                        if (!target)
-                            handler->SendSysMessage(LANG_MOVEGENS_CHASE_NULL);
-                        else if (target->GetTypeId() == TYPEID_PLAYER)
-                            handler->PSendSysMessage(LANG_MOVEGENS_CHASE_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        else
-                            handler->PSendSysMessage(LANG_MOVEGENS_CHASE_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        break;
+                        target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     }
+                    else
+                    {
+                        target = static_cast<ChaseMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                    }
+
+                    if (!target)
+                    {
+                        handler->SendSysMessage(LANG_MOVEGENS_CHASE_NULL);
+                    }
+                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_CHASE_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    else
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_CHASE_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    break;
+                }
                 case FOLLOW_MOTION_TYPE:
+                {
+                    Unit* target = nullptr;
+                    if (unit->GetTypeId() == TYPEID_PLAYER)
                     {
-                        Unit* target = nullptr;
-                        if (unit->GetTypeId() == TYPEID_PLAYER)
-                            target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
-                        else
-                            target = static_cast<FollowMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                        target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
+                    }
+                    else
+                    {
+                        target = static_cast<FollowMovementGenerator<Creature> const*>(movementGenerator)->GetTarget();
+                    }
 
-                        if (!target)
-                            handler->SendSysMessage(LANG_MOVEGENS_FOLLOW_NULL);
-                        else if (target->GetTypeId() == TYPEID_PLAYER)
-                            handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        else
-                            handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
-                        break;
-                    }
-                case HOME_MOTION_TYPE:
+                    if (!target)
                     {
-                        if (unit->GetTypeId() == TYPEID_UNIT)
-                            handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
-                        else
-                            handler->SendSysMessage(LANG_MOVEGENS_HOME_PLAYER);
-                        break;
+                        handler->SendSysMessage(LANG_MOVEGENS_FOLLOW_NULL);
                     }
+                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_PLAYER, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    else
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_CREATURE, target->GetName().c_str(), target->GetGUID().GetCounter());
+                    }
+                    break;
+                }
+                case HOME_MOTION_TYPE:
+                {
+                    if (unit->GetTypeId() == TYPEID_UNIT)
+                    {
+                        handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
+                    }
+                    else
+                    {
+                        handler->SendSysMessage(LANG_MOVEGENS_HOME_PLAYER);
+                    }
+                    break;
+                }
                 case FLIGHT_MOTION_TYPE:
                     handler->SendSysMessage(LANG_MOVEGENS_FLIGHT);
                     break;
                 case POINT_MOTION_TYPE:
-                    {
-                        handler->PSendSysMessage(LANG_MOVEGENS_POINT, x, y, z);
-                        break;
-                    }
+                {
+                    handler->PSendSysMessage(LANG_MOVEGENS_POINT, x, y, z);
+                    break;
+                }
                 case FLEEING_MOTION_TYPE:
                     handler->SendSysMessage(LANG_MOVEGENS_FEAR);
                     break;
@@ -2828,7 +2941,9 @@ public:
     {
         Unit* unit = handler->getSelectedUnit();
         if (!unit)
+        {
             unit = handler->GetSession()->GetPlayer();
+        }
 
         unit->RemoveCharmAuras();
         return true;
@@ -2866,7 +2981,7 @@ public:
         return true;
     }
 
-    static bool HandleStringCommand(ChatHandler *handler, uint32 id, Optional<uint8> locale)
+    static bool HandleStringCommand(ChatHandler* handler, uint32 id, Optional<uint8> locale)
     {
         if (!id)
         {

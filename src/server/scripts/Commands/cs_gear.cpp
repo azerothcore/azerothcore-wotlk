@@ -59,7 +59,9 @@ public:
 
         // check online security
         if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+        {
             return false;
+        }
 
         // Repair items
         target->GetConnectedPlayer()->DurabilityRepairAll(false, 0, false);

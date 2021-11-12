@@ -204,8 +204,8 @@ public:
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         MailDraft(subject, text)
-                .AddMoney(money)
-                .SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
+        .AddMoney(money)
+        .SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
 
         CharacterDatabase.CommitTransaction(trans);
 
