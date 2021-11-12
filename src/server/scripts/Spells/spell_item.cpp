@@ -2219,6 +2219,8 @@ class spell_item_shadowmourne : public AuraScript
                     return false;
             }
         }
+
+        return true;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
