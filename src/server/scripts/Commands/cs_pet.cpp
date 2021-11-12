@@ -32,16 +32,16 @@ class pet_commandscript : public CommandScript
 public:
     pet_commandscript() : CommandScript("pet_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> petCommandTable =
+        static ChatCommandTable petCommandTable =
         {
             { "create",  HandlePetCreateCommand,  SEC_GAMEMASTER, Console::No },
             { "learn",   HandlePetLearnCommand,   SEC_GAMEMASTER, Console::No },
             { "unlearn", HandlePetUnlearnCommand, SEC_GAMEMASTER, Console::No }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "pet", petCommandTable }
         };
