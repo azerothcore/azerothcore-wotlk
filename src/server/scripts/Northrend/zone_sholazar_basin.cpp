@@ -136,13 +136,13 @@ public:
             {
                 summons.Summon(cr);
                 cr->CastSpell(cr, SPELL_TOMB_OF_THE_HEARTLESS, true);
-                cr->setFaction(me->getFaction());
+                cr->SetFaction(me->GetFaction());
             }
             if ((cr = me->SummonCreature(NPC_ZEPIK, 5631.63f, 3794.36f, -92.24f, 3.45f)))
             {
                 summons.Summon(cr);
                 cr->CastSpell(cr, SPELL_TOMB_OF_THE_HEARTLESS, true);
-                cr->setFaction(me->getFaction());
+                cr->SetFaction(me->GetFaction());
             }
         }
 
@@ -202,7 +202,7 @@ public:
                         {
                             minion->Say("Now you not catch us with back turned! Now we hurt you bad undead. BAD!", LANG_UNIVERSAL);
                             minion->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
-                            minion->setFaction(me->GetVictim()->getFaction());
+                            minion->SetFaction(me->GetVictim()->GetFaction());
                             minion->AddThreat(me, 100000.0f);
                             minion->AI()->AttackStart(me);
                             minion->DespawnOrUnsummon(900000);
@@ -827,7 +827,7 @@ public:
             if (npc_engineer_heliceAI* pEscortAI = CAST_AI(npc_engineer_helice::npc_engineer_heliceAI, creature->AI()))
             {
                 creature->GetMotionMaster()->MoveJumpTo(0, 0.4f, 0.4f);
-                creature->setFaction(113);
+                creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
 
                 pEscortAI->Start(false, false, player->GetGUID());
                 creature->AI()->Talk(SAY_WP_1);

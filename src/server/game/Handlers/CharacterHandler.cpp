@@ -997,7 +997,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
         SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077 });
 
-        switch (pCurrChar->getFaction())
+        switch (pCurrChar->GetFaction())
         {
             case ALLIANCE:
                 SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946 });

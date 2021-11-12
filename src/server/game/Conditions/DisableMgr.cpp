@@ -16,6 +16,7 @@
  */
 
 #include "DisableMgr.h"
+#include "GameEventMgr.h"
 #include "MMapFactory.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -41,7 +42,7 @@ namespace DisableMgr
 
         DisableMap m_DisableMap;
 
-        uint8 MAX_DISABLE_TYPES = 9;
+        uint8 MAX_DISABLE_TYPES = 10;
     }
 
     void LoadDisables()
@@ -237,6 +238,31 @@ namespace DisableMgr
                         }
                         break;
                     }
+                    case DISABLE_TYPE_GAME_EVENT:
+                    {
+                        GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
+
+                        if (entry < 1 || entry >= events.size())
+                        {
+                            LOG_ERROR("disable", "Event entry %u from `disables` does not exist, skipped.", entry);
+                            continue;
+                        }
+
+                        GameEventData const& eventData = events[entry];
+                        if (!eventData.isValid())
+                        {
+                            LOG_ERROR("disable", "Event entry %u from `disables` does not exist, skipped.", entry);
+                            continue;
+                        }
+
+                        GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
+                        if (activeEvents.find(entry) != activeEvents.end())
+                        {
+                            sGameEventMgr->StopEvent(entry);
+                            LOG_INFO("disable", "Event entry %u was stopped because it has been disabled.", entry);
+                        }
+                        break;
+                    }
                 default:
                     break;
             }
@@ -365,6 +391,8 @@ namespace DisableMgr
             case DISABLE_TYPE_VMAP:
                 return flags & itr->second.flags;
             case DISABLE_TYPE_GO_LOS:
+                return true;
+            case DISABLE_TYPE_GAME_EVENT:
                 return true;
         }
 

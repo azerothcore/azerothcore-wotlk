@@ -211,7 +211,7 @@ public:
             sizeTimer = 0;
             auraVisualTimer = 1;
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f);
-            me->setFaction(21);
+            me->SetFaction(FACTION_BOOTY_BAY);
         }
 
         void KilledUnit(Unit* who) override

@@ -1389,8 +1389,7 @@ public:
             float dist = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
             float angle = frand(0.0f, 2 * M_PI);
 
-            Position pos;
-            GetCaster()->GetNearPosition(pos, dist, angle);
+            Position pos = GetCaster()->GetNearPosition(dist, angle);
             dest.Relocate(pos);
         }
 
@@ -1562,8 +1561,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                Position pos;
-                caster->GetRandomNearPosition(pos, 5.0f);
+                Position pos = caster->GetRandomNearPosition(5.0f);
                 if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
                 {
                     haunt->SetSpeed(MOVE_RUN, 0.5, true);
@@ -1602,8 +1600,7 @@ public:
 
             if (Unit* caster = GetCaster())
             {
-                Position pos;
-                caster->GetRandomNearPosition(pos, 5.0f);
+                Position pos = caster->GetRandomNearPosition(5.0f);
                 if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
                 {
                     haunt->SetSpeed(MOVE_RUN, 0.5, true);
@@ -1993,7 +1990,10 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
+            if (eventInfo.GetActionTarget())
+            {
+                eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
+            }
         }
 
         void Register() override
@@ -2674,7 +2674,10 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+            if (GetHitUnit())
+            {
+                GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+            }
         }
 
         void Register() override
@@ -2719,7 +2722,10 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+            if (GetHitUnit())
+            {
+                GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+            }
         }
 
         void Register() override
@@ -4601,6 +4607,11 @@ public:
             Unit* caster = eventInfo.GetActionTarget();
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
 
+            if (!caster)
+            {
+                return;
+            }
+
             uint8 stacks = GetStackAmount();
             int32 bp = 0;
 
@@ -4656,8 +4667,10 @@ public:
         void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             // Final heal only on duration end
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_ENEMY_SPELL)
+            if (GetTargetApplication() && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_ENEMY_SPELL)
+            {
                 return;
+            }
 
             // final heal
             GetTarget()->CastSpell(GetTarget(), _spellId, true, nullptr, aurEff, GetCasterGUID());
@@ -5228,8 +5241,12 @@ public:
         void HandleDummy(SpellEffIndex /* effIndex */)
         {
             if (Creature* vendor = GetCaster()->ToCreature())
-                if (vendor->GetEntry() == NPC_AMPHITHEATER_VENDOR)
+            {
+                if (vendor->GetEntry() == NPC_AMPHITHEATER_VENDOR && vendor->AI())
+                {
                     vendor->AI()->Talk(SAY_AMPHITHEATER_VENDOR);
+                }
+            }
         }
 
         void Register() override
@@ -5294,6 +5311,11 @@ public:
 
         void RemoveVehicleAuras()
         {
+            if (!GetHitUnit())
+            {
+                return;
+            }
+
             Unit* u = nullptr;
             if (Vehicle* vehicle = GetHitUnit()->GetVehicleKit())
             {
@@ -5345,6 +5367,11 @@ public:
 
         void EjectPassenger(SpellEffIndex /*effIndex*/)
         {
+            if (!GetHitUnit())
+            {
+                return;
+            }
+
             if (Vehicle* vehicle = GetHitUnit()->GetVehicleKit())
             {
                 if (Unit* passenger = vehicle->GetPassenger(GetEffectValue() - 1))
@@ -5464,7 +5491,10 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetCaster()->SummonGameObject(181597, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10 * IN_MILLISECONDS * MINUTE);
+            if (GetCaster()->IsMounted())
+            {
+                GetCaster()->SummonGameObject(181597, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10 * IN_MILLISECONDS * MINUTE);
+            }
         }
 
         void Register() override

@@ -166,7 +166,6 @@ void WorldSession::HandleMoveWorldportAck()
             _player->SetIsSpectator(false);
 
         GetPlayer()->SetPendingSpectatorForBG(0);
-        timeWhoCommandAllowed = time(nullptr) + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
 
         if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
         {

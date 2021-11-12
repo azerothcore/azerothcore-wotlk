@@ -21,6 +21,7 @@
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GossipDef.h"
+#include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
@@ -116,6 +117,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(PetScript);
     SCR_CLEAR(ArenaScript);
     SCR_CLEAR(CommandSC);
+    SCR_CLEAR(DatabaseScript);
 
 #undef SCR_CLEAR
 
@@ -189,7 +191,8 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<PetScript>::GetScriptById(sid) &&
                 !ScriptRegistry<CommandSC>::GetScriptById(sid) &&
                 !ScriptRegistry<ArenaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GroupScript>::GetScriptById(sid))
+                !ScriptRegistry<GroupScript>::GetScriptById(sid) &&
+                !ScriptRegistry<DatabaseScript>::GetScriptById(sid))
                 {
                     LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
                 }
@@ -3173,6 +3176,11 @@ void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
     FOREACH_SCRIPT(CommandSC)->OnHandleDevCommand(player, argstr);
 }
 
+void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
+{
+    FOREACH_SCRIPT(DatabaseScript)->OnAfterDatabasesLoaded(updateFlags);
+}
+
 ///-
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
@@ -3263,6 +3271,36 @@ AreaTriggerScript::AreaTriggerScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<AreaTriggerScript>::AddScript(this);
+}
+
+bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTrigger const* trigger)
+{
+    uint32 const triggerId = trigger->entry;
+    if (InstanceScript* instance = player->GetInstanceScript())
+    {
+        if (instance->IsAreaTriggerDone(triggerId))
+        {
+            return true;
+        }
+        else
+        {
+            instance->MarkAreaTriggerDone(triggerId);
+        }
+    }
+    return _OnTrigger(player, trigger);
+}
+
+void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(InstanceScript* script, uint32 triggerId)
+{
+    script->ResetAreaTriggerDone(triggerId);
+}
+
+void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(Player const* player, AreaTrigger const* trigger)
+{
+    if (InstanceScript* instance = player->GetInstanceScript())
+    {
+        ResetAreaTriggerDone(instance, trigger->entry);
+    }
 }
 
 BattlegroundScript::BattlegroundScript(const char* name)
@@ -3421,6 +3459,11 @@ CommandSC::CommandSC(const char* name)
     ScriptRegistry<CommandSC>::AddScript(this);
 }
 
+DatabaseScript::DatabaseScript(const char* name) : ScriptObject(name)
+{
+    ScriptRegistry<DatabaseScript>::AddScript(this);
+}
+
 // Specialize for each script type class like so:
 template class ScriptRegistry<SpellScriptLoader>;
 template class ScriptRegistry<ServerScript>;
@@ -3462,3 +3505,4 @@ template class ScriptRegistry<MiscScript>;
 template class ScriptRegistry<PetScript>;
 template class ScriptRegistry<ArenaScript>;
 template class ScriptRegistry<CommandSC>;
+template class ScriptRegistry<DatabaseScript>;

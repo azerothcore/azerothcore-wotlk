@@ -2480,7 +2480,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                                 pos = *destTarget;
                             else
                                 // randomize position for multiple summons
-                                m_caster->GetRandomPoint(*destTarget, radius, pos);
+                                pos = m_caster->GetRandomPoint(*destTarget, radius);
 
                             summon = m_originalCaster->SummonCreature(entry, pos, summonType, duration);
                             if (!summon)
@@ -2491,7 +2491,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                             if (properties->Category == SUMMON_CATEGORY_ALLY)
                             {
                                 summon->SetOwnerGUID(m_originalCaster->GetGUID());
-                                summon->setFaction(m_originalCaster->getFaction());
+                                summon->SetFaction(m_originalCaster->GetFaction());
                             }
 
                             ExecuteLogEffectSummonObject(effIndex, summon);
@@ -2541,9 +2541,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             // xinef: i think this is wrong, found only 2 vehicles with faction override and one of them should inherit caster faction...
             //uint32 faction = properties->Faction;
             //if (!faction)
-            uint32 faction = m_originalCaster->getFaction();
+            uint32 faction = m_originalCaster->GetFaction();
 
-            summon->setFaction(faction);
+            summon->SetFaction(faction);
             break;
     }
 
@@ -4376,7 +4376,7 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
         return;
     }
 
-    pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->getFaction());
+    pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->GetFaction());
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel() + 1);
     int32 duration = m_spellInfo->GetDuration();
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
@@ -4872,8 +4872,7 @@ void Spell::EffectLeap(SpellEffIndex /*effIndex*/)
     if (!m_targets.HasDst())
         return;
 
-    Position dstpos;
-    destTarget->GetPosition(&dstpos);
+    Position dstpos = destTarget->GetPosition();
     unitTarget->NearTeleportTo(dstpos.GetPositionX(), dstpos.GetPositionY(), dstpos.GetPositionZ(), dstpos.GetOrientation(), unitTarget == m_caster);
 }
 
@@ -5102,15 +5101,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
         else
         {
-            Position pos;
-            unitTarget->GetContactPoint(m_caster, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            // assume that target is not in water - else should be always in los
-            if (!m_caster->IsWithinLOS(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()))
-            {
-                float angle = m_caster->GetRelativeAngle(&pos);
-                float dist = m_caster->GetDistance(pos);
-                m_caster->GetFirstCollisionPosition(pos, dist, angle);
-            }
+            Position pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetObjectSize(), unitTarget->GetRelativeAngle(m_caster));
 
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT, SPEED_CHARGE, EVENT_CHARGE,
                 nullptr, false, 0.f, targetGUID);
@@ -5135,14 +5126,13 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
 
     if (m_targets.HasDst())
     {
-        Position pos;
-        destTarget->GetPosition(&pos);
+        Position pos = destTarget->GetPosition();
 
         if (!m_caster->IsWithinLOS(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()))
         {
             float angle = m_caster->GetRelativeAngle(pos.GetPositionX(), pos.GetPositionY());
             float dist = m_caster->GetDistance(pos);
-            m_caster->GetFirstCollisionPosition(pos, dist, angle);
+            pos = m_caster->GetFirstCollisionPosition(dist, angle);
         }
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
@@ -6174,7 +6164,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         else
         {
             // randomize position
-            m_caster->GetRandomPoint(*destTarget, radius, pos);
+            pos = m_caster->GetRandomPoint(*destTarget, radius);
         }
 
         summon = map->SummonCreature(entry, pos, properties, duration, caster, m_spellInfo->Id);
@@ -6199,7 +6189,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         }
 
         if (properties && properties->Category == SUMMON_CATEGORY_ALLY)
-            summon->setFaction(caster->getFaction());
+            summon->SetFaction(caster->GetFaction());
 
         ExecuteLogEffectSummonObject(i, summon);
     }
@@ -6438,8 +6428,7 @@ void Spell::EffectBind(SpellEffIndex effIndex)
         homeLoc.WorldRelocate(*destTarget);
     else
     {
-        player->GetPosition(&homeLoc);
-        homeLoc.m_mapId = player->GetMapId();
+        homeLoc = player->GetWorldLocation();
     }
 
     player->SetHomebind(homeLoc, areaId);

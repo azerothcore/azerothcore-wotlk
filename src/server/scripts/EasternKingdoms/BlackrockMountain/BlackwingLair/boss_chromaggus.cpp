@@ -318,8 +318,8 @@ class go_chromaggus_lever : public GameObjectScript
                         _instance->HandleGameObject(ObjectGuid::Empty, true, go);
                 }
 
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
-                go->SetGoState(GO_STATE_ACTIVE);
+                me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
+                me->SetGoState(GO_STATE_ACTIVE);
 
                 return true;
             }
