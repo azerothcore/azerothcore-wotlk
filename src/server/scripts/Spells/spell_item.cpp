@@ -2100,7 +2100,6 @@ class spell_item_party_time : public AuraScript
         }
 
         player->m_Events.AddEvent(new PartyTimeEmoteEvent(player), RAND(player->m_Events.CalculateTime(5000), player->m_Events.CalculateTime(10000), player->m_Events.CalculateTime(15000)));
-
     }
 
     void Register() override
