@@ -1774,10 +1774,8 @@ public:
                     // Get how many times it should ring
                     time_t t = time(nullptr);
                     tm     tm;
-
                     tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
                     localtime_r(&t, &tm);
-
                     uint8 _rings = (tm.tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
 
