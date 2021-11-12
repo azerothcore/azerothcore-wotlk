@@ -18,6 +18,7 @@
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
+#include "CharacterCache.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -103,12 +104,14 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     }
     else
     {
-        GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(playerGuid.GetCounter());
+        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
         if (!playerData)
+        {
             return false;
+        }
 
-        playerName = playerData->name;
-        playerClass = playerData->playerClass;
+        playerName = playerData->Name;
+        playerClass = playerData->Class;
     }
 
     if (!sScriptMgr->CanAddMember(this, playerGuid))
@@ -168,7 +171,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     newMember.MaxMMR           = maxMMR;
 
     Members.push_back(newMember);
-    sWorld->UpdateGlobalPlayerArenaTeam(playerGuid.GetCounter(), GetSlot(), GetId());
+    sCharacterCache->UpdateCharacterArenaTeamId(playerGuid, GetSlot(), GetId());
 
     // Save player's arena team membership to db
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
@@ -263,7 +266,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
 
         // Put the player in the team
         Members.push_back(newMember);
-        sWorld->UpdateGlobalPlayerArenaTeam(newMember.Guid.GetCounter(), GetSlot(), GetId());
+        sCharacterCache->UpdateCharacterArenaTeamId(newMember.Guid, GetSlot(), GetId());
     } while (result->NextRow());
 
     if (Empty() || !captainPresentInTeam)
@@ -353,7 +356,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
         if (itr->Guid == guid)
         {
             Members.erase(itr);
-            sWorld->UpdateGlobalPlayerArenaTeam(guid.GetCounter(), GetSlot(), 0);
+            sCharacterCache->UpdateCharacterArenaTeamId(guid, GetSlot(), 0);
             break;
         }
     }

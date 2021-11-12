@@ -29,6 +29,7 @@
 #include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
+#include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "Config.h"
@@ -2785,8 +2786,6 @@ void Player::SendNewMail()
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), GetMailSize(), false);
-
     if (deliver_time <= time(nullptr))                      // ready now
     {
         ++unReadMails;
@@ -6086,33 +6085,6 @@ void Player::ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans)
     }
 }
 
-uint32 Player::GetGuildIdFromStorage(ObjectGuid::LowType guid)
-{
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->guildId;
-    return 0;
-}
-
-uint32 Player::GetGroupIdFromStorage(ObjectGuid::LowType guid)
-{
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->groupId;
-    return 0;
-}
-
-uint32 Player::GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot)
-{
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-    {
-        auto itr = playerData->arenaTeamId.find(slot);
-        if (itr != playerData->arenaTeamId.end())
-        {
-            return itr->second;
-        }
-    }
-    return 0;
-}
-
 uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
@@ -6176,15 +6148,6 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
     }
 
     return zone;
-}
-
-uint32 Player::GetLevelFromStorage(ObjectGuid::LowType guid)
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->level;
-
-    return 0;
 }
 
 //If players are too far away from the duel flag... they lose the duel

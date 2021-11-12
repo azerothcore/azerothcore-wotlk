@@ -17,6 +17,7 @@
 
 #include "CalendarMgr.h"
 #include "Chat.h"
+#include "CharacterCache.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "Guild.h"
@@ -1963,7 +1964,7 @@ bool Guild::LoadMemberFromDB(Field* fields)
         return false;
     }
     m_members[memberGUID] = member;
-    sWorld->UpdateGlobalPlayerGuild(memberGUID.GetCounter(), GetId());
+    sCharacterCache->UpdateCharacterGuildId(memberGUID, GetId());
     return true;
 }
 
@@ -2249,7 +2250,7 @@ bool Guild::AddMember(ObjectGuid guid, uint8 rankId)
             return false;
         }
         m_members[guid] = member;
-        sWorld->UpdateGlobalPlayerGuild(guid.GetCounter(), m_id);
+        sCharacterCache->UpdateCharacterGuildId(guid, m_id);
     }
 
     CharacterDatabaseTransaction trans(nullptr);
@@ -2321,7 +2322,9 @@ void Guild::DeleteMember(ObjectGuid guid, bool isDisbanding, bool isKicked, bool
         player->SetRank(0);
     }
     else
-        sWorld->UpdateGlobalPlayerGuild(guid.GetCounter(), 0);
+    {
+        sCharacterCache->UpdateCharacterGuildId(guid, 0);
+    }
 
     _DeleteMemberFromDB(guid.GetCounter());
     if (!isDisbanding)

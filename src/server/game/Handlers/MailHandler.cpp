@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "Item.h"
@@ -26,7 +27,6 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -178,10 +178,10 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     else
     {
         // xinef: get data from global storage
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(receiverGuid.GetCounter()))
+        if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(receiverGuid))
         {
-            rc_teamId = Player::TeamIdForRace(playerData->race);
-            mails_count = playerData->mailCount;
+            rc_teamId = Player::TeamIdForRace(playerData->Race);
+            mails_count = playerData->MailCount;
         }
     }
     //do not allow to have more than 100 mails in mailbox.. mails count is in opcode uint8!!! - so max can be 255..
@@ -380,8 +380,8 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
         }
 
         m->state = MAIL_STATE_DELETED;
-        // xinef: update global data
-        sWorld->UpdateGlobalPlayerMails(player->GetGUID().GetCounter(), -1);
+
+        sCharacterCache->DecreaseCharacterMailCount(player->GetGUID());
     }
     player->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
@@ -444,8 +444,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     delete m;                                               //we can deallocate old mail
     player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_OK);
 
-    // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(player->GetGUID().GetCounter(), -1);
+    sCharacterCache->DecreaseCharacterMailCount(player->GetGUID());
 }
 
 //called when player takes item attached in mail

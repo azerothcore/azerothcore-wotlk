@@ -20,6 +20,7 @@
 
 #include "ArenaTeam.h"
 #include "Battleground.h"
+#include "CharacterCache.h"
 #include "DatabaseEnvFwd.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
@@ -1832,7 +1833,7 @@ public:
     {
         SetUInt32Value(PLAYER_GUILDID, GuildId);
         // xinef: update global storage
-        sWorld->UpdateGlobalPlayerGuild(GetGUID().GetCounter(), GuildId);
+        sCharacterCache->UpdateCharacterGuildId(GetGUID(), GetGuildId());
     }
     void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
     [[nodiscard]] uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }

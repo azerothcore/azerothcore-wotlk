@@ -19,6 +19,7 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "GameGraveyard.h"
 #include "GridNotifiers.h"
@@ -3149,7 +3150,7 @@ public:
         }
         else if (targetName)
         {
-            if (ObjectGuid playerGUID = sWorld->GetGlobalPlayerGUID(name))
+            if (ObjectGuid playerGUID = sCharacterCache->GetCharacterGuidByName(name))
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
                 stmt->setUInt32(0, playerGUID.GetCounter());

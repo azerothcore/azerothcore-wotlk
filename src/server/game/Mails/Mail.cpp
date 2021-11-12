@@ -17,6 +17,7 @@
 
 #include "AuctionHouseMgr.h"
 #include "BattlegroundMgr.h"
+#include "CharacterCache.h"
 #include "CalendarMgr.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
@@ -250,8 +251,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         trans->Append(stmt);
     }
 
-    // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(receiver.GetPlayerGUIDLow(), 1);
+    sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver.GetPlayerGUIDLow()));
 
     // For online receiver update in game mail status and data
     if (pReceiver)
