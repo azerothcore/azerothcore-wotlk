@@ -137,7 +137,7 @@ public:
         };
         static ChatCommandTable inventoryCommandTable =
         {
-            { "count",             SEC_MODERATOR,           false,  &HandleInventoryCountCommand,       "" },
+            { "count",             HandleInventoryCountCommand, SEC_MODERATOR,  Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -3629,24 +3629,20 @@ public:
         return true;
     };
 
-    static bool HandleInventoryCountCommand(ChatHandler* handler, char const* args)
+    static bool HandleInventoryCountCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
-        Player* playerTarget;
-        ObjectGuid guidTarget;
-        std::string nameTarget;
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
 
-        ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), nameTarget))
+        if (!player)
         {
-            playerTarget = ObjectAccessor::FindConnectedPlayer(parseGUID);
-            guidTarget = parseGUID;
-        }
-        else if (!handler->extractPlayerTarget((char*) args, &playerTarget, &guidTarget, &nameTarget))
-        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (!playerTarget || nameTarget.empty())
+        Player* target = player->GetConnectedPlayer();
+        if (!target)
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
@@ -3659,7 +3655,7 @@ public:
         // Check backpack
         for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
         {
-            if (!playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            if (!target->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
             {
                 haveFreeSlot = true;
                 ++freeSlotsInBags[ITEM_SUBCLASS_CONTAINER];
@@ -3669,7 +3665,7 @@ public:
         // Check bags
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
         {
-            if (Bag* bag = playerTarget->GetBagByPos(i))
+            if (Bag* bag = target->GetBagByPos(i))
             {
                 if (ItemTemplate const* bagTemplate = bag->GetTemplate())
                 {
@@ -3689,7 +3685,7 @@ public:
         std::ostringstream str;
         if (haveFreeSlot)
         {
-            str << "Player " << nameTarget << " have ";
+            str << "Player " << target->GetName() << " have ";
             bool initialize = true;
             for (uint8 i = ITEM_SUBCLASS_CONTAINER; i < MAX_ITEM_SUBCLASS_CONTAINER; ++i)
             {
@@ -3711,7 +3707,7 @@ public:
         }
         else
         {
-            str << "Player " << nameTarget << " does not have free slots in their bags";
+            str << "Player " << target->GetName() << " does not have free slots in their bags";
         }
 
         if (freeSlotsForBags)
