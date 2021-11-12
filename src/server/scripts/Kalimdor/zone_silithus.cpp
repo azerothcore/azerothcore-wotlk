@@ -1013,7 +1013,7 @@ public:
         {
             if (reportUse)
             {
-                uint32 gossipId         = go->GetGOInfo()->GetGossipMenuId();
+                uint32 gossipId         = me->GetGOInfo()->GetGossipMenuId();
                 bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()) ? true : false);
                 bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()) ? true : false);
                 bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()) ? true : false);
@@ -1023,19 +1023,19 @@ public:
                 case GOSSIPID_LESSER_WS:
                 {
                     if (!_twilightSetAura)
-                        go->CastSpell(player, SPELL_PUNISHMENT);
+                        me->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
                 case GOSSIPID_WS:
                 {
                     if (!_twilightSetAura || !_medallionAura)
-                        go->CastSpell(player, SPELL_PUNISHMENT);
+                        me->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
                 case GOSSIPID_GREATER_WS:
                 {
                     if (!_twilightSetAura || !_medallionAura || !_ringAura)
-                        go->CastSpell(player, SPELL_PUNISHMENT);
+                        me->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
                 default:
@@ -1054,19 +1054,19 @@ public:
                 switch (action)
                 {
                 case 0:
-                    SummonNPC(go, player, RAND(NPC_TEMPLAR_WATER, NPC_TEMPLAR_FIRE, NPC_TEMPLAR_EARTH, NPC_TEMPLAR_AIR), SPELL_TEMPLAR_RANDOM);
+                    SummonNPC(me, player, RAND(NPC_TEMPLAR_WATER, NPC_TEMPLAR_FIRE, NPC_TEMPLAR_EARTH, NPC_TEMPLAR_AIR), SPELL_TEMPLAR_RANDOM);
                     break;
                 case 1:
-                    SummonNPC(go, player, NPC_TEMPLAR_FIRE, SPELL_TEMPLAR_FIRE);
+                    SummonNPC(me, player, NPC_TEMPLAR_FIRE, SPELL_TEMPLAR_FIRE);
                     break;
                 case 2:
-                    SummonNPC(go, player, NPC_TEMPLAR_WATER, SPELL_TEMPLAR_WATER);
+                    SummonNPC(me, player, NPC_TEMPLAR_WATER, SPELL_TEMPLAR_WATER);
                     break;
                 case 3:
-                    SummonNPC(go, player, NPC_TEMPLAR_EARTH, SPELL_TEMPLAR_EARTH);
+                    SummonNPC(me, player, NPC_TEMPLAR_EARTH, SPELL_TEMPLAR_EARTH);
                     break;
                 case 4:
-                    SummonNPC(go, player, NPC_TEMPLAR_AIR, SPELL_TEMPLAR_AIR);
+                    SummonNPC(me, player, NPC_TEMPLAR_AIR, SPELL_TEMPLAR_AIR);
                     break;
                 default:
                     break;
@@ -1077,19 +1077,19 @@ public:
                 switch (action)
                 {
                 case 0:
-                    SummonNPC(go, player, RAND(NPC_DUKE_WATER, NPC_DUKE_FIRE, NPC_DUKE_EARTH, NPC_DUKE_AIR), SPELL_DUKE_RANDOM);
+                    SummonNPC(me, player, RAND(NPC_DUKE_WATER, NPC_DUKE_FIRE, NPC_DUKE_EARTH, NPC_DUKE_AIR), SPELL_DUKE_RANDOM);
                     break;
                 case 1:
-                    SummonNPC(go, player, NPC_DUKE_FIRE, SPELL_DUKE_FIRE);
+                    SummonNPC(me, player, NPC_DUKE_FIRE, SPELL_DUKE_FIRE);
                     break;
                 case 2:
-                    SummonNPC(go, player, NPC_DUKE_WATER, SPELL_DUKE_WATER);
+                    SummonNPC(me, player, NPC_DUKE_WATER, SPELL_DUKE_WATER);
                     break;
                 case 3:
-                    SummonNPC(go, player, NPC_DUKE_EARTH, SPELL_DUKE_EARTH);
+                    SummonNPC(me, player, NPC_DUKE_EARTH, SPELL_DUKE_EARTH);
                     break;
                 case 4:
-                    SummonNPC(go, player, NPC_DUKE_AIR, SPELL_DUKE_AIR);
+                    SummonNPC(me, player, NPC_DUKE_AIR, SPELL_DUKE_AIR);
                     break;
                 default:
                     break;
@@ -1100,19 +1100,19 @@ public:
                 switch (action)
                 {
                 case 0:
-                    SummonNPC(go, player, RAND(NPC_ROYAL_WATER, NPC_ROYAL_FIRE, NPC_ROYAL_EARTH, NPC_ROYAL_AIR), SPELL_ROYAL_RANDOM);
+                    SummonNPC(me, player, RAND(NPC_ROYAL_WATER, NPC_ROYAL_FIRE, NPC_ROYAL_EARTH, NPC_ROYAL_AIR), SPELL_ROYAL_RANDOM);
                     break;
                 case 1:
-                    SummonNPC(go, player, NPC_ROYAL_FIRE, SPELL_ROYAL_FIRE);
+                    SummonNPC(me, player, NPC_ROYAL_FIRE, SPELL_ROYAL_FIRE);
                     break;
                 case 2:
-                    SummonNPC(go, player, NPC_ROYAL_WATER, SPELL_ROYAL_WATER);
+                    SummonNPC(me, player, NPC_ROYAL_WATER, SPELL_ROYAL_WATER);
                     break;
                 case 3:
-                    SummonNPC(go, player, NPC_ROYAL_EARTH, SPELL_ROYAL_EARTH);
+                    SummonNPC(me, player, NPC_ROYAL_EARTH, SPELL_ROYAL_EARTH);
                     break;
                 case 4:
-                    SummonNPC(go, player, NPC_ROYAL_AIR, SPELL_ROYAL_AIR);
+                    SummonNPC(me, player, NPC_ROYAL_AIR, SPELL_ROYAL_AIR);
                     break;
                 default:
                     break;

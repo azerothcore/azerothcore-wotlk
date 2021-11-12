@@ -178,10 +178,10 @@ public:
             // Should have no impact from unit state
             if (rangeCheckTimer <= diff)
             {
-                Creature const* golemagg = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GEDDON));
+                Creature const* golemagg = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GOLEMAGG));
                 if (golemagg && me->GetDistance(golemagg) > 100.0f)
                 {
-                    instance->DoAction(ACTION_RESET_MAGMADAR_ENCOUNTER);
+                    instance->DoAction(ACTION_RESET_GOLEMAGG_ENCOUNTER);
                     return;
                 }
 

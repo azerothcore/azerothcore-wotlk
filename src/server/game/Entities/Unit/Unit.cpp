@@ -447,12 +447,37 @@ void Unit::Update(uint32 p_time)
     // not implemented before 3.0.2
     // xinef: if attack time > 0, reduce by diff
     // if on next update, attack time < 0 assume player didnt attack - set to 0
-    if (int32 base_attack = getAttackTimer(BASE_ATTACK))
-        setAttackTimer(BASE_ATTACK, base_attack > 0 ? base_attack - (int32)p_time : 0);
-    if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
-        setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32)p_time : 0);
-    if (int32 off_attack = getAttackTimer(OFF_ATTACK))
-        setAttackTimer(OFF_ATTACK, off_attack > 0 ? off_attack - (int32)p_time : 0);
+    bool suspendAttackTimer = false;
+    if (IsPlayer() && HasUnitState(UNIT_STATE_CASTING))
+    {
+        for (Spell* spell : m_currentSpells)
+        {
+            if (spell)
+            {
+                if (spell->GetSpellInfo()->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
+                {
+                    suspendAttackTimer = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!suspendAttackTimer)
+    {
+        if (int32 base_attack = getAttackTimer(BASE_ATTACK))
+        {
+            setAttackTimer(BASE_ATTACK, base_attack > 0 ? base_attack - (int32) p_time : 0);
+        }
+        if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
+        {
+            setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32) p_time : 0);
+        }
+        if (int32 off_attack = getAttackTimer(OFF_ATTACK))
+        {
+            setAttackTimer(OFF_ATTACK, off_attack > 0 ? off_attack - (int32) p_time : 0);
+        }
+    }
 
     // update abilities available only for fraction of time
     UpdateReactives(p_time);
@@ -18808,7 +18833,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     Position pos;
     if (!exitPosition)                          // Exit position not specified
-        vehicleBase->GetPosition(&pos);  // This should use passenger's current position, leaving it as it is now
+        pos = vehicleBase->GetPosition();  // This should use passenger's current position, leaving it as it is now
     // because we calculate positions incorrect (sometimes under map)
     else
         pos = *exitPosition;
