@@ -1,3 +1,19 @@
+-- DB update 2021_11_12_00 -> 2021_11_12_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_12_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_12_00 2021_11_12_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1636407148113092900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636407148113092900');
 
 UPDATE `smart_scripts` SET `action_param2`=7, `action_param3`=0 WHERE `entryorguid`=17558400 AND `id`=17;
@@ -29,3 +45,13 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` IN (175621) AND `id`>1;
 INSERT INTO `smart_scripts` VALUES
 (175621,1,2,3,77,0,100,0,1,20,5000,5000,0,34,4,2,0,0,0,0,1,0,0,0,0,0,0,0,0, 'Ur\'s Tribute Pile - on 20 count - fail event'),
 (175621,1,3,0,61,0,100,0,0,0,0,0,0,41,0,180,0,0,0,0,1,0,0,0,0,0,0,0,0, 'Ur\'s Tribute Pile - on 20 count - despawn');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_12_01' WHERE sql_rev = '1636407148113092900';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
