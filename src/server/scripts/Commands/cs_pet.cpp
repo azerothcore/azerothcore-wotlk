@@ -23,6 +23,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 #include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
