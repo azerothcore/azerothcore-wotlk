@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: server_commandscript
-%Complete: 100
-Comment: All server related commands
-Category: commandscripts
-EndScriptData */
+ /* ScriptData
+ Name: server_commandscript
+ %Complete: 100
+ Comment: All server related commands
+ Category: commandscripts
+ EndScriptData */
 
 #include "AvgDiffTracker.h"
 #include "Chat.h"
@@ -41,10 +41,6 @@ EndScriptData */
 #include <openssl/opensslv.h>
 #include <numeric>
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
 class server_commandscript : public CommandScript
@@ -56,66 +52,66 @@ public:
     {
         static ChatCommandTable serverIdleRestartCommandTable =
         {
-            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",       SEC_CONSOLE,        true,  &HandleServerIdleRestartCommand,         "" }
+            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "",             HandleServerIdleRestartCommand,    SEC_CONSOLE,       Console::Yes }
         };
 
         static ChatCommandTable serverIdleShutdownCommandTable =
         {
-            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",       SEC_CONSOLE,        true,  &HandleServerIdleShutDownCommand,        "" }
+            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "",             HandleServerIdleShutDownCommand,   SEC_CONSOLE,       Console::Yes }
         };
 
         static ChatCommandTable serverRestartCommandTable =
         {
-            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
+            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "",             HandleServerRestartCommand,        SEC_ADMINISTRATOR, Console::Yes }
         };
 
         static ChatCommandTable serverShutdownCommandTable =
         {
-            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
+            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "",             HandleServerShutDownCommand,       SEC_ADMINISTRATOR, Console::Yes }
         };
 
         static ChatCommandTable serverSetCommandTable =
         {
-            { "difftime",       SEC_CONSOLE,        true,  &HandleServerSetDiffTimeCommand,         "" },
-            { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
-            { "motd",           SEC_ADMINISTRATOR,  true,  &HandleServerSetMotdCommand,             "" },
-            { "closed",         SEC_CONSOLE,        true,  &HandleServerSetClosedCommand,           "" }
+            { "difftime",     HandleServerSetDiffTimeCommand,    SEC_CONSOLE,       Console::Yes },
+            { "loglevel",     HandleServerSetLogLevelCommand,    SEC_CONSOLE,       Console::Yes },
+            { "motd",         HandleServerSetMotdCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "closed",       HandleServerSetClosedCommand,      SEC_CONSOLE,       Console::Yes },
         };
 
         static ChatCommandTable serverCommandTable =
         {
-            { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
-            { "debug",          SEC_ADMINISTRATOR,  true,  &HandleServerDebugCommand,               "" },
-            { "exit",           SEC_CONSOLE,        true,  &HandleServerExitCommand,                "" },
-            { "idlerestart",    SEC_CONSOLE,        true,  nullptr,                                 "", serverIdleRestartCommandTable },
-            { "idleshutdown",   SEC_CONSOLE,        true,  nullptr,                                 "", serverIdleShutdownCommandTable },
-            { "info",           SEC_PLAYER,         true,  &HandleServerInfoCommand,                "" },
-            { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "" },
-            { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverRestartCommandTable },
-            { "shutdown",       SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverShutdownCommandTable },
-            { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable }
+            { "corpses",      HandleServerCorpsesCommand,        SEC_GAMEMASTER,    Console::Yes },
+            { "debug",        HandleServerDebugCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "exit",         HandleServerExitCommand,           SEC_CONSOLE,       Console::Yes },
+            { "idlerestart",  serverIdleRestartCommandTable },
+            { "idleshutdown", serverIdleShutdownCommandTable },
+            { "info",         HandleServerInfoCommand,           SEC_PLAYER,        Console::Yes },
+            { "motd",         HandleServerMotdCommand,           SEC_PLAYER,        Console::Yes },
+            { "restart",      serverRestartCommandTable },
+            { "shutdown",     serverShutdownCommandTable },
+            { "set",          serverSetCommandTable }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
+            { "server", serverCommandTable }
         };
 
         return commandTable;
     }
 
     // Triggering corpses expire check in world
-    static bool HandleServerCorpsesCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    static bool HandleServerCorpsesCommand(ChatHandler* /*handler*/)
     {
         sWorld->RemoveOldCorpses();
         return true;
     }
 
-    static bool HandleServerDebugCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleServerDebugCommand(ChatHandler* handler)
     {
         uint16 worldPort = uint16(sWorld->getIntConfig(CONFIG_PORT_WORLD));
         std::string dbPortOutput;
@@ -226,7 +222,7 @@ public:
         return true;
     }
 
-    static bool HandleServerInfoCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleServerInfoCommand(ChatHandler* handler)
     {
         std::string realmName = sWorld->GetRealmName();
         uint32 playerCount = sWorld->GetPlayerCount();
@@ -258,163 +254,77 @@ public:
         return true;
     }
     // Display the 'Message of the day' for the realm
-    static bool HandleServerMotdCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleServerMotdCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage(LANG_MOTD_CURRENT, Motd::GetMotd());
         return true;
     }
 
-    static bool HandleServerShutDownCancelCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    static bool HandleServerShutDownCancelCommand(ChatHandler* /*handler*/)
     {
         sWorld->ShutdownCancel();
 
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, char const* args)
+    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
-        if (!*args)
-            return false;
-
-        char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(nullptr, "");
-
-        int32 time = atoi(timeStr);
-
-        // Prevent interpret wrong arg value as 0 secs shutdown time
-        if ((time == 0 && (timeStr[0] != '0' || timeStr[1] != '\0')) || time < 0)
-            return false;
-
-        if (exitCodeStr)
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            int32 exitCode = atoi(exitCodeStr);
-
-            // Handle atoi() errors
-            if (exitCode == 0 && (exitCodeStr[0] != '0' || exitCodeStr[1] != '\0'))
-                return false;
-
-            // Exit code should be in range of 0-125, 126-255 is used
-            // in many shells for their own return codes and code > 255
-            // is not supported in many others
-            if (exitCode < 0 || exitCode > 125)
-                return false;
-
-            sWorld->ShutdownServ(time, 0, exitCode);
+            sWorld->ShutdownServ(time, 0, *exitCode);
         }
         else
+        {
             sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE);
+        }
 
         return true;
     }
 
-    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, char const* args)
+    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
-        if (!*args)
-            return false;
-
-        char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(nullptr, "");
-
-        int32 time = atoi(timeStr);
-
-        //  Prevent interpret wrong arg value as 0 secs shutdown time
-        if ((time == 0 && (timeStr[0] != '0' || timeStr[1] != '\0')) || time < 0)
-            return false;
-
-        if (exitCodeStr)
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            int32 exitCode = atoi(exitCodeStr);
-
-            // Handle atoi() errors
-            if (exitCode == 0 && (exitCodeStr[0] != '0' || exitCodeStr[1] != '\0'))
-                return false;
-
-            // Exit code should be in range of 0-125, 126-255 is used
-            // in many shells for their own return codes and code > 255
-            // is not supported in many others
-            if (exitCode < 0 || exitCode > 125)
-                return false;
-
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, exitCode);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, *exitCode);
         }
         else
+        {
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
+        }
 
         return true;
     }
 
-    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, char const* args)
+    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
-        if (!*args)
-            return false;
-
-        char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(nullptr, "");
-
-        int32 time = atoi(timeStr);
-
-        // Prevent interpret wrong arg value as 0 secs shutdown time
-        if ((time == 0 && (timeStr[0] != '0' || timeStr[1] != '\0')) || time < 0)
-            return false;
-
-        if (exitCodeStr)
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            int32 exitCode = atoi(exitCodeStr);
-
-            // Handle atoi() errors
-            if (exitCode == 0 && (exitCodeStr[0] != '0' || exitCodeStr[1] != '\0'))
-                return false;
-
-            // Exit code should be in range of 0-125, 126-255 is used
-            // in many shells for their own return codes and code > 255
-            // is not supported in many others
-            if (exitCode < 0 || exitCode > 125)
-                return false;
-
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, exitCode);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
+        {
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE);
+        }
+
         return true;
     }
 
-    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, char const* args)
+    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
     {
-        if (!*args)
-            return false;
-
-        char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(nullptr, "");
-
-        int32 time = atoi(timeStr);
-
-        // Prevent interpret wrong arg value as 0 secs shutdown time
-        if ((time == 0 && (timeStr[0] != '0' || timeStr[1] != '\0')) || time < 0)
-            return false;
-
-        if (exitCodeStr)
+        if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
-            int32 exitCode = atoi(exitCodeStr);
-
-            // Handle atoi() errors
-            if (exitCode == 0 && (exitCodeStr[0] != '0' || exitCodeStr[1] != '\0'))
-                return false;
-
-            // Exit code should be in range of 0-125, 126-255 is used
-            // in many shells for their own return codes and code > 255
-            // is not supported in many others
-            if (exitCode < 0 || exitCode > 125)
-                return false;
-
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, exitCode);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
+        {
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE);
+        }
+
         return true;
     }
 
     // Exit the realm
-    static bool HandleServerExitCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleServerExitCommand(ChatHandler* handler)
     {
         handler->SendSysMessage(LANG_COMMAND_EXIT);
         World::StopNow(SHUTDOWN_EXIT_CODE);
@@ -422,23 +332,23 @@ public:
     }
 
     // Define the 'Message of the day' for the realm
-    static bool HandleServerSetMotdCommand(ChatHandler* handler, char const* args)
+    static bool HandleServerSetMotdCommand(ChatHandler* handler, std::string motd)
     {
-        Motd::SetMotd(args);
-        handler->PSendSysMessage(LANG_MOTD_NEW, args);
+        Motd::SetMotd(motd);
+        handler->PSendSysMessage(LANG_MOTD_NEW, motd);
         return true;
     }
 
     // Set whether we accept new clients
-    static bool HandleServerSetClosedCommand(ChatHandler* handler, char const* args)
+    static bool HandleServerSetClosedCommand(ChatHandler* handler, Optional<std::string> args)
     {
-        if (strncmp(args, "on", 3) == 0)
+        if (StringStartsWith("on", *args))
         {
             handler->SendSysMessage(LANG_WORLD_CLOSED);
             sWorld->SetClosed(true);
             return true;
         }
-        else if (strncmp(args, "off", 4) == 0)
+        else if (StringStartsWith("off", *args))
         {
             handler->SendSysMessage(LANG_WORLD_OPENED);
             sWorld->SetClosed(false);
@@ -451,33 +361,15 @@ public:
     }
 
     // Set the level of logging
-    static bool HandleServerSetLogLevelCommand(ChatHandler* /*handler*/, char const* args)
+    static bool HandleServerSetLogLevelCommand(ChatHandler* /*handler*/, bool isLogger, std::string const& name, int32 level)
     {
-       if (!*args)
-            return false;
-
-        char* type = strtok((char*)args, " ");
-        char* name = strtok(nullptr, " ");
-        char* level = strtok(nullptr, " ");
-
-        if (!type || !name || !level || *name == '\0' || *level == '\0' || (*type != 'a' && *type != 'l'))
-            return false;
-
-        sLog->SetLogLevel(name, *Acore::StringTo<uint32>(level), *type == 'l');
+        sLog->SetLogLevel(name, level, isLogger);
         return true;
     }
 
     // set diff time record interval
-    static bool HandleServerSetDiffTimeCommand(ChatHandler* /*handler*/, char const* args)
+    static bool HandleServerSetDiffTimeCommand(ChatHandler* /*handler*/, int32 newTime)
     {
-        if (!*args)
-            return false;
-
-        char* newTimeStr = strtok((char*)args, " ");
-        if (!newTimeStr)
-            return false;
-
-        int32 newTime = atoi(newTimeStr);
         if (newTime < 0)
             return false;
 
