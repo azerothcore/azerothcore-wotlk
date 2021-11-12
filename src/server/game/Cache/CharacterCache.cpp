@@ -86,6 +86,7 @@ void CharacterCache::LoadCharacterCacheStorage()
     } while (result->NextRow());
 
     LOG_INFO("server.loading", "Loaded character infos for " SZFMTD " characters in %u ms", _characterCacheStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 /*
@@ -200,7 +201,7 @@ void CharacterCache::UpdateCharacterMailCount(ObjectGuid const& guid, int8 count
     update ? itr->second.MailCount = count : itr->second.MailCount += count;
 }
 
-void CharacterCache::UpdateCharacterGroup(ObjectGuid const& guid, uint32 groupId)
+void CharacterCache::UpdateCharacterGroup(ObjectGuid const& guid, ObjectGuid groupGUID)
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
@@ -208,7 +209,7 @@ void CharacterCache::UpdateCharacterGroup(ObjectGuid const& guid, uint32 groupId
         return;
     }
 
-    itr->second.GroupId = groupId;
+    itr->second.GroupGuid = groupGUID;
 }
 
 /*
@@ -327,7 +328,16 @@ uint32 CharacterCache::GetCharacterArenaTeamIdByGuid(ObjectGuid guid, uint8 type
         return 0;
     }
 
-    uint8 slot = ArenaTeam::GetSlotByType(type);
-    ASSERT(slot < 3);
-    return itr->second.ArenaTeamId[slot];
+    return itr->second.ArenaTeamId[type];
+}
+
+ObjectGuid CharacterCache::GetCharacterGroupGuidByGuid(ObjectGuid guid) const
+{
+    auto itr = _characterCacheStore.find(guid);
+    if (itr == _characterCacheStore.end())
+    {
+        return ObjectGuid::Empty;
+    }
+
+    return itr->second.GroupGuid;
 }

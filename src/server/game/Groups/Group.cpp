@@ -245,6 +245,11 @@ void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uin
 
     m_memberSlots.push_back(member);
 
+    if (!isBGGroup() && !isBFGroup())
+    {
+        sCharacterCache->UpdateCharacterGroup(ObjectGuid(HighGuid::Player, guidLow), GetGUID());
+    }
+
     SubGroupCounterIncrease(subgroup);
 
     sLFGMgr->SetupGroupMember(member.guid, GetGUID());
@@ -400,6 +405,11 @@ bool Group::AddMember(Player* player)
     member.flags     = 0;
     member.roles     = 0;
     m_memberSlots.push_back(member);
+
+    if (!isBGGroup() && !isBFGroup())
+    {
+        sCharacterCache->UpdateCharacterGroup(player->GetGUID(), GetGUID());
+    }
 
     SubGroupCounterIncrease(subGroup);
 
@@ -614,6 +624,11 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
         {
             SubGroupCounterDecrease(slot->group);
             m_memberSlots.erase(slot);
+
+            if (!isBGGroup() && !isBFGroup())
+            {
+                sCharacterCache->ClearCharacterGroup(guid);
+            }
         }
 
         // Reevaluate group enchanter if the leaving player had enchanting skill or the player is offline
@@ -730,6 +745,11 @@ void Group::Disband(bool hideDestroy /* = false */)
     Player* player;
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
+        if (!isBGGroup() && !isBFGroup())
+        {
+            sCharacterCache->ClearCharacterGroup(citr->guid);
+        }
+
         player = ObjectAccessor::FindConnectedPlayer(citr->guid);
 
         _homebindIfInstance(player);

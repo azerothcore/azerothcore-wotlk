@@ -3285,8 +3285,12 @@ public:
             groupTarget = playerTarget->GetGroup();
 
         if (!groupTarget && guidTarget)
-            if (uint32 groupGUID = Player::GetGroupIdFromStorage(guidTarget.GetCounter()))
-                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
+        {
+            if (ObjectGuid groupGUID = sCharacterCache->GetCharacterGroupGuidByGuid(guidTarget))
+            {
+                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID.GetCounter());
+            }
+        }
 
         if (groupTarget)
         {

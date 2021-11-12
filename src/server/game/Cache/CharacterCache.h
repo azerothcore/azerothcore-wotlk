@@ -35,6 +35,7 @@ struct CharacterCacheEntry
     uint8 MailCount;
     ObjectGuid::LowType GuildId;
     uint32 ArenaTeamId[3];
+    ObjectGuid GroupGuid;
 };
 
 class AC_GAME_API CharacterCache
@@ -62,6 +63,9 @@ class AC_GAME_API CharacterCache
         CharacterCacheEntry const* GetCharacterCacheByGuid(ObjectGuid const& guid) const;
         CharacterCacheEntry const* GetCharacterCacheByName(std::string const& name) const;
 
+        void UpdateCharacterGroup(ObjectGuid const& guid, ObjectGuid groupGUID);
+        void ClearCharacterGroup(ObjectGuid const& guid) { UpdateCharacterGroup(guid, ObjectGuid::Empty); };
+
         ObjectGuid GetCharacterGuidByName(std::string const& name) const;
         bool GetCharacterNameByGuid(ObjectGuid guid, std::string& name) const;
         uint32 GetCharacterTeamByGuid(ObjectGuid guid) const;
@@ -70,6 +74,7 @@ class AC_GAME_API CharacterCache
         uint8 GetCharacterLevelByGuid(ObjectGuid guid) const;
         ObjectGuid::LowType GetCharacterGuildIdByGuid(ObjectGuid guid) const;
         uint32 GetCharacterArenaTeamIdByGuid(ObjectGuid guid, uint8 type) const;
+        ObjectGuid GetCharacterGroupGuidByGuid(ObjectGuid guid) const;
 };
 
 #define sCharacterCache CharacterCache::instance()
