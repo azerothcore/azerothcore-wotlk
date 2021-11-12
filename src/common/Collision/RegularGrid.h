@@ -90,7 +90,7 @@ public:
 
     void remove(const T& value)
     {
-        for (MemberTable::value_type& p : Acore::Containers::MapEqualRange(memberTable, &value))
+        for (auto& p : Acore::Containers::MapEqualRange(memberTable, &value))
             p.second->remove(value);
         // Remove the member
         memberTable.erase(&value);
