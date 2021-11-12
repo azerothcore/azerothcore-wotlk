@@ -1551,9 +1551,10 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
 void Guild::HandleAcceptMember(WorldSession* session)
 {
     Player* player = session->GetPlayer();
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) &&
-            player->GetTeamId() != sObjectMgr->GetPlayerTeamIdByGUID(GetLeaderGUID().GetCounter()))
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && player->GetTeamId() != sCharacterCache->GetCharacterTeamByGuid(GetLeaderGUID()))
+    {
         return;
+    }
 
     AddMember(player->GetGUID());
 }
@@ -2173,7 +2174,7 @@ void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 max
         }
 
         Member* member = itr->second;
-        uint32 level = Player::GetLevelFromStorage(member->GetGUID().GetCounter());
+        uint32 level = sCharacterCache->GetCharacterLevelByGuid(member->GetGUID());
 
         if (member->GetGUID() != session->GetPlayer()->GetGUID() && level >= minLevel && level <= maxLevel && member->IsRankNotLower(minRank))
         {
@@ -2198,7 +2199,7 @@ bool Guild::AddMember(ObjectGuid guid, uint8 rankId)
         if (player->GetGuildId() != 0)
             return false;
     }
-    else if (Player::GetGuildIdFromStorage(guid.GetCounter()) != 0)
+    else if (sCharacterCache->GetCharacterGuildIdByGuid(guid) != 0)
         return false;
 
     // Remove all player signs from another petitions

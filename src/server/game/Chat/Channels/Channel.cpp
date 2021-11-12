@@ -1047,7 +1047,7 @@ void Channel::MakeChannelOwner(WorldPacket* data)
 {
     std::string name = "";
 
-    if (!sObjectMgr->GetPlayerNameByGUID(_ownerGUID.GetCounter(), name) || name.empty())
+    if (!sCharacterCache->GetCharacterNameByGuid(_ownerGUID, name) || name.empty())
         name = "PLAYER_NOT_FOUND";
 
     MakeNotifyPacket(data, CHAT_CHANNEL_OWNER_NOTICE);

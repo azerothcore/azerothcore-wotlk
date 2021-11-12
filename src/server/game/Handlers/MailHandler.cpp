@@ -122,7 +122,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     ObjectGuid receiverGuid;
     if (normalizePlayerName(receiver))
-        receiverGuid = sObjectMgr->GetPlayerGUIDByName(receiver);
+    {
+        receiverGuid = sCharacterCache->GetCharacterGuidByName(receiver);
+    }
 
     if (!receiverGuid)
     {
@@ -207,7 +209,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         }
     }*/
 
-    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(receiverGuid.GetCounter());
+    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(receiverGuid);
 
     if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
@@ -505,9 +507,13 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
             uint32 sender_accId = 0;
             Player* sender = ObjectAccessor::FindPlayerByLowGUID(m->sender);
             if (sender)
+            {
                 sender_accId = sender->GetSession()->GetAccountId();
+            }
             else
-                sender_accId = sObjectMgr->GetPlayerAccountIdByGUID(m->sender);
+            {
+                sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, m->sender));
+            }
 
             // check player existence
             if (sender || sender_accId)
@@ -519,8 +525,10 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                 if( m->COD >= 10 * GOLD )
                 {
                     std::string senderName;
-                    if (!sObjectMgr->GetPlayerNameByGUID(m->sender, senderName))
+                    if (!sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, m->sender), senderName))
+                    {
                         senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
+                    }
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
                     CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())",

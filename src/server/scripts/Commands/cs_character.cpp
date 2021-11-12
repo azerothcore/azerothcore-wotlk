@@ -224,7 +224,7 @@ public:
             return;
         }
 
-        if (sObjectMgr->GetPlayerGUIDByName(delInfo.name))
+        if (sCharacterCache->GetCharacterGuidByName(delInfo.name))
         {
             handler->PSendSysMessage(LANG_CHARACTER_DELETED_SKIP_NAME, delInfo.name.c_str(), delInfo.lowGuid, delInfo.accountId);
             return;
@@ -428,7 +428,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : static_cast<uint8>(Player::GetLevelFromStorage(player->GetGUID().GetCounter()));
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
 
         if (newlevel < 1)
             return false;                                       // invalid level
@@ -732,7 +732,9 @@ public:
             target->GetSession()->KickPlayer("HandleCharacterEraseCommand GM Command deleting character");
         }
         else
-            accountId = sObjectMgr->GetPlayerAccountIdByGUID(player.GetGUID().GetCounter());
+        {
+            accountId = sCharacterCache->GetCharacterAccountIdByGuid(player.GetGUID());
+        }
 
         std::string accountName;
         AccountMgr::GetName(accountId, accountName);
@@ -751,7 +753,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = static_cast<uint8>(player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : Player::GetLevelFromStorage(player->GetGUID().GetCounter()));
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
         int16 newlevel = static_cast<int16>(oldlevel) + level;
 
         if (newlevel < 1)
@@ -791,7 +793,7 @@ public:
 
         if (characterGUID)
         {
-            if (sObjectMgr->GetPlayerAccountIdByGUID(*characterGUID))
+            if (sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, *characterGUID)))
             {
                 handler->PSendSysMessage(LANG_CHARACTER_GUID_IN_USE, *characterGUID);
                 handler->SetSentErrorMessage(true);

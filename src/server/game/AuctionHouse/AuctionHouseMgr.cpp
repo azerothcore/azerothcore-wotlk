@@ -117,9 +117,13 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
     uint32 bidder_accId = 0;
     Player* bidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
     if (bidder)
+    {
         bidder_accId = bidder->GetSession()->GetAccountId();
+    }
     else
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+    {
+        bidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
+    }
 
     // receiver exist
     if (bidder || bidder_accId)
@@ -153,7 +157,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
     // owner exist (online or offline)
     if (owner || owner_accId)
     {
@@ -175,7 +179,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, Characte
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
     // owner exist
     if (owner || owner_accId)
     {
@@ -225,7 +229,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
         return;
 
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
 
     // owner exist
     if (owner || owner_accId)
@@ -251,7 +255,7 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 
     uint32 oldBidder_accId = 0;
     if (!oldBidder)
-        oldBidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+        oldBidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
 
     // old bidder exist
     if (oldBidder || oldBidder_accId)
@@ -275,7 +279,9 @@ void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, Ch
 
     uint32 bidder_accId = 0;
     if (!bidder)
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+    {
+        bidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
+    }
 
     // bidder exist
     if (bidder || bidder_accId)

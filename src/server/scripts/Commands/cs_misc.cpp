@@ -1826,7 +1826,7 @@ public:
 
         ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), targetName))
+        if (sCharacterCache->GetCharacterNameByGuid(parseGUID, targetName))
         {
             target = ObjectAccessor::FindConnectedPlayer(parseGUID);
             targetGuid = parseGUID;
@@ -2274,7 +2274,7 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter());
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
 
         // find only player from same account if any
         if (!target)
@@ -2350,7 +2350,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(targetGuid);
 
         // find only player from same account if any
         if (!target)
@@ -3272,7 +3272,7 @@ public:
 
         ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), nameTarget))
+        if (sCharacterCache->GetCharacterNameByGuid(parseGUID, nameTarget))
         {
             playerTarget = ObjectAccessor::FindConnectedPlayer(parseGUID);
             guidTarget = parseGUID;

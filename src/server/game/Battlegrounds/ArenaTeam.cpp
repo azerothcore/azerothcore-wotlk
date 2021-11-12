@@ -118,7 +118,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
         return false;
 
     // Check if player is already in a similar arena team
-    if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromStorage(playerGuid.GetCounter(), GetSlot()) != 0)
+    if ((player && player->GetArenaTeamId(GetSlot())) || sCharacterCache->GetCharacterArenaTeamIdByGuid(playerGuid, GetSlot()) != 0)
     {
         LOG_ERROR("bg.arena", "Arena: Player %s (%s) already has an arena team of type %u", playerName.c_str(), playerGuid.ToString().c_str(), GetType());
         return false;
@@ -452,7 +452,7 @@ void ArenaTeam::Roster(WorldSession* session)
         data << itr->Guid;                                  // guid
         data << uint8((player ? 1 : 0));                    // online flag
         tempName = "";
-        sObjectMgr->GetPlayerNameByGUID(itr->Guid.GetCounter(), tempName);
+        sCharacterCache->GetCharacterNameByGuid(itr->Guid, tempName);
         data << tempName;                                  // member name
         data << uint32((itr->Guid == GetCaptain() ? 0 : 1));// captain flag 0 captain 1 member
         data << uint8((player ? player->getLevel() : 0));           // unknown, level?
@@ -996,7 +996,7 @@ bool ArenaTeam::IsFighting() const
 
 ArenaTeamMember* ArenaTeam::GetMember(const std::string& name)
 {
-    return GetMember(sObjectMgr->GetPlayerGUIDByName(name));
+    return GetMember(sCharacterCache->GetCharacterGuidByName(name));
 }
 
 ArenaTeamMember* ArenaTeam::GetMember(ObjectGuid guid)

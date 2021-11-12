@@ -102,7 +102,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
 
     uint32 DurationSecs = TimeStringToSecs(Duration);
 
-    uint32 AccountID = sObjectMgr->GetPlayerAccountIdByPlayerName(CharacterName);
+    uint32 AccountID = sCharacterCache->GetCharacterAccountIdByName(CharacterName);
     if (!AccountID)
         return BAN_NOTFOUND;
 
@@ -284,7 +284,7 @@ bool BanMgr::RemoveBanAccount(std::string const& AccountName)
 /// Remove a ban from an player name
 bool BanMgr::RemoveBanAccountByPlayerName(std::string const& CharacterName)
 {
-    uint32 AccountID = sObjectMgr->GetPlayerAccountIdByPlayerName(CharacterName);
+    uint32 AccountID = sCharacterCache->GetCharacterAccountIdByName(CharacterName);
     if (!AccountID)
         return false;
 
