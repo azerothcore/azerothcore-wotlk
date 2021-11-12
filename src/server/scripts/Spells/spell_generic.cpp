@@ -5510,6 +5510,41 @@ public:
     }
 };
 
+enum HolidayFoodBuffEnum
+{
+    SPELL_WELL_FED = 24870,
+};
+
+// -24869 - Food
+class spell_gen_holiday_buff_food : public SpellScriptLoader
+{
+public:
+    spell_gen_holiday_buff_food() : SpellScriptLoader("spell_gen_holiday_buff_food") {}
+
+    class spell_gen_holiday_buff_food_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_holiday_buff_food_AuraScript);
+
+        void TriggerFoodBuff(AuraEffect* aurEff)
+        {
+            if (aurEff->GetTickNumber() == 10 && GetUnitOwner())
+            {
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_WELL_FED, TriggerCastFlags(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS));
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_holiday_buff_food_AuraScript::TriggerFoodBuff, EFFECT_0, SPELL_AURA_OBS_MOD_HEALTH);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_holiday_buff_food_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_silithyst();
@@ -5640,4 +5675,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_eject_passenger();
     new spell_gen_charmed_unit_spell_cooldown();
     new spell_contagion_of_rot();
+    new spell_gen_holiday_buff_food();
 }
