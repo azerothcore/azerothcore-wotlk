@@ -1389,8 +1389,7 @@ public:
             float dist = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
             float angle = frand(0.0f, 2 * M_PI);
 
-            Position pos;
-            GetCaster()->GetNearPosition(pos, dist, angle);
+            Position pos = GetCaster()->GetNearPosition(dist, angle);
             dest.Relocate(pos);
         }
 
@@ -1562,8 +1561,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                Position pos;
-                caster->GetRandomNearPosition(pos, 5.0f);
+                Position pos = caster->GetRandomNearPosition(5.0f);
                 if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
                 {
                     haunt->SetSpeed(MOVE_RUN, 0.5, true);
@@ -1602,8 +1600,7 @@ public:
 
             if (Unit* caster = GetCaster())
             {
-                Position pos;
-                caster->GetRandomNearPosition(pos, 5.0f);
+                Position pos = caster->GetRandomNearPosition(5.0f);
                 if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
                 {
                     haunt->SetSpeed(MOVE_RUN, 0.5, true);
@@ -5513,6 +5510,41 @@ public:
     }
 };
 
+enum HolidayFoodBuffEnum
+{
+    SPELL_WELL_FED = 24870,
+};
+
+// -24869 - Food
+class spell_gen_holiday_buff_food : public SpellScriptLoader
+{
+public:
+    spell_gen_holiday_buff_food() : SpellScriptLoader("spell_gen_holiday_buff_food") {}
+
+    class spell_gen_holiday_buff_food_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_holiday_buff_food_AuraScript);
+
+        void TriggerFoodBuff(AuraEffect* aurEff)
+        {
+            if (aurEff->GetTickNumber() == 10 && GetUnitOwner())
+            {
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_WELL_FED, TriggerCastFlags(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS));
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_holiday_buff_food_AuraScript::TriggerFoodBuff, EFFECT_0, SPELL_AURA_OBS_MOD_HEALTH);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_holiday_buff_food_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_silithyst();
@@ -5643,4 +5675,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_eject_passenger();
     new spell_gen_charmed_unit_spell_cooldown();
     new spell_contagion_of_rot();
+    new spell_gen_holiday_buff_food();
 }

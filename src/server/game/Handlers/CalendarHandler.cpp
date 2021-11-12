@@ -36,6 +36,7 @@ Copied events should probably have a new owner
 #include "ArenaTeamMgr.h"
 #include "CalendarMgr.h"
 #include "DatabaseEnv.h"
+#include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
@@ -155,6 +156,11 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     for (uint32 entry : sGameEventMgr->modifiedHolidays)
     {
         HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(entry);
+
+        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, sGameEventMgr->GetHolidayEventId(holiday->Id), nullptr))
+        {
+            continue;
+        }
 
         data << uint32(holiday->Id);                        // m_ID
         data << uint32(holiday->Region);                    // m_region, might be looping

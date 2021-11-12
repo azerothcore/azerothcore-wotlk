@@ -1684,11 +1684,11 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
 }
 
-void WorldObject::GetRandomPoint(const Position& srcPos, float distance, Position& pos) const
+Position WorldObject::GetRandomPoint(const Position& srcPos, float distance) const
 {
     float x, y, z;
     GetRandomPoint(srcPos, distance, x, y, z);
-    pos.Relocate(x, y, z, GetOrientation());
+    return Position(x, y, z, GetOrientation());
 }
 
 void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
@@ -2533,10 +2533,10 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
     return creature;
 }
 
-GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
+GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range, bool onlySpawned /*= false*/) const
 {
     GameObject* go = nullptr;
-    Acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
+    Acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range, onlySpawned);
     Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
     Cell::VisitGridObjects(this, searcher, range);
     return go;
@@ -2797,22 +2797,18 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     return true;
 }
 
-void WorldObject::GetNearPosition(Position& pos, float dist, float angle)
+Position WorldObject::GetNearPosition(float dist, float angle)
 {
-    GetPosition(&pos);
+    Position pos = GetPosition();
     MovePosition(pos, dist, angle);
+    return pos;
 }
 
-void WorldObject::GetFirstCollisionPosition(Position& pos, float dist, float angle)
+Position WorldObject::GetRandomNearPosition(float radius)
 {
-    GetPosition(&pos);
-    MovePositionToFirstCollision(pos, dist, angle);
-}
-
-void WorldObject::GetRandomNearPosition(Position& pos, float radius)
-{
-    GetPosition(&pos);
+    Position pos = GetPosition();
     MovePosition(pos, radius * (float) rand_norm(), (float) rand_norm() * static_cast<float>(2 * M_PI));
+    return pos;
 }
 
 void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
@@ -2820,7 +2816,8 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
-    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
+    // Exclude gameobjects from LoS calculations
+    if (fabs(this->GetPositionZ() - z) > 3.0f || (GetTypeId() != TYPEID_GAMEOBJECT && !IsWithinLOS(x, y, z)))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2926,7 +2923,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
 Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
 {
     Position pos = GetPosition();
-    GetFirstCollisionPosition(pos, dist, angle);
+    MovePositionToFirstCollision(pos, dist, angle);
     return pos;
 }
 
