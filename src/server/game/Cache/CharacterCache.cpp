@@ -127,10 +127,14 @@ void CharacterCache::UpdateCharacterData(ObjectGuid const& guid, std::string con
     itr->second.Name = name;
 
     if (gender)
+    {
         itr->second.Sex = *gender;
+    }
 
     if (race)
+    {
         itr->second.Race = *race;
+    }
 
     //WorldPackets::Misc::InvalidatePlayer packet(guid);
     //sWorld->SendGlobalMessage(packet.Write());
@@ -144,7 +148,9 @@ void CharacterCache::UpdateCharacterLevel(ObjectGuid const& guid, uint8 level)
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return;
+    }
 
     itr->second.Level = level;
 }
@@ -153,7 +159,9 @@ void CharacterCache::UpdateCharacterAccountId(ObjectGuid const& guid, uint32 acc
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return;
+    }
 
     itr->second.AccountId = accountId;
 }
@@ -162,7 +170,9 @@ void CharacterCache::UpdateCharacterGuildId(ObjectGuid const& guid, ObjectGuid::
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return;
+    }
 
     itr->second.GuildId = guildId;
 }
@@ -171,7 +181,9 @@ void CharacterCache::UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 sl
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return;
+    }
 
     ASSERT(slot < 3);
     itr->second.ArenaTeamId[slot] = arenaTeamId;
@@ -181,9 +193,22 @@ void CharacterCache::UpdateCharacterMailCount(ObjectGuid const& guid, int8 count
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return;
+    }
 
     update ? itr->second.MailCount = count : itr->second.MailCount += count;
+}
+
+void CharacterCache::UpdateCharacterGroup(ObjectGuid const& guid, uint32 groupId)
+{
+    auto itr = _characterCacheStore.find(guid);
+    if (itr == _characterCacheStore.end())
+    {
+        return;
+    }
+
+    itr->second.GroupId = groupId;
 }
 
 /*
@@ -198,7 +223,9 @@ CharacterCacheEntry const* CharacterCache::GetCharacterCacheByGuid(ObjectGuid co
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr != _characterCacheStore.end())
+    {
         return &itr->second;
+    }
 
     return nullptr;
 }
@@ -207,7 +234,9 @@ CharacterCacheEntry const* CharacterCache::GetCharacterCacheByName(std::string c
 {
     auto itr = _characterCacheByNameStore.find(name);
     if (itr != _characterCacheByNameStore.end())
+    {
         return itr->second;
+    }
 
     return nullptr;
 }
@@ -216,7 +245,9 @@ ObjectGuid CharacterCache::GetCharacterGuidByName(std::string const& name) const
 {
     auto itr = _characterCacheByNameStore.find(name);
     if (itr != _characterCacheByNameStore.end())
+    {
         return itr->second->Guid;
+    }
 
     return ObjectGuid::Empty;
 }
@@ -225,7 +256,9 @@ bool CharacterCache::GetCharacterNameByGuid(ObjectGuid guid, std::string& name) 
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return false;
+    }
 
     name = itr->second.Name;
     return true;
@@ -235,7 +268,9 @@ uint32 CharacterCache::GetCharacterTeamByGuid(ObjectGuid guid) const
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return 0;
+    }
 
     return Player::TeamIdForRace(itr->second.Race);
 }
@@ -244,7 +279,9 @@ uint32 CharacterCache::GetCharacterAccountIdByGuid(ObjectGuid guid) const
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return 0;
+    }
 
     return itr->second.AccountId;
 }
@@ -253,7 +290,9 @@ uint32 CharacterCache::GetCharacterAccountIdByName(std::string const& name) cons
 {
     auto itr = _characterCacheByNameStore.find(name);
     if (itr != _characterCacheByNameStore.end())
+    {
         return itr->second->AccountId;
+    }
 
     return 0;
 }
@@ -262,7 +301,9 @@ uint8 CharacterCache::GetCharacterLevelByGuid(ObjectGuid guid) const
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return 0;
+    }
 
     return itr->second.Level;
 }
@@ -271,7 +312,9 @@ ObjectGuid::LowType CharacterCache::GetCharacterGuildIdByGuid(ObjectGuid guid) c
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return 0;
+    }
 
     return itr->second.GuildId;
 }
@@ -280,7 +323,9 @@ uint32 CharacterCache::GetCharacterArenaTeamIdByGuid(ObjectGuid guid, uint8 type
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
+    {
         return 0;
+    }
 
     uint8 slot = ArenaTeam::GetSlotByType(type);
     ASSERT(slot < 3);
