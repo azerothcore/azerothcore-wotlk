@@ -208,7 +208,8 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
     // This is quite handy for escort quests and other stuff
     if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
     {
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        creature->StopMoving();
+        Stop(1000);
         return true;
     }
 
@@ -219,23 +220,6 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
     // Xinef: Dont allow dead creatures to move
     if (!creature->IsAlive())
         return false;
-
-    // prevent movement while casting spells with cast time or channel time
-    if (creature->HasUnitState(UNIT_STATE_CASTING))
-    {
-        bool stop = true;
-        if (Spell* spell = creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (!(spell->GetSpellInfo()->ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING)) && !(spell->GetSpellInfo()->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
-                stop = false;
-
-        if (stop)
-        {
-            Stop(1000);
-            if (!creature->IsStopped())
-                creature->StopMoving();
-            return true;
-        }
-    }
 
     if (Stopped())
     {

@@ -100,7 +100,7 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
 
     if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
     {
-        unit->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        unit->StopMoving();
         return true;
     }
 

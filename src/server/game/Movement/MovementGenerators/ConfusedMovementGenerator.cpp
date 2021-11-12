@@ -123,6 +123,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 {
     if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
     {
+        unit->StopMoving();
         return true;
     }
 

@@ -263,7 +263,7 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
     if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
     {
         _nextMoveTime.Reset(0);  // Expire the timer
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        creature->StopMoving();
         return true;
     }
 
@@ -273,23 +273,6 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
         _nextMoveTime.Reset(0);  // Expire the timer
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
         return true;
-    }
-
-    // prevent movement while casting spells with cast time or channel time
-    if (creature->HasUnitState(UNIT_STATE_CASTING))
-    {
-        bool stop = true;
-        if (Spell* spell = creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (!(spell->GetSpellInfo()->ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING)) && !(spell->GetSpellInfo()->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
-                stop = false;
-
-        if (stop)
-        {
-            if (!creature->IsStopped())
-                creature->StopMoving();
-
-            return true;
-        }
     }
 
     if (creature->movespline->Finalized())

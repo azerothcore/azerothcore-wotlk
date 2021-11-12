@@ -350,7 +350,7 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
-        owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
+        owner->StopMoving();
         return true;
     }
 
@@ -389,7 +389,7 @@ bool TimedFleeingMovementGenerator::Update(Unit* owner, uint32 time_diff)
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
-        owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
+        owner->StopMoving();
         return true;
     }
 
