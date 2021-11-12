@@ -18,7 +18,7 @@
 #ifndef DEF_AHNKAHET_H
 #define DEF_AHNKAHET_H
 
-#define AhnahetScriptName "instance_ahnkahet"
+#define AhnKahetScriptName "instance_ahnkahet"
 constexpr uint32 MAX_ENCOUNTER = 5;
 enum AhnkahetData
 {
@@ -66,9 +66,9 @@ enum AhnKahetActions
 };
 
 template <class AI, class T>
-inline AI* GetAhnkahetAI(T* obj)
+inline AI* GetAhnKahetAI(T* obj)
 {
-    return GetInstanceAI<AI>(obj, AhnahetScriptName);
+    return GetInstanceAI<AI>(obj, AhnKahetScriptName);
 }
 
 #endif // DEF_AHNKAHET_H
