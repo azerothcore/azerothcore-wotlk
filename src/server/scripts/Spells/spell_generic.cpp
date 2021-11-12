@@ -1002,8 +1002,7 @@ class spell_gen_random_target32 : public SpellScript
         float dist = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
         float angle = frand(0.0f, 2 * M_PI);
 
-        Position pos;
-        GetCaster()->GetNearPosition(pos, dist, angle);
+        Position pos = GetCaster()->GetNearPosition(dist, angle);
         dest.Relocate(pos);
     }
 
@@ -1116,8 +1115,7 @@ class spell_gen_haunted : public SpellScript
 
         if (Unit* caster = GetCaster())
         {
-            Position pos;
-            caster->GetRandomNearPosition(pos, 5.0f);
+            Position pos = caster->GetRandomNearPosition(5.0f);
             if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
             {
                 haunt->SetSpeed(MOVE_RUN, 0.5, true);
@@ -1146,8 +1144,7 @@ class spell_gen_haunted_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            Position pos;
-            caster->GetRandomNearPosition(pos, 5.0f);
+            Position pos = caster->GetRandomNearPosition(5.0f);
             if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
             {
                 haunt->SetSpeed(MOVE_RUN, 0.5, true);
@@ -4311,6 +4308,30 @@ class spell_silithyst : public AuraScript
     }
 };
 
+enum HolidayFoodBuffEnum
+{
+    SPELL_WELL_FED = 24870,
+};
+
+// -24869 - Food
+class spell_gen_holiday_buff_food : public AuraScript
+{
+    PrepareAuraScript(spell_gen_holiday_buff_food);
+
+    void TriggerFoodBuff(AuraEffect* aurEff)
+    {
+        if (aurEff->GetTickNumber() == 10 && GetUnitOwner())
+        {
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_WELL_FED, TriggerCastFlags(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS));
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_holiday_buff_food::TriggerFoodBuff, EFFECT_0, SPELL_AURA_OBS_MOD_HEALTH);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4441,4 +4462,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_eject_passenger);
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_contagion_of_rot);
+    RegisterSpellScript(spell_gen_holiday_buff_food);
 }

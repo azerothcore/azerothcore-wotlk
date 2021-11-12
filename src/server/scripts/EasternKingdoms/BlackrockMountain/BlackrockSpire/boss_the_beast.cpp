@@ -62,8 +62,7 @@ public:
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         _me->SetReactState(REACT_PASSIVE);
-        Position movePos;
-        _me->GetRandomPoint(OrcsRunawayPosition, 10.0f, movePos);
+        Position movePos = _me->GetRandomPoint(OrcsRunawayPosition, 10.0f);
         _me->GetMotionMaster()->MovePoint(1, movePos);
         return true;
     }
