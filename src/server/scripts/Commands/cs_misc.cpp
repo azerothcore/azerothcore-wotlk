@@ -675,7 +675,7 @@ public:
             if (handler->HasLowerSecurity(targetPlayer))
             {
                 return false;
-            }            
+            }
 
             Map* map = targetPlayer->GetMap();
             if (map->IsBattlegroundOrArena())
