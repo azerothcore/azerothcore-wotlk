@@ -35,6 +35,7 @@ public:
             _pylonsState = 0;
             _northWingProgress = 0;
             _northWingBosses = 0;
+            HighborneSummoners.clear();
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -43,10 +44,25 @@ public:
             {
                 case NPC_IMMOL_THAR:
                     _immoltharGUID = creature->GetGUID();
+                    if (_pylonsState == ALL_PYLONS_OFF)
+                    {
+                        creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                    else
+                    {
+                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
                     break;
                 case NPC_HIGHBORNE_SUMMONER:
                     if (_pylonsState == ALL_PYLONS_OFF)
+                    {
                         creature->DespawnOrUnsummon(5000);
+                    }
+                    else
+                    {
+                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                    HighborneSummoners.push_back(creature->GetGUID());
                     break;
             }
         }
@@ -100,6 +116,14 @@ public:
                         {
                             immol->setActive(true);
                             immol->GetAI()->SetData(1, 1);
+                            immol->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        }
+                        for (const auto& guid : HighborneSummoners)
+                        {
+                            if (Creature* summoner = instance->GetCreature(guid))
+                            {
+                                summoner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            }
                         }
                     }
                     break;
@@ -153,6 +177,7 @@ public:
         uint32 _northWingBosses;
 
         ObjectGuid _immoltharGUID;
+        std::vector<ObjectGuid> HighborneSummoners;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
