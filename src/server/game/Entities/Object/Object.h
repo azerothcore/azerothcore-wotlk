@@ -354,11 +354,6 @@ struct Position
         z = m_positionZ;
         o = m_orientation;
     }
-    void GetPosition(Position* pos) const
-    {
-        if (pos)
-            pos->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
-    }
 
     [[nodiscard]] Position GetPosition() const { return *this; }
 
@@ -697,13 +692,12 @@ public:
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
-    void GetNearPosition(Position& pos, float dist, float angle);
+    Position GetNearPosition(float dist, float angle);
     void MovePositionToFirstCollision(Position& pos, float dist, float angle);
     Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
     Position GetFirstCollisionPosition(float destX, float destY, float destZ);
     Position GetFirstCollisionPosition(float dist, float angle);
-    void GetFirstCollisionPosition(Position& pos, float dist, float angle);
-    void GetRandomNearPosition(Position& pos, float radius);
+    Position GetRandomNearPosition(float radius);
 
     void GetContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
     void GetChargeContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
@@ -715,7 +709,7 @@ public:
     void UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ = nullptr) const;
 
     void GetRandomPoint(const Position& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
-    void GetRandomPoint(const Position& srcPos, float distance, Position& pos) const;
+    Position GetRandomPoint(const Position& srcPos, float distance) const;
 
     [[nodiscard]] uint32 GetInstanceId() const { return m_InstanceId; }
 
@@ -818,7 +812,7 @@ public:
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
     [[nodiscard]] Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
-    [[nodiscard]] GameObject* FindNearestGameObject(uint32 entry, float range) const;
+    [[nodiscard]] GameObject* FindNearestGameObject(uint32 entry, float range, bool onlySpawned = false) const;
     [[nodiscard]] GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
 
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
