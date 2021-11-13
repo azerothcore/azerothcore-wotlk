@@ -31,11 +31,11 @@ namespace
     std::unordered_map<std::string, CharacterCacheEntry*> _characterCacheByNameStore;
 }
 
-CharacterCache::CharacterCache()
+CharacterCache::CharacterCache() noexcept
 {
 }
 
-CharacterCache::~CharacterCache()
+CharacterCache::~CharacterCache() noexcept
 {
 }
 
