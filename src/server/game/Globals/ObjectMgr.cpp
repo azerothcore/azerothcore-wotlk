@@ -717,8 +717,8 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6         7
-    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_template_addon");
+    //                                                0       1       2      3       4       5              6               7
+    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, visibilityDistanceType, auras FROM creature_template_addon");
 
     if (!result)
     {
@@ -747,7 +747,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
-        creatureAddon.isLarge = fields[6].GetBool();
+        creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
         uint8 i = 0;
@@ -778,6 +778,11 @@ void ObjectMgr::LoadCreatureTemplateAddons()
             creatureAddon.emote = 0;
         }
 
+        if (creatureAddon.visibilityDistanceType >= VisibilityDistanceType::Max)
+        {
+            LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid visibilityDistanceType (%u) defined in `creature_template_addon`.", entry, AsUnderlyingType(creatureAddon.visibilityDistanceType));
+            creatureAddon.visibilityDistanceType = VisibilityDistanceType::Normal;
+        }
         ++count;
     } while (result->NextRow());
 
@@ -1135,8 +1140,8 @@ void ObjectMgr::LoadCreatureAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6        7
-    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_addon");
+    //                                                0       1       2      3       4       5             6                7
+    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, visibilityDistanceType, auras FROM creature_addon");
 
     if (!result)
     {
@@ -1172,7 +1177,7 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
-        creatureAddon.isLarge = fields[6].GetBool();
+        creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
         uint8 i = 0;
@@ -1201,6 +1206,12 @@ void ObjectMgr::LoadCreatureAddons()
         {
             LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid emote (%u) defined in `creature_addon`.", guid, creatureAddon.emote);
             creatureAddon.emote = 0;
+        }
+
+        if (creatureAddon.visibilityDistanceType >= VisibilityDistanceType::Max)
+        {
+            LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid visibilityDistanceType (%u) defined in `creature_addon`.", guid, AsUnderlyingType(creatureAddon.visibilityDistanceType));
+            creatureAddon.visibilityDistanceType = VisibilityDistanceType::Normal;
         }
 
         ++count;
