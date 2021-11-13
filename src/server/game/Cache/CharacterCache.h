@@ -42,7 +42,7 @@ class AC_GAME_API CharacterCache
 {
     public:
         CharacterCache() = default;
-        ~CharacterCache() = default;
+        ~CharacterCache() noexcept = default;
         static CharacterCache* instance();
 
         void LoadCharacterCacheStorage();
