@@ -41,8 +41,8 @@ struct CharacterCacheEntry
 class AC_GAME_API CharacterCache
 {
     public:
-        CharacterCache();
-        ~CharacterCache();
+        CharacterCache() = default;
+        ~CharacterCache() = default;
         static CharacterCache* instance();
 
         void LoadCharacterCacheStorage();
