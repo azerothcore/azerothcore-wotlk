@@ -216,8 +216,7 @@ public:
             if (!sindragosa->IsAlive())
                 return true;
 
-            Position pos;
-            _owner->GetPosition(&pos);
+            Position pos = _owner->GetPosition();
             _owner->UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
 
             if (TempSummon* summon = sindragosa->SummonCreature(NPC_ICE_TOMB, pos))

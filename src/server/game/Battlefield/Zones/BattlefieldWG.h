@@ -1338,8 +1338,7 @@ struct BfWGGameObjectBuilding
             // Spawn Turret bottom
             for (uint8 i = 0; i < TowerCannon[towerid].nbTowerCannonBottom; i++)
             {
-                Position turretPos;
-                TowerCannon[towerid].TowerCannonBottom[i].GetPosition(&turretPos);
+                Position turretPos = TowerCannon[towerid].TowerCannonBottom[i].GetPosition();
                 if (Creature* turret = m_WG->SpawnCreature(NPC_WINTERGRASP_TOWER_CANNON, turretPos, TEAM_ALLIANCE))
                 {
                     m_TowerCannonBottomList.insert(turret->GetGUID());
@@ -1350,8 +1349,7 @@ struct BfWGGameObjectBuilding
             // Spawn Turret top
             for (uint8 i = 0; i < TowerCannon[towerid].nbTurretTop; i++)
             {
-                Position towerCannonPos;
-                TowerCannon[towerid].TurretTop[i].GetPosition(&towerCannonPos);
+                Position towerCannonPos = TowerCannon[towerid].TurretTop[i].GetPosition();
                 if (Creature* turret = m_WG->SpawnCreature(NPC_WINTERGRASP_TOWER_CANNON, towerCannonPos, TEAM_ALLIANCE))
                 {
                     m_TurretTopList.insert(turret->GetGUID());
