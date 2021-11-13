@@ -99,6 +99,32 @@ void CharacterCache::LoadCharacterCacheStorage()
     LOG_INFO("server.loading", " ");
 }
 
+void CharacterCache::RefreshCacheEntry(uint32 lowGuid)
+{
+    QueryResult result = CharacterDatabase.PQuery("SELECT guid, name, account, race, gender, class, level FROM characters WHERE guid = %u", lowGuid);
+    if (!result)
+    {
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+        DeleteCharacterCacheEntry(ObjectGuid::Create<HighGuid::Player>(lowGuid), fields[1].GetString());
+        AddCharacterCacheEntry(ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32()) /*guid*/, fields[2].GetUInt32() /*account*/, fields[1].GetString() /*name*/, fields[4].GetUInt8() /*gender*/, fields[3].GetUInt8() /*race*/, fields[5].GetUInt8() /*class*/, fields[6].GetUInt8() /*level*/);
+    } while (result->NextRow());
+
+    QueryResult mailCountResult = CharacterDatabase.PQuery("SELECT receiver, COUNT(receiver) FROM mail WHERE receiver = %u GROUP BY receiver", lowGuid);
+    if (mailCountResult)
+    {
+        do
+        {
+            Field* fields = mailCountResult->Fetch();
+            UpdateCharacterMailCount(ObjectGuid(HighGuid::Player, fields[0].GetUInt32()), static_cast<int8>(fields[1].GetUInt64()), true);
+        } while (mailCountResult->NextRow());
+    }
+}
+
 /*
 Modifying functions
 */
