@@ -1191,7 +1191,6 @@ void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)
     m_visibilityDistanceOverride = VisibilityDistances[AsUnderlyingType(type)];
 }
 
-
 void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 {
     if (IsInWorld())

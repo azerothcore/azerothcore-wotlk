@@ -2512,7 +2512,6 @@ bool Creature::LoadCreaturesAddon(bool reload)
     if (cainfo->visibilityDistanceType != VisibilityDistanceType::Normal)
         SetVisibilityDistanceOverride(cainfo->visibilityDistanceType);
 
-
     //Load Path
     if (cainfo->path_id != 0)
     {
