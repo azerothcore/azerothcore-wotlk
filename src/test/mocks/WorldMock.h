@@ -21,15 +21,17 @@
 #include "ArenaSpectator.h"
 #include "gmock/gmock.h"
 #include "IWorld.h"
+#include "Timer.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 void AddScripts() {}
 
-class WorldMock: public IWorld {
+class WorldMock: public IWorld
+{
 public:
-    ~WorldMock() override {}
+    ~WorldMock() override { }
     MOCK_METHOD(WorldSession*, FindSession, (uint32 id), (const));
     MOCK_METHOD(WorldSession*, FindOfflineSession, (uint32 id), (const));
     MOCK_METHOD(WorldSession*, FindOfflineSessionForCharacterGUID, (ObjectGuid::LowType guidLow),(const));
@@ -65,9 +67,9 @@ public:
     MOCK_METHOD(std::string const&, GetNewCharString, (), (const));
     MOCK_METHOD(LocaleConstant, GetDefaultDbcLocale, (), (const));
     MOCK_METHOD(std::string const&, GetDataPath, (), (const));
-    MOCK_METHOD(time_t, GetNextDailyQuestsResetTime, (), (const));
-    MOCK_METHOD(time_t, GetNextWeeklyQuestsResetTime, (), (const));
-    MOCK_METHOD(time_t, GetNextRandomBGResetTime, (), (const));
+    MOCK_METHOD(Seconds, GetNextDailyQuestsResetTime, (), (const));
+    MOCK_METHOD(Seconds, GetNextWeeklyQuestsResetTime, (), (const));
+    MOCK_METHOD(Seconds, GetNextRandomBGResetTime, (), (const));
     MOCK_METHOD(uint16, GetConfigMaxSkillValue, (), (const));
     MOCK_METHOD(void, SetInitialWorldSettings, ());
     MOCK_METHOD(void, LoadConfigSettings, (bool reload), ());
