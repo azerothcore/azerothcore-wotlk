@@ -792,7 +792,10 @@ class spell_pri_vampiric_touch : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), 57669, true, nullptr, aurEff);
+        if (Unit* actor = eventInfo.GetActor())
+        {
+            actor->CastSpell(actor, 57669, true, nullptr, aurEff);
+        }
     }
 
     void Register() override
