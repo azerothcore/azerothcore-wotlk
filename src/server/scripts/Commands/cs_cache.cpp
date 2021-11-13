@@ -23,7 +23,7 @@ using namespace Acore::ChatCommands;
 class cache_commandscript : public CommandScript
 {
 public:
-    cache_commandscript() : CommandScript("learn_commandscript") { }
+    cache_commandscript() : CommandScript("cache_commandscript") { }
 
     ChatCommandTable GetCommands() const override
     {
