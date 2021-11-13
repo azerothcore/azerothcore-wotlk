@@ -1143,6 +1143,32 @@ public:
     }
 };
 
+// 69483 - Dark Reckoning
+class spell_deathwhisper_dark_reckoning : public AuraScript
+{
+    PrepareAuraScript(spell_deathwhisper_dark_reckoning);
+
+    bool Validate(SpellInfo const* spell) override
+    {
+        return ValidateSpellInfo({ spell->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+        {
+            uint32 spellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+            caster->CastSpell(GetTarget(), spellId, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathwhisper_dark_reckoning::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 class at_lady_deathwhisper_entrance : public AreaTriggerScript
 {
 public:
@@ -1161,11 +1187,17 @@ public:
 
 void AddSC_boss_lady_deathwhisper()
 {
+    // Creatures
     new boss_lady_deathwhisper();
     new npc_cult_fanatic();
     new npc_cult_adherent();
     new npc_vengeful_shade();
     new npc_darnavan();
+
+    // Spells
     new spell_deathwhisper_mana_barrier();
+    RegisterSpellScript(spell_deathwhisper_dark_reckoning);
+
+    // AreaTriggers
     new at_lady_deathwhisper_entrance();
 }
