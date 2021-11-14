@@ -376,7 +376,7 @@ public:
                 case DATA_UROK_DOOMHOWL:
                     if (data == FAIL)
                     {
-                        if (!(GetBossState(DATA_UROK_DOOMHOWL) == NOT_STARTED))
+                        if (GetBossState(DATA_UROK_DOOMHOWL) != NOT_STARTED)
                         {
                             SetBossState(DATA_UROK_DOOMHOWL, NOT_STARTED);
                             if (GameObject* challenge = instance->GetGameObject(go_urokChallenge))
@@ -395,7 +395,7 @@ public:
                                     circle->Delete();
                                 }
                             }
-                            for (const auto& mobGUID: UrokMobs)
+                            for (const auto& mobGUID : UrokMobs)
                             {
                                 if (Creature* mob = instance->GetCreature(mobGUID))
                                 {
@@ -510,6 +510,10 @@ public:
                     return go_emberseerrunes[6];
                 case GO_PORTCULLIS_ACTIVE:
                     return go_portcullis_active;
+                case GO_UROK_PILE:
+                    return go_urokPile;
+                case GO_UROK_CHALLENGE:
+                    return go_urokChallenge;
                 default:
                     break;
             }
