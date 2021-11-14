@@ -18,6 +18,7 @@
 #ifndef CharacterCache_h__
 #define CharacterCache_h__
 
+#include "ArenaTeam.h"
 #include "Define.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
@@ -34,7 +35,7 @@ struct CharacterCacheEntry
     uint8 Level;
     uint8 MailCount;
     ObjectGuid::LowType GuildId;
-    uint32 ArenaTeamId[3];
+    std::array<uint32, MAX_ARENA_SLOT> ArenaTeamId;
     ObjectGuid GroupGuid;
 };
 
