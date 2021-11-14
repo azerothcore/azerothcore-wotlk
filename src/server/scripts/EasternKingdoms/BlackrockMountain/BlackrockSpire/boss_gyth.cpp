@@ -94,7 +94,10 @@ public:
         }
 
         // Prevent clearing summon list, otherwise Rend despawns if the drake is killed first.
-        void JustDied(Unit* /*killer*/) override { }
+        void JustDied(Unit* /*killer*/) override
+        {
+            instance->SetBossState(DATA_GYTH, DONE);
+        }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {

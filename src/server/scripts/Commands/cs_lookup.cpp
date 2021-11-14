@@ -94,7 +94,7 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (auto const& areaEntry : sAreaTableStore)
+        for (auto areaEntry : sAreaTableStore)
         {
             int locale = handler->GetSessionDbcLocale();
             std::string name = areaEntry->area_name[locale];
@@ -336,7 +336,7 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        for (auto const& factionEntry : sFactionStore)
+        for (auto factionEntry : sFactionStore)
         {
             FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
 
@@ -882,7 +882,7 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in SkillLine.dbc
-        for (auto const& skillInfo : sSkillLineStore)
+        for (auto skillInfo : sSkillLineStore)
         {
             int locale = handler->GetSessionDbcLocale();
             std::string name = skillInfo->name[locale];
@@ -1240,7 +1240,7 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in TaxiNodes.dbc
-        for (auto const& nodeEntry : sTaxiNodesStore)
+        for (auto nodeEntry : sTaxiNodesStore)
         {
             int locale = handler->GetSessionDbcLocale();
             std::string name = nodeEntry->name[locale];
@@ -1388,7 +1388,7 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in CharTitles.dbc
-        for (auto const& titleInfo : sCharTitlesStore)
+        for (auto titleInfo : sCharTitlesStore)
         {
             int locale = handler->GetSessionDbcLocale();
             std::string name = titleInfo->nameMale[locale];
@@ -1471,7 +1471,7 @@ public:
         uint8 locale = handler->GetSession() ? handler->GetSession()->GetSessionDbcLocale() : sWorld->GetDefaultDbcLocale();
 
         // search in Map.dbc
-        for (auto const& mapInfo : sMapStore)
+        for (auto mapInfo : sMapStore)
         {
             std::string name = mapInfo->name[locale];
 
