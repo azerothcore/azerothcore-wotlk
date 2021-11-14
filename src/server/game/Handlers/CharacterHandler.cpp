@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -18,12 +29,14 @@
 #include "GuildMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerDump.h"
+#include "QueryHolder.h"
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -32,15 +45,14 @@
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "QueryHolder.h"
-#include "StringConvert.h"
-#include "Tokenize.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -111,19 +123,14 @@ bool LoginQueryHolder::Initialize()
     stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_ACTIONS, stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
     stmt->setUInt32(0, lowGuid);
     stmt->setUInt32(1, uint32(time(nullptr)));
-    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT, stmt);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAILS, stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
     stmt->setUInt32(0, lowGuid);
-    stmt->setUInt32(1, uint32(time(nullptr)));
-    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT, stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILDATE);
-    stmt->setUInt32(0, lowGuid);
-    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE, stmt);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_ITEMS, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_SOCIALLIST);
     stmt->setUInt32(0, lowGuid);
@@ -658,16 +665,22 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
-    if (PlayerLoading() || GetPlayer() != nullptr)
-    {
-        LOG_ERROR("network", "Player tries to login again, AccountId = %d", GetAccountId());
-        KickPlayer("WorldSession::HandlePlayerLoginOpcode Another client logging in");
-        return;
-    }
-
     m_playerLoading = true;
     ObjectGuid playerGuid;
     recvData >> playerGuid;
+
+    if (PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
+    {
+        // limit player interaction with the world
+        if (!sWorld->getBoolConfig(CONFIG_REALM_LOGIN_ENABLED))
+        {
+            WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
+            // see LoginFailureReason enum for more reasons
+            data << uint8(LoginFailureReason::NoWorld);
+            SendPacket(&data);
+            return;
+        }
+    }
 
     if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
     {
@@ -945,7 +958,9 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
     if (pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
-        pCurrChar->SetContestedPvP();
+    {
+        pCurrChar->SetContestedPvP(nullptr, false);
+    }
 
     // Apply at_login requests
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
@@ -982,7 +997,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
         SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077 });
 
-        switch (pCurrChar->getFaction())
+        switch (pCurrChar->GetFaction())
         {
             case ALLIANCE:
                 SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946 });
@@ -1079,6 +1094,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
         sScriptMgr->OnFirstLogin(pCurrChar);
     }
+
+    METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 }
 
 void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
