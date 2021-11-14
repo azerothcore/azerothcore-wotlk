@@ -803,7 +803,7 @@ class spell_warl_demonic_circle_summon : public AuraScript
 {
     PrepareAuraScript(spell_warl_demonic_circle_summon);
 
-    bool Validate(SpellInfo const* /*spellInfo*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_CIRCLE_ALLOW_CAST, SPELL_WARLOCK_DEMONIC_CIRCLE_TELEPORT });
     }
@@ -849,7 +849,7 @@ class spell_warl_demonic_circle_teleport : public AuraScript
 {
     PrepareAuraScript(spell_warl_demonic_circle_teleport);
 
-    bool Validate(SpellInfo const* /*spellInfo*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_CIRCLE_SUMMON });
     }
@@ -1020,7 +1020,7 @@ class spell_warl_health_funnel : public AuraScript
 {
     PrepareAuraScript(spell_warl_health_funnel);
 
-    bool Validate(SpellInfo const* /*spellInfo*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({
             SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R2,
