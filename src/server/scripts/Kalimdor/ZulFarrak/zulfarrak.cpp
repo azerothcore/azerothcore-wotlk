@@ -273,7 +273,7 @@ public:
     private:
         void initBlyCrewMember(uint32 entry, float x, float y, float z)
         {
-            if (Creature* crew = ObjectAccessor::GetCreature(*go, instance->GetGuidData(entry)))
+            if (Creature* crew = ObjectAccessor::GetCreature(*me, instance->GetGuidData(entry)))
             {
                 crew->SetReactState(REACT_AGGRESSIVE);
                 crew->SetWalk(true);
