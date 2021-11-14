@@ -843,7 +843,7 @@ public:
 
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
-    bool IsFarVisible() const { return m_isFarVisible; }
+    [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
     [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
     void SetVisibilityDistanceOverride(VisibilityDistanceType type);
     void SetWorldObject(bool apply);
