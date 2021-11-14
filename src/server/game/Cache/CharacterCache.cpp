@@ -31,14 +31,6 @@ namespace
     std::unordered_map<std::string, CharacterCacheEntry*> _characterCacheByNameStore;
 }
 
-CharacterCache::CharacterCache()
-{
-}
-
-CharacterCache::~CharacterCache()
-{
-}
-
 CharacterCache* CharacterCache::instance()
 {
     static CharacterCache instance;
