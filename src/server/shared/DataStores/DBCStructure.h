@@ -951,7 +951,7 @@ struct FactionTemplateEntry
     [[nodiscard]] bool IsPVPFaction() const
     {
         // lists the various factions that are linked to PVP. Warsong, defilers, silverwing, etc.
-        constexpr std::array<uint32, 16> pvpFactions = { 1515, 1641, 412, 1598, 1514, 1642, 1577, 1599, 1214, 1215, 1335, 1554, 1597, 1216, 1217, 1334, 1534, 1596 };
+        constexpr std::array<uint32, 18> pvpFactions = { 1515, 1641, 412, 1598, 1514, 1642, 1577, 1599, 1214, 1215, 1335, 1554, 1597, 1216, 1217, 1334, 1534, 1596 };
         for (const auto& faction : pvpFactions)
         {
             if (ID == faction)
