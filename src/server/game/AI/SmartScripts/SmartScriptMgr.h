@@ -1462,6 +1462,13 @@ struct SmartTarget
 
         struct
         {
+            uint32 entry;
+            uint32 dist;
+            uint32 onlySpawned;
+        } closestGameobject;
+
+        struct
+        {
             uint32 maxDist;
             uint32 playerOnly;
         } closestAttackable;
