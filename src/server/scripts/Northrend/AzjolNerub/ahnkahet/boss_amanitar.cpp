@@ -108,7 +108,7 @@ public:
 
     struct boss_amanitarAI : public BossAI
     {
-        boss_amanitarAI(Creature *creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
+        boss_amanitarAI(Creature* creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
         {
             creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
             creature->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
@@ -239,7 +239,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<boss_amanitarAI>(creature);
+        return GetAhnKahetAI<boss_amanitarAI>(creature);
     }
 };
 
@@ -342,7 +342,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<npc_amanitar_mushroomsAI>(creature);
+        return GetAhnKahetAI<npc_amanitar_mushroomsAI>(creature);
     }
 };
 

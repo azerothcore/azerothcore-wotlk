@@ -34,72 +34,50 @@ enum PriestSpells
     SPELL_PRIEST_LIGHTWELL_CHARGES          = 59907
 };
 
-class npc_pet_pri_lightwell : public CreatureScript
+struct npc_pet_pri_lightwell : public TotemAI
 {
-public:
-    npc_pet_pri_lightwell() : CreatureScript("npc_pet_pri_lightwell") { }
+    npc_pet_pri_lightwell(Creature* creature) : TotemAI(creature) { }
 
-    struct npc_pet_pri_lightwellAI : public TotemAI
+    void InitializeAI() override
     {
-        npc_pet_pri_lightwellAI(Creature* creature) : TotemAI(creature) { }
-
-        void InitializeAI() override
+        if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
         {
-            if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
-            {
-                uint32 hp = uint32(owner->GetMaxHealth() * 0.3f);
-                me->SetMaxHealth(hp);
-                me->SetHealth(hp);
-                me->SetLevel(owner->getLevel());
-            }
-
-            me->CastSpell(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false); // Spell for Lightwell Charges
-            TotemAI::InitializeAI();
+            uint32 hp = uint32(owner->GetMaxHealth() * 0.3f);
+            me->SetMaxHealth(hp);
+            me->SetHealth(hp);
+            me->SetLevel(owner->getLevel());
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_pet_pri_lightwellAI(creature);
+        me->CastSpell(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false); // Spell for Lightwell Charges
+        TotemAI::InitializeAI();
     }
 };
 
-class npc_pet_pri_shadowfiend : public CreatureScript
+struct npc_pet_pri_shadowfiend : public PetAI
 {
-public:
-    npc_pet_pri_shadowfiend() : CreatureScript("npc_pet_pri_shadowfiend") { }
+    npc_pet_pri_shadowfiend(Creature* creature) : PetAI(creature) { }
 
-    struct npc_pet_pri_shadowfiendAI : public PetAI
+    void Reset() override
     {
-        npc_pet_pri_shadowfiendAI(Creature* creature) : PetAI(creature) { }
+        PetAI::Reset();
+        if (!me->HasAura(SPELL_PRIEST_SHADOWFIEND_DODGE))
+            me->AddAura(SPELL_PRIEST_SHADOWFIEND_DODGE, me);
 
-        void Reset() override
-        {
-            PetAI::Reset();
-            if (!me->HasAura(SPELL_PRIEST_SHADOWFIEND_DODGE))
-                me->AddAura(SPELL_PRIEST_SHADOWFIEND_DODGE, me);
+        if (Unit* target = me->SelectNearestTarget(15.0f))
+            AttackStart(target);
+    }
 
-            if (Unit* target = me->SelectNearestTarget(15.0f))
-                AttackStart(target);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (me->IsSummon())
-                if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
-                    if (owner->HasAura(SPELL_PRIEST_GLYPH_OF_SHADOWFIEND))
-                        owner->CastSpell(owner, SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA, true);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustDied(Unit* /*killer*/) override
     {
-        return new npc_pet_pri_shadowfiendAI(creature);
+        if (me->IsSummon())
+            if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
+                if (owner->HasAura(SPELL_PRIEST_GLYPH_OF_SHADOWFIEND))
+                    owner->CastSpell(owner, SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA, true);
     }
 };
 
 void AddSC_priest_pet_scripts()
 {
-    new npc_pet_pri_lightwell();
-    new npc_pet_pri_shadowfiend();
+    RegisterCreatureAI(npc_pet_pri_lightwell);
+    RegisterCreatureAI(npc_pet_pri_shadowfiend);
 }

@@ -272,6 +272,9 @@ struct TriggeredByAuraSpellData
 
     void Init(AuraEffect const* aurEff);
 
+    operator bool() const { return spellInfo != nullptr; }
+    bool operator!() const { return !(bool(*this)); }
+
     SpellInfo const* spellInfo;
     int8 effectIndex;
     uint32 tickNumber;

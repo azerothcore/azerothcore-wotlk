@@ -53,7 +53,7 @@ public:
             {
                 if (apply)
                 {
-                    me->setFaction(who->getFaction());
+                    me->SetFaction(who->GetFaction());
                     me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
                     Start(false, true, who->GetGUID());
                 }
@@ -483,7 +483,7 @@ public:
 
                 if (Player* charmer = GetValidPlayer())
                 {
-                    me->setFaction(16);
+                    me->SetFaction(FACTION_MONSTER_2);
                     charmer->SetClientControl(me, 0, true);
 
                     me->SetSpeed(MOVE_RUN, 2.0f, true);
