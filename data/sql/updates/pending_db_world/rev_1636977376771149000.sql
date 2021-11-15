@@ -1,18 +1,17 @@
---INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636977376771149000');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636977376771149000');
 
--- TODO find some free guids
-SET @BAT_GUID_1  := 1000000;
-SET @BAT_GUID_2  := 1000001;
-SET @BAT_GUID_3  := 1000002;
-SET @BAT_GUID_4  := 1000003;
-SET @BAT_GUID_5  := 1000004;
-SET @BAT_GUID_6  := 1000005;
-SET @BAT_GUID_7  := 1000006;
-SET @BAT_GUID_8  := 1000007;
-SET @BAT_GUID_9  := 1000008;
-SET @BAT_GUID_10 := 1000009;
-SET @BAT_GUID_11 := 1000010;
-SET @BAT_GUID_12 := 1000011;
+SET @BAT_GUID_1  := 201194;
+SET @BAT_GUID_2  := 201195;
+SET @BAT_GUID_3  := 201196;
+SET @BAT_GUID_4  := 201197;
+SET @BAT_GUID_5  := 201198;
+SET @BAT_GUID_6  := 201199;
+SET @BAT_GUID_7  := 201200;
+SET @BAT_GUID_8  := 201201;
+SET @BAT_GUID_9  := 201202;
+SET @BAT_GUID_10 := 201203;
+SET @BAT_GUID_11 := 201204;
+SET @BAT_GUID_12 := 201205;
 
 SET @PATH_BAT_GUID_1  := @BAT_GUID_1 * 10;
 SET @PATH_BAT_GUID_2  := @BAT_GUID_2 * 10;
@@ -36,9 +35,9 @@ SET @BAT_MOVE_DELAY := 3000; -- Bats start moving after first bell toll
 UPDATE `creature_template` SET `InhabitType`=4 WHERE `entry`=10716;        -- Flying
 UPDATE `creature_template` SET `unit_flags`=33555200 WHERE `entry`=10716;  -- UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NOT_SELECTABLE
 
--- TODO needed?
--- Table `creature_template` lists creature (Entry: 10716) with disallowed `flags_extra` 33554432, removing incorrect flag.
+-- VMangos:
 -- UPDATE `creature_template` SET `flags_extra`=33555202 WHERE `entry`=10716; -- 0x2000302 CREATURE_FLAG_EXTRA_CIVILIAN| CREATURE_FLAG_EXTRA_NO_TAUNT | CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE | CREATURE_FLAG_EXTRA_UNUSED_26
+-- startup error -> Table `creature_template` lists creature (Entry: 10716) with disallowed `flags_extra` 33554432, removing incorrect flag.
 
 DELETE FROM `creature` WHERE `guid`=@BAT_GUID_1;
 DELETE FROM `creature` WHERE `guid`=@BAT_GUID_2;
