@@ -28,6 +28,7 @@
 #include "LFGMgr.h"
 #include "Map.h"
 #include "MapInstanced.h"
+#include "Metric.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -868,6 +869,14 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     HandleDelayedVisibility();
 
     sScriptMgr->OnMapUpdate(this, t_diff);
+
+    METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
+        METRIC_TAG("map_id", std::to_string(GetId())),
+        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
+
+    METRIC_VALUE("map_gameobjects", uint64(GetObjectsStore().Size<GameObject>()),
+        METRIC_TAG("map_id", std::to_string(GetId())),
+        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
 }
 
 void Map::HandleDelayedVisibility()
@@ -3401,9 +3410,21 @@ void Map::DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId)
 void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source)
 {
     Difficulty difficulty_fixed = (IsSharedDifficultyMap(GetId()) ? Difficulty(GetDifficulty() % 2) : GetDifficulty());
-    DungeonEncounterList const* encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    DungeonEncounterList const* encounters;
+    // 631 : ICC - 724 : Ruby Sanctum --- For heroic difficulties, for some reason, we don't have an encounter list, so we get the encounter list from normal diff. We shouldn't change difficulty_fixed variable.
+    if ((GetId() == 631 || GetId() == 724) && IsHeroic())
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), !Is25ManRaid() ? RAID_DIFFICULTY_10MAN_NORMAL : RAID_DIFFICULTY_25MAN_NORMAL);
+    }
+    else
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    }
+
     if (!encounters)
+    {
         return;
+    }
 
     uint32 dungeonId = 0;
     bool updated = false;

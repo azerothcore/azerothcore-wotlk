@@ -30,14 +30,20 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class reset_commandscript : public CommandScript
 {
 public:
     reset_commandscript() : CommandScript("reset_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> resetCommandTable =
+        static ChatCommandTable resetCommandTable =
         {
             { "achievements",   SEC_CONSOLE,        true,  &HandleResetAchievementsCommand,     "" },
             { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
@@ -47,7 +53,7 @@ public:
             { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "" },
             { "all",            SEC_CONSOLE,        true,  &HandleResetAllCommand,              "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "reset",          SEC_ADMINISTRATOR,  true, nullptr,                              "", resetCommandTable }
         };
@@ -100,7 +106,7 @@ public:
         if (!player->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
             player->SetShapeshiftForm(FORM_NONE);
 
-        player->setFactionForRace(player->getRace());
+        player->SetFactionForRace(player->getRace());
 
         player->SetUInt32Value(UNIT_FIELD_BYTES_0, ((player->getRace()) | (player->getClass() << 8) | (player->getGender() << 16) | (powerType << 24)));
 

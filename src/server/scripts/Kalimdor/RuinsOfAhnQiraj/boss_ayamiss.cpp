@@ -155,8 +155,7 @@ public:
                 _phase = PHASE_GROUND;
                 SetCombatMovement(true);
                 me->SetCanFly(false);
-                Position VictimPos;
-                me->GetVictim()->GetPosition(&VictimPos);
+                Position VictimPos = me->GetVictim()->GetPosition();
                 me->GetMotionMaster()->MovePoint(POINT_GROUND, VictimPos);
                 DoResetThreat();
                 events.ScheduleEvent(EVENT_LASH, urand(5000, 8000));
@@ -208,8 +207,7 @@ public:
                         break;
                     case EVENT_SUMMON_SWARMER:
                         {
-                            Position Pos;
-                            me->GetRandomPoint(SwarmerPos, 80.0f, Pos);
+                            Position Pos = me->GetRandomPoint(SwarmerPos, 80.0f);
                             me->SummonCreature(NPC_SWARMER, Pos);
                             events.ScheduleEvent(EVENT_SUMMON_SWARMER, 5000);
                             break;

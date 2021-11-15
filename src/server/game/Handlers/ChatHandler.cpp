@@ -304,20 +304,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
             return;
         }
-
-        if (lang != LANG_ADDON)
-        {
-            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
-            {
-                //LOG_ERROR("network.opcode", "Player %s (%s) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
-                //    GetPlayer()->GetGUID().ToString().c_str(), msg.c_str());
-
-                if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-                    KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
-
-                return;
-            }
-        }
     }
 
     // do message validity checks
@@ -352,27 +338,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
             msg.erase(end, msg.end());
         }
-    }
 
-    // exploit
-    size_t found1 = msg.find("|Hquest");
-    if (found1 != std::string::npos)
-    {
-        size_t found2 = msg.find(":", found1 + 8);
-        size_t found3 = msg.find("|", found1 + 8);
-        if (found3 != std::string::npos)
+        // Validate hyperlinks
+        if (!ValidateHyperlinksAndMaybeKick(msg))
         {
-            if (found2 == std::string::npos)
-                return;
-            if (found2 > found3)
-                return;
+            return;
         }
-    }
-
-    // prevent crash player
-    if (msg.find("| |Hquest") != std::string::npos)
-    {
-        return;
     }
 
     sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
@@ -394,11 +365,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 if (type == CHAT_MSG_SAY)
-                    sender->Say(msg, lang);
+                    sender->Say(msg, Language(lang));
                 else if (type == CHAT_MSG_EMOTE)
                     sender->TextEmote(msg);
                 else if (type == CHAT_MSG_YELL)
-                    sender->Yell(msg, lang);
+                    sender->Yell(msg, Language(lang));
             }
             break;
         case CHAT_MSG_WHISPER:
@@ -442,7 +413,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
-                GetPlayer()->Whisper(msg, lang, receiver->GetGUID());
+                GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
             break;
         case CHAT_MSG_PARTY:

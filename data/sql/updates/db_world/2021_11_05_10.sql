@@ -1,0 +1,36 @@
+-- DB update 2021_11_05_09 -> 2021_11_05_10
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_05_09';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_05_09 2021_11_05_10 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1635884292065100734'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1635884292065100734');
+
+-- Add missing weapons to Burning Blade npcs
+DELETE FROM `creature_equip_template` WHERE `CreatureID` IN (4663,4664,4665,4666,4667);
+INSERT INTO `creature_equip_template` (`CreatureID`,`ID`,`ItemID1`,`ItemID2`,`ItemID3`,`VerifiedBuild`) VALUES
+(4663,1,5303,0,0,0),
+(4664,1,4991,0,0,0),
+(4665,1,2559,0,0,0),
+(4666,1,5285,5281,0,0),
+(4667,1,1927,0,0,0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_05_10' WHERE sql_rev = '1635884292065100734';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

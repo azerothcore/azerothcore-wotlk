@@ -142,7 +142,7 @@ public:
                 case EVENT_MAGIC_PULL:
                     {
                         Talk(SAY_PULL);
-                        //me->MonsterTextEmote(TEXT_MAGIC_PULL, 0, true);
+                        //me->TextEmote(TEXT_MAGIC_PULL, nullptr, true);
 
                         me->CastSpell(me, SPELL_MAGIC_PULL, false);
                         events.RepeatEvent(urand(15000, 25000));

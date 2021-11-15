@@ -104,9 +104,9 @@ public:
             }
 
             if (yell)
-                c->MonsterYell(text.c_str(), LANG_UNIVERSAL, player);
+                c->Yell(text.c_str(), LANG_UNIVERSAL, player);
             else
-                c->MonsterWhisper(text.c_str(), player, false);
+                c->Whisper(text.c_str(), LANG_UNIVERSAL, player);
         }
 
         void DespawnOachanoa()
@@ -330,7 +330,7 @@ public:
                     {
                         futureGUID = cr->GetGUID();
                         summoner->CastSpell(cr, SPELL_CLONE_CASTER, true);
-                        cr->setFaction(summoner->getFaction());
+                        cr->SetFaction(summoner->GetFaction());
                         cr->SetReactState(REACT_AGGRESSIVE);
                     }
                 }
@@ -359,12 +359,12 @@ public:
             {
                 case EVENT_START_EVENT:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", getSummoner());
+                        cr->Whisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", LANG_UNIVERSAL, getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_1, 7000);
                     break;
                 case EVENT_FIGHT_1:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", getSummoner());
+                        cr->Whisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", LANG_UNIVERSAL, getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_2, 6000);
                     break;
                 case EVENT_FIGHT_2:
@@ -415,13 +415,13 @@ public:
                         if (Player* player = getSummoner())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
-                        me->MonsterWhisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", getSummoner());
+                        me->Whisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", LANG_UNIVERSAL, getSummoner());
                         events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
                         break;
                     }
                 case EVENT_FINISH_EVENT:
                     {
-                        me->MonsterWhisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", getSummoner());
+                        me->Whisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", LANG_UNIVERSAL, getSummoner());
                         me->DespawnOrUnsummon(500);
                         if (getFuture())
                             getFuture()->DespawnOrUnsummon(500);
@@ -462,7 +462,7 @@ public:
             }
 
             if (Creature* cr = getFuture())
-                cr->MonsterWhisper(text.c_str(), getSummoner());
+                cr->Whisper(text, LANG_UNIVERSAL, getSummoner());
         }
     };
 };
@@ -490,7 +490,7 @@ public:
         void Reset() override
         {
             if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
-                me->setFaction(me->ToTempSummon()->GetSummonerUnit()->getFaction());
+                me->SetFaction(me->ToTempSummon()->GetSummonerUnit()->GetFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -1768,9 +1768,7 @@ enum StrengthenAncientsMisc
     SPELL_CREATE_ITEM_BARK      = 47550,
     SPELL_CONFUSED              = 47044,
 
-    NPC_LOTHALOR                = 26321,
-
-    FACTION_WALKER_ENEMY        = 14,
+    NPC_LOTHALOR                = 26321
 };
 
 class spell_q12096_q12092_dummy : public SpellScriptLoader // Strengthen the Ancients: On Interact Dummy to Woodlands Walker
@@ -1803,7 +1801,7 @@ public:
             else if (roll == 0) // enemy version
             {
                 tree->AI()->Talk(SAY_WALKER_ENEMY, player);
-                tree->setFaction(FACTION_WALKER_ENEMY);
+                tree->SetFaction(FACTION_MONSTER);
                 tree->Attack(player, true);
             }
         }

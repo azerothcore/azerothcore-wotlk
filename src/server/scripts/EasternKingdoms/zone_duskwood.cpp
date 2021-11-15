@@ -38,8 +38,7 @@ enum TwilightCorrupter
     SPELL_LEVEL_UP                  = 24312,
 
     EVENT_SOUL_CORRUPTION           = 1,
-    EVENT_CREATURE_OF_NIGHTMARE     = 2,
-    FACTION_HOSTILE                 = 14
+    EVENT_CREATURE_OF_NIGHTMARE     = 2
 };
 
 /*######
@@ -83,7 +82,7 @@ public:
             {
                 _introSpoken = true;
                 Talk(YELL_TWILIGHTCORRUPTOR_RESPAWN, who);
-                me->setFaction(FACTION_HOSTILE);
+                me->SetFaction(FACTION_MONSTER);
             }
             ScriptedAI::MoveInLineOfSight(who);
         }
