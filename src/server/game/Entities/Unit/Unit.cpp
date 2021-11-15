@@ -3683,6 +3683,30 @@ int32 Unit::GetCurrentSpellCastTime(uint32 spell_id) const
     return 0;
 }
 
+bool Unit::IsMovementPreventedByCasting() const
+{
+    // can always move when not casting
+    if (!HasUnitState(UNIT_STATE_CASTING))
+    {
+        return false;
+    }
+
+    // channeled spells during channel stage (after the initial cast timer) allow movement with a specific spell attribute
+    if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
+    {
+        if (spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive())
+        {
+            if (spell->GetSpellInfo()->IsMoveAllowedChannel())
+            {
+                return false;
+            }
+        }
+    }
+
+    // prohibit movement for all other spell casts
+    return true;
+}
+
 bool Unit::CanMoveDuringChannel() const
 {
     if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
@@ -13707,9 +13731,10 @@ void Unit::setDeathState(DeathState s, bool despawn)
 
     if (s == JUST_DIED)
     {
-        // xinef: needed for procs, this is refreshed in Unit::Update
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, false);
+
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
