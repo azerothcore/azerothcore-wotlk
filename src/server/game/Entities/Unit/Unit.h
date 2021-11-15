@@ -2024,7 +2024,7 @@ public:
     void RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid);
     void RemoveAurasByType(AuraType auraType, ObjectGuid casterGUID = ObjectGuid::Empty, Aura* except = nullptr, bool negative = true, bool positive = true);
     void RemoveNotOwnSingleTargetAuras();
-    void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0);
+    void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0, bool isAutoshot = false);
     void RemoveAurasWithAttribute(uint32 flags);
     void RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, ObjectGuid casterGUID);
     void RemoveAurasWithMechanic(uint32 mechanic_mask, AuraRemoveMode removemode = AURA_REMOVE_BY_DEFAULT, uint32 except = 0);
