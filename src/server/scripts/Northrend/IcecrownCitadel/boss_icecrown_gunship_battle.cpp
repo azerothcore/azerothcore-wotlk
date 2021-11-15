@@ -2392,8 +2392,6 @@ public:
             if (!si)
                 return;
             SpellCastTargets targets;
-            Position         dest;
-            GetExplTargetDest()->GetPosition(&dest);
             Position dest = GetExplTargetDest()->GetPosition();
             targets.SetDst(dest);
             CustomSpellValues values;
