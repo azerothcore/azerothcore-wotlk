@@ -469,14 +469,16 @@ void Unit::Update(uint32 p_time)
         {
             setAttackTimer(BASE_ATTACK, base_attack > 0 ? base_attack - (int32) p_time : 0);
         }
-        if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
-        {
-            setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32) p_time : 0);
-        }
+
         if (int32 off_attack = getAttackTimer(OFF_ATTACK))
         {
             setAttackTimer(OFF_ATTACK, off_attack > 0 ? off_attack - (int32) p_time : 0);
         }
+    }
+
+    if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
+    {
+        setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32) p_time : 0);
     }
 
     // update abilities available only for fraction of time
@@ -13705,9 +13707,10 @@ void Unit::setDeathState(DeathState s, bool despawn)
 
     if (s == JUST_DIED)
     {
-        // xinef: needed for procs, this is refreshed in Unit::Update
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, false);
+
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
