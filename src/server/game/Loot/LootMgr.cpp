@@ -484,7 +484,6 @@ void LootItem::AddAllowedLooter(Player const* player)
 //
 
 // Inserts the item into the loot (called by LootTemplate processors)
-// Inserts the item into the loot (called by LootTemplate processors)
 void Loot::AddItem(LootStoreItem const& item)
 {
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
