@@ -147,4 +147,3 @@ void AddSC_boss_baroness_anastari()
 {
     new boss_baroness_anastari;
 }
-

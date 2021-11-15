@@ -803,6 +803,11 @@ class spell_warl_demonic_circle_summon : public AuraScript
 {
     PrepareAuraScript(spell_warl_demonic_circle_summon);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_CIRCLE_ALLOW_CAST, SPELL_WARLOCK_DEMONIC_CIRCLE_TELEPORT });
+    }
+
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
     {
         // If effect is removed by expire remove the summoned demonic circle too.
@@ -843,6 +848,11 @@ class spell_warl_demonic_circle_summon : public AuraScript
 class spell_warl_demonic_circle_teleport : public AuraScript
 {
     PrepareAuraScript(spell_warl_demonic_circle_teleport);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_CIRCLE_SUMMON });
+    }
 
     void HandleTeleport(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
@@ -1009,6 +1019,16 @@ class spell_warl_curse_of_doom : public AuraScript
 class spell_warl_health_funnel : public AuraScript
 {
     PrepareAuraScript(spell_warl_health_funnel);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R2,
+            SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2,
+            SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R1,
+            SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R1
+            });
+    }
 
     void ApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
