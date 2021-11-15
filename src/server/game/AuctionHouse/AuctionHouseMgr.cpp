@@ -110,7 +110,6 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
                     }
                 }
 
-
                 int result = leftName.compare(rightName);
                 if (result == 0)
                 {
@@ -838,8 +837,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 {
                     // Append the suffix to the name (ie: of the Monkey) if one exists
                     // These are found in ItemRandomSuffix.dbc and ItemRandomProperties.dbc
-                    //  even though the DBC name seems misleading
-
+                    // even though the DBC name seems misleading
                     std::array<char const*, 16> const* suffix = nullptr;
 
                     if (propRefID < 0)
