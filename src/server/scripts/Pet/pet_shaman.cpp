@@ -66,7 +66,6 @@ struct npc_pet_shaman_earth_elemental : public ScriptedAI
             _initAttack = false;
         }
 
-
         if (!UpdateVictim())
             return;
 
