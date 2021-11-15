@@ -359,7 +359,7 @@ public:
     void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
-    bool IsMovementPreventedByCasting() const;
+    bool IsMovementPreventedByCasting() const override;
 
     // Part of Evade mechanics
     [[nodiscard]] time_t GetLastDamagedTime() const;
