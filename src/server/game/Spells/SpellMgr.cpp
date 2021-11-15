@@ -4118,7 +4118,7 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     // Killing Spree
-    ApplySpellFix({51690}, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 51690 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_ALLOW_WHILE_STEALTHED;
     });
