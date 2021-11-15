@@ -10197,7 +10197,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
                     rec    = proto->Spells[idx].SpellCooldown;
                     catrec = proto->Spells[idx].SpellCategoryCooldown;
 
-                    if (cat != catrec)
+                    if (static_cast<int32>(cat) != catrec)
                     {
                         useSpellCooldown = true;
                     }
