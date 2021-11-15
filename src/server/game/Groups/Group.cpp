@@ -537,7 +537,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
     }
 
     // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG/BF allow 1 member group)
-    if (GetMembersCount() > ((isBGGroup() || isLFGGroup(true) || isBFGroup()) ? 1u : 2u))
+    if (GetMembersCount() > ((isBGGroup() || isLFGGroup() || isBFGroup()) ? 1u : 2u))
     {
         Player* player = ObjectAccessor::FindConnectedPlayer(guid);
         if (player)
@@ -659,7 +659,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             //return false;
         }
 
-        if (isLFGGroup(true) && GetMembersCount() == 1)
+        if (isLFGGroup() && GetMembersCount() == 1)
         {
             Player* leader = ObjectAccessor::FindConnectedPlayer(GetLeaderGUID());
             uint32 mapId = sLFGMgr->GetDungeonMapId(GetGUID());
@@ -671,7 +671,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             }
         }
 
-        if (m_memberMgr.getSize() < ((isLFGGroup(true) || isBGGroup() || isBFGroup()) ? 1u : 2u))
+        if (m_memberMgr.getSize() < ((isLFGGroup() || isBGGroup() || isBFGroup()) ? 1u : 2u))
         {
             Disband();
             return false;

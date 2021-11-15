@@ -106,10 +106,7 @@ public:
                         events.ScheduleEvent(EVENT_CLEAVE, 8000);
                         break;
                     case EVENT_CONFLAGRATION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
-                        {
-                            DoCast(target, SPELL_CONFLAGRATION);
-                        }
+                        DoCastVictim(SPELL_CONFLAGRATION);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 18000);
                         break;
                     case EVENT_THUNDERCLAP:
