@@ -4117,8 +4117,8 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
-    // Killing Spree, disenchant, prospect
-    ApplySpellFix({51690, 13262, 31252}, [](SpellEntry* spellInfo)
+    // Killing Spree
+    ApplySpellFix({51690}, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_ALLOW_WHILE_STEALTHED;
     });
