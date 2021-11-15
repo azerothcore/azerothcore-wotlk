@@ -7534,13 +7534,13 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
     LOG_DEBUG("loot", "Player::SendLoot");
 
-    // slightly overkill array but easier for future changes.
+    // remove FD and invisibility at all loots
     constexpr std::array<AuraType, 2> toRemove = {SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH};
     for (const auto& aura : toRemove)
     {
         RemoveAurasByType(aura);
     }
-    // remove stealth if looting a corpse, ignoring containers
+    // remove stealth only if looting a corpse
     if (loot_type == LOOT_CORPSE && !guid.IsItem())
     {
         RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
