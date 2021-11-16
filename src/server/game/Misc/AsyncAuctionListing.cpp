@@ -16,7 +16,6 @@
  */
 
 #include "AsyncAuctionListing.h"
-#include "AuctionHouseMgr.h"
 #include "Creature.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -47,7 +46,7 @@ bool AuctionListItemsDelayEvent::Execute()
     if (!creature)
         return true;
 
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
+    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
     WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4) + 50 * ((16 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3) * 4));
     uint32 count = 0;
@@ -64,7 +63,7 @@ bool AuctionListItemsDelayEvent::Execute()
     bool result = auctionHouse->BuildListAuctionItems(data, plr,
                   wsearchedname, _listfrom, _levelmin, _levelmax, _usable,
                   _auctionSlotID, _auctionMainCategory, _auctionSubCategory, _quality,
-                  count, totalcount, _getAll);
+                  count, totalcount, _getAll, _sortOrder);
 
     if (!result)
         return false;

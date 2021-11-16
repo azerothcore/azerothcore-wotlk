@@ -349,7 +349,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<boss_volazjAI>(creature);
+        return GetAhnKahetAI<boss_volazjAI>(creature);
     }
 };
 
