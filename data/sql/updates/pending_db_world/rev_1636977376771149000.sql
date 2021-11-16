@@ -101,7 +101,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Add sound script
 DELETE FROM `waypoint_scripts` WHERE `id`= @BAT_SOUND_ACTION_1;
-INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES(@BAT_SOUND_ACTION_1, 0, 16, 6596 , 2 , 0 , 0 , 0 , 0 , 0 , @BAT_GUID_1);
+INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES
+(@BAT_SOUND_ACTION_1, 0, 16, 6596 , 2 , 0 , 0 , 0 , 0 , 0 , @BAT_GUID_1);
 
 DELETE FROM `waypoint_data` WHERE `id`= @PATH_BAT_GUID_2;
 -- Add waypoints for Belfry Bat @BAT_GUID_2
