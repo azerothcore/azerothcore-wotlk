@@ -182,8 +182,14 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() || me->GetPositionY() > FirewalPositionY)
+            if (!UpdateVictim())
             {
+                return;
+            }
+
+            if (me->GetPositionY() > FirewalPositionY)
+            {
+                EnterEvadeMode();
                 return;
             }
 
