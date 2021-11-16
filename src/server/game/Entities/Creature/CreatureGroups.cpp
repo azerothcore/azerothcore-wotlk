@@ -226,6 +226,47 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     }
 }
 
+void CreatureGroup::MemberEvaded(Creature* member)
+{
+    uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+    {
+        return;
+    }
+
+    for (auto const& itr : m_members)
+    {
+        Creature* pMember = itr.first;
+
+        //Skip one check
+        if (pMember == member)
+        {
+            continue;
+        }
+
+        if (!pMember->IsAlive())
+        {
+            continue;
+        }
+
+        if (pMember->IsInEvadeMode())
+        {
+            continue;
+        }
+
+        if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+        {
+            if (pMember->IsAIEnabled)
+            {
+                if (CreatureAI* pMemberAI = pMember->AI())
+                {
+                    pMemberAI->EnterEvadeMode();
+                }
+            }
+        }
+    }
+}
+
 void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
     if (m_members.size() && !(m_members.begin()->second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))))
