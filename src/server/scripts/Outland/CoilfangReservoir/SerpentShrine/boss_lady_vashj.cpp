@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -313,7 +326,7 @@ public:
         void Reset()
         {
             me->SetDisableGravity(true);
-            me->setFaction(14);
+            me->SetFaction(FACTION_MONSTER);
             MovementTimer = 0;
             ToxicSporeTimer = 5000;
             BoltTimer = 5500;
@@ -351,7 +364,7 @@ public:
                 {
                     if (Creature* trig = me->SummonCreature(TOXIC_SPORES_TRIGGER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 30000))
                     {
-                        trig->setFaction(14);
+                        trig->SetFaction(FACTION_MONSTER);
                         trig->CastSpell(trig, SPELL_TOXIC_SPORES, true);
                     }
                 }
@@ -369,7 +382,7 @@ public:
                     // remove
                     me->setDeathState(DEAD);
                     me->RemoveCorpse();
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                 }
 
                 CheckTimer = 1000;

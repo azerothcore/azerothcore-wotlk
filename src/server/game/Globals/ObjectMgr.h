@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _OBJECTMGR_H
@@ -428,7 +439,7 @@ struct BroadcastText
     }
 
     uint32 Id{0};
-    uint32 Language{0};
+    uint32 LanguageID{0};
     std::vector<std::string> MaleText;
     std::vector<std::string> FemaleText;
     uint32 EmoteId0{0};
@@ -679,6 +690,10 @@ struct DungeonEncounter
 typedef std::list<DungeonEncounter const*> DungeonEncounterList;
 typedef std::unordered_map<uint32, DungeonEncounterList> DungeonEncounterContainer;
 
+static constexpr uint32 MAX_QUEST_MONEY_REWARDS = 10;
+typedef std::array<uint32, MAX_QUEST_MONEY_REWARDS> QuestMoneyRewardArray;
+typedef std::unordered_map<uint32, QuestMoneyRewardArray> QuestMoneyRewardStore;
+
 class PlayerDumpReader;
 
 class ObjectMgr
@@ -904,6 +919,7 @@ public:
     }
 
     void LoadQuests();
+    void LoadQuestMoneyRewards();
     void LoadQuestStartersAndEnders()
     {
         LOG_INFO("server.loading", "Loading GO Start Quest Data...");
@@ -1140,6 +1156,7 @@ public:
             return &itr->second;
         return nullptr;
     }
+    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
@@ -1156,6 +1173,7 @@ public:
         return itr->second;
     }
 
+    GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
@@ -1271,10 +1289,10 @@ public:
         if (itr == _gameTeleStore.end()) return nullptr;
         return &itr->second;
     }
-    [[nodiscard]] GameTele const* GetGameTele(std::string const& name) const;
+    [[nodiscard]] GameTele const* GetGameTele(std::string_view name) const;
     [[nodiscard]] GameTeleContainer const& GetGameTeleMap() const { return _gameTeleStore; }
     bool AddGameTele(GameTele& data);
-    bool DeleteGameTele(std::string const& name);
+    bool DeleteGameTele(std::string_view name);
 
     [[nodiscard]] TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
     {
@@ -1301,7 +1319,7 @@ public:
     void LoadScriptNames();
     ScriptNameContainer& GetScriptNames() { return _scriptNamesStore; }
     [[nodiscard]] std::string const& GetScriptName(uint32 id) const;
-    uint32 GetScriptId(const char* name);
+    uint32 GetScriptId(std::string const& name);
 
     [[nodiscard]] SpellClickInfoMapBounds GetSpellClickInfoMapBounds(uint32 creature_id) const
     {
@@ -1328,6 +1346,13 @@ public:
     }
 
     static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
+    static std::string_view GetLocaleString(std::vector<std::string> const& data, size_t locale)
+    {
+        if (locale < data.size())
+            return data[locale];
+        else
+            return {};
+    }
     static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
         if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
@@ -1349,6 +1374,8 @@ public:
     void LoadFactionChangeTitles();
 
     [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
+
+    [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
 
 private:
     // first free id for selected id type
@@ -1512,6 +1539,8 @@ private:
     };
 
     std::set<uint32> _transportMaps; // Helper container storing map ids that are for transports only, loaded from gameobject_template
+
+    QuestMoneyRewardStore _questMoneyRewards;
 };
 
 #define sObjectMgr ObjectMgr::instance()

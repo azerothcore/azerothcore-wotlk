@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlefieldMgr.h"
@@ -90,6 +103,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
+    time_t lastTick = m_Last_tick;
     if (now > m_Last_tick)
     {
         // Update items that have just a limited lifetime
@@ -142,8 +156,7 @@ void Player::Update(uint32 p_time)
 
     m_achievementMgr->UpdateTimedAchievements(p_time);
 
-    if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) &&
-        !HasUnitState(UNIT_STATE_CASTING))
+    if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING) && !HasUnitState(UNIT_STATE_CHARGING))
     {
         if (Unit* victim = GetVictim())
         {
@@ -218,7 +231,7 @@ void Player::Update(uint32 p_time)
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
-        if (now > m_Last_tick && _restTime > 0) // freeze update
+        if (now > lastTick && _restTime > 0) // freeze update
         {
             time_t currTime = time(nullptr);
             time_t timeDiff = currTime - _restTime;
@@ -268,9 +281,7 @@ void Player::Update(uint32 p_time)
             }
 
             uint32 newzone, newarea;
-            GetZoneAndAreaId(newzone, newarea, true);
-            m_last_zone_id = newzone;
-            m_last_area_id = newarea;
+            GetZoneAndAreaId(newzone, newarea);
 
             if (m_zoneUpdateId != newzone)
                 UpdateZone(newzone, newarea); // also update area
@@ -354,7 +365,7 @@ void Player::Update(uint32 p_time)
     }
 
     // not auto-free ghost from body in instances
-    if (m_deathTimer > 0 && !GetBaseMap()->Instanceable() &&
+    if (m_deathTimer > 0 && !GetMap()->Instanceable() &&
         !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
     {
         if (p_time >= m_deathTimer)
@@ -399,7 +410,7 @@ void Player::Update(uint32 p_time)
     {
         m_hostileReferenceCheckTimer = 15000;
         if (!GetMap()->IsDungeon())
-            getHostileRefManager().deleteReferencesOutOfRange(
+            getHostileRefMgr().deleteReferencesOutOfRange(
                 GetVisibilityRange());
     }
     else
@@ -587,7 +598,7 @@ void Player::UpdateRating(CombatRating cr)
                                          (*i)->GetAmount()));
     if (amount < 0)
         amount = 0;
-    SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr, uint32(amount));
+    SetUInt32Value(static_cast<uint16>(PLAYER_FIELD_COMBAT_RATING_1) + static_cast<uint16>(cr), uint32(amount));
 
     bool affectStats = CanModifyStats();
 
@@ -1463,6 +1474,7 @@ void Player::UpdatePvP(bool state, bool _override)
     }
 
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+    sScriptMgr->OnPlayerPVPFlagChange(this, state);
 }
 
 void Player::UpdatePotionCooldown(Spell* spell)
@@ -1491,8 +1503,8 @@ void Player::UpdatePotionCooldown(Spell* spell)
     {
         if (spell->IsIgnoringCooldowns())
             return;
-        else
-            SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
+
+        SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
     }
 
     SetLastPotionId(0);
@@ -1815,8 +1827,7 @@ void Player::UpdateForQuestWorldObjects()
 
     UpdateData  udata;
     WorldPacket packet;
-    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin();
-         itr != m_clientGUIDs.end(); ++itr)
+    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
         if ((*itr).IsGameObject())
         {
@@ -1825,8 +1836,7 @@ void Player::UpdateForQuestWorldObjects()
         }
         else if ((*itr).IsCreatureOrVehicle())
         {
-            Creature* obj =
-                ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
+            Creature* obj = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
             if (!obj)
                 continue;
 
@@ -1834,23 +1844,15 @@ void Player::UpdateForQuestWorldObjects()
             if (!obj->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
                 continue;
 
-            SpellClickInfoMapBounds clickPair =
-                sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
-            for (SpellClickInfoContainer::const_iterator _itr = clickPair.first;
-                 _itr != clickPair.second; ++_itr)
+            SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
+            for (SpellClickInfoContainer::const_iterator _itr = clickPair.first; _itr != clickPair.second; ++_itr)
             {
-                //! This code doesn't look right, but it was logically converted
-                //! to condition system to do the exact same thing it did
-                //! before. It definitely needs to be overlooked for intended
-                //! functionality.
-                ConditionList conds =
-                    sConditionMgr->GetConditionsForSpellClickEvent(
-                        obj->GetEntry(), _itr->second.spellId);
+                //! This code doesn't look right, but it was logically converted to condition system to do the exact
+                //! same thing it did before. It definitely needs to be overlooked for intended functionality.
+                ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
                 bool buildUpdateBlock = false;
-                for (ConditionList::const_iterator jtr = conds.begin();
-                     jtr != conds.end() && !buildUpdateBlock; ++jtr)
-                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED ||
-                        (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
+                for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
+                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
                         buildUpdateBlock = true;
 
                 if (buildUpdateBlock)
@@ -1973,96 +1975,6 @@ void Player::UpdateCorpseReclaimDelay()
     }
     else
         m_deathExpireTime = now + DEATH_EXPIRE_STEP;
-}
-
-void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
-{
-    // pussywizard: optimization
-    if (GetExactDistSq(&m_last_underwaterstate_position) < 3.0f * 3.0f)
-        return;
-
-    m_last_underwaterstate_position.Relocate(m_positionX, m_positionY,
-                                             m_positionZ);
-
-    if (!IsPositionValid()) // pussywizard: crashfix if calculated grid coords
-                            // would be out of range 0-64
-        return;
-
-    LiquidData    liquid_status;
-    ZLiquidStatus res = m->getLiquidStatus(
-        x, y, z, MAP_ALL_LIQUIDS, &liquid_status, GetCollisionHeight());
-    if (!res)
-    {
-        m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA |
-                                UNDERWATER_INSLIME | UNDERWARER_INDARKWATER);
-        if (_lastLiquid && _lastLiquid->SpellId)
-            RemoveAurasDueToSpell(_lastLiquid->SpellId);
-
-        _lastLiquid = nullptr;
-        return;
-    }
-
-    if (uint32 liqEntry = liquid_status.entry)
-    {
-        LiquidTypeEntry const* liquid = sLiquidTypeStore.LookupEntry(liqEntry);
-        if (_lastLiquid && _lastLiquid->SpellId && _lastLiquid->Id != liqEntry)
-            RemoveAurasDueToSpell(_lastLiquid->SpellId);
-
-        if (liquid && liquid->SpellId)
-        {
-            if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER))
-            {
-                if (!HasAura(liquid->SpellId))
-                    CastSpell(this, liquid->SpellId, true);
-            }
-            else
-                RemoveAurasDueToSpell(liquid->SpellId);
-        }
-
-        _lastLiquid = liquid;
-    }
-    else if (_lastLiquid && _lastLiquid->SpellId)
-    {
-        RemoveAurasDueToSpell(_lastLiquid->SpellId);
-        _lastLiquid = nullptr;
-    }
-
-    // All liquids type - check under water position
-    if (liquid_status.type_flags &
-        (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_MAGMA |
-         MAP_LIQUID_TYPE_SLIME))
-    {
-        if (res & LIQUID_MAP_UNDER_WATER)
-            m_MirrorTimerFlags |= UNDERWATER_INWATER;
-        else
-            m_MirrorTimerFlags &= ~UNDERWATER_INWATER;
-    }
-
-    // Allow travel in dark water on taxi or transport
-    if ((liquid_status.type_flags & MAP_LIQUID_TYPE_DARK_WATER) &&
-        !IsInFlight() && !GetTransport())
-        m_MirrorTimerFlags |= UNDERWARER_INDARKWATER;
-    else
-        m_MirrorTimerFlags &= ~UNDERWARER_INDARKWATER;
-
-    // in lava check, anywhere in lava level
-    if (liquid_status.type_flags & MAP_LIQUID_TYPE_MAGMA)
-    {
-        if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER |
-                   LIQUID_MAP_WATER_WALK))
-            m_MirrorTimerFlags |= UNDERWATER_INLAVA;
-        else
-            m_MirrorTimerFlags &= ~UNDERWATER_INLAVA;
-    }
-    // in slime check, anywhere in slime level
-    if (liquid_status.type_flags & MAP_LIQUID_TYPE_SLIME)
-    {
-        if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER |
-                   LIQUID_MAP_WATER_WALK))
-            m_MirrorTimerFlags |= UNDERWATER_INSLIME;
-        else
-            m_MirrorTimerFlags &= ~UNDERWATER_INSLIME;
-    }
 }
 
 void Player::UpdateCharmedAI()
@@ -2360,4 +2272,59 @@ void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
     data << Field;
     data << Value;
     GetSession()->SendPacket(&data);
+}
+
+void Player::ProcessTerrainStatusUpdate()
+{
+    // process liquid auras using generic unit code
+    Unit::ProcessTerrainStatusUpdate();
+
+    LiquidData const& liquidData = GetLiquidData();
+
+    // player specific logic for mirror timers
+    if (liquidData.Status != LIQUID_MAP_NO_WATER)
+    {
+        // Breath bar state (under water in any liquid type)
+        if ((liquidData.Flags & MAP_ALL_LIQUIDS) != 0)
+        {
+            if ((liquidData.Status & LIQUID_MAP_UNDER_WATER) != 0)
+                m_MirrorTimerFlags |= UNDERWATER_INWATER;
+            else
+                m_MirrorTimerFlags &= ~UNDERWATER_INWATER;
+        }
+
+        // Fatigue bar state (if not on flight path or transport)
+        if ((liquidData.Flags & MAP_LIQUID_TYPE_DARK_WATER) && !IsInFlight() && !GetTransport())
+        {
+            // Exclude also uncontrollable vehicles
+            Vehicle*                vehicle     = GetVehicle();
+            VehicleSeatEntry const* vehicleSeat = vehicle ? vehicle->GetSeatForPassenger(this) : nullptr;
+            if (!vehicleSeat || vehicleSeat->CanControl())
+                m_MirrorTimerFlags |= UNDERWATER_INDARKWATER;
+            else
+                m_MirrorTimerFlags &= ~UNDERWATER_INDARKWATER;
+        }
+        else
+            m_MirrorTimerFlags &= ~UNDERWATER_INDARKWATER;
+
+        // Lava state (any contact)
+        if (liquidData.Flags & MAP_LIQUID_TYPE_MAGMA)
+        {
+            if (liquidData.Status & MAP_LIQUID_STATUS_IN_CONTACT)
+                m_MirrorTimerFlags |= UNDERWATER_INLAVA;
+            else
+                m_MirrorTimerFlags &= ~UNDERWATER_INLAVA;
+        }
+
+        // Slime state (any contact)
+        if (liquidData.Flags & MAP_LIQUID_TYPE_SLIME)
+        {
+            if (liquidData.Status & MAP_LIQUID_STATUS_IN_CONTACT)
+                m_MirrorTimerFlags |= UNDERWATER_INSLIME;
+            else
+                m_MirrorTimerFlags &= ~UNDERWATER_INSLIME;
+        }
+    }
+    else
+        m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
 }

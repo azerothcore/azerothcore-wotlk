@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ArenaSpectator.h"
@@ -20,7 +31,7 @@
 #include "GameGraveyard.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Object.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -299,11 +310,10 @@ inline void Battleground::_CheckSafePositions(uint32 diff)
     {
         m_ValidStartPositionTimer = 0;
 
-        Position pos;
         float x, y, z, o;
         for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         {
-            itr->second->GetPosition(&pos);
+            Position pos = itr->second->GetPosition();
             GetTeamStartLoc(itr->second->GetBgTeamId(), x, y, z, o);
             if (pos.GetExactDistSq(x, y, z) > maxDist)
             {
@@ -753,20 +763,18 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
     int32 winmsg_id = 0;
 
+    SetWinner(winnerTeamId);
+
     if (winnerTeamId == TEAM_ALLIANCE)
     {
-        SetWinner(TEAM_HORDE); // reversed in packet
         winmsg_id = isBattleground() ? LANG_BG_A_WINS : LANG_ARENA_GOLD_WINS;
         PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
     }
     else if (winnerTeamId == TEAM_HORDE)
     {
-        SetWinner(TEAM_ALLIANCE); // reversed in packet
         winmsg_id = isBattleground() ? LANG_BG_H_WINS : LANG_ARENA_GREEN_WINS;
         PlaySoundToAll(SOUND_HORDE_WINS);                   // horde wins sound
     }
-    else
-        SetWinner(TEAM_NEUTRAL);
 
     CharacterDatabasePreparedStatement* stmt = nullptr;
     uint64 battlegroundId = 1;
@@ -946,7 +954,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         {
             //needed cause else in av some creatures will kill the players at the end
             player->CombatStop();
-            player->getHostileRefManager().deleteReferences();
+            player->getHostileRefMgr().deleteReferences();
         }
 
         // per player calculation
@@ -979,8 +987,6 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         uint32 loser_kills = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_FIRST);
         uint32 winner_arena = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_ARENA_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_ARENA_FIRST);
 
-        sScriptMgr->OnBattlegroundEndReward(this, player, winnerTeamId);
-
         // Reward winner team
         if (bgTeamId == winnerTeamId)
         {
@@ -1003,6 +1009,8 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
             if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)))
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(loser_kills));
         }
+
+        sScriptMgr->OnBattlegroundEndReward(this, player, winnerTeamId);
 
         player->ResetAllPowers();
         player->CombatStopWithPets(true);
@@ -1105,6 +1113,9 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
+    // GetStatus might be changed in RemovePlayer - define it here
+    BattlegroundStatus status = GetStatus();
+
     // BG subclass specific code
     RemovePlayer(player);
 
@@ -1116,7 +1127,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
         player->ClearAfkReports();
 
         //left a rated match in progress, consider as loser
-        if (isArena() && isRated() && GetStatus() == STATUS_IN_PROGRESS && teamId != TEAM_NEUTRAL)
+        if (isArena() && isRated() && status == STATUS_IN_PROGRESS && teamId != TEAM_NEUTRAL)
         {
             ArenaTeam* winnerArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeamId(teamId)));
             ArenaTeam* loserArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(teamId));
@@ -1139,7 +1150,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
         // cast deserter
         if (isBattleground() && !player->IsGameMaster() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
-            if (GetStatus() == STATUS_IN_PROGRESS || GetStatus() == STATUS_WAIT_JOIN)
+            if (status == STATUS_IN_PROGRESS || status == STATUS_WAIT_JOIN)
                 player->ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
     }
 
@@ -1598,7 +1609,7 @@ Creature* Battleground::GetBGCreature(uint32 type)
     return creature;
 }
 
-void Battleground::SpawnBGObject(uint32 type, uint32 respawntime)
+void Battleground::SpawnBGObject(uint32 type, uint32 respawntime, uint32 forceRespawnDelay)
 {
     if (Map* map = FindBgMap())
         if (GameObject* obj = map->GetGameObject(BgObjects[type]))
@@ -1610,6 +1621,11 @@ void Battleground::SpawnBGObject(uint32 type, uint32 respawntime)
                 obj->SetLootState(GO_READY);
             obj->SetRespawnTime(respawntime);
             map->AddToMap(obj);
+
+            if (forceRespawnDelay)
+            {
+                obj->SetRespawnDelay(forceRespawnDelay);
+            }
         }
 }
 
@@ -1986,7 +2002,7 @@ void Battleground::SetBgRaid(TeamId teamId, Group* bg_raid)
 
 GraveyardStruct const* Battleground::GetClosestGraveyard(Player* player)
 {
-    return sGraveyard->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetBgTeamId());
+    return sGraveyard->GetClosestGraveyard(player, player->GetBgTeamId());
 }
 
 void Battleground::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)

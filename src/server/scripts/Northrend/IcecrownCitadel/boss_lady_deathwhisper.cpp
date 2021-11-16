@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Group.h"
 #include "icecrown_citadel.h"
@@ -286,7 +299,7 @@ public:
             if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
             {
                 // reset threat
-                ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                 {
                     Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->getUnitGuid());
@@ -501,7 +514,7 @@ public:
                 if (darnavan->IsAlive())
                 {
                     darnavan->RemoveAllAuras();
-                    darnavan->setFaction(35);
+                    darnavan->SetFaction(FACTION_FRIENDLY);
                     darnavan->DeleteThreatList();
                     darnavan->CombatStop(true);
                     darnavan->GetMotionMaster()->MoveIdle();
@@ -917,7 +930,7 @@ public:
             ScriptedAI::AttackStart(who);
             if (!targetGUID)
             {
-                me->getThreatManager().resetAllAggro();
+                me->getThreatMgr().resetAllAggro();
                 me->AddThreat(who, 1000000.0f);
                 targetGUID = who->GetGUID();
             }
@@ -1130,6 +1143,32 @@ public:
     }
 };
 
+// 69483 - Dark Reckoning
+class spell_deathwhisper_dark_reckoning : public AuraScript
+{
+    PrepareAuraScript(spell_deathwhisper_dark_reckoning);
+
+    bool Validate(SpellInfo const* spell) override
+    {
+        return ValidateSpellInfo({ spell->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+        {
+            uint32 spellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+            caster->CastSpell(GetTarget(), spellId, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathwhisper_dark_reckoning::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 class at_lady_deathwhisper_entrance : public AreaTriggerScript
 {
 public:
@@ -1148,11 +1187,17 @@ public:
 
 void AddSC_boss_lady_deathwhisper()
 {
+    // Creatures
     new boss_lady_deathwhisper();
     new npc_cult_fanatic();
     new npc_cult_adherent();
     new npc_vengeful_shade();
     new npc_darnavan();
+
+    // Spells
     new spell_deathwhisper_mana_barrier();
+    RegisterSpellScript(spell_deathwhisper_dark_reckoning);
+
+    // AreaTriggers
     new at_lady_deathwhisper_entrance();
 }

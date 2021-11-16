@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SC_SCRIPTMGR_H
@@ -20,6 +31,8 @@
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SharedDefines.h"
+#include "Tuples.h"
+#include "Types.h"
 #include "Weather.h"
 #include "World.h"
 #include <atomic>
@@ -30,7 +43,6 @@ class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
 class Channel;
-class ChatCommand;
 class Creature;
 class CreatureAI;
 class DynamicObject;
@@ -69,6 +81,11 @@ struct ItemTemplate;
 struct OutdoorPvPData;
 struct GroupQueueInfo;
 struct TargetInfo;
+
+namespace Acore::ChatCommands
+{
+    struct ChatCommandBuilder;
+}
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
@@ -194,6 +211,13 @@ public:
 
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
+
+    /**
+     * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
+     *
+     * @param version The cache version that we will be sending to the Client.
+     */
+    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) {}
 };
 
 class FormulaScript : public ScriptObject
@@ -530,6 +554,19 @@ public:
     [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
+class OnlyOnceAreaTriggerScript : public AreaTriggerScript
+{
+    using AreaTriggerScript::AreaTriggerScript;
+
+public:
+    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) override;
+
+protected:
+    virtual bool _OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) = 0;
+    void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
+    void ResetAreaTriggerDone(Player const* /*player*/, AreaTrigger const* /*trigger*/);
+};
+
 class BattlegroundScript : public ScriptObject
 {
 protected:
@@ -561,7 +598,7 @@ protected:
 
 public:
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-    [[nodiscard]] virtual std::vector<ChatCommand> GetCommands() const = 0;
+    [[nodiscard]] virtual std::vector<Acore::ChatCommands::ChatCommandBuilder> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -711,6 +748,9 @@ public:
     // Called when a player kills another player
     virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
 
+    // Called when a player toggles pvp
+    virtual void OnPlayerPVPFlagChange(Player* /*player*/, bool /*state*/) { }
+
     // Called when a player kills a creature
     virtual void OnCreatureKill(Player* /*killer*/, Creature* /*killed*/) { }
 
@@ -822,6 +862,9 @@ public:
 
     // Called when a player is added to battleground
     virtual void OnAddToBattleground(Player* /*player*/, Battleground* /*bg*/) { }
+
+    // Called when a player queues a Random Dungeon using the RDF (Random Dungeon Finder)
+    virtual void OnQueueRandomDungeon(Player* /*player*/, uint32 & /*rDungeonId*/) { }
 
     // Called when a player is removed from battleground
     virtual void OnRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) { }
@@ -1412,7 +1455,20 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+     virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+};
+
+class DatabaseScript : public ScriptObject
+{
+protected:
+
+    DatabaseScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) {}
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1466,6 +1522,7 @@ public: /* WorldScript */
     void OnOpenStateChange(bool open);
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
+    void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
     void OnMotdChange(std::string& newMotd);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();
@@ -1541,7 +1598,7 @@ public: /* OutdoorPvPScript */
     OutdoorPvP* CreateOutdoorPvP(OutdoorPvPData const* data);
 
 public: /* CommandScript */
-    std::vector<ChatCommand> GetChatCommands();
+    std::vector<Acore::ChatCommands::ChatCommandBuilder> GetChatCommands();
 
 public: /* WeatherScript */
     void OnWeatherChange(Weather* weather, WeatherState state, float grade);
@@ -1590,6 +1647,7 @@ public: /* PlayerScript */
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
+    void OnPlayerPVPFlagChange(Player* player, bool state);
     void OnCreatureKill(Player* killer, Creature* killed);
     void OnCreatureKilledByPet(Player* petOwner, Creature* killed);
     void OnPlayerKilledByCreature(Creature* killer, Player* killed);
@@ -1627,6 +1685,7 @@ public: /* PlayerScript */
     bool OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit* target);
     void OnPlayerUpdateFaction(Player* player);
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
+    void OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
     void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
     bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
@@ -1894,6 +1953,10 @@ public: /* AchievementScript */
 
         void OnHandleDevCommand(Player* player, std::string& argstr);
 
+    public: /* DatabaseScript */
+
+        void OnAfterDatabasesLoaded(uint32 updateFlags);
+
 private:
     uint32 _scriptCount;
 
@@ -1902,6 +1965,85 @@ private:
 
     ScriptLoaderCallbackType _script_loader_callback;
 };
+
+namespace Acore::SpellScripts
+{
+    template<typename T>
+    using is_SpellScript = std::is_base_of<SpellScript, T>;
+
+    template<typename T>
+    using is_AuraScript = std::is_base_of<AuraScript, T>;
+}
+
+template <typename... Ts>
+class GenericSpellAndAuraScriptLoader : public SpellScriptLoader
+{
+    using SpellScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_SpellScript, Ts...>;
+    using AuraScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_AuraScript, Ts...>;
+    using ArgsType = typename Acore::find_type_if_t<Acore::is_tuple, Ts...>;
+
+public:
+    GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
+
+private:
+    SpellScript* GetSpellScript() const override
+    {
+        if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<SpellScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    AuraScript* GetAuraScript() const override
+    {
+        if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<AuraScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    ArgsType _args;
+};
+
+#define RegisterSpellScriptWithArgs(spell_script, script_name, ...) new GenericSpellAndAuraScriptLoader<spell_script, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellScript(spell_script) RegisterSpellScriptWithArgs(spell_script, #spell_script)
+#define RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, script_name, ...) new GenericSpellAndAuraScriptLoader<script_1, script_2, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellAndAuraScriptPair(script_1, script_2) RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, #script_1)
+
+template <class AI>
+class GenericCreatureScript : public CreatureScript
+{
+    public:
+        GenericCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return new AI(me); }
+};
+#define RegisterCreatureAI(ai_name) new GenericCreatureScript<ai_name>(#ai_name)
+
+template <class AI, AI*(*AIFactory)(Creature*)>
+class FactoryCreatureScript : public CreatureScript
+{
+    public:
+        FactoryCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return AIFactory(me); }
+};
+#define RegisterCreatureAIWithFactory(ai_name, factory_fn) new FactoryCreatureScript<ai_name, &factory_fn>(#ai_name)
+
+template <class AI>
+class GenericGameObjectScript : public GameObjectScript
+{
+    public:
+        GenericGameObjectScript(char const* name) : GameObjectScript(name) { }
+        GameObjectAI* GetAI(GameObject* go) const override { return new AI(go); }
+};
+#define RegisterGameObjectAI(ai_name) new GenericGameObjectScript<ai_name>(#ai_name)
 
 #define sScriptMgr ScriptMgr::instance()
 
@@ -1963,31 +2105,31 @@ public:
                 if (id)
                 {
                     // Try to find an existing script.
-                    bool existing = false;
+                    TScript const* oldScript = nullptr;
                     for (auto iterator = ScriptPointerList.begin(); iterator != ScriptPointerList.end(); ++iterator)
                     {
                         // If the script names match...
                         if (iterator->second->GetName() == script->GetName())
                         {
                             // ... It exists.
-                            existing = true;
+                            oldScript = iterator->second;
                             break;
                         }
                     }
 
-                    // If the script isn't assigned -> assign it!
-                    if (!existing)
+                    // If the script is already assigned -> delete it!
+                    if (oldScript)
                     {
-                        ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
+                        delete oldScript;
                     }
-                    else
-                    {
-                        // If the script is already assigned -> delete it!
-                        LOG_ERROR("scripts", "Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
-                                       script->GetName().c_str());
 
-                        ABORT(); // Error that should be fixed ASAP.
+                    // Assign new script!
+                    ScriptPointerList[id] = script;
+
+                    // Increment script count only with new scripts
+                    if (!oldScript)
+                    {
+                        sScriptMgr->IncrementScriptCount();
                     }
                 }
                 else

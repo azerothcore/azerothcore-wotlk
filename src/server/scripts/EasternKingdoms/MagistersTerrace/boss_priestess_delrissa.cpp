@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "magisters_terrace.h"
 #include "ScriptedCreature.h"
@@ -127,7 +140,7 @@ public:
             else if (HelpersKilled == MAX_ACTIVE_HELPERS)
             {
                 me->loot.clear();
-                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1);
+                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
                 instance->SetData(DATA_DELRISSA_EVENT, DONE);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
@@ -286,15 +299,15 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
         for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatManager().getThreat(pUnit) )
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatMgr().getThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->getThreatManager().modifyThreatPercent(pUnit, -100);
-                if (HostileReference* ref = me->getThreatManager().getOnlineContainer().getReferenceByTarget(pUnit))
+                me->getThreatMgr().modifyThreatPercent(pUnit, -100);
+                if (HostileReference* ref = me->getThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
                     ref->addThreat(10000000.0f * threatMod);
             }
         }
@@ -728,7 +741,7 @@ public:
                 case EVENT_SPELL_BLINK:
                     {
                         bool InMeleeRange = false;
-                        ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+                        ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
                         for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                             if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                                 if (target->IsWithinMeleeRange(me))

@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -227,7 +240,7 @@ public:
             if (Unit* caster = GetCaster())
             {
                 caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
-                caster->setFaction(88);
+                caster->SetFaction(FACTION_BLACKFATHOM);
             }
         }
 
@@ -389,15 +402,23 @@ public:
         bool handled;
         bool Load() override { handled = false; return true; }
 
+        SpellCastResult CheckCast()
+        {
+            GetCaster()->GetCreaturesWithEntryInRange(_crList, 100.0f, NPC_TORCH_TARGET);
+            if (_crList.empty())
+            {
+                return SPELL_FAILED_NOT_HERE;
+            }
+
+            return SPELL_CAST_OK;
+        }
+
         void ThrowNextTorch(Unit* caster)
         {
-            std::list<Creature*> crList;
-            caster->GetCreaturesWithEntryInRange(crList, 100.0f, NPC_TORCH_TARGET);
-
-            uint8 rand = urand(0, crList.size() - 1);
+            uint8 rand = urand(0, _crList.size() - 1);
             Position pos;
             pos.Relocate(0.0f, 0.0f, 0.0f);
-            for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr, --rand)
+            for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr, --rand)
             {
                 if (caster->GetDistance(*itr) < 5)
                 {
@@ -473,8 +494,14 @@ public:
         {
             AfterCast += SpellCastFn(spell_midsummer_fling_torch_SpellScript::HandleFinish);
             if (m_scriptSpellId == 45671)
+            {
+                OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch_SpellScript::CheckCast);
                 OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
         }
+
+    private:
+        std::list<Creature*> _crList;
     };
 
     SpellScript* GetSpellScript() const override

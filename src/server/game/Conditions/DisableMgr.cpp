@@ -1,10 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DisableMgr.h"
+#include "GameEventMgr.h"
 #include "MMapFactory.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -30,7 +42,7 @@ namespace DisableMgr
 
         DisableMap m_DisableMap;
 
-        uint8 MAX_DISABLE_TYPES = 9;
+        uint8 MAX_DISABLE_TYPES = 10;
     }
 
     void LoadDisables()
@@ -226,6 +238,16 @@ namespace DisableMgr
                         }
                         break;
                     }
+                    case DISABLE_TYPE_GAME_EVENT:
+                    {
+                        GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
+                        if (activeEvents.find(entry) != activeEvents.end())
+                        {
+                            sGameEventMgr->StopEvent(entry);
+                            LOG_INFO("disable", "Event entry %u was stopped because it has been disabled.", entry);
+                        }
+                        break;
+                    }
                 default:
                     break;
             }
@@ -354,6 +376,8 @@ namespace DisableMgr
             case DISABLE_TYPE_VMAP:
                 return flags & itr->second.flags;
             case DISABLE_TYPE_GO_LOS:
+                return true;
+            case DISABLE_TYPE_GAME_EVENT:
                 return true;
         }
 

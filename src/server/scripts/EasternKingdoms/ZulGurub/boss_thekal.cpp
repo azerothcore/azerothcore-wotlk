@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -163,7 +174,7 @@ public:
                                 if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
                                 {
                                     pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pLorKhan->setFaction(14);
+                                    pLorKhan->SetFaction(FACTION_MONSTER);
                                     pLorKhan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                     pLorKhan->SetFullHealth();
                                     instance->SetData(DATA_LORKHAN, DONE);
@@ -176,7 +187,7 @@ public:
                                 if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
                                 {
                                     pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                                    pZath->setFaction(14);
+                                    pZath->SetFaction(FACTION_MONSTER);
                                     pZath->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                     pZath->SetFullHealth();
                                     instance->SetBossState(DATA_ZATH, DONE);
@@ -350,7 +361,7 @@ public:
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->setFaction(14);
+                        pThekal->SetFaction(FACTION_MONSTER);
                         pThekal->SetFullHealth();
                     }
                 }
@@ -362,7 +373,7 @@ public:
                     {
                         pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pZath->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pZath->setFaction(14);
+                        pZath->SetFaction(FACTION_MONSTER);
                         pZath->SetFullHealth();
                     }
                 }
@@ -378,7 +389,7 @@ public:
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->AttackStop();
 
                 instance->SetBossState(DATA_LORKHAN, SPECIAL);
@@ -503,7 +514,7 @@ public:
                     {
                         pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pLorKhan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pLorKhan->setFaction(14);
+                        pLorKhan->SetFaction(FACTION_MONSTER);
                         pLorKhan->SetFullHealth();
                     }
                 }
@@ -515,7 +526,7 @@ public:
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pThekal->setFaction(14);
+                        pThekal->SetFaction(FACTION_MONSTER);
                         pThekal->SetFullHealth();
                     }
                 }
@@ -531,7 +542,7 @@ public:
                 me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->AttackStop();
 
                 instance->SetBossState(DATA_ZATH, SPECIAL);

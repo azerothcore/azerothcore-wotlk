@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _LFGMGR_H
@@ -18,14 +29,16 @@
 class Group;
 class Player;
 class Quest;
+class WorldLocation;
 
 namespace lfg
 {
 
     enum LfgOptions
     {
-        LFG_OPTION_ENABLE_DUNGEON_FINDER             = 0x01,
-        LFG_OPTION_ENABLE_RAID_BROWSER               = 0x02,
+        LFG_OPTION_ENABLE_DUNGEON_FINDER                = 0x01,
+        LFG_OPTION_ENABLE_RAID_BROWSER                  = 0x02,
+        LFG_OPTION_ENABLE_SEASONAL_BOSSES               = 0x04
     };
 
     enum LFGMgrEnum
@@ -125,6 +138,14 @@ namespace lfg
         LFG_UPDATE_FLAG_AREA          = 0x20,
         LFG_UPDATE_FLAG_STATUS        = 0x40,
         LFG_UPDATE_FLAG_BINDED        = 0x80
+    };
+
+    enum LfgSeasonalDungeons
+    {
+        LFG_DUNGEON_HEADLESS_HORSEMAN   = 285,
+        LFG_DUNGEON_FROST_LORD_AHUNE    = 286,
+        LFG_DUNGEON_COREN_DIREBREW      = 287,
+        LFG_DUNGEON_CROWN_CHEMICAL_CO   = 288
     };
 
     struct RBEntryInfo
@@ -500,7 +521,7 @@ namespace lfg
         /// Returns all random and seasonal dungeons for given level and expansion
         LfgDungeonSet GetRandomAndSeasonalDungeons(uint8 level, uint8 expansion);
         /// Teleport a player to/from selected dungeon
-        void TeleportPlayer(Player* player, bool out, bool fromOpcode = false);
+        void TeleportPlayer(Player* player, bool out, WorldLocation const* teleportLocation = nullptr);
         /// Inits new proposal to boot a player
         void InitBoot(ObjectGuid gguid, ObjectGuid kicker, ObjectGuid victim, std::string const& reason);
         /// Updates player boot proposal with new player answer
@@ -550,12 +571,17 @@ namespace lfg
         static bool HasIgnore(ObjectGuid guid1, ObjectGuid guid2);
         /// Sends queue status to player
         static void SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data);
+        // debug lfg command
+        void ToggleTesting();
+        /// For 1 player queue testing
+        [[nodiscard]] bool IsTesting() const { return m_Testing; }
+
+        void SetDungeon(ObjectGuid guid, uint32 dungeon);
 
     private:
         TeamId GetTeam(ObjectGuid guid);
         void RestoreState(ObjectGuid guid, char const* debugMsg);
         void ClearState(ObjectGuid guid, char const* debugMsg);
-        void SetDungeon(ObjectGuid guid, uint32 dungeon);
         void SetSelectedDungeons(ObjectGuid guid, LfgDungeonSet const& dungeons);
         void SetLockedDungeons(ObjectGuid guid, LfgLockMap const& lock);
         void DecreaseKicksLeft(ObjectGuid guid);
@@ -602,6 +628,7 @@ namespace lfg
         LfgPlayerBootContainer BootsStore;                 ///< Current player kicks
         LfgPlayerDataContainer PlayersStore;               ///< Player data
         LfgGroupDataContainer GroupsStore;                 ///< Group data
+        bool m_Testing;
     };
 
 } // namespace lfg
