@@ -150,6 +150,8 @@ public:
             _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
             _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
             _events.ScheduleEvent(EVENT_STRIKE, urand(12000, 20800));
+
+            DoZoneInCombat();
         }
 
         void UpdateAI(uint32 diff) override
