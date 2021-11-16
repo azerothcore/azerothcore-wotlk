@@ -1,3 +1,19 @@
+-- DB update 2021_11_15_04 -> 2021_11_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_15_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_15_04 2021_11_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1636737168152613886'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1636737168152613886');
 
 -- Malyfous's Catalogue
@@ -32,3 +48,13 @@ INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`, `lang0`,
 (3697,"The finest preservative of flesh known to man and Scourge alike - Frostwhisper's embalming fluid.  Only one place an adventurer could find this and one would think that the lich the fluid is named after would not take too kindly to anyone going to said place.$B$BBut... if it's the fluid you want, the Scholomance you'll haunt...","",6165,0,1,0),
 (3698,"The ground upon which the Scholomance was built was given to Kel'Thuzad by the Barov family. In exchange for this land - a place where the Cult of the Damned could learn the foul magics of the Scourge - Kel'Thuzad granted the Barov's immortality through undeath.$B$BIt is in Shadow Vault that you will find both the skin of shadow and its owner, Lady Illucia Barov.$B$BA finer mirror for the vain and dead never existed.","",6166,0,1,0),
 (3699,"A staple of the Thorium Brotherhood.$B$BArcanite crystals are harvested from rich thorium lodes. Through the alchemical prowess of powerful alchemists, arcanite bars are born.$B$BSeek out a miner, if you aren't one... and find a good alchemist! You'll need both.","",6167,0,1,0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_16_00' WHERE sql_rev = '1636737168152613886';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
