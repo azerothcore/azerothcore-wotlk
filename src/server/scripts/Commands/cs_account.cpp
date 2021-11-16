@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -27,14 +38,20 @@ EndScriptData */
 #include <openssl/rand.h>
 #include <unordered_map>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class account_commandscript : public CommandScript
 {
 public:
     account_commandscript() : CommandScript("account_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> accountSetCommandTable =
+        static ChatCommandTable accountSetCommandTable =
         {
             { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
             { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
@@ -42,24 +59,24 @@ public:
             { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
         };
 
-        static std::vector<ChatCommand> accountLockCommandTable
+        static ChatCommandTable accountLockCommandTable
         {
             { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
             { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
         };
 
-        static std::vector<ChatCommand> account2faCommandTable
+        static ChatCommandTable account2faCommandTable
         {
             { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
             { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
         };
 
-        static std::vector<ChatCommand> accountRemoveCommandTable
+        static ChatCommandTable accountRemoveCommandTable
         {
             { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
 
-        static std::vector<ChatCommand> accountCommandTable =
+        static ChatCommandTable accountCommandTable =
         {
             { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
             { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
@@ -73,7 +90,7 @@ public:
             { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
         };

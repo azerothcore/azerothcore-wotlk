@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /** \file
@@ -16,8 +27,10 @@
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "Hyperlinks.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -119,7 +132,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
-    timeWhoCommandAllowed(0),
     _calendarEventCreationCooldown(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
@@ -307,6 +319,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
 
+        METRIC_DETAILED_TIMER("worldsession_update_opcode_time", METRIC_TAG("opcode", opHandle->Name));
+
         try
         {
             switch (opHandle->Status)
@@ -378,6 +392,26 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                 break;
             }
         }
+        catch (WorldPackets::InvalidHyperlinkException const& ihe)
+        {
+            LOG_ERROR("network", "%s sent %s with an invalid link:\n%s", GetPlayerInfo().c_str(),
+                GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), ihe.GetInvalidValue().c_str());
+
+            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+            {
+                KickPlayer("WorldSession::Update Invalid chat link");
+            }
+        }
+        catch (WorldPackets::IllegalHyperlinkException const& ihe)
+        {
+            LOG_ERROR("network", "%s sent %s which illegally contained a hyperlink:\n%s", GetPlayerInfo().c_str(),
+                GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), ihe.GetInvalidValue().c_str());
+
+            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+            {
+                KickPlayer("WorldSession::Update Illegal chat link");
+            }
+        }
         catch (WorldPackets::PacketArrayMaxCapacityException const& pamce)
         {
             LOG_ERROR("network", "PacketArrayMaxCapacityException: %s while parsing %s from %s.",
@@ -408,6 +442,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     }
 
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
+
+    METRIC_VALUE("processed_packets", processedPackets);
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
@@ -639,6 +675,8 @@ void WorldSession::LogoutPlayer(bool save)
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);
 
+        METRIC_EVENT("player_events", "Logout", _player->GetName());
+
         LOG_INFO("entities.player", "Account: %d (IP: %s) Logout Character:[%s] (%s) Level: %d",
             GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), _player->getLevel());
 
@@ -685,6 +723,34 @@ void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 
     if (setKicked)
         SetKicked(true); // pussywizard: the session won't be left ingame for 60 seconds and to also kick offline session
+}
+
+bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
+{
+    if (Acore::Hyperlinks::CheckAllLinks(str))
+        return true;
+
+    LOG_ERROR("network", "Player %s%s sent a message with an invalid link:\n%.*s", GetPlayer()->GetName().c_str(),
+        GetPlayer()->GetGUID().ToString().c_str(), STRING_VIEW_FMT_ARG(str));
+
+    if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+        KickPlayer("WorldSession::ValidateHyperlinksAndMaybeKick Invalid chat link");
+
+    return false;
+}
+
+bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
+{
+    if (str.find('|') == std::string_view::npos)
+        return true;
+
+    LOG_ERROR("network", "Player %s %s sent a message which illegally contained a hyperlink:\n%.*s", GetPlayer()->GetName().c_str(),
+        GetPlayer()->GetGUID().ToString().c_str(), STRING_VIEW_FMT_ARG(str));
+
+    if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+        KickPlayer("WorldSession::DisallowHyperlinksAndMaybeKick Illegal chat link");
+
+    return false;
 }
 
 void WorldSession::SendNotification(const char* format, ...)

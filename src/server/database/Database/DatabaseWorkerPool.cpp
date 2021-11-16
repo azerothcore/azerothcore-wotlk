@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DatabaseWorkerPool.h"
@@ -62,7 +74,7 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool()
 
     WPFatal(isSupportClientDB, "AzerothCore does not support MySQL versions below 5.7 and MariaDB 10.2\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors).");
     WPFatal(isSameClientDB, "Used MySQL library version (%s id %lu) does not match the version id used to compile AzerothCore (id %u).\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors).",
-        mysql_get_client_info(), mysql_get_client_version(), MIN_MYSQL_CLIENT_VERSION);
+        mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
 }
 
 template <class T>
@@ -416,6 +428,12 @@ template <class T>
 void DatabaseWorkerPool<T>::Enqueue(SQLOperation* op)
 {
     _queue->Push(op);
+}
+
+template <class T>
+size_t DatabaseWorkerPool<T>::QueueSize() const
+{
+    return _queue->Size();
 }
 
 template <class T>

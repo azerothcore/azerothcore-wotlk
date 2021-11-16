@@ -9,6 +9,8 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ah-bot.gi
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-anticheat.git modules/mod-anticheat
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-azerothshard.git modules/mod-azerothshard
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-cfbg.git modules/mod-cfbg
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chat-transmitter modules/mod-chat-transmitter
+# NOTE: disabled because it causes DB error
 #git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chromie-xp.git modules/mod-chromie-xp
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-desertion-warnings.git modules/mod-desertion-warnings
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset.git modules/mod-duel-reset
@@ -20,3 +22,4 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvpstats-
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-queue-list-cache.git modules/mod-queue-list-cache
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-server-auto-shutdown.git modules/mod-server-auto-shutdown
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-transmog.git modules/mod-transmog
+git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-progression-system modules/mod-progression-system
