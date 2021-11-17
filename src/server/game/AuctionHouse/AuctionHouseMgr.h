@@ -70,6 +70,33 @@ enum AuctionHouses
     AUCTIONHOUSE_NEUTRAL        = 7
 };
 
+enum AuctionSortOrder
+{
+    AUCTION_SORT_MINLEVEL       = 0,
+    AUCTION_SORT_RARITY         = 1,
+    AUCTION_SORT_BUYOUT         = 2,
+    AUCTION_SORT_TIMELEFT       = 3,
+    AUCTION_SORT_UNK4           = 4,
+    AUCTION_SORT_ITEM           = 5,
+    AUCTION_SORT_MINBIDBUY      = 6,
+    AUCTION_SORT_OWNER          = 7,
+    AUCTION_SORT_BID            = 8,
+    AUCTION_SORT_STACK          = 9,
+    AUCTION_SORT_BUYOUT_2       = 10,
+
+    AUCTION_SORT_MAX
+};
+
+struct AuctionSortInfo
+{
+    AuctionSortInfo() : sortOrder(AUCTION_SORT_MAX), isDesc(true) { }
+
+    AuctionSortOrder sortOrder;
+    bool isDesc;
+};
+
+typedef std::vector<AuctionSortInfo> AuctionSortOrderVector;
+
 struct AuctionEntry
 {
     uint32 Id;
@@ -135,7 +162,7 @@ public:
     bool BuildListAuctionItems(WorldPacket& data, Player* player,
                                std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
                                uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-                               uint32& count, uint32& totalcount, uint8 getAll);
+                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder);
 
 private:
     AuctionEntryMap AuctionsMap;
