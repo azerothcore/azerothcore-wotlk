@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battlefield.h"
@@ -742,8 +755,8 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((go->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
-                    (go->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
+            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
+                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
         }
 
         Creature* IsValidVehicle(Creature* cVeh)
@@ -752,7 +765,7 @@ public:
                 if (Vehicle* vehicle = cVeh->GetVehicleKit())
                     if (Unit* passenger = vehicle->GetPassenger(0))
                         if (IsFriendly(passenger))
-                            if (Creature* teleportTrigger = passenger->SummonTrigger(go->GetPositionX() - 60.0f, go->GetPositionY(), go->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1000))
+                            if (Creature* teleportTrigger = passenger->SummonTrigger(me->GetPositionX() - 60.0f, me->GetPositionY(), me->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1000))
                                 return teleportTrigger;
 
             return nullptr;
@@ -764,7 +777,7 @@ public:
             if (_checkTimer >= 1000)
             {
                 for (uint8 i = 0; i < MAX_WINTERGRASP_VEHICLES; i++)
-                    if (Creature* vehicleCreature = go->FindNearestCreature(vehiclesList[i], 3.0f, true))
+                    if (Creature* vehicleCreature = me->FindNearestCreature(vehiclesList[i], 3.0f, true))
                         if (Creature* teleportTrigger = IsValidVehicle(vehicleCreature))
                             teleportTrigger->CastSpell(vehicleCreature, SPELL_VEHICLE_TELEPORT, true);
 

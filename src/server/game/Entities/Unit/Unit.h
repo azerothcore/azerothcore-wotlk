@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __UNIT_H
@@ -9,12 +20,12 @@
 
 #include "EventProcessor.h"
 #include "FollowerReference.h"
-#include "FollowerRefManager.h"
-#include "HostileRefManager.h"
+#include "FollowerRefMgr.h"
+#include "HostileRefMgr.h"
 #include "MotionMaster.h"
 #include "Object.h"
 #include "SpellAuraDefines.h"
-#include "ThreatManager.h"
+#include "ThreatMgr.h"
 #include <functional>
 
 #define WORLD_TRIGGER   12999
@@ -114,10 +125,11 @@ enum SpellValueMod
     SPELLVALUE_RADIUS_MOD,
     SPELLVALUE_MAX_TARGETS,
     SPELLVALUE_AURA_STACK,
+    SPELLVALUE_AURA_DURATION,
     SPELLVALUE_FORCED_CRIT_RESULT
 };
 
-typedef std::pair<SpellValueMod, int32>     CustomSpellValueMod;
+typedef std::pair<SpellValueMod, int32> CustomSpellValueMod;
 class CustomSpellValues : public std::vector<CustomSpellValueMod>
 {
 public:
@@ -248,6 +260,9 @@ enum UnitRename
 };
 
 static constexpr uint32 MAX_CREATURE_SPELLS = 8;
+static constexpr uint32 infinityCooldownDelay = 0x9A7EC800; // used for set "infinity cooldowns" for spells and check, MONTH*IN_MILLISECONDS
+static constexpr uint32 infinityCooldownDelayCheck = 0x4D3F6400; // MONTH*IN_MILLISECONDS/2;
+
 #define MAX_SPELL_CHARM         4
 #define MAX_SPELL_VEHICLE       6
 #define MAX_SPELL_POSSESS       8
@@ -395,9 +410,10 @@ enum TriggerCastFlags
     TRIGGERED_IGNORE_CASTER_AURAS                   = 0x00010000,   //! Will ignore caster aura restrictions or requirements
     TRIGGERED_DISALLOW_PROC_EVENTS                  = 0x00020000,   //! Disallows proc events from triggered spell (default)
     TRIGGERED_DONT_REPORT_CAST_ERROR                = 0x00040000,   //! Will return SPELL_FAILED_DONT_REPORT in CheckCast functions
+    TRIGGERED_FULL_MASK                             = 0x0007FFFF,   //! Used when doing CastSpell with triggered == true
     TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT      = 0x00080000,   //! Will ignore equipped item requirements
     TRIGGERED_NO_PERIODIC_RESET                     = 0x00100000,   //! Periodic aura tick wont be reset on override
-    TRIGGERED_FULL_MASK                             = 0xFFFFFFFF
+    TRIGGERED_FULL_DEBUG_MASK                       = 0xFFFFFFFF
 };
 
 enum UnitMods
@@ -584,6 +600,7 @@ enum DamageEffectType
 };
 
 // Value masks for UNIT_FIELD_FLAGS
+// EnumUtils: DESCRIBE THIS
 enum UnitFlags
 {
     UNIT_FLAG_SERVER_CONTROLLED             = 0x00000001,           // set only when unit movement is controlled by server - by SPLINE/MONSTER_MOVE packets, together with UNIT_FLAG_STUNNED; only set to units controlled by client; client function CGUnit_C::IsClientControlled returns false when set for owner
@@ -644,7 +661,8 @@ enum UnitFlags2
 };
 
 /// Non Player Character flags
-enum NPCFlags
+// EnumUtils: DESCRIBE THIS
+enum NPCFlags : uint32
 {
     UNIT_NPC_FLAG_NONE                  = 0x00000000,       // SKIP
     UNIT_NPC_FLAG_GOSSIP                = 0x00000001,       // TITLE has gossip menu DESCRIPTION 100%
@@ -879,6 +897,7 @@ struct CleanDamage
 };
 
 struct CalcDamageInfo;
+struct SpellNonMeleeDamage;
 
 class DamageInfo
 {
@@ -893,9 +912,11 @@ private:
     uint32 m_absorb;
     uint32 m_resist;
     uint32 m_block;
+    uint32 m_cleanDamage;
 public:
-    explicit DamageInfo(Unit* _attacker, Unit* _victim, uint32 _damage, SpellInfo const* _spellInfo, SpellSchoolMask _schoolMask, DamageEffectType _damageType);
+    explicit DamageInfo(Unit* _attacker, Unit* _victim, uint32 _damage, SpellInfo const* _spellInfo, SpellSchoolMask _schoolMask, DamageEffectType _damageType, uint32 cleanDamage = 0);
     explicit DamageInfo(CalcDamageInfo& dmgInfo);
+    DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEffectType damageType);
 
     void ModifyDamage(int32 amount);
     void AbsorbDamage(uint32 amount);
@@ -912,6 +933,8 @@ public:
     [[nodiscard]] uint32 GetAbsorb() const { return m_absorb; };
     [[nodiscard]] uint32 GetResist() const { return m_resist; };
     [[nodiscard]] uint32 GetBlock() const { return m_block; };
+
+    [[nodiscard]] uint32 GetUnmitigatedDamage() const;
 };
 
 class HealInfo
@@ -936,6 +959,11 @@ public:
         m_heal -= amount;
     }
 
+    void SetHeal(uint32 amount)
+    {
+        m_heal = amount;
+    }
+
     [[nodiscard]] Unit* GetHealer() const { return m_healer; }
     [[nodiscard]] Unit* GetTarget() const { return m_target; }
     [[nodiscard]] uint32 GetHeal() const { return m_heal; }
@@ -955,14 +983,14 @@ private:
     uint32 _spellPhaseMask;
     uint32 _hitMask;
     uint32 _cooldown;
-    Spell* _spell;
+    Spell const* _spell;
     DamageInfo* _damageInfo;
     HealInfo* _healInfo;
     SpellInfo const* const _triggeredByAuraSpell;
     int8 _procAuraEffectIndex;
 
 public:
-    explicit ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* spell, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell = nullptr, int8 procAuraEffectIndex = -1);
+    explicit ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell const* spell, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell = nullptr, int8 procAuraEffectIndex = -1);
     Unit* GetActor() { return _actor; };
     [[nodiscard]] Unit* GetActionTarget() const { return _actionTarget; }
     [[nodiscard]] Unit* GetProcTarget() const { return _procTarget; }
@@ -972,7 +1000,7 @@ public:
     [[nodiscard]] uint32 GetHitMask() const { return _hitMask; }
     [[nodiscard]] SpellInfo const* GetSpellInfo() const;
     [[nodiscard]] SpellSchoolMask GetSchoolMask() const { return SPELL_SCHOOL_MASK_NONE; }
-    [[nodiscard]] Spell* GetProcSpell() const { return _spell; }
+    [[nodiscard]] Spell const* GetProcSpell() const { return _spell; }
     [[nodiscard]] DamageInfo* GetDamageInfo() const { return _damageInfo; }
     [[nodiscard]] HealInfo* GetHealInfo() const { return _healInfo; }
     [[nodiscard]] SpellInfo const* GetTriggerAuraSpell() const { return _triggeredByAuraSpell; }
@@ -1006,21 +1034,21 @@ struct CalcDamageInfo
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage
 {
-    SpellNonMeleeDamage(Unit* _attacker, Unit* _target, uint32 _SpellID, uint32 _schoolMask)
-        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), overkill(0), schoolMask(_schoolMask),
+    SpellNonMeleeDamage(Unit* _attacker, Unit* _target, SpellInfo const* _spellInfo, uint32 _schoolMask)
+        : target(_target), attacker(_attacker), spellInfo(_spellInfo), damage(0), overkill(0), schoolMask(_schoolMask),
           absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0)
     {}
 
-    Unit*   target;
-    Unit*   attacker;
-    uint32 SpellID;
+    Unit* target;
+    Unit* attacker;
+    SpellInfo const* spellInfo;
     uint32 damage;
     uint32 overkill;
     uint32 schoolMask;
     uint32 absorb;
     uint32 resist;
-    bool   physicalLog;
-    bool   unused;
+    bool physicalLog;
+    bool unused;
     uint32 blocked;
     uint32 HitInfo;
     // Used for help
@@ -1571,8 +1599,8 @@ public:
     virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
 
     // faction template id
-    [[nodiscard]] uint32 getFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
-    void setFaction(uint32 faction);
+    [[nodiscard]] uint32 GetFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
+    void SetFaction(uint32 faction);
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
 
     ReputationRank GetReactionTo(Unit const* target) const;
@@ -1628,8 +1656,8 @@ public:
     static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr);
     static int32 DealHeal(Unit* healer, Unit* victim, uint32 addhealth);
 
-    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr);
-    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr);
+    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr);
+    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr);
 
     void GetProcAurasTriggeredOnEvent(std::list<AuraApplication*>& aurasTriggeringProc, std::list<AuraApplication*>* procAuras, ProcEventInfo eventInfo);
     void TriggerAurasProcOnEvent(CalcDamageInfo& damageInfo);
@@ -1777,7 +1805,7 @@ public:
     bool isInAccessiblePlaceFor(Creature const* c) const;
 
     void SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 OverHeal, uint32 Absorb, bool critical = false);
-    int32 HealBySpell(Unit* victim, SpellInfo const* spellInfo, uint32 addHealth, bool critical = false);
+    int32 HealBySpell(HealInfo& healInfo, bool critical = false);
     void SendEnergizeSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
     void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
 
@@ -1806,7 +1834,7 @@ public:
     void SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount);
     void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log);
     void SendSpellNonMeleeReflectLog(SpellNonMeleeDamage* log, Unit* attacker);
-    void SendSpellNonMeleeDamageLog(Unit* target, uint32 SpellID, uint32 Damage, SpellSchoolMask damageSchoolMask, uint32 AbsorbedDamage, uint32 Resist, bool PhysicalDamage, uint32 Blocked, bool CriticalHit = false);
+    void SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, uint32 Damage, SpellSchoolMask damageSchoolMask, uint32 AbsorbedDamage, uint32 Resist, bool PhysicalDamage, uint32 Blocked, bool CriticalHit = false);
     void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo);
     void SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo);
     void SendSpellDamageResist(Unit* target, uint32 spellId);
@@ -1863,7 +1891,7 @@ public:
     DeathState getDeathState() { return m_deathState; };
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
 
-    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return  GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
     void SetOwnerGUID(ObjectGuid owner);
     [[nodiscard]] ObjectGuid GetCreatorGUID() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
     void SetCreatorGUID(ObjectGuid creator) { SetGuidValue(UNIT_FIELD_CREATEDBY, creator); }
@@ -2117,6 +2145,8 @@ public:
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     [[nodiscard]] int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
+    virtual bool IsMovementPreventedByCasting() const;
+
     ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
     ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
 
@@ -2200,10 +2230,10 @@ public:
     void DeleteThreatList();
     void TauntApply(Unit* victim);
     void TauntFadeOut(Unit* taunter);
-    ThreatManager& getThreatManager() { return m_ThreatManager; }
-    void addHatedBy(HostileReference* pHostileReference) { m_HostileRefManager.insertFirst(pHostileReference); };
+    ThreatMgr& getThreatMgr() { return m_ThreatMgr; }
+    void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
     void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
-    HostileRefManager& getHostileRefManager() { return m_HostileRefManager; }
+    HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
 
     VisibleAuraMap const* GetVisibleAuras() { return &m_visibleAuras; }
     AuraApplication* GetVisibleAura(uint8 slot)
@@ -2272,7 +2302,7 @@ public:
     void SetLastManaUse(uint32 spellCastTime) { m_lastManaUse = spellCastTime; }
     [[nodiscard]] bool IsUnderLastManaUseEffect() const;
 
-    void SetContestedPvP(Player* attackedPlayer = nullptr);
+    void SetContestedPvP(Player* attackedPlayer = nullptr, bool lookForNearContestedGuards = true);
 
     uint32 GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const;
     float CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffectType damagetype) const;
@@ -2293,8 +2323,8 @@ public:
     // redefined in Creature
     static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = nullptr, uint8 effIndex = MAX_SPELL_EFFECTS);
     static uint32 CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, const uint32 damage, SpellInfo const* spellInfo, uint8 attackerLevel = 0, WeaponAttackType attackType = MAX_ATTACK);
-    static void CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32* absorb, uint32* resist, SpellInfo const* spellInfo = nullptr, bool Splited = false);
-    static void CalcHealAbsorb(Unit const* victim, const SpellInfo* spellProto, uint32& healAmount, uint32& absorb);
+    static void CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited = false);
+    static void CalcHealAbsorb(HealInfo& healInfo);
 
     void  UpdateSpeed(UnitMoveType mtype, bool forced);
     [[nodiscard]] float GetSpeed(UnitMoveType mtype) const;
@@ -2309,7 +2339,7 @@ public:
     void  ModSpellCastTime(SpellInfo const* spellProto, int32& castTime, Spell* spell = nullptr);
     float CalculateLevelPenalty(SpellInfo const* spellProto) const;
 
-    void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
+    void addFollower(FollowerReference* pRef) { m_FollowingRefMgr.insertFirst(pRef); }
     void removeFollower(FollowerReference* /*pRef*/) { /* nothing to do yet */ }
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
@@ -2478,6 +2508,17 @@ public:
     // Movement info
     Movement::MoveSpline* movespline;
 
+    virtual void Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target);
+    virtual void Say(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void Yell(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void TextEmote(std::string_view text, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(std::string_view text, Language language, Player* target, bool isBossWhisper = false);
+    virtual void Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target);
+    virtual void Say(uint32 textId, WorldObject const* target = nullptr);
+    virtual void Yell(uint32 textId, WorldObject const* target = nullptr);
+    virtual void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(uint32 textId, Player* target, bool isBossWhisper = false);
+
     [[nodiscard]] float GetCollisionHeight() const override;
     [[nodiscard]] float GetCollisionWidth() const override;
     [[nodiscard]] float GetCollisionRadius() const override;
@@ -2551,7 +2592,7 @@ protected:
     uint32 m_reactiveTimer[MAX_REACTIVE];
     int32 m_regenTimer;
 
-    ThreatManager m_ThreatManager;
+    ThreatMgr m_ThreatMgr;
     typedef std::map<ObjectGuid, float> CharmThreatMap;
     CharmThreatMap _charmThreatInfo;
 
@@ -2568,7 +2609,7 @@ protected:
     bool _instantCast;
 
 private:
-    bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
+    bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
     bool HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
     bool HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, bool* handled);
     bool HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
@@ -2597,9 +2638,9 @@ private:
 
     Diminishing m_Diminishing;
     // Manage all Units that are threatened by us
-    HostileRefManager m_HostileRefManager;
+    HostileRefMgr m_HostileRefMgr;
 
-    FollowerRefManager m_FollowingRefManager;
+    FollowerRefMgr m_FollowingRefMgr;
     Unit* m_comboTarget;
 
     ComboPointHolderSet m_ComboPointHolders;

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ConditionMgr.h"
@@ -752,7 +763,7 @@ bool ConditionMgr::CanHaveSourceGroupSet(ConditionSourceType sourceType) const
 {
     return (sourceType == CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_DISENCHANT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_FISHING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GAMEOBJECT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_ITEM_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MAIL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MILLING_LOOT_TEMPLATE ||
             sourceType == CONDITION_SOURCE_TYPE_PICKPOCKETING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_PROSPECTING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_REFERENCE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SKINNING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SPELL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION || sourceType == CONDITION_SOURCE_TYPE_VEHICLE_SPELL ||
-            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR);
+            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR || sourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE);
 }
 
 bool ConditionMgr::CanHaveSourceIdSet(ConditionSourceType sourceType) const
@@ -865,6 +876,7 @@ void ConditionMgr::LoadConditions(bool isReload)
         LootTemplates_Disenchant.ResetConditions();
         LootTemplates_Prospecting.ResetConditions();
         LootTemplates_Spell.ResetConditions();
+        LootTemplates_Player.ResetConditions();
 
         LOG_INFO("server.loading", "Re-Loading `gossip_menu` Table for Conditions!");
         sObjectMgr->LoadGossipMenu();
@@ -992,7 +1004,7 @@ void ConditionMgr::LoadConditions(bool isReload)
             cond->ErrorTextId = 0;
         }
 
-        if (cond->SourceGroup)
+        if (cond->SourceGroup || cond->SourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE)
         {
             bool valid = false;
             // handle grouped conditions
@@ -1072,6 +1084,11 @@ void ConditionMgr::LoadConditions(bool isReload)
                 valid = true;
                 ++count;
                 continue;
+            }
+            case CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE:
+            {
+                valid = addToLootTemplate(cond, LootTemplates_Player.GetLootForConditionFill(cond->SourceGroup));
+                break;
             }
             default:
                 break;
@@ -1519,6 +1536,20 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                 break;
             }
 
+            switch (spellInfo->Effects[i].Effect)
+            {
+                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+                case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+                case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+                case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+                    continue;
+                default:
+                    break;
+            }
+
             // Xinef: chain targets are treated as area targets! Apply conditions!
             if (spellInfo->Effects[i].ChainTarget > 1)
                 continue;
@@ -1586,6 +1617,23 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
         if (!itemTemplate)
         {
             LOG_ERROR("condition", "SourceEntry %u in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceEntry);
+            return false;
+        }
+        break;
+    }
+    case CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE:
+    {
+        if (!LootTemplates_Player.HaveLootFor(cond->SourceGroup))
+        {
+            LOG_ERROR("sql.sql", "SourceGroup %u in `condition` table, does not exist in `player_loot_template`, ignoring.", cond->SourceGroup);
+            return false;
+        }
+
+        LootTemplate* loot = LootTemplates_Player.GetLootForConditionFill(cond->SourceGroup);
+        ItemTemplate const* pItemProto = sObjectMgr->GetItemTemplate(cond->SourceEntry);
+        if (!pItemProto && !loot->isReference(cond->SourceEntry))
+        {
+            LOG_ERROR("sql.sql", "SourceType %u, SourceEntry %u in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceType, cond->SourceEntry);
             return false;
         }
         break;

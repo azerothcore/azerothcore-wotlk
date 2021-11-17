@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Containers.h"
@@ -40,6 +51,7 @@ LootStore LootTemplates_Prospecting("prospecting_loot_template",     "item entry
 LootStore LootTemplates_Reference("reference_loot_template",         "reference id",                    false);
 LootStore LootTemplates_Skinning("skinning_loot_template",           "creature skinning id",            true);
 LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (random item creating)", false);
+LootStore LootTemplates_Player("player_loot_template",               "team id",                         true);
 
 // Selects invalid loot items to be removed from group possible entries (before rolling)
 struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, bool>
@@ -417,6 +429,14 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
         return false;
     }
 
+    // Checking for unique or unique(XX) objects
+    // master looter should still be able to see the loot to give to people.
+    // casting to avoid warnings, it's unlikely there's an item with unique but 2^31 items allowed.
+    if (!isMasterLooter && pProto->MaxCount > 0 && ((int32)player->GetItemCount(itemid, true) >= pProto->MaxCount))
+    {
+        return false;
+    }
+
     // not show loot for not own team
     if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId(true) != TEAM_HORDE)
     {
@@ -464,7 +484,6 @@ void LootItem::AddAllowedLooter(Player const* player)
 // --------- Loot ---------
 //
 
-// Inserts the item into the loot (called by LootTemplate processors)
 // Inserts the item into the loot (called by LootTemplate processors)
 void Loot::AddItem(LootStoreItem const& item)
 {
@@ -2231,6 +2250,27 @@ void LoadLootTemplates_Spell()
         LOG_INFO("server.loading", ">> Loaded %u spell loot templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     else
         LOG_ERROR("sql.sql", ">> Loaded 0 spell loot templates. DB table `spell_loot_template` is empty");
+    LOG_INFO("server.loading", " ");
+}
+
+void LoadLootTemplates_Player()
+{
+    LOG_INFO("server.loading", "Loading player loot templates...");
+
+    uint32 oldMSTime = getMSTime();
+
+    LootIdSet lootIdSet;
+    uint32 count = LootTemplates_Player.LoadAndCollectLootIds(lootIdSet);
+
+    if (count)
+    {
+        LOG_INFO("server.loading", ">> Loaded %u player loot templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    }
+    else
+    {
+        LOG_ERROR("sql.sql", ">> Loaded 0 player loot templates. DB table `player_loot_template` is empty");
+    }
+
     LOG_INFO("server.loading", " ");
 }
 

@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GameObjectAI.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
@@ -366,7 +379,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetSheath(SHEATH_STATE_UNARMED);
-            me->setFaction(190);
+            me->SetFaction(190);
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
 
             _phaseTwo = false;
@@ -424,7 +437,7 @@ public:
 
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(false);
                     if (m_pInstance)
@@ -589,7 +602,7 @@ public:
                 damage = 0;
                 me->SetReactState(REACT_PASSIVE);
                 me->AttackStop();
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 events.Reset();
                 summons.DespawnAll();
@@ -653,7 +666,7 @@ public:
                     me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
                     // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->setFaction(14);
+                    me->SetFaction(FACTION_MONSTER);
                     if (Player* target = SelectTargetFromPlayerList(150.0f))
                         AttackStart(target);
                     me->SetInCombatWithZone();
@@ -1088,7 +1101,7 @@ public:
         bool GossipHello(Player* player, bool  /*reportUse*/) override
         {
             bool hasKey = true;
-            if (LockEntry const* lock = sLockStore.LookupEntry(go->GetGOInfo()->goober.lockId))
+            if (LockEntry const* lock = sLockStore.LookupEntry(me->GetGOInfo()->goober.lockId))
             {
                 hasKey = false;
                 for (uint32 i = 0; i < MAX_LOCK_CASE; ++i)
@@ -1111,18 +1124,18 @@ public:
                 return false;
             _locked = true;
             // Start Algalon event
-            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
             events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5000);
-            if (Creature* brann = go->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
+            if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
                 brann->AI()->DoAction(ACTION_START_INTRO);
 
-            if (InstanceScript* instance = go->GetInstanceScript())
+            if (InstanceScript* instance = me->GetInstanceScript())
             {
                 instance->SetData(DATA_ALGALON_SUMMON_STATE, 1);
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -1138,7 +1151,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_DESPAWN_CONSOLE:
-                    go->Delete();
+                    me->Delete();
                     break;
             }
         }

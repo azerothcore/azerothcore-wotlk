@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _MAPTREE_H
@@ -15,7 +26,7 @@ namespace VMAP
 {
     class ModelInstance;
     class GroupModel;
-    class VMapManager2;
+    class VMapMgr2;
 
     struct LocationInfo
     {
@@ -63,10 +74,10 @@ namespace VMAP
         bool GetAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
         bool GetLocationInfo(const G3D::Vector3& pos, LocationInfo& info) const;
 
-        bool InitMap(const std::string& fname, VMapManager2* vm);
-        void UnloadMap(VMapManager2* vm);
-        bool LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
-        void UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
+        bool InitMap(const std::string& fname, VMapMgr2* vm);
+        void UnloadMap(VMapMgr2* vm);
+        bool LoadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
+        void UnloadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
         [[nodiscard]] bool isTiled() const { return iIsTiled; }
         [[nodiscard]] uint32 numLoadedTiles() const { return iLoadedTiles.size(); }
         void GetModelInstances(ModelInstance*& models, uint32& count);
