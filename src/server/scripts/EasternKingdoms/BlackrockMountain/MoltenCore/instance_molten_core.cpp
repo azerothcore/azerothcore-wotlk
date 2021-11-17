@@ -265,20 +265,6 @@ public:
                         }
                         break;
                     }
-                    case IN_PROGRESS:
-                    {
-                        if (!_golemaggMinionsGUIDS.empty())
-                        {
-                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
-                            {
-                                if (Creature* minion = instance->GetCreature(minionGuid))
-                                {
-                                    minion->AI()->DoZoneInCombat(nullptr, 150.0f);
-                                }
-                            }
-                        }
-                        break;
-                    }
                     case DONE:
                     {
                         if (!_golemaggMinionsGUIDS.empty())
@@ -294,6 +280,7 @@ public:
                         }
                         break;
                     }
+                    case IN_PROGRESS:
                     default:
                         break;
                 }
