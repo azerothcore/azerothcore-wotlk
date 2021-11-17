@@ -264,7 +264,7 @@ public:
                                 break;
                             }
                         case EVENT_ENTER_COMBAT:
-                            AttackStart(me->SelectNearestPlayer(30.0f));
+                            DoZoneInCombat();
                             break;
                         default:
                             break;
@@ -292,8 +292,7 @@ public:
                         events.ScheduleEvent(EVENT_FLAMEBUFFET, 14000);
                         break;
                     case EVENT_PYROBLAST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            DoCast(target, SPELL_PYROBLAST);
+                        DoCastRandomTarget(SPELL_PYROBLAST, 0, 100.0f);
                         events.ScheduleEvent(EVENT_PYROBLAST, 15000);
                         break;
                     default:
@@ -314,13 +313,15 @@ public:
 ## npc_blackhand_incarcerator
 ####*/
 
-enum IncarceratorEvents
+enum IncarceratorData
 {
     // OOC
     EVENT_ENCAGED_EMBERSEER         = 1,
     // Combat
     EVENT_STRIKE                    = 2,
-    EVENT_ENCAGE                    = 3
+    EVENT_ENCAGE                    = 3,
+
+    EMOTE_FLEE                      = 0
 };
 
 class npc_blackhand_incarcerator : public CreatureScript
@@ -330,18 +331,33 @@ public:
 
     struct npc_blackhand_incarceratorAI : public ScriptedAI
     {
-        npc_blackhand_incarceratorAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_blackhand_incarceratorAI(Creature* creature) : ScriptedAI(creature)
+        {
+            _fleedForAssistance = false;
+        }
 
         void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
                 Emberseer->AI()->SetData(1, 3);
+
+            _fleedForAssistance = false;
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(10000);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (!_fleedForAssistance && me->HealthBelowPctDamaged(30, damage))
+            {
+                _fleedForAssistance = true;
+                me->DoFleeToGetAssistance();
+                Talk(EMOTE_FLEE);
+            }
         }
 
         void SetData(uint32 data, uint32 value) override
@@ -350,6 +366,7 @@ public:
             {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                DoZoneInCombat();
                 _events.CancelEvent(EVENT_ENCAGED_EMBERSEER);
             }
 
@@ -423,6 +440,7 @@ public:
 
     private:
         EventMap _events;
+        bool _fleedForAssistance;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

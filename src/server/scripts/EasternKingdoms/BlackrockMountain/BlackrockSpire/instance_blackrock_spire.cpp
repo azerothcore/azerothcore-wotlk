@@ -61,6 +61,14 @@ MinionData const minionData[] =
     { NPC_CHROMATIC_ELITE_GUARD, DATA_GENERAL_DRAKKISATH }
 };
 
+DoorData const doorData[] =
+{
+    { GO_GYTH_EXIT_DOOR,    DATA_WARCHIEF_REND_BLACKHAND,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_DRAKKISATH_DOOR_1, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { GO_DRAKKISATH_DOOR_2, DATA_GENERAL_DRAKKISATH,       DOOR_TYPE_PASSAGE, BOUNDARY_NONE },
+    { 0,                 0,          DOOR_TYPE_ROOM,                          BOUNDARY_NONE } // END
+};
+
 class instance_blackrock_spire : public InstanceMapScript
 {
 public:
@@ -76,6 +84,7 @@ public:
         {
             SetBossNumber(EncounterCount);
             LoadMinionData(minionData);
+            LoadDoorData(doorData);
             CurrentSolakarWave = 0;
             SolakarState       = NOT_STARTED;
             SolakarSummons.clear();
@@ -260,11 +269,6 @@ public:
                     if (GetBossState(DATA_GYTH) == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
-                case GO_PORTCULLIS_TOBOSSROOMS:
-                    go_portcullis_tobossrooms = go->GetGUID();
-                    if (GetBossState(DATA_GYTH) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
                 case GO_UROK_PILE:
                     go_urokPile = go->GetGUID();
                     break;
@@ -277,6 +281,8 @@ public:
                 default:
                     break;
             }
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -370,7 +376,7 @@ public:
                 case DATA_UROK_DOOMHOWL:
                     if (data == FAIL)
                     {
-                        if (!(GetBossState(DATA_UROK_DOOMHOWL) == NOT_STARTED))
+                        if (GetBossState(DATA_UROK_DOOMHOWL) != NOT_STARTED)
                         {
                             SetBossState(DATA_UROK_DOOMHOWL, NOT_STARTED);
                             if (GameObject* challenge = instance->GetGameObject(go_urokChallenge))
@@ -389,7 +395,7 @@ public:
                                     circle->Delete();
                                 }
                             }
-                            for (const auto& mobGUID: UrokMobs)
+                            for (const auto& mobGUID : UrokMobs)
                             {
                                 if (Creature* mob = instance->GetCreature(mobGUID))
                                 {
@@ -504,8 +510,10 @@ public:
                     return go_emberseerrunes[6];
                 case GO_PORTCULLIS_ACTIVE:
                     return go_portcullis_active;
-                case GO_PORTCULLIS_TOBOSSROOMS:
-                    return go_portcullis_tobossrooms;
+                case GO_UROK_PILE:
+                    return go_urokPile;
+                case GO_UROK_CHALLENGE:
+                    return go_urokChallenge;
                 default:
                     break;
             }
@@ -708,7 +716,6 @@ public:
         ObjectGuid go_emberseerrunes[7];
         GuidVector runecreaturelist[7];
         ObjectGuid go_portcullis_active;
-        ObjectGuid go_portcullis_tobossrooms;
         ObjectGuid go_urokPile;
         ObjectGuid go_urokChallenge;
         std::vector<ObjectGuid> go_urokOgreCirles;
