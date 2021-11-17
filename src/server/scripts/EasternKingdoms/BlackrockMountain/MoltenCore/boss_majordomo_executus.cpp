@@ -252,18 +252,7 @@ public:
                 }
                 else if (!remainingAdds)
                 {
-                    if (!static_minionsGUIDS.empty())
-                    {
-                        for (ObjectGuid const& guid : static_minionsGUIDS)
-                        {
-                            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
-                            {
-                                minion->DespawnOrUnsummon();
-                            }
-                        }
-
-                        static_minionsGUIDS.clear();
-                    }
+                    static_minionsGUIDS.clear();
 
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);
