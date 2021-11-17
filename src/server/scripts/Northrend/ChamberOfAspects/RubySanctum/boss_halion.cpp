@@ -1045,8 +1045,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             if (Creature* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id))
             {
                 bool heroic = summon->GetMap()->IsHeroic();

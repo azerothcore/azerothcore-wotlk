@@ -9,6 +9,7 @@
 #    EXAMPLE CONFIG
 #    CONNECTIONS AND DIRECTORIES
 #    PERFORMANCE SETTINGS
+#    SERVER LOGGING
 #    SERVER SETTINGS
 #    CRYPTOGRAPHY
 #    WARDEN SETTINGS
@@ -597,6 +598,15 @@ GameType = 0
 #                     29 - (CN9           - basic-Latin at create, any at login)
 
 RealmZone = 1
+
+#
+#    World.RealmAvailability
+#        Description: If enabled, players will enter the realm normally.
+#                     Character creation will still be possible even when realm is disabled.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+World.RealmAvailability = 1
 
 #
 #    StrictPlayerNames
@@ -3586,15 +3596,6 @@ LFG.MaxKickCount = 2
 #                     0 - Disabled
 
 LFG.KickPreventionTimer = 900
-
-#
-#    World.RealmAvailability
-#        Description: If enabled, players will enter the realm normally.
-#                     Character creation will still be possible even when realm is disabled.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-World.RealmAvailability = 1
 
 #
 ###################################################################################################
