@@ -1419,8 +1419,12 @@ public:
         bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest)
         {
             if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
+            {
                 if (InstanceScript* pInstance = creature->GetInstanceScript())
+                {
                     pInstance->SetData(DATA_SHOW_CRATES, 1);
+                }
+            }
 
             return true;
         }
@@ -1431,8 +1435,12 @@ public:
             if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
             {
                 if (InstanceScript* pInstance = creature->GetInstanceScript())
+                {
                     if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                    {
                         pInstance->SetData(DATA_SHOW_CRATES, 1);
+                    }
+                }
 
                 if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
                 {
@@ -1448,7 +1456,9 @@ public:
                     {
                         pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
                         if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetGuidData(DATA_ARTHAS)))
+                        {
                             arthas->AI()->Reset();
+                        }
                     }
                     player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
                 }
