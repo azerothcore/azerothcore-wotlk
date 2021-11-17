@@ -2872,8 +2872,12 @@ void GameObject::AddToSkillupList(ObjectGuid playerGuid)
 bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
 {
     for (auto const& itr : m_SkillupList)
+    {
         if (itr.first == playerGuid)
+        {
             return true;
+        }
+    }
 
     return false;
 }
