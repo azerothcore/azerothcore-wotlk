@@ -75,11 +75,6 @@ public:
             instance->SetBossState(DATA_GOLEMAGG, IN_PROGRESS);
         }
 
-        void EnterEvadeMode() override
-        {
-            instance->SetBossState(DATA_GOLEMAGG, FAIL);
-        }
-
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!enraged && me->HealthBelowPctDamaged(10, damage))
