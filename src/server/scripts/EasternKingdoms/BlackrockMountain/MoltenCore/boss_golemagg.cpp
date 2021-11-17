@@ -63,8 +63,6 @@ public:
             DoCastSelf(SPELL_MAGMASPLASH);
             DoCastSelf(SPELL_GOLEMAGG_TRUST_AURA);
             DoCastSelf(SPELL_DOUBLE_ATTACK);
-
-            instance->SetBossState(DATA_GOLEMAGG, FAIL);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -75,6 +73,11 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             instance->SetBossState(DATA_GOLEMAGG, IN_PROGRESS);
+        }
+
+        void EnterEvadeMode() override
+        {
+            instance->SetBossState(DATA_GOLEMAGG, FAIL);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
