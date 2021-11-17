@@ -7445,7 +7445,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Arcane Bolt
     ApplySpellFix({ 15979 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_40_YARDS;
+        spellInfo->RangeIndex = 3; // 20y
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
