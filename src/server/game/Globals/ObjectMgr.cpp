@@ -18,6 +18,7 @@
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaTeamMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -2342,56 +2343,6 @@ void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectDat
             cell_guids.gameobjects.erase(guid);
         }
     }
-}
-
-ObjectGuid ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
-{
-    // Get data from global storage
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
-        return guid;
-
-    // No player found
-    return ObjectGuid::Empty;
-}
-
-bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const
-{
-    // Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(lowGuid))
-    {
-        name = playerData->name;
-        return true;
-    }
-
-    return false;
-}
-
-TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return Player::TeamIdForRace(playerData->race);
-
-    return TEAM_NEUTRAL;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->accountId;
-
-    return 0;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
-{
-    // Get data from global storage
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
-            return playerData->accountId;
-
-    return 0;
 }
 
 void ObjectMgr::LoadItemLocales()
@@ -5820,8 +5771,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 }
 
                 // xinef: update global data
-                sWorld->UpdateGlobalPlayerMails(m->sender, 1);
-                sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+                sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->sender));
+                sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
 
                 delete m;
                 ++returnedCount;
@@ -5829,8 +5780,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             }
         }
 
-        // xinef: update global data
-        sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+        sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
         stmt->setUInt32(0, m->messageID);
