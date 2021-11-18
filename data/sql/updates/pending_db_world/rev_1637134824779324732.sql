@@ -6,7 +6,6 @@ SET @newPathId = 42143 * 10;
 
 UPDATE `creature` SET `spawntimesecs` = 5400, `MovementType` = 2 WHERE `guid` = 42143;
 
-
 -- Insert new path
 
 UPDATE `creature_addon` SET `path_id` = @newPathId WHERE `guid` = 42143;
