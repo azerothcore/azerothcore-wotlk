@@ -330,7 +330,8 @@ public:
     void UpdateWaypointID(uint32 wpID) { m_waypointID = wpID; }
 
     void SearchFormation();
-    [[nodiscard]] CreatureGroup* GetFormation() const { return m_formation; }
+    [[nodiscard]] CreatureGroup const* GetFormation() const { return m_formation; }
+    [[nodiscard]] CreatureGroup* GetFormation() { return m_formation; }
     void SetFormation(CreatureGroup* formation) { m_formation = formation; }
 
     Unit* SelectVictim();

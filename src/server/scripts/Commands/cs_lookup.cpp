@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"
@@ -1615,11 +1616,11 @@ public:
                     uint8 plevel = 0, prace = 0, pclass = 0;
                     bool online = ObjectAccessor::FindPlayerByLowGUID(guid) != nullptr;
 
-                    if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
+                    if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByName(name))
                     {
-                        plevel = gpd->level;
-                        prace = gpd->race;
-                        pclass = gpd->playerClass;
+                        plevel = gpd->Level;
+                        prace = gpd->Race;
+                        pclass = gpd->Class;
                     }
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
