@@ -4,9 +4,7 @@ SET @newPathId = 42143 * 10;
 
 -- Change Spawn time
 
-UPDATE `creature`
-SET `spawntimesecs` = 5400
-WHERE `guid` = 42143;
+UPDATE `creature` SET `spawntimesecs` = 5400, `MovementType` = 2 WHERE `guid` = 42143;
 
 
 -- Insert new path
