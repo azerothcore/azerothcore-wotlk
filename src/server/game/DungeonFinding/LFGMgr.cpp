@@ -806,12 +806,20 @@ namespace lfg
                 {
                     LFGQueue& queue = GetQueue(gguid);
                     queue.RemoveFromQueue(gguid);
+                    uint32 dungeonId = GetDungeon(gguid);
                     SetState(gguid, LFG_STATE_NONE);
                     const LfgGuidSet& players = GetPlayers(gguid);
                     for (LfgGuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
                     {
                         SetState(*it, LFG_STATE_NONE);
                         SendLfgUpdateParty(*it, LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
+                    }
+                    if (Group* group = sGroupMgr->GetGroupByGUID(gguid.GetCounter()))
+                    {
+                        if (group->isLFGGroup())
+                        {
+                            SetDungeon(gguid, dungeonId);
+                        }
                     }
                 }
                 else
@@ -1568,7 +1576,28 @@ namespace lfg
         LFGDungeonData const* dungeon = GetLFGDungeon(proposal.dungeonId);
         ASSERT(dungeon);
 
+        bool isPremadeGroup = false;
         Group* grp = proposal.group ? sGroupMgr->GetGroupByGUID(proposal.group.GetCounter()) : nullptr;
+        if (!grp)
+        {
+            ObjectGuid groupGUID;
+            for (ObjectGuid const& guid : players)
+            {
+                if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
+                {
+                    Group* group = player->GetGroup();
+                    if (!group || (groupGUID && groupGUID != group->GetGUID()))
+                    {
+                        isPremadeGroup = false;
+                        break;
+                    }
+
+                    groupGUID = group->GetGUID();
+                    isPremadeGroup = true;
+                }
+            }
+        }
+
         ObjectGuid oldGroupGUID;
         for (LfgGuidList::const_iterator it = players.begin(); it != players.end(); ++it)
         {
@@ -1578,6 +1607,13 @@ namespace lfg
                 continue;
 
             Group* group = player->GetGroup();
+            if (isPremadeGroup && !grp)
+            {
+                oldGroupGUID = group->GetGUID();
+                grp = group;
+                grp->ConvertToLFG(false);
+                SetState(grp->GetGUID(), LFG_STATE_PROPOSAL);
+            }
 
             // Xinef: Apply Random Buff
             if (grp && !grp->IsLfgWithBuff())
@@ -1691,6 +1727,14 @@ namespace lfg
 
                     // Remove bind to that map
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+                }
+                else
+                {
+                    // RDF removes all binds to that map
+                    if (randomDungeon && !sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                    {
+                        sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+                    }
                 }
 
                 playersTeleported.push_back(player);
@@ -2655,13 +2699,13 @@ namespace lfg
     {
         switch (dungeonId)
         {
-            case 285: // The Headless Horseman
+            case LFG_DUNGEON_HEADLESS_HORSEMAN:
                 return IsHolidayActive(HOLIDAY_HALLOWS_END);
-            case 286: // The Frost Lord Ahune
+            case LFG_DUNGEON_FROST_LORD_AHUNE:
                 return IsHolidayActive(HOLIDAY_FIRE_FESTIVAL);
-            case 287: // Coren Direbrew
+            case LFG_DUNGEON_COREN_DIREBREW:
                 return IsHolidayActive(HOLIDAY_BREWFEST);
-            case 288: // The Crown Chemical Co.
+            case LFG_DUNGEON_CROWN_CHEMICAL_CO:
                 return IsHolidayActive(HOLIDAY_LOVE_IS_IN_THE_AIR);
         }
         return false;

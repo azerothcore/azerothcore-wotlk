@@ -1159,10 +1159,18 @@ public:
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
-    void Say(std::string const& text, const uint32 language);
-    void Yell(std::string const& text, const uint32 language);
-    void TextEmote(std::string const& text);
-    void Whisper(std::string const& text, const uint32 language, ObjectGuid receiver);
+    /// Handles said message in regular chat based on declared language and in config pre-defined Range.
+    void Say(std::string_view text, Language language, WorldObject const* = nullptr) override;
+    void Say(uint32 textId, WorldObject const* target = nullptr) override;
+    /// Handles yelled message in regular chat based on declared language and in config pre-defined Range.
+    void Yell(std::string_view text, Language language, WorldObject const* = nullptr) override;
+    void Yell(uint32 textId, WorldObject const* target = nullptr) override;
+    /// Outputs an universal text which is supposed to be an action.
+    void TextEmote(std::string_view text, WorldObject const* = nullptr, bool = false) override;
+    void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false) override;
+    /// Handles whispers from Addons and players based on sender, receiver's guid and language.
+    void Whisper(std::string_view text, Language language, Player* receiver, bool = false) override;
+    void Whisper(uint32 textId, Player* target, bool isBossWhisper = false) override;
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
@@ -1580,6 +1588,8 @@ public:
     Mail* GetMail(uint32 id);
 
     PlayerMails const& GetMails() const { return m_mail; }
+    void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
+    void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
@@ -2038,7 +2048,7 @@ public:
 
     static TeamId TeamIdForRace(uint8 race);
     [[nodiscard]] TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };
-    void setFactionForRace(uint8 race);
+    void SetFactionForRace(uint8 race);
     void setTeamId(TeamId teamid) { m_team = teamid; };
 
     void InitDisplayIds();
@@ -2485,6 +2495,7 @@ public:
     [[nodiscard]] bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const { return HasTitle(title->bit_index); }
     void SetTitle(CharTitlesEntry const* title, bool lost = false);
+    void SetCurrentTitle(CharTitlesEntry const* title, bool clear = false) { SetUInt32Value(PLAYER_CHOSEN_TITLE, clear ? 0 : title->bit_index); };
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
@@ -2500,6 +2511,7 @@ public:
     void ClearWhisperWhiteList() { WhisperList.clear(); }
     void AddWhisperWhiteList(ObjectGuid guid) { WhisperList.push_back(guid); }
     bool IsInWhisperWhiteList(ObjectGuid guid);
+    void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
     bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
@@ -2731,6 +2743,7 @@ public:
 
     RewardedQuestSet m_RewardedQuests;
     QuestStatusSaveMap m_RewardedQuestsSave;
+    void SendQuestGiverStatusMultiple();
 
     SkillStatusMap mSkillStatus;
 

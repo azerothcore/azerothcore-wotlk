@@ -42,22 +42,22 @@ public:
         switch (creature->GetEntry())
         {
             case NPC_FREYA_GOSSIP:
-                creature->MonsterYell("Eonar, your servant calls for your blessing!", LANG_UNIVERSAL, 0);
+                creature->Yell("Eonar, your servant calls for your blessing!", LANG_UNIVERSAL);
                 creature->PlayDirectSound(15535);
                 _keeper = KEEPER_FREYA;
                 break;
             case NPC_HODIR_GOSSIP:
-                creature->MonsterYell("The veil of winter will protect you, champions!", LANG_UNIVERSAL, 0);
+                creature->Yell("The veil of winter will protect you, champions!", LANG_UNIVERSAL);
                 creature->PlayDirectSound(15559);
                 _keeper = KEEPER_HODIR;
                 break;
             case NPC_MIMIRON_GOSSIP:
-                creature->MonsterYell("Combat matrix enhanced. Behold wonderous rapidity!", LANG_UNIVERSAL, 0);
+                creature->Yell("Combat matrix enhanced. Behold wonderous rapidity!", LANG_UNIVERSAL);
                 creature->PlayDirectSound(15630);
                 _keeper = KEEPER_MIMIRON;
                 break;
             case NPC_THORIM_GOSSIP:
-                creature->MonsterYell("Golganneth, lend me your strengh! Grant my mortal allies the power of thunder!", LANG_UNIVERSAL, 0);
+                creature->Yell("Golganneth, lend me your strengh! Grant my mortal allies the power of thunder!", LANG_UNIVERSAL);
                 creature->PlayDirectSound(15750);
                 _keeper = KEEPER_THORIM;
                 break;
@@ -267,7 +267,7 @@ public:
 
         void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
         {
-            me->setFaction(p->getFaction());
+            me->SetFaction(p->GetFaction());
             me->SetReactState(REACT_PASSIVE);
         }
 
@@ -282,7 +282,7 @@ public:
                 me->CombatStop(true);
                 me->SetReactState(REACT_PASSIVE);
                 me->SetRegeneratingHealth(false);
-                me->setFaction(31);
+                me->SetFaction(FACTION_PREY);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                 me->CastSpell(me, 64770, true);
             }
@@ -290,13 +290,13 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (me->getFaction() == 16)
+            if (me->GetFaction() == FACTION_MONSTER_2)
                 ScriptedAI::AttackStart(who);
         }
 
         void EnterEvadeMode() override
         {
-            if (me->getFaction() == 16)
+            if (me->GetFaction() == FACTION_MONSTER_2)
                 ScriptedAI::EnterEvadeMode();
         }
 
@@ -304,7 +304,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (me->getFaction() != 16)
+            if (me->GetFaction() != FACTION_MONSTER_2)
             {
                 if (me->IsAlive() && (me->GetExactDist2dSq(2058.0f, 42.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2203.0f, 292.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2125.0f, 170.0f) > 160.0f * 160.0f))
                     Unit::Kill(me, me, false);

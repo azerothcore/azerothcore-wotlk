@@ -505,7 +505,7 @@ void BattlegroundEY::EventTeamCapturedPoint(TeamId teamId, uint32 point)
 
     if (trigger)
     {
-        trigger->setFaction(teamId == TEAM_ALLIANCE ? 84 : 83);
+        trigger->SetFaction(teamId == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
         trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, true);
     }
 }

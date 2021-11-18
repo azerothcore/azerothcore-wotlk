@@ -44,169 +44,171 @@ EndScriptData */
 #include "StringConvert.h"
 #include "Tokenize.h"
 
+using namespace Acore::ChatCommands;
+
 class reload_commandscript : public CommandScript
 {
 public:
     reload_commandscript() : CommandScript("reload_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> reloadAllCommandTable =
+        static ChatCommandTable reloadAllCommandTable =
         {
-            { "achievement", SEC_ADMINISTRATOR,  true,  &HandleReloadAllAchievementCommand, "" },
-            { "area",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllAreaCommand,       "" },
-            { "gossips",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllGossipsCommand,    "" },
-            { "item",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllItemCommand,       "" },
-            { "locales",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllLocalesCommand,    "" },
-            { "loot",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllLootCommand,       "" },
-            { "npc",         SEC_ADMINISTRATOR,  true,  &HandleReloadAllNpcCommand,        "" },
-            { "quest",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllQuestCommand,      "" },
-            { "scripts",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllScriptsCommand,    "" },
-            { "spell",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllSpellCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "" }
+            { "achievement",                   HandleReloadAllAchievementCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "area",                          HandleReloadAllAreaCommand,                    SEC_ADMINISTRATOR, Console::Yes },
+            { "gossips",                       HandleReloadAllGossipsCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "item",                          HandleReloadAllItemCommand,                    SEC_ADMINISTRATOR, Console::Yes },
+            { "locales",                       HandleReloadAllLocalesCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "loot",                          HandleReloadAllLootCommand,                    SEC_ADMINISTRATOR, Console::Yes },
+            { "npc",                           HandleReloadAllNpcCommand,                     SEC_ADMINISTRATOR, Console::Yes },
+            { "quest",                         HandleReloadAllQuestCommand,                   SEC_ADMINISTRATOR, Console::Yes },
+            { "scripts",                       HandleReloadAllScriptsCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "spell",                         HandleReloadAllSpellCommand,                   SEC_ADMINISTRATOR, Console::Yes },
+            { "",                              HandleReloadAllCommand,                        SEC_ADMINISTRATOR, Console::Yes },
         };
-        static std::vector<ChatCommand> reloadCommandTable =
+        static ChatCommandTable reloadCommandTable =
         {
-            { "auctions",                     SEC_ADMINISTRATOR, true,  &HandleReloadAuctionsCommand,                   "" },
-            { "dungeon_access_template",      SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
-            { "dungeon_access_requirements",  SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
-            { "achievement_criteria_data",    SEC_ADMINISTRATOR, true,  &HandleReloadAchievementCriteriaDataCommand,    "" },
-            { "achievement_reward",           SEC_ADMINISTRATOR, true,  &HandleReloadAchievementRewardCommand,          "" },
-            { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                                        "", reloadAllCommandTable },
-            { "areatrigger",                  SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerCommand,                "" },
-            { "areatrigger_involvedrelation", SEC_ADMINISTRATOR, true,  &HandleReloadQuestAreaTriggersCommand,          "" },
-            { "areatrigger_tavern",           SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTavernCommand,          "" },
-            { "areatrigger_teleport",         SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTeleportCommand,        "" },
-            { "autobroadcast",                SEC_ADMINISTRATOR, true,  &HandleReloadAutobroadcastCommand,              "" },
-            { "broadcast_text",               SEC_ADMINISTRATOR, true,  &HandleReloadBroadcastTextCommand,              "" },
-            { "battleground_template",        SEC_ADMINISTRATOR, true,  &HandleReloadBattlegroundTemplate,              "" },
-            { "command",                      SEC_ADMINISTRATOR, true,  &HandleReloadCommandCommand,                    "" },
-            { "conditions",                   SEC_ADMINISTRATOR, true,  &HandleReloadConditions,                        "" },
-            { "config",                       SEC_ADMINISTRATOR, true,  &HandleReloadConfigCommand,                     "" },
-            { "creature_text",                SEC_ADMINISTRATOR, true,  &HandleReloadCreatureText,                      "" },
-            { "creature_questender",          SEC_ADMINISTRATOR, true,  &HandleReloadCreatureQuestEnderCommand,         "" },
-            { "creature_linked_respawn",      SEC_GAMEMASTER,    true,  &HandleReloadLinkedRespawnCommand,              "" },
-            { "creature_loot_template",       SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesCreatureCommand,      "" },
-            { "creature_onkill_reputation",   SEC_ADMINISTRATOR, true,  &HandleReloadOnKillReputationCommand,           "" },
-            { "creature_queststarter",        SEC_ADMINISTRATOR, true,  &HandleReloadCreatureQuestStarterCommand,       "" },
-            { "creature_template",            SEC_ADMINISTRATOR, true,  &HandleReloadCreatureTemplateCommand,           "" },
-            { "disables",                     SEC_ADMINISTRATOR, true,  &HandleReloadDisablesCommand,                   "" },
-            { "disenchant_loot_template",     SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesDisenchantCommand,    "" },
-            { "event_scripts",                SEC_ADMINISTRATOR, true,  &HandleReloadEventScriptsCommand,               "" },
-            { "fishing_loot_template",        SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesFishingCommand,       "" },
-            { "game_graveyard",               SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardCommand,              "" },
-            { "graveyard_zone",               SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardZoneCommand,          "" },
-            { "game_tele",                    SEC_ADMINISTRATOR, true,  &HandleReloadGameTeleCommand,                   "" },
-            { "gameobject_questender",        SEC_ADMINISTRATOR, true,  &HandleReloadGOQuestEnderCommand,               "" },
-            { "gameobject_loot_template",     SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesGameobjectCommand,    "" },
-            { "gameobject_queststarter",      SEC_ADMINISTRATOR, true,  &HandleReloadGOQuestStarterCommand,             "" },
-            { "gm_tickets",                   SEC_ADMINISTRATOR, true,  &HandleReloadGMTicketsCommand,                  "" },
-            { "gossip_menu",                  SEC_ADMINISTRATOR, true,  &HandleReloadGossipMenuCommand,                 "" },
-            { "gossip_menu_option",           SEC_ADMINISTRATOR, true,  &HandleReloadGossipMenuOptionCommand,           "" },
-            { "item_enchantment_template",    SEC_ADMINISTRATOR, true,  &HandleReloadItemEnchantementsCommand,          "" },
-            { "item_loot_template",           SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesItemCommand,          "" },
-            { "item_set_names",               SEC_ADMINISTRATOR, true,  &HandleReloadItemSetNamesCommand,               "" },
-            { "lfg_dungeon_rewards",          SEC_ADMINISTRATOR, true,  &HandleReloadLfgRewardsCommand,                 "" },
-            { "achievement_reward_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesAchievementRewardCommand,   "" },
-            { "creature_template_locale",     SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureCommand,            "" },
-            { "creature_text_locale",         SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureTextCommand,        "" },
-            { "gameobject_template_locale",   SEC_ADMINISTRATOR, true,  &HandleReloadLocalesGameobjectCommand,          "" },
-            { "gossip_menu_option_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesGossipMenuOptionCommand,    "" },
-            { "item_template_locale",         SEC_ADMINISTRATOR, true,  &HandleReloadLocalesItemCommand,                "" },
-            { "item_set_name_locale",         SEC_ADMINISTRATOR, true,  &HandleReloadLocalesItemSetNameCommand,         "" },
-            { "npc_text_locale",              SEC_ADMINISTRATOR, true,  &HandleReloadLocalesNpcTextCommand,             "" },
-            { "page_text_locale",             SEC_ADMINISTRATOR, true,  &HandleReloadLocalesPageTextCommand,            "" },
-            { "points_of_interest_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesPointsOfInterestCommand,    "" },
-            { "quest_template_locale",        SEC_ADMINISTRATOR, true,  &HandleReloadLocalesQuestCommand,               "" },
-            { "quest_offer_reward_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesQuestOfferRewardCommand,    "" },
-            { "quest_request_item_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesQuestRequestItemsCommand,   "" },
-            { "mail_level_reward",            SEC_ADMINISTRATOR, true,  &HandleReloadMailLevelRewardCommand,            "" },
-            { "mail_loot_template",           SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesMailCommand,          "" },
-            { "milling_loot_template",        SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesMillingCommand,       "" },
-            { "npc_spellclick_spells",        SEC_ADMINISTRATOR, true,  &HandleReloadSpellClickSpellsCommand,           "" },
-            { "npc_trainer",                  SEC_ADMINISTRATOR, true,  &HandleReloadNpcTrainerCommand,                 "" },
-            { "npc_vendor",                   SEC_ADMINISTRATOR, true,  &HandleReloadNpcVendorCommand,                  "" },
-            { "page_text",                    SEC_ADMINISTRATOR, true,  &HandleReloadPageTextsCommand,                  "" },
-            { "pickpocketing_loot_template",  SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesPickpocketingCommand, "" },
-            { "points_of_interest",           SEC_ADMINISTRATOR, true,  &HandleReloadPointsOfInterestCommand,           "" },
-            { "prospecting_loot_template",    SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesProspectingCommand,   "" },
-            { "quest_poi",                    SEC_ADMINISTRATOR, true,  &HandleReloadQuestPOICommand,                   "" },
-            { "quest_template",               SEC_ADMINISTRATOR, true,  &HandleReloadQuestTemplateCommand,              "" },
-            { "rbac",                         rbac::RBAC_PERM_COMMAND_RELOAD_RBAC,     true,  &HandleReloadRBACCommand, "" },
-            { "reference_loot_template",      SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesReferenceCommand,     "" },
-            { "reserved_name",                SEC_ADMINISTRATOR, true,  &HandleReloadReservedNameCommand,               "" },
-            { "reputation_reward_rate",       SEC_ADMINISTRATOR, true,  &HandleReloadReputationRewardRateCommand,       "" },
-            { "reputation_spillover_template", SEC_ADMINISTRATOR, true,  &HandleReloadReputationRewardRateCommand,      "" },
-            { "skill_discovery_template",     SEC_ADMINISTRATOR, true,  &HandleReloadSkillDiscoveryTemplateCommand,     "" },
-            { "skill_extra_item_template",    SEC_ADMINISTRATOR, true,  &HandleReloadSkillExtraItemTemplateCommand,     "" },
-            { "skill_fishing_base_level",     SEC_ADMINISTRATOR, true,  &HandleReloadSkillFishingBaseLevelCommand,      "" },
-            { "skinning_loot_template",       SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesSkinningCommand,      "" },
-            { "smart_scripts",                SEC_ADMINISTRATOR, true,  &HandleReloadSmartScripts,                      "" },
-            { "spell_required",               SEC_ADMINISTRATOR, true,  &HandleReloadSpellRequiredCommand,              "" },
-            { "spell_area",                   SEC_ADMINISTRATOR, true,  &HandleReloadSpellAreaCommand,                  "" },
-            { "spell_bonus_data",             SEC_ADMINISTRATOR, true,  &HandleReloadSpellBonusesCommand,               "" },
-            { "spell_group",                  SEC_ADMINISTRATOR, true,  &HandleReloadSpellGroupsCommand,                "" },
-            { "spell_loot_template",          SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesSpellCommand,         "" },
-            { "spell_linked_spell",           SEC_ADMINISTRATOR, true,  &HandleReloadSpellLinkedSpellCommand,           "" },
-            { "spell_pet_auras",              SEC_ADMINISTRATOR, true,  &HandleReloadSpellPetAurasCommand,              "" },
-            { "spell_proc_event",             SEC_ADMINISTRATOR, true,  &HandleReloadSpellProcEventCommand,             "" },
-            { "spell_proc",                   SEC_ADMINISTRATOR, true,  &HandleReloadSpellProcsCommand,                 "" },
-            { "spell_scripts",                SEC_ADMINISTRATOR, true,  &HandleReloadSpellScriptsCommand,               "" },
-            { "spell_target_position",        SEC_ADMINISTRATOR, true,  &HandleReloadSpellTargetPositionCommand,        "" },
-            { "spell_threats",                SEC_ADMINISTRATOR, true,  &HandleReloadSpellThreatsCommand,               "" },
-            { "spell_group_stack_rules",      SEC_ADMINISTRATOR, true,  &HandleReloadSpellGroupStackRulesCommand,       "" },
-            { "acore_string",                 SEC_ADMINISTRATOR, true,  &HandleReloadAcoreStringCommand,              "" },
-            { "warden_action",                SEC_ADMINISTRATOR, true,  &HandleReloadWardenactionCommand,               "" },
-            { "waypoint_scripts",             SEC_ADMINISTRATOR, true,  &HandleReloadWpScriptsCommand,                  "" },
-            { "waypoint_data",                SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "" },
-            { "vehicle_accessory",            SEC_ADMINISTRATOR, true,  &HandleReloadVehicleAccessoryCommand,           "" },
-            { "vehicle_template_accessory",   SEC_ADMINISTRATOR, true,  &HandleReloadVehicleTemplateAccessoryCommand,   "" }
+            { "auctions",                      HandleReloadAuctionsCommand,                   SEC_ADMINISTRATOR, Console::Yes },
+            { "dungeon_access_template",       HandleReloadDungeonAccessCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "dungeon_access_requirements",   HandleReloadDungeonAccessCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "achievement_criteria_data",     HandleReloadAchievementCriteriaDataCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "achievement_reward",            HandleReloadAchievementRewardCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "all", reloadAllCommandTable },
+            { "areatrigger",                   HandleReloadQuestAreaTriggersCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "areatrigger_involvedrelation",  HandleReloadQuestAreaTriggersCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "areatrigger_tavern",            HandleReloadAreaTriggerTavernCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "areatrigger_teleport",          HandleReloadAreaTriggerTeleportCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "autobroadcast",                 HandleReloadAutobroadcastCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "broadcast_text",                HandleReloadBroadcastTextCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "battleground_template",         HandleReloadBattlegroundTemplate,              SEC_ADMINISTRATOR, Console::Yes },
+            { "command",                       HandleReloadCommandCommand,                    SEC_ADMINISTRATOR, Console::Yes },
+            { "conditions",                    HandleReloadConditions,                        SEC_ADMINISTRATOR, Console::Yes },
+            { "config",                        HandleReloadConfigCommand,                     SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_text",                 HandleReloadCreatureText,                      SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_questender",           HandleReloadCreatureQuestEnderCommand,         SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_linked_respawn",       HandleReloadLinkedRespawnCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_loot_template",        HandleReloadLootTemplatesCreatureCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_onkill_reputation",    HandleReloadOnKillReputationCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_queststarter",         HandleReloadCreatureQuestStarterCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_template",             HandleReloadCreatureTemplateCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "disables",                      HandleReloadDisablesCommand,                   SEC_ADMINISTRATOR, Console::Yes },
+            { "disenchant_loot_template",      HandleReloadLootTemplatesDisenchantCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "event_scripts",                 HandleReloadEventScriptsCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "fishing_loot_template",         HandleReloadLootTemplatesFishingCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "game_graveyard",                HandleReloadGameGraveyardCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "graveyard_zone",                HandleReloadGameGraveyardZoneCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "game_tele",                     HandleReloadGameTeleCommand,                   SEC_ADMINISTRATOR, Console::Yes },
+            { "gameobject_questender",         HandleReloadGOQuestEnderCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "gameobject_loot_template",      HandleReloadLootTemplatesGameobjectCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "gameobject_queststarter",       HandleReloadGOQuestStarterCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "gm_tickets",                    HandleReloadGMTicketsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "gossip_menu",                   HandleReloadGossipMenuCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "gossip_menu_option",            HandleReloadGossipMenuOptionCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "item_enchantment_template",     HandleReloadItemEnchantementsCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "item_loot_template",            HandleReloadLootTemplatesItemCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "item_set_names",                HandleReloadItemSetNamesCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "lfg_dungeon_rewards",           HandleReloadLfgRewardsCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "achievement_reward_locale",     HandleReloadLocalesAchievementRewardCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_template_locale",      HandleReloadLocalesCreatureCommand,            SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_text_locale",          HandleReloadLocalesCreatureTextCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "gameobject_template_locale",    HandleReloadLocalesGameobjectCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "gossip_menu_option_locale",     HandleReloadLocalesGossipMenuOptionCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "item_template_locale",          HandleReloadLocalesItemCommand,                SEC_ADMINISTRATOR, Console::Yes },
+            { "item_set_name_locale",          HandleReloadLocalesItemSetNameCommand,         SEC_ADMINISTRATOR, Console::Yes },
+            { "npc_text_locale",               HandleReloadLocalesNpcTextCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "page_text_locale",              HandleReloadLocalesPageTextCommand,            SEC_ADMINISTRATOR, Console::Yes },
+            { "points_of_interest_locale",     HandleReloadLocalesPointsOfInterestCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "quest_template_locale",         HandleReloadLocalesQuestCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "quest_offer_reward_locale",     HandleReloadLocalesQuestOfferRewardCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "quest_request_item_locale",     HandleReloadLocalesQuestRequestItemsCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "mail_level_reward",             HandleReloadMailLevelRewardCommand,            SEC_ADMINISTRATOR, Console::Yes },
+            { "mail_loot_template",            HandleReloadLootTemplatesMailCommand,          SEC_ADMINISTRATOR, Console::Yes },
+            { "milling_loot_template",         HandleReloadLootTemplatesMillingCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "npc_spellclick_spells",         HandleReloadSpellClickSpellsCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "npc_trainer",                   HandleReloadNpcTrainerCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "npc_vendor",                    HandleReloadNpcVendorCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "page_text",                     HandleReloadPageTextsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "pickpocketing_loot_template",   HandleReloadLootTemplatesPickpocketingCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "points_of_interest",            HandleReloadPointsOfInterestCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "prospecting_loot_template",     HandleReloadLootTemplatesProspectingCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "quest_poi",                     HandleReloadQuestPOICommand,                   SEC_ADMINISTRATOR, Console::Yes },
+            { "quest_template",                HandleReloadQuestTemplateCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     SEC_ADMINISTRATOR, Console::Yes },
+            { "reserved_name",                 HandleReloadReservedNameCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "reputation_reward_rate",        HandleReloadReputationRewardRateCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "reputation_spillover_template", HandleReloadReputationRewardRateCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "skill_discovery_template",      HandleReloadSkillDiscoveryTemplateCommand,     SEC_ADMINISTRATOR, Console::Yes },
+            { "skill_extra_item_template",     HandleReloadSkillExtraItemTemplateCommand,     SEC_ADMINISTRATOR, Console::Yes },
+            { "skill_fishing_base_level",      HandleReloadSkillFishingBaseLevelCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "skinning_loot_template",        HandleReloadLootTemplatesSkinningCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "smart_scripts",                 HandleReloadSmartScripts,                      SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_required",                HandleReloadSpellRequiredCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_area",                    HandleReloadSpellAreaCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_bonus_data",              HandleReloadSpellBonusesCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_group",                   HandleReloadSpellGroupsCommand,                SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_loot_template",           HandleReloadLootTemplatesSpellCommand,         SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_linked_spell",            HandleReloadSpellLinkedSpellCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_pet_auras",               HandleReloadSpellPetAurasCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_proc_event",              HandleReloadSpellProcEventCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_proc",                    HandleReloadSpellProcsCommand,                 SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_scripts",                 HandleReloadSpellScriptsCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_target_position",         HandleReloadSpellTargetPositionCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_threats",                 HandleReloadSpellThreatsCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "spell_group_stack_rules",       HandleReloadSpellGroupStackRulesCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "acore_string",                  HandleReloadAcoreStringCommand,                SEC_ADMINISTRATOR, Console::Yes },
+            { "warden_action",                 HandleReloadWardenactionCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "waypoint_scripts",              HandleReloadWpScriptsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "waypoint_data",                 HandleReloadWpCommand,                         SEC_ADMINISTRATOR, Console::Yes },
+            { "vehicle_accessory",             HandleReloadVehicleAccessoryCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "vehicle_template_accessory",    HandleReloadVehicleTemplateAccessoryCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "rbac",                          HandleReloadRBACCommand,                       SEC_ADMINISTRATOR, Console::Yes },
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
-            { "reload",         SEC_ADMINISTRATOR,  true,  nullptr,                                                     "", reloadCommandTable }
+            { "reload", reloadCommandTable }
         };
         return commandTable;
     }
 
     //reload commands
-    static bool HandleReloadGMTicketsCommand(ChatHandler* /*handler*/, const char* /*args*/)
+    static bool HandleReloadGMTicketsCommand(ChatHandler* /*handler*/)
     {
         sTicketMgr->LoadTickets();
         return true;
     }
 
-    static bool HandleReloadAllCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllCommand(ChatHandler* handler)
     {
-        HandleReloadSkillFishingBaseLevelCommand(handler, "");
+        HandleReloadSkillFishingBaseLevelCommand(handler);
 
-        HandleReloadAllAchievementCommand(handler, "");
-        HandleReloadAllAreaCommand(handler, "");
-        HandleReloadAllLootCommand(handler, "");
-        HandleReloadAllNpcCommand(handler, "");
-        HandleReloadAllQuestCommand(handler, "");
-        HandleReloadAllSpellCommand(handler, "");
-        HandleReloadAllItemCommand(handler, "");
-        HandleReloadAllGossipsCommand(handler, "");
-        HandleReloadAllLocalesCommand(handler, "");
+        HandleReloadAllAchievementCommand(handler);
+        HandleReloadAllAreaCommand(handler);
+        HandleReloadAllLootCommand(handler);
+        HandleReloadAllNpcCommand(handler);
+        HandleReloadAllQuestCommand(handler);
+        HandleReloadAllSpellCommand(handler);
+        HandleReloadAllItemCommand(handler);
+        HandleReloadAllGossipsCommand(handler);
+        HandleReloadAllLocalesCommand(handler);
 
-        HandleReloadDungeonAccessCommand(handler, "");
-        HandleReloadMailLevelRewardCommand(handler, "");
-        HandleReloadCommandCommand(handler, "");
-        HandleReloadReservedNameCommand(handler, "");
-        HandleReloadAcoreStringCommand(handler, "");
-        HandleReloadGameTeleCommand(handler, "");
+        HandleReloadDungeonAccessCommand(handler);
+        HandleReloadMailLevelRewardCommand(handler);
+        HandleReloadCommandCommand(handler);
+        HandleReloadReservedNameCommand(handler);
+        HandleReloadAcoreStringCommand(handler);
+        HandleReloadGameTeleCommand(handler);
 
-        HandleReloadVehicleAccessoryCommand(handler, "");
-        HandleReloadVehicleTemplateAccessoryCommand(handler, "");
+        HandleReloadVehicleAccessoryCommand(handler);
+        HandleReloadVehicleTemplateAccessoryCommand(handler);
 
-        HandleReloadAutobroadcastCommand(handler, "");
-        HandleReloadBroadcastTextCommand(handler, "");
-        HandleReloadBattlegroundTemplate(handler, "");
+        HandleReloadAutobroadcastCommand(handler);
+        HandleReloadBroadcastTextCommand(handler);
+        HandleReloadBattlegroundTemplate(handler);
         return true;
     }
 
-    static bool HandleReloadBattlegroundTemplate(ChatHandler* handler, char const* /*args*/)
+    static bool HandleReloadBattlegroundTemplate(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Battleground Templates...");
         sBattlegroundMgr->CreateInitialBattlegrounds();
@@ -214,23 +216,23 @@ public:
         return true;
     }
 
-    static bool HandleReloadAllAchievementCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllAchievementCommand(ChatHandler* handler)
     {
-        HandleReloadAchievementCriteriaDataCommand(handler, "");
-        HandleReloadAchievementRewardCommand(handler, "");
+        HandleReloadAchievementCriteriaDataCommand(handler);
+        HandleReloadAchievementRewardCommand(handler);
         return true;
     }
 
-    static bool HandleReloadAllAreaCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllAreaCommand(ChatHandler* handler)
     {
-        //HandleReloadQuestAreaTriggersCommand(handler, ""); -- reloaded in HandleReloadAllQuestCommand
-        HandleReloadAreaTriggerTeleportCommand(handler, "");
-        HandleReloadAreaTriggerTavernCommand(handler, "");
-        HandleReloadGameGraveyardZoneCommand(handler, "");
+        //HandleReloadQuestAreaTriggersCommand(handler); -- reloaded in HandleReloadAllQuestCommand
+        HandleReloadAreaTriggerTeleportCommand(handler);
+        HandleReloadAreaTriggerTavernCommand(handler);
+        HandleReloadGameGraveyardZoneCommand(handler);
         return true;
     }
 
-    static bool HandleReloadAllLootCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllLootCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables...");
         LoadLootTables();
@@ -239,21 +241,20 @@ public:
         return true;
     }
 
-    static bool HandleReloadAllNpcCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadAllNpcCommand(ChatHandler* handler)
     {
-        if (*args != 'a')                                          // will be reloaded from all_gossips
-            HandleReloadNpcTrainerCommand(handler, "a");
-        HandleReloadNpcVendorCommand(handler, "a");
-        HandleReloadPointsOfInterestCommand(handler, "a");
-        HandleReloadSpellClickSpellsCommand(handler, "a");
+        HandleReloadNpcTrainerCommand(handler);
+        HandleReloadNpcVendorCommand(handler);
+        HandleReloadPointsOfInterestCommand(handler);
+        HandleReloadSpellClickSpellsCommand(handler);
         return true;
     }
 
-    static bool HandleReloadAllQuestCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllQuestCommand(ChatHandler* handler)
     {
-        HandleReloadQuestAreaTriggersCommand(handler, "a");
-        HandleReloadQuestPOICommand(handler, "a");
-        HandleReloadQuestTemplateCommand(handler, "a");
+        HandleReloadQuestAreaTriggersCommand(handler);
+        HandleReloadQuestPOICommand(handler);
+        HandleReloadQuestTemplateCommand(handler);
 
         LOG_INFO("server.loading", "Re-Loading Quests Relations...");
         sObjectMgr->LoadQuestStartersAndEnders();
@@ -261,7 +262,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAllScriptsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllScriptsCommand(ChatHandler* handler)
     {
         if (sScriptMgr->IsScriptScheduled())
         {
@@ -271,66 +272,65 @@ public:
         }
 
         LOG_INFO("server.loading", "Re-Loading Scripts...");
-        HandleReloadEventScriptsCommand(handler, "a");
-        HandleReloadSpellScriptsCommand(handler, "a");
+        HandleReloadEventScriptsCommand(handler);
+        HandleReloadSpellScriptsCommand(handler);
         handler->SendGlobalGMSysMessage("DB tables `*_scripts` reloaded.");
-        HandleReloadWpScriptsCommand(handler, "a");
-        HandleReloadWpCommand(handler, "a");
+        HandleReloadWpScriptsCommand(handler);
+        HandleReloadWpCommand(handler);
         return true;
     }
 
-    static bool HandleReloadAllSpellCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllSpellCommand(ChatHandler* handler)
     {
-        HandleReloadSkillDiscoveryTemplateCommand(handler, "a");
-        HandleReloadSkillExtraItemTemplateCommand(handler, "a");
-        HandleReloadSpellRequiredCommand(handler, "a");
-        HandleReloadSpellAreaCommand(handler, "a");
-        HandleReloadSpellGroupsCommand(handler, "a");
-        HandleReloadSpellLinkedSpellCommand(handler, "a");
-        HandleReloadSpellProcEventCommand(handler, "a");
-        HandleReloadSpellProcsCommand(handler, "a");
-        HandleReloadSpellBonusesCommand(handler, "a");
-        HandleReloadSpellTargetPositionCommand(handler, "a");
-        HandleReloadSpellThreatsCommand(handler, "a");
-        HandleReloadSpellGroupStackRulesCommand(handler, "a");
-        HandleReloadSpellPetAurasCommand(handler, "a");
+        HandleReloadSkillDiscoveryTemplateCommand(handler);
+        HandleReloadSkillExtraItemTemplateCommand(handler);
+        HandleReloadSpellRequiredCommand(handler);
+        HandleReloadSpellAreaCommand(handler);
+        HandleReloadSpellGroupsCommand(handler);
+        HandleReloadSpellLinkedSpellCommand(handler);
+        HandleReloadSpellProcEventCommand(handler);
+        HandleReloadSpellProcsCommand(handler);
+        HandleReloadSpellBonusesCommand(handler);
+        HandleReloadSpellTargetPositionCommand(handler);
+        HandleReloadSpellThreatsCommand(handler);
+        HandleReloadSpellGroupStackRulesCommand(handler);
+        HandleReloadSpellPetAurasCommand(handler);
         return true;
     }
 
-    static bool HandleReloadAllGossipsCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadAllGossipsCommand(ChatHandler* handler)
     {
-        HandleReloadGossipMenuCommand(handler, "a");
-        HandleReloadGossipMenuOptionCommand(handler, "a");
-        if (*args != 'a')                                          // already reload from all_scripts
-            HandleReloadPointsOfInterestCommand(handler, "a");
+        HandleReloadGossipMenuCommand(handler);
+        HandleReloadGossipMenuOptionCommand(handler);
+        HandleReloadPointsOfInterestCommand(handler);
         return true;
     }
 
-    static bool HandleReloadAllItemCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllItemCommand(ChatHandler* handler)
     {
-        HandleReloadPageTextsCommand(handler, "a");
-        HandleReloadItemEnchantementsCommand(handler, "a");
+        HandleReloadPageTextsCommand(handler);
+        HandleReloadItemEnchantementsCommand(handler);
         return true;
     }
 
-    static bool HandleReloadAllLocalesCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAllLocalesCommand(ChatHandler* handler)
     {
-        HandleReloadLocalesAchievementRewardCommand(handler, "a");
-        HandleReloadLocalesCreatureCommand(handler, "a");
-        HandleReloadLocalesCreatureTextCommand(handler, "a");
-        HandleReloadLocalesGameobjectCommand(handler, "a");
-        HandleReloadLocalesGossipMenuOptionCommand(handler, "a");
-        HandleReloadLocalesItemCommand(handler, "a");
-        HandleReloadLocalesNpcTextCommand(handler, "a");
-        HandleReloadLocalesPageTextCommand(handler, "a");
-        HandleReloadLocalesPointsOfInterestCommand(handler, "a");
-        HandleReloadLocalesQuestCommand(handler, "a");
-        HandleReloadLocalesQuestOfferRewardCommand(handler, "a");
-        HandleReloadLocalesQuestRequestItemsCommand(handler, "a");
+        HandleReloadLocalesAchievementRewardCommand(handler);
+        HandleReloadLocalesCreatureCommand(handler);
+        HandleReloadLocalesCreatureTextCommand(handler);
+        HandleReloadLocalesGameobjectCommand(handler);
+        HandleReloadLocalesGossipMenuOptionCommand(handler);
+        HandleReloadLocalesItemCommand(handler);
+        HandleReloadLocalesNpcTextCommand(handler);
+        HandleReloadLocalesPageTextCommand(handler);
+        HandleReloadLocalesPointsOfInterestCommand(handler);
+        HandleReloadLocalesQuestCommand(handler);
+        HandleReloadLocalesQuestOfferRewardCommand(handler);
+        HandleReloadLocalesQuestRequestItemsCommand(handler);
         return true;
     }
 
-    static bool HandleReloadConfigCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadConfigCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading config settings...");
         sWorld->LoadConfigSettings(true);
@@ -339,7 +339,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadDungeonAccessCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadDungeonAccessCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Dungeon Access Requirement definitions...");
         sObjectMgr->LoadAccessRequirements();
@@ -347,7 +347,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAchievementCriteriaDataCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAchievementCriteriaDataCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Additional Achievement Criteria Data...");
         sAchievementMgr->LoadAchievementCriteriaData();
@@ -355,7 +355,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAchievementRewardCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAchievementRewardCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Achievement Reward Data...");
         sAchievementMgr->LoadRewards();
@@ -363,7 +363,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAreaTriggerTavernCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAreaTriggerTavernCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Tavern Area Triggers...");
         sObjectMgr->LoadTavernAreaTriggers();
@@ -371,7 +371,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAreaTriggerCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAreaTriggerCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Area Trigger definitions...");
         sObjectMgr->LoadAreaTriggers();
@@ -379,7 +379,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAreaTriggerTeleportCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAreaTriggerTeleportCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Area Trigger teleport definitions...");
         sObjectMgr->LoadAreaTriggerTeleports();
@@ -387,7 +387,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAutobroadcastCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAutobroadcastCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Autobroadcasts...");
         sWorld->LoadAutobroadcasts();
@@ -395,7 +395,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadBroadcastTextCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadBroadcastTextCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Broadcast texts...");
         sObjectMgr->LoadBroadcastTexts();
@@ -404,14 +404,18 @@ public:
         return true;
     }
 
-    static bool HandleReloadCommandCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadCommandCommand(ChatHandler* handler)
     {
-        handler->SetLoadCommandTable(true);
-        handler->SendGlobalGMSysMessage("DB table `command` will be reloaded at next chat command use.");
-        return true;
+        LOG_INFO("server.loading", "Reloading .command information...");
+        Acore::ChatCommands::LoadCommandMap();
+        handler->SendGlobalGMSysMessage("DB table `command` reloaded.");
+
+        // do not log this invocation, otherwise we might crash (the command table we used to get here is no longer valid!)
+        handler->SetSentErrorMessage(true);
+        return false;
     }
 
-    static bool HandleReloadOnKillReputationCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadOnKillReputationCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading creature award reputation definitions...");
         sObjectMgr->LoadReputationOnKill();
@@ -419,9 +423,9 @@ public:
         return true;
     }
 
-    static bool HandleReloadCreatureTemplateCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadCreatureTemplateCommand(ChatHandler* handler, std::string_view args)
     {
-        if (!*args)
+        if (args.empty())
             return false;
 
         for (std::string_view entryStr : Acore::Tokenize(args, ' ', false))
@@ -457,7 +461,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadCreatureQuestStarterCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadCreatureQuestStarterCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`creature_queststarter`)");
         sObjectMgr->LoadCreatureQuestStarters();
@@ -465,7 +469,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLinkedRespawnCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLinkedRespawnCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Loading Linked Respawns... (`creature_linked_respawn`)");
         sObjectMgr->LoadLinkedRespawn();
@@ -473,7 +477,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadCreatureQuestEnderCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadCreatureQuestEnderCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`creature_questender`)");
         sObjectMgr->LoadCreatureQuestEnders();
@@ -481,7 +485,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadGossipMenuCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadGossipMenuCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `gossip_menu` Table!");
         sObjectMgr->LoadGossipMenu();
@@ -490,7 +494,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadGossipMenuOptionCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadGossipMenuOptionCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `gossip_menu_option` Table!");
         sObjectMgr->LoadGossipMenuItems();
@@ -499,7 +503,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadGOQuestStarterCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadGOQuestStarterCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`gameobject_queststarter`)");
         sObjectMgr->LoadGameobjectQuestStarters();
@@ -507,7 +511,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadGOQuestEnderCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadGOQuestEnderCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`gameobject_questender`)");
         sObjectMgr->LoadGameobjectQuestEnders();
@@ -515,7 +519,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadQuestAreaTriggersCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadQuestAreaTriggersCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Quest Area Triggers...");
         sObjectMgr->LoadQuestAreaTriggers();
@@ -523,7 +527,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadQuestTemplateCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadQuestTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Quest Templates...");
         sObjectMgr->LoadQuests();
@@ -536,7 +540,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesCreatureCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesCreatureCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`creature_loot_template`)");
         LoadLootTemplates_Creature();
@@ -546,7 +550,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesDisenchantCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesDisenchantCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`disenchant_loot_template`)");
         LoadLootTemplates_Disenchant();
@@ -556,7 +560,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesFishingCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesFishingCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`fishing_loot_template`)");
         LoadLootTemplates_Fishing();
@@ -566,7 +570,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesGameobjectCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesGameobjectCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`gameobject_loot_template`)");
         LoadLootTemplates_Gameobject();
@@ -576,7 +580,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesItemCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesItemCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`item_loot_template`)");
         LoadLootTemplates_Item();
@@ -586,7 +590,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesMillingCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesMillingCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`milling_loot_template`)");
         LoadLootTemplates_Milling();
@@ -596,7 +600,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesPickpocketingCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesPickpocketingCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`pickpocketing_loot_template`)");
         LoadLootTemplates_Pickpocketing();
@@ -606,7 +610,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesProspectingCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesProspectingCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`prospecting_loot_template`)");
         LoadLootTemplates_Prospecting();
@@ -616,7 +620,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesMailCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesMailCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`mail_loot_template`)");
         LoadLootTemplates_Mail();
@@ -626,7 +630,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesReferenceCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesReferenceCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`reference_loot_template`)");
         LoadLootTemplates_Reference();
@@ -635,7 +639,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesSkinningCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesSkinningCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`skinning_loot_template`)");
         LoadLootTemplates_Skinning();
@@ -645,7 +649,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLootTemplatesSpellCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLootTemplatesSpellCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Loot Tables... (`spell_loot_template`)");
         LoadLootTemplates_Spell();
@@ -655,7 +659,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAcoreStringCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAcoreStringCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading acore_string Table!");
         sObjectMgr->LoadAcoreStrings();
@@ -663,7 +667,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadWardenactionCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadWardenactionCommand(ChatHandler* handler)
     {
         if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
         {
@@ -678,7 +682,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadNpcTrainerCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadNpcTrainerCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `npc_trainer` Table!");
         sObjectMgr->LoadTrainerSpell();
@@ -686,7 +690,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadNpcVendorCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadNpcVendorCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `npc_vendor` Table!");
         sObjectMgr->LoadVendors();
@@ -694,7 +698,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadPointsOfInterestCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadPointsOfInterestCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `points_of_interest` Table!");
         sObjectMgr->LoadPointsOfInterest();
@@ -702,7 +706,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadQuestPOICommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadQuestPOICommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Quest POI ..." );
         sObjectMgr->LoadQuestPOI();
@@ -710,7 +714,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellClickSpellsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellClickSpellsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `npc_spellclick_spells` Table!");
         sObjectMgr->LoadNPCSpellClickSpells();
@@ -718,7 +722,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadReservedNameCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadReservedNameCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Loading ReservedNames... (`reserved_name`)");
         sObjectMgr->LoadReservedPlayersNames();
@@ -726,7 +730,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadReputationRewardRateCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadReputationRewardRateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `reputation_reward_rate` Table!" );
         sObjectMgr->LoadReputationRewardRate();
@@ -734,7 +738,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadReputationSpilloverTemplateCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadReputationSpilloverTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `reputation_spillover_template` Table!" );
         sObjectMgr->LoadReputationSpilloverTemplate();
@@ -742,7 +746,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSkillDiscoveryTemplateCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSkillDiscoveryTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Skill Discovery Table...");
         LoadSkillDiscoveryTable();
@@ -750,7 +754,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSkillPerfectItemTemplateCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSkillPerfectItemTemplateCommand(ChatHandler* handler)
     {
         // latched onto HandleReloadSkillExtraItemTemplateCommand as it's part of that table group (and i don't want to chance all the command IDs)
         LOG_INFO("server.loading", "Re-Loading Skill Perfection Data Table...");
@@ -759,15 +763,15 @@ public:
         return true;
     }
 
-    static bool HandleReloadSkillExtraItemTemplateCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadSkillExtraItemTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Skill Extra Item Table...");
         LoadSkillExtraItemTable();
         handler->SendGlobalGMSysMessage("DB table `skill_extra_item_template` (extra item creation when crafting) reloaded.");
-        return HandleReloadSkillPerfectItemTemplateCommand(handler, args);
+        return HandleReloadSkillPerfectItemTemplateCommand(handler);
     }
 
-    static bool HandleReloadSkillFishingBaseLevelCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSkillFishingBaseLevelCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Skill Fishing base level requirements...");
         sObjectMgr->LoadFishingBaseSkillLevel();
@@ -775,7 +779,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellAreaCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellAreaCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading SpellArea Data...");
         sSpellMgr->LoadSpellAreas();
@@ -783,7 +787,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellRequiredCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellRequiredCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Required Data... ");
         sSpellMgr->LoadSpellRequired();
@@ -791,7 +795,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellGroupsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellGroupsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Groups...");
         sSpellMgr->LoadSpellGroups();
@@ -799,7 +803,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellLinkedSpellCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellLinkedSpellCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Linked Spells...");
         sSpellMgr->LoadSpellLinked();
@@ -807,7 +811,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellProcEventCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellProcEventCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Proc Event conditions...");
         sSpellMgr->LoadSpellProcEvents();
@@ -815,7 +819,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellProcsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellProcsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Proc conditions and data...");
         sSpellMgr->LoadSpellProcs();
@@ -823,7 +827,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellBonusesCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellBonusesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Bonus Data...");
         sSpellMgr->LoadSpellBonusess();
@@ -831,7 +835,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellTargetPositionCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellTargetPositionCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell target coordinates...");
         sSpellMgr->LoadSpellTargetPositions();
@@ -839,7 +843,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellThreatsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellThreatsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Aggro Spells Definitions...");
         sSpellMgr->LoadSpellThreats();
@@ -847,7 +851,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellGroupStackRulesCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellGroupStackRulesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell Group Stack Rules...");
         sSpellMgr->LoadSpellGroupStackRules();
@@ -855,7 +859,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellPetAurasCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSpellPetAurasCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Spell pet auras...");
         sSpellMgr->LoadSpellPetAuras();
@@ -863,7 +867,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadPageTextsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadPageTextsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Page Texts...");
         sObjectMgr->LoadPageTexts();
@@ -872,7 +876,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadItemEnchantementsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadItemEnchantementsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Item Random Enchantments Table...");
         LoadRandomEnchantmentsTable();
@@ -880,7 +884,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadItemSetNamesCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadItemSetNamesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Item set names...");
         sObjectMgr->LoadItemSetNames();
@@ -888,7 +892,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadEventScriptsCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadEventScriptsCommand(ChatHandler* handler)
     {
         if (sScriptMgr->IsScriptScheduled())
         {
@@ -897,18 +901,16 @@ public:
             return false;
         }
 
-        if (*args != 'a')
-            LOG_INFO("server.loading", "Re-Loading Scripts from `event_scripts`...");
+        LOG_INFO("server.loading", "Re-Loading Scripts from `event_scripts`...");
 
         sObjectMgr->LoadEventScripts();
 
-        if (*args != 'a')
-            handler->SendGlobalGMSysMessage("DB table `event_scripts` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `event_scripts` reloaded.");
 
         return true;
     }
 
-    static bool HandleReloadWpScriptsCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadWpScriptsCommand(ChatHandler* handler)
     {
         if (sScriptMgr->IsScriptScheduled())
         {
@@ -917,31 +919,25 @@ public:
             return false;
         }
 
-        if (*args != 'a')
-            LOG_INFO("server.loading", "Re-Loading Scripts from `waypoint_scripts`...");
+        LOG_INFO("server.loading", "Re-Loading Scripts from `waypoint_scripts`...");
 
         sObjectMgr->LoadWaypointScripts();
 
-        if (*args != 'a')
-            handler->SendGlobalGMSysMessage("DB table `waypoint_scripts` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `waypoint_scripts` reloaded.");
 
         return true;
     }
 
-    static bool HandleReloadWpCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadWpCommand(ChatHandler* handler)
     {
-        if (*args != 'a')
-            LOG_INFO("server.loading", "Re-Loading Waypoints data from 'waypoints_data'");
-
+        LOG_INFO("server.loading", "Re-Loading Waypoints data from 'waypoints_data'");
         sWaypointMgr->Load();
-
-        if (*args != 'a')
-            handler->SendGlobalGMSysMessage("DB Table 'waypoint_data' reloaded.");
+        handler->SendGlobalGMSysMessage("DB Table 'waypoint_data' reloaded.");
 
         return true;
     }
 
-    static bool HandleReloadSpellScriptsCommand(ChatHandler* handler, const char* args)
+    static bool HandleReloadSpellScriptsCommand(ChatHandler* handler)
     {
         if (sScriptMgr->IsScriptScheduled())
         {
@@ -950,18 +946,16 @@ public:
             return false;
         }
 
-        if (*args != 'a')
-            LOG_INFO("server.loading", "Re-Loading Scripts from `spell_scripts`...");
+        LOG_INFO("server.loading", "Re-Loading Scripts from `spell_scripts`...");
 
         sObjectMgr->LoadSpellScripts();
 
-        if (*args != 'a')
-            handler->SendGlobalGMSysMessage("DB table `spell_scripts` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `spell_scripts` reloaded.");
 
         return true;
     }
 
-    static bool HandleReloadGameGraveyardZoneCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadGameGraveyardZoneCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Graveyard-zone links...");
 
@@ -972,7 +966,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadGameTeleCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadGameTeleCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Game Tele coordinates...");
 
@@ -983,7 +977,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadDisablesCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadDisablesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading disables table...");
         DisableMgr::LoadDisables();
@@ -993,7 +987,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesAchievementRewardCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesAchievementRewardCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Achievement Reward Data Locale...");
         sAchievementMgr->LoadRewardLocales();
@@ -1001,7 +995,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLfgRewardsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLfgRewardsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading lfg dungeon rewards...");
         sLFGMgr->LoadRewards();
@@ -1009,7 +1003,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesCreatureCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesCreatureCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Creature Template Locale...");
         sObjectMgr->LoadCreatureLocales();
@@ -1017,7 +1011,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesCreatureTextCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesCreatureTextCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Creature Texts Locale...");
         sCreatureTextMgr->LoadCreatureTextLocales();
@@ -1025,7 +1019,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesGameobjectCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesGameobjectCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Gameobject Template Locale ... ");
         sObjectMgr->LoadGameObjectLocales();
@@ -1033,7 +1027,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesGossipMenuOptionCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesGossipMenuOptionCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Gossip Menu Option Locale ... ");
         sObjectMgr->LoadGossipMenuItemsLocales();
@@ -1041,7 +1035,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesItemCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesItemCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Item Template Locale ... ");
         sObjectMgr->LoadItemLocales();
@@ -1049,7 +1043,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesItemSetNameCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesItemSetNameCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Item set name Locale... ");
         sObjectMgr->LoadItemSetNameLocales();
@@ -1057,7 +1051,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesNpcTextCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesNpcTextCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading NPC Text Locale ... ");
         sObjectMgr->LoadNpcTextLocales();
@@ -1065,7 +1059,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesPageTextCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesPageTextCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Page Text Locale ... ");
         sObjectMgr->LoadPageTextLocales();
@@ -1074,7 +1068,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesPointsOfInterestCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesPointsOfInterestCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Points Of Interest Locale ... ");
         sObjectMgr->LoadPointOfInterestLocales();
@@ -1082,7 +1076,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesQuestCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadLocalesQuestCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Locales Quest ... ");
         sObjectMgr->LoadQuestLocales();
@@ -1090,7 +1084,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesQuestOfferRewardCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleReloadLocalesQuestOfferRewardCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Quest Offer Reward Locale... ");
         sObjectMgr->LoadQuestOfferRewardLocale();
@@ -1098,7 +1092,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadLocalesQuestRequestItemsCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleReloadLocalesQuestRequestItemsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Quest Request Item Locale... ");
         sObjectMgr->LoadQuestRequestItemsLocale();
@@ -1106,7 +1100,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadMailLevelRewardCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadMailLevelRewardCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Player level dependent mail rewards...");
         sObjectMgr->LoadMailLevelRewards();
@@ -1114,7 +1108,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadAuctionsCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadAuctionsCommand(ChatHandler* handler)
     {
         ///- Reload dynamic data tables from the database
         LOG_INFO("server.loading", "Re-Loading Auctions...");
@@ -1124,7 +1118,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadConditions(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadConditions(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Conditions...");
         sConditionMgr->LoadConditions(true);
@@ -1132,7 +1126,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadCreatureText(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadCreatureText(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Creature Texts...");
         sCreatureTextMgr->LoadCreatureTexts();
@@ -1140,7 +1134,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadSmartScripts(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadSmartScripts(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Smart Scripts...");
         sSmartScriptMgr->LoadSmartAIFromDB();
@@ -1148,7 +1142,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadVehicleAccessoryCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadVehicleAccessoryCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading vehicle_accessory table...");
         sObjectMgr->LoadVehicleAccessories();
@@ -1156,7 +1150,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadVehicleTemplateAccessoryCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadVehicleTemplateAccessoryCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading vehicle_template_accessory table...");
         sObjectMgr->LoadVehicleTemplateAccessories();
@@ -1164,7 +1158,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadGameGraveyardCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadGameGraveyardCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading game_graveyard table...");
         sGraveyard->LoadGraveyardFromDB();
@@ -1172,7 +1166,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadRBACCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleReloadRBACCommand(ChatHandler* handler)
     {
         LOG_INFO("misc", "Reloading RBAC tables...");
         sAccountMgr->LoadRBAC();
