@@ -7706,15 +7706,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             uint32 pLevel = bones->loot.gold;
             bones->loot.clear();
 
-            // Xinef: For AV Achievement
-            if (Battleground* bg = GetBattleground())
-            {
-                if (bg->GetBgTypeID(true) == BATTLEGROUND_AV)
-                    loot->FillLoot(1, LootTemplates_Creature, this, true);
-            }
-            // Xinef: For wintergrasp Quests
-            else if (GetZoneId() == AREA_WINTERGRASP)
-                loot->FillLoot(1, LootTemplates_Creature, this, true);
+            loot->FillLoot(GetTeamId(), LootTemplates_Player, this, true);
 
             // It may need a better formula
             // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
