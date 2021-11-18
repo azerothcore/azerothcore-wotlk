@@ -322,7 +322,7 @@ public:
     }
 
     //rename characters
-    static bool HandleCharacterRenameCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<std::string_view> newNameV)
+    static bool HandleCharacterRenameCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, Optional<bool> reserveName, Optional<std::string_view> newNameV)
     {
         if (!player && newNameV)
             return false;
@@ -415,6 +415,11 @@ public:
                 stmt->setUInt32(1, player->GetGUID().GetCounter());
                 CharacterDatabase.Execute(stmt);
             }
+        }
+
+        if (reserveName)
+        {
+            sObjectMgr->AddReservedPlayerName(player->GetName());
         }
 
         return true;
