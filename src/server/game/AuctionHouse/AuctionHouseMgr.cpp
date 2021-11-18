@@ -137,10 +137,10 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
             case AUCTION_SORT_OWNER:
             {
                 std::string leftName;
-                sObjectMgr->GetPlayerNameByGUID(left->owner.GetCounter(), leftName);
+                sCharacterCache->GetCharacterNameByGuid(left->owner, leftName);
 
                 std::string rightName;
-                sObjectMgr->GetPlayerNameByGUID(right->owner.GetCounter(), rightName);
+                sCharacterCache->GetCharacterNameByGuid(right->owner, rightName);
 
                 int result = leftName.compare(rightName);
                 if (result == 0)
