@@ -165,8 +165,8 @@ public:
 
             if (caster && target)
             {
-                caster->CastSpell(target, SPELL_SHAZZRAH_GATE, true);
-                caster->CastSpell(caster, SPELL_ARCANE_EXPLOSION);
+                target->CastSpell(caster, SPELL_SHAZZRAH_GATE, true);
+                caster->CastSpell(nullptr, SPELL_ARCANE_EXPLOSION);
 
                 if (Creature* creatureCaster = caster->ToCreature())
                 {
