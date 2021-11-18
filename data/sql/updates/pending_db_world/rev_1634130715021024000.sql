@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634130715021024000');
 
 UPDATE `creature_template` SET `unit_flags` = 768, `flags_extra` = `flags_extra`|512 WHERE `entry` IN (36908,36909);
 DELETE FROM `creature_template_addon` WHERE `entry` IN (36908,36909);
-INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (36908,0,0,0,1,0,0,'69641'),
 (36909,0,0,0,1,0,0,'69641');
 
