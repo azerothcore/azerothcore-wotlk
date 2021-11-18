@@ -995,15 +995,15 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             }
         };
 
-        SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077 });
+        SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077, 1106, 1104, 1090, 1098, 1156, 1073, 1105, 1119, 1091 });
 
         switch (pCurrChar->GetFaction())
         {
             case ALLIANCE:
-                SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946 });
+                SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946, 1037, 1068, 1126, 1094, 1050 });
                 break;
             case HORDE:
-                SendFullReputation({ 76, 68, 81, 911, 729, 941, 530, 947 });
+                SendFullReputation({ 76, 68, 81, 911, 729, 941, 530, 947, 1052, 1067, 1124, 1064, 1085 });
                 break;
             default:
                 break;

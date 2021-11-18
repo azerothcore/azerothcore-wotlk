@@ -242,6 +242,11 @@ public:
 
     uint32 GetEncounterCount() const { return bosses.size(); }
 
+    // Only used by areatriggers that inherit from OnlyOnceAreaTriggerScript
+    void MarkAreaTriggerDone(uint32 id) { _activatedAreaTriggers.insert(id); }
+    void ResetAreaTriggerDone(uint32 id) { _activatedAreaTriggers.erase(id); }
+    bool IsAreaTriggerDone(uint32 id) const { return _activatedAreaTriggers.find(id) != _activatedAreaTriggers.end(); }
+
     // Allows to perform particular actions
     virtual void DoAction(int32 /*action*/) {}
 protected:
@@ -272,6 +277,7 @@ private:
     ObjectInfoMap _gameObjectInfo;
     ObjectGuidMap _objectGuids;
     uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+    std::unordered_set<uint32> _activatedAreaTriggers;
 };
 
 #endif
