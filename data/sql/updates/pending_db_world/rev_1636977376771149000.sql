@@ -309,26 +309,26 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Assign waypoints for Belfry Bats
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_1;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_1, @PATH_BAT_GUID_1, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_1, @PATH_BAT_GUID_1, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_2;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_2, @PATH_BAT_GUID_2, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_2, @PATH_BAT_GUID_2, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_3;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_3, @PATH_BAT_GUID_3, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_3, @PATH_BAT_GUID_3, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_4;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_4, @PATH_BAT_GUID_4, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_4, @PATH_BAT_GUID_4, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_5;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_5, @PATH_BAT_GUID_5, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_5, @PATH_BAT_GUID_5, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_6;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_6, @PATH_BAT_GUID_6, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_6, @PATH_BAT_GUID_6, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_7;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_7, @PATH_BAT_GUID_7, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_7, @PATH_BAT_GUID_7, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_8;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_8, @PATH_BAT_GUID_8, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_8, @PATH_BAT_GUID_8, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_9;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_9, @PATH_BAT_GUID_9, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_9, @PATH_BAT_GUID_9, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_10;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_10, @PATH_BAT_GUID_10, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_10, @PATH_BAT_GUID_10, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_11;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_11, @PATH_BAT_GUID_11, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_11, @PATH_BAT_GUID_11, 0, 0, 0 , 0, 3, '');
 DELETE FROM `creature_addon` WHERE `guid`=@BAT_GUID_12;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`, `auras`) VALUES (@BAT_GUID_12, @PATH_BAT_GUID_12, 0, 0, 0 , 0, 1, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`, `auras`) VALUES (@BAT_GUID_12, @PATH_BAT_GUID_12, 0, 0, 0 , 0, 3, '');
