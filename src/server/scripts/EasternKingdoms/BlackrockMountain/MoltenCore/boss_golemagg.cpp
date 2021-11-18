@@ -65,16 +65,6 @@ public:
             DoCastSelf(SPELL_DOUBLE_ATTACK);
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetBossState(DATA_GOLEMAGG, DONE);
-        }
-
-        void EnterCombat(Unit* /*victim*/) override
-        {
-            instance->SetBossState(DATA_GOLEMAGG, IN_PROGRESS);
-        }
-
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!enraged && me->HealthBelowPctDamaged(10, damage))
