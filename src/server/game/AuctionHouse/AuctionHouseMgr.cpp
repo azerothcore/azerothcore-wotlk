@@ -137,10 +137,10 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
             case AUCTION_SORT_OWNER:
             {
                 std::string leftName;
-                sObjectMgr->GetPlayerNameByGUID(left->owner.GetCounter(), leftName);
+                sCharacterCache->GetCharacterNameByGuid(left->owner, leftName);
 
                 std::string rightName;
-                sObjectMgr->GetPlayerNameByGUID(right->owner.GetCounter(), rightName);
+                sCharacterCache->GetCharacterNameByGuid(right->owner, rightName);
 
                 int result = leftName.compare(rightName);
                 if (result == 0)
@@ -297,9 +297,13 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
     uint32 bidder_accId = 0;
     Player* bidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
     if (bidder)
+    {
         bidder_accId = bidder->GetSession()->GetAccountId();
+    }
     else
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+    {
+        bidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
+    }
 
     // receiver exist
     if (bidder || bidder_accId)
@@ -333,7 +337,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
     // owner exist (online or offline)
     if (owner || owner_accId)
     {
@@ -355,7 +359,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, Characte
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
     // owner exist
     if (owner || owner_accId)
     {
@@ -380,18 +384,18 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY), 0, false, true, auction->Id);
 
         if (auction->bid >= 500 * GOLD)
-            if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(auction->bidder.GetCounter()))
+            if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(auction->bidder))
             {
                 Player* bidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
                 std::string owner_name = "";
                 uint8 owner_level = 0;
-                if (const GlobalPlayerData* gpd_owner = sWorld->GetGlobalPlayerData(auction->owner.GetCounter()))
+                if (CharacterCacheEntry const* gpd_owner = sCharacterCache->GetCharacterCacheByGuid(auction->owner))
                 {
-                    owner_name = gpd_owner->name;
-                    owner_level = gpd_owner->level;
+                    owner_name = gpd_owner->Name;
+                    owner_level = gpd_owner->Level;
                 }
                 CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<AH> profit: %ug, bidder: %s %u lvl (guid: %u), seller: %s %u lvl (guid: %u), item %u (%u)\", NOW())",
-                    gpd->accountId, auction->bidder.GetCounter(), gpd->name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", owner_accId, owner_name.c_str(), auction->bid, (profit / GOLD), gpd->name.c_str(), gpd->level, auction->bidder.GetCounter(), owner_name.c_str(), owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount);
+                    gpd->AccountId, auction->bidder.GetCounter(), gpd->Name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", owner_accId, owner_name.c_str(), auction->bid, (profit / GOLD), gpd->Name.c_str(), gpd->Level, auction->bidder.GetCounter(), owner_name.c_str(), owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount);
             }
     }
 }
@@ -405,7 +409,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
         return;
 
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
 
     // owner exist
     if (owner || owner_accId)
@@ -431,7 +435,7 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 
     uint32 oldBidder_accId = 0;
     if (!oldBidder)
-        oldBidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+        oldBidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
 
     // old bidder exist
     if (oldBidder || oldBidder_accId)
@@ -455,7 +459,9 @@ void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, Ch
 
     uint32 bidder_accId = 0;
     if (!bidder)
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+    {
+        bidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
+    }
 
     // bidder exist
     if (bidder || bidder_accId)
