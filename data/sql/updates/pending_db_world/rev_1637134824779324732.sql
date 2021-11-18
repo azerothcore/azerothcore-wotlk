@@ -11,9 +11,7 @@ WHERE `guid` = 42143;
 
 -- Insert new path
 
-UPDATE `creature_addon`
-SET `path_id` = @newPathId
-WHERE `guid` = 42143;
+UPDATE `creature_addon` SET `path_id` = @newPathId WHERE `guid` = 42143;
 
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `delay`)
 VALUES
