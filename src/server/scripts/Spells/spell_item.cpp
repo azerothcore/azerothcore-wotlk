@@ -1771,7 +1771,7 @@ class spell_item_mingos_fortune_generator : public SpellScript
         return ValidateSpellInfo(CreateFortuneSpells);
     }
 
-    void HandleDummy(SpellEffIndex effIndex)
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         GetCaster()->CastSpell(GetCaster(), Acore::Containers::SelectRandomContainerElement(CreateFortuneSpells), true);
     }
