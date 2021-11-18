@@ -138,6 +138,7 @@ public:
     MOCK_METHOD(time_t, GetNextTimeWithMonthAndHour, (int8 month, int8 hour), ());
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
+    MOCK_METHOD(void, ReloadRBAC, ());
     MOCK_METHOD(void, RemoveOldCorpses, ());
 };
 #pragma GCC diagnostic pop
