@@ -370,7 +370,7 @@ class spell_dk_chains_of_ice : public SpellScript
         {
             std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
             for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-                if (ihit->missCondition == SPELL_MISS_NONE && ihit->targetGUID == target->GetGUID())
+                if (ihit->missCondition == SpellMissInfo::None && ihit->targetGUID == target->GetGUID())
                     GetCaster()->CastSpell(target, 55095 /*SPELL_FROST_FEVER*/, true);
         }
     }
@@ -531,7 +531,7 @@ class spell_dk_hungering_cold : public AuraScript
     void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        if (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DispelType::DISEASE))
+        if (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DispelType::Disease))
             SetDuration(0);
     }
 

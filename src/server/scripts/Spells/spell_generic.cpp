@@ -1582,7 +1582,7 @@ class spell_gen_obsidian_armor : public AuraScript
             return false;
         }
 
-        if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
+        if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SpellSchool::Normal)
             return false;
 
         return true;

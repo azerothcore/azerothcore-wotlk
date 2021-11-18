@@ -57,7 +57,7 @@ class spell_rog_savage_combat : public AuraScript
     {
         Unit::AuraApplicationMap const& auras = GetUnitOwner()->GetAppliedAuras();
         for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-            if (itr->second->GetBase()->GetCasterGUID() == this->GetCasterGUID() && itr->second->GetBase()->GetSpellInfo()->Dispel == DispelType::POISON)
+            if (itr->second->GetBase()->GetCasterGUID() == this->GetCasterGUID() && itr->second->GetBase()->GetSpellInfo()->Dispel == DispelType::Poison)
                 return;
 
         SetDuration(0);
@@ -202,7 +202,7 @@ class spell_rog_deadly_poison : public SpellScript
 
     void HandleBeforeHit(SpellMissInfo missInfo)
     {
-        if (missInfo != SPELL_MISS_NONE)
+        if (missInfo != SpellMissInfo::None)
         {
             return;
         }
@@ -251,7 +251,7 @@ class spell_rog_deadly_poison : public SpellScript
                     }
 
                     // Proc only rogue poisons
-                    if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || spellInfo->Dispel != DispelType::POISON)
+                    if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || spellInfo->Dispel != DispelType::Poison)
                         continue;
 
                     // Do not reproc deadly

@@ -1313,7 +1313,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 // If crit add critical bonus
                 if (crit)
                 {
-                    damageInfo->HitInfo |= SpellHitType::Crit;
+                    damageInfo->HitInfo |= static_cast<uint32>(SpellHitType::Crit);
                     damageInfo->damage = Unit::SpellCriticalDamageBonus(this, spellInfo, damageInfo->damage, victim);
                 }
 
@@ -5101,8 +5101,8 @@ Aura* Unit::GetAuraOfRankedSpell(uint32 spellId, ObjectGuid casterGUID, ObjectGu
 void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList)
 {
     // we should not be able to dispel diseases if the target is affected by unholy blight
-    if (dispelMask & (1 << static_cast<uint32>(DispelType::DISEASE)) && HasAura(50536))
-        dispelMask &= ~(1 << static_cast<uint32>(DispelType::DISEASE));
+    if (dispelMask & (1 << static_cast<uint32>(DispelType::Disease)) && HasAura(50536))
+        dispelMask &= ~(1 << static_cast<uint32>(DispelType::Disease));
 
     ReputationRank rank = GetReactionTo(caster);
     bool positive = rank >= REP_FRIENDLY;
@@ -5136,7 +5136,7 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
 
         if (aura->GetSpellInfo()->GetDispelMask() & dispelMask)
         {
-            if (aura->GetSpellInfo()->Dispel == DispelType::MAGIC)
+            if (aura->GetSpellInfo()->Dispel == DispelType::Magic)
             {
                 // do not remove positive auras if friendly target
                 //               negative auras if non-friendly target
@@ -5315,7 +5315,7 @@ uint32 Unit::GetDiseasesByCaster(ObjectGuid casterGUID, uint8 mode)
         for (AuraEffectList::iterator i = m_modAuras[diseaseAuraTypes[index]].begin(); i != m_modAuras[diseaseAuraTypes[index]].end();)
         {
             // Get auras with disease dispel type by caster
-            if ((*i)->GetSpellInfo()->Dispel == DispelType::DISEASE
+            if ((*i)->GetSpellInfo()->Dispel == DispelType::Disease
                     && ((*i)->GetCasterGUID() == casterGUID || (*i)->GetCasterGUID() == drwGUID)) // if its caster or his dancing rune weapon
             {
                 ++diseases;
@@ -5815,7 +5815,7 @@ void Unit::SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, 
     log.resist = Resist;
     log.physicalLog = PhysicalDamage;
     log.blocked = Blocked;
-    log.HitInfo = static_cast<uint32>(SpellHitType::CritDebug) | static_cast<uint32>(SpellHitType::HitDebug) | static_cast<uint32>(SpellHitType::AttackTableDebug);
+    log.HitInfo     = static_cast<uint32>(SpellHitType::CritDebug) | static_cast<uint32>(SpellHitType::HitDebug) | static_cast<uint32>(SpellHitType::AttackTableDebug);
     if (CriticalHit)
         log.HitInfo |= static_cast<uint32>(SpellHitType::Crit);
     SendSpellNonMeleeDamageLog(&log);
@@ -12175,7 +12175,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo)
     if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         return false;
 
-    if (spellInfo->Dispel != DispelType::NONE)
+    if (spellInfo->Dispel != DispelType::None)
     {
         SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
         for (SpellImmuneList::const_iterator itr = dispelList.begin(); itr != dispelList.end(); ++itr)
@@ -12272,7 +12272,7 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
             AuraEffectList const& immuneAuraApply = GetAuraEffectsByType(SPELL_AURA_MOD_IMMUNE_AURA_APPLY_SCHOOL);
             for (AuraEffectList::const_iterator iter = immuneAuraApply.begin(); iter != immuneAuraApply.end(); ++iter)
             {
-                if (/*(spellInfo->Dispel == DispelType::MAGIC || spellInfo->Dispel == DispelType::CURSE || spellInfo->Dispel == DispelType::DISEASE) &&*/ // Magic debuff, xinef: all kinds?
+                if (/*(spellInfo->Dispel == DispelType::Magic || spellInfo->Dispel == DispelType::Curse || spellInfo->Dispel == DispelType::Disease) &&*/ // Magic debuff, xinef: all kinds?
                     ((*iter)->GetMiscValue() & spellInfo->GetSchoolMask()) &&  // Check school
                     !spellInfo->IsPositiveEffect(index) &&                                  // Harmful
                     spellInfo->Effects[index].Effect != SPELL_EFFECT_PERSISTENT_AREA_AURA)  // Not Persistent area auras

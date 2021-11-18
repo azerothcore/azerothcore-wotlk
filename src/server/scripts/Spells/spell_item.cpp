@@ -672,7 +672,7 @@ class spell_item_powerful_anti_venom : public SpellScript
             for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura* aura = itr->second;
-                if (aura->GetSpellInfo()->SpellLevel > 60 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                if (aura->GetSpellInfo()->SpellLevel > 60 || aura->GetSpellInfo()->Dispel != DispelType::Poison)
                 {
                     continue;
                 }
@@ -707,7 +707,7 @@ class spell_item_strong_anti_venom : public SpellScript
             for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura* aura = itr->second;
-                if (aura->GetSpellInfo()->SpellLevel > 35 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                if (aura->GetSpellInfo()->SpellLevel > 35 || aura->GetSpellInfo()->Dispel != DispelType::Poison)
                     continue;
 
                 removeList.push_back(aura->GetId());
@@ -738,7 +738,7 @@ class spell_item_anti_venom : public SpellScript
             for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura* aura = itr->second;
-                if (aura->GetSpellInfo()->SpellLevel > 25 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                if (aura->GetSpellInfo()->SpellLevel > 25 || aura->GetSpellInfo()->Dispel != DispelType::Poison)
                 {
                     continue;
                 }

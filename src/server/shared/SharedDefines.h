@@ -1341,21 +1341,21 @@ enum Mechanics : uint32
 // Spell dispel type
 enum class DispelType : uint32
 {
-    NONE         = 0,
-    MAGIC        = 1,
-    CURSE        = 2,
-    DISEASE      = 3,
-    POISON       = 4,
-    STEALTH      = 5,
-    INVISIBILITY = 6,
-    ALL          = 7,
-    SPE_NPC_ONLY = 8,
-    ENRAGE       = 9,
-    ZG_TICKET    = 10,
-    OLD_UNUSED   = 11
+    None           = 0,
+    Magic          = 1,
+    Curse          = 2,
+    Disease        = 3,
+    Poison         = 4,
+    Stealth        = 5,
+    Invisibility   = 6,
+    All            = 7,
+    SpecialNpcOnly = 8,
+    Enrage         = 9,
+    ZgTicket       = 10,
+    OldUnused      = 11
 };
 
-constexpr uint32 DISPEL_ALL_MASK = ((1 << static_cast<uint32>(DispelType::MAGIC)) | (1 << static_cast<uint32>(DispelType::CURSE)) | (1 << static_cast<uint32>(DispelType::DISEASE)) | (1 << static_cast<uint32>(DispelType::POISON)));
+constexpr uint32 DISPEL_ALL_MASK = ((1 << static_cast<uint32>(DispelType::Magic)) | (1 << static_cast<uint32>(DispelType::Curse)) | (1 << static_cast<uint32>(DispelType::Disease)) | (1 << static_cast<uint32>(DispelType::Poison)));
 
 //To all Immune system, if target has immunes,
 //some spell that related to ImmuneToDispel or ImmuneToSchool or ImmuneToDamage type can't cast to it,
