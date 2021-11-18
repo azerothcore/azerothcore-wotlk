@@ -614,11 +614,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         _worldSession->InitWarden(account.SessionKey, account.OS);
     }
 
-    sWorld->AddSession(_worldSession);
-
-    // @TODO FIX ME CRASH
-    // _queryProcessor.AddCallback(_worldSession->LoadPermissionsAsync().WithPreparedCallback(std::bind(&WorldSocket::LoadSessionPermissionsCallback, this, std::placeholders::_1)));
-
+    _queryProcessor.AddCallback(_worldSession->LoadPermissionsAsync().WithPreparedCallback(std::bind(&WorldSocket::LoadSessionPermissionsCallback, this, std::placeholders::_1)));
     AsyncRead();
 }
 
@@ -670,7 +666,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
             {
                 std::unique_lock<std::mutex> sessionGuard(_worldSessionLock);
 
-                if (_worldSession && !_worldSession->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_OVERSPEED_PING))
+                if (_worldSession && AccountMgr::IsPlayerAccount(_worldSession->GetSecurity()))
                 {
                     LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s)",
                         _worldSession->GetPlayerInfo().c_str(), GetRemoteIpAddress().to_string().c_str());

@@ -81,6 +81,7 @@ public:
 
     // function with different implementation for chat/console
     virtual bool IsHumanReadable() const { return true; }
+    virtual bool HasPermission(uint32 permission) const;
     virtual std::string GetNameLink() const { return GetNameLink(m_session->GetPlayer()); }
     virtual bool needReportToTarget(Player* chr) const;
     virtual LocaleConstant GetSessionDbcLocale() const;
@@ -139,6 +140,7 @@ public:
 
     // overwrite functions
     char const* GetAcoreString(uint32 entry) const override;
+    bool HasPermission(uint32 /*permission*/) const override { return true; }
     void SendSysMessage(std::string_view, bool escapeCharacters) override;
     bool ParseCommands(std::string_view str) override;
     std::string GetNameLink() const override;

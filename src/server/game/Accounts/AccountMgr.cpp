@@ -16,13 +16,17 @@
  */
 
 #include "AccountMgr.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
+#include "CryptoHash.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SRP6.h"
 #include "Util.h"
+#include "World.h"
 #include "WorldSession.h"
 
 AccountMgr::AccountMgr() { }
@@ -38,19 +42,20 @@ AccountMgr* AccountMgr::instance()
     return &instance;
 }
 
-AccountOpResult AccountMgr::CreateAccount(std::string username, std::string password)
+AccountOpResult AccountMgr::CreateAccount(std::string username, std::string password, std::string email /*= ""*/)
 {
     if (utf8length(username) > MAX_ACCOUNT_STR)
-        return AOR_NAME_TOO_LONG;                           // username's too long
+        return AccountOpResult::AOR_NAME_TOO_LONG;                           // username's too long
 
     if (utf8length(password) > MAX_PASS_STR)
-        return AOR_PASS_TOO_LONG;                           // password's too long
+        return AccountOpResult::AOR_PASS_TOO_LONG;                           // password's too long
 
     Utf8ToUpperOnlyLatin(username);
     Utf8ToUpperOnlyLatin(password);
+    Utf8ToUpperOnlyLatin(email);
 
     if (GetId(username))
-        return AOR_NAME_ALREADY_EXIST;                      // username does already exist
+        return AccountOpResult::AOR_NAME_ALREADY_EXIST;                       // username does already exist
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT);
 
@@ -58,15 +63,15 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
     auto [salt, verifier] = Acore::Crypto::SRP6::MakeRegistrationData(username, password);
     stmt->setBinary(1, salt);
     stmt->setBinary(2, verifier);
-    stmt->setInt8(3, uint8(sWorld->getIntConfig(CONFIG_EXPANSION)));
+    stmt->setString(3, email);
+    stmt->setString(4, email);
 
-    LoginDatabase.Execute(stmt);
+    LoginDatabase.DirectExecute(stmt); // Enforce saving, otherwise AddGroup can fail
 
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_REALM_CHARACTERS_INIT);
-
     LoginDatabase.Execute(stmt);
 
-    return AOR_OK;                                          // everything's fine
+    return AccountOpResult::AOR_OK;                                          // everything's fine
 }
 
 AccountOpResult AccountMgr::DeleteAccount(uint32 accountId)
@@ -74,13 +79,14 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accountId)
     // Check if accounts exists
     LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_ID);
     loginStmt->setUInt32(0, accountId);
-
     PreparedQueryResult result = LoginDatabase.Query(loginStmt);
+
     if (!result)
-        return AOR_NAME_NOT_EXIST;
+        return AccountOpResult::AOR_NAME_NOT_EXIST;
 
     // Obtain accounts characters
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
+
     stmt->setUInt32(0, accountId);
 
     result = CharacterDatabase.Query(stmt);
@@ -89,14 +95,14 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accountId)
     {
         do
         {
-            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].GetUInt32());
+            ObjectGuid guid(HighGuid::Player, (*result)[0].GetUInt32());
 
             // Kick if player is online
-            if (Player* p = ObjectAccessor::FindPlayer(guid))
+            if (Player* p = ObjectAccessor::FindConnectedPlayer(guid))
             {
                 WorldSession* s = p->GetSession();
-                s->KickPlayer("Delete account");            // mark session to remove at next session list update
-                s->LogoutPlayer(false);                     // logout player without waiting next session list update
+                s->KickPlayer("AccountMgr::DeleteAccount Deleting the account"); // mark session to remove at next session list update
+                s->LogoutPlayer(false); // logout player without waiting next session list update
             }
 
             Player::DeleteFromDB(guid.GetCounter(), accountId, false, true);       // no need to update realm characters
@@ -140,7 +146,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accountId)
 
     LoginDatabase.CommitTransaction(trans);
 
-    return AOR_OK;
+    return AccountOpResult::AOR_OK;
 }
 
 AccountOpResult AccountMgr::ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword)
@@ -151,13 +157,13 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accountId, std::string newUser
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     if (!result)
-        return AOR_NAME_NOT_EXIST;
+        return AccountOpResult::AOR_NAME_NOT_EXIST;
 
     if (utf8length(newUsername) > MAX_ACCOUNT_STR)
-        return AOR_NAME_TOO_LONG;
+        return AccountOpResult::AOR_NAME_TOO_LONG;
 
     if (utf8length(newPassword) > MAX_PASS_STR)
-        return AOR_PASS_TOO_LONG;                           // password's too long
+        return AccountOpResult::AOR_PASS_TOO_LONG;
 
     Utf8ToUpperOnlyLatin(newUsername);
     Utf8ToUpperOnlyLatin(newPassword);
@@ -174,7 +180,7 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accountId, std::string newUser
     stmt->setUInt32(2, accountId);
     LoginDatabase.Execute(stmt);
 
-    return AOR_OK;
+    return AccountOpResult::AOR_OK;
 }
 
 AccountOpResult AccountMgr::ChangePassword(uint32 accountId, std::string newPassword)
@@ -184,46 +190,96 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accountId, std::string newPass
     if (!GetName(accountId, username))
     {
         sScriptMgr->OnFailedPasswordChange(accountId);
-        return AOR_NAME_NOT_EXIST;                          // account doesn't exist
+        return AccountOpResult::AOR_NAME_NOT_EXIST;                          // account doesn't exist
     }
 
     if (utf8length(newPassword) > MAX_PASS_STR)
     {
-        sScriptMgr->OnFailedEmailChange(accountId);
-        return AOR_PASS_TOO_LONG;                           // password's too long
+        sScriptMgr->OnFailedPasswordChange(accountId);
+        return AccountOpResult::AOR_PASS_TOO_LONG;
     }
 
     Utf8ToUpperOnlyLatin(username);
     Utf8ToUpperOnlyLatin(newPassword);
-
     auto [salt, verifier] = Acore::Crypto::SRP6::MakeRegistrationData(username, newPassword);
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGON);
     stmt->setBinary(0, salt);
     stmt->setBinary(1, verifier);
-    stmt->setUInt32(2, accountId);
+    stmt->setUInt32(2, accountId);;
     LoginDatabase.Execute(stmt);
 
     sScriptMgr->OnPasswordChange(accountId);
-    return AOR_OK;
+    return AccountOpResult::AOR_OK;
 }
 
-uint32 AccountMgr::GetId(std::string const& username)
+AccountOpResult AccountMgr::ChangeEmail(uint32 accountId, std::string newEmail)
+{
+    std::string username;
+
+    if (!GetName(accountId, username))
+    {
+        sScriptMgr->OnFailedEmailChange(accountId);
+        return AccountOpResult::AOR_NAME_NOT_EXIST;                          // account doesn't exist
+    }
+
+    if (utf8length(newEmail) > MAX_EMAIL_STR)
+    {
+        sScriptMgr->OnFailedEmailChange(accountId);
+        return AccountOpResult::AOR_EMAIL_TOO_LONG;
+    }
+
+    Utf8ToUpperOnlyLatin(username);
+    Utf8ToUpperOnlyLatin(newEmail);
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EMAIL);
+
+    stmt->setString(0, newEmail);
+    stmt->setUInt32(1, accountId);
+
+    LoginDatabase.Execute(stmt);
+
+    sScriptMgr->OnEmailChange(accountId);
+    return AccountOpResult::AOR_OK;
+}
+
+AccountOpResult AccountMgr::ChangeRegEmail(uint32 accountId, std::string newEmail)
+{
+    std::string username;
+
+    if (!GetName(accountId, username))
+    {
+        sScriptMgr->OnFailedEmailChange(accountId);
+        return AccountOpResult::AOR_NAME_NOT_EXIST;                          // account doesn't exist
+    }
+
+    if (utf8length(newEmail) > MAX_EMAIL_STR)
+    {
+        sScriptMgr->OnFailedEmailChange(accountId);
+        return AccountOpResult::AOR_EMAIL_TOO_LONG;
+    }
+
+    Utf8ToUpperOnlyLatin(username);
+    Utf8ToUpperOnlyLatin(newEmail);
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REG_EMAIL);
+
+    stmt->setString(0, newEmail);
+    stmt->setUInt32(1, accountId);
+
+    LoginDatabase.Execute(stmt);
+
+    sScriptMgr->OnEmailChange(accountId);
+    return AccountOpResult::AOR_OK;
+}
+
+uint32 AccountMgr::GetId(std::string_view username)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
-    stmt->setString(0, username);
+    stmt->setStringView(0, username);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     return (result) ? (*result)[0].GetUInt32() : 0;
-}
-
-uint32 AccountMgr::GetSecurity(uint32 accountId)
-{
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ACCESS_GMLEVEL);
-    stmt->setUInt32(0, accountId);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    return (result) ? (*result)[0].GetUInt8() : uint32(SEC_PLAYER);
 }
 
 uint32 AccountMgr::GetSecurity(uint32 accountId, int32 realmId)
@@ -236,6 +292,17 @@ uint32 AccountMgr::GetSecurity(uint32 accountId, int32 realmId)
     return (result) ? (*result)[0].GetUInt8() : uint32(SEC_PLAYER);
 }
 
+QueryCallback AccountMgr::GetSecurityAsync(uint32 accountId, int32 realmId, std::function<void(uint32)> callback)
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_GMLEVEL_BY_REALMID);
+    stmt->setUInt32(0, accountId);
+    stmt->setInt32(1, realmId);
+    return LoginDatabase.AsyncQuery(stmt).WithPreparedCallback([callback = std::move(callback)](PreparedQueryResult result)
+    {
+        callback(result ? uint32((*result)[0].GetUInt8()) : uint32(SEC_PLAYER));
+    });
+}
+
 bool AccountMgr::GetName(uint32 accountId, std::string& name)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_USERNAME_BY_ID);
@@ -245,6 +312,21 @@ bool AccountMgr::GetName(uint32 accountId, std::string& name)
     if (result)
     {
         name = (*result)[0].GetString();
+        return true;
+    }
+
+    return false;
+}
+
+bool AccountMgr::GetEmail(uint32 accountId, std::string& email)
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_EMAIL_BY_ID);
+    stmt->setUInt32(0, accountId);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    if (result)
+    {
+        email = (*result)[0].GetString();
         return true;
     }
 
@@ -263,6 +345,7 @@ bool AccountMgr::CheckPassword(uint32 accountId, std::string password)
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD);
     stmt->setUInt32(0, accountId);
+
     if (PreparedQueryResult result = LoginDatabase.Query(stmt))
     {
         Acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>();
@@ -270,6 +353,23 @@ bool AccountMgr::CheckPassword(uint32 accountId, std::string password)
         if (Acore::Crypto::SRP6::CheckLogin(username, password, salt, verifier))
             return true;
     }
+
+    return false;
+}
+
+bool AccountMgr::CheckEmail(uint32 accountId, std::string newEmail)
+{
+    std::string oldEmail;
+
+    // We simply return false for a non-existing email
+    if (!GetEmail(accountId, oldEmail))
+        return false;
+
+    Utf8ToUpperOnlyLatin(oldEmail);
+    Utf8ToUpperOnlyLatin(newEmail);
+
+    if (strcmp(oldEmail.c_str(), newEmail.c_str()) == 0)
+        return true;
 
     return false;
 }
@@ -282,6 +382,18 @@ uint32 AccountMgr::GetCharactersCount(uint32 accountId)
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     return (result) ? (*result)[0].GetUInt64() : 0;
+}
+
+bool AccountMgr::IsBannedAccount(std::string const& name)
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_BY_USERNAME);
+    stmt->setString(0, name);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    if (!result)
+        return false;
+
+    return true;
 }
 
 bool AccountMgr::IsPlayerAccount(uint32 gmlevel)
@@ -393,7 +505,7 @@ void AccountMgr::LoadRBAC()
 
 void AccountMgr::UpdateAccountAccess(rbac::RBACData* rbac, uint32 accountId, uint8 securityLevel, int32 realmId)
 {
-    if (rbac && securityLevel == rbac->GetSecurityLevel())
+    if (rbac && securityLevel != rbac->GetSecurityLevel())
         rbac->SetSecurityLevel(securityLevel);
 
     LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
@@ -443,19 +555,19 @@ bool AccountMgr::HasPermission(uint32 accountId, uint32 permissionId, uint32 rea
         return false;
     }
 
-    rbac::RBACData rbac(accountId, "", realmId, GetSecurity(accountId));
+    rbac::RBACData rbac(accountId, "", realmId, GetSecurity(accountId, realmId));
     rbac.LoadFromDB();
     bool hasPermission = rbac.HasPermission(permissionId);
 
     LOG_DEBUG("rbac", "AccountMgr::HasPermission [AccountId: %u, PermissionId: %u, realmId: %d]: %u",
-                 accountId, permissionId, realmId, hasPermission);
+                   accountId, permissionId, realmId, hasPermission);
     return hasPermission;
 }
 
 void AccountMgr::ClearRBAC()
 {
-    for (rbac::RBACPermissionsContainer::iterator itr = _permissions.begin(); itr != _permissions.end(); ++itr)
-        delete itr->second;
+    for (std::pair<uint32 const, rbac::RBACPermission*>& permission : _permissions)
+        delete permission.second;
 
     _permissions.clear();
     _defaultPermissions.clear();

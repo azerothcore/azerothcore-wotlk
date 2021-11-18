@@ -38,7 +38,6 @@
 #include "PacketUtilities.h"
 #include "Pet.h"
 #include "Player.h"
-#include "Realm.h"
 #include "QueryHolder.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
@@ -50,6 +49,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
+#include "Realm.h"
 #include <zlib.h>
 
 #ifdef ELUNA

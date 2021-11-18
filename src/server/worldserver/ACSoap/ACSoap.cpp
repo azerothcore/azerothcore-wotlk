@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "soapH.h"
 #include "soapStub.h"
+#include "Realm.h"
 #include "World.h"
 
 void ACSoapThread(const std::string& host, uint16 port)
@@ -94,7 +95,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return 401;
     }
 
-    if (AccountMgr::GetSecurity(accountId) < SEC_ADMINISTRATOR)
+    if (AccountMgr::GetSecurity(accountId, realm.Id.Realm) < SEC_ADMINISTRATOR)
     {
         LOG_DEBUG("network.soap", "ACSoap: %s's gmlevel is too low", soap->userid);
         return 403;

@@ -280,6 +280,7 @@ public:
     AccountTypes GetSecurity() const { return _security; }
     bool CanSkipQueue() const { return _skipQueue; }
     uint32 GetAccountId() const { return _accountId; }
+    std::string const& GetAccountName() const { return _accountName; }
     Player* GetPlayer() const { return _player; }
     std::string const& GetPlayerName() const;
     std::string GetPlayerInfo() const;

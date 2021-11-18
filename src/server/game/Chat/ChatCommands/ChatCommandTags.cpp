@@ -48,7 +48,7 @@ ChatCommandResult Acore::ChatCommands::QuotedString::TryConsume(ChatHandler cons
         if (args[i] == '\\')
         {
             ++i;
-            if (!(i < args.length()))
+            if (i >= args.length())
                 break;
         }
         std::string::push_back(args[i]);
@@ -57,6 +57,9 @@ ChatCommandResult Acore::ChatCommands::QuotedString::TryConsume(ChatHandler cons
     // if we reach this, we did not find a closing quote
     return std::nullopt;
 }
+
+Acore::ChatCommands::AccountIdentifier::AccountIdentifier(WorldSession& session)
+        : _id(session.GetAccountId()), _name(session.GetAccountName()), _session(&session) {}
 
 ChatCommandResult Acore::ChatCommands::AccountIdentifier::TryConsume(ChatHandler const* handler, std::string_view args)
 {
@@ -85,6 +88,15 @@ ChatCommandResult Acore::ChatCommands::AccountIdentifier::TryConsume(ChatHandler
         return next;
     else
         return FormatAcoreString(handler, LANG_CMDPARSER_ACCOUNT_ID_NO_EXIST, _id);
+}
+
+Optional<Acore::ChatCommands::AccountIdentifier> Acore::ChatCommands::AccountIdentifier::FromTarget(ChatHandler* handler)
+{
+    if (Player* player = handler->GetPlayer())
+        if (Player* target = player->GetSelectedPlayer())
+            if (WorldSession* session = target->GetSession())
+                return { *session };
+    return std::nullopt;
 }
 
 ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler const* handler, std::string_view args)
