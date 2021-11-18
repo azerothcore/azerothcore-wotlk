@@ -60,6 +60,16 @@
 #include "LuaEngine.h"
 #endif
 
+constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max)] =
+{
+    DEFAULT_VISIBILITY_DISTANCE,
+    VISIBILITY_DISTANCE_TINY,
+    VISIBILITY_DISTANCE_SMALL,
+    VISIBILITY_DISTANCE_LARGE,
+    VISIBILITY_DISTANCE_GIGANTIC,
+    MAX_VISIBILITY_DISTANCE
+};
+
 Object::Object() : m_PackGUID(sizeof(uint64) + 1)
 {
     m_objectTypeId      = TYPEID_OBJECT;
@@ -1099,7 +1109,7 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
 #ifdef ELUNA
     elunaEvents(nullptr),
 #endif
-    LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
+    LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
     m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
@@ -1170,12 +1180,15 @@ void WorldObject::setActive(bool on)
     }
 }
 
-void WorldObject::SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride)
+void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)
 {
+    ASSERT(type < VisibilityDistanceType::Max);
     if (GetTypeId() == TYPEID_PLAYER)
+    {
         return;
+    }
 
-    m_isVisibilityDistanceOverride = isVisibilityDistanceOverride;
+    m_visibilityDistanceOverride = VisibilityDistances[AsUnderlyingType(type)];
 }
 
 void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
@@ -1814,15 +1827,25 @@ float WorldObject::GetGridActivationRange() const
 float WorldObject::GetVisibilityRange() const
 {
     if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
+    {
         return MAX_VISIBILITY_DISTANCE;
+    }
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
     {
-        if (IsInWintergrasp())
-            return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
-        else if (IsVisibilityOverridden())
-            return MAX_VISIBILITY_DISTANCE;
-        else
-            return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
+        {
+            if (IsInWintergrasp())
+            {
+                return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
+            }
+            else if (IsVisibilityOverridden())
+            {
+                return MAX_VISIBILITY_DISTANCE;
+            }
+            else
+            {
+                return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
+            }
+        }
     }
     else
         return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
