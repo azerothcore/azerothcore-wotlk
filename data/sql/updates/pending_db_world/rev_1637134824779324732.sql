@@ -11,9 +11,8 @@ UPDATE `creature` SET `spawntimesecs` = 5400, `MovementType` = 2 WHERE `guid` = 
 
 UPDATE `creature_addon` SET `path_id` = @newPathId WHERE `guid` = 42143;
 
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `delay`)
-VALUES
-       (@newPathId, 1, 1960, -346, 35.5772, 10000),
-       (@newPathId, 2, 1952, -421, 35.5772, 10000),
-       (@newPathId, 3, 2046, -419, 35.5772, 10000),
-       (@newPathId, 4, 2056, -357, 35.5772, 10000);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `delay`) VALUES
+(@newPathId, 1, 1960, -346, 35.5772, 10000),
+(@newPathId, 2, 1952, -421, 35.5772, 10000),
+(@newPathId, 3, 2046, -419, 35.5772, 10000),
+(@newPathId, 4, 2056, -357, 35.5772, 10000);
