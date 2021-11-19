@@ -39,20 +39,6 @@ enum Events
     EVENT_RAGE
 };
 
-enum ChromaticEliteGuardEvents
-{
-    EVENT_MORTAL_STRIKE = 1,
-    EVENT_KNOCKDOWN     = 2,
-    EVENT_STRIKE        = 3
-};
-
-enum ChromaticEliteGuardSpells
-{
-    SPELL_MORTAL_STRIKE = 15708,
-    SPELL_KNOCKDOWN     = 16790,
-    SPELL_STRIKE        = 15580
-};
-
 class boss_drakkisath : public CreatureScript
 {
 public:
@@ -61,11 +47,6 @@ public:
     struct boss_drakkisathAI : public BossAI
     {
         boss_drakkisathAI(Creature* creature) : BossAI(creature, DATA_GENERAL_DRAKKISATH) { }
-
-        void Reset() override
-        {
-            _Reset();
-        }
 
         void EnterCombat(Unit* /*who*/) override
         {
@@ -76,11 +57,6 @@ public:
             events.ScheduleEvent(EVENT_THUNDERCLAP,    17000);
             events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5000);
             events.ScheduleEvent(EVENT_RAGE, 1000);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
         }
 
         void UpdateAI(uint32 diff) override
@@ -106,10 +82,7 @@ public:
                         events.ScheduleEvent(EVENT_CLEAVE, 8000);
                         break;
                     case EVENT_CONFLAGRATION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
-                        {
-                            DoCast(target, SPELL_CONFLAGRATION);
-                        }
+                        DoCastVictim(SPELL_CONFLAGRATION);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 18000);
                         break;
                     case EVENT_THUNDERCLAP:
@@ -136,63 +109,7 @@ public:
     }
 };
 
-class chromatic_elite_guard : public CreatureScript
-{
-public:
-    chromatic_elite_guard() : CreatureScript("chromatic_elite_guard") { }
-
-    struct chromatic_elite_guardAI : public ScriptedAI
-    {
-        chromatic_elite_guardAI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap _events;
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _events.Reset();
-            _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
-            _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
-            _events.ScheduleEvent(EVENT_STRIKE, urand(12000, 20800));
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            while (uint32 const eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_MORTAL_STRIKE:
-                        DoCastVictim(SPELL_MORTAL_STRIKE);
-                        _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 13000);
-                        break;
-                    case EVENT_KNOCKDOWN:
-                        DoCastVictim(SPELL_KNOCKDOWN);
-                        _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(11200, 25700));
-                        break;
-                    case EVENT_STRIKE:
-                        DoCastVictim(SPELL_STRIKE);
-                        _events.ScheduleEvent(EVENT_STRIKE, 9000);
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new chromatic_elite_guardAI(creature);
-    }
-};
-
 void AddSC_boss_drakkisath()
 {
     new boss_drakkisath();
-    new chromatic_elite_guard();
 }

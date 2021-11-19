@@ -101,7 +101,8 @@ public:
             { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::No },
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No }
+            { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
+            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -1242,6 +1243,12 @@ public:
         LOG_INFO("sql.dev", "(@PATH, XX, %.3f, %.3f, %.5f, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
+        return true;
+    }
+
+    static bool HandleDebugDummyCommand(ChatHandler* handler)
+    {
+        handler->SendSysMessage("This command does nothing right now. Edit your local core (cs_debug.cpp) to make it do whatever you need for testing.");
         return true;
     }
 };

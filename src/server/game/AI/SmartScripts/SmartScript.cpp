@@ -1271,15 +1271,17 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                {
                     if (IsCreature(*itr))
                     {
-                        (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range);
+                        (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range, e.GetEventType() == SMART_EVENT_AGGRO ? unit : nullptr);
                         if (e.action.callHelp.withEmote)
                         {
                             Acore::BroadcastTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
                             sCreatureTextMgr->SendChatPacket(*itr, builder, CHAT_MSG_MONSTER_EMOTE);
                         }
                     }
+                }
 
                 delete targets;
                 break;
@@ -3681,7 +3683,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             }
         case SMART_TARGET_CLOSEST_GAMEOBJECT:
             {
-                GameObject* target = GetClosestGameObjectWithEntry(GetBaseObject(), e.target.closest.entry, (float)(e.target.closest.dist ? e.target.closest.dist : 100));
+                GameObject* target = GetClosestGameObjectWithEntry(GetBaseObject(), e.target.closestGameobject.entry, (float)(e.target.closestGameobject.dist ? e.target.closestGameobject.dist : 100), e.target.closestGameobject.onlySpawned);
                 if (target)
                     l->push_back(target);
                 break;

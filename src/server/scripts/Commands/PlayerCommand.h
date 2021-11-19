@@ -25,8 +25,8 @@ namespace Acore
     // Used in player/character commands
     namespace PlayerCommand
     {
-        bool HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
-        bool HandleUnlearnSpellCommand(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
+        bool HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
+        bool HandleUnlearnSpellCommand(ChatHandler* handler, Player* targetPlayer,  SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
     };
 };
 

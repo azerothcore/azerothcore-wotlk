@@ -26,6 +26,7 @@
 #include "ModelIgnoreFlags.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
+#include "Optional.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include <set>
@@ -813,7 +814,7 @@ public:
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
     [[nodiscard]] Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
-    [[nodiscard]] GameObject* FindNearestGameObject(uint32 entry, float range) const;
+    [[nodiscard]] GameObject* FindNearestGameObject(uint32 entry, float range, bool onlySpawned = false) const;
     [[nodiscard]] GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
 
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
@@ -843,8 +844,9 @@ public:
 
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
-    [[nodiscard]] bool IsVisibilityOverridden() const { return m_isVisibilityDistanceOverride; }
-    void SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride);
+    [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
+    [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
+    void SetVisibilityDistanceOverride(VisibilityDistanceType type);
     void SetWorldObject(bool apply);
     [[nodiscard]] bool IsPermanentWorldObject() const { return m_isWorldObject; }
     [[nodiscard]] bool IsWorldObject() const;
@@ -901,7 +903,8 @@ public:
 protected:
     std::string m_name;
     bool m_isActive;
-    bool m_isVisibilityDistanceOverride;
+    bool m_isFarVisible;
+    Optional<float> m_visibilityDistanceOverride;
     const bool m_isWorldObject;
     ZoneScript* m_zoneScript;
 
