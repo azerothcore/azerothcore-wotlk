@@ -1220,6 +1220,11 @@ enum AcoreStrings
 
     LANG_NPCINFO_SPELL_SCHOOL_IMMUNE    = 5062,
 
+    LANG_COMMAND_CACHE_INFO             = 5063,
+    LANG_COMMAND_CACHE_DELETE           = 5064,
+    LANG_COMMAND_CACHE_REFRESH          = 5065,
+    LANG_COMMAND_CACHE_NOT_FOUND        = 5066,
+
     // Room for more strings    5063-9999
 
     // Level requirement notifications
