@@ -31,7 +31,7 @@ ALTER TABLE `creature_template_addon`
     DROP COLUMN `isLarge`;
 	
 -- Set right visibility for creatures
-UPDATE `creature_template_addon` SET `visibilityDistanceType`='5' WHERE `entry` IN (
+UPDATE `creature_template_addon` SET `visibilityDistanceType`=5 WHERE `entry` IN (
 18733,
 33377,
 16128,
@@ -152,7 +152,7 @@ UPDATE `creature_template_addon` SET `visibilityDistanceType`='5' WHERE `entry` 
 39234,
 34044);
 
-UPDATE `creature_template_addon` SET `visibilityDistanceType`='4' WHERE `entry` IN (
+UPDATE `creature_template_addon` SET `visibilityDistanceType`=4 WHERE `entry` IN (
 37574,
 22441,
 35336,
@@ -372,7 +372,7 @@ UPDATE `creature_template_addon` SET `visibilityDistanceType`='4' WHERE `entry` 
 38771,
 38772);
 
-UPDATE `creature_template_addon` SET `visibilityDistanceType`='3'WHERE `entry` IN (
+UPDATE `creature_template_addon` SET `visibilityDistanceType`=3 WHERE `entry` IN (
 3653,
 3669,
 3670,
