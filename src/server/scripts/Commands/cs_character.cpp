@@ -224,7 +224,7 @@ public:
             return;
         }
 
-        if (sObjectMgr->GetPlayerGUIDByName(delInfo.name))
+        if (sCharacterCache->GetCharacterGuidByName(delInfo.name))
         {
             handler->PSendSysMessage(LANG_CHARACTER_DELETED_SKIP_NAME, delInfo.name.c_str(), delInfo.lowGuid, delInfo.accountId);
             return;
@@ -239,7 +239,9 @@ public:
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_NAME_DATA);
         stmt->setUInt32(0, delInfo.lowGuid);
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-            sWorld->AddGlobalPlayerData(delInfo.lowGuid, delInfo.accountId, delInfo.name, (*result)[2].GetUInt8(), (*result)[0].GetUInt8(), (*result)[1].GetUInt8(), (*result)[3].GetUInt8(), 0, 0);
+        {
+            sCharacterCache->AddCharacterCacheEntry(ObjectGuid(HighGuid::Player, delInfo.lowGuid), delInfo.accountId, delInfo.name, (*result)[2].GetUInt8(), (*result)[0].GetUInt8(), (*result)[1].GetUInt8(), (*result)[3].GetUInt8());
+        }
     }
 
     static void HandleCharacterLevel(Player* player, ObjectGuid playerGuid, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
@@ -268,8 +270,7 @@ public:
             stmt->setUInt32(1, playerGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
 
-            // xinef: update global storage
-            sWorld->UpdateGlobalPlayerData(playerGuid.GetCounter(), PLAYER_UPDATE_DATA_LEVEL, "", newLevel);
+            sCharacterCache->UpdateCharacterLevel(playerGuid, newLevel);
         }
     }
 
@@ -390,8 +391,7 @@ public:
                 CharacterDatabase.Execute(stmt);
             }
 
-            sWorld->UpdateGlobalNameData(player->GetGUID().GetCounter(), player->GetName().c_str(), newName);
-            sWorld->UpdateGlobalPlayerData(player->GetGUID().GetCounter(), PLAYER_UPDATE_DATA_NAME, newName);
+            sCharacterCache->UpdateCharacterData(player->GetGUID(), newName);
 
             handler->PSendSysMessage(LANG_RENAME_PLAYER_WITH_NEW_NAME, player->GetName().c_str(), newName.c_str());
         }
@@ -433,7 +433,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : static_cast<uint8>(Player::GetLevelFromStorage(player->GetGUID().GetCounter()));
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
 
         if (newlevel < 1)
             return false;                                       // invalid level
@@ -737,7 +737,9 @@ public:
             target->GetSession()->KickPlayer("HandleCharacterEraseCommand GM Command deleting character");
         }
         else
-            accountId = sObjectMgr->GetPlayerAccountIdByGUID(player.GetGUID().GetCounter());
+        {
+            accountId = sCharacterCache->GetCharacterAccountIdByGuid(player.GetGUID());
+        }
 
         std::string accountName;
         AccountMgr::GetName(accountId, accountName);
@@ -756,7 +758,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = static_cast<uint8>(player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : Player::GetLevelFromStorage(player->GetGUID().GetCounter()));
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
         int16 newlevel = static_cast<int16>(oldlevel) + level;
 
         if (newlevel < 1)
@@ -796,7 +798,7 @@ public:
 
         if (characterGUID)
         {
-            if (sObjectMgr->GetPlayerAccountIdByGUID(*characterGUID))
+            if (sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, *characterGUID)))
             {
                 handler->PSendSysMessage(LANG_CHARACTER_GUID_IN_USE, *characterGUID);
                 handler->SetSentErrorMessage(true);
