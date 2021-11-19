@@ -745,7 +745,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     }
     else
     {
-        time_t curTime = sWorld->GetGameTime();
+        auto curTime = GameTime::GetGameTime();
 
         int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
         int locdbc_idx = player->GetSession()->GetSessionDbcLocale();
@@ -756,7 +756,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
             {
                 if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
                 {
-                    if (avgDiffTracker.getAverage() >= 30 || getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
+                    if (sWorldUpdateTime.GetAverageUpdateTime() >= 30 || GetMSTimeDiff(GameTime::GetGameTimeMS(), GetTimeMS()) >= 10ms) // pussywizard: stop immediately if diff is high or waiting too long
                     {
                         return false;
                     }
@@ -765,7 +765,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 
             AuctionEntry* Aentry = itr->second;
             // Skip expired auctions
-            if (Aentry->expire_time < curTime)
+            if (Aentry->expire_time < curTime.count())
             {
                 continue;
             }
