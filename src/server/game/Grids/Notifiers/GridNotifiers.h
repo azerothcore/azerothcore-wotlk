@@ -165,7 +165,7 @@ namespace Acore
 
     // WorldObject searchers & workers
 
-        // Generic base class to insert elements into arbitrary containers using push_back
+    // Generic base class to insert elements into arbitrary containers using push_back
     template <typename Type> class ContainerInserter
     {
         using InserterType = void (*)(void*, Type&&);
