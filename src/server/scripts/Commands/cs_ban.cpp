@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "BanMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "GameTime.h"
 #include "Language.h"
@@ -327,7 +328,7 @@ public:
 
         if (!target)
         {
-            targetGuid = sWorld->GetGlobalPlayerGUID(name);
+            targetGuid = sCharacterCache->GetCharacterGuidByName(name);
             if (!targetGuid)
             {
                 handler->PSendSysMessage(LANG_BANINFO_NOCHARACTER);

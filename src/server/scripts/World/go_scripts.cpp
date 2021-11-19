@@ -1626,6 +1626,190 @@ public:
     }
 };
 
+/*####
+## go_bells
+####*/
+
+enum BellHourlySoundFX
+{
+    BELLTOLLHORDE      = 6595,
+    BELLTOLLTRIBAL     = 6675,
+    BELLTOLLALLIANCE   = 6594,
+    BELLTOLLNIGHTELF   = 6674,
+    BELLTOLLDWARFGNOME = 7234,
+    BELLTOLLKHARAZHAN  = 9154,
+    LIGHTHOUSEFOGHORN  = 7197
+};
+
+enum BellHourlySoundZones
+{
+    TIRISFAL_ZONE            = 85,
+    UNDERCITY_ZONE           = 1497,
+    DUN_MOROGH_ZONE          = 1,
+    IRONFORGE_ZONE           = 1537,
+    TELDRASSIL_ZONE          = 141,
+    DARNASSUS_ZONE           = 1657,
+    ASHENVALE_ZONE           = 331,
+    HILLSBRAD_FOOTHILLS_ZONE = 267,
+    DUSKWOOD_ZONE            = 10,
+    WESTFALL_ZONE            = 40,
+    DUSTWALLOW_MARSH_ZONE    = 15,
+    SHATTRATH_ZONE           = 3703
+};
+
+enum LightHouseAreas
+{
+    AREA_ALCAZ_ISLAND        = 2079,
+    AREA_WESTFALL_LIGHTHOUSE = 115
+};
+
+enum BellHourlyObjects
+{
+    GO_HORDE_BELL     = 175885,
+    GO_ALLIANCE_BELL  = 176573,
+    GO_KHARAZHAN_BELL = 182064
+};
+
+enum BellHourlyMisc
+{
+    GAME_EVENT_HOURLY_BELLS = 73,
+    EVENT_RING_BELL         = 1,
+    EVENT_TIME              = 2
+};
+
+class go_bells : public GameObjectScript
+{
+public:
+    go_bells() : GameObjectScript("go_bells") {}
+
+    struct go_bellsAI : public GameObjectAI
+    {
+        go_bellsAI(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+        {
+            uint32 zoneId = go->GetZoneId();
+
+            switch (go->GetEntry())
+            {
+            case GO_HORDE_BELL:
+            {
+                switch (zoneId)
+                {
+                case TIRISFAL_ZONE:
+                case UNDERCITY_ZONE:
+                case HILLSBRAD_FOOTHILLS_ZONE:
+                case DUSKWOOD_ZONE:
+                    _soundId = BELLTOLLHORDE;
+                    break;
+                default:
+                    _soundId = BELLTOLLTRIBAL;
+                    break;
+                }
+                break;
+            }
+            case GO_ALLIANCE_BELL:
+            {
+                switch (zoneId)
+                {
+                case IRONFORGE_ZONE:
+                case DUN_MOROGH_ZONE:
+                    _soundId = BELLTOLLDWARFGNOME;
+                    break;
+                case DARNASSUS_ZONE:
+                case TELDRASSIL_ZONE:
+                case ASHENVALE_ZONE:
+                case SHATTRATH_ZONE:
+                    _soundId = BELLTOLLNIGHTELF;
+                    break;
+                case WESTFALL_ZONE:
+                    if (go->GetAreaId() == AREA_WESTFALL_LIGHTHOUSE)
+                    {
+                        _soundId = LIGHTHOUSEFOGHORN;
+                    }
+                    else
+                    {
+                        _soundId = BELLTOLLALLIANCE;
+                    }
+                    break;
+                case DUSTWALLOW_MARSH_ZONE:
+                    if (go->GetAreaId() == AREA_ALCAZ_ISLAND)
+                    {
+                        _soundId = LIGHTHOUSEFOGHORN;
+                    }
+                    else
+                    {
+                        _soundId = BELLTOLLALLIANCE;
+                    }
+                    break;
+                default:
+                    _soundId = BELLTOLLALLIANCE;
+                    break;
+                }
+                break;
+            }
+            case GO_KHARAZHAN_BELL:
+            {
+                _soundId = BELLTOLLKHARAZHAN;
+                break;
+            }
+            break;
+            }
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once)
+            {
+                // Reset
+                once = false;
+                _events.ScheduleEvent(EVENT_TIME, 1000);
+            }
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TIME:
+                {
+                    // Get how many times it should ring
+                    time_t t = time(nullptr);
+                    tm local_tm;
+                    tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
+                    localtime_r(&t, &local_tm);
+                    uint8 _rings = (local_tm.tm_hour) % 12;
+                    _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Schedule ring event
+                    for (auto i = 0; i < _rings; ++i)
+                    {
+                        _events.ScheduleEvent(EVENT_RING_BELL, (i * 4 + 1) * 1000);
+                    }
+                    break;
+                }
+                case EVENT_RING_BELL:
+                {
+                    me->PlayDirectSound(_soundId);
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+
+    private:
+        EventMap _events;
+        uint32   _soundId;
+        bool     once;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_bellsAI(go);
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1668,4 +1852,5 @@ void AddSC_go_scripts()
     new go_hive_pod();
     new go_massive_seaforium_charge();
     new go_veil_skith_cage();
+    new go_bells();
 }

@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "ChannelMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
@@ -357,14 +358,15 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (ban && (AccountMgr::IsGMAccount(sec) || isGoodConstantModerator))
         {
-            if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
-                if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid.GetCounter()))
+            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+            {
+                if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(guid))
                 {
-                    if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->getRace()))
+                    if (Player::TeamIdForRace(gpd->Race) == Player::TeamIdForRace(player->getRace()))
                     {
                         banOffline = true;
-                        victim = guid;
-                        badAccId = gpd->accountId;
+                        victim     = guid;
+                        badAccId   = gpd->AccountId;
                     }
                     else
                     {
@@ -372,6 +374,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
                         return;
                     }
                 }
+            }
 
             if (!banOffline)
             {
@@ -494,8 +497,10 @@ void Channel::UnBan(Player const* player, std::string const& badname)
     }
 
     ObjectGuid victim;
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
+    if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+    {
         victim = guid;
+    }
 
     if (!victim || !IsBanned(victim))
     {
@@ -1054,7 +1059,7 @@ void Channel::MakeChannelOwner(WorldPacket* data)
 {
     std::string name = "";
 
-    if (!sObjectMgr->GetPlayerNameByGUID(_ownerGUID.GetCounter(), name) || name.empty())
+    if (!sCharacterCache->GetCharacterNameByGuid(_ownerGUID, name) || name.empty())
         name = "PLAYER_NOT_FOUND";
 
     MakeNotifyPacket(data, CHAT_CHANNEL_OWNER_NOTICE);

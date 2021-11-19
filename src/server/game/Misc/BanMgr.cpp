@@ -103,7 +103,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
 
     uint32 DurationSecs = TimeStringToSecs(Duration);
 
-    uint32 AccountID = sObjectMgr->GetPlayerAccountIdByPlayerName(CharacterName);
+    uint32 AccountID = sCharacterCache->GetCharacterAccountIdByName(CharacterName);
     if (!AccountID)
         return BAN_NOTFOUND;
 
@@ -229,7 +229,7 @@ BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string con
     /// Pick a player to ban if not online
     if (!target)
     {
-        TargetGUID = sWorld->GetGlobalPlayerGUID(CharacterName);
+        TargetGUID = sCharacterCache->GetCharacterGuidByName(CharacterName);
         if (!TargetGUID)
             return BAN_NOTFOUND;
     }
@@ -285,7 +285,7 @@ bool BanMgr::RemoveBanAccount(std::string const& AccountName)
 /// Remove a ban from an player name
 bool BanMgr::RemoveBanAccountByPlayerName(std::string const& CharacterName)
 {
-    uint32 AccountID = sObjectMgr->GetPlayerAccountIdByPlayerName(CharacterName);
+    uint32 AccountID = sCharacterCache->GetCharacterAccountIdByName(CharacterName);
     if (!AccountID)
         return false;
 
@@ -315,7 +315,7 @@ bool BanMgr::RemoveBanCharacter(std::string const& CharacterName)
 
     /// Pick a player to ban if not online
     if (!pBanned)
-        guid = sWorld->GetGlobalPlayerGUID(CharacterName);
+        guid = sCharacterCache->GetCharacterGuidByName(CharacterName);
     else
         guid = pBanned->GetGUID();
 
