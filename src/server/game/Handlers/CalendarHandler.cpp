@@ -549,13 +549,13 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     else
     {
         // xinef: Get Data From global storage
-        if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
+        if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name))
         {
-            if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
+            if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid))
             {
                 inviteeGuid = guid;
-                inviteeTeamId = Player::TeamIdForRace(playerData->race);
-                inviteeGuildId = playerData->guildId;
+                inviteeTeamId = Player::TeamIdForRace(playerData->Race);
+                inviteeGuildId = playerData->GuildId;
             }
         }
     }
