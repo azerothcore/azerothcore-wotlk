@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CharacterCache.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DisableMgr.h"
@@ -806,12 +807,20 @@ namespace lfg
                 {
                     LFGQueue& queue = GetQueue(gguid);
                     queue.RemoveFromQueue(gguid);
+                    uint32 dungeonId = GetDungeon(gguid);
                     SetState(gguid, LFG_STATE_NONE);
                     const LfgGuidSet& players = GetPlayers(gguid);
                     for (LfgGuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
                     {
                         SetState(*it, LFG_STATE_NONE);
                         SendLfgUpdateParty(*it, LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
+                    }
+                    if (Group* group = sGroupMgr->GetGroupByGUID(gguid.GetCounter()))
+                    {
+                        if (group->isLFGGroup())
+                        {
+                            SetDungeon(gguid, dungeonId);
+                        }
                     }
                 }
                 else
@@ -1052,11 +1061,11 @@ namespace lfg
                         talents[0] = 0;
                         talents[1] = 0;
                         talents[2] = 0;
-                        if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(mitr->guid.GetCounter()))
+                        if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(mitr->guid))
                         {
-                            level = gpd->level;
-                            Class = gpd->playerClass;
-                            race = gpd->race;
+                            level = gpd->Level;
+                            Class = gpd->Class;
+                            race = gpd->Race;
                         }
                         Player* mplr = ObjectAccessor::FindConnectedPlayer(guid);
                         if (mplr)

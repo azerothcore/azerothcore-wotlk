@@ -73,13 +73,13 @@ public:
             // If boss is below 2% hp - cast Armageddon
             if (!armageddonCasted && damage < me->GetHealth() && me->HealthBelowPctDamaged(2, damage))
             {
-                me->InterruptNonMeleeSpells(true);
-                if (me->CastSpell(me, SPELL_ARMAGEDDON) == SPELL_CAST_OK)
+                me->RemoveAurasDueToSpell(SPELL_INFERNO);
+                me->StopMoving();
+                if (me->CastSpell(me, SPELL_ARMAGEDDON, TRIGGERED_FULL_MASK) == SPELL_CAST_OK)
                 {
                     Talk(EMOTE_SERVICE);
+                    armageddonCasted = true;
                 }
-
-                armageddonCasted = true;
             }
         }
 
@@ -89,7 +89,7 @@ public:
             {
                 case EVENT_INFERNO:
                 {
-                    DoCastSelf(SPELL_INFERNO);
+                    DoCastAOE(SPELL_INFERNO);
                     events.RepeatEvent(urand(21000, 26000));
                     break;
                 }
@@ -141,6 +141,23 @@ public:
             return ValidateSpellInfo({ SPELL_INFERNO_DUMMY_EFFECT });
         }
 
+        void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
+            {
+                pCreatureTarget->SetReactState(REACT_PASSIVE);
+                pCreatureTarget->AttackStop();
+            }
+        }
+
+        void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
+            {
+                pCreatureTarget->SetReactState(REACT_AGGRESSIVE);
+            }
+        }
+
         void PeriodicTick(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
@@ -168,12 +185,14 @@ public:
                         break;
                 }
 
-                caster->CastCustomSpell(SPELL_INFERNO_DUMMY_EFFECT, SPELLVALUE_BASE_POINT0, 500 * multiplier, caster, TRIGGERED_NONE, nullptr, aurEff);
+                caster->CastCustomSpell(SPELL_INFERNO_DUMMY_EFFECT, SPELLVALUE_BASE_POINT0, 500 * multiplier, (Unit*)nullptr, TRIGGERED_NONE, nullptr, aurEff);
             }
         }
 
         void Register() override
         {
+            AfterEffectApply += AuraEffectApplyFn(spell_geddon_inferno_AuraScript::HandleAfterApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_geddon_inferno_AuraScript::HandleAfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_geddon_inferno_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
@@ -184,10 +203,51 @@ public:
     }
 };
 
+// 20478 Armageddon
+class spell_geddon_armageddon : public SpellScriptLoader
+{
+public:
+    spell_geddon_armageddon() : SpellScriptLoader("spell_geddon_armageddon") { }
+
+    class spell_geddon_armageddon_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_geddon_armageddon_AuraScript);
+
+        void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
+            {
+                pCreatureTarget->SetReactState(REACT_PASSIVE);
+                pCreatureTarget->AttackStop();
+            }
+        }
+
+        void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
+            {
+                pCreatureTarget->SetReactState(REACT_AGGRESSIVE);
+            }
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_geddon_armageddon_AuraScript::HandleAfterApply, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_geddon_armageddon_AuraScript::HandleAfterRemove, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_geddon_armageddon_AuraScript();
+    }
+};
+
 void AddSC_boss_baron_geddon()
 {
     new boss_baron_geddon();
 
     // Spells
     new spell_geddon_inferno();
+    new spell_geddon_armageddon();
 }

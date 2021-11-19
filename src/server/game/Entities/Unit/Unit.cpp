@@ -21,6 +21,7 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Common.h"
@@ -447,12 +448,39 @@ void Unit::Update(uint32 p_time)
     // not implemented before 3.0.2
     // xinef: if attack time > 0, reduce by diff
     // if on next update, attack time < 0 assume player didnt attack - set to 0
-    if (int32 base_attack = getAttackTimer(BASE_ATTACK))
-        setAttackTimer(BASE_ATTACK, base_attack > 0 ? base_attack - (int32)p_time : 0);
+    bool suspendAttackTimer = false;
+    if (IsPlayer() && HasUnitState(UNIT_STATE_CASTING))
+    {
+        for (Spell* spell : m_currentSpells)
+        {
+            if (spell)
+            {
+                if (spell->GetSpellInfo()->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
+                {
+                    suspendAttackTimer = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!suspendAttackTimer)
+    {
+        if (int32 base_attack = getAttackTimer(BASE_ATTACK))
+        {
+            setAttackTimer(BASE_ATTACK, base_attack > 0 ? base_attack - (int32) p_time : 0);
+        }
+
+        if (int32 off_attack = getAttackTimer(OFF_ATTACK))
+        {
+            setAttackTimer(OFF_ATTACK, off_attack > 0 ? off_attack - (int32) p_time : 0);
+        }
+    }
+
     if (int32 ranged_attack = getAttackTimer(RANGED_ATTACK))
-        setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32)p_time : 0);
-    if (int32 off_attack = getAttackTimer(OFF_ATTACK))
-        setAttackTimer(OFF_ATTACK, off_attack > 0 ? off_attack - (int32)p_time : 0);
+    {
+        setAttackTimer(RANGED_ATTACK, ranged_attack > 0 ? ranged_attack - (int32) p_time : 0);
+    }
 
     // update abilities available only for fraction of time
     UpdateReactives(p_time);
@@ -2324,6 +2352,14 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
         else
             LOG_DEBUG("entities.unit", "AttackerStateUpdate: (NPC) %s attacked %s for %u dmg, absorbed %u, blocked %u, resisted %u.",
                                  GetGUID().ToString().c_str(), victim->GetGUID().ToString().c_str(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+
+        // Let the pet know we've started attacking someting. Handles melee attacks only
+        // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
+        if (GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
+            for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+                if (Unit* pet = *itr)
+                    if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
+                        pet->ToCreature()->AI()->OwnerAttacked(victim);
     }
 }
 
@@ -3646,6 +3682,30 @@ int32 Unit::GetCurrentSpellCastTime(uint32 spell_id) const
     if (Spell const* spell = FindCurrentSpellBySpellId(spell_id))
         return spell->GetCastTime();
     return 0;
+}
+
+bool Unit::IsMovementPreventedByCasting() const
+{
+    // can always move when not casting
+    if (!HasUnitState(UNIT_STATE_CASTING))
+    {
+        return false;
+    }
+
+    // channeled spells during channel stage (after the initial cast timer) allow movement with a specific spell attribute
+    if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
+    {
+        if (spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive())
+        {
+            if (spell->GetSpellInfo()->IsMoveAllowedChannel())
+            {
+                return false;
+            }
+        }
+    }
+
+    // prohibit movement for all other spell casts
+    return true;
 }
 
 bool Unit::CanMoveDuringChannel() const
@@ -9715,7 +9775,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    if (creature && !IsControlledByPlayer())
+    if (creature && !(IsControllableGuardian() && IsControlledByPlayer()))
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -9736,14 +9796,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     if (meleeAttack)
         SendMeleeAttackStart(victim);
-
-    // Let the pet know we've started attacking someting. Handles melee attacks only
-    // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
-    if (GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
-        for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-            if (Unit* pet = *itr)
-                if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
-                    pet->ToCreature()->AI()->OwnerAttacked(victim);
 
     return true;
 }
@@ -9773,7 +9825,6 @@ bool Unit::AttackStop()
         if (creature->HasSearchedAssistance())
         {
             creature->SetNoSearchAssistance(false);
-            UpdateSpeed(MOVE_RUN, false);
         }
     }
 
@@ -13496,11 +13547,23 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             break;
     }
 
-    // for creature case, we check explicit if mob searched for assistance
-    if (GetTypeId() == TYPEID_UNIT)
+    int32 slowFromHealth = 0;
+    Creature* creature = ToCreature();
+    // ignore pets, player owned vehicles, and mobs immune to snare
+    if (creature
+        && !IsPet()
+        && !(IsControlledByPlayer() && IsVehicle())
+        && !(creature->HasMechanicTemplateImmunity(MECHANIC_SNARE))
+        && !(creature->IsDungeonBoss()))
     {
-        if (ToCreature()->HasSearchedAssistance())
-            speed *= 0.66f;                                 // best guessed value, so this will be 33% reduction. Based off initial speed, mob can then "run", "walk fast" or "walk".
+        // 1.6% for each % under 30.
+        // use min(0, health-30) so that we don't boost mobs above 30.
+        slowFromHealth = (int32) std::min(0.0f, (1.66f * (GetHealthPct() - 30.0f)));
+    }
+
+    if (slowFromHealth)
+    {
+        AddPct(speed, slowFromHealth);
     }
 
     // Apply strongest slow aura mod to speed
@@ -13669,9 +13732,10 @@ void Unit::setDeathState(DeathState s, bool despawn)
 
     if (s == JUST_DIED)
     {
-        // xinef: needed for procs, this is refreshed in Unit::Update
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
-        //ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, false);
+
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
@@ -14548,9 +14612,10 @@ void Unit::SetLevel(uint8 lvl, bool showLevelChange)
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetGroup())
         ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_LEVEL);
 
-    // xinef: update global data
     if (GetTypeId() == TYPEID_PLAYER)
-        sWorld->UpdateGlobalPlayerData(ToPlayer()->GetGUID().GetCounter(), PLAYER_UPDATE_DATA_LEVEL, "", lvl);
+    {
+        sCharacterCache->UpdateCharacterLevel(GetGUID(), lvl);
+    }
 }
 
 void Unit::SetHealth(uint32 val)
@@ -14566,7 +14631,15 @@ void Unit::SetHealth(uint32 val)
             val = maxHealth;
     }
 
+    float prevHealthPct = GetHealthPct();
+
     SetUInt32Value(UNIT_FIELD_HEALTH, val);
+
+    // mobs that are now or were below 30% need to update their speed
+    if (GetTypeId() == TYPEID_UNIT && (prevHealthPct < 30.0 || HealthBelowPct(30)))
+    {
+        UpdateSpeed(MOVE_RUN, false);
+    }
 
     // group update
     if (GetTypeId() == TYPEID_PLAYER)
@@ -18789,7 +18862,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     Position pos;
     if (!exitPosition)                          // Exit position not specified
-        vehicleBase->GetPosition(&pos);  // This should use passenger's current position, leaving it as it is now
+        pos = vehicleBase->GetPosition();  // This should use passenger's current position, leaving it as it is now
     // because we calculate positions incorrect (sometimes under map)
     else
         pos = *exitPosition;
