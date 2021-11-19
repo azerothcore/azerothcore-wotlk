@@ -3282,6 +3282,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
             case 63978: // Ulduar(Rubble): Stone Nova
+            case 15502: // Sunder Armor
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
