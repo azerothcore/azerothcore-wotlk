@@ -29,6 +29,7 @@
 #include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
+#include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "Config.h"
@@ -2785,8 +2786,6 @@ void Player::SendNewMail()
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), GetMailSize(), false);
-
     if (deliver_time <= time(nullptr))                      // ready now
     {
         ++unReadMails;
@@ -3876,10 +3875,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
 
     // if we want to finally delete the character or the character does not meet the level requirement,
     // we set it to mode CHAR_DELETE_REMOVE
-    if (deleteFinally || Player::GetLevelFromStorage(lowGuid) < charDelete_minLvl)
+    if (deleteFinally || sCharacterCache->GetCharacterLevelByGuid(playerGuid) < charDelete_minLvl)
         charDelete_method = CHAR_DELETE_REMOVE;
 
-    if (uint32 guildId = GetGuildIdFromStorage(lowGuid))
+    if (uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(playerGuid))
         if (Guild* guild = sGuildMgr->GetGuildById(guildId))
             guild->DeleteMember(playerGuid, false, false, true);
 
@@ -3892,7 +3891,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
         sTicketMgr->CloseTicket(ticket->GetId(), playerGuid);
 
     // remove from group
-    if (uint32 groupId = GetGroupIdFromStorage(lowGuid))
+    if (uint32 groupId = sCharacterCache->GetCharacterGuildIdByGuid(playerGuid))
         if (Group* group = sGroupMgr->GetGroupByGUID(groupId))
             RemoveFromGroup(group, playerGuid);
 
@@ -3984,7 +3983,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                         stmt->setUInt32(0, mail_id);
                         trans->Append(stmt);
 
-                        uint32 pl_account = sObjectMgr->GetPlayerAccountIdByGUID(lowGuid);
+                        uint32 pl_account = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, lowGuid));
 
                         draft.AddMoney(money).SendReturnToSender(pl_account, lowGuid, sender, trans);
                     } while (resultMail->NextRow());
@@ -6086,33 +6085,6 @@ void Player::ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans)
     }
 }
 
-uint32 Player::GetGuildIdFromStorage(ObjectGuid::LowType guid)
-{
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->guildId;
-    return 0;
-}
-
-uint32 Player::GetGroupIdFromStorage(ObjectGuid::LowType guid)
-{
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->groupId;
-    return 0;
-}
-
-uint32 Player::GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot)
-{
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-    {
-        auto itr = playerData->arenaTeamId.find(slot);
-        if (itr != playerData->arenaTeamId.end())
-        {
-            return itr->second;
-        }
-    }
-    return 0;
-}
-
 uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
@@ -6176,15 +6148,6 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
     }
 
     return zone;
-}
-
-uint32 Player::GetLevelFromStorage(ObjectGuid::LowType guid)
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->level;
-
-    return 0;
 }
 
 //If players are too far away from the duel flag... they lose the duel
