@@ -8,6 +8,8 @@ UPDATE `creature_loot_template` SET `Chance`=4 WHERE `Item`=2839 AND `Entry`=152
 -- Rattlecage Soldier, Cracked Skull Soldier
 UPDATE `creature_loot_template` SET `Chance`=3 WHERE `Item`=2839 AND `Entry` IN (1520,1523);
 
+DELETE FROM `creature_loot_template` WHERE `Item`=2839 AND `Entry` IN(1664, 1770, 1548, 1537, 1530, 1532);
+
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (1664,2839,0,0.12,0,1,0,1,1,'Captain Vachon - A Letter to Yvette'),
 (1770,2839,0,0.05,0,1,0,1,1,'Moonrage Darkrunner - A Letter to Yvette'),
