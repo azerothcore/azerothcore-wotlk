@@ -177,7 +177,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     m_leaderGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
 
     // group leader not exist
-    if (!sObjectMgr->GetPlayerNameByGUID(fields[0].GetUInt32(), m_leaderName))
+    if (!sCharacterCache->GetCharacterNameByGuid(m_leaderGuid, m_leaderName))
     {
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP);
@@ -230,7 +230,7 @@ void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uin
     member.guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // skip non-existed member
-    if (!sObjectMgr->GetPlayerNameByGUID(member.guid.GetCounter(), member.name))
+    if (!sCharacterCache->GetCharacterNameByGuid(member.guid, member.name))
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
         stmt->setUInt32(0, guidLow);
@@ -244,8 +244,11 @@ void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uin
     member.roles = roles;
 
     m_memberSlots.push_back(member);
+
     if (!isBGGroup() && !isBFGroup())
-        sWorld->UpdateGlobalPlayerGroup(guidLow, GetGUID().GetCounter());
+    {
+        sCharacterCache->UpdateCharacterGroup(ObjectGuid(HighGuid::Player, guidLow), GetGUID());
+    }
 
     SubGroupCounterIncrease(subgroup);
 
@@ -402,8 +405,11 @@ bool Group::AddMember(Player* player)
     member.flags     = 0;
     member.roles     = 0;
     m_memberSlots.push_back(member);
+
     if (!isBGGroup() && !isBFGroup())
-        sWorld->UpdateGlobalPlayerGroup(player->GetGUID().GetCounter(), GetGUID().GetCounter());
+    {
+        sCharacterCache->UpdateCharacterGroup(player->GetGUID(), GetGUID());
+    }
 
     SubGroupCounterIncrease(subGroup);
 
@@ -618,8 +624,11 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
         {
             SubGroupCounterDecrease(slot->group);
             m_memberSlots.erase(slot);
+
             if (!isBGGroup() && !isBFGroup())
-                sWorld->UpdateGlobalPlayerGroup(guid.GetCounter(), 0);
+            {
+                sCharacterCache->ClearCharacterGroup(guid);
+            }
         }
 
         // Reevaluate group enchanter if the leaving player had enchanting skill or the player is offline
@@ -737,7 +746,9 @@ void Group::Disband(bool hideDestroy /* = false */)
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         if (!isBGGroup() && !isBFGroup())
-            sWorld->UpdateGlobalPlayerGroup(citr->guid.GetCounter(), 0);
+        {
+            sCharacterCache->ClearCharacterGroup(citr->guid);
+        }
 
         player = ObjectAccessor::FindConnectedPlayer(citr->guid);
 
