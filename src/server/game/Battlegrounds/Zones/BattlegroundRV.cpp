@@ -25,6 +25,11 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+static constexpr Milliseconds BG_RV_PILLAR_SWITCH_TIMER  = 25s;
+static constexpr Milliseconds BG_RV_FIRE_TO_PILLAR_TIMER = 20s;
+static constexpr Milliseconds BG_RV_CLOSE_FIRE_TIMER     = 5s;
+static constexpr Milliseconds BG_RV_FIRST_TIMER          = 20500ms; // elevators rise in 20133ms
+
 BattlegroundRV::BattlegroundRV()
 {
     BgObjects.resize(BG_RV_OBJECT_MAX);

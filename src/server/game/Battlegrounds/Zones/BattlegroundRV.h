@@ -82,11 +82,6 @@ enum BattlegroundRVData
     BG_RV_WORLD_STATE                            = 0xe1a,
 };
 
-static constexpr Milliseconds BG_RV_PILLAR_SWITCH_TIMER  = 25s;
-static constexpr Milliseconds BG_RV_FIRE_TO_PILLAR_TIMER = 20s;
-static constexpr Milliseconds BG_RV_CLOSE_FIRE_TIMER     = 5s;
-static constexpr Milliseconds BG_RV_FIRST_TIMER          = 20500ms; // elevators rise in 20133ms
-
 class BattlegroundRV : public Battleground
 {
 public:
