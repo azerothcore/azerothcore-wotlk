@@ -1773,7 +1773,7 @@ public:
                 case EVENT_TIME:
                 {
                     // Get how many times it should ring
-                    time_t t = time(nullptr);
+                    time_t t = GameTime::GetGameTime().count();
                     tm local_tm;
                     tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
                     localtime_r(&t, &local_tm);
