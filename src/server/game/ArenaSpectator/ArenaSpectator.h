@@ -30,23 +30,23 @@ class Player;
 class Map;
 class WorldPacket;
 
-#define SPECTATOR_ADDON_VERSION 27
-#define SPECTATOR_BUFFER_LEN 150
-#define SPECTATOR_ADDON_PREFIX "ASSUN\x09"
-#define SPECTATOR_COOLDOWN_MIN 20
-#define SPECTATOR_COOLDOWN_MAX 900
-#define SPECTATOR_SPELL_BINDSIGHT 6277
-#define SPECTATOR_SPELL_SPEED 1557
+constexpr auto SPECTATOR_ADDON_VERSION = 27;
+constexpr auto SPECTATOR_BUFFER_LEN = 150;
+constexpr auto SPECTATOR_ADDON_PREFIX = "ASSUN\x09";
+constexpr auto SPECTATOR_COOLDOWN_MIN = 20;
+constexpr auto SPECTATOR_COOLDOWN_MAX = 900;
+constexpr auto SPECTATOR_SPELL_BINDSIGHT = 6277;
+constexpr auto SPECTATOR_SPELL_SPEED = 1557;
 
 namespace ArenaSpectator
 {
     template<class T>
-    AC_GAME_API void SendPacketTo(const T* object, std::string&& message);
+    AC_GAME_API void SendPacketTo(const T* object, std::string_view message);
 
-    template<class T, typename Format, typename... Args>
-    inline void SendCommand(T* o, Format&& fmt, Args&& ... args)
+    template<class T, typename... Args>
+    inline void SendCommand(T* o, std::string_view fmt, Args&&... args)
     {
-        SendPacketTo(o, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        SendPacketTo(o, fmt::format(fmt, std::forward<Args>(args)...));
     }
 
     template<class T>
@@ -55,7 +55,7 @@ namespace ArenaSpectator
         if (!targetGUID.IsPlayer())
             return;
 
-        SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, c);
+        SendCommand(o, "{}0x{:016X};{}={};", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, c);
     }
 
     template<class T>
@@ -64,7 +64,7 @@ namespace ArenaSpectator
         if (!targetGUID.IsPlayer())
             return;
 
-        SendCommand(o, "%s0x%016llX;%s=%u;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, t);
+        SendCommand(o, "{}0x{:016X};{}={};", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, t);
     }
 
     template<class T>
@@ -73,7 +73,7 @@ namespace ArenaSpectator
         if (!targetGUID.IsPlayer())
             return;
 
-        SendCommand(o, "%s0x%016llX;%s=0x%016llX;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, t.GetRawValue());
+        SendCommand(o, "{}0x{:016X};{}=0x{:016X};", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, t.GetRawValue());
     }
 
     template<class T>
@@ -82,7 +82,7 @@ namespace ArenaSpectator
         if (!targetGUID.IsPlayer())
             return;
 
-        SendCommand(o, "%s0x%016llX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, id, casttime);
+        SendCommand(o, "{}0x{:016X};{}={},{};", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, id, casttime);
     }
 
     template<class T>
@@ -95,7 +95,7 @@ namespace ArenaSpectator
             if (si->SpellIconID == 1)
                 return;
 
-        SendCommand(o, "%s0x%016llX;%s=%u,%u,%u;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, id, dur, maxdur);
+        SendCommand(o, "{}0x{:016X};{}={},{},{};", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, id, dur, maxdur);
     }
 
     template<class T>
@@ -104,12 +104,12 @@ namespace ArenaSpectator
         if (!targetGUID.IsPlayer())
             return;
 
-        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, caster.GetRawValue());
+        SendCommand(o, "{}0x{:016X};{}={},{},{},{},{},{},{},0x{:016X};", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, caster.GetRawValue());
     }
 
     AC_GAME_API bool HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name);
     AC_GAME_API bool HandleSpectatorWatchCommand(ChatHandler* handler, std::string const& name);
-    AC_GAME_API void CreatePacket(WorldPacket& data, std::string const& message);
+    AC_GAME_API void CreatePacket(WorldPacket& data, std::string_view message);
     AC_GAME_API void HandleResetCommand(Player* player);
     AC_GAME_API bool ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid targetGUID, bool remove);
 }

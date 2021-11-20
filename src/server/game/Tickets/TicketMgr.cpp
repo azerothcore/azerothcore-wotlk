@@ -252,6 +252,19 @@ void GmTicket::SetChatLog(std::list<uint32> time, std::string const& log)
     _chatLog = newss.str();
 }
 
+std::string GmTicket::GetAssignedToName() const
+{
+    std::string name;
+
+    // save queries if ticket is not assigned
+    if (_assignedTo)
+    {
+        sCharacterCache->GetCharacterNameByGuid(_assignedTo, name);
+    }
+
+    return name;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Ticket manager
 TicketMgr::TicketMgr() : _status(true), _lastTicketId(0), _lastSurveyId(0), _openTicketCount(0), _lastChange(time(nullptr)) { }

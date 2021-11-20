@@ -19,12 +19,9 @@
 #define ACORE_SMARTSCRIPTMGR_H
 
 #include "Common.h"
-#include "Creature.h"
-#include "CreatureAI.h"
-#include "Spell.h"
-//#include "SmartAI.h"
-//#include "SmartScript.h"
-#include "Unit.h"
+#include "Errors.h"
+#include "ScriptedCreature.h"
+#include <unordered_map>
 
 struct WayPoint
 {
@@ -1348,7 +1345,7 @@ enum SMARTAI_TARGETS
 
 struct SmartTarget
 {
-    SmartTarget (SMARTAI_TARGETS t = SMART_TARGET_NONE, uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0, uint32 p4 = 0)
+    SmartTarget(SMARTAI_TARGETS t = SMART_TARGET_NONE, uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0, uint32 p4 = 0)
     {
         type = t;
         raw.param1 = p1;
@@ -1360,8 +1357,10 @@ struct SmartTarget
         z = 0.0f;
         o = 0.0f;
     }
+
     SMARTAI_TARGETS type;
     float x, y, z, o;
+
     union
     {
         // Xinef: allow random selectors to limit distance
@@ -1708,7 +1707,7 @@ struct SmartScriptHolder
 {
     SmartScriptHolder() : entryOrGuid(0), source_type(SMART_SCRIPT_TYPE_CREATURE)
         , event_id(0), link(0), event(), action(), target(), timer(0), active(false), runOnce(false)
-        , enableTimed(false) {}
+        , enableTimed(false) { }
 
     int32 entryOrGuid;
     SmartScriptType source_type;
@@ -1732,7 +1731,6 @@ public:
 };
 
 typedef std::unordered_map<uint32, WayPoint*> WPPath;
-
 typedef std::list<WorldObject*> ObjectList;
 
 class ObjectGuidList
@@ -1755,24 +1753,7 @@ public:
         }
     }
 
-    ObjectList* GetObjectList()
-    {
-        if (m_baseObject)
-        {
-            //sanitize list using m_guidList
-            m_objectList->clear();
-
-            for (GuidList::iterator itr = m_guidList->begin(); itr != m_guidList->end(); ++itr)
-            {
-                if (WorldObject* obj = ObjectAccessor::GetWorldObject(*m_baseObject, *itr))
-                    m_objectList->push_back(obj);
-                //else
-                //    TC_LOG_DEBUG("scripts.ai", "SmartScript::mTargetStorage stores a guid to an invalid object: %s", (*itr).ToString().c_str());
-            }
-        }
-
-        return m_objectList;
-    }
+    ObjectList* GetObjectList();
 
     bool Equals(ObjectList* objectList)
     {
@@ -1790,7 +1771,7 @@ typedef std::unordered_map<uint32, ObjectGuidList*> ObjectListMap;
 
 class SmartWaypointMgr
 {
-    SmartWaypointMgr() {}
+    SmartWaypointMgr() { }
 public:
     ~SmartWaypointMgr();
 
@@ -1802,7 +1783,8 @@ public:
     {
         if (waypoint_map.find(id) != waypoint_map.end())
             return waypoint_map[id];
-        else return 0;
+
+        return 0;
     }
 
 private:
@@ -1818,26 +1800,19 @@ typedef std::unordered_map<int32, SmartAIEventList> SmartAIEventMap;
 
 class SmartAIMgr
 {
-    SmartAIMgr() {};
-public:
-    ~SmartAIMgr() {};
+    SmartAIMgr() = default;
+    ~SmartAIMgr() = default;
 
+    SmartAIMgr(SmartAIMgr const&) = delete;
+    SmartAIMgr(SmartAIMgr&&) = delete;
+    SmartAIMgr& operator= (SmartAIMgr const&) = delete;
+    SmartAIMgr& operator= (SmartAIMgr&&) = delete;
+
+public:
     static SmartAIMgr* instance();
 
     void LoadSmartAIFromDB();
-
-    SmartAIEventList GetScript(int32 entry, SmartScriptType type)
-    {
-        SmartAIEventList temp;
-        if (mEventMap[uint32(type)].find(entry) != mEventMap[uint32(type)].end())
-            return mEventMap[uint32(type)][entry];
-        else
-        {
-            if (entry > 0) //first search is for guid (negative), do not drop error if not found
-                LOG_DEBUG("sql.sql", "SmartAIMgr::GetScript: Could not load Script for Entry %d ScriptType %u.", entry, uint32(type));
-            return temp;
-        }
-    }
+    SmartAIEventList GetScript(int32 entry, SmartScriptType type);
 
 private:
     //event stores
@@ -1845,138 +1820,17 @@ private:
 
     bool IsEventValid(SmartScriptHolder& e);
     bool IsTargetValid(SmartScriptHolder const& e);
-
-    /*inline bool IsTargetValid(SmartScriptHolder e, int32 target)
-    {
-        if (target < SMART_TARGET_NONE || target >= SMART_TARGET_END)
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses invalid Target type %d, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), target);
-            return false;
-        }
-        return true;
-    }*/
-
-    bool IsMinMaxValid(SmartScriptHolder const& e, uint32 min, uint32 max)
-    {
-        if (max < min)
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses min/max params wrong (%u/%u), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), min, max);
-            return false;
-        }
-        return true;
-    }
-
-    /*inline bool IsPercentValid(SmartScriptHolder e, int32 pct)
-    {
-        if (pct < -100 || pct > 100)
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has invalid Percent set (%d), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), pct);
-            return false;
-        }
-        return true;
-    }*/
-
-    bool NotNULL(SmartScriptHolder const& e, uint32 data)
-    {
-        if (!data)
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u Parameter can not be nullptr, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
-            return false;
-        }
-        return true;
-    }
-
-    bool IsCreatureValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sObjectMgr->GetCreatureTemplate(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Creature entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsQuestValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sObjectMgr->GetQuestTemplate(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Quest entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsGameObjectValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sObjectMgr->GetGameObjectTemplate(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent GameObject entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsSpellValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sSpellMgr->GetSpellInfo(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Spell entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsItemValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sObjectMgr->GetItemTemplate(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Item entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsTextEmoteValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sEmotesTextStore.LookupEntry(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Text Emote entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsEmoteValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sEmotesStore.LookupEntry(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Emote entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsAreaTriggerValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sObjectMgr->GetAreaTrigger(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent AreaTrigger entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    bool IsSoundValid(SmartScriptHolder const& e, uint32 entry)
-    {
-        if (!sSoundEntriesStore.LookupEntry(entry))
-        {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Sound entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        return true;
-    }
-
-    //bool IsTextValid(SmartScriptHolder const& e, uint32 id);
+    bool IsMinMaxValid(SmartScriptHolder const& e, uint32 min, uint32 max);
+    bool NotNULL(SmartScriptHolder const& e, uint32 data);
+    bool IsCreatureValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsQuestValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsGameObjectValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsSpellValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsItemValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsTextEmoteValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsEmoteValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsAreaTriggerValid(SmartScriptHolder const& e, uint32 entry);
+    bool IsSoundValid(SmartScriptHolder const& e, uint32 entry);
 };
 
 #define sSmartScriptMgr SmartAIMgr::instance()

@@ -54,8 +54,9 @@ LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (
 LootStore LootTemplates_Player("player_loot_template",               "team id",                         true);
 
 // Selects invalid loot items to be removed from group possible entries (before rolling)
-struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, bool>
+struct LootGroupInvalidSelector
 {
+public:
     explicit LootGroupInvalidSelector(Loot const& loot, uint16 lootMode) : _loot(loot), _lootMode(lootMode) { }
 
     bool operator()(LootStoreItem* item) const

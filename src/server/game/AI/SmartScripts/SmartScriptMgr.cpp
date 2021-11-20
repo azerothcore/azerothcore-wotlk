@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SmartScriptMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
@@ -27,8 +28,26 @@
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
-#include "SmartScriptMgr.h"
 #include "SpellMgr.h"
+
+ObjectList* ObjectGuidList::GetObjectList()
+{
+    if (m_baseObject)
+    {
+        // Sanitize list using m_guidList
+        m_objectList->clear();
+
+        for (auto const& itr : *m_guidList)
+        {
+            if (WorldObject* obj = ObjectAccessor::GetWorldObject(*m_baseObject, itr))
+            {
+                m_objectList->emplace_back(obj);
+            }
+        }
+    }
+
+    return m_objectList;
+}
 
 SmartWaypointMgr* SmartWaypointMgr::instance()
 {
@@ -113,6 +132,25 @@ SmartAIMgr* SmartAIMgr::instance()
 {
     static SmartAIMgr instance;
     return &instance;
+}
+
+SmartAIEventList SmartAIMgr::GetScript(int32 entry, SmartScriptType type)
+{
+    SmartAIEventList temp;
+
+    if (mEventMap[uint32(type)].find(entry) != mEventMap[uint32(type)].end())
+    {
+        return mEventMap[uint32(type)][entry];
+    }
+    else
+    {
+        if (entry) // first search is for guid (negative), do not drop error if not found
+        {
+            FMT_LOG_DEBUG("sql.sql", "SmartAIMgr::GetScript: Could not load Script for Entry {} ScriptType {}.", entry, uint32(type));
+        }
+
+        return temp;
+    }
 }
 
 void SmartAIMgr::LoadSmartAIFromDB()
@@ -1275,29 +1313,123 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
     return true;
 }
 
-/*bool SmartAIMgr::IsTextValid(SmartScriptHolder const& e, uint32 id) // unused
+bool SmartAIMgr::IsMinMaxValid(SmartScriptHolder const& e, uint32 min, uint32 max)
 {
-    bool error = false;
-    uint32 entry = 0;
-    if (e.entryOrGuid >= 0)
-        entry = uint32(e.entryOrGuid);
-    else {
-        entry = uint32(abs(e.entryOrGuid));
-        CreatureData const* data = sObjectMgr->GetCreatureData(entry);
-        if (!data)
-        {
-            LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u using non-existent Creature guid %d, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
-            return false;
-        }
-        else
-            entry = data->id;
-    }
-    if (!entry || !sCreatureTextMgr->TextExist(entry, uint8(id)))
-        error = true;
-    if (error)
+    if (max < min)
     {
-        LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u using non-existent Text id %d, skipped.", e.entryOrGuid, e.GetScriptType(), e.source_type, e.GetActionType(), id);
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses min/max params wrong (%u/%u), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), min, max);
         return false;
     }
+
     return true;
-}*/
+}
+
+bool SmartAIMgr::NotNULL(SmartScriptHolder const& e, uint32 data)
+{
+    if (!data)
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u Parameter can not be nullptr, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsCreatureValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sObjectMgr->GetCreatureTemplate(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Creature entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsQuestValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sObjectMgr->GetQuestTemplate(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Quest entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsGameObjectValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sObjectMgr->GetGameObjectTemplate(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent GameObject entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsSpellValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sSpellMgr->GetSpellInfo(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Spell entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsItemValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sObjectMgr->GetItemTemplate(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Item entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsTextEmoteValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sEmotesTextStore.LookupEntry(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Text Emote entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsEmoteValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sEmotesStore.LookupEntry(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Emote entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsAreaTriggerValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sObjectMgr->GetAreaTrigger(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent AreaTrigger entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}
+
+bool SmartAIMgr::IsSoundValid(SmartScriptHolder const& e, uint32 entry)
+{
+    if (!sSoundEntriesStore.LookupEntry(entry))
+    {
+        LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Sound entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+        return false;
+    }
+
+    return true;
+}

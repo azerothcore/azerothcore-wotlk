@@ -84,4 +84,6 @@ private:
     uint32 _taxiSegment;
 };
 
+std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
+
 #endif

@@ -29,7 +29,7 @@
 bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)
 {
     Player* player = handler->GetSession()->GetPlayer();
-    std::list<std::string> errors;
+    std::vector<std::string> errors;
 
     if (player->IsSpectator())
     {
@@ -38,6 +38,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
             HandleSpectatorWatchCommand(handler, name);
             return true;
         }
+
         handler->PSendSysMessage("You are already spectacting arena.");
         return true;
     }
@@ -75,70 +76,76 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     }
 
     if (player->IsBeingTeleported() || !player->IsInWorld())
-        errors.push_back("Can't use while being teleported.");
+        errors.emplace_back("Can't use while being teleported.");
 
     if (!player->FindMap() || player->FindMap()->Instanceable())
-        errors.push_back("Can't use while in instance, bg or arena.");
+        errors.emplace_back("Can't use while in instance, bg or arena.");
 
     if (player->GetVehicle())
-        errors.push_back("Can't be on a vehicle.");
+        errors.emplace_back("Can't be on a vehicle.");
 
     if (player->IsInCombat())
-        errors.push_back("Can't be in combat.");
+        errors.emplace_back("Can't be in combat.");
 
     if (player->isUsingLfg())
-        errors.push_back("Can't spectate while using LFG system.");
+        errors.emplace_back("Can't spectate while using LFG system.");
 
     if (player->InBattlegroundQueue())
-        errors.push_back("Can't be queued for arena or bg.");
+        errors.emplace_back("Can't be queued for arena or bg.");
 
     if (player->GetGroup())
-        errors.push_back("Can't be in a group.");
+        errors.emplace_back("Can't be in a group.");
 
     if (player->HasUnitState(UNIT_STATE_ISOLATED))
-        errors.push_back("Can't be isolated.");
+        errors.emplace_back("Can't be isolated.");
 
     if (player->m_mover != player)
-        errors.push_back("You must control yourself.");
+        errors.emplace_back("You must control yourself.");
 
     if (player->IsInFlight())
-        errors.push_back("Can't be in flight.");
+        errors.emplace_back("Can't be in flight.");
 
     if (player->IsMounted())
-        errors.push_back("Dismount before spectating.");
+        errors.emplace_back("Dismount before spectating.");
 
     if (!player->IsAlive())
-        errors.push_back("Must be alive.");
+        errors.emplace_back("Must be alive.");
 
     if (!player->m_Controlled.empty())
-        errors.push_back("Can't be controlling creatures.");
+        errors.emplace_back("Can't be controlling creatures.");
 
-    const Unit::VisibleAuraMap* va = player->GetVisibleAuras();
-    for (auto itr = va->begin(); itr != va->end(); ++itr)
-        if (Aura* aura = itr->second->GetBase())
-            if (!itr->second->IsPositive() && !aura->IsPermanent() && aura->GetDuration() < HOUR * IN_MILLISECONDS)
+    for (auto const& [id, auraApplication] : *player->GetVisibleAuras())
+    {
+        if (Aura* aura = auraApplication->GetBase())
+        {
+            if (!auraApplication->IsPositive() && !aura->IsPermanent() && aura->GetDuration() < HOUR * IN_MILLISECONDS)
             {
                 switch (aura->GetSpellInfo()->Id)
                 {
-                    case lfg::LFG_SPELL_DUNGEON_DESERTER:
-                    case lfg::LFG_SPELL_DUNGEON_COOLDOWN:
-                    case 26013: // bg deserter
-                    case 57724: // sated
-                    case 57723: // exhaustion
-                    case 25771: // forbearance
-                    case 15007: // resurrection sickness
-                    case 24755: // Tricked or Treated (z eventu)
-                        continue;
+                case lfg::LFG_SPELL_DUNGEON_DESERTER:
+                case lfg::LFG_SPELL_DUNGEON_COOLDOWN:
+                case 26013: // bg deserter
+                case 57724: // sated
+                case 57723: // exhaustion
+                case 25771: // forbearance
+                case 15007: // resurrection sickness
+                case 24755: // Tricked or Treated (z eventu)
+                    continue;
                 }
 
-                errors.push_back("Can't have negative auras.");
+                errors.emplace_back("Can't have negative auras.");
                 break;
             }
+        }
+    }
 
     if (uint32 inviteInstanceId = player->GetPendingSpectatorInviteInstanceId())
     {
         if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId))
+        {
             tbg->RemoveToBeTeleported(player->GetGUID());
+        }
+
         player->SetPendingSpectatorInviteInstanceId(0);
     }
 
@@ -155,8 +162,9 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     if (!errors.empty())
     {
         handler->PSendSysMessage("To spectate, please fix the following:");
-        for (std::list<std::string>::const_iterator itr = errors.begin(); itr != errors.end(); ++itr)
-            handler->PSendSysMessage("- %s", (*itr).c_str());
+
+        for (auto const& itr : errors)
+            handler->PSendSysMessage("- %s", itr.c_str());
 
         return true;
     }
@@ -210,7 +218,7 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, std::stri
     return true;
 }
 
-void ArenaSpectator::CreatePacket(WorldPacket& data, std::string const& message)
+void ArenaSpectator::CreatePacket(WorldPacket& data, std::string_view message)
 {
     size_t len = message.length();
     data.Initialize(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + 8 + 4 + 1 + len + 1);
@@ -249,10 +257,12 @@ void ArenaSpectator::HandleResetCommand(Player* player)
         SendCommand_UInt32Value(player, itr->first, "MHP", plr->GetMaxHealth());
         SendCommand_UInt32Value(player, itr->first, "CHP", plr->GetHealth());
         SendCommand_UInt32Value(player, itr->first, "STA", plr->IsAlive() ? 1 : 0);
+
         Powers ptype = plr->getPowerType();
         SendCommand_UInt32Value(player, itr->first, "PWT", ptype);
         SendCommand_UInt32Value(player, itr->first, "MPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetMaxPower(ptype) / 10 : plr->GetMaxPower(ptype));
         SendCommand_UInt32Value(player, itr->first, "CPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetPower(ptype) / 10 : plr->GetPower(ptype));
+
         Pet* pet = plr->GetPet();
         SendCommand_UInt32Value(player, itr->first, "PHP", pet && pet->GetCreatureTemplate()->family ? (uint32)pet->GetHealthPct() : 0);
         SendCommand_UInt32Value(player, itr->first, "PET", pet ? pet->GetCreatureTemplate()->family : 0);
@@ -274,6 +284,7 @@ void ArenaSpectator::HandleResetCommand(Player* player)
         for (Unit::VisibleAuraMap::const_iterator aitr = visibleAuras->begin(); aitr != visibleAuras->end(); ++aitr)
         {
             Aura* aura = aitr->second->GetBase();
+
             if (ShouldSendAura(aura, aitr->second->GetEffectMask(), plr->GetGUID(), false))
                 SendCommand_Aura(player, itr->first, "AUR", aura->GetCasterGUID(), aura->GetSpellInfo()->Id, aura->GetSpellInfo()->IsPositive(), aura->GetSpellInfo()->Dispel, aura->GetDuration(), aura->GetMaxDuration(), (aura->GetCharges() > 1 ? aura->GetCharges() : aura->GetStackAmount()), false);
         }
@@ -298,11 +309,18 @@ bool ArenaSpectator::ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid target
                 return true;
         }
     }
+
     return false;
 }
 
+template<class T>
+AC_GAME_API void ArenaSpectator::SendPacketTo([[maybe_unused]] const T* object, [[maybe_unused]] std::string_view message)
+{
+    static_assert(Acore::dependant_false_v<T>, "Unsupported type used for SendPacketTo");
+}
+
 template<>
-AC_GAME_API void ArenaSpectator::SendPacketTo(const Player* player, std::string&& message)
+AC_GAME_API void ArenaSpectator::SendPacketTo(const Player* player, std::string_view message)
 {
     WorldPacket data;
     CreatePacket(data, message);
@@ -310,7 +328,7 @@ AC_GAME_API void ArenaSpectator::SendPacketTo(const Player* player, std::string&
 }
 
 template<>
-AC_GAME_API void ArenaSpectator::SendPacketTo(const Map* map, std::string&& message)
+AC_GAME_API void ArenaSpectator::SendPacketTo(const Map* map, std::string_view message)
 {
     if (!map->IsBattleArena())
         return;

@@ -37,6 +37,10 @@
 /*********************************************************/
 /***                    QUEST SYSTEM                   ***/
 /*********************************************************/
+int32 Player::GetQuestLevel(Quest const* quest) const
+{
+    return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : getLevel();
+}
 
 void Player::PrepareQuestMenu(ObjectGuid guid)
 {
