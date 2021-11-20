@@ -267,7 +267,7 @@ public:
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<std::string> reason, Optional<int32> exitCode)
+    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
     {
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
