@@ -10,7 +10,7 @@ UPDATE `quest_template_addon` SET `SpecialFlags` = 1 WHERE `ID` IN (1641, 1645);
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=19 AND `SourceGroup`=0 AND `SourceEntry` IN (1641, 1645) AND `SourceId`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(19, 0, 1641, 0, 0, 47, 0, 1642, 64, 0, 1, 0, 0, '', 'Quest The Tome of Divinity (Human, offer book) available if quest The Tome of Divinity (Human, book) has not been rewarded.'),
 (19, 0, 1641, 0, 0, 47, 0, 1642, 1, 0, 0, 0, 0, '', 'Quest The Tome of Divinity (Human, offer book) available if quest The Tome of Divinity (Human, book) has not been taken.'),
-(19, 0, 1641, 0, 0, 2,  0, 6775, 1,  0, 1, 0, 0, '', 'Quest The Tome of Divinity (Human, offer book) available if player does not already have item Tome of Divinity (Human)'),
-(19, 0, 1645, 0, 0, 47, 0, 1646, 1, 0, 0, 0, 0, '', 'Quest The Tome of Divinity (Dwarf, offer book) available if quest The Tome of Divinity (Dwarf, book) has not been taken.'),
-(19, 0, 1645, 0, 0, 2,  0, 6916, 1,  0, 1, 0, 0, '', 'Quest The Tome of Divinity (Dwarf, offer book) available if player does not already have item Tome of Divinity (human)');
+(19, 0, 1645, 0, 0, 47, 0, 1646, 64, 0, 1, 0, 0, '', 'Quest The Tome of Divinity (Dwarf, offer book) available if quest The Tome of Divinity (Dwarf, book) has not been rewarded.'),
+(19, 0, 1645, 0, 0, 47, 0, 1646, 1, 0, 0, 0, 0, '', 'Quest The Tome of Divinity (Dwarf, offer book) available if quest The Tome of Divinity (Dwarf, book) has not been taken.');
