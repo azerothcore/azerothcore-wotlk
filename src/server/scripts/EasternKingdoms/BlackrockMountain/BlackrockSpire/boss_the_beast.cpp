@@ -86,6 +86,9 @@ private:
     Creature* _me;
 };
 
+// Used to make Hodir disengage whenever he leaves his room
+constexpr static float FirewalPositionY = -505.f;
+
 class boss_the_beast : public CreatureScript
 {
 public:
@@ -184,6 +187,12 @@ public:
                 return;
             }
 
+            if (me->GetPositionY() > FirewalPositionY)
+            {
+                EnterEvadeMode();
+                return;
+            }
+
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -217,10 +226,18 @@ public:
                     case EVENT_FIREBALL:
                         DoCastVictim(SPELL_FIREBALL);
                         events.ScheduleEvent(EVENT_FIREBALL, 8 * IN_MILLISECONDS, 21 * IN_MILLISECONDS);
+                        if (events.GetNextEventTime(EVENT_FIREBLAST) < 3 * IN_MILLISECONDS)
+                        {
+                            events.RescheduleEvent(EVENT_FIREBLAST, 3 * IN_MILLISECONDS);
+                        }
                         break;
                     case EVENT_FIREBLAST:
                         DoCastVictim(SPELL_FIREBLAST);
                         events.ScheduleEvent(EVENT_FIREBLAST, 5 * IN_MILLISECONDS, 8 * IN_MILLISECONDS);
+                        if (events.GetNextEventTime(EVENT_FIREBALL) < 3 * IN_MILLISECONDS)
+                        {
+                            events.RescheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
+                        }
                         break;
                 }
 

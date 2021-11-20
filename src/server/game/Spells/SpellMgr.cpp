@@ -3282,6 +3282,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
             case 63978: // Ulduar(Rubble): Stone Nova
+            case 15502: // Sunder Armor
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
@@ -7435,11 +7436,35 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Serverside - Summon Arcane Disruptor
+    ApplySpellFix({ 49591 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 37889;
+    });
+
+    // Serverside - Create Rocket Pack
+    ApplySpellFix({ 70055 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 49278;
+    });
+
     // Ashenvale Outrunner Sneak
     // Stealth
     ApplySpellFix({ 20540, 32199 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
+    });
+
+    // Panic
+    ApplySpellFix({ 19408 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_30_YARDS;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

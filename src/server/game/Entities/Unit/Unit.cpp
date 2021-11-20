@@ -21,6 +21,7 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Common.h"
@@ -14611,9 +14612,10 @@ void Unit::SetLevel(uint8 lvl, bool showLevelChange)
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetGroup())
         ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_LEVEL);
 
-    // xinef: update global data
     if (GetTypeId() == TYPEID_PLAYER)
-        sWorld->UpdateGlobalPlayerData(ToPlayer()->GetGUID().GetCounter(), PLAYER_UPDATE_DATA_LEVEL, "", lvl);
+    {
+        sCharacterCache->UpdateCharacterLevel(GetGUID(), lvl);
+    }
 }
 
 void Unit::SetHealth(uint32 val)

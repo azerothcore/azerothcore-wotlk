@@ -400,7 +400,9 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     // Check if GameObject is Large
     if (goinfo->IsLargeGameObject())
-        SetVisibilityDistanceOverride(true);
+    {
+        SetVisibilityDistanceOverride(VisibilityDistanceType::Large);
+    }
 
     return true;
 }
