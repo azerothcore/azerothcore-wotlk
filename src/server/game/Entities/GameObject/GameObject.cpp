@@ -2867,7 +2867,7 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
 
 void GameObject::AddToSkillupList(ObjectGuid playerGuid)
 {
-    int32 timer = GetMap()->IsDungeon() ? -1 : World::GetGameTimeMS() + 10 * MINUTE * IN_MILLISECONDS;
+    int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;
     m_SkillupList[playerGuid] = timer;
 }
 
