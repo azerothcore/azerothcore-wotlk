@@ -1,4 +1,4 @@
-name: core-build
+name: main
 on:
   push:
     branches:
@@ -17,20 +17,6 @@ jobs:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         os: [ubuntu-20.04]
         compiler: [clang]
-        # we can include specific combinations here
-        include:
-          - os: ubuntu-20.04
-            compiler: clang12
-          - os: ubuntu-20.04
-            compiler: clang11
-          - os: ubuntu-18.04
-            compiler: clang10
-          - os: ubuntu-18.04
-            compiler: gcc8
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is gcc 9
-          - os: ubuntu-20.04
-            compiler: gcc10
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:

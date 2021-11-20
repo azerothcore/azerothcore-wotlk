@@ -135,6 +135,38 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
     return nullptr;
 }
 
+bool SummonList::IsAnyCreatureAlive() const
+{
+    for (auto const& guid : storage_)
+    {
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+        {
+            if (summon->IsAlive())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool SummonList::IsAnyCreatureInCombat() const
+{
+    for (auto const& guid : storage_)
+    {
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+        {
+            if (summon->IsInCombat())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     me(creature),
     IsFleeing(false),
@@ -710,9 +742,9 @@ Creature* GetClosestCreatureWithEntry(WorldObject* source, uint32 entry, float m
     return source->FindNearestCreature(entry, maxSearchRange, alive);
 }
 
-GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange)
+GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange, bool onlySpawned /*= false*/)
 {
-    return source->FindNearestGameObject(entry, maxSearchRange);
+    return source->FindNearestGameObject(entry, maxSearchRange, onlySpawned);
 }
 
 void GetCreatureListWithEntryInGrid(std::list<Creature*>& list, WorldObject* source, uint32 entry, float maxSearchRange)

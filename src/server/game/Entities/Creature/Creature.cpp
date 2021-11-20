@@ -222,13 +222,11 @@ void Creature::AddToWorld()
         // it's also initialized in AIM_Initialize(), few lines below, but it's not a problem
         Motion_Initialize();
 
-        if (GetZoneScript())
-            GetZoneScript()->OnCreatureCreate(this);
-
         GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
         if (m_spawnId)
+        {
             GetMap()->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
-
+        }
         Unit::AddToWorld();
 
         SearchFormation();
@@ -236,7 +234,14 @@ void Creature::AddToWorld()
         AIM_Initialize();
 
         if (IsVehicle())
+        {
             GetVehicleKit()->Install();
+        }
+
+        if (GetZoneScript())
+        {
+            GetZoneScript()->OnCreatureCreate(this);
+        }
 #ifdef ELUNA
         sEluna->OnAddToWorld(this);
 
@@ -1805,7 +1810,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (HasSearchedAssistance())
         {
             SetNoSearchAssistance(false);
-            UpdateSpeed(MOVE_RUN, false);
         }
 
         //Dismiss group if is leader
@@ -2233,14 +2237,20 @@ void Creature::CallAssistance(Unit* target /*= nullptr*/)
     }
 }
 
-void Creature::CallForHelp(float radius)
+void Creature::CallForHelp(float radius, Unit* target /*= nullptr*/)
 {
-    if (radius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
+    if (radius <= 0.0f || IsPet() || IsCharmed())
+    {
         return;
+    }
 
-    Acore::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
+    if (!target)
+    {
+        target = GetVictim();
+    }
+
+    Acore::CallOfHelpCreatureInRangeDo u_do(this, target, radius);
     Acore::CreatureWorker<Acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
-
     Cell::VisitGridObjects(this, worker, radius);
 }
 
@@ -2499,10 +2509,20 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
     // Check if Creature is Large
     if (cainfo->isLarge)
-        SetVisibilityDistanceOverride(true);
+    {
+        SetVisibilityDistanceOverride(cainfo->visibilityDistanceType);
+    }
 
     if (cainfo->emote != 0)
+    {
         SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
+    }
+
+    // Check if visibility distance different
+    if (cainfo->visibilityDistanceType != VisibilityDistanceType::Normal)
+    {
+        SetVisibilityDistanceOverride(cainfo->visibilityDistanceType);
+    }
 
     //Load Path
     if (cainfo->path_id != 0)
@@ -2550,40 +2570,8 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
 
 void Creature::SetInCombatWithZone()
 {
-    if (!CanHaveThreatList())
-    {
-        LOG_ERROR("entities.unit", "Creature entry %u call SetInCombatWithZone but creature cannot have threat list.", GetEntry());
-        return;
-    }
-
-    Map* map = GetMap();
-
-    if (!map->IsDungeon())
-    {
-        LOG_ERROR("entities.unit", "Creature entry %u call SetInCombatWithZone for map (id: %u) that isn't an instance.", GetEntry(), map->GetId());
-        return;
-    }
-
-    Map::PlayerList const& PlList = map->GetPlayers();
-
-    if (PlList.isEmpty())
-        return;
-
-    for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
-    {
-        if (Player* player = i->GetSource())
-        {
-            if (player->IsGameMaster())
-                continue;
-
-            if (player->IsAlive())
-            {
-                this->SetInCombatWith(player);
-                player->SetInCombatWith(this);
-                AddThreat(player, 0.0f);
-            }
-        }
-    }
+    if (IsAIEnabled)
+        AI()->DoZoneInCombat();
 }
 
 void Creature::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)

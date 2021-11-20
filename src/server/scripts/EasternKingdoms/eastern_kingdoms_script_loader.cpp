@@ -43,6 +43,8 @@ void AddSC_boss_pyroguard_emberseer();
 void AddSC_boss_gyth();
 void AddSC_boss_rend_blackhand();
 void AddSC_boss_urok_doomhowl();
+void AddSC_boss_solakar_flamewreath();
+void AddSC_boss_quartermasterzigris();
 void AddSC_instance_blackrock_spire();
 void AddSC_boss_razorgore();                 //Blackwing lair
 void AddSC_boss_vaelastrasz();
@@ -74,7 +76,8 @@ void AddSC_boss_selin_fireheart();
 void AddSC_boss_vexallus();
 void AddSC_boss_priestess_delrissa();
 void AddSC_instance_magisters_terrace();
-void AddSC_boss_lucifron();                  //Molten core
+void AddSC_molten_core();                   //Molten core
+void AddSC_boss_lucifron();
 void AddSC_boss_magmadar();
 void AddSC_boss_gehennas();
 void AddSC_boss_garr();
@@ -147,6 +150,7 @@ void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
 //void AddSC_wetlands();
+void AddSC_burning_steppes();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -177,8 +181,10 @@ void AddEasternKingdomsScripts()
     AddSC_boss_warmastervoone();
     AddSC_boss_pyroguard_emberseer();
     AddSC_boss_gyth();
+    AddSC_boss_solakar_flamewreath();
     AddSC_boss_rend_blackhand();
     AddSC_boss_urok_doomhowl();
+    AddSC_boss_quartermasterzigris();
     AddSC_instance_blackrock_spire();
     AddSC_boss_razorgore();                 //Blackwing lair
     AddSC_boss_vaelastrasz();
@@ -210,7 +216,8 @@ void AddEasternKingdomsScripts()
     AddSC_boss_vexallus();
     AddSC_boss_priestess_delrissa();
     AddSC_instance_magisters_terrace();
-    AddSC_boss_lucifron();                  //Molten core
+    AddSC_molten_core();                    // Molten core
+    AddSC_boss_lucifron();
     AddSC_boss_magmadar();
     AddSC_boss_gehennas();
     AddSC_boss_garr();
@@ -283,4 +290,5 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     //AddSC_wetlands();
+    AddSC_burning_steppes();
 }
