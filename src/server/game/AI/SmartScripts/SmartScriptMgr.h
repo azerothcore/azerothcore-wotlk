@@ -22,8 +22,7 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Spell.h"
-//#include "SmartAI.h"
-//#include "SmartScript.h"
+#include "SpellMgr.h"
 #include "Unit.h"
 
 struct WayPoint
