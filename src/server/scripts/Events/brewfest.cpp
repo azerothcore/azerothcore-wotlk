@@ -303,7 +303,7 @@ enum darkIronAttack
     NPC_MOLE_MACHINE_TRIGGER            = 23894,
     NPC_DARK_IRON_GUZZLER               = 23709,
     NPC_NORMAL_DROHN                    = 24492,
-    NPC_NORMAL_VOODOO                   = 21349,
+    NPC_NORMAL_VOODOO                   = 24493,
     NPC_NORMAL_BARLEYBREW               = 23683,
     NPC_NORMAL_THUNDERBREW              = 23684,
     NPC_NORMAL_GORDOK                   = 23685,
