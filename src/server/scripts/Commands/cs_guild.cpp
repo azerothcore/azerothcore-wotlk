@@ -176,7 +176,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
+        uint32 guildId = target ? target->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(targetGuid);
         if (!guildId)
             return false;
 
@@ -196,7 +196,7 @@ public:
         if (!player)
             return false;
 
-        uint32 guildId = player->IsConnected() ? player->GetConnectedPlayer()->GetGuildId() : Player::GetGuildIdFromStorage(player->GetGUID().GetCounter());
+        uint32 guildId = player->IsConnected() ? player->GetConnectedPlayer()->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(player->GetGUID());
         if (!guildId)
             return false;
 
@@ -227,8 +227,10 @@ public:
         // Display Guild Information
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
         std::string guildMasterName;
-        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID().GetCounter(), guildMasterName))
+        if (sCharacterCache->GetCharacterNameByGuid(guild->GetLeaderGUID(), guildMasterName))
+        {
             handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
+        }
 
         // Format creation date
         char createdDateStr[20];

@@ -25,6 +25,7 @@
 #include "Map.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
+#include "Optional.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include <set>
@@ -842,8 +843,9 @@ public:
 
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
-    [[nodiscard]] bool IsVisibilityOverridden() const { return m_isVisibilityDistanceOverride; }
-    void SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride);
+    [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
+    [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
+    void SetVisibilityDistanceOverride(VisibilityDistanceType type);
     void SetWorldObject(bool apply);
     [[nodiscard]] bool IsPermanentWorldObject() const { return m_isWorldObject; }
     [[nodiscard]] bool IsWorldObject() const;
@@ -900,7 +902,8 @@ public:
 protected:
     std::string m_name;
     bool m_isActive;
-    bool m_isVisibilityDistanceOverride;
+    bool m_isFarVisible;
+    Optional<float> m_visibilityDistanceOverride;
     const bool m_isWorldObject;
     ZoneScript* m_zoneScript;
 
