@@ -39,18 +39,15 @@ enum SelectAggroTarget
 };
 
 // default predicate function to select target based on distance, player and/or aura criteria
-struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
+struct DefaultTargetSelector
 {
-    const Unit* me;
-    float m_dist;
-    bool m_playerOnly;
-    int32 m_aura;
-
+public:
     // unit: the reference unit
     // dist: if 0: ignored, if > 0: maximum distance to the reference unit, if < 0: minimum distance to the reference unit
     // playerOnly: self explaining
     // aura: if 0: ignored, if > 0: the target shall have the aura, if < 0, the target shall NOT have the aura
-    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, int32 aura) : me(unit), m_dist(dist), m_playerOnly(playerOnly), m_aura(aura) {}
+    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, int32 aura) :
+        me(unit), m_dist(dist), m_playerOnly(playerOnly), m_aura(aura) { }
 
     bool operator()(Unit const* target) const
     {
@@ -85,11 +82,17 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 
         return true;
     }
+
+private:
+    const Unit* me;
+    float m_dist;
+    bool m_playerOnly;
+    int32 m_aura;
 };
 
 // Target selector for spell casts checking range, auras and attributes
 // TODO: Add more checks from Spell::CheckCast
-struct SpellTargetSelector : public Acore::unary_function<Unit*, bool>
+struct SpellTargetSelector
 {
 public:
     SpellTargetSelector(Unit* caster, uint32 spellId);
@@ -103,7 +106,7 @@ private:
 // Very simple target selector, will just skip main target
 // NOTE: When passing to UnitAI::SelectTarget remember to use 0 as position for random selection
 //       because tank will not be in the temporary list
-struct NonTankTargetSelector : public Acore::unary_function<Unit*, bool>
+struct NonTankTargetSelector
 {
 public:
     NonTankTargetSelector(Creature* source, bool playerOnly = true) : _source(source), _playerOnly(playerOnly) { }
@@ -115,13 +118,9 @@ private:
 };
 
 // Simple selector for units using mana
-struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
+struct PowerUsersSelector
 {
-    Unit const* _me;
-    Powers const _power;
-    float const _dist;
-    bool const _playerOnly;
-
+public:
     PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
 
     bool operator()(Unit const* target) const
@@ -143,10 +142,16 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
 
         return true;
     }
+private:
+    Unit const* _me;
+    Powers const _power;
+    float const _dist;
+    bool const _playerOnly;
 };
 
-struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
+struct FarthestTargetSelector
 {
+public:
     FarthestTargetSelector(Unit const* unit, float dist, bool playerOnly, bool inLos) : _me(unit), _dist(dist), _playerOnly(playerOnly), _inLos(inLos) {}
 
     bool operator()(Unit const* target) const
@@ -200,9 +205,10 @@ public:
     virtual ObjectGuid GetGUID(int32 /*id*/ = 0) const { return ObjectGuid::Empty; }
 
     Unit* SelectTarget(SelectAggroTarget targetType, uint32 position = 0, float dist = 0.0f, bool playerOnly = false, int32 aura = 0);
+
     // Select the targets satifying the predicate.
-    // predicate shall extend Acore::unary_function<Unit*, bool>
-    template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
+    template <class PREDICATE>
+    Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
     {
         ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
         if (position >= threatlist.size())
@@ -251,8 +257,8 @@ public:
     void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectAggroTarget targetType, float dist = 0.0f, bool playerOnly = false, int32 aura = 0);
 
     // Select the targets satifying the predicate.
-    // predicate shall extend Acore::unary_function<Unit*, bool>
-    template <class PREDICATE> void SelectTargetList(std::list<Unit*>& targetList, PREDICATE const& predicate, uint32 maxTargets, SelectAggroTarget targetType)
+    template <class PREDICATE>
+    void SelectTargetList(std::list<Unit*>& targetList, PREDICATE const& predicate, uint32 maxTargets, SelectAggroTarget targetType)
     {
         ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
         if (threatlist.empty())

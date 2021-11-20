@@ -22,7 +22,6 @@
  Category: commandscripts
  EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
@@ -31,6 +30,7 @@
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

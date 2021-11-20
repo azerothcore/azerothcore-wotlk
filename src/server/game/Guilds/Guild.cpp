@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Guild.h"
 #include "CalendarMgr.h"
-#include "Chat.h"
 #include "CharacterCache.h"
+#include "Chat.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-#include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
 #include "Log.h"

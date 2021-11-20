@@ -28,9 +28,9 @@ npc_tapoke_slim_jahn
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_tapoke_slim_jahn

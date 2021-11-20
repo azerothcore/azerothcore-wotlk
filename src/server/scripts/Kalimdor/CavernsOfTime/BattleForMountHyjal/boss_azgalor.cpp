@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "hyjal_trash.h"
-#include "hyjal.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "hyjal.h"
+#include "hyjal_trash.h"
 
 enum Spells
 {
