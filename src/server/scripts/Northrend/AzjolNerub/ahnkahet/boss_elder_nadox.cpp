@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Containers.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ahnkahet.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "Containers.h"
+#include "ahnkahet.h"
 
 enum Misc
 {

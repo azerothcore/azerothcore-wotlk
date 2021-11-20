@@ -20,8 +20,8 @@
 
 #include "BigNumber.h"
 #include "Common.h"
-#include "Optional.h"
 #include "Log.h"
+#include "Optional.h"
 #include <array>
 #include <mutex>
 #include <string>

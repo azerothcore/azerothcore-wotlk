@@ -18,11 +18,11 @@
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "scholomance.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "scholomance.h"
 
 Position KirtonosSpawn = Position(315.028, 70.5385, 102.15, 0.385971);
 

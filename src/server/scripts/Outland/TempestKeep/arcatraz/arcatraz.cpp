@@ -16,8 +16,8 @@
  */
 
 #include "arcatraz.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum MillhouseSays
 {
