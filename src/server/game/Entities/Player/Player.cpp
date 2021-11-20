@@ -6152,7 +6152,9 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
 void Player::CheckDuelDistance(time_t currTime)
 {
     if (!duel)
+    {
         return;
+    }
 
     ObjectGuid duelFlagGUID = GetGuidValue(PLAYER_DUEL_ARBITER);
     GameObject* obj = GetMap()->GetGameObject(duelFlagGUID);
@@ -6209,7 +6211,9 @@ void Player::DuelComplete(DuelCompleteType type)
     data << uint8((type != DUEL_INTERRUPTED) ? 1 : 0);
     SendDirectMessage(&data);
     if (opponent->GetSession())
+    {
         opponent->SendDirectMessage(&data);
+    }
 
     if (type != DUEL_INTERRUPTED)
     {
@@ -6235,9 +6239,13 @@ void Player::DuelComplete(DuelCompleteType type)
             else
             {
                 if (!IsPvP())
+                {
                     AttackStop();
+                }
                 if (!opponent->IsPvP())
+                {
                     opponent->AttackStop();
+                }
             }
             break;
         case DUEL_WON:
@@ -6246,11 +6254,15 @@ void Player::DuelComplete(DuelCompleteType type)
 
             // Credit for quest Death's Challenge
             if (getClass() == CLASS_DEATH_KNIGHT && opponent->GetQuestStatus(12733) == QUEST_STATUS_INCOMPLETE)
+            {
                 opponent->CastSpell(opponent, 52994, true);
+            }
 
             // Honor points after duel (the winner) - ImpConfig
             if (uint32 amount = sWorld->getIntConfig(CONFIG_HONOR_AFTER_DUEL))
+            {
                 opponent->RewardHonor(nullptr, 1, amount);
+            }
 
             break;
         default:
@@ -6259,12 +6271,16 @@ void Player::DuelComplete(DuelCompleteType type)
 
     // Victory emote spell
     if (type != DUEL_INTERRUPTED)
+    {
         opponent->CastSpell(opponent, 52852, true);
+    }
 
     //Remove Duel Flag object
     GameObject* obj = GetMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER));
     if (obj)
+    {
         duel->Initiator->RemoveGameObject(obj, true);
+    }
 
     /* remove auras */
     AuraApplicationMap &itsAuras = opponent->GetAppliedAuras();
@@ -6272,9 +6288,13 @@ void Player::DuelComplete(DuelCompleteType type)
     {
         Aura const* aura = i->second->GetBase();
         if (!i->second->IsPositive() && aura->GetCasterGUID() == GetGUID() && aura->GetApplyTime() >= duel->StartTime)
+        {
             opponent->RemoveAura(i);
+        }
         else
+        {
             ++i;
+        }
     }
 
     AuraApplicationMap &myAuras = GetAppliedAuras();
@@ -6294,9 +6314,13 @@ void Player::DuelComplete(DuelCompleteType type)
         ClearComboPoints();
 
     if (duel->Opponent->GetComboTarget() == GetGUID())
+    {
         duel->Opponent->ClearComboPoints();
+    }
     else if (duel->Opponent->GetComboTarget() == GetPetGUID())
+    {
         duel->Opponent->ClearComboPoints();
+    }
 
     //cleanups
     SetGuidValue(PLAYER_DUEL_ARBITER, ObjectGuid::Empty);
@@ -10655,11 +10679,17 @@ bool Player::IsAlwaysDetectableFor(WorldObject const* seer) const
         return true;
 
     if (duel && duel->State != DUEL_STATE_CHALLENGED && duel->Opponent == seer)
+    {
         return false;
+    }
 
     if (const Player* seerPlayer = seer->ToPlayer())
+    {
         if (IsGroupVisibleFor(seerPlayer))
+        {
             return true;
+        }
+    }
 
     return false;
 }
