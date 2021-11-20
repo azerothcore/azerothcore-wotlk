@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633020417816915100');
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (79,80);
-INSERT INTO `game_event` (`eventEntry`,`start_time`,`end_time`,`occurence`,`length`,`holiday`,`description`,`world_event`, announce) VALUES
+INSERT INTO `game_event` (`eventEntry`,`start_time`,`end_time`,`occurence`,`length`,`holiday`,`description`,`world_event`, `announce`) VALUES
 (79, '2018-10-28 12:00:00', '2030-12-31 18:00:00',1440,360,0, 'Diurnal fishing event',0,2),
 (80, '2018-10-28 00:00:00', '2030-12-31 06:00:00',1440,360,0, 'Nocturnal fishing event',0,2);
 
