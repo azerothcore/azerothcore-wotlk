@@ -172,19 +172,50 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     if (!pSrcItem)
         return;                                             // only at cheat
 
-    uint16 dest;
-    InventoryResult msg = _player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
-    if (msg != EQUIP_ERR_OK)
+    ItemTemplate const* pProto = pSrcItem->GetTemplate();
+    if (!pProto)
     {
-        _player->SendEquipError(msg, pSrcItem, nullptr);
+        _player->SendEquipError(pSrcItem->IsBag() ? EQUIP_ERR_ITEM_NOT_FOUND : EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, pSrcItem);
+        return;
+    }
+
+    uint8 eslot = _player->FindEquipSlot(pProto, NULL_SLOT, !pSrcItem->IsBag());
+    if (eslot == NULL_SLOT)
+    {
+        _player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
     }
 
     uint16 src = pSrcItem->GetPos();
-    if (dest == src)                                           // prevent equip in same slot, only at cheat
+    uint16 dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
+    if (dest == src) // prevent equip in same slot, only at cheat
+    {
+        _player->SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, pSrcItem);
         return;
+    }
 
     Item* pDstItem = _player->GetItemByPos(dest);
+
+    // Remove item enchantments for now and restore it later
+    // Needed for swap sanity checks
+    if (pDstItem)
+    {
+        _player->ApplyEnchantment(pDstItem, false);
+    }
+
+    InventoryResult msg = _player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
+    if (msg != EQUIP_ERR_OK)
+    {
+        // Restore enchantments
+        if (pDstItem)
+        {
+            _player->ApplyEnchantment(pDstItem, true);
+        }
+
+        _player->SendEquipError(msg, pSrcItem, nullptr);
+        return;
+    }
+
     if (!pDstItem)                                         // empty slot, simple case
     {
         _player->RemoveItem(srcbag, srcslot, true);
@@ -193,6 +224,9 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     }
     else                                                    // have currently equipped item, not simple case
     {
+        // Restore enchantments
+        _player->ApplyEnchantment(pDstItem, true);
+
         uint8 dstbag = pDstItem->GetBagSlot();
         uint8 dstslot = pDstItem->GetSlot();
 
@@ -298,7 +332,10 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         _player->DestroyItemCount(pItem, i_count, true);
     }
     else
+    {
         _player->DestroyItem(bag, slot, true);
+    }
+    _player->SendQuestGiverStatusMultiple();
 }
 
 bool ItemTemplate::HasStat(ItemModType stat) const
@@ -1221,9 +1258,10 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
             return;
         }
 
+        uint32 count = pItem->GetCount();
         _player->RemoveItem(srcbag, srcslot, true);
         if (Item const* storedItem = _player->StoreItem(dest, pItem, true))
-            _player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
+            _player->ItemAddedQuestCheck(storedItem->GetEntry(), count);
     }
     else                                                    // moving from inventory to bank
     {
@@ -1236,6 +1274,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
         }
 
         _player->RemoveItem(srcbag, srcslot, true);
+        _player->ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
         _player->BankItem(dest, pItem, true);
         _player->UpdateTitansGrip();
     }

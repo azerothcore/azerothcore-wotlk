@@ -101,7 +101,7 @@ void FormationMgr::LoadCreatureFormations()
         group_member.leaderGUID            = fields[0].GetUInt32();
         ObjectGuid::LowType const memberGUID = fields[1].GetUInt32();
         float const follow_dist             = fields[2].GetFloat();
-        float const follow_angle            = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
+        float const follow_angle            = fields[3].GetFloat() * (static_cast<float>(M_PI) / 180);
         group_member.groupAI               = fields[4].GetUInt16();
         group_member.point_1               = fields[5].GetUInt16();
         group_member.point_2               = fields[6].GetUInt16();
@@ -124,7 +124,7 @@ void FormationMgr::LoadCreatureFormations()
             else
             {
                 group_member.follow_dist       = follow_dist;
-                group_member.follow_angle      = follow_angle * static_cast<float>(M_PI) / 180;
+                group_member.follow_angle      = follow_angle;
             }
         }
         else
@@ -223,6 +223,47 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 
         if (pMember->IsValidAttackTarget(target) && pMember->AI())
             pMember->AI()->AttackStart(target);
+    }
+}
+
+void CreatureGroup::MemberEvaded(Creature* member)
+{
+    uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+    {
+        return;
+    }
+
+    for (auto const& itr : m_members)
+    {
+        Creature* pMember = itr.first;
+
+        //Skip one check
+        if (pMember == member)
+        {
+            continue;
+        }
+
+        if (!pMember->IsAlive())
+        {
+            continue;
+        }
+
+        if (pMember->IsInEvadeMode())
+        {
+            continue;
+        }
+
+        if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+        {
+            if (pMember->IsAIEnabled)
+            {
+                if (CreatureAI* pMemberAI = pMember->AI())
+                {
+                    pMemberAI->EnterEvadeMode();
+                }
+            }
+        }
     }
 }
 

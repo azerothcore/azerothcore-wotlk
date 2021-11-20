@@ -35,28 +35,22 @@ class WorldSession;
 class Player;
 
 /// Storage class for commands issued for delayed execution
-struct CliCommandHolder
+struct AC_GAME_API CliCommandHolder
 {
-    typedef void Print(void*, const char*);
-    typedef void CommandFinished(void*, bool success);
+    using Print = void(*)(void*, std::string_view);
+    using CommandFinished = void(*)(void*, bool success);
 
     void* m_callbackArg;
     char* m_command;
-    Print* m_print;
+    Print m_print;
+    CommandFinished m_commandFinished;
 
-    CommandFinished* m_commandFinished;
+    CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished);
+    ~CliCommandHolder();
 
-    CliCommandHolder(void* callbackArg, const char* command, Print* zprint, CommandFinished* commandFinished)
-            : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
-    {
-        // TODO: fix Codacy warning
-        //  "Does not handle strings that are not \0-terminated; if given one it may perform an over-read (it could cause a crash if unprotected) (CWE-126)."
-        size_t len = strlen(command) + 1;
-        m_command = new char[len];
-        memcpy(m_command, command, len);
-    }
-
-    ~CliCommandHolder() { delete[] m_command; }
+private:
+    CliCommandHolder(CliCommandHolder const& right) = delete;
+    CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
 typedef std::unordered_map<uint32, WorldSession*> SessionMap;
@@ -176,6 +170,7 @@ enum WorldBoolConfigs
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     CONFIG_SET_BOP_ITEM_TRADEABLE,
     CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
+    CONFIG_REALM_LOGIN_ENABLED,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -396,6 +391,8 @@ enum WorldIntConfigs
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
     CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
+    CONFIG_LFG_MAX_KICK_COUNT,
+    CONFIG_LFG_KICK_PREVENTION_TIMER,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -488,22 +485,6 @@ enum Rates
     MAX_RATES
 };
 
-// xinef: global storage
-struct GlobalPlayerData
-{
-    ObjectGuid::LowType guidLow;
-    uint32 accountId;
-    std::string name;
-    uint8 race;
-    uint8 playerClass;
-    uint8 gender;
-    uint8 level;
-    uint16 mailCount;
-    uint32 guildId;
-    uint32 groupId;
-    std::map<uint8, uint32> arenaTeamId;
-};
-
 class IWorld
 {
 public:
@@ -585,17 +566,6 @@ public:
     virtual void KickAll() = 0;
     virtual void KickAllLess(AccountTypes sec) = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
-    virtual void LoadGlobalPlayerDataStore() = 0;
-    virtual ObjectGuid GetGlobalPlayerGUID(std::string const& name) const = 0;
-    virtual GlobalPlayerData const* GetGlobalPlayerData(ObjectGuid::LowType guid) const = 0;
-    virtual void AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0) = 0;
-    virtual void UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add = true) = 0;
-    virtual void UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId) = 0;
-    virtual void UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId) = 0;
-    virtual void UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName) = 0;
-    virtual void DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name) = 0;
     virtual void ProcessCliCommands() = 0;
     virtual void QueueCliCommand(CliCommandHolder* commandHolder) = 0;
     virtual void ForceGameEventUpdate() = 0;

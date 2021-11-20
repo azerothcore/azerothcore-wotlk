@@ -439,7 +439,7 @@ struct BroadcastText
     }
 
     uint32 Id{0};
-    uint32 Language{0};
+    uint32 LanguageID{0};
     std::vector<std::string> MaleText;
     std::vector<std::string> FemaleText;
     uint32 EmoteId0{0};
@@ -690,6 +690,10 @@ struct DungeonEncounter
 typedef std::list<DungeonEncounter const*> DungeonEncounterList;
 typedef std::unordered_map<uint32, DungeonEncounterList> DungeonEncounterContainer;
 
+static constexpr uint32 MAX_QUEST_MONEY_REWARDS = 10;
+typedef std::array<uint32, MAX_QUEST_MONEY_REWARDS> QuestMoneyRewardArray;
+typedef std::unordered_map<uint32, QuestMoneyRewardArray> QuestMoneyRewardStore;
+
 class PlayerDumpReader;
 
 class ObjectMgr
@@ -772,12 +776,6 @@ public:
     [[nodiscard]] PlayerInfo const* GetPlayerInfo(uint32 race, uint32 class_) const;
 
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
-
-    [[nodiscard]] ObjectGuid GetPlayerGUIDByName(std::string const& name) const;
-    bool GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const;
-    [[nodiscard]] TeamId GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
     uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId);
     void GetTaxiPath(uint32 source, uint32 destination, uint32& path, uint32& cost);
@@ -915,6 +913,7 @@ public:
     }
 
     void LoadQuests();
+    void LoadQuestMoneyRewards();
     void LoadQuestStartersAndEnders()
     {
         LOG_INFO("server.loading", "Loading GO Start Quest Data...");
@@ -1151,6 +1150,7 @@ public:
             return &itr->second;
         return nullptr;
     }
+    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
@@ -1167,6 +1167,7 @@ public:
         return itr->second;
     }
 
+    GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
@@ -1282,10 +1283,10 @@ public:
         if (itr == _gameTeleStore.end()) return nullptr;
         return &itr->second;
     }
-    [[nodiscard]] GameTele const* GetGameTele(std::string const& name) const;
+    [[nodiscard]] GameTele const* GetGameTele(std::string_view name) const;
     [[nodiscard]] GameTeleContainer const& GetGameTeleMap() const { return _gameTeleStore; }
     bool AddGameTele(GameTele& data);
-    bool DeleteGameTele(std::string const& name);
+    bool DeleteGameTele(std::string_view name);
 
     [[nodiscard]] TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
     {
@@ -1312,7 +1313,7 @@ public:
     void LoadScriptNames();
     ScriptNameContainer& GetScriptNames() { return _scriptNamesStore; }
     [[nodiscard]] std::string const& GetScriptName(uint32 id) const;
-    uint32 GetScriptId(const char* name);
+    uint32 GetScriptId(std::string const& name);
 
     [[nodiscard]] SpellClickInfoMapBounds GetSpellClickInfoMapBounds(uint32 creature_id) const
     {
@@ -1339,6 +1340,13 @@ public:
     }
 
     static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
+    static std::string_view GetLocaleString(std::vector<std::string> const& data, size_t locale)
+    {
+        if (locale < data.size())
+            return data[locale];
+        else
+            return {};
+    }
     static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
         if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
@@ -1360,6 +1368,8 @@ public:
     void LoadFactionChangeTitles();
 
     [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
+
+    [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
 
 private:
     // first free id for selected id type
@@ -1523,6 +1533,8 @@ private:
     };
 
     std::set<uint32> _transportMaps; // Helper container storing map ids that are for transports only, loaded from gameobject_template
+
+    QuestMoneyRewardStore _questMoneyRewards;
 };
 
 #define sObjectMgr ObjectMgr::instance()
