@@ -7445,7 +7445,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Mortal Shots
     ApplySpellFix({ 19485, 19487, 19488, 19489, 19490 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectSpellClassMask[EFFECT_0] |= 0x00004000;
+        spellInfo->EffectSpellClassMask[EFFECT_0][EFFECT_0] |= 0x00004000;
         spellInfo->Effect[EFFECT_1] = 0;
     });
 
