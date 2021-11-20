@@ -221,6 +221,7 @@ public:
         {
             Bomb_Timer = 2000;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->AddUnitState(UNIT_STATE_ROOT);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -232,16 +233,25 @@ public:
 
             if (Bomb_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                std::list<Unit*> targets;
+                SelectTargetList(targets, 1, SELECT_TARGET_RANDOM, 500.0f, true);
+                if (!targets.empty())
                 {
-                    DoCast(target, SPELL_BOMB);
-                    Bomb_Timer = 5000;
+                    if (targets.size() > 1)
+                    {
+                        targets.resize(1);
+                    }
                 }
+
+                for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                {
+                    me->CastSpell((*itr), SPELL_BOMB);
+                }
+
+                Bomb_Timer = 7000;
             }
             else
                 Bomb_Timer -= diff;
-
-            DoMeleeAttackIfReady();
         }
     };
 
