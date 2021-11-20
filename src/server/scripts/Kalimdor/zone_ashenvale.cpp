@@ -29,7 +29,6 @@ EndScriptData */
 
 enum Muglash
 {
-    FACTION_QUEST           = 113,
     SAY_MUG_START1          = 0,
     SAY_MUG_START2          = 1,
     SAY_MUG_BRAZIER         = 2,
@@ -117,7 +116,7 @@ public:
             if (quest->GetQuestId() == QUEST_VORSHA)
             {
                 Talk(SAY_MUG_START1);
-                me->setFaction(FACTION_QUEST);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                 npc_escortAI::Start(true, false, player->GetGUID());
             }
         }

@@ -215,8 +215,7 @@ public:
             if (!sindragosa->IsAlive())
                 return true;
 
-            Position pos;
-            _owner->GetPosition(&pos);
+            Position pos = _owner->GetPosition();
             _owner->UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
 
             if (TempSummon* summon = sindragosa->SummonCreature(NPC_ICE_TOMB, pos))
@@ -294,7 +293,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -366,7 +364,6 @@ public:
             instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -407,7 +404,6 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
@@ -434,7 +430,6 @@ public:
             {
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
-                    me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
@@ -462,7 +457,6 @@ public:
                 case POINT_LAND_GROUND:
                     {
                         _isInAirPhase = false;
-                        me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
@@ -612,9 +606,7 @@ public:
                     me->AttackStop();
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
-                    me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
                     events.ScheduleEvent(EVENT_AIR_PHASE, 110000);
@@ -855,7 +847,7 @@ public:
 
             uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
 
-            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
             damageInfo.damage = damage;
             GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
             GetCaster()->DealSpellDamage(&damageInfo, false);
@@ -954,7 +946,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -1402,7 +1394,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -1412,7 +1403,6 @@ public:
             ScriptedAI::JustReachedHome();
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -1456,7 +1446,6 @@ public:
                 return;
 
             me->setActive(false);
-            me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
@@ -1536,7 +1525,6 @@ public:
 
             if (!_summoned)
             {
-                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
         }
@@ -1546,7 +1534,6 @@ public:
             ScriptedAI::JustReachedHome();
             if (_summoned)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
             }
         }
@@ -1592,7 +1579,6 @@ public:
             if (point == POINT_FROSTWYRM_LAND)
             {
                 me->setActive(false);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
@@ -1600,7 +1586,6 @@ public:
             }
             else if (point == POINT_LAND_GROUND)
             {
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetReactState(REACT_DEFENSIVE);
                 if (Unit* victim = me->SelectVictim())
@@ -1644,9 +1629,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
 
                         me->AttackStop();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;

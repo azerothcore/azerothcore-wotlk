@@ -268,8 +268,7 @@ public:
                     break;
             }
 
-            Position pos;
-            rift->GetNearPosition(pos, 10.0f, 2 * M_PI * rand_norm());
+            Position pos = rift->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
             if (TempSummon* summon = instance->SummonCreature(abs(entry), pos))
             {

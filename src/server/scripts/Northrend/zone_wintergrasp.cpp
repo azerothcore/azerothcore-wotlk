@@ -755,8 +755,8 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((go->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
-                    (go->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
+            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
+                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
         }
 
         Creature* IsValidVehicle(Creature* cVeh)
@@ -765,7 +765,7 @@ public:
                 if (Vehicle* vehicle = cVeh->GetVehicleKit())
                     if (Unit* passenger = vehicle->GetPassenger(0))
                         if (IsFriendly(passenger))
-                            if (Creature* teleportTrigger = passenger->SummonTrigger(go->GetPositionX() - 60.0f, go->GetPositionY(), go->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1000))
+                            if (Creature* teleportTrigger = passenger->SummonTrigger(me->GetPositionX() - 60.0f, me->GetPositionY(), me->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1000))
                                 return teleportTrigger;
 
             return nullptr;
@@ -777,7 +777,7 @@ public:
             if (_checkTimer >= 1000)
             {
                 for (uint8 i = 0; i < MAX_WINTERGRASP_VEHICLES; i++)
-                    if (Creature* vehicleCreature = go->FindNearestCreature(vehiclesList[i], 3.0f, true))
+                    if (Creature* vehicleCreature = me->FindNearestCreature(vehiclesList[i], 3.0f, true))
                         if (Creature* teleportTrigger = IsValidVehicle(vehicleCreature))
                             teleportTrigger->CastSpell(vehicleCreature, SPELL_VEHICLE_TELEPORT, true);
 

@@ -173,7 +173,6 @@ enum deathsChallenge
     SAY_DUEL                    = 0,
 
     QUEST_DEATH_CHALLENGE       = 12733,
-    FACTION_HOSTILE             = 2068,
 
     DATA_IN_PROGRESS            = 0,
 
@@ -337,7 +336,7 @@ public:
                     Talk(SAY_DUEL + 4, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+5:
-                    me->setFaction(FACTION_HOSTILE);
+                    me->SetFaction(FACTION_UNDEAD_SCOURGE_2);
                     if (Player* player = ObjectAccessor::GetPlayer(*me, _duelGUID))
                         AttackStart(player);
                     return;
@@ -723,7 +722,7 @@ public:
             anchorGUID.Clear();
             phase = PHASE_CHAINED;
             events.Reset();
-            me->setFaction(7);
+            me->SetFaction(FACTION_CREATURE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
@@ -825,7 +824,7 @@ public:
                             wait_timer -= diff;
                         else
                         {
-                            me->setFaction(14);
+                            me->SetFaction(FACTION_MONSTER);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                             phase = PHASE_ATTACKING;
 
@@ -947,7 +946,7 @@ public:
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
 
@@ -970,7 +969,7 @@ public:
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
                 me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -1080,7 +1079,7 @@ public:
                         me->SetFacingToObject(car);
                         // xinef: add some flags
                         car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                        car->setFaction(35);
+                        car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);
                     SetRun(true);

@@ -24,6 +24,7 @@ Category: Zul'Gurub
 
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "Player.h"
 #include "zulgurub.h"
 
 enum Says
@@ -175,7 +176,35 @@ public:
     }
 };
 
+class at_zulgurub_entrance_speech : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_zulgurub_entrance_speech() : OnlyOnceAreaTriggerScript("at_zulgurub_entrance_speech") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            // Instance map's enormous, Hakkar's GRID is not loaded by the time players enter.
+            // Without this, the creature never says anything, because it doesn't load in time.
+            player->GetMap()->LoadGrid(-11783.99f, -1655.27f);
+
+            if (Creature* hakkar = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_HAKKAR)))
+            {
+                hakkar->setActive(true);
+                if (hakkar->GetAI())
+                {
+                    hakkar->AI()->Talk(SAY_PROTECT_ALTAR);
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+};
+
 void AddSC_boss_hakkar()
 {
     new boss_hakkar();
+    new at_zulgurub_entrance_speech();
 }
