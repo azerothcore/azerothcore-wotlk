@@ -513,6 +513,7 @@ public:
             // Achievement criteria updates correctly after the next time a quest is rewarded.
             // Titles are already awarded correctly the next time they login (only one quest awards title - 11549).
             // Rewarded talent points (Death Knights) and spells (e.g Druid forms) are also granted on login.
+            // No reputation gains - too troublesome to calculate them when the player is offline.
 
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
             uint8 charLevel = sCharacterCache->GetCharacterLevelByGuid(ObjectGuid(HighGuid::Player, guid));
@@ -667,6 +668,14 @@ public:
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE);
                 stmt->setUInt32(0, honor);
+                stmt->setUInt32(1, guid);
+                trans->Append(stmt);
+            }
+
+            if (quest->GetRewArenaPoints())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS_ACCUMULATIVE);
+                stmt->setUInt32(0, quest->GetRewArenaPoints());
                 stmt->setUInt32(1, guid);
                 trans->Append(stmt);
             }
