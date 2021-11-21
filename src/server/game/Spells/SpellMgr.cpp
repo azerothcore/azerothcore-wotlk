@@ -1480,9 +1480,13 @@ void SpellMgr::LoadSpellLearnSkills()
                     dbc_node.skill = entry->Effects[i].MiscValue;
                     dbc_node.step  = entry->Effects[i].CalcValue();
                     if (dbc_node.skill != SKILL_RIDING)
+                    {
                         dbc_node.value = 1;
+                    }
                     else
+                    {
                         dbc_node.value = dbc_node.step * 75;
+                    }
                     dbc_node.maxvalue = dbc_node.step * 75;
                     break;
                 case SPELL_EFFECT_DUAL_WIELD:
