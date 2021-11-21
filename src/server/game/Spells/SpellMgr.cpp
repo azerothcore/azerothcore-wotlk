@@ -7476,12 +7476,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
     });
 
-    // Panic
-    ApplySpellFix({ 19408 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_30_YARDS;
-    });
-
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
