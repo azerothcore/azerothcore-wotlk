@@ -186,6 +186,9 @@ void CreatureAI::TriggerAlert(Unit const* who) const
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
         return;
+    // Only alert if target is within line of sight
+    if (!me->IsWithinLOSInMap(who))
+        return;
     // Send alert sound (if any) for this creature
     me->SendAIReaction(AI_REACTION_ALERT);
     // Face the unit (stealthed player) and set distracted state for 5 seconds
