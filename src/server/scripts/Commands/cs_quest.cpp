@@ -510,7 +510,7 @@ public:
         }
         else
         {
-            // Achievement criteria updates correctly after the next time a quest is rewarded.
+            // Achievement criteria updates correctly the next time a quest is rewarded.
             // Titles are already awarded correctly the next time they login (only one quest awards title - 11549).
             // Rewarded talent points (Death Knights) and spells (e.g Druid forms) are also granted on login.
             // No reputation gains - too troublesome to calculate them when the player is offline.
