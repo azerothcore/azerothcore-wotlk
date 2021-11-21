@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "AccountMgr.h"
 #include "Cell.h"
@@ -1757,8 +1770,7 @@ public:
         {
             if (spell->Id == 71306 && c->GetTypeId() == TYPEID_UNIT) // Twisted Winds
             {
-                Position myPos;
-                me->GetPosition(&myPos);
+                Position myPos = me->GetPosition();
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
                 const ThreatContainer::StorageType me_tl = me->getThreatMgr().getThreatList();
@@ -2168,9 +2180,7 @@ public:
             if (!caster)
                 return;
 
-            Position pos;
-            caster->GetPosition(&pos);
-            caster->GetNearPosition(pos, 5.0f, 0.0f);
+            Position pos = caster->GetNearPosition(5.0f, 0.0f);
             pos.m_positionZ = caster->GetMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
             pos.m_positionZ += 0.1f;
             caster->SendMeleeAttackStop(caster->GetVictim());
@@ -3201,8 +3211,7 @@ public:
 
             if (currPipeWP != VENGEFUL_WP_COUNT)
             {
-                Position pos;
-                who->GetPosition(&pos);
+                Position pos = who->GetPosition();
                 float angle = who->GetAngle(me);
                 float dist = 3.0f;
                 pos.m_positionX += cos(angle) * dist;

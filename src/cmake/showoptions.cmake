@@ -1,3 +1,15 @@
+#
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+
 # output generic information about the core and buildtype chosen
 message("")
 message("* AzerothCore revision            : ${rev_hash} ${rev_date} (${rev_branch} branch)")
@@ -142,6 +154,18 @@ if(WITH_STRICT_DATABASE_TYPE_CHECKS)
   message(" *** invalid calls will result in returning value 0")
   message(" *** NOT COMPATIBLE WITH MARIADB!")
   add_definitions(-DACORE_STRICT_DATABASE_TYPE_CHECKS)
+endif()
+
+if(WITHOUT_METRICS)
+  message("")
+  message(" *** WITHOUT_METRICS - WARNING!")
+  message(" *** Please note that this will disable all metrics output (i.e. InfluxDB and Grafana)")
+  add_definitions(-DWITHOUT_METRICS)
+elseif (WITH_DETAILED_METRICS)
+  message("")
+  message(" *** WITH_DETAILED_METRICS - WARNING!")
+  message(" *** Please note that this will enable detailed metrics output (i.e. time each session takes to update)")
+  add_definitions(-DWITH_DETAILED_METRICS)
 endif()
 
 if(BUILD_SHARED_LIBS)

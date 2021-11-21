@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
@@ -135,11 +148,11 @@ public:
             if( damage >= me->GetHealth() )
             {
                 damage = me->GetHealth() - 1;
-                if( me->getFaction() != 35 )
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(TEXT_EADRIC_DEATH);
                     me->getThreatMgr().clearReferences();
@@ -168,7 +181,7 @@ public:
                     break;
                 case EVENT_SPELL_RADIANCE:
                     me->CastSpell((Unit*)nullptr, SPELL_RADIANCE, false);
-                    me->MonsterTextEmote(TEXT_RADIATE, 0, true);
+                    me->TextEmote(TEXT_RADIATE, nullptr, true);
                     events.RepeatEvent(16000);
                     break;
                 case EVENT_SPELL_HAMMER_RIGHTEOUS:
@@ -176,7 +189,7 @@ public:
                     {
                         char buffer[100];
                         sprintf(buffer, "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
-                        me->MonsterTextEmote(buffer, 0, true);
+                        me->TextEmote(buffer, nullptr, true);
                         Talk(TEXT_EADRIC_HAMMER);
                         me->CastSpell(target, SPELL_HAMMER_JUSTICE, true);
                         me->CastSpell(target, SPELL_HAMMER_RIGHTEOUS, false);
@@ -283,10 +296,10 @@ public:
             {
                 damage = me->GetHealth() - 1;
 
-                if( me->getFaction() != 35 )
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68574, true); // achievements
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(TEXT_PALETRESS_DEATH);
                     me->getThreatMgr().clearReferences();

@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "culling_of_stratholme.h"
 #include "PassiveAI.h"
@@ -553,7 +566,7 @@ public:
                 case 11:
                     if (Creature* cityman = GetEventNpc(NPC_CITY_MAN2))
                     {
-                        cityman->MonsterSay("Oh no...", LANG_UNIVERSAL, 0); // missing script_text
+                        cityman->Say("Oh no...", LANG_UNIVERSAL); // missing script_text
                         me->CastSpell(cityman, SPELL_ARTHAS_CRUSADER_STRIKE, true);
                     }
                     me->SetReactState(REACT_DEFENSIVE);
@@ -1013,7 +1026,7 @@ public:
                         }
 
                         summons.DespawnAll();
-                        me->MonsterSay("I can't afford to spare you.", LANG_UNIVERSAL, 0);
+                        me->Say("I can't afford to spare you.", LANG_UNIVERSAL);
                         me->SetFacingTo(0.0f);
                         ScheduleNextEvent(currentEvent, 5000);
                         break;
@@ -1391,6 +1404,7 @@ enum chromie
     ITEM_ARCANE_DISRUPTOR               = 37888,
     QUEST_DISPELLING_ILLUSIONS          = 13149,
     QUEST_A_ROYAL_ESCORT                = 13151,
+    SPELL_SUMMON_ARCANE_DISRUPTOR       = 49591
 };
 
 class npc_cos_chromie_start : public CreatureScript
@@ -1398,44 +1412,66 @@ class npc_cos_chromie_start : public CreatureScript
 public:
     npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest) override
+    struct npc_cos_chromie_startAI : public ScriptedAI
     {
-        if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
-                pInstance->SetData(DATA_SHOW_CRATES, 1);
+        npc_cos_chromie_startAI(Creature* creature) : ScriptedAI(creature) {}
 
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
-    {
-        // final menu id, show crates if hidden and add item if missing
-        if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
+        bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest)
         {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
-                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
-                    pInstance->SetData(DATA_SHOW_CRATES, 1);
-
-            if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
-                player->AddItem(ITEM_ARCANE_DISRUPTOR, 1);
-        }
-        // Skip Event
-        else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
-        {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
+            if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
             {
-                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                if (InstanceScript* pInstance = creature->GetInstanceScript())
                 {
-                    pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
-                    if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetGuidData(DATA_ARTHAS)))
-                        arthas->AI()->Reset();
+                    pInstance->SetData(DATA_SHOW_CRATES, 1);
                 }
-                player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
             }
+
+            return true;
         }
 
-        // return false to display last windows
-        return false;
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+        {
+            // final menu id, show crates if hidden and add item if missing
+            if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
+            {
+                if (InstanceScript* pInstance = creature->GetInstanceScript())
+                {
+                    if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                    {
+                        pInstance->SetData(DATA_SHOW_CRATES, 1);
+                    }
+                }
+
+                if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
+                {
+                    me->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+                }
+            }
+            // Skip Event
+            else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
+            {
+                if (InstanceScript* pInstance = creature->GetInstanceScript())
+                {
+                    if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                    {
+                        pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetGuidData(DATA_ARTHAS)))
+                        {
+                            arthas->AI()->Reset();
+                        }
+                    }
+                    player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
+                }
+            }
+
+            // return false to display last windows
+            return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetCullingOfStratholmeAI<npc_cos_chromie_startAI>(creature);
     }
 };
 

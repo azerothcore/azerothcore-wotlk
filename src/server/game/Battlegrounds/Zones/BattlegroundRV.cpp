@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battleground.h"
@@ -13,6 +24,11 @@
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+
+static constexpr Milliseconds BG_RV_PILLAR_SWITCH_TIMER  = 25s;
+static constexpr Milliseconds BG_RV_FIRE_TO_PILLAR_TIMER = 20s;
+static constexpr Milliseconds BG_RV_CLOSE_FIRE_TIMER     = 5s;
+static constexpr Milliseconds BG_RV_FIRST_TIMER          = 20500ms; // elevators rise in 20133ms
 
 BattlegroundRV::BattlegroundRV()
 {
@@ -61,14 +77,14 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    if (getTimer() < diff)
+    if (GetTimer() < Milliseconds(diff))
     {
         switch (getState())
         {
             case BG_RV_STATE_OPEN_FENCES:
                 for (uint8 i = BG_RV_OBJECT_FIRE_1; i <= BG_RV_OBJECT_FIREDOOR_2; ++i)
                     DoorOpen(i);
-                setTimer(BG_RV_CLOSE_FIRE_TIMER);
+                SetTimer(BG_RV_CLOSE_FIRE_TIMER);
                 setState(BG_RV_STATE_CLOSE_FIRE);
 
                 for (auto itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -117,17 +133,17 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                 for (uint8 i = BG_RV_OBJECT_FIRE_1; i <= BG_RV_OBJECT_FIREDOOR_2; ++i)
                     DoorClose(i);
                 // Fire got closed after five seconds, leaves twenty seconds before toggling pillars
-                setTimer(BG_RV_FIRE_TO_PILLAR_TIMER);
+                SetTimer(BG_RV_FIRE_TO_PILLAR_TIMER);
                 setState(BG_RV_STATE_SWITCH_PILLARS);
                 break;
             case BG_RV_STATE_SWITCH_PILLARS:
                 UpdatePillars();
-                setTimer(BG_RV_PILLAR_SWITCH_TIMER);
+                SetTimer(BG_RV_PILLAR_SWITCH_TIMER);
                 break;
         }
     }
     else
-        setTimer(getTimer() - diff);
+        SetTimer(GetTimer() - Milliseconds(diff));
 
     if (getState() == BG_RV_STATE_OPEN_FENCES)
         return;
@@ -162,7 +178,7 @@ void BattlegroundRV::StartingEventOpenDoors()
     DoorOpen(BG_RV_OBJECT_ELEVATOR_2);
 
     setState(BG_RV_STATE_OPEN_FENCES);
-    setTimer(BG_RV_FIRST_TIMER);
+    SetTimer(BG_RV_FIRST_TIMER);
 }
 
 void BattlegroundRV::AddPlayer(Player* player)

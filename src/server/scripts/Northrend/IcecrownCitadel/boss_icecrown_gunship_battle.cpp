@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureTextMgr.h"
 #include "icecrown_citadel.h"
@@ -156,6 +169,7 @@ enum Spells
     SPELL_ON_ORGRIMS_HAMMER_DECK            = 70121,
 
     // Rocket Pack
+    SPELL_CREATE_ROCKET_PACK                = 70055,
     SPELL_ROCKET_PACK_DAMAGE                = 69193,
     SPELL_ROCKET_BURST                      = 69192,
     SPELL_ROCKET_PACK_USEABLE               = 70348,
@@ -1410,7 +1424,7 @@ public:
 
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
-            player->AddItem(ITEM_GOBLIN_ROCKET_PACK, 1);
+            me->CastSpell(player, SPELL_CREATE_ROCKET_PACK);
             player->PlayerTalkClass->SendCloseGossip();
         }
     };
@@ -2415,8 +2429,7 @@ public:
             if (!si)
                 return;
             SpellCastTargets targets;
-            Position dest;
-            GetExplTargetDest()->GetPosition(&dest);
+            Position dest = GetExplTargetDest()->GetPosition();
             targets.SetDst(dest);
             CustomSpellValues values;
             int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;

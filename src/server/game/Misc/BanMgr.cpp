@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -89,7 +102,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
 
     uint32 DurationSecs = TimeStringToSecs(Duration);
 
-    uint32 AccountID = sObjectMgr->GetPlayerAccountIdByPlayerName(CharacterName);
+    uint32 AccountID = sCharacterCache->GetCharacterAccountIdByName(CharacterName);
     if (!AccountID)
         return BAN_NOTFOUND;
 
@@ -215,7 +228,7 @@ BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string con
     /// Pick a player to ban if not online
     if (!target)
     {
-        TargetGUID = sWorld->GetGlobalPlayerGUID(CharacterName);
+        TargetGUID = sCharacterCache->GetCharacterGuidByName(CharacterName);
         if (!TargetGUID)
             return BAN_NOTFOUND;
     }
@@ -271,7 +284,7 @@ bool BanMgr::RemoveBanAccount(std::string const& AccountName)
 /// Remove a ban from an player name
 bool BanMgr::RemoveBanAccountByPlayerName(std::string const& CharacterName)
 {
-    uint32 AccountID = sObjectMgr->GetPlayerAccountIdByPlayerName(CharacterName);
+    uint32 AccountID = sCharacterCache->GetCharacterAccountIdByName(CharacterName);
     if (!AccountID)
         return false;
 
@@ -301,7 +314,7 @@ bool BanMgr::RemoveBanCharacter(std::string const& CharacterName)
 
     /// Pick a player to ban if not online
     if (!pBanned)
-        guid = sWorld->GetGlobalPlayerGUID(CharacterName);
+        guid = sCharacterCache->GetCharacterGuidByName(CharacterName);
     else
         guid = pBanned->GetGUID();
 
