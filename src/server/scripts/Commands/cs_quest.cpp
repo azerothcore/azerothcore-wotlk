@@ -323,7 +323,7 @@ public:
             }
 
             // If the quest requires money
-            int32 ReqOrRewMoney = quest->GetRewOrReqMoney(player);
+            int32 ReqOrRewMoney = quest->GetRewOrReqMoney(player->getLevel());
             if (ReqOrRewMoney < 0)
             {
                 player->ModifyMoney(-ReqOrRewMoney);
@@ -338,7 +338,7 @@ public:
 
             if (!result)
             {
-                handler->PSendSysMessage("The selected player does not have this quest active.");
+                handler->PSendSysMessage("Quest not found in quest log.");
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -402,7 +402,7 @@ public:
 
             trans->Append(stmt);
 
-            // If the quest requires reputation to complete
+            // If the quest requires reputation to complete, set the player rep to the required amount.
             if (uint32 repFaction = quest->GetRepObjectiveFaction())
             {
                 uint32 repValue = quest->GetRepObjectiveValue();
@@ -432,7 +432,7 @@ public:
                 }
             }
 
-            // If the quest requires another reputation to complete
+            // If the quest requires reputation to complete, set the player rep to the required amount.
             if (uint32 repFaction = quest->GetRepObjectiveFaction2())
             {
                 uint32 repValue = quest->GetRepObjectiveValue();
@@ -510,7 +510,208 @@ public:
         }
         else
         {
+            // Achievement criteria updates correctly after the next time a quest is rewarded.
+            // Titles are already awarded correctly the next time they login (only one quest awards title - 11549).
+            // Rewarded talent points (Death Knights) and spells (e.g Druid forms) are also granted on login.
 
+            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            uint8 charLevel = sCharacterCache->GetCharacterLevelByGuid(ObjectGuid(HighGuid::Player, guid));
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabasePreparedStatement* stmt;
+
+            QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM character_queststatus WHERE guid = %u AND quest = %u AND status = 1", guid, entry);
+
+            if (!result)
+            {
+                handler->PSendSysMessage("The quest must be active and complete before rewarding.");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            for (uint32 const& requiredItem : quest->RequiredItemId)
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
+                stmt->setUInt32(0, requiredItem);
+                stmt->setUInt32(1, guid);
+
+                PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    trans->Append(stmt);
+                }
+            }
+
+            for (uint32 const& sourceItem : quest->ItemDrop)
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
+                stmt->setUInt32(0, sourceItem);
+                stmt->setUInt32(1, guid);
+
+                PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    trans->Append(stmt);
+                }
+            }
+
+            typedef std::pair<uint32, uint32> items;
+            std::vector<items> questRewardItems;
+
+            if (quest->GetRewChoiceItemsCount())
+            {
+                for (uint32 const& itemId : quest->RewardChoiceItemId)
+                {
+                    uint8 index = 0;
+                    questRewardItems.push_back(std::pair(itemId, quest->RewardChoiceItemCount[index++]));
+                }
+            }
+
+            if (quest->GetRewItemsCount())
+            {
+                for (uint32 const& itemId : quest->RewardItemId)
+                {
+                    uint8 index = 0;
+                    questRewardItems.push_back(std::pair(itemId, quest->RewardItemIdCount[index++]));
+                }
+            }
+
+            if (!questRewardItems.empty())
+            {
+                MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
+                // fill mail
+                MailDraft draft(quest->GetTitle(), "This quest has been manually rewarded to you. This mail contains your quest rewards.");
+
+                for (auto itr : questRewardItems)
+                {
+                    if (!itr.first || !itr.second)
+                    {
+                        continue;
+                    }
+
+                    // Skip invalid items.
+                    if (!sObjectMgr->GetItemTemplate(itr.first))
+                    {
+                        continue;
+                    }
+
+                    if (Item* item = Item::CreateItem(itr.first, itr.second))
+                    {
+                        item->SaveToDB(trans);
+                        draft.AddItem(item);
+                    }
+                }
+
+                draft.SendMailTo(trans, MailReceiver(nullptr, guid), sender);
+            }
+
+            // Send quest giver mail, if any.
+            if (uint32 mail_template_id = quest->GetRewMailTemplateId())
+            {
+                if (quest->GetRewMailSenderEntry() != 0)
+                {
+                    MailDraft(mail_template_id).SendMailTo(trans, MailReceiver(nullptr, guid), quest->GetRewMailSenderEntry(), MAIL_CHECK_MASK_HAS_BODY, quest->GetRewMailDelaySecs());
+                }
+            }
+
+            if (quest->IsDaily() || quest->IsDFQuest())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
+                stmt->setUInt32(0, guid);
+                stmt->setUInt32(1, entry);
+                stmt->setUInt64(2, time(nullptr));
+                trans->Append(stmt);
+            }
+            else if (quest->IsWeekly())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_WEEKLYQUESTSTATUS);
+                stmt->setUInt32(0, guid);
+                stmt->setUInt32(1, entry);
+                trans->Append(stmt);
+            }
+            else if (quest->IsMonthly())
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_MONTHLYQUESTSTATUS);
+                stmt->setUInt32(0, guid);
+                stmt->setUInt32(1, entry);
+                trans->Append(stmt);
+            }
+            else if (quest->IsSeasonal())
+            {
+                // We can't know which event is the quest linked to, so we can't do anything about this.
+                /* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SEASONALQUESTSTATUS);
+                stmt->setUInt32(0, guid);
+                stmt->setUInt32(1, entry);
+                stmt->setUInt32(2, event_id);
+                trans->Append(stmt);*/
+            }
+
+            if (uint32 honor = quest->CalculateHonorGain(charLevel))
+            {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE);
+                stmt->setUInt32(0, honor);
+                stmt->setUInt32(1, guid);
+                trans->Append(stmt);
+            }
+
+            int32 rewMoney = 0;
+
+            if (charLevel >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            {
+                rewMoney = quest->GetRewMoneyMaxLevel();
+            }
+            else
+            {
+                // Some experience might get lost on level up.
+                uint32 xp = uint32(quest->XPValue(charLevel) * sWorld->getRate(RATE_XP_QUEST));
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_XP_ACCUMULATIVE);
+                stmt->setUInt32(0, xp);
+                stmt->setUInt32(1, guid);
+                trans->Append(stmt);
+            }
+
+            if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(charLevel))
+            {
+                rewMoney += rewOrReqMoney;
+            }
+
+            // Only reward money, don't subtract, let's not cause an overflow...
+            if (rewMoney > 0)
+            {
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_MONEY_ACCUMULATIVE);
+                stmt->setUInt32(0, rewMoney);
+                stmt->setUInt32(1, guid);
+                trans->Append(stmt);
+            }
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_QUESTSTATUS_REWARDED);
+            stmt->setUInt32(0, guid);
+            stmt->setUInt32(1, entry);
+            trans->Append(stmt);
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
+            stmt->setUInt32(0, guid);
+            stmt->setUInt32(1, entry);
+            trans->Append(stmt);
+
+            CharacterDatabase.CommitTransaction(trans);
         }
 
         return true;
