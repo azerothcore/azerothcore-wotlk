@@ -1114,7 +1114,8 @@ enum AcoreStrings
     LANG_CMDPARSER_ITEM_NO_EXIST          = 1513,
     LANG_CMDPARSER_SPELL_NO_EXIST         = 1514,
     LANG_CMDPARSER_EXACT_SEQ_MISMATCH     = 1515,
-    // FREE IDS                             1516-1499
+    LANG_CMDPARSER_QUEST_NO_EXIST         = 1516,
+    // FREE IDS                             1517-1499
 
     // Ticket Strings 2000-2030
     LANG_COMMAND_TICKETNEW              = 2000,

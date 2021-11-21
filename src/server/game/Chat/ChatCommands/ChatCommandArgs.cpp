@@ -136,7 +136,7 @@ ChatCommandResult Acore::Impl::ChatCommands::ArgInfo<Quest const*>::TryConsume(Q
 
     if (uint32* id = std::get_if<uint32>(&val))
     {
-        return FormatAcoreString(handler, LANG_CMDPARSER_SPELL_NO_EXIST, *id);
+        return FormatAcoreString(handler, LANG_CMDPARSER_QUEST_NO_EXIST, *id);
     }
 
     return std::nullopt;
