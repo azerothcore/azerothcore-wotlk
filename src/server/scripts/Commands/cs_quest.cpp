@@ -176,7 +176,7 @@ public:
             }
 
             player->RemoveRewardedQuest(entry);
-            player->RemoveActiveQuest(entry, false); 
+            player->RemoveActiveQuest(entry, false);
         }
         else
         {
