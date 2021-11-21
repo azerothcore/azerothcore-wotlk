@@ -2519,7 +2519,7 @@ public:
     bool SetFeatherFall(bool apply, bool packetOnly = false) override;
     bool SetHover(bool enable, bool packetOnly = false) override;
 
-    [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
+    [[nodiscard]] bool CanFly() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
 
     // OURS

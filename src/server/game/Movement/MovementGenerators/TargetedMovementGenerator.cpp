@@ -189,7 +189,18 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     bool walk = false;
     if (cOwner && !cOwner->IsPet())
     {
-        walk = owner->IsWalking();
+        switch (cOwner->GetMovementTemplate().GetChase())
+        {
+        case CreatureChaseMovementType::CanWalk:
+            if (owner->IsWalking())
+                walk = true;
+            break;
+        case CreatureChaseMovementType::AlwaysWalk:
+            walk = true;
+            break;
+        default:
+            break;
+        }
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE_MOVE);

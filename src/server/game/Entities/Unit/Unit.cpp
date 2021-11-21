@@ -15983,7 +15983,6 @@ void Unit::SendPetAIReaction(ObjectGuid guid)
 }
 
 ///----------End of Pet responses methods----------
-
 void Unit::StopMoving()
 {
     ClearUnitState(UNIT_STATE_MOVING);
