@@ -21,6 +21,7 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "DBCStores.h"
 #include "Spell.h"
 #include "SpellMgr.h"
 #include "Unit.h"
