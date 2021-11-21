@@ -1564,9 +1564,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Instance Template...");
     sObjectMgr->LoadInstanceTemplate();
 
-    // xinef: Global Storage, should be loaded asap
-    LOG_INFO("server.loading", "Load Global Player Data...");
-    sWorld->LoadGlobalPlayerDataStore();
+    LOG_INFO("server.loading", "Load Character Cache...");
+    sCharacterCache->LoadCharacterCacheStorage();
 
     // Must be called before `creature_respawn`/`gameobject_respawn` tables
     LOG_INFO("server.loading", "Loading instances...");
@@ -2713,7 +2712,7 @@ void World::_UpdateGameTime()
 }
 
 /// Shutdown the server
-void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
+void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason)
 {
     // ignore if server shutdown at next tick
     if (IsStopped())
@@ -2734,14 +2733,14 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
     else
     {
         m_ShutdownTimer = time;
-        ShutdownMsg(true);
+        ShutdownMsg(true, nullptr, reason);
     }
 
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
 /// Display a shutdown message to the user(s)
-void World::ShutdownMsg(bool show, Player* player)
+void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
 {
     // not show messages for idle shutdown mode
     if (m_ShutdownMask & SHUTDOWN_MASK_IDLE)
@@ -2756,6 +2755,11 @@ void World::ShutdownMsg(bool show, Player* player)
             (m_ShutdownTimer > 12 * HOUR && (m_ShutdownTimer % (12 * HOUR)) == 0)) // > 12 h ; every 12 h
     {
         std::string str = secsToTimeString(m_ShutdownTimer).append(".");
+
+        if (!reason.empty())
+        {
+            str += " - " + reason;
+        }
 
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
@@ -3332,260 +3336,6 @@ uint64 World::getWorldState(uint32 index) const
 void World::ProcessQueryCallbacks()
 {
     _queryProcessor.ProcessReadyCallbacks();
-}
-
-void World::LoadGlobalPlayerDataStore()
-{
-    uint32 oldMSTime = getMSTime();
-
-    _globalPlayerDataStore.clear();
-    QueryResult result = CharacterDatabase.Query("SELECT guid, account, name, gender, race, class, level FROM characters WHERE deleteDate IS NULL");
-    if (!result)
-    {
-        LOG_INFO("server.loading", ">> Loaded 0 Players data.");
-        return;
-    }
-
-    uint32 count = 0;
-
-    // query to load number of mails by receiver
-    std::map<uint32, uint16> _mailCountMap;
-    QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail GROUP BY receiver");
-    if (mailCountResult)
-    {
-        do
-        {
-            Field* fields = mailCountResult->Fetch();
-            _mailCountMap[fields[0].GetUInt32()] = uint16(fields[1].GetUInt64());
-        } while (mailCountResult->NextRow());
-    }
-
-    do
-    {
-        Field* fields = result->Fetch();
-        ObjectGuid::LowType guidLow = fields[0].GetUInt32();
-
-        // count mails
-        uint16 mailCount = 0;
-        std::map<uint32, uint16>::const_iterator itr = _mailCountMap.find(guidLow);
-        if (itr != _mailCountMap.end())
-            mailCount = itr->second;
-
-        AddGlobalPlayerData(
-            guidLow,               /*guid*/
-            fields[1].GetUInt32(), /*accountId*/
-            fields[2].GetString(), /*name*/
-            fields[3].GetUInt8(),  /*gender*/
-            fields[4].GetUInt8(),  /*race*/
-            fields[5].GetUInt8(),  /*class*/
-            fields[6].GetUInt8(),  /*level*/
-            mailCount,             /*mail count*/
-            0                      /*guild id*/);
-
-        ++count;
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded %d Players data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
-}
-
-void World::AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)
-{
-    GlobalPlayerData data;
-
-    data.guidLow = guid;
-    data.accountId = accountId;
-    data.name = name;
-    data.level = level;
-    data.race = race;
-    data.playerClass = playerClass;
-    data.gender = gender;
-    data.mailCount = mailCount;
-    data.guildId = guildId;
-    data.groupId = 0;
-    data.arenaTeamId[0] = 0;
-    data.arenaTeamId[1] = 0;
-    data.arenaTeamId[2] = 0;
-
-    _globalPlayerDataStore[guid] = data;
-    _globalPlayerNameStore[name] = guid;
-}
-
-void World::UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    if (mask & PLAYER_UPDATE_DATA_LEVEL)
-        itr->second.level = level;
-    if (mask & PLAYER_UPDATE_DATA_RACE)
-        itr->second.race = race;
-    if (mask & PLAYER_UPDATE_DATA_CLASS)
-        itr->second.playerClass = playerClass;
-    if (mask & PLAYER_UPDATE_DATA_GENDER)
-        itr->second.gender = gender;
-    if (mask & PLAYER_UPDATE_DATA_NAME)
-        itr->second.name = name;
-
-    WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
-    data << guid;
-    SendGlobalMessage(&data);
-}
-
-void World::UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    if (!add)
-    {
-        itr->second.mailCount = count;
-        return;
-    }
-
-    int16 icount = (int16)itr->second.mailCount;
-    if (count < 0 && abs(count) > icount)
-        count = -icount;
-    itr->second.mailCount = uint16(icount + count); // addition or subtraction
-}
-
-void World::UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    itr->second.guildId = guildId;
-}
-void World::UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    itr->second.groupId = groupId;
-}
-
-void World::UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    itr->second.arenaTeamId[slot] = arenaTeamId;
-}
-
-void World::UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName)
-{
-    _globalPlayerNameStore.erase(oldName);
-    _globalPlayerNameStore[newName] = guidLow;
-}
-
-void World::DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name)
-{
-    if (guid)
-        _globalPlayerDataStore.erase(guid);
-    if (!name.empty())
-        _globalPlayerNameStore.erase(name);
-}
-
-GlobalPlayerData const* World::GetGlobalPlayerData(ObjectGuid::LowType guid) const
-{
-    // Get data from global storage
-    GlobalPlayerDataMap::const_iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr != _globalPlayerDataStore.end())
-        return &itr->second;
-
-    // Player is not in the global storage, try to get it from the Database
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_GUID);
-
-    stmt->setUInt32(0, guid);
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-    if (result)
-    {
-        // Player was not in the global storage, but it was found in the database
-        // Let's add it to the global storage
-        Field* fields = result->Fetch();
-
-        std::string name = fields[2].GetString();
-
-        LOG_INFO("server.worldserver", "Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guid);
-
-        sWorld->AddGlobalPlayerData(
-            fields[0].GetUInt32(), /*guid*/
-            fields[1].GetUInt32(), /*accountId*/
-            fields[2].GetString(), /*name*/
-            fields[3].GetUInt8(),  /*gender*/
-            fields[4].GetUInt8(),  /*race*/
-            fields[5].GetUInt8(),  /*class*/
-            fields[6].GetUInt8(),  /*level*/
-            0,                     /*mail count*/
-            0                      /*guild id*/
-        );
-
-        itr = _globalPlayerDataStore.find(guid);
-        if (itr != _globalPlayerDataStore.end())
-        {
-            LOG_INFO("server.worldserver", "Player %s [GUID: %u] added to the global storage.", name.c_str(), guid);
-            return &itr->second;
-        }
-    }
-
-    // Player not found
-    return nullptr;
-}
-
-ObjectGuid World::GetGlobalPlayerGUID(std::string const& name) const
-{
-    // Get data from global storage
-    GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
-    if (itr != _globalPlayerNameStore.end())
-        return ObjectGuid::Create<HighGuid::Player>(itr->second);
-
-    // Player is not in the global storage, try to get it from the Database
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_NAME);
-
-    stmt->setString(0, name);
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-    if (result)
-    {
-        // Player was not in the global storage, but it was found in the database
-        // Let's add it to the global storage
-        Field* fields = result->Fetch();
-
-        ObjectGuid::LowType guidLow = fields[0].GetUInt32();
-
-        LOG_INFO("server.worldserver", "Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guidLow);
-
-        sWorld->AddGlobalPlayerData(
-            guidLow,               /*guid*/
-            fields[1].GetUInt32(), /*accountId*/
-            fields[2].GetString(), /*name*/
-            fields[3].GetUInt8(),  /*gender*/
-            fields[4].GetUInt8(),  /*race*/
-            fields[5].GetUInt8(),  /*class*/
-            fields[6].GetUInt8(),  /*level*/
-            0,                     /*mail count*/
-            0                      /*guild id*/
-        );
-
-        itr = _globalPlayerNameStore.find(name);
-        if (itr != _globalPlayerNameStore.end())
-        {
-            LOG_INFO("server.worldserver", "Player %s [GUID: %u] added to the global storage.", name.c_str(), guidLow);
-
-            return ObjectGuid::Create<HighGuid::Player>(guidLow);
-        }
-    }
-
-    // Player not found
-    return ObjectGuid::Empty;
 }
 
 void World::RemoveOldCorpses()
