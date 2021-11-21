@@ -80,7 +80,6 @@ std::string CreatureMovementData::ToString() const
     return str.str();
 }
 
-
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);

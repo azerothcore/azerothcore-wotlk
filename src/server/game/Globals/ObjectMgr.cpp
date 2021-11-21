@@ -1335,7 +1335,6 @@ CreatureMovementData const* ObjectMgr::GetCreatureMovementOverride(ObjectGuid::L
     return Acore::Containers::MapGetValuePtr(_creatureMovementOverrides, spawnId);
 }
 
-
 EquipmentInfo const* ObjectMgr::GetEquipmentInfo(uint32 entry, int8& id)
 {
     EquipmentInfoContainer::const_iterator itr = _equipmentInfoStore.find(entry);

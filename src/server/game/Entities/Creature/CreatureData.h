@@ -119,7 +119,6 @@ enum class CreatureRandomMovementType : uint8
     Max
 };
 
-
 struct CreatureMovementData
 {
     CreatureMovementData();
