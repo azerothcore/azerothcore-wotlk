@@ -94,6 +94,11 @@ class spell_pal_seal_of_command_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget())
+        {
+            return false;
+        }
+
         if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
         {
             if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
@@ -117,12 +122,10 @@ class spell_pal_seal_of_command_aura : public AuraScript
             }
         }
 
-        if (Unit* target = eventInfo.GetActionTarget())
+        Unit* target = eventInfo.GetActionTarget();
+        if (target->IsAlive())
         {
-            if (target->IsAlive())
-            {
-                eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, target, false, nullptr, aurEff);
-            }
+            eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, target, false, nullptr, aurEff);
         }
     }
 

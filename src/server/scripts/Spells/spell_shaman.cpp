@@ -658,6 +658,11 @@ class spell_sha_earthliving_weapon : public AuraScript
     {
         auto chance = 20;
         Unit* caster = eventInfo.GetActor();
+        if (!caster || !eventInfo.GetProcTarget())
+        {
+            return false;
+        }
+
         if (AuraEffect const* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1, EFFECT_1, caster->GetGUID()))
         {
             if (eventInfo.GetProcTarget()->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT))
