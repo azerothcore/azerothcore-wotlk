@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Chat.h"
@@ -26,18 +27,18 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
-#include "Map.h"
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
+#include "ObjectGridLoader.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
-#include "Vehicle.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "Vehicle.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"

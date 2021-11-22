@@ -22,7 +22,6 @@
  Category: commandscripts
  EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Bag.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
@@ -36,6 +35,7 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "Transport.h"
 #include "Warden.h"

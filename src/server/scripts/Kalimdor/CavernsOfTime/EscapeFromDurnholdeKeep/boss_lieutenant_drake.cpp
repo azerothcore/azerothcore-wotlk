@@ -16,10 +16,10 @@
  */
 
 #include "MoveSplineInit.h"
-#include "old_hillsbrad.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
+#include "old_hillsbrad.h"
 
 enum LieutenantDrake
 {

@@ -16,10 +16,11 @@
  */
 
 #ifdef ELUNA
-#include "LuaEngine.h"
 #include "ElunaUtility.h"
+#include "LuaEngine.h"
 #endif
 
+#include "Spell.h"
 #include "ArenaSpectator.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
@@ -37,9 +38,9 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MapMgr.h"
 #include "MMapFactory.h"
 #include "MMapMgr.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -47,7 +48,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -58,8 +58,8 @@
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "VMapFactory.h"
+#include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

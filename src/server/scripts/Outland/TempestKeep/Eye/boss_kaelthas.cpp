@@ -16,10 +16,10 @@
  */
 
 #include "Opcodes.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "the_eye.h"
+#include "ScriptedCreature.h"
 #include "WorldPacket.h"
+#include "the_eye.h"
 
 enum Yells
 {

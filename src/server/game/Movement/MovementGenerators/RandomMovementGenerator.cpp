@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "RandomMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureGroups.h"
 #include "Map.h"
@@ -22,7 +23,6 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
-#include "RandomMovementGenerator.h"
 #include "Spell.h"
 #include "Util.h"
 

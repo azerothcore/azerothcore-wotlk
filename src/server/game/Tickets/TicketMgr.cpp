@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TicketMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -22,7 +24,6 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "TicketMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

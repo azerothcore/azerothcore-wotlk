@@ -18,8 +18,8 @@
 #ifndef DEF_THE_BOTANICA_H
 #define DEF_THE_BOTANICA_H
 
-#include "SpellScript.h"
 #include "CreatureAIImpl.h"
+#include "SpellScript.h"
 
 #define TheBotanicaScriptName "instance_the_botanica"
 

@@ -18,20 +18,20 @@
 #ifndef _MAP_BUILDER_H
 #define _MAP_BUILDER_H
 
-#include <list>
-#include <vector>
-#include <set>
 #include <atomic>
+#include <list>
 #include <map>
+#include <set>
 #include <thread>
+#include <vector>
 
-#include "TerrainBuilder.h"
 #include "IntermediateValues.h"
+#include "TerrainBuilder.h"
 
-#include "Recast.h"
 #include "DetourNavMesh.h"
 #include "Optional.h"
 #include "PCQueue.h"
+#include "Recast.h"
 
 using namespace VMAP;
 
