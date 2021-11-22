@@ -2,7 +2,7 @@
 SET @NPC := 55176;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=10378.912,`position_y`=-6399.252,`position_z`=49.71716 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;creature_addon
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`, `visibilityDistanceType`, `auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
@@ -36,7 +36,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,28,10346.602,-6264.276,24.630213,0,0,0,0,100,0),
 (@PATH,29,10344.479,-6293.903,24.547476,0,0,0,0,100,0),
 (@PATH,30,10351.415,-6317.104,29.917639,0,0,0,0,100,0),
-(@PATH,31,10350.206,-6313.216,29.505285,0,0,0,0,100,0),
+(@PATH,31,10347.966,-6345.291,31.328112,0,0,0,0,100,0),
 (@PATH,32,10363.819,-6347.5557,31.820726,0,0,0,0,100,0),
 (@PATH,33,10382.403,-6341.804,34.086304,0,0,0,0,100,0),
 (@PATH,34,10408.614,-6344.924,36.926704,0,0,0,0,100,0),
