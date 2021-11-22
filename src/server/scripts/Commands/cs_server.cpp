@@ -27,6 +27,7 @@
 #include "Config.h"
 #include "GitRevision.h"
 #include "Language.h"
+#include "ModuleMgr.h"
 #include "MySQLThreading.h"
 #include "Player.h"
 #include "Realm.h"
@@ -35,7 +36,6 @@
 #include "StringConvert.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
-#include "ModuleMgr.h"
 #include <boost/version.hpp>
 #include <filesystem>
 #include <numeric>

@@ -19,8 +19,8 @@
 #define _MODULE_MGR_H_
 
 #include "Define.h"
-#include <vector>
 #include <string_view>
+#include <vector>
 
 namespace Acore::Module
 {

@@ -38,6 +38,7 @@
 #include "IoContext.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "ModulesScriptLoader.h"
 #include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
@@ -53,7 +54,6 @@
 #include "World.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "ModulesScriptLoader.h"
 #include <boost/asio/signal_set.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/program_options.hpp>
