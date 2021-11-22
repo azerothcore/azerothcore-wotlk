@@ -31,7 +31,8 @@ enum Texts
     SAY_HAND                                = 7,
     SAY_WRATH                               = 8,
     SAY_KILL                                = 9,
-    SAY_MAGMABURST                          = 10
+    SAY_MAGMABURST                          = 10,
+    SAY_HAMMER                              = 11,
 };
 
 enum Spells
@@ -39,13 +40,15 @@ enum Spells
     SPELL_HAND_OF_RAGNAROS                  = 19780,
     SPELL_WRATH_OF_RAGNAROS                 = 20566,
     SPELL_LAVA_BURST                        = 21158,
-    SPELL_MAGMA_BLAST                       = 20565,                   // Ranged attack
-    SPELL_SONS_OF_FLAME_DUMMY               = 21108,                   // Server side effect
-    SPELL_RAGSUBMERGE                       = 21107,                   // Stealth aura
-    SPELL_RAGNA_SUBMERGE_VISUAL             = 20567,                   // Visual for submerging into lava
+    SPELL_MAGMA_BLAST                       = 20565,    // Ranged attack
+    SPELL_SONS_OF_FLAME_DUMMY               = 21108,    // Server side effect
+    SPELL_RAGSUBMERGE                       = 21107,    // Stealth aura
+    SPELL_RAGNA_SUBMERGE_VISUAL             = 20567,    // Visual for submerging into lava
     SPELL_RAGEMERGE                         = 20568,
     SPELL_ERRUPTION                         = 17731,
-    SPELL_RAGNAROS_SUBMERGE_EFFECT          = 21859,    // Applies pacify state and applies all schools immunity
+    SPELL_RAGNAROS_SUBMERGE_EFFECT          = 21859,    // Applies pacify state and applies all schools immunity (server side)
+    SPELL_ELEMENTAL_FIRE_KILL               = 19773,    // Spell is used only on Majordomo
+    SPELL_MIGHT_OF_RAGNAROS                 = 21154,
 };
 
 enum Events
@@ -53,6 +56,7 @@ enum Events
     EVENT_ERUPTION                          = 1,
     EVENT_WRATH_OF_RAGNAROS,
     EVENT_HAND_OF_RAGNAROS,
+    EVENT_MIGHT_OF_RAGNAROS,
     EVENT_LAVA_BURST,
     EVENT_MAGMA_BLAST,
     EVENT_SUBMERGE,
@@ -264,6 +268,22 @@ public:
                         events.RepeatEvent(2500);
                         break;
                     }
+                    case EVENT_MIGHT_OF_RAGNAROS:
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, [](Unit const* target)
+                        {
+                            return target->IsPlayer() && target->getPowerType() == POWER_MANA;
+                        }))
+                        {
+                            if (me->CastSpell(target, SPELL_MIGHT_OF_RAGNAROS) == SPELL_CAST_OK)
+                            {
+                                Talk(SAY_HAMMER, me);
+                                ResetCombatAction(action, urand(11000, 30000));
+                            }
+                        }
+                        events.RepeatEvent(urand(11000, 30000))
+                        break;
+                    }
                     case EVENT_SUBMERGE:
                     {
                         events.CancelEventGroup(PHASE_EMERGED);
@@ -348,6 +368,7 @@ public:
             events.RescheduleEvent(EVENT_LAVA_BURST, 10000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_MAGMA_BLAST, 2000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_SUBMERGE, 180000, PHASE_EMERGED, PHASE_EMERGED);
+            events.RescheduleEvent(EVENT_MIGHT_OF_RAGNAROS, 11000, PHASE_EMERGED, PHASE_EMERGED);
         }
     };
 
