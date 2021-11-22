@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SmartAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "DatabaseEnv.h"
@@ -25,9 +26,8 @@
 #include "InstanceScript.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "SmartAI.h"
+#include "ScriptedCreature.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 

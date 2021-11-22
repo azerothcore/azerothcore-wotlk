@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Vehicle.h"
 #include "BattlefieldWG.h"
 #include "Common.h"
 #include "CreatureAI.h"
@@ -27,7 +28,6 @@
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "WorldPacket.h"
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
