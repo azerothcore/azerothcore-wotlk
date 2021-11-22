@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellInfo.h"
 #include "Battleground.h"
 #include "Chat.h"
 #include "ConditionMgr.h"
@@ -24,7 +25,6 @@
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
-#include "SpellInfo.h"
 #include "SpellMgr.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)

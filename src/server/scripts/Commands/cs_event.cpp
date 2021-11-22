@@ -22,11 +22,11 @@
  Category: commandscripts
  EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "GameEventMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

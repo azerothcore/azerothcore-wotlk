@@ -22,8 +22,8 @@
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 
 ///////////////////////////////////////

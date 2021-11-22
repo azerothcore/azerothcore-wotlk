@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceSaveMgr.h"
 #include "Common.h"
 #include "Config.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
-#include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Log.h"
 #include "Map.h"

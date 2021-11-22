@@ -16,8 +16,8 @@
  */
 
 #include "Formulas.h"
-#include "Log.h"
 #include "Creature.h"
+#include "Log.h"
 #include "Player.h"
 #include "World.h"
 

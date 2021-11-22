@@ -27,9 +27,9 @@ npcs_riverbreeze_and_silversky
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npcs_riverbreeze_and_silversky
