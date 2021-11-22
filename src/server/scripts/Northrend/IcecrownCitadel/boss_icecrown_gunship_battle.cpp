@@ -2343,7 +2343,7 @@ public:
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
         }
 
-         void PowerGain()
+        void PowerGain()
         {
             GetCaster()->SetPower(POWER_ENERGY, GetCaster()->GetPower(POWER_ENERGY) + urand(6, 10));
             if (GetCaster()->GetPower(POWER_ENERGY) >= 100)
