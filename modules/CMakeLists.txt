@@ -58,18 +58,25 @@ function(ConfigureElunaModule moduleName)
 
   add_subdirectory(${MODULE_SOURCE_PATH}/lualib)
 
-  file(GLOB_RECURSE method_headers ${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/*Methods.h)
-  file(GLOB_RECURSE sources_ElunaFile_CPP ${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/*.cpp)
-  file(GLOB_RECURSE sources_ElunaFile_H ${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/*.h)
+  file(GLOB_RECURSE method_headers ${MODULE_SOURCE_PATH}/LuaEngine/*Methods.h)
+  file(GLOB_RECURSE sources_ElunaFile_CPP ${MODULE_SOURCE_PATH}/LuaEngine/*.cpp)
+  file(GLOB_RECURSE sources_ElunaFile_H ${MODULE_SOURCE_PATH}/LuaEngine/*.h)
 
   set(ElunaLuaEngineFiles
-    ${ElunaLuaEngineFiles}
+    # ${method_headers}
     ${sources_ElunaFile_H}
     ${sources_ElunaFile_CPP})
 
   source_group("LuaEngine\\Methods" FILES ${method_headers})
   source_group("LuaEngine\\Header Files" FILES ${sources_ElunaFile_H})
   source_group("LuaEngine\\Source Files" FILES ${sources_ElunaFile_CPP})
+
+  add_library(LuaEngine STATIC
+    ${ElunaLuaEngineFiles})
+
+  target_link_libraries(LuaEngine
+    PRIVATE
+      game-interface)
 
   set(PUBLIC_INCLUDES_ELUNA
     ${MODULE_SOURCE_PATH}/LuaEngine
@@ -79,12 +86,13 @@ function(ConfigureElunaModule moduleName)
     INTERFACE
       ${PUBLIC_INCLUDES_ELUNA})
 
-  add_dependencies(game
-    lualib)
+  # add_dependencies(game
+    # lualib)
 
   target_link_libraries(game
     PUBLIC
-      lualib)
+      lualib
+      LuaEngine)
 
   # Define eluna compile options
   target_compile_options(game-interface
