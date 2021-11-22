@@ -670,16 +670,24 @@ public:
 
 enum CreateHeartCandy
 {
-    ITEM_HEART_CANDY_1 = 21818,
-    ITEM_HEART_CANDY_2 = 21817,
-    ITEM_HEART_CANDY_3 = 21821,
-    ITEM_HEART_CANDY_4 = 21819,
-    ITEM_HEART_CANDY_5 = 21816,
-    ITEM_HEART_CANDY_6 = 21823,
-    ITEM_HEART_CANDY_7 = 21822,
-    ITEM_HEART_CANDY_8 = 21820,
+    SPELL_CREATE_HEART_CANDY_1     = 26668,
+    SPELL_CREATE_HEART_CANDY_2     = 26670,
+    SPELL_CREATE_HEART_CANDY_3     = 26671,
+    SPELL_CREATE_HEART_CANDY_4     = 26672,
+    SPELL_CREATE_HEART_CANDY_5     = 26673,
+    SPELL_CREATE_HEART_CANDY_6     = 26674,
+    SPELL_CREATE_HEART_CANDY_7     = 26675,
+    SPELL_CREATE_HEART_CANDY_8     = 26676
 };
 
+std::array<uint32, 8> constexpr CreateHeartCandySpells =
+{
+    SPELL_CREATE_HEART_CANDY_1, SPELL_CREATE_HEART_CANDY_2, SPELL_CREATE_HEART_CANDY_3,
+    SPELL_CREATE_HEART_CANDY_4, SPELL_CREATE_HEART_CANDY_5, SPELL_CREATE_HEART_CANDY_6,
+    SPELL_CREATE_HEART_CANDY_7, SPELL_CREATE_HEART_CANDY_8
+};
+
+// 26678 - Create Heart Candy
 class spell_item_create_heart_candy : public SpellScriptLoader
 {
 public:
@@ -689,17 +697,19 @@ public:
     {
         PrepareSpellScript(spell_item_create_heart_candy_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo(CreateHeartCandySpells);
+        }
+
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit() || !GetHitUnit()->ToPlayer())
-                return;
+            if (Player* target = GetHitUnit()->ToPlayer())
+            {
+               target->CastSpell(target, Acore::Containers::SelectRandomContainerElement(CreateHeartCandySpells), true);
+            }
 
-            Player* target = GetHitUnit()->ToPlayer();
-
-            static const uint32 items[] = {ITEM_HEART_CANDY_1, ITEM_HEART_CANDY_2, ITEM_HEART_CANDY_3, ITEM_HEART_CANDY_4, ITEM_HEART_CANDY_5, ITEM_HEART_CANDY_6, ITEM_HEART_CANDY_7, ITEM_HEART_CANDY_8};
-
-            target->AddItem(items[urand(0, 7)], 1);
         }
 
         void Register() override
