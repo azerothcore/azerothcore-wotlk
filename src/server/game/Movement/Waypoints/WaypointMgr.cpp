@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WaypointMgr.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "Log.h"
-#include "WaypointMgr.h"
 
 WaypointMgr::WaypointMgr()
 {

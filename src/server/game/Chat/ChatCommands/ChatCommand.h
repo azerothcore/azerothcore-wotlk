@@ -18,7 +18,6 @@
 #ifndef _CHATCOMMAND_H
 #define _CHATCOMMAND_H
 
-#include "advstd.h"
 #include "ChatCommandArgs.h"
 #include "ChatCommandTags.h"
 #include "Define.h"
@@ -28,11 +27,12 @@
 #include "Optional.h"
 #include "StringFormat.h"
 #include "Util.h"
+#include "advstd.h"
 #include <cstddef>
 #include <map>
-#include <utility>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 #include <variant>
 #include <vector>
 

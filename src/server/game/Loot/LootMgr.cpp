@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LootMgr.h"
 #include "Containers.h"
 #include "Group.h"
 #include "Log.h"
-#include "LootMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"

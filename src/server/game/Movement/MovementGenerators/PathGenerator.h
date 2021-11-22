@@ -20,9 +20,9 @@
 
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
-#include "MapDefines.h"
 #include "MMapFactory.h"
 #include "MMapMgr.h"
+#include "MapDefines.h"
 #include "MoveSplineInitArgs.h"
 #include "SharedDefines.h"
 #include <G3D/Vector3.h>

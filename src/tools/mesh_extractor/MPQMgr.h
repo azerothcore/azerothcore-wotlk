@@ -20,9 +20,9 @@
 
 #include "MPQ.h"
 #include "PolicyLock.h"
+#include <map>
 #include <mutex>
 #include <set>
-#include <map>
 
 class DBC;
 class MPQMgr

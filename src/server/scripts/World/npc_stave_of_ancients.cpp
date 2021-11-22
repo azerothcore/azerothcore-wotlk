@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "npc_stave_of_ancients.h"
 #include "CreatureGroups.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
-#include "npc_stave_of_ancients.h"
 
 uint32 NPCStaveQuestAI::GetFormEntry(std::string type)
 {
