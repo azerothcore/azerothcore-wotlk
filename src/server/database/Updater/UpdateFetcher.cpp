@@ -41,7 +41,7 @@ UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
                              std::function<void(Path const& path)> const& applyFile,
                              std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories /*= nullptr*/) :
     _sourceDirectory(std::make_unique<Path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
-    _retrieve(retrieve), _dbModuleName(dbModuleName), _setDirectories(setDirectories), _modulesList({})
+    _retrieve(retrieve), _dbModuleName(dbModuleName), _setDirectories(setDirectories)
 {
 }
 

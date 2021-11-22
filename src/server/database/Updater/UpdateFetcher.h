@@ -161,7 +161,7 @@ private:
     // modules
     std::string const _dbModuleName;
     std::vector<std::string> const* _setDirectories;
-    std::string_view _modulesList;
+    std::string_view _modulesList = {};
 };
 
 #endif // UpdateFetcher_h__
