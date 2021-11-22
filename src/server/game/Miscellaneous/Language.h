@@ -1226,6 +1226,10 @@ enum AcoreStrings
     LANG_COMMAND_CACHE_REFRESH          = 5065,
     LANG_COMMAND_CACHE_NOT_FOUND        = 5066,
 
+    LANG_COMMAND_QUEST_ADD              = 5067,
+    LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG = 5068,
+    LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
+
     // Room for more strings    5063-9999
 
     // Level requirement notifications

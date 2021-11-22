@@ -82,7 +82,8 @@ public:
         {
             if (player->IsActiveQuest(entry))
             {
-                handler->PSendSysMessage("This quest is already active!");
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->SetSentErrorMessage(true);
                 return false;
             }
 
@@ -99,7 +100,7 @@ public:
 
             if (result)
             {
-                handler->PSendSysMessage("This quest is already active!");
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -128,6 +129,8 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 
@@ -218,7 +221,8 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        handler->SendSysMessage(LANG_COMMAND_QUEST_REMOVED);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 
@@ -241,7 +245,7 @@ public:
         if (Player* player = playerTarget->GetConnectedPlayer())
         {
             // If player doesn't have the quest
-            if (!quest || player->GetQuestStatus(entry) == QUEST_STATUS_NONE)
+            if (player->GetQuestStatus(entry) == QUEST_STATUS_NONE)
             {
                 handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
                 handler->SetSentErrorMessage(true);
@@ -338,7 +342,7 @@ public:
 
             if (!result)
             {
-                handler->PSendSysMessage("Quest not found in quest log.");
+                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, quest->GetTitle(), entry);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -477,6 +481,8 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 
@@ -524,7 +530,7 @@ public:
 
             if (!result)
             {
-                handler->PSendSysMessage("The quest must be active and complete before rewarding.");
+                handler->SendSysMessage(LANG_COMMAND_QUEST_NOT_COMPLETE);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -723,6 +729,8 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle().c_str(), entry);
+        handler->SetSentErrorMessage(false);
         return true;
     }
 };
