@@ -2989,7 +2989,6 @@ UPDATE pool_gameobject SET pool_gameobject.chance = 30 WHERE pool_gameobject.des
 UPDATE pool_gameobject SET pool_gameobject.chance = 70 WHERE pool_gameobject.description LIKE 'Spawn Point%Tin%' AND pool_gameobject.chance = 30;
 UPDATE pool_gameobject SET pool_gameobject.chance = 30 WHERE pool_gameobject.description LIKE 'Spawn Point%Silver%' AND pool_gameobject.chance = 5;
 
-
 -- Re-insert the TBC Copper veins in the Database
 -- No need to delete these since we deleted gameobject with gameobject_template 1731
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
