@@ -28,18 +28,17 @@ enum Texts
     SAY_ARRIVAL5_RAG                        = 4,
     SAY_REINFORCEMENTS1                     = 5,
     SAY_REINFORCEMENTS2                     = 6,
-    SAY_HAND                                = 7,
+    SAY_KNOCKBACK                           = 7,        // Text is used for SPELL_HAND_OF_RAGNAROS & SPELL_MIGHT_OF_RAGNAROS. "By fire be purged!"
     SAY_WRATH                               = 8,
     SAY_KILL                                = 9,
     SAY_MAGMABURST                          = 10,
-    SAY_HAMMER                              = 11,   // TODO: db text
 };
 
 enum Spells
 {
     SPELL_HAND_OF_RAGNAROS                  = 19780,
     SPELL_WRATH_OF_RAGNAROS                 = 20566,
-    SPELL_LAVA_BURST                        = 21908,    // Randomly trigger one of server side spells (21886, 21900 - 21907) which summons Go 178088
+    SPELL_LAVA_BURST                        = 21908,    // Randomly trigger one of server side spells (21886, 21900 - 21907) which summons Go 178088 (TODO)
     SPELL_MAGMA_BLAST                       = 20565,    // Ranged attack
     SPELL_SONS_OF_FLAME_DUMMY               = 21108,    // Server side effect
     SPELL_RAGSUBMERGE                       = 21107,    // Stealth aura
@@ -49,7 +48,7 @@ enum Spells
     SPELL_ELEMENTAL_FIRE_KILL               = 19773,    // Spell is used only on Majordomo
     SPELL_MIGHT_OF_RAGNAROS                 = 21154,
     SPELL_INTENSE_HEAT                      = 21155,
-    SPELL_SUMMON_SONS_FLAME                 = 21108,    // Trigger the eight spells summoning the Son of Flame adds
+    SPELL_SUMMON_SONS_FLAME                 = 21108,    // Trigger the eight spells summoning the Son of Flame adds (TODO)
 };
 
 enum Events
@@ -67,7 +66,10 @@ enum Events
 
     // Intro
     EVENT_INTRO_SAY,
-    EVENT_INTRO_MAKE_ATTACKABLE
+    EVENT_INTRO_MAKE_ATTACKABLE,
+
+    // Misc
+    EVENT_RESET_KNOCKBACK_EMOTE,
 };
 
 enum Creatures
@@ -98,7 +100,8 @@ public:
         boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
             _isIntroDone(false),
             _hasYelledMagmaBurst(false),
-            _hasSubmergedOnce(false)
+            _hasSubmergedOnce(false),
+            _isKnockbackEmoteAllowed(true)
         {
         }
 
@@ -119,6 +122,7 @@ public:
 
             _hasYelledMagmaBurst = false;
             _hasSubmergedOnce = false;
+            _isKnockbackEmoteAllowed = true;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
         }
 
@@ -212,6 +216,11 @@ public:
                             HandleEmerge();
                             break;
                         }
+                        case EVENT_RESET_KNOCKBACK_EMOTE:
+                        {
+                            _isKnockbackEmoteAllowed = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -246,9 +255,11 @@ public:
                     case EVENT_HAND_OF_RAGNAROS:
                     {
                         DoCastSelf(SPELL_HAND_OF_RAGNAROS);
-                        if (urand(0, 1))
+                        if (_isKnockbackEmoteAllowed)
                         {
-                            Talk(SAY_HAND);
+                            Talk(SAY_KNOCKBACK);
+                            _isKnockbackEmoteAllowed = false;
+                            extraEvents.RescheduleEvent(EVENT_RESET_KNOCKBACK_EMOTE, 5000);
                         }
                         events.RepeatEvent(20000);
                         break;
@@ -290,9 +301,11 @@ public:
                             return target->IsPlayer() && target->getPowerType() == POWER_MANA;
                         }))
                         {
-                            if (me->CastSpell(target, SPELL_MIGHT_OF_RAGNAROS) == SPELL_CAST_OK)
+                            if (me->CastSpell(target, SPELL_MIGHT_OF_RAGNAROS) == SPELL_CAST_OK && _isKnockbackEmoteAllowed)
                             {
-                                Talk(SAY_HAMMER, me);
+                                Talk(SAY_KNOCKBACK, me);
+                                _isKnockbackEmoteAllowed = false;
+                                extraEvents.RescheduleEvent(EVENT_RESET_KNOCKBACK_EMOTE, 5000);
                             }
                         }
                         events.RepeatEvent(urand(11000, 30000));
@@ -350,6 +363,7 @@ public:
         bool _isIntroDone;
         bool _hasYelledMagmaBurst;
         bool _hasSubmergedOnce;
+        bool _isKnockbackEmoteAllowed;  // Prevents possible text overlap
 
         void HandleEmerge()
         {
@@ -380,7 +394,7 @@ public:
             events.RescheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_LAVA_BURST, 10000, PHASE_EMERGED, PHASE_EMERGED);
-            events.RescheduleEvent(EVENT_MAGMA_BLAST, 2000, PHASE_EMERGED, PHASE_EMERGED);
+            events.RescheduleEvent(EVENT_MAGMA_BLAST, 500, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_SUBMERGE, 180000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_MIGHT_OF_RAGNAROS, 11000, PHASE_EMERGED, PHASE_EMERGED);
         }
