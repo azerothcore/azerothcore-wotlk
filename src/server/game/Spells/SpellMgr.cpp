@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
@@ -31,7 +32,6 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -1473,20 +1473,35 @@ void SpellMgr::LoadSpellLearnSkills()
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (entry->Effects[i].Effect == SPELL_EFFECT_SKILL)
+            SpellLearnSkillNode dbc_node;
+            switch (entry->Effects[i].Effect)
             {
-                SpellLearnSkillNode dbc_node;
-                dbc_node.skill = entry->Effects[i].MiscValue;
-                dbc_node.step  = entry->Effects[i].CalcValue();
-                if (dbc_node.skill != SKILL_RIDING)
+                case SPELL_EFFECT_SKILL:
+                    dbc_node.skill = entry->Effects[i].MiscValue;
+                    dbc_node.step  = entry->Effects[i].CalcValue();
+                    if (dbc_node.skill != SKILL_RIDING)
+                    {
+                        dbc_node.value = 1;
+                    }
+                    else
+                    {
+                        dbc_node.value = dbc_node.step * 75;
+                    }
+                    dbc_node.maxvalue = dbc_node.step * 75;
+                    break;
+                case SPELL_EFFECT_DUAL_WIELD:
+                    dbc_node.skill = SKILL_DUAL_WIELD;
+                    dbc_node.step = 1;
                     dbc_node.value = 1;
-                else
-                    dbc_node.value = dbc_node.step * 75;
-                dbc_node.maxvalue = dbc_node.step * 75;
-                mSpellLearnSkills[spell] = dbc_node;
-                ++dbc_count;
-                break;
+                    dbc_node.maxvalue = 1;
+                    break;
+                default:
+                    continue;
             }
+
+            mSpellLearnSkills[spell] = dbc_node;
+            ++dbc_count;
+            break;
         }
     }
 
@@ -3282,6 +3297,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
             case 63978: // Ulduar(Rubble): Stone Nova
+            case 15502: // Sunder Armor
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
@@ -7433,6 +7449,24 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Serverside - Summon Arcane Disruptor
+    ApplySpellFix({ 49591 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 37889;
+    });
+
+    // Serverside - Create Rocket Pack
+    ApplySpellFix({ 70055 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 49278;
     });
 
     // Ashenvale Outrunner Sneak

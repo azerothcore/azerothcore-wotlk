@@ -18,14 +18,14 @@
 #ifndef NetworkThread_h__
 #define NetworkThread_h__
 
-#include "Define.h"
 #include "DeadlineTimer.h"
+#include "Define.h"
 #include "Errors.h"
 #include "IoContext.h"
 #include "Log.h"
 #include "Timer.h"
-#include <boost/asio/ip/tcp.hpp>
 #include <atomic>
+#include <boost/asio/ip/tcp.hpp>
 #include <chrono>
 #include <memory>
 #include <mutex>
