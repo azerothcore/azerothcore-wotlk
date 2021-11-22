@@ -32,24 +32,24 @@ enum Texts
     SAY_WRATH                               = 8,
     SAY_KILL                                = 9,
     SAY_MAGMABURST                          = 10,
-    SAY_HAMMER                              = 11,
+    SAY_HAMMER                              = 11,   // TODO: db text
 };
 
 enum Spells
 {
     SPELL_HAND_OF_RAGNAROS                  = 19780,
     SPELL_WRATH_OF_RAGNAROS                 = 20566,
-    SPELL_LAVA_BURST                        = 21158,
+    SPELL_LAVA_BURST                        = 21908,    // Randomly trigger one of server side spells (21886, 21900 - 21907) which summons Go 178088
     SPELL_MAGMA_BLAST                       = 20565,    // Ranged attack
     SPELL_SONS_OF_FLAME_DUMMY               = 21108,    // Server side effect
     SPELL_RAGSUBMERGE                       = 21107,    // Stealth aura
     SPELL_RAGNA_SUBMERGE_VISUAL             = 20567,    // Visual for submerging into lava
     SPELL_RAGEMERGE                         = 20568,
-    SPELL_ERRUPTION                         = 17731,
     SPELL_RAGNAROS_SUBMERGE_EFFECT          = 21859,    // Applies pacify state and applies all schools immunity (server side)
     SPELL_ELEMENTAL_FIRE_KILL               = 19773,    // Spell is used only on Majordomo
     SPELL_MIGHT_OF_RAGNAROS                 = 21154,
     SPELL_INTENSE_HEAT                      = 21155,
+    SPELL_SUMMON_SONS_FLAME                 = 21108,    // Trigger the eight spells summoning the Son of Flame adds
 };
 
 enum Events
@@ -228,16 +228,11 @@ public:
                 return;
             }
 
+            // Base combat events - (mainly emerge phase)
             while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
-                    case EVENT_ERUPTION:
-                    {
-                        DoCastVictim(SPELL_ERRUPTION);
-                        events.RepeatEvent(urand(20000, 45000));
-                        break;
-                    }
                     case EVENT_WRATH_OF_RAGNAROS:
                     {
                         DoCastVictim(SPELL_WRATH_OF_RAGNAROS);
@@ -260,23 +255,32 @@ public:
                     }
                     case EVENT_LAVA_BURST:
                     {
-                        DoCastVictim(SPELL_LAVA_BURST);
+                        DoCastAOE(SPELL_LAVA_BURST);
                         events.RepeatEvent(10000);
                         break;
                     }
                     case EVENT_MAGMA_BLAST:
                     {
-                        Unit* victim = me->GetVictim();
+                        Unit const* victim = me->GetVictim();
                         if (victim && !me->IsWithinMeleeRange(victim))
                         {
-                            DoCast(victim, SPELL_MAGMA_BLAST);
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            {
+                                DoCast(target, SPELL_MAGMA_BLAST);
+                            }
+
                             if (!_hasYelledMagmaBurst)
                             {
                                 Talk(SAY_MAGMABURST);
                                 _hasYelledMagmaBurst = true;
                             }
                         }
-                        events.RepeatEvent(2500);
+                        else if (_hasYelledMagmaBurst)
+                        {
+                            _hasYelledMagmaBurst = false;
+                        }
+
+                        events.RepeatEvent(500);
                         break;
                     }
                     case EVENT_MIGHT_OF_RAGNAROS:
