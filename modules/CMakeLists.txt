@@ -37,6 +37,7 @@ CU_GET_GLOBAL("AC_ADD_SCRIPTS_INCLUDE")
 set("AC_SCRIPTS_INCLUDES" "")
 set("AC_MODULE_LIST" "")
 set("AC_SCRIPTS_LIST" "")
+set(MOD_ELUNA_FOUND 0)
 
 foreach(include ${AC_ADD_SCRIPTS_INCLUDE})
   set("AC_SCRIPTS_INCLUDES" "#include \"${include}\"\n${AC_SCRIPTS_INCLUDES}")
@@ -49,6 +50,49 @@ endforeach()
 foreach(scriptName ${AC_ADD_SCRIPTS_LIST})
   set("AC_SCRIPTS_LIST" "    ${scriptName};\n${AC_SCRIPTS_LIST}")
 endforeach()
+
+function(ConfigureElunaModule moduleName)
+  set(MOD_ELUNA_FOUND 1)
+
+  GetPathToModuleSource(${SOURCE_MODULE} MODULE_SOURCE_PATH)
+
+  add_subdirectory(${MODULE_SOURCE_PATH}/lualib)
+
+  file(GLOB_RECURSE method_headers ${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/*Methods.h)
+  file(GLOB_RECURSE sources_ElunaFile_CPP ${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/*.cpp)
+  file(GLOB_RECURSE sources_ElunaFile_H ${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/*.h)
+
+  set(ElunaLuaEngineFiles
+    ${ElunaLuaEngineFiles}
+    ${sources_ElunaFile_H}
+    ${sources_ElunaFile_CPP})
+
+  source_group("LuaEngine\\Methods" FILES ${method_headers})
+  source_group("LuaEngine\\Header Files" FILES ${sources_ElunaFile_H})
+  source_group("LuaEngine\\Source Files" FILES ${sources_ElunaFile_CPP})
+
+  set(PUBLIC_INCLUDES_ELUNA
+    ${MODULE_SOURCE_PATH}/LuaEngine
+    ${MODULE_SOURCE_PATH}/lualib)
+
+  target_include_directories(game-interface
+    INTERFACE
+      ${PUBLIC_INCLUDES_ELUNA})
+
+  add_dependencies(game
+    lualib)
+
+  target_link_libraries(game
+    PUBLIC
+      lualib)
+
+  # Define eluna compile options
+  target_compile_options(game-interface
+    INTERFACE
+      -DELUNA
+      -DAZEROTHCORE
+      -DWOTLK)
+endfunction()
 
 # Set the MODULES_${SOURCE_MODULE} variables from the
 # variables set above
@@ -66,7 +110,7 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
 
   # Use only static for mod-eluna-lua-engine
   if (SOURCE_MODULE MATCHES "mod-eluna-lua-engine")
-    set(${MODULE_MODULE_VARIABLE} "static")
+    ConfigureElunaModule(${SOURCE_MODULE})
   endif()
 
   # Build the Graph values
@@ -332,5 +376,20 @@ target_compile_options(modules
 target_compile_options(modules
   INTERFACE
     -DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
+
+if (MOD_ELUNA_FOUND)
+  if (WIN32)
+    if (MSVC)
+      set(MSVC_CONFIGURATION_NAME $(ConfigurationName)/)
+    endif()
+
+    add_custom_command(TARGET modules
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/extensions" "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/")
+  endif()
+
+  install(DIRECTORY "${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/extensions" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
+endif()
 
 message("")
