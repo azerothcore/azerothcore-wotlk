@@ -35,6 +35,7 @@
 #include "StringConvert.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "ModuleMgr.h"
 #include <filesystem>
 #include <boost/version.hpp>
 #include <openssl/crypto.h>
@@ -219,6 +220,14 @@ public:
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+
+        handler->SendSysMessage("> List enable modules:");
+
+        for (auto const& modName : Acore::Module::GetEnableModulesList())
+        {
+            handler->SendSysMessage(Acore::StringFormatFmt("- {}", modName));
+        }
+
         return true;
     }
 

@@ -53,6 +53,7 @@
 #include "World.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
+#include "ModulesScriptLoader.h"
 #include <boost/asio/signal_set.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/program_options.hpp>
@@ -60,6 +61,8 @@
 #include <iostream>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
+
+#include "ModuleMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -279,6 +282,8 @@ int main(int argc, char** argv)
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
     sScriptMgr->SetScriptLoader(AddScripts);
+    sScriptMgr->SetModulesLoader(AddModulesScripts);
+
     std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
     {
         sScriptMgr->Unload();
@@ -314,6 +319,8 @@ int main(int argc, char** argv)
         METRIC_EVENT("events", "Worldserver shutdown", "");
         sMetric->Unload();
     });
+
+    Acore::Module::SetEnableModulesList(AC_MODULES_LIST);
 
     // Loading modules configs
     sConfigMgr->PrintLoadedModulesConfigs();
@@ -448,7 +455,7 @@ bool StartDB()
     MySQL::Library_Init();
 
     // Load databases
-    DatabaseLoader loader("server.worldserver");
+    DatabaseLoader loader("server.worldserver", DatabaseLoader::DATABASE_NONE, AC_MODULES_LIST);
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")

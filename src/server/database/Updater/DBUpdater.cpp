@@ -214,7 +214,7 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 }
 
 template<class T>
-bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
 {
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
@@ -260,7 +260,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
 
     UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
     [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
-    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName());
+    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);
 
     UpdateResult result;
     try

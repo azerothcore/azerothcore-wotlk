@@ -1493,12 +1493,20 @@ public: /* Initialization */
     uint32 GetScriptCount() const { return _scriptCount; }
 
     typedef void(*ScriptLoaderCallbackType)();
+    typedef void(*ModulesLoaderCallbackType)();
 
     /// Sets the script loader callback which is invoked to load scripts
     /// (Workaround for circular dependency game <-> scripts)
     void SetScriptLoader(ScriptLoaderCallbackType script_loader_callback)
     {
         _script_loader_callback = script_loader_callback;
+    }
+
+    /// Sets the modules loader callback which is invoked to load modules
+    /// (Workaround for circular dependency game <-> scripts)
+    void SetModulesLoader(ModulesLoaderCallbackType script_loader_callback)
+    {
+        _modules_loader_callback = script_loader_callback;
     }
 
 public: /* Unloading */
@@ -1964,6 +1972,7 @@ private:
     std::atomic<long> _scheduledScripts;
 
     ScriptLoaderCallbackType _script_loader_callback;
+    ModulesLoaderCallbackType _modules_loader_callback;
 };
 
 namespace Acore::SpellScripts

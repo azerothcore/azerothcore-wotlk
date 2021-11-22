@@ -49,7 +49,10 @@ struct TSpellSummary
 #include "ScriptMgrMacros.h"
 
 ScriptMgr::ScriptMgr()
-    : _scriptCount(0), _scheduledScripts(0), _script_loader_callback(nullptr) { }
+    : _scriptCount(0),
+    _scheduledScripts(0),
+    _script_loader_callback(nullptr),
+    _modules_loader_callback(nullptr) { }
 
 ScriptMgr::~ScriptMgr() { }
 
@@ -69,7 +72,11 @@ void ScriptMgr::Initialize()
     ASSERT(_script_loader_callback,
         "Script loader callback wasn't registered!");
 
+    ASSERT(_modules_loader_callback,
+        "Modules loader callback wasn't registered!");
+
     _script_loader_callback();
+    _modules_loader_callback();
 }
 
 void ScriptMgr::Unload()
