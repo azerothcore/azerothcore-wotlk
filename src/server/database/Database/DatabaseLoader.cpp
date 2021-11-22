@@ -27,8 +27,8 @@
 
 DatabaseLoader::DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask, std::string_view modulesList)
     : _logger(logger),
-    _autoSetup(sConfigMgr->GetOption<bool>("Updates.AutoSetup", true)),
     _modulesList(modulesList),
+    _autoSetup(sConfigMgr->GetOption<bool>("Updates.AutoSetup", true)),
     _updateFlags(sConfigMgr->GetOption<uint32>("Updates.EnableDatabases", defaultUpdateMask)) { }
 
 template <class T>
