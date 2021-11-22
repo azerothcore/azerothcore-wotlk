@@ -49,6 +49,7 @@ enum Spells
     SPELL_RAGNAROS_SUBMERGE_EFFECT          = 21859,    // Applies pacify state and applies all schools immunity (server side)
     SPELL_ELEMENTAL_FIRE_KILL               = 19773,    // Spell is used only on Majordomo
     SPELL_MIGHT_OF_RAGNAROS                 = 21154,
+    SPELL_INTENSE_HEAT                      = 21155,
 };
 
 enum Events
@@ -72,6 +73,7 @@ enum Events
 enum Creatures
 {
     NPC_SON_OF_FLAME                        = 12143,
+    NPC_FLAME_OF_RAGNAROS                   = 13148,
 };
 
 enum Misc
@@ -126,6 +128,15 @@ public:
             {
                 extraEvents.SetPhase(PHASE_INTRO);
                 extraEvents.ScheduleEvent(EVENT_INTRO_SAY, 5000, 0, PHASE_INTRO);
+            }
+        }
+
+        void JustSummoned(Creature* summon) override
+        {
+            BossAI::JustSummoned(summon);
+            if (summon->GetEntry() == NPC_FLAME_OF_RAGNAROS)
+            {
+                summon->CastSpell((Unit*)nullptr, SPELL_INTENSE_HEAT, true, nullptr, nullptr, me->GetGUID());
             }
         }
 
@@ -278,10 +289,9 @@ public:
                             if (me->CastSpell(target, SPELL_MIGHT_OF_RAGNAROS) == SPELL_CAST_OK)
                             {
                                 Talk(SAY_HAMMER, me);
-                                ResetCombatAction(action, urand(11000, 30000));
                             }
                         }
-                        events.RepeatEvent(urand(11000, 30000))
+                        events.RepeatEvent(urand(11000, 30000));
                         break;
                     }
                     case EVENT_SUBMERGE:
