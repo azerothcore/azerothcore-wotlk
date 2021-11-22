@@ -19,14 +19,14 @@
 #define UTILS_H
 
 #include <cstdio>
-#include <string>
 #include <sstream>
+#include <string>
 
-#include "G3D/Matrix4.h"
 #include "DetourNavMesh.h"
+#include "G3D/Matrix4.h"
 
-#include "Define.h"
 #include "Constants.h"
+#include "Define.h"
 
 struct WorldModelDefinition;
 class DoodadDefinition;
