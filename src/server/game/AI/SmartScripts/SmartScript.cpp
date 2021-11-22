@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SmartScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "ChatTextBuilder.h"
@@ -33,7 +34,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
-#include "SmartScript.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 

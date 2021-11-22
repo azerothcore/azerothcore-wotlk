@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LFGMgr.h"
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DBCStores.h"
@@ -22,12 +23,12 @@
 #include "GameEventMgr.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "Language.h"
+#include "InstanceSaveMgr.h"
 #include "LFGGroupData.h"
-#include "LFGMgr.h"
 #include "LFGPlayerData.h"
 #include "LFGQueue.h"
 #include "LFGScripts.h"
+#include "Language.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -38,7 +39,6 @@
 
 namespace lfg
 {
-
     LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
     {
         new LFGPlayerScript();

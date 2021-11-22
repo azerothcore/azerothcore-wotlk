@@ -19,8 +19,8 @@
 #define BATTLEFIELD_WG_
 
 #include "Battlefield.h"
-#include "ObjectAccessor.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
 #include "World.h"
 #include "WorldPacket.h"
 

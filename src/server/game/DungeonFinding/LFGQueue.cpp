@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LFGQueue.h"
 #include "Containers.h"
 #include "DBCStores.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
-#include "LFGQueue.h"
 #include "Log.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
