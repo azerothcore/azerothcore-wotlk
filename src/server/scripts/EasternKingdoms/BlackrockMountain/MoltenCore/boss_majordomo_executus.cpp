@@ -40,6 +40,7 @@ enum Texts
     // Majordomo
     SAY_RAG_SUM_1                           = 9,
     SAY_RAG_SUM_2                           = 10,
+    SAY_DEATH                               = 11,
 
     // Ragnaros
     SAY_ARRIVAL1_RAG                        = 1,
@@ -130,8 +131,11 @@ public:
     {
         boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
 
-        // Disabled events
-        void JustDied(Unit* /*killer*/) override {}
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_DEATH);
+            me->DespawnOrUnsummon(10s, 0s);
+        }
 
         void JustSummoned(Creature* summon) override
         {

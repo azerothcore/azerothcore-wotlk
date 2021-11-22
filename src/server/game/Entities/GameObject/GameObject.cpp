@@ -430,6 +430,22 @@ void GameObject::Update(uint32 diff)
         }
     }
 
+    for (std::unordered_map<ObjectGuid, int32>::iterator itr = m_SkillupList.begin(); itr != m_SkillupList.end();)
+    {
+        if (itr->second > 0)
+        {
+            if (itr->second > static_cast<int32>(diff))
+            {
+                itr->second -= static_cast<int32>(diff);
+                ++itr;
+            }
+            else
+            {
+                itr = m_SkillupList.erase(itr);
+            }
+        }
+    }
+
     switch (m_lootState)
     {
         case GO_NOT_READY:
@@ -2847,4 +2863,23 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     }
 
     return nullptr;
+}
+
+void GameObject::AddToSkillupList(ObjectGuid playerGuid)
+{
+    int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;
+    m_SkillupList[playerGuid] = timer;
+}
+
+bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
+{
+    for (auto const& itr : m_SkillupList)
+    {
+        if (itr.first == playerGuid)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
