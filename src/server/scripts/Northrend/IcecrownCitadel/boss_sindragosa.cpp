@@ -16,11 +16,11 @@
  */
 
 #include "GridNotifiers.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -237,7 +237,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }

@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapUpdater.h"
 #include "AvgDiffTracker.h"
 #include "LFGMgr.h"
 #include "Map.h"
-#include "MapUpdater.h"
 #include "Metric.h"
 
 class UpdateRequest

@@ -743,11 +743,16 @@ class spell_gen_proc_once_per_cast : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (Player* player = eventInfo.GetActor()->ToPlayer())
+        if (eventInfo.GetActor())
         {
-            if (player->m_spellModTakingSpell == _spellPointer)
-                return false;
-            _spellPointer = player->m_spellModTakingSpell;
+            if (Player* player = eventInfo.GetActor()->ToPlayer())
+            {
+                if (player->m_spellModTakingSpell == _spellPointer)
+                {
+                    return false;
+                }
+                _spellPointer = player->m_spellModTakingSpell;
+            }
         }
         return true;
     }

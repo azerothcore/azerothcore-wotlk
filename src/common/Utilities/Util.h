@@ -28,9 +28,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <list>
-#include <map>
-#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder

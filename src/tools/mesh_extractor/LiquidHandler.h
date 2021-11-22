@@ -18,8 +18,8 @@
 #ifndef LIQUID_H
 #define LIQUID_H
 #include "ADT.h"
-#include "Utils.h"
 #include "Define.h"
+#include "Utils.h"
 
 #include <vector>
 
