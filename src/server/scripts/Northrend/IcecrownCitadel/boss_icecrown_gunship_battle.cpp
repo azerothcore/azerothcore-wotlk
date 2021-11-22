@@ -169,10 +169,11 @@ enum Spells
     SPELL_ON_ORGRIMS_HAMMER_DECK     = 70121,
 
     // Rocket Pack
-    SPELL_CREATE_ROCKET_PACK  = 70055,
-    SPELL_ROCKET_PACK_DAMAGE  = 69193,
-    SPELL_ROCKET_BURST        = 69192,
-    SPELL_ROCKET_PACK_USEABLE = 70348,
+
+    SPELL_CREATE_ROCKET_PACK                = 70055,
+    SPELL_ROCKET_PACK_DAMAGE                = 69193,
+    SPELL_ROCKET_BURST                      = 69192,
+    SPELL_ROCKET_PACK_USEABLE               = 70348,
 
     // Alliance Gunship Cannon
     // Horde Gunship Cannon

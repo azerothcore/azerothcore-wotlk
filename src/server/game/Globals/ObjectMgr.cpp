@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectMgr.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaTeamMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -26,11 +28,10 @@
 #include "GossipDef.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
-#include "ObjectMgr.h"
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
@@ -717,8 +718,8 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6         7
-    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_template_addon");
+    //                                                0       1       2      3       4       5              6               7
+    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, visibilityDistanceType, auras FROM creature_template_addon");
 
     if (!result)
     {
@@ -747,7 +748,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
-        creatureAddon.isLarge = fields[6].GetBool();
+        creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
         uint8 i = 0;
@@ -778,6 +779,11 @@ void ObjectMgr::LoadCreatureTemplateAddons()
             creatureAddon.emote = 0;
         }
 
+        if (creatureAddon.visibilityDistanceType >= VisibilityDistanceType::Max)
+        {
+            LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid visibilityDistanceType (%u) defined in `creature_template_addon`.", entry, AsUnderlyingType(creatureAddon.visibilityDistanceType));
+            creatureAddon.visibilityDistanceType = VisibilityDistanceType::Normal;
+        }
         ++count;
     } while (result->NextRow());
 
@@ -1135,8 +1141,8 @@ void ObjectMgr::LoadCreatureAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6        7
-    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_addon");
+    //                                                0       1       2      3       4       5             6                7
+    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, visibilityDistanceType, auras FROM creature_addon");
 
     if (!result)
     {
@@ -1172,7 +1178,7 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
-        creatureAddon.isLarge = fields[6].GetBool();
+        creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
         uint8 i = 0;
@@ -1201,6 +1207,12 @@ void ObjectMgr::LoadCreatureAddons()
         {
             LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid emote (%u) defined in `creature_addon`.", guid, creatureAddon.emote);
             creatureAddon.emote = 0;
+        }
+
+        if (creatureAddon.visibilityDistanceType >= VisibilityDistanceType::Max)
+        {
+            LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid visibilityDistanceType (%u) defined in `creature_addon`.", guid, AsUnderlyingType(creatureAddon.visibilityDistanceType));
+            creatureAddon.visibilityDistanceType = VisibilityDistanceType::Normal;
         }
 
         ++count;
@@ -2331,56 +2343,6 @@ void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectDat
             cell_guids.gameobjects.erase(guid);
         }
     }
-}
-
-ObjectGuid ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
-{
-    // Get data from global storage
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
-        return guid;
-
-    // No player found
-    return ObjectGuid::Empty;
-}
-
-bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const
-{
-    // Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(lowGuid))
-    {
-        name = playerData->name;
-        return true;
-    }
-
-    return false;
-}
-
-TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return Player::TeamIdForRace(playerData->race);
-
-    return TEAM_NEUTRAL;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->accountId;
-
-    return 0;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
-{
-    // Get data from global storage
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
-            return playerData->accountId;
-
-    return 0;
 }
 
 void ObjectMgr::LoadItemLocales()
@@ -5809,8 +5771,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 }
 
                 // xinef: update global data
-                sWorld->UpdateGlobalPlayerMails(m->sender, 1);
-                sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+                sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->sender));
+                sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
 
                 delete m;
                 ++returnedCount;
@@ -5818,8 +5780,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             }
         }
 
-        // xinef: update global data
-        sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+        sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
         stmt->setUInt32(0, m->messageID);

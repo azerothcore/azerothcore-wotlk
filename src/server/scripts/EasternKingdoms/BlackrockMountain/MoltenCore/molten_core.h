@@ -18,7 +18,10 @@
 #ifndef DEF_MOLTEN_CORE_H
 #define DEF_MOLTEN_CORE_H
 
-#define MCScriptName "instance_molten_core"
+#include "CreatureAIImpl.h"
+#include "Object.h"
+
+constexpr auto MCScriptName = "instance_molten_core";
 
 constexpr uint32 MAX_ENCOUNTER = 10;
 

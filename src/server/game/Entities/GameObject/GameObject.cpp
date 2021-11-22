@@ -34,9 +34,9 @@
 #include "Transport.h"
 #include "UpdateFieldFlags.h"
 #include "World.h"
-#include <G3D/Quat.h>
 #include <G3D/Box.h>
 #include <G3D/CoordinateFrame.h>
+#include <G3D/Quat.h>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -400,7 +400,9 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     // Check if GameObject is Large
     if (goinfo->IsLargeGameObject())
-        SetVisibilityDistanceOverride(true);
+    {
+        SetVisibilityDistanceOverride(VisibilityDistanceType::Large);
+    }
 
     return true;
 }

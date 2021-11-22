@@ -18,8 +18,8 @@
 #ifndef AZEROTHCORE_QUEST_H
 #define AZEROTHCORE_QUEST_H
 
-#include "DatabaseEnv.h"
 #include "DBCEnums.h"
+#include "DatabaseEnv.h"
 #include "Define.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
@@ -107,7 +107,7 @@ enum QuestStatus : uint8
     MAX_QUEST_STATUS
 };
 
-enum QuestGiverStatus
+enum QuestGiverStatus : uint32
 {
     DIALOG_STATUS_NONE                     = 0,
     DIALOG_STATUS_UNAVAILABLE              = 1,

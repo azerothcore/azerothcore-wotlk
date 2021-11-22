@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scholomance.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
-#include "SpellScript.h"
 #include "Map.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "scholomance.h"
 
 enum Spells
 {

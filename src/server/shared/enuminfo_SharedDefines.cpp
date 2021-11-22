@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SharedDefines.h"
 #include "Define.h"
+#include "SharedDefines.h"
 #include "SmartEnum.h"
 #include <stdexcept>
 
