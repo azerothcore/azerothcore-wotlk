@@ -19,9 +19,9 @@
 #include "LFGMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 #define GOSSIP_TEXT_ID          15864

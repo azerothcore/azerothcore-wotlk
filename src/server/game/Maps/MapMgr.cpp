@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapMgr.h"
 #include "AvgDiffTracker.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
@@ -22,16 +23,15 @@
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "MapInstanced.h"
-#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "ScriptMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
