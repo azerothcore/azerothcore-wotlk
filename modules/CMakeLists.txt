@@ -30,28 +30,6 @@ else()
   set(MODULES_DEFAULT_LINKAGE "disabled")
 endif()
 
-# Stores the absolut path of the given config module in the variable
-function(GetPathToModuleConfig module variable)
-  set(${variable} "${CMAKE_SOURCE_DIR}/modules/${module}/conf" PARENT_SCOPE)
-endfunction()
-
-function(PrintModuleWithConfig ModuleName)
-  message("  |   +- ${ModuleName}")
-
-  GetPathToModuleConfig(${ModuleName} MODULE_CONFIG_PATH)
-
-  file(GLOB MODULE_CONFIG_LIST RELATIVE
-    ${MODULE_CONFIG_PATH}
-    ${MODULE_CONFIG_PATH}/*.conf.dist)
-
-  foreach(configFileName ${MODULE_CONFIG_LIST})
-    # CopyModuleConfig("${MODULE_CONFIG_PATH}/${configFileName}")
-    # set(CONFIG_LIST ${CONFIG_LIST}${configFileName},)
-    # message(STATUS "  |      +- ${configFileName}")
-    # list(APPEND CONFIG_LIST ${MODULE_CONFIG_PATH}/${configFileName})
-  endforeach()
-endfunction()
-
 # Add support old api modules
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_LIST")
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_INCLUDE")
