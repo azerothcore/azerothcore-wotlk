@@ -431,7 +431,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
     // impossible have online own another character (use this for speedup check in case online owner)
     Player* auction_owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    if (!auction_owner && sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter()) == GetAccountId())
+    if (!auction_owner && sCharacterCache->GetCharacterAccountIdByGuid(auction->owner) == GetAccountId())
     {
         //you cannot bid your another character auction:
         SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_BID_OWN);

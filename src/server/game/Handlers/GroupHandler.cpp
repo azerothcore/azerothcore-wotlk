@@ -328,8 +328,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
         return;
     }
 
-    // Xinef: name is properly filled in packets
-    sObjectMgr->GetPlayerNameByGUID(guid.GetCounter(), name);
+    sCharacterCache->GetCharacterNameByGuid(guid, name);
 
     PartyResult res = GetPlayer()->CanUninviteFromGroup(guid);
     if (res != ERR_PARTY_RESULT_OK)
@@ -681,7 +680,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     else
     {
         CharacterDatabase.EscapeString(name);
-        guid = sObjectMgr->GetPlayerGUIDByName(name.c_str());
+        guid = sCharacterCache->GetCharacterGuidByName(name);
     }
 
     group->ChangeMembersGroup(guid, groupNr);
@@ -1185,7 +1184,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
         }
         else
         {
-            if (ObjectGuid guid = sObjectMgr->GetPlayerGUIDByName(playerName))
+            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(playerName))
             {
                 return guid;
             }
