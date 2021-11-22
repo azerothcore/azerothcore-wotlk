@@ -23,8 +23,8 @@
 #include "QueryResult.h"
 #include "Tokenize.h"
 #include "Util.h"
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 using namespace std::filesystem;
 

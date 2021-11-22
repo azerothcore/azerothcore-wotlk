@@ -17,13 +17,13 @@
 
 #include "CreatureGroups.h"
 #include "Opcodes.h"
-#include "pit_of_saron.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "WorldSession.h"
+#include "pit_of_saron.h"
 
 enum Yells
 {

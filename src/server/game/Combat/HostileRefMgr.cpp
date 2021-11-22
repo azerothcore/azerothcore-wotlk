@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureAI.h"
 #include "HostileRefMgr.h"
+#include "CreatureAI.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "ThreatMgr.h"

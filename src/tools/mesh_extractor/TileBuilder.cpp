@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ContinentBuilder.h"
 #include "TileBuilder.h"
-#include "Geometry.h"
-#include "WorldModelRoot.h"
-#include "Constants.h"
-#include "Utils.h"
-#include "Cache.h"
 #include "ADT.h"
-#include "WDT.h"
+#include "Cache.h"
+#include "Constants.h"
+#include "ContinentBuilder.h"
+#include "DetourNavMeshBuilder.h"
+#include "Geometry.h"
 #include "Recast.h"
 #include "RecastAlloc.h"
-#include "DetourNavMeshBuilder.h"
+#include "Utils.h"
+#include "WDT.h"
+#include "WorldModelRoot.h"
 
 TileBuilder::TileBuilder(ContinentBuilder* _cBuilder, std::string world, int x, int y, uint32 mapId) :
     World(world), X(x), Y(y), MapId(mapId), _Geometry(nullptr), DataSize(0), cBuilder(_cBuilder)
