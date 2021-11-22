@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"
-#include "ObjectMgr.h"
-#include "ObjectAccessor.h"
 
 enum Texts
 {

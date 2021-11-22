@@ -32,6 +32,7 @@ EndScriptData */
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -78,8 +79,13 @@ public:
         return commandTable;
     }
 
-    static bool HandleLookupAreaCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupAreaCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -164,8 +170,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupCreatureCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupCreatureCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -255,8 +266,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupEventCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupEventCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -318,8 +334,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupFactionCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupFactionCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         // Can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
@@ -451,8 +472,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupItemCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupItemCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -546,8 +572,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupItemSetCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupItemSetCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -632,8 +663,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupObjectCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupObjectCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
@@ -722,8 +758,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupQuestCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupQuestCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
@@ -863,8 +904,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupSkillCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupSkillCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
@@ -963,8 +1009,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupSpellCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupSpellCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
@@ -1224,8 +1275,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -1310,8 +1366,13 @@ public:
     }
 
     // Find teleport in game_tele order by name
-    static bool HandleLookupTeleCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupTeleCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))
@@ -1367,8 +1428,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupTitleCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupTitleCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
@@ -1456,8 +1522,13 @@ public:
         return true;
     }
 
-    static bool HandleLookupMapCommand(ChatHandler* handler, std::string_view namePart)
+    static bool HandleLookupMapCommand(ChatHandler* handler, Tail namePart)
     {
+        if (namePart.empty())
+        {
+            return false;
+        }
+
         std::wstring wNamePart;
 
         if (!Utf8toWStr(namePart, wNamePart))

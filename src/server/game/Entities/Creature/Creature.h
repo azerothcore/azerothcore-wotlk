@@ -247,7 +247,7 @@ public:
     [[nodiscard]] Unit* SelectNearestTargetInAttackDistance(float dist) const;
 
     void DoFleeToGetAssistance();
-    void CallForHelp(float fRadius);
+    void CallForHelp(float fRadius, Unit* target = nullptr);
     void CallAssistance(Unit* target = nullptr);
     void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
     void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
