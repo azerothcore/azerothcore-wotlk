@@ -1,26 +1,38 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Config.h"
 #include "CreatureAI.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "GossipDef.h"
+#include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "ScriptSystem.h"
+#include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "SmartAI.h"
 #include "WorldPacket.h"
 
 #ifdef ELUNA
@@ -105,6 +117,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(PetScript);
     SCR_CLEAR(ArenaScript);
     SCR_CLEAR(CommandSC);
+    SCR_CLEAR(DatabaseScript);
 
 #undef SCR_CLEAR
 
@@ -178,7 +191,8 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<PetScript>::GetScriptById(sid) &&
                 !ScriptRegistry<CommandSC>::GetScriptById(sid) &&
                 !ScriptRegistry<ArenaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GroupScript>::GetScriptById(sid))
+                !ScriptRegistry<GroupScript>::GetScriptById(sid) &&
+                !ScriptRegistry<DatabaseScript>::GetScriptById(sid))
                 {
                     LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
                 }
@@ -345,18 +359,18 @@ void ScriptMgr::OnNetworkStop()
     FOREACH_SCRIPT(ServerScript)->OnNetworkStop();
 }
 
-void ScriptMgr::OnSocketOpen(WorldSocket* socket)
+void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
     FOREACH_SCRIPT(ServerScript)->OnSocketOpen(socket);
 }
 
-void ScriptMgr::OnSocketClose(WorldSocket* socket, bool wasNew)
+void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
-    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket, wasNew);
+    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket);
 }
 
 void ScriptMgr::OnPacketReceive(WorldSession* session, WorldPacket const& packet)
@@ -406,6 +420,11 @@ void ScriptMgr::OnAfterConfigLoad(bool reload)
     sEluna->OnConfigLoad(reload, false);
 #endif
     FOREACH_SCRIPT(WorldScript)->OnAfterConfigLoad(reload);
+}
+
+void ScriptMgr::OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion)
+{
+    FOREACH_SCRIPT(WorldScript)->OnBeforeFinalizePlayerWorldSession(cacheVersion);
 }
 
 void ScriptMgr::OnMotdChange(std::string& newMotd)
@@ -1040,21 +1059,15 @@ OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)
     return tmpscript->GetOutdoorPvP();
 }
 
-std::vector<ChatCommand> ScriptMgr::GetChatCommands()
+Acore::ChatCommands::ChatCommandTable ScriptMgr::GetChatCommands()
 {
-    std::vector<ChatCommand> table;
+    Acore::ChatCommands::ChatCommandTable table;
 
-    FOR_SCRIPTS_RET(CommandScript, itr, end, table)
+    FOR_SCRIPTS(CommandScript, itr, end)
     {
-        std::vector<ChatCommand> cmds = itr->second->GetCommands();
-        table.insert(table.end(), cmds.begin(), cmds.end());
+        Acore::ChatCommands::ChatCommandTable cmds = itr->second->GetCommands();
+        std::move(cmds.begin(), cmds.end(), std::back_inserter(table));
     }
-
-    // Sort commands in alphabetical order
-    std::sort(table.begin(), table.end(), [](const ChatCommand & a, const ChatCommand & b)
-    {
-        return strcmp(a.Name, b.Name) < 0;
-    });
 
     return table;
 }
@@ -1350,6 +1363,11 @@ void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
     FOREACH_SCRIPT(PlayerScript)->OnPVPKill(killer, killed);
 }
 
+void ScriptMgr::OnPlayerPVPFlagChange(Player* player, bool state)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerPVPFlagChange(player, state);
+}
+
 void ScriptMgr::OnCreatureKill(Player* killer, Creature* killed)
 {
 #ifdef ELUNA
@@ -1611,6 +1629,11 @@ void ScriptMgr::OnPlayerUpdateFaction(Player* player)
 void ScriptMgr::OnPlayerAddToBattleground(Player* player, Battleground* bg)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAddToBattleground(player, bg);
+}
+
+void ScriptMgr::OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQueueRandomDungeon(player, rDungeonId);
 }
 
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
@@ -3127,6 +3150,11 @@ void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
     FOREACH_SCRIPT(CommandSC)->OnHandleDevCommand(player, argstr);
 }
 
+void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
+{
+    FOREACH_SCRIPT(DatabaseScript)->OnAfterDatabasesLoaded(updateFlags);
+}
+
 ///-
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
@@ -3217,6 +3245,36 @@ AreaTriggerScript::AreaTriggerScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<AreaTriggerScript>::AddScript(this);
+}
+
+bool OnlyOnceAreaTriggerScript::OnTrigger(Player* player, AreaTrigger const* trigger)
+{
+    uint32 const triggerId = trigger->entry;
+    if (InstanceScript* instance = player->GetInstanceScript())
+    {
+        if (instance->IsAreaTriggerDone(triggerId))
+        {
+            return true;
+        }
+        else
+        {
+            instance->MarkAreaTriggerDone(triggerId);
+        }
+    }
+    return _OnTrigger(player, trigger);
+}
+
+void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(InstanceScript* script, uint32 triggerId)
+{
+    script->ResetAreaTriggerDone(triggerId);
+}
+
+void OnlyOnceAreaTriggerScript::ResetAreaTriggerDone(Player const* player, AreaTrigger const* trigger)
+{
+    if (InstanceScript* instance = player->GetInstanceScript())
+    {
+        ResetAreaTriggerDone(instance, trigger->entry);
+    }
 }
 
 BattlegroundScript::BattlegroundScript(const char* name)
@@ -3375,6 +3433,11 @@ CommandSC::CommandSC(const char* name)
     ScriptRegistry<CommandSC>::AddScript(this);
 }
 
+DatabaseScript::DatabaseScript(const char* name) : ScriptObject(name)
+{
+    ScriptRegistry<DatabaseScript>::AddScript(this);
+}
+
 // Specialize for each script type class like so:
 template class ScriptRegistry<SpellScriptLoader>;
 template class ScriptRegistry<ServerScript>;
@@ -3416,3 +3479,4 @@ template class ScriptRegistry<MiscScript>;
 template class ScriptRegistry<PetScript>;
 template class ScriptRegistry<ArenaScript>;
 template class ScriptRegistry<CommandSC>;
+template class ScriptRegistry<DatabaseScript>;

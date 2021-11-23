@@ -1,16 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "TerrainBuilder.h"
-#include "PathCommon.h"
 #include "MapBuilder.h"
 #include "MapDefines.h"
-#include "VMapManager2.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
+#include "PathCommon.h"
+#include "VMapMgr2.h"
 #include <vector>
 
 // ******************************************
@@ -69,7 +80,7 @@ struct map_liquidHeader
 namespace MMAP
 {
 
-    char const* MAP_VERSION_MAGIC = "v1.8";
+    uint32 const MAP_VERSION_MAGIC = 8;
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
     TerrainBuilder::~TerrainBuilder() = default;
@@ -131,7 +142,7 @@ namespace MMAP
 
         map_fileheader fheader;
         if (fread(&fheader, sizeof(map_fileheader), 1, mapFile) != 1 ||
-                fheader.versionMagic != *((uint32 const*)(MAP_VERSION_MAGIC)))
+                fheader.versionMagic != MAP_VERSION_MAGIC)
         {
             fclose(mapFile);
             printf("%s is the wrong version, please extract new .map files\n", mapFileName);
@@ -636,8 +647,8 @@ namespace MMAP
     /**************************************************************************/
     bool TerrainBuilder::loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
-        IVMapManager* vmapManager = new VMapManager2();
-        int result = vmapManager->loadMap("vmaps", mapID, tileX, tileY);
+        IVMapMgr* vmapMgr = new VMapMgr2();
+        int result = vmapMgr->loadMap("vmaps", mapID, tileX, tileY);
         bool retval = false;
 
         do
@@ -646,7 +657,7 @@ namespace MMAP
                 break;
 
             InstanceTreeMap instanceTrees;
-            ((VMapManager2*)vmapManager)->GetInstanceMapTree(instanceTrees);
+            ((VMapMgr2*)vmapMgr)->GetInstanceMapTree(instanceTrees);
 
             if (!instanceTrees[mapID])
                 break;
@@ -790,8 +801,8 @@ namespace MMAP
             }
         } while (false);
 
-        vmapManager->unloadMap(mapID, tileX, tileY);
-        delete vmapManager;
+        vmapMgr->unloadMap(mapID, tileX, tileY);
+        delete vmapMgr;
 
         return retval;
     }

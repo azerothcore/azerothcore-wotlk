@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "karazhan.h"
 
 enum eSay
 {
@@ -252,7 +265,7 @@ public:
             if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
             {
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* midnight = summon->GetSummoner())
+                    if (Unit* midnight = summon->GetSummonerUnit())
                         midnight->GetAI()->SetData(DATA_ATTUMEN_READY, 0);
             }
         }
@@ -356,7 +369,7 @@ public:
             if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
             {
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* midnight = summon->GetSummoner())
+                    if (Unit* midnight = summon->GetSummonerUnit())
                         midnight->GetAI()->SetData(DATA_ATTUMEN_READY, 0);
             }
         }

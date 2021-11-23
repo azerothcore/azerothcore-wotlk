@@ -1,14 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GridNotifiers.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -322,7 +335,7 @@ public:
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 70.0f)
                                 {
-                                    float th = me->getThreatManager().getThreatWithoutTemp(p);
+                                    float th = me->getThreatMgr().getThreatWithoutTemp(p);
                                     if (!target || th > maxThreat)
                                     {
                                         target = p;
@@ -811,7 +824,15 @@ public:
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 heal = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 heal = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
             GetTarget()->CastCustomSpell(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), TRIGGERED_FULL_MASK, nullptr, aurEff);
         }
 
@@ -862,8 +883,13 @@ public:
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         }
 
-        void OnCast()
+        void OnCast(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (GetCaster()->GetTypeId() != TYPEID_PLAYER || GetCaster()->GetMapId() != 631)
                 return;
             InstanceScript* instance = GetCaster()->GetInstanceScript();
@@ -899,7 +925,7 @@ public:
         void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_blood_queen_vampiric_bite_SpellScript::CheckTarget);
-            BeforeHit += SpellHitFn(spell_blood_queen_vampiric_bite_SpellScript::OnCast);
+            BeforeHit += BeforeSpellHitFn(spell_blood_queen_vampiric_bite_SpellScript::OnCast);
             OnEffectHitTarget += SpellEffectFn(spell_blood_queen_vampiric_bite_SpellScript::HandlePresence, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
         }
     };

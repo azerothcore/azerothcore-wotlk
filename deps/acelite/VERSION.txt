@@ -1,8 +1,0 @@
-This is ACE version 6.5.10, released Wed Jul 01 09:54:36 CEST 2020
-
-If you have any problems with or questions about ACE, please send
-e-mail to the ACE mailing list (ace-bugs@list.isis.vanderbilt.edu),
-using the form found in the file PROBLEM-REPORT-FORM. In order
-to post to the list you must subscribe to it.
-
-See http://www.dre.vanderbilt.edu/~schmidt/ACE-mail.html

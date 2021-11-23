@@ -1,19 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "DatabaseEnv.h"
-#include "Group.h"
 #include "GroupMgr.h"
 #include "InstanceSaveMgr.h"
 #include "LFG.h"
 #include "LFGMgr.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -166,7 +177,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     m_leaderGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
 
     // group leader not exist
-    if (!sObjectMgr->GetPlayerNameByGUID(fields[0].GetUInt32(), m_leaderName))
+    if (!sCharacterCache->GetCharacterNameByGuid(m_leaderGuid, m_leaderName))
     {
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP);
@@ -219,7 +230,7 @@ void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uin
     member.guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // skip non-existed member
-    if (!sObjectMgr->GetPlayerNameByGUID(member.guid.GetCounter(), member.name))
+    if (!sCharacterCache->GetCharacterNameByGuid(member.guid, member.name))
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
         stmt->setUInt32(0, guidLow);
@@ -233,18 +244,26 @@ void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uin
     member.roles = roles;
 
     m_memberSlots.push_back(member);
+
     if (!isBGGroup() && !isBFGroup())
-        sWorld->UpdateGlobalPlayerGroup(guidLow, GetGUID().GetCounter());
+    {
+        sCharacterCache->UpdateCharacterGroup(ObjectGuid(HighGuid::Player, guidLow), GetGUID());
+    }
 
     SubGroupCounterIncrease(subgroup);
 
     sLFGMgr->SetupGroupMember(member.guid, GetGUID());
 }
 
-void Group::ConvertToLFG()
+void Group::ConvertToLFG(bool restricted /*= true*/)
 {
-    m_groupType = GroupType(m_groupType | GROUPTYPE_LFG | GROUPTYPE_LFG_RESTRICTED);
-    m_lootMethod = NEED_BEFORE_GREED;
+    m_groupType = GroupType(m_groupType | GROUPTYPE_LFG);
+    if (restricted)
+    {
+        m_groupType  = GroupType(m_groupType | GROUPTYPE_LFG_RESTRICTED);
+        m_lootMethod = NEED_BEFORE_GREED;
+    }
+
     if (!isBGGroup() && !isBFGroup())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_TYPE);
@@ -386,8 +405,11 @@ bool Group::AddMember(Player* player)
     member.flags     = 0;
     member.roles     = 0;
     m_memberSlots.push_back(member);
+
     if (!isBGGroup() && !isBFGroup())
-        sWorld->UpdateGlobalPlayerGroup(player->GetGUID().GetCounter(), GetGUID().GetCounter());
+    {
+        sCharacterCache->UpdateCharacterGroup(player->GetGUID(), GetGUID());
+    }
 
     SubGroupCounterIncrease(subGroup);
 
@@ -514,7 +536,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
     BroadcastGroupUpdate();
 
     // LFG group vote kick handled in scripts
-    if (isLFGGroup() && method == GROUP_REMOVEMETHOD_KICK)
+    if (isLFGGroup(true) && method == GROUP_REMOVEMETHOD_KICK)
     {
         sLFGMgr->InitBoot(GetGUID(), kicker, guid, std::string(reason ? reason : ""));
         return m_memberSlots.size() > 0;
@@ -602,8 +624,11 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
         {
             SubGroupCounterDecrease(slot->group);
             m_memberSlots.erase(slot);
+
             if (!isBGGroup() && !isBFGroup())
-                sWorld->UpdateGlobalPlayerGroup(guid.GetCounter(), 0);
+            {
+                sCharacterCache->ClearCharacterGroup(guid);
+            }
         }
 
         // Reevaluate group enchanter if the leaving player had enchanting skill or the player is offline
@@ -721,7 +746,9 @@ void Group::Disband(bool hideDestroy /* = false */)
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         if (!isBGGroup() && !isBFGroup())
-            sWorld->UpdateGlobalPlayerGroup(citr->guid.GetCounter(), 0);
+        {
+            sCharacterCache->ClearCharacterGroup(citr->guid);
+        }
 
         player = ObjectAccessor::FindConnectedPlayer(citr->guid);
 
@@ -964,7 +991,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
                 Player* member = itr->GetSource();
                 if (!member)
                     continue;
-                if (member->IsAtGroupRewardDistance(pLootedObject))
+                if (member->IsAtLootRewardDistance(pLootedObject))
                 {
                     if (i->AllowedForPlayer(member))
                     {
@@ -1048,7 +1075,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
             if (!member)
                 continue;
 
-            if (member->IsAtGroupRewardDistance(pLootedObject))
+            if (member->IsAtLootRewardDistance(pLootedObject))
             {
                 if (i->AllowedForPlayer(member))
                 {
@@ -1108,7 +1135,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                 if (!playerToRoll)
                     continue;
 
-                if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtGroupRewardDistance(lootedObject))
+                if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
                 {
                     r->totalPlayersRolling++;
                     if (playerToRoll->GetPassOnGroupLoot())
@@ -1182,7 +1209,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             if (!playerToRoll)
                 continue;
 
-            if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtGroupRewardDistance(lootedObject))
+            if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
             {
                 r->totalPlayersRolling++;
                 r->playerVote[playerToRoll->GetGUID()] = NOT_EMITED_YET;
@@ -1247,31 +1274,32 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
         i->is_blocked = !i->is_underthreshold;
     }
 
-    uint32 real_count = 0;
-
-    WorldPacket data(SMSG_LOOT_MASTER_LIST, 330);
-    data << (uint8)GetMembersCount();
-
+    std::vector<Player*> looters;
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* looter = itr->GetSource();
         if (!looter->IsInWorld())
-            continue;
-
-        if (looter->IsAtGroupRewardDistance(pLootedObject))
         {
-            data << looter->GetGUID();
-            ++real_count;
+            continue;
+        }
+
+        if (looter->IsAtLootRewardDistance(pLootedObject))
+        {
+            looters.push_back(looter);
         }
     }
 
-    data.put<uint8>(0, real_count);
+    WorldPacket data(SMSG_LOOT_MASTER_LIST, 1 + looters.size() * (1 + 8));
+    data << uint8(looters.size());
 
-    for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+    for (Player* looter : looters)
     {
-        Player* looter = itr->GetSource();
-        if (looter->IsAtGroupRewardDistance(pLootedObject))
-            looter->GetSession()->SendPacket(&data);
+        data << looter->GetGUID();
+    }
+
+    for (Player* looter : looters)
+    {
+        looter->GetSession()->SendPacket(&data);
     }
 }
 
@@ -1775,7 +1803,7 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
         {
             // not update if only update if need and ok
             Player* looter = ObjectAccessor::FindPlayer(guid_itr->guid);
-            if (looter && looter->IsAtGroupRewardDistance(pLootedObject))
+            if (looter && looter->IsAtLootRewardDistance(pLootedObject))
                 return;
         }
         ++guid_itr;
@@ -1786,7 +1814,7 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
     for (member_citerator itr = guid_itr; itr != m_memberSlots.end(); ++itr)
     {
         if (Player* player = ObjectAccessor::FindPlayer(itr->guid))
-            if (player->IsAtGroupRewardDistance(pLootedObject))
+            if (player->IsAtLootRewardDistance(pLootedObject))
             {
                 pNewLooter = player;
                 break;
@@ -1799,7 +1827,7 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
         for (member_citerator itr = m_memberSlots.begin(); itr != guid_itr; ++itr)
         {
             if (Player* player = ObjectAccessor::FindPlayer(itr->guid))
-                if (player->IsAtGroupRewardDistance(pLootedObject))
+                if (player->IsAtLootRewardDistance(pLootedObject))
                 {
                     pNewLooter = player;
                     break;
@@ -2106,9 +2134,10 @@ bool Group::IsFull() const
     return isRaidGroup() ? (m_memberSlots.size() >= MAXRAIDSIZE) : (m_memberSlots.size() >= MAXGROUPSIZE);
 }
 
-bool Group::isLFGGroup() const
+bool Group::isLFGGroup(bool restricted /*= false*/) const
 {
-    return m_groupType & GROUPTYPE_LFG;
+    bool isLFG = m_groupType & GROUPTYPE_LFG;
+    return isLFG && (!restricted || (m_groupType & GROUPTYPE_LFG_RESTRICTED) != 0);
 }
 
 bool Group::isRaidGroup() const

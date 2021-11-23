@@ -1,15 +1,28 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 #define SPELL_FLAME_JETS_10             62680
 #define SPELL_FLAME_JETS_25             63472
@@ -133,7 +146,7 @@ public:
                             heat->ModStackAmount(-1);
                         }
                         me->CastSpell(me, SPELL_MOLTEN, true);
-                        me->getThreatManager().resetAllAggro();
+                        me->getThreatMgr().resetAllAggro();
                     }
                 }
             }
@@ -246,7 +259,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32000);
             events.ScheduleEvent(EVENT_GRAB, 25000);
 
-            me->MonsterYell(TEXT_AGGRO, LANG_UNIVERSAL, 0);
+            me->Yell(TEXT_AGGRO, LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_AGGRO);
             DoZoneInCombat();
 
@@ -286,19 +299,19 @@ public:
         {
             if( rand() % 2 )
             {
-                me->MonsterYell(TEXT_SLAY_1, LANG_UNIVERSAL, 0);
+                me->Yell(TEXT_SLAY_1, LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY_1);
             }
             else
             {
-                me->MonsterYell(TEXT_SLAY_2, LANG_UNIVERSAL, 0);
+                me->Yell(TEXT_SLAY_2, LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY_2);
             }
         }
 
         void JustDied(Unit* /*victim*/) override
         {
-            me->MonsterYell(TEXT_DEATH, LANG_UNIVERSAL, 0);
+            me->Yell(TEXT_DEATH, LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_DEATH);
 
             if( me->GetInstanceScript() )
@@ -346,7 +359,7 @@ public:
                     me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     if (++counter >= 20)
                     {
-                        me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_BERSERK, LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_BERSERK);
                         me->CastSpell(me, SPELL_BERSERK, true);
                         break;
@@ -356,12 +369,12 @@ public:
                 case EVENT_SPELL_SCORCH:
                     if( rand() % 2 )
                     {
-                        me->MonsterYell(TEXT_SCORCH_1, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_SCORCH_1, LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_SCORCH_1);
                     }
                     else
                     {
-                        me->MonsterYell(TEXT_SCORCH_2, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_SCORCH_2, LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_SCORCH_2);
                     }
                     me->SetControlled(true, UNIT_STATE_ROOT);
@@ -376,7 +389,7 @@ public:
                     me->DisableRotate(false);
                     break;
                 case EVENT_SPELL_FLAME_JETS:
-                    me->MonsterTextEmote(TEXT_FLAME_JETS, 0, true);
+                    me->TextEmote(TEXT_FLAME_JETS, nullptr, true);
                     me->CastSpell(me->GetVictim(), S_FLAME_JETS, false);
                     events.RepeatEvent(25000);
                     break;
@@ -397,12 +410,14 @@ public:
                             if( me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID() )
                                 continue;
                             bool found = false;
-                            for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
-                                if( (*itr)->GetVictim() && (*itr)->GetVictim()->GetGUID() == temp->GetGUID() )
+                            for (std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
+                            {
+                                if ((*iterator)->GetVictim() && (*iterator)->GetVictim()->GetGUID() == temp->GetGUID())
                                 {
                                     found = true;
                                     break;
                                 }
+                            }
 
                             if( !found )
                                 playerGUIDs.push_back(temp->GetGUID());
@@ -413,7 +428,7 @@ public:
                             int8 pos = urand(0, playerGUIDs.size() - 1);
                             if( Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
                             {
-                                me->MonsterYell(TEXT_SLAG_POT, LANG_UNIVERSAL, 0);
+                                me->Yell(TEXT_SLAG_POT, LANG_UNIVERSAL);
                                 me->PlayDirectSound(SOUND_SLAG_POT);
                                 me->CastSpell(pTarget, SPELL_GRAB, false);
                             }

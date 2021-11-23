@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -16,10 +27,10 @@ npc_aged_dying_ancient_kodo
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 // Ours
@@ -62,7 +73,7 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BODYGUARD_FOR_HIRE)
-            creature->AI()->SetGUID(player->GetGUID(), player->getFaction());
+            creature->AI()->SetGUID(player->GetGUID(), player->GetFaction());
 
         return true;
     }
@@ -144,7 +155,7 @@ public:
         {
             if (field == 1 && data == 1)
                 if (Player* player = me->SelectNearestPlayer(50.0f))
-                    SetGUID(player->GetGUID(), player->getFaction());
+                    SetGUID(player->GetGUID(), player->GetFaction());
         }
 
         bool CheckCaravan()
@@ -183,16 +194,19 @@ public:
             RemoveSummons();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
-            Creature* cr = nullptr;
-            if ((cr = me->SummonCreature(NPC_RIGGER_GIZELTON, *me)))
+            if (Creature* cr = me->SummonCreature(NPC_RIGGER_GIZELTON, *me))
             {
                 cr->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 summons[0] = cr->GetGUID();
             }
-            if ((cr = me->SummonCreature(NPC_CARAVAN_KODO, *me)))
+            if (Creature* cr = me->SummonCreature(NPC_CARAVAN_KODO, *me))
+            {
                 summons[1] = cr->GetGUID();
-            if ((cr = me->SummonCreature(NPC_CARAVAN_KODO, *me)))
+            }
+            if (Creature* cr = me->SummonCreature(NPC_CARAVAN_KODO, *me))
+            {
                 summons[2] = cr->GetGUID();
+            }
 
             SummonsFollow();
         }
@@ -242,7 +256,7 @@ public:
             for (uint8 i = 0; i < MAX_CARAVAN_SUMMONS; ++i)
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summons[i]))
                 {
-                    summon->setFaction(faction);
+                    summon->SetFaction(faction);
                     if (remove)
                         summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                     else
@@ -252,7 +266,7 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             else
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-            me->setFaction(faction);
+            me->SetFaction(faction);
         }
 
         void WaypointReached(uint32 waypointId) override

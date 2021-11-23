@@ -1,21 +1,34 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -357,7 +370,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
                     player->GetSession()->SendPacket(data);
 }
 
-struct ShadowTrapLKTargetSelector : public Acore::unary_function<Unit*, bool>
+struct ShadowTrapLKTargetSelector
 {
 public:
     ShadowTrapLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist) { }
@@ -383,7 +396,7 @@ private:
     float _maxDist;
 };
 
-struct NonTankLKTargetSelector : public Acore::unary_function<Unit*, bool>
+struct NonTankLKTargetSelector
 {
 public:
     NonTankLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f, uint32 exclude1 = 0, uint32 exclude2 = 0) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist), _exclude1(exclude1), _exclude2(exclude2) { }
@@ -417,7 +430,7 @@ private:
     uint32 _exclude2;
 };
 
-struct DefileTargetSelector : public Acore::unary_function<Unit*, bool>
+struct DefileTargetSelector
 {
 public:
     DefileTargetSelector(Creature* source) : _source(source) { }
@@ -485,7 +498,7 @@ public:
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
-        if (!_owner->getThreatManager().isThreatListEmpty())
+        if (!_owner->getThreatMgr().isThreatListEmpty())
             if (Unit* target = _owner->SelectVictim())
                 _owner->AI()->AttackStart(target);
         if (!_owner->GetVictim())
@@ -574,7 +587,7 @@ private:
     Creature& _owner;
 };
 
-class NecroticPlagueTargetCheck : public Acore::unary_function<Unit*, bool>
+class NecroticPlagueTargetCheck
 {
 public:
     NecroticPlagueTargetCheck(Unit const* obj, uint32 notAura1, uint32 notAura2) : _sourceObj(obj), _notAura1(notAura1), _notAura2(notAura2) {}
@@ -719,7 +732,7 @@ public:
             switch (action)
             {
                 case ACTION_RESTORE_LIGHT:
-                    me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, 0, 5000);
+                    me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, 0, 5s);
                     me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_FINE, 0.5f);
                     break;
                 case ACTION_START_ATTACK:
@@ -821,7 +834,7 @@ public:
                     _bFordringMustFallYell = true;
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
-                        tirion->MonsterYell("The Lich King must fall!", LANG_UNIVERSAL, 0);
+                        tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
                         tirion->PlayDirectSound(17389);
                     }
                 }
@@ -904,7 +917,7 @@ public:
         {
             if (spell->Id == REMORSELESS_WINTER_1 || spell->Id == REMORSELESS_WINTER_2)
             {
-                me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SNOWSTORM, 5000);
+                me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SNOWSTORM, 5s);
                 me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_LIGHT_SNOW, 0.5f);
                 summons.DespawnEntry(NPC_SHADOW_TRAP_TRIGGER);
             }
@@ -1523,7 +1536,7 @@ public:
                         me->SetFacingToObject(theLichKing);
                         theLichKing->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, EQUIP_UNEQUIP);
                         theLichKing->CastSpell((Unit*)nullptr, SPELL_SUMMON_BROKEN_FROSTMOURNE_3, true);
-                        me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SOULSTORM, 10000);
+                        me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SOULSTORM, 10s);
                         me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_BLACKSNOW, 0.5f);
 
                         _events.ScheduleEvent(EVENT_OUTRO_AFTER_SUMMON_BROKEN_FROSTMOURNE, 1000);
@@ -1973,8 +1986,13 @@ public:
             targets.resize(1);
         }
 
-        void CheckAura()
+        void CheckAura(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (GetHitUnit()->HasAura(GetSpellInfo()->Id))
                 _hadJumpingAura = true;
             else if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
@@ -1998,7 +2016,7 @@ public:
         void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_necrotic_plague_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            BeforeHit += SpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::CheckAura);
+            BeforeHit += BeforeSpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::CheckAura);
             OnHit += SpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::AddMissingStack);
         }
 
@@ -2307,7 +2325,7 @@ public:
             bool valid = false;
             me->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL, true);
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* summoner = summon->GetSummoner())
+                if (Unit* summoner = summon->GetSummonerUnit())
                     if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                     {
                         valid = true;
@@ -2361,14 +2379,14 @@ public:
                     {
                         me->SetControlled(false, UNIT_STATE_ROOT);
 
-                        if (!me->getThreatManager().isThreatListEmpty())
+                        if (!me->getThreatMgr().isThreatListEmpty())
                             if (Unit* target = me->SelectVictim())
                                 AttackStart(target);
                         if (!me->GetVictim())
                         {
                             bool valid = false;
                             if (TempSummon* summon = me->ToTempSummon())
-                                if (Unit* summoner = summon->GetSummoner())
+                                if (Unit* summoner = summon->GetSummonerUnit())
                                     if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                                     {
                                         valid = true;
@@ -3033,7 +3051,7 @@ public:
                 return;
 
             if (TempSummon* summon = GetCaster()->ToTempSummon())
-                if (Unit* summoner = summon->GetSummoner())
+                if (Unit* summoner = summon->GetSummonerUnit())
                     summoner->GetAI()->SetData(DATA_VILE, 1);
 
             if (Creature* c = GetCaster()->ToCreature())
@@ -3149,7 +3167,7 @@ public:
 
             if (TempSummon* summ = me->ToTempSummon())
             {
-                if (Unit* summoner = summ->GetSummoner())
+                if (Unit* summoner = summ->GetSummonerUnit())
                 {
                     bool buff = _instance->GetBossState(DATA_THE_LICH_KING) == IN_PROGRESS && summoner->GetTypeId() == TYPEID_PLAYER && (!summoner->IsAlive() || summoner->ToPlayer()->IsBeingTeleported() || summoner->FindMap() != me->GetMap());
                     if (summoner->GetTypeId() == TYPEID_PLAYER && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
@@ -3186,7 +3204,7 @@ public:
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
                     if (TempSummon* summ = me->ToTempSummon())
-                        if (Unit* summoner = summ->GetSummoner())
+                        if (Unit* summoner = summ->GetSummonerUnit())
                         {
                             if (summoner->IsAlive() && summoner->GetTypeId() == TYPEID_PLAYER)
                             {
@@ -3518,7 +3536,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 heal = int32(eventInfo.GetDamageInfo()->GetDamage() / 2);
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 heal = static_cast<int32>(damageInfo->GetDamage() / 2);
             GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
         }
 

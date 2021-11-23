@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Chat.h"
@@ -15,6 +26,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "QueryHolder.h"
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -22,7 +34,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "QueryHolder.h"
 
 class LoadPetFromDBQueryHolder : public CharacterDatabaseQueryHolder
 {
@@ -88,16 +99,17 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     if (!result)
         return PET_LOAD_NO_RESULT;
 
-    if (!GetPlayer() || GetPlayer()->GetPet() || GetPlayer()->GetVehicle() || GetPlayer()->IsSpectator())
+    Player* owner = GetPlayer();
+    if (!owner || owner->GetPet() || owner->GetVehicle() || owner->IsSpectator() || owner->IsBeingTeleportedFar())
+    {
         return PET_LOAD_ERROR;
+    }
 
     Field* fields = result->Fetch();
 
     // Xinef: this can happen if fetch is called twice, impossibru.
     if (!fields)
         return PET_LOAD_ERROR;
-
-    Player* owner = GetPlayer();
 
     // update for case of current pet "slot = 0"
     uint32 petentry = fields[1].GetUInt32();
@@ -169,11 +181,12 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     pet->SetLoading(true);
     pet->Relocate(px, py, pz, owner->GetOrientation());
     pet->setPetType(pet_type);
-    pet->setFaction(owner->getFaction());
+    pet->SetFaction(owner->GetFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
 
     if (pet->IsCritter())
     {
+        pet->UpdatePositionData();
         map->AddToMap(pet->ToCreature(), true);
         pet->SetLoading(false); // xinef, mine
         return PET_LOAD_OK;
@@ -185,6 +198,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
         pet->GetCharmInfo()->SetPetNumber(pet_number, false);
 
     pet->SetDisplayId(fields[3].GetUInt32());
+    pet->UpdatePositionData();
     pet->SetNativeDisplayId(fields[3].GetUInt32());
     pet->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
     pet->SetName(fields[8].GetString());
@@ -313,13 +327,13 @@ void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder co
     // load action bar, if data broken will fill later by default spells.
     if (!is_temporary_summoned)
     {
+        pet->GetCharmInfo()->LoadPetActionBar(holder.GetActionBar()); // action bar stored in already read string
         pet->_LoadSpells(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLS));
         pet->InitTalentForLevel();                               // re-init to check talent count
         pet->_LoadSpellCooldowns(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLCOOLDOWN));
         pet->LearnPetPassives();
         pet->InitLevelupSpellsForLevel();
         pet->CastPetAuras(current);
-        pet->GetCharmInfo()->LoadPetActionBar(holder.GetActionBar()); // action bar stored in already read string
     }
 
     pet->CleanupActionBar();                                     // remove unknown spells from action bar after load
@@ -428,6 +442,12 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     if (pet->GetTypeId() == TYPEID_PLAYER && flag != ACT_COMMAND && flag != ACT_REACTION)
         return;
 
+    // Do not follow itself vehicle
+    if (spellid == COMMAND_FOLLOW && _player->IsOnVehicle(pet))
+    {
+        return;
+    }
+
     if (GetPlayer()->m_Controlled.size() == 1)
         HandlePetActionHelper(pet, guid1, spellid, flag, guid2);
     else
@@ -446,8 +466,9 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
             }
         }
 
-        for (std::vector<Unit*>::iterator itr = controlled.begin(); itr != controlled.end(); ++itr)
-            HandlePetActionHelper(*itr, guid1, spellid, flag, guid2);
+        for (Unit* pet : controlled)
+            if (pet && pet->IsInWorld() && pet->GetMap() == _player->GetMap())
+                HandlePetActionHelper(pet, guid1, spellid, flag, guid2);
     }
 }
 
@@ -557,10 +578,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             if (!owner->IsValidAttackTarget(TargetUnit))
                                 return;
 
-                        // pussywizard:
-                        if (Creature* creaturePet = pet->ToCreature())
-                            if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
-                                return;
+                        // pussywizard (excluded charmed)
+                        if (!pet->IsCharmed())
+                            if (Creature* creaturePet = pet->ToCreature())
+                                if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
+                                    return;
 
                         // Not let attack through obstructions
                         bool checkLos = !DisableMgr::IsPathfindingEnabled(pet->GetMap()) ||
@@ -728,7 +750,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 if (result == SPELL_CAST_OK)
                 {
-                    pet->ToCreature()->AddSpellCooldown(spellid, 0, 0);
+                    pet->ToCreature()->AddSpellCooldown(spellid, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
 
                     unit_target = spell->m_targets.GetUnitTarget();
 

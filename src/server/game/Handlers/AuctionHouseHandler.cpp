@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AsyncAuctionListing.h"
@@ -11,8 +22,8 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "ScriptMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
@@ -51,7 +62,7 @@ void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
     if (!sScriptMgr->CanSendAuctionHello(this, guid, unit))
         return;
 
-    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->getFaction());
+    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->GetFaction());
     if (!ahEntry)
         return;
 
@@ -155,7 +166,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         return;
     }
 
-    AuctionHouseEntry const* auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(creature->getFaction());
+    AuctionHouseEntry const* auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(creature->GetFaction());
     if (!auctionHouseEntry)
     {
         LOG_DEBUG("network", "WORLD: HandleAuctionSellItem - Unit (%s) has wrong faction.", auctioneer.ToString().c_str());
@@ -242,7 +253,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         Item* item = items[i];
 
         uint32 auctionTime = uint32(etime * sWorld->getRate(RATE_AUCTION_TIME));
-        AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
+        AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
         uint32 deposit = sAuctionMgr->GetAuctionDeposit(auctionHouseEntry, etime, item, finalCount);
         if (!_player->HasEnoughMoney(deposit))
@@ -406,7 +417,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
+    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* player = GetPlayer();
@@ -420,7 +431,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
     // impossible have online own another character (use this for speedup check in case online owner)
     Player* auction_owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    if (!auction_owner && sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter()) == GetAccountId())
+    if (!auction_owner && sCharacterCache->GetCharacterAccountIdByGuid(auction->owner) == GetAccountId())
     {
         //you cannot bid your another character auction:
         SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_BID_OWN);
@@ -528,7 +539,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
+    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* player = GetPlayer();
@@ -612,7 +623,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
+    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
     WorldPacket data(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4) + 30000); // pussywizard: ensure there is enough memory
     Player* player = GetPlayer();
@@ -679,7 +690,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
+    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
     WorldPacket data(SMSG_AUCTION_OWNER_LIST_RESULT, (4 + 4 + 4) + 60000); // pussywizard: ensure there is enough memory
     data << (uint32) 0;                                     // amount place holder
@@ -716,28 +727,40 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     uint8 getAll;
     recvData >> getAll;
 
-    // this block looks like it uses some lame byte packing or similar...
-    uint8 unkCnt;
-    recvData >> unkCnt;
-    for (uint8 i = 0; i < unkCnt; i++)
+    // Read sort block
+    uint8 sortOrderCount;
+    recvData >> sortOrderCount;
+    AuctionSortOrderVector sortOrder;
+    for (uint8 i = 0; i < sortOrderCount; i++)
     {
-        recvData.read_skip<uint8>();
-        recvData.read_skip<uint8>();
+        uint8 sortMode;
+        uint8 isDesc;
+        recvData >> sortMode;
+        recvData >> isDesc;
+        AuctionSortInfo sortInfo;
+        sortInfo.isDesc = (isDesc == 1);
+        sortInfo.sortOrder = static_cast<AuctionSortOrder>(sortMode);
+        sortOrder.push_back(std::move(sortInfo));
     }
 
     // remove fake death
     if (_player->HasUnitState(UNIT_STATE_DIED))
+    {
         _player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+    }
 
     // pussywizard:
     const uint32 delay = 2000;
     const uint32 now = World::GetGameTimeMS();
     uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
     if (diff > delay)
+    {
         diff = delay;
+    }
     _lastAuctionListItemsMSTime = now + delay - diff;
     std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
-    AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
+    AsyncAuctionListingMgr::GetTempList().push_back(AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID,
+        auctionMainCategory, auctionSubCategory, quality, getAll, sortOrder));
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket& recvData)

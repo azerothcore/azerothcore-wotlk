@@ -1,13 +1,25 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Chat.h"
+#include "DatabaseEnv.h"
 #include "Group.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 
@@ -25,90 +37,91 @@ void GetPlayerInfo(ChatHandler*  handler, Player* player)
                              lfg::GetRolesString(sLFGMgr->GetRoles(guid)).c_str(), sLFGMgr->GetComment(guid).c_str());
 }
 
+using namespace Acore::ChatCommands;
+
 class lfg_commandscript : public CommandScript
 {
 public:
     lfg_commandscript() : CommandScript("lfg_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> lfgCommandTable =
+        static ChatCommandTable lfgCommandTable =
         {
-            { "player",    SEC_MODERATOR,     false, &HandleLfgPlayerInfoCommand, "" },
-            { "group",     SEC_MODERATOR,     false,  &HandleLfgGroupInfoCommand, "" },
-            { "queue",     SEC_MODERATOR,     false,  &HandleLfgQueueInfoCommand, "" },
-            { "clean",     SEC_ADMINISTRATOR, false,      &HandleLfgCleanCommand, "" },
-            { "options",   SEC_GAMEMASTER,    false,    &HandleLfgOptionsCommand, "" },
+            { "player",  HandleLfgPlayerInfoCommand, SEC_MODERATOR,     Console::No },
+            { "group",   HandleLfgGroupInfoCommand,  SEC_MODERATOR,     Console::No },
+            { "queue",   HandleLfgQueueInfoCommand,  SEC_MODERATOR,     Console::Yes },
+            { "clean",   HandleLfgCleanCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "options", HandleLfgOptionsCommand,    SEC_GAMEMASTER,    Console::Yes },
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
-            {  "lfg",   SEC_GAMEMASTER, false,                           nullptr, "", lfgCommandTable },
+            { "lfg", lfgCommandTable },
         };
         return commandTable;
     }
 
-    static bool HandleLfgPlayerInfoCommand(ChatHandler* handler, char const* args)
+    static bool HandleLfgPlayerInfoCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
-        Player* target = nullptr;
-        std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        if (!player)
             return false;
 
-        GetPlayerInfo(handler, target);
-        return true;
-    }
-
-    static bool HandleLfgGroupInfoCommand(ChatHandler* handler, char const* args)
-    {
-        Player* target = nullptr;
-        std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
-            return false;
-
-        Group* grp = target->GetGroup();
-        if (!grp)
+        if (Player* target = player->GetConnectedPlayer())
         {
-            handler->PSendSysMessage(LANG_LFG_NOT_IN_GROUP, playerName.c_str());
+            GetPlayerInfo(handler, target);
             return true;
         }
 
-        ObjectGuid guid = grp->GetGUID();
+        return false;
+    }
+
+    static bool HandleLfgGroupInfoCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
+    {
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        if (!player)
+            return false;
+
+        Group* groupTarget = nullptr;
+        if (Player* target = player->GetConnectedPlayer())
+            groupTarget = target->GetGroup();
+        if (!groupTarget)
+        {
+            handler->PSendSysMessage(LANG_LFG_NOT_IN_GROUP, player->GetName().c_str());
+            return true;
+        }
+
+        ObjectGuid guid = groupTarget->GetGUID();
         std::string const& state = lfg::GetStateString(sLFGMgr->GetState(guid));
-        handler->PSendSysMessage(LANG_LFG_GROUP_INFO, grp->isLFGGroup(),
+        handler->PSendSysMessage(LANG_LFG_GROUP_INFO, groupTarget->isLFGGroup(),
                                  state.c_str(), sLFGMgr->GetDungeon(guid));
 
-        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+        for (GroupReference* itr = groupTarget->GetFirstMember(); itr != nullptr; itr = itr->next())
             GetPlayerInfo(handler, itr->GetSource());
 
         return true;
     }
 
-    static bool HandleLfgOptionsCommand(ChatHandler* handler, char const* args)
+    static bool HandleLfgOptionsCommand(ChatHandler* handler, Optional<uint32> optionsArg)
     {
-        int32 options = -1;
-        if (char* str = strtok((char*)args, " "))
+        if (optionsArg)
         {
-            int32 tmp = atoi(str);
-            if (tmp > -1)
-                options = tmp;
-        }
-
-        if (options != -1)
-        {
-            sLFGMgr->SetOptions(options);
+            sLFGMgr->SetOptions(*optionsArg);
             handler->PSendSysMessage(LANG_LFG_OPTIONS_CHANGED);
         }
         handler->PSendSysMessage(LANG_LFG_OPTIONS, sLFGMgr->GetOptions());
         return true;
     }
 
-    static bool HandleLfgQueueInfoCommand(ChatHandler*  /*handler*/, char const*  /*args*/)
+    static bool HandleLfgQueueInfoCommand(ChatHandler* /*handler*/)
     {
         return true;
     }
 
-    static bool HandleLfgCleanCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleLfgCleanCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage(LANG_LFG_CLEAN);
         sLFGMgr->Clean();

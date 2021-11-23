@@ -1,21 +1,34 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Mail.h"
 #include "AuctionHouseMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
+#include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Log.h"
-#include "Mail.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Unit.h"
 #include "World.h"
+#include "WorldSession.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
@@ -135,7 +148,9 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
 
     uint32 rc_account = 0;
     if (!receiver)
-        rc_account = sObjectMgr->GetPlayerAccountIdByGUID(receiver_guid);
+    {
+        rc_account = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver_guid));
+    }
 
     if (!receiver && !rc_account)                            // sender not exist
     {
@@ -239,8 +254,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         trans->Append(stmt);
     }
 
-    // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(receiver.GetPlayerGUIDLow(), 1);
+    sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver.GetPlayerGUIDLow()));
 
     // For online receiver update in game mail status and data
     if (pReceiver)
