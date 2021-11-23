@@ -17,10 +17,10 @@
 
 #include "Group.h"
 #include "LFGMgr.h"
-#include "oculus.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "oculus.h"
 
 class instance_oculus : public InstanceMapScript
 {

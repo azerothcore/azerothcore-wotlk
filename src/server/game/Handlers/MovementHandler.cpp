@@ -24,8 +24,8 @@
 #include "GameGraveyard.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
-#include "MathUtil.h"
 #include "MapMgr.h"
+#include "MathUtil.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -33,10 +33,10 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "Transport.h"
+#include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Vehicle.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 

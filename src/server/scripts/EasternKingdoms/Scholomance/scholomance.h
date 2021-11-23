@@ -43,11 +43,13 @@ enum TalkGroupIds
 enum CreatureIds
 {
     NPC_RISEN_GUARDIAN          = 11598,
-    NPC_DARKMASTER_GANDLING     = 1853
+    NPC_DARKMASTER_GANDLING     = 1853,
+    NPC_KIRTONOS                = 10506
 };
 
 enum GameobjectIds
 {
+    GO_BRAZIER_KIRTONOS         = 175564,
     GO_GATE_KIRTONOS            = 175570,
 
     GO_GATE_GANDLING_ENTRANCE   = 177374,

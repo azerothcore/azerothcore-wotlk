@@ -26,8 +26,9 @@
 #include "GridNotifiers.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
-#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
@@ -706,12 +707,17 @@ class spell_hun_sniper_training : public AuraScript
         PreventDefaultAction();
         if (aurEff->GetAmount() <= 0)
         {
-            Unit* caster = GetCaster();
-            uint32 spellId = SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_HUNTER_SNIPER_TRAINING_R1;
-            if (Unit* target = GetTarget())
+            if (!GetCaster() || !GetTarget())
             {
-                SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId);
-                Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(GetSpellInfo()) ? caster : target;
+                return;
+            }
+
+            Unit* target = GetTarget();
+
+            uint32 spellId = SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_HUNTER_SNIPER_TRAINING_R1;
+            if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId))
+            {
+                Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(GetSpellInfo()) ? GetCaster() : target;
                 triggerCaster->CastSpell(target, triggeredSpellInfo, true, 0, aurEff);
             }
         }
@@ -1119,7 +1125,7 @@ class spell_hun_lock_and_load : public AuraScript
     bool CheckTrapProc(ProcEventInfo& eventInfo)
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo)
+        if (!spellInfo || !eventInfo.GetActor())
         {
             return false;
         }

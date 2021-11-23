@@ -18,8 +18,8 @@
 #ifndef MAPCHUNK_H
 #define MAPCHUNK_H
 #include "Chunk.h"
-#include "Utils.h"
 #include "Constants.h"
+#include "Utils.h"
 #include <vector>
 class ADT;
 

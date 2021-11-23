@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SmartScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "ChatTextBuilder.h"
@@ -33,7 +34,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
-#include "SmartScript.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
@@ -790,12 +790,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsGameObject(*itr))
                     {
+                        GameObject* go = (*itr)->ToGameObject();
+
                         // Activate
-                        // xinef: wtf is this shit?
-                        (*itr)->ToGameObject()->SetLootState(GO_READY);
-                        (*itr)->ToGameObject()->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
-                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject %s activated",
-                                       (*itr)->GetGUID().ToString().c_str());
+                        if (go->GetGoType() != GAMEOBJECT_TYPE_DOOR)
+                        {
+                            go->SetLootState(GO_READY);
+                        }
+
+                        go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
+                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject %s activated", go->GetGUID().ToString().c_str());
                     }
                 }
 
@@ -1271,15 +1275,17 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                {
                     if (IsCreature(*itr))
                     {
-                        (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range);
+                        (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range, e.GetEventType() == SMART_EVENT_AGGRO ? unit : nullptr);
                         if (e.action.callHelp.withEmote)
                         {
                             Acore::BroadcastTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
                             sCreatureTextMgr->SendChatPacket(*itr, builder, CHAT_MSG_MONSTER_EMOTE);
                         }
                     }
+                }
 
                 delete targets;
                 break;

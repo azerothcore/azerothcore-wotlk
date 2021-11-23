@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PathCommon.h"
 #include "MapBuilder.h"
+#include "PathCommon.h"
 #include "Timer.h"
 
 using namespace MMAP;
