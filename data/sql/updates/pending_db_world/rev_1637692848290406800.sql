@@ -38,9 +38,9 @@ UPDATE `creature_template_movement` SET `Rooted`=1 WHERE `CreatureId` IN (SELECT
 ALTER TABLE `creature_template` DROP `InhabitType`;
 
 DELETE FROM `creature_template_movement` WHERE `CreatureID` IN (20064,28654);
-INSERT INTO `creature_template_movement` (`CreatureID`,`Ground`,`Swim`,`Flight`,`Rooted`,`Chase`) VALUES
-(20064,1,0,0,0,2),
-(28654,1,0,0,0,2);
+INSERT INTO `creature_template_movement` (`CreatureID`,`Ground`,`Swim`,`Flight`,`Rooted`,`Chase`,`Random`,`InteractionPauseTimer`) VALUES
+(20064,1,0,0,0,2,0,0),
+(28654,1,0,0,0,2,0,0);
 
 UPDATE `acore_string` SET `content_default`='Movement type: %s' WHERE `entry`=11008;
 
