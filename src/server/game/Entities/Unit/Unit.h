@@ -19,8 +19,8 @@
 #define __UNIT_H
 
 #include "EventProcessor.h"
-#include "FollowerReference.h"
 #include "FollowerRefMgr.h"
+#include "FollowerReference.h"
 #include "HostileRefMgr.h"
 #include "MotionMaster.h"
 #include "Object.h"
@@ -2144,6 +2144,8 @@ public:
     [[nodiscard]] Spell* GetCurrentSpell(uint32 spellType) const { return m_currentSpells[spellType]; }
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     [[nodiscard]] int32 GetCurrentSpellCastTime(uint32 spell_id) const;
+
+    virtual bool IsMovementPreventedByCasting() const;
 
     ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
     ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
