@@ -29,8 +29,8 @@ EndScriptData */
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
@@ -38,11 +38,11 @@ EndScriptData */
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
+#include "StringConvert.h"
 #include "TicketMgr.h"
+#include "Tokenize.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMgr.h"
-#include "StringConvert.h"
-#include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
 

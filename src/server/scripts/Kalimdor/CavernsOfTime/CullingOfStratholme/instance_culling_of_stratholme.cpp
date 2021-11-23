@@ -16,12 +16,12 @@
  */
 
 #include "CreatureTextMgr.h"
-#include "culling_of_stratholme.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
+#include "culling_of_stratholme.h"
 
 class instance_culling_of_stratholme : public InstanceMapScript
 {

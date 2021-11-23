@@ -22,8 +22,8 @@
 
 #include "PassiveAI.h"
 #include "PetAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "TotemAI.h"
 
 enum PriestSpells

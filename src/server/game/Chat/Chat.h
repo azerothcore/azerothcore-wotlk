@@ -19,8 +19,8 @@
 #define AZEROTHCORE_CHAT_H
 
 #include "ChatCommand.h"
-#include "SharedDefines.h"
 #include "Errors.h"
+#include "SharedDefines.h"
 #include "WorldSession.h"
 #include <vector>
 

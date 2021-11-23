@@ -18,15 +18,15 @@
 #ifndef _CHATCOMMANDTAGS_H
 #define _CHATCOMMANDTAGS_H
 
-#include "advstd.h"
 #include "ChatCommandHelpers.h"
 #include "Hyperlinks.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Util.h"
+#include "advstd.h"
 #include "WorldSession.h"
-#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
 #include <cmath>
 #include <cstring>
 #include <iostream>
