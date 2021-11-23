@@ -63,10 +63,10 @@ CreatureMovementData::CreatureMovementData() : Ground(CreatureGroundMovementType
 
 std::string CreatureMovementData::ToString() const
 {
-    char const* const GroundStates[] = {"None", "Run", "Hover"};
-    char const* const FlightStates[] = {"None", "DisableGravity", "CanFly"};
-    char const* const ChaseStates[]  = {"Run", "CanWalk", "AlwaysWalk"};
-    char const* const RandomStates[] = {"Walk", "CanRun", "AlwaysRun"};
+    constexpr std::array<char[15], 3> GroundStates = {"None", "Run", "Hover"};
+    constexpr std::array<char[15], 3> FlightStates = {"None", "DisableGravity", "CanFly"};
+    constexpr std::array<char[15], 3> ChaseStates  = {"Run", "CanWalk", "AlwaysWalk"};
+    constexpr std::array<char[15], 3> RandomStates = {"Walk", "CanRun", "AlwaysRun"};
 
     std::ostringstream str;
     str << std::boolalpha << "Ground: " << GroundStates[AsUnderlyingType(Ground)]
@@ -3060,14 +3060,6 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;
-}
-
-bool Creature::CanFly() const
-{
-    if (Unit::IsFlying())
-        return true;
-
-    return GetMovementTemplate().IsFlightAllowed();
 }
 
 bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)

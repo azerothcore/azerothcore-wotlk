@@ -15983,6 +15983,12 @@ void Unit::SendPetAIReaction(ObjectGuid guid)
 }
 
 ///----------End of Pet responses methods----------
+
+MovementGeneratorType Unit::GetDefaultMovementType() const
+{
+    return IDLE_MOTION_TYPE;
+}
+
 void Unit::StopMoving()
 {
     ClearUnitState(UNIT_STATE_MOVING);
