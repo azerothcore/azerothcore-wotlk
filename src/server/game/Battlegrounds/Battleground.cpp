@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Battleground.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
-#include "Battleground.h"
 #include "BattlegroundBE.h"
 #include "BattlegroundDS.h"
 #include "BattlegroundMgr.h"

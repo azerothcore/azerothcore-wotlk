@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
@@ -31,7 +32,6 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)

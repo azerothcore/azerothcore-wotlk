@@ -17,10 +17,10 @@
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ruby_sanctum.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
+#include "ruby_sanctum.h"
 
 DoorData const doorData[] =
 {

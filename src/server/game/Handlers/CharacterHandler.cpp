@@ -28,6 +28,7 @@
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "Log.h"
 #include "Metric.h"

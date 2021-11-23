@@ -16,8 +16,8 @@
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "violet_hold.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000

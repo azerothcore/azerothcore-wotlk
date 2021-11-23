@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TotemAI.h"
 #include "CellImpl.h"
 #include "Creature.h"
 #include "DBCStores.h"
@@ -23,7 +24,6 @@
 #include "ObjectAccessor.h"
 #include "SpellMgr.h"
 #include "Totem.h"
-#include "TotemAI.h"
 
 int TotemAI::Permissible(Creature const* creature)
 {

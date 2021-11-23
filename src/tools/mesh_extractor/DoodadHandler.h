@@ -17,10 +17,10 @@
 
 #ifndef DOOADHNDL_H
 #define DOOADHNDL_H
-#include "ObjectDataHandler.h"
-#include "Utils.h"
 #include "Chunk.h"
 #include "Model.h"
+#include "ObjectDataHandler.h"
+#include "Utils.h"
 #include <set>
 #include <vector>
 

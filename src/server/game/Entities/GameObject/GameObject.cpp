@@ -34,9 +34,9 @@
 #include "Transport.h"
 #include "UpdateFieldFlags.h"
 #include "World.h"
-#include <G3D/Quat.h>
 #include <G3D/Box.h>
 #include <G3D/CoordinateFrame.h>
+#include <G3D/Quat.h>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -298,6 +298,8 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         // used switch since there should be more
         case 181233: // maexxna portal effect
         case 181575: // maexxna portal
+        case 20992: // theramore black shield
+        case 21042: // theramore guard badge
             SetLocalRotation(rotation);
             break;
         default:
@@ -427,6 +429,22 @@ void GameObject::Update(uint32 diff)
         {
             m_despawnDelay = 0;
             DespawnOrUnsummon(0ms, m_despawnRespawnTime);
+        }
+    }
+
+    for (std::unordered_map<ObjectGuid, int32>::iterator itr = m_SkillupList.begin(); itr != m_SkillupList.end();)
+    {
+        if (itr->second > 0)
+        {
+            if (itr->second > static_cast<int32>(diff))
+            {
+                itr->second -= static_cast<int32>(diff);
+                ++itr;
+            }
+            else
+            {
+                itr = m_SkillupList.erase(itr);
+            }
         }
     }
 
@@ -2847,4 +2865,23 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     }
 
     return nullptr;
+}
+
+void GameObject::AddToSkillupList(ObjectGuid playerGuid)
+{
+    int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;
+    m_SkillupList[playerGuid] = timer;
+}
+
+bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
+{
+    for (auto const& itr : m_SkillupList)
+    {
+        if (itr.first == playerGuid)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

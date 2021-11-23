@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "AccountMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Battleground.h"
@@ -25,8 +25,8 @@
 #include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCEnums.h"
+#include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GridNotifiersImpl.h"
