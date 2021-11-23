@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1637692848290406800');
 
-DROP TABLE IF EXIST `creature_movement_override`;
+DROP TABLE IF EXISTS `creature_movement_override`;
 CREATE TABLE `creature_movement_override` (
 	`SpawnId` INT UNSIGNED NOT NULL DEFAULT '0',
 	`Ground` TINYINT UNSIGNED NULL DEFAULT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE `creature_movement_override` (
 )
 COLLATE='utf8mb4_general_ci' ENGINE=MyISAM;
 
-DROP TABLE IF EXIST `creature_template_movement`;
+DROP TABLE IF EXISTS `creature_template_movement`;
 CREATE TABLE `creature_template_movement` (
 	`CreatureId` INT UNSIGNED NOT NULL DEFAULT '0',
 	`Ground` TINYINT UNSIGNED NULL DEFAULT NULL,
