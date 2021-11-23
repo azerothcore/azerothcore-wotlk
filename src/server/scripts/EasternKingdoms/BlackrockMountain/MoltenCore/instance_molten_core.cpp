@@ -15,12 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "InstanceScript.h"
 #include "TemporarySummon.h"
 #include "molten_core.h"
 
@@ -265,20 +263,6 @@ public:
                         }
                         break;
                     }
-                    case IN_PROGRESS:
-                    {
-                        if (!_golemaggMinionsGUIDS.empty())
-                        {
-                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
-                            {
-                                if (Creature* minion = instance->GetCreature(minionGuid))
-                                {
-                                    minion->AI()->DoZoneInCombat(nullptr, 150.0f);
-                                }
-                            }
-                        }
-                        break;
-                    }
                     case DONE:
                     {
                         if (!_golemaggMinionsGUIDS.empty())
@@ -294,6 +278,7 @@ public:
                         }
                         break;
                     }
+                    case IN_PROGRESS:
                     default:
                         break;
                 }

@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "QuestDef.h"
 #include "Formulas.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "QuestDef.h"
 #include "World.h"
 
 Quest::Quest(Field* questRecord)

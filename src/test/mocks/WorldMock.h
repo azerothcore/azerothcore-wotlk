@@ -19,8 +19,8 @@
 #define AZEROTHCORE_WORLDMOCK_H
 
 #include "ArenaSpectator.h"
-#include "gmock/gmock.h"
 #include "IWorld.h"
+#include "gmock/gmock.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -86,9 +86,9 @@ public:
     MOCK_METHOD(void, SendServerMessage, (ServerMessageType type, const char* text, Player* player));
     MOCK_METHOD(bool, IsShuttingDown, (), (const));
     MOCK_METHOD(uint32, GetShutDownTimeLeft, (), (const));
-    MOCK_METHOD(void, ShutdownServ, (uint32 time, uint32 options, uint8 exitcode), ());
+    MOCK_METHOD(void, ShutdownServ, (uint32 time, uint32 options, uint8 exitcode, const std::string& reason), ());
     MOCK_METHOD(void, ShutdownCancel, ());
-    MOCK_METHOD(void, ShutdownMsg, (bool show, Player* player), ());
+    MOCK_METHOD(void, ShutdownMsg, (bool show, Player* player, const std::string& reason), ());
     MOCK_METHOD(void, Update, (uint32 diff), ());
     MOCK_METHOD(void, UpdateSessions, (uint32 diff), ());
     MOCK_METHOD(void, setRate, (Rates rate, float value), ());
