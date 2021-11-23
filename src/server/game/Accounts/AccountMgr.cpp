@@ -470,7 +470,7 @@ void AccountMgr::LoadRBAC()
             LOG_ERROR("sql.sql", "RBAC Permission %u has itself as linked permission. Ignored", permissionId);
             continue;
         }
-        permission->AddLinkedPermission(linkedPermissionId); // @TODO THIS FUCKING LINE HAS CRASH
+        permission->AddLinkedPermission(linkedPermissionId);
         ++count2;
     }
     while (result->NextRow());
