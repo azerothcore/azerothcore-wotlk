@@ -43,44 +43,44 @@ class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
 class Channel;
+class ChatHandler;
 class Creature;
 class CreatureAI;
 class DynamicObject;
 class GameObject;
 class GameObjectAI;
-class Guild;
 class GridMap;
 class Group;
+class Guild;
 class InstanceMap;
 class InstanceScript;
 class Item;
 class Map;
+class MotionTransport;
 class OutdoorPvP;
 class Player;
 class Quest;
 class ScriptMgr;
 class Spell;
-class SpellScript;
-class SpellInfo;
 class SpellCastTargets;
-class Transport;
+class SpellInfo;
+class SpellScript;
 class StaticTransport;
-class MotionTransport;
+class Transport;
 class Unit;
 class Vehicle;
+class WorldObject;
 class WorldPacket;
 class WorldSocket;
-class WorldObject;
-class ChatHandler;
 
 struct AchievementCriteriaData;
 struct AuctionEntry;
-struct ConditionSourceInfo;
 struct Condition;
+struct ConditionSourceInfo;
 struct DungeonProgressionRequirements;
+struct GroupQueueInfo;
 struct ItemTemplate;
 struct OutdoorPvPData;
-struct GroupQueueInfo;
 struct TargetInfo;
 
 namespace Acore::ChatCommands
@@ -1400,11 +1400,11 @@ public:
 
     virtual void OnBeforeAuraRankForLevel(SpellInfo const* /*spellInfo*/, SpellInfo const* /*latestSpellInfo*/, uint8 /*level*/) { }
 
-    virtual void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget) { }
+    virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, GameObject* /*gameObjTarget*/) { }
 
-    virtual void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget) { }
+    virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, Creature* /*creatureTarget*/) { }
 
-    virtual void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget) { }
+    virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, Item* /*itemTarget*/) { }
 };
 
 // this class can be used to be extended by Modules
