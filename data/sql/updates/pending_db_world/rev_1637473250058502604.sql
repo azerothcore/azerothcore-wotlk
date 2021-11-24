@@ -2,11 +2,11 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1637473250058502604');
 
 DROP TABLE IF EXISTS `playercreateinfo_cast_spell`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_cast_spell` (
-    `raceMask` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-    `classMask` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-    `spell` MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '0',
-    `note` VARCHAR(255) DEFAULT NULL
-) ENGINE=MYISAM DEFAULT CHARSET=utf8;
+    `raceMask` INT UNSIGNED NOT NULL DEFAULT '0',
+    `classMask` INT UNSIGNED NOT NULL DEFAULT '0',
+    `spell` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
+    `note` VARCHAR DEFAULT NULL
+) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4;
 
 DELETE FROM `playercreateinfo_cast_spell` WHERE `spell` IN (48266, 2457);
 INSERT INTO `playercreateinfo_cast_spell` (`racemask`, `classmask`, `spell`, `note`) VALUES
