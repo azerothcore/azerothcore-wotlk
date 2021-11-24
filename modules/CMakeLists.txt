@@ -55,7 +55,6 @@ endforeach()
 function(ConfigureElunaModule moduleName)
   set(MOD_ELUNA_FOUND 1 PARENT_SCOPE)
   GetPathToModuleSource(${SOURCE_MODULE} MODULE_SOURCE_PATH)
-  add_subdirectory(${MODULE_SOURCE_PATH}/lualib)
   set(MOD_ELUNA_PATH ${MODULE_SOURCE_PATH} PARENT_SCOPE)
 
   # Define eluna compile options
@@ -349,6 +348,16 @@ target_compile_options(modules
     -DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
 
 if (MOD_ELUNA_FOUND)
+  if (APPLE)
+    target_compile_definitions(modules
+      PUBLIC
+        LUA_USE_MACOSX)
+  elseif (UNIX)
+    target_compile_definitions(modules
+      PUBLIC
+        LUA_USE_LINUX)
+  endif()
+
   if (WIN32)
     if (MSVC)
       set(MSVC_CONFIGURATION_NAME $(ConfigurationName)/)
