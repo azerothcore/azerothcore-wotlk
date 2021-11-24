@@ -43,6 +43,15 @@ namespace
         return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos;
     }
 
+    // Check logging system configs like Appender.* and Logger.*
+    bool IsLoggingSystemOptions(std::string_view optionName)
+    {
+        size_t foundAppender = optionName.find("Appender.");
+        size_t foundLogger = optionName.find("Logger.");
+
+        return foundAppender != std::string_view::npos || foundLogger != std::string_view::npos;
+    }
+
     template<typename Format, typename... Args>
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
@@ -65,19 +74,16 @@ namespace
         // Check old option
         if (isOptional && itr == _configOptions.end())
         {
-            if (!isReload)
+            if (!IsLoggingSystemOptions(optionName) && !isReload)
             {
                 PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
-            }
 
 #ifdef CONFIG_ABORT_INCORRECT_OPTIONS
-            if (!isReload)
-            {
                 ABORT_MSG("> Core can't start if found incorrect options");
-            }
 #endif
 
-            return;
+                return;
+            }            
         }
 
         // Check exit option
