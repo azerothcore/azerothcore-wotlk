@@ -298,6 +298,8 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         // used switch since there should be more
         case 181233: // maexxna portal effect
         case 181575: // maexxna portal
+        case 20992: // theramore black shield
+        case 21042: // theramore guard badge
             SetLocalRotation(rotation);
             break;
         default:
@@ -443,6 +445,10 @@ void GameObject::Update(uint32 diff)
             {
                 itr = m_SkillupList.erase(itr);
             }
+        }
+        else
+        {
+            ++itr;
         }
     }
 
