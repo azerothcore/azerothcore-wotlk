@@ -1706,7 +1706,6 @@ public: /* MapScript */
 public: /* InstanceMapScript */
     InstanceScript* CreateInstanceScript(InstanceMap* map);
 
-
 public: /* ItemScript */
     bool OnQuestAccept(Player* player, Item* item, Quest const* quest);
     bool OnItemUse(Player* player, Item* item, SpellCastTargets const& targets);
