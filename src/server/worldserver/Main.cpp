@@ -64,10 +64,6 @@
 
 #include "ModuleMgr.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 #ifdef _WIN32
 #include "ServiceWin32.h"
 char serviceName[] = "worldserver";
@@ -336,10 +332,6 @@ int main(int argc, char** argv)
 
         sOutdoorPvPMgr->Die();                     // unload it before MapMgr
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
-
-#ifdef ELUNA
-        Eluna::Uninitialize();
-#endif
     });
 
     // Start the Remote Access port (acceptor) if enabled

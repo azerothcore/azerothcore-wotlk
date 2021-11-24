@@ -38,6 +38,7 @@ set("AC_SCRIPTS_INCLUDES" "")
 set("AC_MODULE_LIST" "")
 set("AC_SCRIPTS_LIST" "")
 set(MOD_ELUNA_FOUND 0)
+set(MOD_ELUNA_PATH "")
 
 foreach(include ${AC_ADD_SCRIPTS_INCLUDE})
   set("AC_SCRIPTS_INCLUDES" "#include \"${include}\"\n${AC_SCRIPTS_INCLUDES}")
@@ -52,52 +53,14 @@ foreach(scriptName ${AC_ADD_SCRIPTS_LIST})
 endforeach()
 
 function(ConfigureElunaModule moduleName)
-  set(MOD_ELUNA_FOUND 1)
-
+  set(MOD_ELUNA_FOUND 1 PARENT_SCOPE)
   GetPathToModuleSource(${SOURCE_MODULE} MODULE_SOURCE_PATH)
-
   add_subdirectory(${MODULE_SOURCE_PATH}/lualib)
-
-  file(GLOB_RECURSE method_headers ${MODULE_SOURCE_PATH}/LuaEngine/*Methods.h)
-  file(GLOB_RECURSE sources_ElunaFile_CPP ${MODULE_SOURCE_PATH}/LuaEngine/*.cpp)
-  file(GLOB_RECURSE sources_ElunaFile_H ${MODULE_SOURCE_PATH}/LuaEngine/*.h)
-
-  set(ElunaLuaEngineFiles
-    # ${method_headers}
-    ${sources_ElunaFile_H}
-    ${sources_ElunaFile_CPP})
-
-  source_group("LuaEngine\\Methods" FILES ${method_headers})
-  source_group("LuaEngine\\Header Files" FILES ${sources_ElunaFile_H})
-  source_group("LuaEngine\\Source Files" FILES ${sources_ElunaFile_CPP})
-
-  add_library(LuaEngine STATIC
-    ${ElunaLuaEngineFiles})
-
-  target_link_libraries(LuaEngine
-    PRIVATE
-      game-interface)
-
-  set(PUBLIC_INCLUDES_ELUNA
-    ${MODULE_SOURCE_PATH}/LuaEngine
-    ${MODULE_SOURCE_PATH}/lualib)
-
-  target_include_directories(game-interface
-    INTERFACE
-      ${PUBLIC_INCLUDES_ELUNA})
-
-  # add_dependencies(game
-    # lualib)
-
-  target_link_libraries(game
-    PUBLIC
-      lualib
-      LuaEngine)
+  set(MOD_ELUNA_PATH ${MODULE_SOURCE_PATH} PARENT_SCOPE)
 
   # Define eluna compile options
   target_compile_options(game-interface
     INTERFACE
-      -DELUNA
       -DAZEROTHCORE
       -DWOTLK)
 endfunction()
@@ -240,11 +203,6 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
         continue()
       endif()
 
-      # Skip mod-eluna-lua-engine
-      if (SOURCE_MODULE MATCHES "mod-eluna-lua-engine")
-        continue()
-      endif()
-
       # Add the module name to STATIC_SCRIPT_MODULES
       list(APPEND STATIC_SCRIPT_MODULES ${SOURCE_MODULE})
 
@@ -312,10 +270,15 @@ ConfigureScriptLoader("static" SCRIPT_MODULE_PRIVATE_SCRIPTLOADER OFF ${STATIC_S
 
 list(REMOVE_DUPLICATES SCRIPT_MODULE_PRIVATE_SCRIPTLOADER)
 
+if (MOD_ELUNA_FOUND)
+  list(REMOVE_ITEM PRIVATE_SOURCES_MODULES ${MOD_ELUNA_PATH}/lualib/lua.c)
+  list(REMOVE_ITEM PRIVATE_SOURCES_MODULES ${MOD_ELUNA_PATH}/lualib/luac.c)
+endif()
+
 add_library(modules STATIC
-  ModulesScriptLoader.h
-  ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER}
-  ${PRIVATE_SOURCES_MODULES})
+    ModulesScriptLoader.h
+    ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER}
+    ${PRIVATE_SOURCES_MODULES})
 
 target_link_libraries(modules
   PRIVATE
@@ -334,10 +297,10 @@ set_target_properties(scripts
       "modules")
 
 # Generate precompiled header
-if (USE_SCRIPTPCH)
-  list(APPEND ALL_SCRIPT_PROJECTS modules ${DYNAMIC_SCRIPT_MODULE_PROJECTS})
-  add_cxx_pch("${ALL_SCRIPT_PROJECTS}" ${PRIVATE_PCH_HEADER})
-endif()
+# if (USE_SCRIPTPCH)
+#   list(APPEND ALL_SCRIPT_PROJECTS modules ${DYNAMIC_SCRIPT_MODULE_PROJECTS})
+#   add_cxx_pch("${ALL_SCRIPT_PROJECTS}" ${PRIVATE_PCH_HEADER})
+# endif()
 
 # Remove all shared libraries in the installl directory which
 # are contained in the static library already.
@@ -394,10 +357,10 @@ if (MOD_ELUNA_FOUND)
     add_custom_command(TARGET modules
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/extensions" "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/")
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${MOD_ELUNA_PATH}/LuaEngine/extensions" "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/")
   endif()
 
-  install(DIRECTORY "${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine/extensions" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
+  install(DIRECTORY "${MOD_ELUNA_PATH}/LuaEngine/extensions" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
 endif()
 
 message("")

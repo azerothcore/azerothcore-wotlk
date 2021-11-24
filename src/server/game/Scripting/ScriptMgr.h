@@ -71,6 +71,7 @@ class Vehicle;
 class WorldPacket;
 class WorldSocket;
 class WorldObject;
+class ChatHandler;
 
 struct AchievementCriteriaData;
 struct AuctionEntry;
@@ -169,11 +170,11 @@ public:
 
     // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
     // and modifying it is safe.
-    virtual void OnPacketSend(WorldSession* /*session*/, WorldPacket& /*packet*/) { }
+    [[nodiscard]] virtual bool CanPacketSend(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
 
     // Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
     // reading and modifying it is safe. Make sure to check WorldSession pointer before usage, it might be null in case of auth packets
-    virtual void OnPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { }
+    [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
 };
 
 class WorldScript : public ScriptObject
@@ -217,7 +218,12 @@ public:
      *
      * @param version The cache version that we will be sending to the Client.
      */
-    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) {}
+    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) { }
+
+    /**
+     * @brief This hook runs after all scripts loading and before itialized
+     */
+    virtual void OnBeforeWorldInitialized() { }
 };
 
 class FormulaScript : public ScriptObject
@@ -426,6 +432,8 @@ public:
     [[nodiscard]] virtual bool CanSetPhaseMask(Unit const* /*unit*/, uint32 /*newPhaseMask*/, bool /*update*/) { return true; }
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
+
+    virtual void OnUnitUpdate(Unit* /*unit*/, uint32 /*diff*/) { }
 };
 
 class MovementHandlerScript : public ScriptObject
@@ -449,6 +457,16 @@ public:
 
     // Called when a player leave any Map
     virtual void OnPlayerLeaveAll(Map* /*map*/, Player* /*player*/) { }
+
+    virtual void OnBeforeCreateInstanceScript(InstanceMap* /*instanceMap*/, InstanceScript* /*instanceData*/, bool /*load*/, std::string /*data*/, uint32 /*completedEncounterMask*/) { }
+
+    virtual void OnDestroyInstance(MapInstanced* /*mapInstanced*/, Map* /*map*/) { }
+
+    virtual void OnCreateMap(Map* /*map*/) { }
+
+    virtual void OnDestroyMap(Map* /*map*/) { }
+
+    virtual void OnMapUpdate(Map* /*map*/, uint32 /*diff*/) { }
 };
 
 class AllCreatureScript : public ScriptObject
@@ -498,6 +516,20 @@ public:
 
     // Called when a CreatureAI object is needed for the creature.
     virtual CreatureAI* GetAI(Creature* /*creature*/) const { return nullptr; }
+
+    /**
+     * @brief This hook runs after add creature in world
+     *
+     * @param creature Contains information about the Creature
+     */
+    virtual void OnCreatureAddWorld(Creature* /*creature*/) { }
+
+    /**
+     * @brief This hook runs after remove creature in world
+     *
+     * @param creature Contains information about the Creature
+     */
+    virtual void OnCreatureRemoveWorld(Creature* /*creature*/) { }
 };
 
 class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
@@ -540,6 +572,20 @@ public:
 
     // Called when a GameObjectAI object is needed for the gameobject.
     virtual GameObjectAI* GetAI(GameObject* /*go*/) const { return nullptr; }
+
+    /**
+     * @brief This hook runs after add game object in world
+     *
+     * @param go Contains information about the GameObject
+     */
+    virtual void OnGameObjectAddWorld(GameObject* /*go*/) { }
+
+    /**
+     * @brief This hook runs after remove game object in world
+     *
+     * @param go Contains information about the GameObject
+     */
+    virtual void OnGameObjectRemoveWorld(GameObject* /*go*/) { }
 };
 
 class AreaTriggerScript : public ScriptObject
@@ -1064,6 +1110,26 @@ public:
 
     virtual void OnSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
+    virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
+
+    [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/) { return true; }
+
+    [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Player* /*receiver*/) { return true; }
+
+    [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Group* /*group*/) { return true; }
+
+    [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Guild* /*guild*/) { return true; }
+
+    [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Channel* /*channel*/) { return true; }
+
+    virtual void OnPlayerLearnTalents(Player* /*player*/, uint32 /*talentId*/, uint32 /*talentRank*/, uint32 /*spellid*/) { }
+
+    virtual void OnPlayerEnterCombat(Player* /*player*/, Unit* /*enemy*/) { }
+
+    virtual void OnPlayerLeaveCombat(Player* /*player*/) { }
+
+    virtual void OnQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
+
     // Passive Anticheat System
     virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
     virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
@@ -1211,7 +1277,11 @@ protected:
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
-    // Start Battlegroud
+    /**
+     * @brief This hook runs before start Battleground
+     *
+     * @param bg Contains information about the Battleground
+     */
     virtual void OnBattlegroundStart(Battleground* /*bg*/) { }
 
     // End Battleground
@@ -1262,6 +1332,28 @@ public:
      * @return True if you want to continue sending the message, false if you want to disable the message
      */
     [[nodiscard]] virtual bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
+
+    /**
+     * @brief This hook runs after end Battleground
+     *
+     * @param bg Contains information about the Battleground
+     * @param TeamId Contains information about the winneer team
+     */
+    virtual void OnBattlegroundEnd(Battleground* /*bg*/, TeamId /*winner team*/) { }
+
+    /**
+     * @brief This hook runs before Battleground destroy
+     *
+     * @param bg Contains information about the Battleground
+     */
+    virtual void OnBattlegroundDestroy(Battleground* /*bg*/) { }
+
+    /**
+     * @brief This hook runs after Battleground create
+     *
+     * @param bg Contains information about the Battleground
+     */
+    virtual void OnBattlegroundCreate(Battleground* /*bg*/) { }
 };
 
 class ArenaTeamScript : public ScriptObject
@@ -1307,6 +1399,12 @@ public:
     virtual void OnRemoveAuraScaleTargets(Spell* /*spell*/, TargetInfo& /*targetInfo*/, uint8 /*auraScaleMask*/, bool& /*needErase*/) { }
 
     virtual void OnBeforeAuraRankForLevel(SpellInfo const* /*spellInfo*/, SpellInfo const* /*latestSpellInfo*/, uint8 /*level*/) { }
+
+    virtual void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget) { }
+
+    virtual void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget) { }
+
+    virtual void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget) { }
 };
 
 // this class can be used to be extended by Modules
@@ -1381,6 +1479,8 @@ public:
     [[nodiscard]] virtual bool CanUnlearnSpellDefault(Pet* /*pet*/, SpellInfo const* /*spellEntry*/) { return true; }
 
     [[nodiscard]] virtual bool CanResetTalents(Pet* /*pet*/) { return true; }
+
+    virtual void OnPetAddToWorld(Pet* /*pet*/) { }
 };
 
 class ArenaScript : public ScriptObject
@@ -1443,6 +1543,8 @@ public:
     virtual void OnPlayerSetPhase(const AuraEffect* /*auraEff*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/, uint32& /*newPhase*/) { }
 
     virtual void OnInstanceSave(InstanceSave* /*instanceSave*/) { }
+
+    virtual void GetDialogStatus(Player* /*player*/, Object* /*questgiver*/) { }
 };
 
 class CommandSC : public ScriptObject
@@ -1455,7 +1557,15 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-     virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+
+    /**
+     * @brief This hook runs execute chat command
+     *
+     * @param handler Contains information about the ChatHandler
+     * @param cmdStr Contains information about the command name
+     */
+    [[nodiscard]] virtual bool CanExecuteCommand(ChatHandler& /*handler*/, std::string_view /*cmdStr*/) { return true; }
 };
 
 class DatabaseScript : public ScriptObject
@@ -1469,6 +1579,40 @@ public:
     bool IsDatabaseBound() const { return false; }
 
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) {}
+};
+
+class WorldObjectScript : public ScriptObject
+{
+protected:
+
+    WorldObjectScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnWorldObjectDestroy(WorldObject* /*object*/) { }
+
+    virtual void OnWorldObjectCreate(WorldObject* /*object*/) { }
+
+    virtual void OnWorldObjectSetMap(WorldObject* /*object*/, Map* /*map*/ ) { }
+
+    virtual void OnWorldObjectResetMap(WorldObject* /*object*/) { }
+
+    virtual void OnWorldObjectUpdate(WorldObject* /*object*/, uint32 /*diff*/) { }
+};
+
+class LootScript : public ScriptObject
+{
+protected:
+
+    LootScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnLootMoney(Player* /*player*/, uint32 /*gold*/) { }
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1522,8 +1666,8 @@ public: /* ServerScript */
     void OnNetworkStop();
     void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
     void OnSocketClose(std::shared_ptr<WorldSocket> socket);
-    void OnPacketReceive(WorldSession* session, WorldPacket const& packet);
-    void OnPacketSend(WorldSession* session, WorldPacket const& packet);
+    bool CanPacketReceive(WorldSession* session, WorldPacket const& packet);
+    bool CanPacketSend(WorldSession* session, WorldPacket const& packet);
 
 public: /* WorldScript */
     void OnLoadCustomDatabaseTable();
@@ -1537,6 +1681,7 @@ public: /* WorldScript */
     void OnWorldUpdate(uint32 diff);
     void OnStartup();
     void OnShutdown();
+    void OnBeforeWorldInitialized();
 
 public: /* FormulaScript */
     void OnHonorCalculation(float& honor, uint8 level, float multiplier);
@@ -1561,6 +1706,7 @@ public: /* MapScript */
 public: /* InstanceMapScript */
     InstanceScript* CreateInstanceScript(InstanceMap* map);
 
+
 public: /* ItemScript */
     bool OnQuestAccept(Player* player, Item* item, Quest const* quest);
     bool OnItemUse(Player* player, Item* item, SpellCastTargets const& targets);
@@ -1581,6 +1727,8 @@ public: /* CreatureScript */
     uint32 GetDialogStatus(Player* player, Creature* creature);
     CreatureAI* GetCreatureAI(Creature* creature);
     void OnCreatureUpdate(Creature* creature, uint32 diff);
+    void OnCreatureAddWorld(Creature* creature);
+    void OnCreatureRemoveWorld(Creature* creature);
 
 public: /* GameObjectScript */
     bool OnGossipHello(Player* player, GameObject* go);
@@ -1595,6 +1743,8 @@ public: /* GameObjectScript */
     void OnGameObjectStateChanged(GameObject* go, uint32 state);
     void OnGameObjectUpdate(GameObject* go, uint32 diff);
     GameObjectAI* GetGameObjectAI(GameObject* go);
+    void OnGameObjectAddWorld(GameObject* go);
+    void OnGameObjectRemoveWorld(GameObject* go);
 
 public: /* AreaTriggerScript */
     bool OnAreaTrigger(Player* player, AreaTrigger const* trigger);
@@ -1781,6 +1931,18 @@ public: /* PlayerScript */
     bool CanInitTrade(Player* player, Player* target);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
+    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg);
+    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Player* receiver);
+    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Group* group);
+    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Guild* guild);
+    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Channel* channel);
+    void OnPlayerLearnTalents(Player* player, uint32 talentId, uint32 talentRank, uint32 spellid);
+    void OnPlayerEnterCombat(Player* player, Unit* enemy);
+    void OnPlayerLeaveCombat(Player* player);
+    void OnQuestAbandon(Player* player, uint32 questId);
+
+    // Anti cheat
     void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
     void AnticheatSetUnderACKmount(Player* player);
@@ -1858,6 +2020,7 @@ public: /* UnitScript */
     bool IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
     bool CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update);
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
+    void OnUnitUpdate(Unit* unit, uint32 diff);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
@@ -1868,9 +2031,8 @@ public: /* AllCreatureScript */
     void Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature);
 
 public: /* AllMapScript */
-    //listener functions are called by OnPlayerEnterMap and OnPlayerLeaveMap
-    //void OnPlayerEnterAll(Map* map, Player* player);
-    //void OnPlayerLeaveAll(Map* map, Player* player);
+    void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask);
+    void OnDestroyInstance(MapInstanced* mapInstanced, Map* map);
 
 public: /* BGScript */
     void OnBattlegroundStart(Battleground* bg);
@@ -1888,6 +2050,9 @@ public: /* BGScript */
     bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
     bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
     bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
+    void OnBattlegroundEnd(Battleground* bg, TeamId winnerTeamId);
+    void OnBattlegroundDestroy(Battleground* bg);
+    void OnBattlegroundCreate(Battleground* bg);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
@@ -1907,6 +2072,9 @@ public: /* SpellSC */
     void OnScaleAuraUnitAdd(Spell* spell, Unit* target, uint32 effectMask, bool checkIfValid, bool implicit, uint8 auraScaleMask, TargetInfo& targetInfo);
     void OnRemoveAuraScaleTargets(Spell* spell, TargetInfo& targetInfo, uint8 auraScaleMask, bool& needErase);
     void OnBeforeAuraRankForLevel(SpellInfo const* spellInfo, SpellInfo const* latestSpellInfo, uint8 level);
+    void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget);
+    void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget);
+    void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget);
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);
@@ -1917,53 +2085,71 @@ public: /* MailScript */
 
 public: /* AchievementScript */
 
-        void SetRealmCompleted(AchievementEntry const* achievement);
-        bool IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress);
-        bool IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime);
-        void OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList);
-        bool CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria);
+    void SetRealmCompleted(AchievementEntry const* achievement);
+    bool IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress);
+    bool IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime);
+    void OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList);
+    bool CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria);
 
-    public: /* PetScript */
+public: /* PetScript */
 
-        void OnInitStatsForLevel(Guardian* guardian, uint8 petlevel);
-        void OnCalculateMaxTalentPointsForLevel(Pet* pet, uint8 level, uint8& points);
-        bool CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell);
-        bool CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry);
-        bool CanResetTalents(Pet* pet);
+    void OnInitStatsForLevel(Guardian* guardian, uint8 petlevel);
+    void OnCalculateMaxTalentPointsForLevel(Pet* pet, uint8 level, uint8& points);
+    bool CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell);
+    bool CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry);
+    bool CanResetTalents(Pet* pet);
 
-    public: /* ArenaScript */
+public: /* ArenaScript */
 
-        bool CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid);
-        void OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points);
-        bool CanSaveToDB(ArenaTeam* team);
+    bool CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid);
+    void OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points);
+    bool CanSaveToDB(ArenaTeam* team);
 
-    public: /* MiscScript */
+public: /* MiscScript */
 
-        void OnConstructObject(Object* origin);
-        void OnDestructObject(Object* origin);
-        void OnConstructPlayer(Player* origin);
-        void OnDestructPlayer(Player* origin);
-        void OnConstructGroup(Group* origin);
-        void OnDestructGroup(Group* origin);
-        void OnConstructInstanceSave(InstanceSave* origin);
-        void OnDestructInstanceSave(InstanceSave* origin);
-        void OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner);
-        bool CanApplySoulboundFlag(Item* item, ItemTemplate const* proto);
-        bool CanItemApplyEquipSpell(Player* player, Item* item);
-        bool CanSendAuctionHello(WorldSession const* session, ObjectGuid guid, Creature* creature);
-        void ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags);
-        void OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase);
-        void ValidateSpellAtCastSpellResult(Player* player, Unit* mover, Spell* spell, uint32 oldSpellId, uint32 spellId);
-        void OnAfterLootTemplateProcess(Loot* loot, LootTemplate const* tab, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode);
-        void OnInstanceSave(InstanceSave* instanceSave);
+    void OnConstructObject(Object* origin);
+    void OnDestructObject(Object* origin);
+    void OnConstructPlayer(Player* origin);
+    void OnDestructPlayer(Player* origin);
+    void OnConstructGroup(Group* origin);
+    void OnDestructGroup(Group* origin);
+    void OnConstructInstanceSave(InstanceSave* origin);
+    void OnDestructInstanceSave(InstanceSave* origin);
+    void OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner);
+    bool CanApplySoulboundFlag(Item* item, ItemTemplate const* proto);
+    bool CanItemApplyEquipSpell(Player* player, Item* item);
+    bool CanSendAuctionHello(WorldSession const* session, ObjectGuid guid, Creature* creature);
+    void ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags);
+    void OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase);
+    void ValidateSpellAtCastSpellResult(Player* player, Unit* mover, Spell* spell, uint32 oldSpellId, uint32 spellId);
+    void OnAfterLootTemplateProcess(Loot* loot, LootTemplate const* tab, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode);
+    void OnInstanceSave(InstanceSave* instanceSave);
+    void GetDialogStatus(Player* player, Object* questgiver);
 
-    public: /* CommandSC */
+public: /* CommandSC */
 
-        void OnHandleDevCommand(Player* player, std::string& argstr);
+    void OnHandleDevCommand(Player* player, std::string& argstr);
+    bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
 
-    public: /* DatabaseScript */
+public: /* DatabaseScript */
 
-        void OnAfterDatabasesLoaded(uint32 updateFlags);
+    void OnAfterDatabasesLoaded(uint32 updateFlags);
+
+public: /* WorldObjectScript */
+
+    void OnWorldObjectDestroy(WorldObject* object);
+    void OnWorldObjectCreate(WorldObject* object);
+    void OnWorldObjectSetMap(WorldObject* object, Map* map);
+    void OnWorldObjectResetMap(WorldObject* object);
+    void OnWorldObjectUpdate(WorldObject* object, uint32 diff);
+
+public: /* PetScript */
+
+    void OnPetAddToWorld(Pet* pet);
+
+public: /* LootScript */
+
+    void OnLootMoney(Player* player, uint32 gold);
 
 private:
     uint32 _scriptCount;
