@@ -84,10 +84,6 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const /*uiDiff*/) override
-        {
-            me->StopMoving();
-        }
     };
 };
 
