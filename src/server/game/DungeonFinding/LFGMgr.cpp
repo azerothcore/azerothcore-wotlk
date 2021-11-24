@@ -2233,7 +2233,7 @@ namespace lfg
 
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             else
             {
                 done = true;
@@ -2241,7 +2241,7 @@ namespace lfg
                 if (!quest)
                     continue;
                 // we give reward without informing client (retail does this)
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             }
 
             // Give rewards
