@@ -446,6 +446,10 @@ void GameObject::Update(uint32 diff)
                 itr = m_SkillupList.erase(itr);
             }
         }
+        else
+        {
+            ++itr;
+        }
     }
 
     switch (m_lootState)
