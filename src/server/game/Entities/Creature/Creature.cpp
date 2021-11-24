@@ -2249,6 +2249,11 @@ void Creature::CallForHelp(float radius, Unit* target /*= nullptr*/)
         target = GetVictim();
     }
 
+    if (!target)
+    {
+        return;
+    }
+
     Acore::CallOfHelpCreatureInRangeDo u_do(this, target, radius);
     Acore::CreatureWorker<Acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
     Cell::VisitGridObjects(this, worker, radius);
