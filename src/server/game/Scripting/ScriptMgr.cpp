@@ -734,6 +734,14 @@ bool ScriptMgr::OnGossipHello(Player* player, Creature* creature)
     ASSERT(player);
     ASSERT(creature);
 
+    bool ret = false;
+    FOR_SCRIPTS_RET(ElunaScript, itr, end, ret) // return true by default if not scripts
+        if (itr->second->OnGossipHello(player, creature))
+            ret = true; // we change ret value only when scripts return false
+
+    if (ret)
+        return true;
+
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     ClearGossipMenuFor(player);
     return tmpscript->OnGossipHello(player, creature);
@@ -744,6 +752,14 @@ bool ScriptMgr::OnGossipSelect(Player* player, Creature* creature, uint32 sender
     ASSERT(player);
     ASSERT(creature);
 
+    bool ret = false;
+    FOR_SCRIPTS_RET(ElunaScript, itr, end, ret) // return true by default if not scripts
+        if (itr->second->OnGossipSelect(player, creature, sender, action))
+            ret = true; // we change ret value only when scripts return false
+
+    if (ret)
+        return true;
+
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     return tmpscript->OnGossipSelect(player, creature, sender, action);
 }
@@ -753,6 +769,14 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, Creature* creature, uint32 se
     ASSERT(player);
     ASSERT(creature);
     ASSERT(code);
+
+    bool ret = false;
+    FOR_SCRIPTS_RET(ElunaScript, itr, end, ret) // return true by default if not scripts
+        if (itr->second->OnGossipSelectCode(player, creature, sender, action, code))
+            ret = true; // we change ret value only when scripts return false
+
+    if (ret)
+        return true;
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
     return tmpscript->OnGossipSelectCode(player, creature, sender, action, code);
@@ -3403,6 +3427,11 @@ LootScript::LootScript(const char* name) : ScriptObject(name)
     ScriptRegistry<LootScript>::AddScript(this);
 }
 
+ElunaScript::ElunaScript(const char* name) : ScriptObject(name)
+{
+    ScriptRegistry<ElunaScript>::AddScript(this);
+}
+
 // Specialize for each script type class like so:
 template class ScriptRegistry<SpellScriptLoader>;
 template class ScriptRegistry<ServerScript>;
@@ -3447,3 +3476,4 @@ template class ScriptRegistry<CommandSC>;
 template class ScriptRegistry<DatabaseScript>;
 template class ScriptRegistry<WorldObjectScript>;
 template class ScriptRegistry<LootScript>;
+template class ScriptRegistry<ElunaScript>;

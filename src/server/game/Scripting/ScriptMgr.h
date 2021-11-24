@@ -1615,6 +1615,26 @@ public:
     virtual void OnLootMoney(Player* /*player*/, uint32 /*gold*/) { }
 };
 
+class ElunaScript : public ScriptObject
+{
+protected:
+
+    ElunaScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    // Called when a player opens a gossip dialog with the creature.
+    [[nodiscard]] virtual bool OnGossipHello(Player* /*player*/, Creature* /*creature*/) { return false; }
+
+    // Called when a player selects a gossip item in the creature's gossip menu.
+    [[nodiscard]] virtual bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
+
+    // Called when a player selects a gossip with a code in the creature's gossip menu.
+    [[nodiscard]] virtual bool OnGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+};
+
 // Manages registration, loading, and execution of scripts.
 class ScriptMgr
 {
