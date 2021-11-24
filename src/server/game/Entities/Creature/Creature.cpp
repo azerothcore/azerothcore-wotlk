@@ -3198,7 +3198,7 @@ void Creature::UpdateMovementFlags()
     bool canHover = CanHover();
     bool isInAir  = (G3D::fuzzyGt(GetPositionZ(), ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
 
-    bool Swim = false;
+    bool swim = false;
 
     LiquidData const& liquidData = GetLiquidData();
     if (liquidData.Status == LIQUID_MAP_NO_WATER)
@@ -3219,10 +3219,10 @@ void Creature::UpdateMovementFlags()
                 isInAir = true;
                 [[fallthrough]];
             case LIQUID_MAP_IN_WATER:
-                Swim = z - liquidData.DepthLevel > GetCollisionHeight() * 0.75f; // Shallow water at ~75% of collision height
+                swim = z - liquidData.DepthLevel > GetCollisionHeight() * 0.75f; // Shallow water at ~75% of collision height
                 break;
             case LIQUID_MAP_UNDER_WATER:
-                Swim = true;
+                swim = true;
                 break;
             default:
                 break;
