@@ -801,7 +801,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject %s activated", go->GetGUID().ToString().c_str());
                         }
-                        
                     }
                 }
 
