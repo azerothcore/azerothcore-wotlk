@@ -18,8 +18,8 @@
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "serpent_shrine.h"
 #include "TemporarySummon.h"
+#include "serpent_shrine.h"
 
 DoorData const doorData[] =
 {

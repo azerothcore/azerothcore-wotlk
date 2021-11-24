@@ -16,11 +16,11 @@
  */
 
 #include "GridNotifiers.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -215,8 +215,7 @@ public:
             if (!sindragosa->IsAlive())
                 return true;
 
-            Position pos;
-            _owner->GetPosition(&pos);
+            Position pos = _owner->GetPosition();
             _owner->UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
 
             if (TempSummon* summon = sindragosa->SummonCreature(NPC_ICE_TOMB, pos))
@@ -238,7 +237,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }

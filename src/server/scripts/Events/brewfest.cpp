@@ -22,9 +22,9 @@
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -2105,16 +2105,16 @@ public:
 
         void Reset() override
         {
-            go->SetLootState(GO_READY);
+            me->SetLootState(GO_READY);
 
             _scheduler.Schedule(Seconds(1), [this](TaskContext /*context*/)
             {
-                go->UseDoorOrButton();
-                go->CastSpell(nullptr, SPELL_MOLE_MACHINE_EMERGE);
+                me->UseDoorOrButton();
+                me->CastSpell(nullptr, SPELL_MOLE_MACHINE_EMERGE);
             })
             .Schedule(Seconds(4), [this](TaskContext /*context*/)
             {
-                if (GameObject* trap = go->GetLinkedTrap())
+            if (GameObject* trap = me->GetLinkedTrap())
                 {
                     trap->UseDoorOrButton();
                     trap->SetLootState(GO_READY);

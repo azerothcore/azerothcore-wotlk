@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellAuraEffects.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
@@ -33,7 +34,6 @@
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
-#include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "Unit.h"
 #include "Util.h"
@@ -2808,6 +2808,7 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
         return;
 
     Unit* target = aurApp->GetTarget();
+    Unit* caster = GetCaster();
 
     if (apply)
     {
@@ -2820,6 +2821,19 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
                 creatureEntry = 24906;
             else
                 creatureEntry = 15665;
+        }
+
+        // Festive Brewfest Mount
+        if (!GetBase()->HasEffectType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && target->HasAura(FRESH_BREWFEST_HOPS))
+        {
+            if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+            {
+                creatureEntry = GREAT_BREWFEST_KODO;
+            }
+            else
+            {
+                creatureEntry = BREWFEST_KODO;
+            }
         }
 
         CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(creatureEntry);
@@ -5365,6 +5379,36 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             }
                         }
                         break;
+                    case FRESH_BREWFEST_HOPS: // Festive Brewfest Mount
+                        if (target->HasAuraType(SPELL_AURA_MOUNTED) && !target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                        {
+                            uint32 creatureEntry = 0;
+
+                            if (apply)
+                            {
+                                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                                {
+                                    creatureEntry = GREAT_BREWFEST_KODO;
+                                }
+                                else
+                                {
+                                    creatureEntry = BREWFEST_KODO;
+                                }
+                            }
+                            else
+                            {
+                                creatureEntry = target->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetMiscValue();
+                            }
+
+                            if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
+                            {
+                                uint32 displayID = ObjectMgr::ChooseDisplayId(creatureInfo);
+                                sObjectMgr->GetCreatureModelRandomGender(&displayID);
+
+                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                            }
+                        }
+                        break;
                 }
 
                 break;
@@ -6914,7 +6958,12 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
         {
             float radius = GetSpellInfo()->Effects[GetEffIndex()].CalcRadius(caster);
 
-            if (Unit* triggerTarget = target->GetNextRandomRaidMemberOrPet(radius))
+            Unit*                                                         triggerTarget = nullptr;
+            Acore::MostHPMissingGroupInRange                              u_check(target, radius, 0);
+            Acore::UnitLastSearcher<Acore::MostHPMissingGroupInRange>     searcher(target, triggerTarget, u_check);
+            Cell::VisitAllObjects(target, searcher, radius);
+
+            if (triggerTarget)
             {
                 target->CastCustomSpell(triggerTarget, GetId(), &value, nullptr, nullptr, true, nullptr, this, GetCasterGUID());
                 if (Aura* aura = triggerTarget->GetAura(GetId(), GetCasterGUID()))

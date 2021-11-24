@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "vmapexport.h"
 #include "model.h"
-#include "wmo.h"
 #include "adtfile.h"
-#include <cassert>
 #include "mpq_libmpq04.h"
+#include "vmapexport.h"
+#include "wmo.h"
 #include <G3D/Quat.h>
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <limits>
 

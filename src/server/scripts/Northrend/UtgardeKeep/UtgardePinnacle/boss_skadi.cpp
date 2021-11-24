@@ -17,11 +17,11 @@
 
 #include "CombatAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "utgarde_pinnacle.h"
 #include "Vehicle.h"
+#include "utgarde_pinnacle.h"
 
 enum Misc
 {
