@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WaypointMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
@@ -25,7 +26,6 @@
 #include "Player.h"
 #include "Spell.h"
 #include "Transport.h"
-#include "WaypointMovementGenerator.h"
 #include "World.h"
 
 void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
@@ -145,8 +145,10 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     }
 
     // xinef: do not initialize motion if we got stunned in movementinform
-    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE))
+    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
+    {
         return true;
+    }
 
     WaypointData const* node = i_path->at(i_currentNode);
 
@@ -204,11 +206,13 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
 {
     // Waypoint movement can be switched on/off
     // This is quite handy for escort quests and other stuff
-    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE))
+    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
     {
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        creature->StopMoving();
+        Stop(1000);
         return true;
     }
+
     // prevent a crash at empty waypoint path.
     if (!i_path || i_path->empty())
         return false;
@@ -216,23 +220,6 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
     // Xinef: Dont allow dead creatures to move
     if (!creature->IsAlive())
         return false;
-
-    // prevent movement while casting spells with cast time or channel time
-    if (creature->HasUnitState(UNIT_STATE_CASTING))
-    {
-        bool stop = true;
-        if (Spell* spell = creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (!(spell->GetSpellInfo()->ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING)) && !(spell->GetSpellInfo()->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
-                stop = false;
-
-        if (stop)
-        {
-            Stop(1000);
-            if (!creature->IsStopped())
-                creature->StopMoving();
-            return true;
-        }
-    }
 
     if (Stopped())
     {

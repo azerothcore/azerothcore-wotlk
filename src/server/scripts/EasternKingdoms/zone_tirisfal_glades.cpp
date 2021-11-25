@@ -29,8 +29,8 @@ go_mausoleum_trigger
 EndContentData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 /*######
 ## npc_calvin_montague

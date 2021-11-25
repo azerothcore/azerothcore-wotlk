@@ -15,19 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Chat.h"
-#include "Language.h"
-#include "Player.h"
 #include "PlayerCommand.h"
 #include "ScriptMgr.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
-class player_commandscript : public CommandScript, public PlayerCommand
+class player_commandscript : public CommandScript
 {
 public:
     player_commandscript() : CommandScript("player_commandscript") { }
@@ -36,84 +29,37 @@ public:
     {
         static ChatCommandTable playerCommandTable =
         {
-            { "learn",               SEC_GAMEMASTER,  true, &HandlePlayerLearnCommand,           "" },
-            { "unlearn",             SEC_GAMEMASTER,  true, &HandlePlayerUnLearnCommand,         "" }
+            { "learn",   HandlePlayerLearnCommand,   SEC_GAMEMASTER, Console::Yes },
+            { "unlearn", HandlePlayerUnLearnCommand, SEC_GAMEMASTER, Console::Yes }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "player",              SEC_GAMEMASTER,  true, nullptr,                             "", playerCommandTable }
+            { "player", playerCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandlePlayerLearnCommand(ChatHandler* handler, char const* args)
+    static bool HandlePlayerLearnCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks)
     {
-        if (!*args)
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        if (!player || !player->IsConnected())
             return false;
 
-        char* playerName = strtok((char*)args, " ");
-        char* spellId = strtok(nullptr, " ");
-        char const* all = strtok(nullptr, " ");
-        Player* targetPlayer = FindPlayer(handler, playerName);
-        if (!spellId || !targetPlayer)
-        {
-            return false;
-        }
-
-        uint32 spell = handler->extractSpellIdFromLink(spellId);
-
-        if (!spell)
-        {
-            return false;
-        }
-
-        return Learn(handler, targetPlayer, spell, all);
+        Player* targetPlayer = player->GetConnectedPlayer();
+        return Acore::PlayerCommand::HandleLearnSpellCommand(handler, targetPlayer, spell, allRanks);
     }
 
-    static bool HandlePlayerUnLearnCommand(ChatHandler* handler, char const* args)
+    static bool HandlePlayerUnLearnCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks)
     {
-        if (!*args)
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        if (!player || !player->IsConnected())
             return false;
 
-        char* playerName = strtok((char*)args, " ");
-        char* spellId = strtok(nullptr, " ");
-        char const* all = strtok(nullptr, " ");
-        Player* targetPlayer = FindPlayer(handler, playerName);
-
-        if (!spellId || !targetPlayer)
-        {
-            return false;
-        }
-
-        uint32 spell = handler->extractSpellIdFromLink(spellId);
-
-        if (!spell)
-        {
-            return false;
-        }
-
-        return UnLearn(handler, targetPlayer, spell, all);
-    }
-
-private:
-    static Player* FindPlayer(ChatHandler* handler, char* playerName)
-    {
-        if (!playerName)
-            return nullptr;
-
-        Player* targetPlayer;
-        if (!handler->extractPlayerTarget(playerName, &targetPlayer))
-            return nullptr;
-
-        if (!targetPlayer)
-        {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
-            return nullptr;
-        }
-
-        return targetPlayer;
+        Player* targetPlayer = player->GetConnectedPlayer();
+        return Acore::PlayerCommand::HandleUnlearnSpellCommand(handler, targetPlayer, spell, allRanks);
     }
 };
 

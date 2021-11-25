@@ -16,10 +16,10 @@
  */
 
 #include "DoodadHandler.h"
-#include "Chunk.h"
 #include "Cache.h"
-#include "Model.h"
+#include "Chunk.h"
 #include "G3D/Matrix4.h"
+#include "Model.h"
 
 DoodadHandler::DoodadHandler( ADT* adt ) :
     ObjectDataHandler(adt), _definitions(nullptr), _paths(nullptr)

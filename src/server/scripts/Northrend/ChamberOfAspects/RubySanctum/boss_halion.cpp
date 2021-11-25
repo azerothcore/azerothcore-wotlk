@@ -18,13 +18,14 @@
 #include "GameObjectAI.h"
 #include "MapMgr.h"
 #include "Player.h"
-#include "ruby_sanctum.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "WorldSession.h"
+#include "ruby_sanctum.h"
 
 enum Texts
 {
@@ -1045,8 +1046,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             if (Creature* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id))
             {
                 bool heroic = summon->GetMap()->IsHeroic();

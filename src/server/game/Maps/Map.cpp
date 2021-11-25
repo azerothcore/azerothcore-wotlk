@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Chat.h"
@@ -26,18 +27,18 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
-#include "Map.h"
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
+#include "ObjectGridLoader.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
-#include "Vehicle.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "Vehicle.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -68,7 +69,7 @@ Map::~Map()
     {
         WorldObject* obj = *i_worldObjects.begin();
         ASSERT(obj->IsWorldObject());
-        LOG_ERROR("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
+        LOG_DEBUG("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
         //ASSERT(obj->GetTypeId() == TYPEID_CORPSE);
         obj->RemoveFromWorld();
         obj->ResetMap();
@@ -533,13 +534,13 @@ void Map::InitializeObject(T* /*obj*/)
 template<>
 void Map::InitializeObject(Creature*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<>
 void Map::InitializeObject(GameObject*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<class T>
@@ -3410,9 +3411,21 @@ void Map::DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId)
 void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source)
 {
     Difficulty difficulty_fixed = (IsSharedDifficultyMap(GetId()) ? Difficulty(GetDifficulty() % 2) : GetDifficulty());
-    DungeonEncounterList const* encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    DungeonEncounterList const* encounters;
+    // 631 : ICC - 724 : Ruby Sanctum --- For heroic difficulties, for some reason, we don't have an encounter list, so we get the encounter list from normal diff. We shouldn't change difficulty_fixed variable.
+    if ((GetId() == 631 || GetId() == 724) && IsHeroic())
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), !Is25ManRaid() ? RAID_DIFFICULTY_10MAN_NORMAL : RAID_DIFFICULTY_25MAN_NORMAL);
+    }
+    else
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    }
+
     if (!encounters)
+    {
         return;
+    }
 
     uint32 dungeonId = 0;
     bool updated = false;

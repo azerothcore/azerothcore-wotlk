@@ -18,6 +18,7 @@
 #ifndef _TICKETMGR_H
 #define _TICKETMGR_H
 
+#include "CharacterCache.h"
 #include "ObjectMgr.h"
 #include <string>
 
@@ -108,7 +109,9 @@ public:
         std::string name;
         // save queries if ticket is not assigned
         if (_assignedTo)
-            sObjectMgr->GetPlayerNameByGUID(_assignedTo.GetCounter(), name);
+        {
+            sCharacterCache->GetCharacterNameByGuid(_assignedTo, name);
+        }
 
         return name;
     }

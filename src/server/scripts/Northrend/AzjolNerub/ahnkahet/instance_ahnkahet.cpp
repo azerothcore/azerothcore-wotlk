@@ -15,17 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ahnkahet.h"
-#include "Player.h"
 #include "SpellScript.h"
+#include "ahnkahet.h"
 #include <array>
 
 class instance_ahnkahet : public InstanceMapScript
 {
 public:
-    instance_ahnkahet() : InstanceMapScript(AhnahetScriptName, 619) { }
+    instance_ahnkahet() : InstanceMapScript(AhnKahetScriptName, 619) { }
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {

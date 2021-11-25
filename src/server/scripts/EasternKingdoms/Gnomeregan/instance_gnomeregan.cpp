@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gnomeregan.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "gnomeregan.h"
 
 class instance_gnomeregan : public InstanceMapScript
 {
