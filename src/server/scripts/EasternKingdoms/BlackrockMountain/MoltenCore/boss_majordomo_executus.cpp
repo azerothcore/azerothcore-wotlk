@@ -40,6 +40,7 @@ enum Texts
     // Majordomo
     SAY_RAG_SUM_1                           = 9,
     SAY_RAG_SUM_2                           = 10,
+    SAY_DEATH                               = 11,
 
     // Ragnaros
     SAY_ARRIVAL1_RAG                        = 1,
@@ -130,8 +131,11 @@ public:
     {
         boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
 
-        // Disabled events
-        void JustDied(Unit* /*killer*/) override {}
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_DEATH);
+            me->DespawnOrUnsummon(10s, 0s);
+        }
 
         void JustSummoned(Creature* summon) override
         {
@@ -252,18 +256,7 @@ public:
                 }
                 else if (!remainingAdds)
                 {
-                    if (!static_minionsGUIDS.empty())
-                    {
-                        for (ObjectGuid const& guid : static_minionsGUIDS)
-                        {
-                            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
-                            {
-                                minion->DespawnOrUnsummon();
-                            }
-                        }
-
-                        static_minionsGUIDS.clear();
-                    }
+                    static_minionsGUIDS.clear();
 
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);

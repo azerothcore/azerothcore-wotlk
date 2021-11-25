@@ -4679,7 +4679,7 @@ void Unit::RemoveNotOwnSingleTargetAuras()
     }
 }
 
-void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
+void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except, bool isAutoshot /*= false*/)
 {
     if (!(m_interruptMask & flag))
         return;
@@ -4700,10 +4700,16 @@ void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
 
     // interrupt channeled spell
     if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
-        if (spell->getState() == SPELL_STATE_CASTING
-                && (spell->m_spellInfo->ChannelInterruptFlags & flag)
-                && spell->m_spellInfo->Id != except)
-            InterruptNonMeleeSpells(false, spell->m_spellInfo->Id);
+    {
+        if (spell->getState() == SPELL_STATE_CASTING && (spell->m_spellInfo->ChannelInterruptFlags & flag) && spell->m_spellInfo->Id != except)
+        {
+            // Do not interrupt if auto shot
+            if (!(isAutoshot && spell->m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS)))
+            {
+                InterruptNonMeleeSpells(false, spell->m_spellInfo->Id);
+            }
+        }
+    }
 
     UpdateInterruptMask();
 }

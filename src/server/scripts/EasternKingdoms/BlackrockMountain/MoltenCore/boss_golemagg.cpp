@@ -31,8 +31,10 @@ enum Spells
     // Golemagg
     SPELL_PYROBLAST             = 20228,
     SPELL_EARTHQUAKE            = 19798,
-    SPELL_ENRAGE                = 19953,
     SPELL_ATTRACK_RAGER         = 20544,
+    SPELL_MAGMASPLASH           = 13879,
+    SPELL_GOLEMAGG_TRUST_AURA   = 20556,
+    SPELL_DOUBLE_ATTACK         = 18943,
 
     // Core Rager
     SPELL_MANGLE                = 19820,
@@ -58,13 +60,15 @@ public:
             earthquakeTimer = 0;
             pyroblastTimer = urand(3000, 7000);
             enraged = false;
+            DoCastSelf(SPELL_MAGMASPLASH);
+            DoCastSelf(SPELL_GOLEMAGG_TRUST_AURA);
+            DoCastSelf(SPELL_DOUBLE_ATTACK);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!enraged && me->HealthBelowPctDamaged(10, damage))
             {
-                DoCastSelf(SPELL_ENRAGE, true);
                 DoCastSelf(SPELL_ATTRACK_RAGER, true);
                 DoCastAOE(SPELL_EARTHQUAKE, true);
                 earthquakeTimer = 5000;
@@ -84,7 +88,7 @@ public:
             {
                 if (earthquakeTimer <= diff)
                 {
-                    DoCastAOE(SPELL_EARTHQUAKE, true);
+                    DoCastSelf(SPELL_EARTHQUAKE, true);
                     earthquakeTimer = 5000;
                 }
                 else
@@ -100,10 +104,7 @@ public:
 
             if (pyroblastTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                {
-                    DoCast(target, SPELL_PYROBLAST);
-                }
+                DoCastRandomTarget(SPELL_PYROBLAST);
 
                 pyroblastTimer = 7000;
             }
