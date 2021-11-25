@@ -18,8 +18,8 @@
 #ifndef SC_HYJALAI_H
 #define SC_HYJALAI_H
 
-#include "hyjal.h"
 #include "ScriptedEscortAI.h"
+#include "hyjal.h"
 
 #define HYJAL_AI_MAX_SPELLS 3
 

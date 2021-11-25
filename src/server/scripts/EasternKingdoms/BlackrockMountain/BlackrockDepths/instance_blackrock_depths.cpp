@@ -15,12 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_depths.h"
-#include "Player.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "Player.h"
-#include "Map.h"
+#include "ScriptMgr.h"
+#include "blackrock_depths.h"
 
 #define MAX_ENCOUNTER 6
 

@@ -18,8 +18,8 @@
 #ifndef DEF_FORGE_OF_SOULS_H
 #define DEF_FORGE_OF_SOULS_H
 
-#include "GridNotifiers.h"
 #include "CreatureAIImpl.h"
+#include "GridNotifiers.h"
 
 #define ForgeOfSoulsScriptName "instance_forge_of_souls"
 

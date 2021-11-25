@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GroupMgr.h"
 #include "Common.h"
 #include "DBCStores.h"
-#include "GroupMgr.h"
-#include "Log.h"
 #include "InstanceSaveMgr.h"
+#include "Log.h"
 #include "World.h"
 
 GroupMgr::GroupMgr()

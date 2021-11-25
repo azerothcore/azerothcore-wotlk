@@ -23,9 +23,9 @@ SDCategory: Ashenvale Forest
 EndScriptData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 enum Muglash
 {

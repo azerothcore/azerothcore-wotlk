@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Creature.h"
 #include "CreatureAI.h"
+#include "Creature.h"
 #include "CreatureAIImpl.h"
+#include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
 #include "Log.h"
 #include "MapReference.h"
@@ -185,6 +186,9 @@ void CreatureAI::TriggerAlert(Unit const* who) const
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
         return;
+    // Only alert if target is within line of sight
+    if (!me->IsWithinLOSInMap(who))
+        return;
     // Send alert sound (if any) for this creature
     me->SendAIReaction(AI_REACTION_ALERT);
     // Face the unit (stealthed player) and set distracted state for 5 seconds
@@ -292,7 +296,9 @@ bool CreatureAI::UpdateVictim()
 bool CreatureAI::_EnterEvadeMode()
 {
     if (!me->IsAlive())
+    {
         return false;
+    }
 
     // don't remove vehicle auras, passengers aren't supposed to drop off the vehicle
     // don't remove clone caster on evade (to be verified)
@@ -308,8 +314,15 @@ bool CreatureAI::_EnterEvadeMode()
     me->SetLastDamagedTime(0);
     me->SetCannotReachTarget(false);
 
+    if (CreatureGroup* formation = me->GetFormation())
+    {
+        formation->MemberEvaded(me);
+    }
+
     if (me->IsInEvadeMode())
+    {
         return false;
+    }
 
     return true;
 }

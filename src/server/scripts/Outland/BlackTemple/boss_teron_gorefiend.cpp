@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -62,7 +62,7 @@ enum Misc
     EVENT_TALK_KILL                 = 10
 };
 
-struct ShadowOfDeathSelector : public Acore::unary_function<Unit*, bool>
+struct ShadowOfDeathSelector
 {
     bool operator()(Unit const* target) const
     {
