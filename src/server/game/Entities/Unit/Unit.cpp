@@ -11167,7 +11167,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
             if (!spellProto->ValidateAttribute6SpellDamageMods(caster, *i, damagetype == DOT))
                 continue;
 
-            // Only death knight spell with this aura, ZOMG!
+            // Only death knight spell with this aura
             if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
                 if (!caster || caster->GetGUID() != (*i)->GetCasterGUID())
                     continue;
@@ -18169,7 +18169,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
 
     if (IsInWorld())
     {
-        // xinef: ZOMG!, to comment, bellow line should be removed
+        // xinef: to comment, bellow line should be removed
         // pussywizard: goign to other phase (valithria, algalon) should not remove such auras
         //RemoveNotOwnSingleTargetAuras(newPhaseMask, true);            // we can lost access to caster or target
 
