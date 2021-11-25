@@ -1,9 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Vehicle.h"
 #include "BattlefieldWG.h"
 #include "Common.h"
 #include "CreatureAI.h"
@@ -16,7 +28,6 @@
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "WorldPacket.h"
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
@@ -50,11 +61,11 @@ Vehicle::~Vehicle()
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*_me, itr->second.Passenger.Guid))
             {
-                LOG_FATAL("vehicles", "ZOMG! ~Vehicle(), unit: %s, entry: %u, typeid: %u, this_entry: %u, this_typeid: %u!", unit->GetName().c_str(), unit->GetEntry(), unit->GetTypeId(), _me ? _me->GetEntry() : 0, _me ? _me->GetTypeId() : 0);
+                LOG_FATAL("vehicles", "Vehicle(), unit: %s, entry: %u, typeid: %u, this_entry: %u, this_typeid: %u!", unit->GetName().c_str(), unit->GetEntry(), unit->GetTypeId(), _me ? _me->GetEntry() : 0, _me ? _me->GetTypeId() : 0);
                 unit->_ExitVehicle();
             }
             else
-                LOG_FATAL("vehicles", "ZOMG! ~Vehicle(), unknown guid!");
+                LOG_FATAL("vehicles", "Vehicle(), unknown guid!");
         }
 }
 
@@ -369,7 +380,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     unit->m_movementInfo.transport.seat = seat->first;
     unit->m_movementInfo.transport.guid = _me->GetGUID();
 
-    // xinef: removed retarded seat->first == 0 check...
+    // xinef: removed seat->first == 0 check...
     if (_me->GetTypeId() == TYPEID_UNIT
             && unit->GetTypeId() == TYPEID_PLAYER
             && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
@@ -381,15 +392,15 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         }
         catch (...)
         {
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy()!");
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u", _me ? 1 : 0);
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy()!");
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u", _me ? 1 : 0);
             if (!_me)
                 return false;
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is: %u!", _me->IsInWorld());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is2: %u!", _me->IsDuringRemoveFromWorld());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s!", _me->GetName().c_str());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). typeid: %u!", _me->GetTypeId());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s, typeid: %u, in world: %u, duringremove: %u has wrong CharmType! Charmer %s, typeid: %u, in world: %u, duringremove: %u.", _me->GetName().c_str(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName().c_str(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is: %u!", _me->IsInWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is2: %u!", _me->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s!", _me->GetName().c_str());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). typeid: %u!", _me->GetTypeId());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s, typeid: %u, in world: %u, duringremove: %u has wrong CharmType! Charmer %s, typeid: %u, in world: %u, duringremove: %u.", _me->GetName().c_str(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName().c_str(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
             return false;
         }
     }
@@ -441,7 +452,11 @@ void Vehicle::RemovePassenger(Unit* unit)
     // but the unit is not on the vehicles seat yet, thus crashing at ASSERT(seat != Seats.end());
     // ASSERT(seat != Seats.end());
     if (seat == Seats.end())
+    {
+        LOG_ERROR("vehicles", "Vehicle::RemovePassenger: Vehicle entry (%u) id (%u) is dissmised and removed all existing passangers, but the unit (%s) was not on the vehicle!",
+            _me->GetEntry(), _vehicleInfo->m_ID, unit->GetName().c_str());
         return;
+    }
 
     LOG_DEBUG("vehicles", "Unit %s exit vehicle entry %u id %u (%s) seat %d",
         unit->GetName().c_str(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUID().ToString().c_str(), (int32)seat->first);

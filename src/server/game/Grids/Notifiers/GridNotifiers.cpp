@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "GridNotifiers.h"
@@ -9,6 +20,7 @@
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
@@ -19,10 +31,12 @@ void VisibleNotifier::Visit(GameObjectMapType& m)
 {
     for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
+        GameObject* go = iter->GetSource();
+        if (i_largeOnly != go->IsVisibilityOverridden())
             continue;
-        vis_guids.erase(iter->GetSource()->GetGUID());
-        i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
+
+        vis_guids.erase(go->GetGUID());
+        i_player.UpdateVisibilityOf(go, i_data, i_visibleNow);
     }
 }
 
@@ -61,8 +75,10 @@ void VisibleNotifier::SendToSelf()
     for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
     {
         if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
+        {
             if (i_largeOnly != obj->IsVisibilityOverridden())
                 continue;
+        }
 
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
         if ((*it).IsTransport())
@@ -92,6 +108,7 @@ void VisibleNotifier::SendToSelf()
     {
         if (i_largeOnly != (*it)->IsVisibilityOverridden())
             continue;
+
         i_player.GetInitialVisiblePackets(*it);
     }
 }
@@ -134,18 +151,19 @@ void VisibleChangesNotifier::Visit(DynamicObjectMapType& m)
 inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
 {
     if (!u->IsAlive() || !c->IsAlive() || c == u || u->IsInFlight())
+    {
         return;
+    }
 
-    if (c->HasReactState(REACT_AGGRESSIVE) && !c->HasUnitState(UNIT_STATE_SIGHTLESS))
+    if (!c->HasUnitState(UNIT_STATE_SIGHTLESS))
     {
         if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
         {
             c->AI()->MoveInLineOfSight_Safe(u);
         }
-        else
+        else if (u->GetTypeId() == TYPEID_PLAYER && u->HasStealthAura() && c->IsAIEnabled && c->CanSeeOrDetect(u, false, true, true))
         {
-            if (u->GetTypeId() == TYPEID_PLAYER && u->HasStealthAura() && c->IsAIEnabled && c->CanSeeOrDetect(u, false, true, true))
-                c->AI()->TriggerAlert(u);
+            c->AI()->TriggerAlert(u);
         }
     }
 }
@@ -322,10 +340,10 @@ void MessageDistDelivererToHostile::Visit(DynamicObjectMapType& m)
 }
 
 template<class T>
-void ObjectUpdater::Visit(GridRefManager<T>& m)
+void ObjectUpdater::Visit(GridRefMgr<T>& m)
 {
     T* obj;
-    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); )
+    for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); )
     {
         obj = iter->GetSource();
         ++iter;

@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Opcodes.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "the_eye.h"
+#include "ScriptedCreature.h"
 #include "WorldPacket.h"
+#include "the_eye.h"
 
 enum Yells
 {
@@ -543,7 +556,7 @@ public:
                     //me->CastSpell(me, SPELL_KEAL_STUNNED, true);
                     break;
                 case EVENT_SCENE_9:
-                    me->CastSpell(me, 52241, true); // WRONG VISUAL, ZOMG!
+                    me->CastSpell(me, 52241, true); // WRONG VISUAL
                     me->CastSpell(me, 34807, true);
                     me->SummonCreature(NPC_WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
                     if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -588,7 +601,7 @@ public:
                     break;
                 case EVENT_SCENE_16:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveAurasDueToSpell(52241); // WRONG VISUAL, ZOMG!
+                    me->RemoveAurasDueToSpell(52241); // WRONG VISUAL
                     me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
                     break;
             }
@@ -984,7 +997,7 @@ public:
         {
             PreventHitEffect(effIndex);
 
-            ThreatContainer::StorageType const& ThreatList = GetCaster()-> getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& ThreatList = GetCaster()-> getThreatMgr().getThreatList();
             std::list<Unit*> targetList;
             for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
             {

@@ -1,14 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -1046,15 +1059,16 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             Unit* victim = eventInfo.GetActionTarget();
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
 
             //uint32 markCount = 0;
             //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
@@ -1078,7 +1092,6 @@ public:
         {
             DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_AuraScript::CheckProc);
             OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathbringer_blood_link_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
@@ -1100,8 +1113,9 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)

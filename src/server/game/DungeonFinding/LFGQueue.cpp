@@ -1,26 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * This program is free software you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation either version 2 of the License, or (at your
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Containers.h"
-#include "Group.h"
-#include "LFGMgr.h"
 #include "LFGQueue.h"
+#include "Containers.h"
+#include "DBCStores.h"
+#include "Group.h"
+#include "InstanceScript.h"
+#include "LFGMgr.h"
 #include "Log.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "World.h"
 
 namespace lfg
@@ -285,7 +289,7 @@ namespace lfg
             return LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS;
 
         // Group with less that MAXGROUPSIZE members always compatible
-        if (check.size() == 1 && numPlayers < MAXGROUPSIZE)
+        if (!sLFGMgr->IsTesting() && check.size() == 1 && numPlayers < MAXGROUPSIZE)
         {
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(check.front());
             LfgRolesMap roles = itQueue->second.roles;
@@ -315,7 +319,7 @@ namespace lfg
                     {
                         if (itRoles->first == itPlayer->first)
                         {
-                            // pussywizard: LFG ZOMG! this means that this player was in two different LfgQueueData (in QueueDataStore), and at least one of them is a group guid, because we do checks so there aren't 2 same guids in current CHECK
+                            // pussywizard: LFG this means that this player was in two different LfgQueueData (in QueueDataStore), and at least one of them is a group guid, because we do checks so there aren't 2 same guids in current CHECK
                             //LOG_ERROR("lfg", "LFGQueue::CheckCompatibility: ERROR! Player multiple times in queue! [%s]", itRoles->first.ToString().c_str());
                             break;
                         }
@@ -382,7 +386,7 @@ namespace lfg
         }
 
         // Enough players?
-        if (numPlayers != MAXGROUPSIZE)
+        if (!sLFGMgr->IsTesting() && numPlayers != MAXGROUPSIZE)
         {
             strGuids.addRoles(proposalRoles);
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
@@ -397,9 +401,8 @@ namespace lfg
             return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
         }
 
-        ObjectGuid gguid = check.front();
         proposal.queues = strGuids;
-        proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(gguid) != LFG_STATE_DUNGEON;
+        proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(proposal.group) != LFG_STATE_DUNGEON;
 
         if (!sLFGMgr->AllQueued(check)) // can't create proposal
             return LFG_COMPATIBILITY_PENDING;
@@ -410,6 +413,7 @@ namespace lfg
         proposal.leader.Clear();
         proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(proposalDungeons);
 
+        uint32 completedEncounters = 0;
         bool leader = false;
         for (LfgRolesMap::const_iterator itRoles = proposalRoles.begin(); itRoles != proposalRoles.end(); ++itRoles)
         {
@@ -429,7 +433,26 @@ namespace lfg
             data.group = proposalGroups.find(itRoles->first)->second;
             if (!proposal.isNew && data.group && data.group == proposal.group) // Player from existing group, autoaccept
                 data.accept = LFG_ANSWER_AGREE;
+
+            if (!completedEncounters && !proposal.isNew)
+            {
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(proposal.dungeonId))
+                {
+                    if (Player* player = ObjectAccessor::FindConnectedPlayer(itRoles->first))
+                    {
+                        if (player->GetMapId() == static_cast<uint32>(dungeon->map))
+                        {
+                            if (InstanceScript* instance = player->GetInstanceScript())
+                            {
+                                completedEncounters = instance->GetCompletedEncounterMask();
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        proposal.encounters = completedEncounters;
 
         for (uint8 i = 0; i < 5 && proposal.queues.guids[i]; ++i)
             RemoveFromQueue(proposal.queues.guids[i], true);

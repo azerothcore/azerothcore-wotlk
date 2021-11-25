@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
-#include "magtheridons_lair.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "magtheridons_lair.h"
 
 DoorData const doorData[] =
 {
@@ -118,7 +131,7 @@ public:
             {
                 if (state == IN_PROGRESS)
                 {
-                    for (ObjectGuid const guid : _wardersSet)
+                    for (ObjectGuid const& guid : _wardersSet)
                         if (Creature* warder = instance->GetCreature(guid))
                             if (warder->IsAlive())
                             {
@@ -128,7 +141,7 @@ public:
                 }
                 else
                 {
-                    for (ObjectGuid const guid : _cubesSet)
+                    for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
                             cube->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
@@ -149,12 +162,12 @@ public:
                             magtheridon->SetInCombatWithZone();
                     break;
                 case DATA_ACTIVATE_CUBES:
-                    for (ObjectGuid const guid : _cubesSet)
+                    for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
                             cube->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_COLLAPSE:
-                    for (ObjectGuid const guid : _columnSet)
+                    for (ObjectGuid const& guid : _columnSet)
                         if (GameObject* column = instance->GetGameObject(guid))
                             column->SetGoState(GOState(data));
                     break;

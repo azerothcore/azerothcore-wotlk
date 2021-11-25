@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _CHARACTERDATABASE_H
@@ -67,10 +79,8 @@ enum CharacterDatabaseStatements : uint32
     CHAR_SEL_CHARACTER_INVENTORY,
     CHAR_SEL_CHARACTER_ACTIONS,
     CHAR_SEL_CHARACTER_ACTIONS_SPEC,
-    CHAR_SEL_CHARACTER_MAILCOUNT,
     CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD,
     CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH,
-    CHAR_SEL_CHARACTER_MAILDATE,
     CHAR_SEL_CHARACTER_SOCIALLIST,
     CHAR_SEL_CHARACTER_HOMEBIND,
     CHAR_SEL_CHARACTER_SPELLCOOLDOWNS,
@@ -122,6 +132,7 @@ enum CharacterDatabaseStatements : uint32
     CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES,
     CHAR_SEL_MATCH_MAKER_RATING,
     CHAR_SEL_CHARACTER_COUNT,
+    CHAR_UPD_NAME_BY_GUID,
     CHAR_DEL_DECLINED_NAME,
 
     CHAR_INS_GUILD,
@@ -279,6 +290,7 @@ enum CharacterDatabaseStatements : uint32
     CHAR_UDP_RESTORE_DELETE_INFO,
     CHAR_UPD_ZONE,
     CHAR_UPD_LEVEL,
+    CHAR_UPD_XP_ACCUMULATIVE,
     CHAR_DEL_INVALID_ACHIEV_PROGRESS_CRITERIA,
     CHAR_DEL_INVALID_ACHIEVMENT,
     CHAR_INS_ADDON,
@@ -341,6 +353,7 @@ enum CharacterDatabaseStatements : uint32
     CHAR_SEL_AUCTIONHOUSE_COUNT_ITEM,
     CHAR_SEL_GUILD_BANK_COUNT_ITEM,
     CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY,
+    CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER,
     CHAR_SEL_MAIL_ITEMS_BY_ENTRY,
     CHAR_SEL_AUCTIONHOUSE_ITEM_BY_ENTRY,
     CHAR_SEL_GUILD_BANK_ITEM_BY_ENTRY,
@@ -402,8 +415,11 @@ enum CharacterDatabaseStatements : uint32
     CHAR_DEL_CHAR_TALENT,
     CHAR_DEL_CHAR_SKILLS,
     CHAR_UDP_CHAR_HONOR_POINTS,
+    CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE,
     CHAR_UDP_CHAR_ARENA_POINTS,
+    CHAR_UDP_CHAR_ARENA_POINTS_ACCUMULATIVE,
     CHAR_UDP_CHAR_MONEY,
+    CHAR_UDP_CHAR_MONEY_ACCUMULATIVE,
     CHAR_UPD_CHAR_REMOVE_GHOST, // pussywizard
     CHAR_INS_CHAR_ACTION,
     CHAR_UPD_CHAR_ACTION,
@@ -424,6 +440,7 @@ enum CharacterDatabaseStatements : uint32
     CHAR_INS_CHAR_SPELL,
     CHAR_DEL_CHAR_STATS,
     CHAR_INS_CHAR_STATS,
+    CHAR_SEL_CHAR_STATS,
     CHAR_DEL_PETITION_BY_OWNER,
     CHAR_DEL_PETITION_SIGNATURE_BY_OWNER,
     CHAR_DEL_PETITION_BY_OWNER_AND_TYPE,

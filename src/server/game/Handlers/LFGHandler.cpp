@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Group.h"
@@ -34,7 +45,7 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& l
 
 void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 {
-    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER))
+    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER | lfg::LFG_OPTION_ENABLE_SEASONAL_BOSSES))
     {
         recvData.rfinish();
         return;
@@ -151,7 +162,7 @@ void WorldSession::HandleLfgTeleportOpcode(WorldPacket& recvData)
     recvData >> out;
 
     LOG_DEBUG("network", "CMSG_LFG_TELEPORT [%s] out: %u", GetPlayer()->GetGUID().ToString().c_str(), out ? 1 : 0);
-    sLFGMgr->TeleportPlayer(GetPlayer(), out, true);
+    sLFGMgr->TeleportPlayer(GetPlayer(), out);
 }
 
 void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*/)
@@ -193,9 +204,10 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
 
         if (quest)
         {
+            uint8 playerLevel = GetPlayer() ? GetPlayer()->getLevel() : 0;
             data << uint8(done);
-            data << uint32(quest->GetRewOrReqMoney());
-            data << uint32(quest->XPValue(GetPlayer()));
+            data << uint32(quest->GetRewOrReqMoney(playerLevel));
+            data << uint32(quest->XPValue(playerLevel));
             data << uint32(0);
             data << uint32(0);
             data << uint8(quest->GetRewItemsCount());
@@ -480,13 +492,15 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
 
     uint8 itemNum = rewardData.quest->GetRewItemsCount();
 
+    uint8 playerLevel = GetPlayer() ? GetPlayer()->getLevel() : 0;
+
     WorldPacket data(SMSG_LFG_PLAYER_REWARD, 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4 + 1 + itemNum * (4 + 4 + 4));
     data << uint32(rewardData.rdungeonEntry);              // Random Dungeon Finished
     data << uint32(rewardData.sdungeonEntry);              // Dungeon Finished
     data << uint8(rewardData.done);
     data << uint32(1);
-    data << uint32(rewardData.quest->GetRewOrReqMoney());
-    data << uint32(rewardData.quest->XPValue(GetPlayer()));
+    data << uint32(rewardData.quest->GetRewOrReqMoney(playerLevel));
+    data << uint32(rewardData.quest->XPValue(playerLevel));
     data << uint32(0);
     data << uint32(0);
     data << uint8(itemNum);

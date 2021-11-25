@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_UNITAI_H
@@ -172,7 +183,7 @@ public:
 
     virtual bool CanAIAttack(Unit const* /*target*/) const { return true; }
     virtual void AttackStart(Unit* /*target*/);
-    virtual void UpdateAI(uint32 diff) = 0;
+    virtual void UpdateAI(uint32 /*diff*/) = 0;
 
     virtual void InitializeAI() { if (!me->isDead()) Reset(); }
 
@@ -193,7 +204,7 @@ public:
     // predicate shall extend Acore::unary_function<Unit*, bool>
     template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
     {
-        ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
         if (position >= threatlist.size())
             return nullptr;
 
@@ -243,7 +254,7 @@ public:
     // predicate shall extend Acore::unary_function<Unit*, bool>
     template <class PREDICATE> void SelectTargetList(std::list<Unit*>& targetList, PREDICATE const& predicate, uint32 maxTargets, SelectAggroTarget targetType)
     {
-        ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
         if (threatlist.empty())
             return;
 
@@ -289,6 +300,7 @@ public:
     void DoCastToAllHostilePlayers(uint32 spellid, bool triggered = false);
     void DoCastVictim(uint32 spellId, bool triggered = false);
     void DoCastAOE(uint32 spellId, bool triggered = false);
+    void DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
 
     float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
 

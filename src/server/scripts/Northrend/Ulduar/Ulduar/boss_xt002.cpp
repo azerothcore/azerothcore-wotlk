@@ -1,16 +1,29 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum XT002Spells
 {
@@ -190,7 +203,7 @@ public:
             RescheduleEvents(); // Other events are scheduled here
 
             me->setActive(true);
-            me->MonsterYell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL, 0);
+            me->Yell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL);
             me->PlayDirectSound(XT_SOUND_AGGRO);
 
             if (m_pInstance)
@@ -212,12 +225,12 @@ public:
             {
                 if (urand(0, 1))
                 {
-                    me->MonsterYell("I... I think I broke it.", LANG_UNIVERSAL, 0);
+                    me->Yell("I... I think I broke it.", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_SLAY1);
                 }
                 else
                 {
-                    me->MonsterYell("I guess it doesn't bend that way.", LANG_UNIVERSAL, 0);
+                    me->Yell("I guess it doesn't bend that way.", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_SLAY2);
                 }
             }
@@ -225,7 +238,7 @@ public:
 
         void JustDied(Unit* /*victim*/) override
         {
-            me->MonsterYell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
+            me->Yell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL);
             me->PlayDirectSound(XT_SOUND_DEATH);
 
             if (m_pInstance)
@@ -266,7 +279,7 @@ public:
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
-                me->MonsterTextEmote("XT-002 Deconstructor's heart is severed from his body.", 0, true);
+                me->TextEmote("XT-002 Deconstructor's heart is severed from his body.", nullptr, true);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                 return;
             }
@@ -316,7 +329,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_STUNNED);
                         me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
-                        me->MonsterYell("So tired. I will rest for just a moment!", LANG_UNIVERSAL, 0);
+                        me->Yell("So tired. I will rest for just a moment!", LANG_UNIVERSAL);
                         me->PlayDirectSound(XT_SOUND_HEART_OPEN);
 
                         events.CancelEventGroup(1);
@@ -342,21 +355,21 @@ public:
                     events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10000, 1);
                     break;
                 case EVENT_TYMPANIC_TANTARUM:
-                    me->MonsterTextEmote("XT-002 Deconstructor begins to cause the earth to quake.", 0, true);
-                    me->MonsterYell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL, 0);
+                    me->TextEmote("XT-002 Deconstructor begins to cause the earth to quake.", nullptr, true);
+                    me->Yell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_TANTARUM);
                     me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
                     events.RepeatEvent(60000);
                     return;
                 case EVENT_ENRAGE:
-                    me->MonsterYell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL, 0);
+                    me->Yell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_ENRAGE);
                     me->CastSpell(me, SPELL_XT002_ENRAGE, true);
                     break;
 
                 // Animation events
                 case EVENT_START_SECOND_PHASE:
-                    me->MonsterTextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", 0, true);
+                    me->TextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", nullptr, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
@@ -370,7 +383,7 @@ public:
                         return;
                     }
 
-                    me->MonsterYell("I'm ready to play!", LANG_UNIVERSAL, 0);
+                    me->Yell("I'm ready to play!", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
 
                     me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
@@ -586,7 +599,7 @@ public:
                 }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -606,7 +619,7 @@ public:
                     }
 
                     if (!urand(0, 2))
-                        me->MonsterTextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", 0, true);
+                        me->TextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", nullptr, true);
 
                     me->DespawnOrUnsummon(1);
                 }
@@ -786,7 +799,7 @@ public:
             }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -853,6 +866,7 @@ public:
     };
 };
 
+// 62775 - Tympanic Tantrum
 class spell_xt002_tympanic_tantrum : public SpellScriptLoader
 {
 public:
@@ -886,6 +900,7 @@ public:
     }
 };
 
+// 64234, 63024 - Gravity Bomb
 class spell_xt002_gravity_bomb_aura : public SpellScriptLoader
 {
 public:
@@ -956,6 +971,7 @@ public:
     }
 };
 
+// 64233, 63025 - Gravity Bomb
 class spell_xt002_gravity_bomb_damage : public SpellScriptLoader
 {
 public:
@@ -988,6 +1004,7 @@ public:
     }
 };
 
+// 63018, 65121 - Searing Light
 class spell_xt002_searing_light_spawn_life_spark : public SpellScriptLoader
 {
 public:

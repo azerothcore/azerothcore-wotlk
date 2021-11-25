@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /// \addtogroup u2w
@@ -12,9 +23,9 @@
 #define __WORLDSESSION_H
 
 #include "AccountMgr.h"
-#include "AuthDefines.h"
 #include "AddonMgr.h"
-#include "BanManager.h"
+#include "AuthDefines.h"
+#include "BanMgr.h"
 #include "CircularBuffer.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -22,8 +33,8 @@
 #include "Packet.h"
 #include "SharedDefines.h"
 #include "World.h"
-#include <utility>
 #include <map>
+#include <utility>
 
 class Creature;
 class GameObject;
@@ -230,14 +241,14 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerLogout() const { return m_playerLogout; }
     bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }
 
-    void ReadAddonsInfo(WorldPacket& data);
+    void ReadAddonsInfo(ByteBuffer& data);
     void SendAddonsInfo();
 
     void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
@@ -298,11 +309,18 @@ public:
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
 
+    // Returns true if all contained hyperlinks are valid
+    // May kick player on false depending on world config (handler should abort)
+    bool ValidateHyperlinksAndMaybeKick(std::string_view str);
+    // Returns true if the message contains no hyperlinks
+    // May kick player on false depending on world config (handler should abort)
+    bool DisallowHyperlinksAndMaybeKick(std::string_view str);
+
     void QueuePacket(WorldPacket* new_packet);
     bool Update(uint32 diff, PacketFilter& updater);
 
     /// Handle the authentication waiting queue (to be completed)
-    void SendAuthWaitQue(uint32 position);
+    void SendAuthWaitQueue(uint32 position);
 
     //void SendTestCreatureQueryOpcode(uint32 entry, ObjectGuid guid, uint32 testvalue);
     void SendNameQueryOpcode(ObjectGuid guid);
@@ -987,7 +1005,7 @@ protected:
     {
         friend class World;
     public:
-        DosProtection(WorldSession* s) : Session(s), _policy((Policy)sWorld->getIntConfig(CONFIG_PACKET_SPOOF_POLICY)) { }
+        DosProtection(WorldSession* s);
         bool EvaluateOpcode(WorldPacket& p, time_t time) const;
     protected:
         enum Policy
@@ -1035,20 +1053,20 @@ private:
 
     ObjectGuid::LowType m_GUIDLow;
     Player* _player;
-    WorldSocket* m_Socket;
+    std::shared_ptr<WorldSocket> m_Socket;
     std::string m_Address;
-    // std::string m_LAddress;                             // Last Attempted Remote Adress - we can not set attempted ip for a non-existing session!
 
     AccountTypes _security;
     bool _skipQueue;
     uint32 _accountId;
+    std::string _accountName;
     uint8 m_expansion;
     uint32 m_total_time;
 
     typedef std::list<AddonInfo> AddonsList;
 
     // Warden
-    Warden* _warden;                                    // Remains nullptr if Warden system is not enabled by config
+    std::unique_ptr<Warden> _warden;                    // Remains nullptr if Warden system is not enabled by config
 
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue
@@ -1057,7 +1075,7 @@ private:
     bool m_playerSave;
     LocaleConstant m_sessionDbcLocale;
     LocaleConstant m_sessionDbLocaleIndex;
-    uint32 m_latency;
+    std::atomic<uint32> m_latency;
     AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
     uint32 m_Tutorials[MAX_ACCOUNT_TUTORIAL_VALUES];
     bool   m_TutorialsChanged;
@@ -1067,7 +1085,6 @@ private:
     LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
     ObjectGuid m_currentBankerGUID;
-    time_t timeWhoCommandAllowed;
     uint32 _offlineTime;
     bool _kicked;
     bool _shouldSetOfflineInDB;
@@ -1081,6 +1098,9 @@ private:
     std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
     uint32 _timeSyncNextCounter;
     uint32 _timeSyncTimer;
+
+    WorldSession(WorldSession const& right) = delete;
+    WorldSession& operator=(WorldSession const& right) = delete;
 };
 #endif
 /// @}

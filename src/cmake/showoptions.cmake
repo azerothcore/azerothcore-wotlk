@@ -1,3 +1,15 @@
+#
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+
 # output generic information about the core and buildtype chosen
 message("")
 message("* AzerothCore revision            : ${rev_hash} ${rev_date} (${rev_branch} branch)")
@@ -118,25 +130,11 @@ endif()
 
 # Performance optimization options:
 
-if( ENABLE_EXTRAS )
-  message("* Enable extra features           : Yes (default)")
-  add_definitions(-DENABLE_EXTRAS)
-else()
-  message("* Enable extra features           : No")
-endif()
-
 if( ENABLE_VMAP_CHECKS )
   message("* Enable vmap DisableMgr checks   : Yes (default)")
   add_definitions(-DENABLE_VMAP_CHECKS)
 else()
   message("* Enable vmap DisableMgr checks   : No")
-endif()
-
-if( ENABLE_EXTRA_LOGS )
-  message("* Enable extra logging functions  : Yes")
-  add_definitions(-DENABLE_EXTRA_LOGS)
-else()
-  message("* Enable extra logging functions  : No (default)")
 endif()
 
 if(WIN32)
@@ -158,6 +156,18 @@ if(WITH_STRICT_DATABASE_TYPE_CHECKS)
   add_definitions(-DACORE_STRICT_DATABASE_TYPE_CHECKS)
 endif()
 
+if(WITHOUT_METRICS)
+  message("")
+  message(" *** WITHOUT_METRICS - WARNING!")
+  message(" *** Please note that this will disable all metrics output (i.e. InfluxDB and Grafana)")
+  add_definitions(-DWITHOUT_METRICS)
+elseif (WITH_DETAILED_METRICS)
+  message("")
+  message(" *** WITH_DETAILED_METRICS - WARNING!")
+  message(" *** Please note that this will enable detailed metrics output (i.e. time each session takes to update)")
+  add_definitions(-DWITH_DETAILED_METRICS)
+endif()
+
 if(BUILD_SHARED_LIBS)
   message("")
   message(" *** WITH_DYNAMIC_LINKING - INFO!")
@@ -170,6 +180,12 @@ if(BUILD_SHARED_LIBS)
   add_definitions(-DACORE_API_USE_DYNAMIC_LINKING)
 
   WarnAboutSpacesInBuildPath()
+endif()
+
+if (USE_CPP_20)
+  message("")
+  message(" *** Enabled C++20 standart")
+  message(" *** Please note that this is an experimental feature!")
 endif()
 
 message("")

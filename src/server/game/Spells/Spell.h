@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __SPELL_H
@@ -19,8 +30,11 @@ class GameObject;
 class DynamicObject;
 class WorldObject;
 class Aura;
+class AuraEffect;
 class SpellScript;
+class SpellEvent;
 class ByteBuffer;
+class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
@@ -28,11 +42,11 @@ enum SpellCastFlags
 {
     CAST_FLAG_NONE               = 0x00000000,
     CAST_FLAG_PENDING            = 0x00000001,              // aoe combat log?
-    CAST_FLAG_UNKNOWN_2          = 0x00000002,
+    CAST_FLAG_HAS_TRAJECTORY     = 0x00000002,
     CAST_FLAG_UNKNOWN_3          = 0x00000004,
     CAST_FLAG_UNKNOWN_4          = 0x00000008,              // ignore AOE visual
     CAST_FLAG_UNKNOWN_5          = 0x00000010,
-    CAST_FLAG_AMMO               = 0x00000020,              // Projectiles visual
+    CAST_FLAG_PROJECTILE         = 0x00000020,              // Projectiles visual
     CAST_FLAG_UNKNOWN_7          = 0x00000040,
     CAST_FLAG_UNKNOWN_8          = 0x00000080,
     CAST_FLAG_UNKNOWN_9          = 0x00000100,
@@ -57,8 +71,8 @@ enum SpellCastFlags
     CAST_FLAG_UNKNOWN_28         = 0x08000000,
     CAST_FLAG_UNKNOWN_29         = 0x10000000,
     CAST_FLAG_UNKNOWN_30         = 0x20000000,
-    CAST_FLAG_UNKNOWN_31         = 0x40000000,
-    CAST_FLAG_UNKNOWN_32         = 0x80000000,
+    CAST_FLAG_HEAL_PREDICTION    = 0x40000000,              //@todo: Unused on TC 3.3.5a. Defined from TC Master.
+    CAST_FLAG_UNKNOWN_32         = 0x80000000
 };
 
 //Spells casted on self should not be diminished.
@@ -200,6 +214,7 @@ struct SpellValue
     uint32    MaxAffectedTargets;
     float     RadiusMod;
     uint8     AuraStackAmount;
+    int32     AuraDuration;
     bool      ForcedCritResult;
 };
 
@@ -250,6 +265,20 @@ struct TargetInfo
 };
 
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
+
+struct TriggeredByAuraSpellData
+{
+    TriggeredByAuraSpellData() : spellInfo(nullptr), effectIndex(-1), tickNumber(0) {}
+
+    void Init(AuraEffect const* aurEff);
+
+    operator bool() const { return spellInfo != nullptr; }
+    bool operator!() const { return !(bool(*this)); }
+
+    SpellInfo const* spellInfo;
+    int8 effectIndex;
+    uint32 tickNumber;
+};
 
 class Spell
 {
@@ -490,6 +519,7 @@ public:
 
     SpellInfo const* m_spellInfo;
     Item* m_CastItem;
+    Item* m_weaponItem;
     ObjectGuid m_castItemGUID;
     uint8 m_cast_count;
     uint32 m_glyphIndex;
@@ -520,6 +550,8 @@ public:
     uint64 GetDelayMoment() const { return m_delayMoment; }
     uint64 GetDelayTrajectory() const { return m_delayTrajectory; }
 
+    uint64 CalculateDelayMomentForDst() const;
+    void RecalculateDelayMomentForDst();
     bool IsNeedSendToClient(bool go) const;
 
     CurrentSpellTypes GetCurrentContainer() const;
@@ -540,7 +572,10 @@ public:
     // xinef: moved to public
     void LoadScripts();
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
-protected:
+
+    [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
+
+ protected:
     bool HasGlobalCooldown() const;
     void TriggerGlobalCooldown();
     void CancelGlobalCooldown();
@@ -677,7 +712,7 @@ protected:
     SpellCastResult CallScriptCheckCastHandlers();
     void PrepareScriptHitHandlers();
     bool CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMode mode);
-    void CallScriptBeforeHitHandlers();
+    void CallScriptBeforeHitHandlers(SpellMissInfo missInfo);
     void CallScriptOnHitHandlers();
     void CallScriptAfterHitHandlers();
     void CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
@@ -709,12 +744,13 @@ protected:
     uint32 m_spellState;
     int32 m_timer;
 
+    SpellEvent* _spellEvent;
     TriggerCastFlags _triggeredCastFlags;
 
     // if need this can be replaced by Aura copy
     // we can't store original aura link to prevent access to deleted auras
     // and in same time need aura data and after aura deleting.
-    SpellInfo const* m_triggeredByAuraSpell;
+    TriggeredByAuraSpellData m_triggeredByAuraSpell;
 
     bool m_skipCheck;
     uint8 m_auraScaleMask;
@@ -786,29 +822,16 @@ namespace Acore
 
 typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
 
-class SpellEvent : public BasicEvent
-{
-public:
-    SpellEvent(Spell* spell);
-    ~SpellEvent() override;
-
-    bool Execute(uint64 e_time, uint32 p_time) override;
-    void Abort(uint64 e_time) override;
-    bool IsDeletable() const override;
-protected:
-    Spell* m_Spell;
-};
-
 class ReflectEvent : public BasicEvent
 {
-public:
-    ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
+    public:
+        ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+        bool Execute(uint64 e_time, uint32 p_time) override;
 
-protected:
-    Unit* _caster;
-    ObjectGuid _targetGUID;
-    const SpellInfo* _spellInfo;
+    protected:
+        Unit* _caster;
+        ObjectGuid _targetGUID;
+        const SpellInfo* _spellInfo;
 };
 
 #endif

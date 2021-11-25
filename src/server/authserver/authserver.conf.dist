@@ -136,6 +136,23 @@ WrongPass.BanType = 0
 WrongPass.Logging = 0
 
 #
+#    BanExpiryCheckInterval
+#        Description: Time (in seconds) between checks for expired bans
+#        Default:     60
+#
+
+BanExpiryCheckInterval = 60
+
+#
+#    StrictVersionCheck
+#        Description: Prevent modified clients from connecting
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+StrictVersionCheck = 0
+
+#
 #    SourceDirectory
 #        Description: The path to your AzerothCore source directory.
 #                     If the path is left empty, the built-in CMAKE_SOURCE_DIR is used.
@@ -166,6 +183,15 @@ MySQLExecutable = ""
 #        Default:     ""  - (Disabled)
 
 IPLocationFile = ""
+
+#
+#    AllowLoggingIPAddressesInDatabase
+#        Description: Specifies if IP addresses can be logged to the database
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+
+AllowLoggingIPAddressesInDatabase = 1
 
 #
 ###################################################################################################

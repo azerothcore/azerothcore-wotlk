@@ -1,21 +1,32 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ContinentBuilder.h"
 #include "TileBuilder.h"
-#include "Geometry.h"
-#include "WorldModelRoot.h"
-#include "Constants.h"
-#include "Utils.h"
-#include "Cache.h"
 #include "ADT.h"
-#include "WDT.h"
+#include "Cache.h"
+#include "Constants.h"
+#include "ContinentBuilder.h"
+#include "DetourNavMeshBuilder.h"
+#include "Geometry.h"
 #include "Recast.h"
 #include "RecastAlloc.h"
-#include "DetourNavMeshBuilder.h"
+#include "Utils.h"
+#include "WDT.h"
+#include "WorldModelRoot.h"
 
 TileBuilder::TileBuilder(ContinentBuilder* _cBuilder, std::string world, int x, int y, uint32 mapId) :
     World(world), X(x), Y(y), MapId(mapId), _Geometry(nullptr), DataSize(0), cBuilder(_cBuilder)

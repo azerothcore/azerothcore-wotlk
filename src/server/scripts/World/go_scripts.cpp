@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ContentData
@@ -34,9 +45,9 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "Spell.h"
 #include "WorldSession.h"
 
@@ -81,7 +92,7 @@ public:
         {
             if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
             {
-                cr->MonsterYell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL, 0);
+                cr->Yell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL);
                 cr->AI()->AttackStart(pPlayer);
             }
         }
@@ -108,8 +119,8 @@ public:
                 _timer += diff;
                 if (_timer > 5000)
                 {
-                    go->CastSpell(nullptr, 9056);
-                    go->DestroyForNearbyPlayers();
+                    me->CastSpell(nullptr, 9056);
+                    me->DestroyForNearbyPlayers();
                     _timer = 0;
                 }
             }
@@ -284,7 +295,7 @@ public:
             requireSummon = 0;
             int8 count = urand(1, 3);
             for (int8 i = 0; i < count; ++i)
-                go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionZ(), go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
         void OnStateChanged(uint32 state, Unit*  /*unit*/) override
@@ -295,7 +306,7 @@ public:
 
         void UpdateAI(uint32  /*diff*/) override
         {
-            if (go->isSpawned() && requireSummon == 2)
+            if (me->isSpawned() && requireSummon == 2)
                 SummonTadpoles();
         }
 
@@ -308,7 +319,7 @@ public:
             if (player->GetQuestStatus(QUEST_OH_NOES_THE_TADPOLES) == QUEST_STATUS_INCOMPLETE)
             {
                 std::list<Creature*> cList;
-                GetCreatureListWithEntryInGrid(cList, go, NPC_WINTERFIN_TADPOLE, 5.0f);
+                GetCreatureListWithEntryInGrid(cList, me, NPC_WINTERFIN_TADPOLE, 5.0f);
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                 {
                     player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE);
@@ -349,15 +360,15 @@ public:
             {
                 timer = 0;
                 std::list<Player*> players;
-                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                Cell::VisitWorldObjects(go, searcher, 0.3f);
+                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
+                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
+                Cell::VisitWorldObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
                     std::list<Player*>::iterator itr = players.begin();
                     std::advance(itr, urand(0, players.size() - 1));
-                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
+                    if (Creature* trigger = me->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
                         trigger->CastSpell(trigger, SPELL_FLAMES);
                 }
             }
@@ -396,15 +407,15 @@ public:
             {
                 timer = 0;
                 std::list<Player*> players;
-                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                Cell::VisitWorldObjects(go, searcher, 0.3f);
+                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
+                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
+                Cell::VisitWorldObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
                     std::list<Player*>::iterator itr = players.begin();
                     std::advance(itr, urand(0, players.size() - 1));
-                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
+                    if (Creature* trigger = me->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
                         trigger->CastSpell(trigger, SPELL_HEAT);
                 }
             }
@@ -498,7 +509,7 @@ public:
                             //Restart the current selected music
                             _currentMusicEvent = 0;
                             //Check zone to play correct music
-                            if (go->GetAreaId() == SILVERMOON || go->GetAreaId() == UNDERCITY || go->GetAreaId() == ORGRIMMAR_1 || go->GetAreaId() == ORGRIMMAR_2 || go->GetAreaId() == THUNDERBLUFF)
+                            if (me->GetAreaId() == SILVERMOON || me->GetAreaId() == UNDERCITY || me->GetAreaId() == ORGRIMMAR_1 || me->GetAreaId() == ORGRIMMAR_2 || me->GetAreaId() == THUNDERBLUFF)
                             {
                                 switch (rnd)
                                 {
@@ -518,7 +529,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (go->GetAreaId() == IRONFORGE_1 || go->GetAreaId() == IRONFORGE_2 || go->GetAreaId() == STORMWIND || go->GetAreaId() == EXODAR || go->GetAreaId() == DARNASSUS)
+                            else if (me->GetAreaId() == IRONFORGE_1 || me->GetAreaId() == IRONFORGE_2 || me->GetAreaId() == STORMWIND || me->GetAreaId() == EXODAR || me->GetAreaId() == DARNASSUS)
                             {
                                 switch (rnd)
                                 {
@@ -538,7 +549,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (go->GetAreaId() == SHATTRATH)
+                            else if (me->GetAreaId() == SHATTRATH)
                             {
                                 rnd = urand(0, 5);
                                 switch (rnd)
@@ -580,7 +591,7 @@ public:
                         // Play selected music
                         if (_currentMusicEvent != 0)
                         {
-                            go->PlayDirectMusic(_currentMusicEvent);
+                            me->PlayDirectMusic(_currentMusicEvent);
                         }
                         _events.ScheduleEvent(EVENT_BM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client
                         break;
@@ -638,7 +649,7 @@ public:
                     case EVENT_PDM_START_MUSIC:
                         if (!IsHolidayActive(HOLIDAY_PIRATES_DAY))
                             break;
-                        go->PlayDirectMusic(MUSIC_PIRATE_DAY_MUSIC);
+                        me->PlayDirectMusic(MUSIC_PIRATE_DAY_MUSIC);
                         _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                         break;
                     default:
@@ -693,7 +704,7 @@ public:
                     case EVENT_DFM_START_MUSIC:
                         if (!IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_ELWYNN) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_THUNDER) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_SHATTRATH))
                             break;
-                        go->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
+                        me->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
                         _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                         break;
                     default:
@@ -750,18 +761,18 @@ public:
                             if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
                                 break;
 
-                            Map::PlayerList const& players = go->GetMap()->GetPlayers();
+                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource())
                                 {
                                     if (player->GetTeamId() == TEAM_HORDE)
                                     {
-                                        go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
+                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
                                     }
                                     else
                                     {
-                                        go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
+                                        me->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
                                     }
                                 }
                             }
@@ -1378,7 +1389,7 @@ public:
             if (reportUse)
                 return false;
 
-            Unit* owner = go->GetOwner();
+            Unit* owner = me->GetOwner();
             if (_stoneSpell == 0 || _stoneId == 0)
             {
                 if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
@@ -1405,7 +1416,7 @@ public:
 
             // Item has to actually be created to remove a charge on the well.
             if (player->HasItemCount(_stoneId))
-                go->AddUse();
+                me->AddUse();
 
             return true;
         }
@@ -1614,6 +1625,190 @@ public:
     }
 };
 
+/*####
+## go_bells
+####*/
+
+enum BellHourlySoundFX
+{
+    BELLTOLLHORDE      = 6595,
+    BELLTOLLTRIBAL     = 6675,
+    BELLTOLLALLIANCE   = 6594,
+    BELLTOLLNIGHTELF   = 6674,
+    BELLTOLLDWARFGNOME = 7234,
+    BELLTOLLKHARAZHAN  = 9154,
+    LIGHTHOUSEFOGHORN  = 7197
+};
+
+enum BellHourlySoundZones
+{
+    TIRISFAL_ZONE            = 85,
+    UNDERCITY_ZONE           = 1497,
+    DUN_MOROGH_ZONE          = 1,
+    IRONFORGE_ZONE           = 1537,
+    TELDRASSIL_ZONE          = 141,
+    DARNASSUS_ZONE           = 1657,
+    ASHENVALE_ZONE           = 331,
+    HILLSBRAD_FOOTHILLS_ZONE = 267,
+    DUSKWOOD_ZONE            = 10,
+    WESTFALL_ZONE            = 40,
+    DUSTWALLOW_MARSH_ZONE    = 15,
+    SHATTRATH_ZONE           = 3703
+};
+
+enum LightHouseAreas
+{
+    AREA_ALCAZ_ISLAND        = 2079,
+    AREA_WESTFALL_LIGHTHOUSE = 115
+};
+
+enum BellHourlyObjects
+{
+    GO_HORDE_BELL     = 175885,
+    GO_ALLIANCE_BELL  = 176573,
+    GO_KHARAZHAN_BELL = 182064
+};
+
+enum BellHourlyMisc
+{
+    GAME_EVENT_HOURLY_BELLS = 73,
+    EVENT_RING_BELL         = 1,
+    EVENT_TIME              = 2
+};
+
+class go_bells : public GameObjectScript
+{
+public:
+    go_bells() : GameObjectScript("go_bells") {}
+
+    struct go_bellsAI : public GameObjectAI
+    {
+        go_bellsAI(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+        {
+            uint32 zoneId = go->GetZoneId();
+
+            switch (go->GetEntry())
+            {
+            case GO_HORDE_BELL:
+            {
+                switch (zoneId)
+                {
+                case TIRISFAL_ZONE:
+                case UNDERCITY_ZONE:
+                case HILLSBRAD_FOOTHILLS_ZONE:
+                case DUSKWOOD_ZONE:
+                    _soundId = BELLTOLLHORDE;
+                    break;
+                default:
+                    _soundId = BELLTOLLTRIBAL;
+                    break;
+                }
+                break;
+            }
+            case GO_ALLIANCE_BELL:
+            {
+                switch (zoneId)
+                {
+                case IRONFORGE_ZONE:
+                case DUN_MOROGH_ZONE:
+                    _soundId = BELLTOLLDWARFGNOME;
+                    break;
+                case DARNASSUS_ZONE:
+                case TELDRASSIL_ZONE:
+                case ASHENVALE_ZONE:
+                case SHATTRATH_ZONE:
+                    _soundId = BELLTOLLNIGHTELF;
+                    break;
+                case WESTFALL_ZONE:
+                    if (go->GetAreaId() == AREA_WESTFALL_LIGHTHOUSE)
+                    {
+                        _soundId = LIGHTHOUSEFOGHORN;
+                    }
+                    else
+                    {
+                        _soundId = BELLTOLLALLIANCE;
+                    }
+                    break;
+                case DUSTWALLOW_MARSH_ZONE:
+                    if (go->GetAreaId() == AREA_ALCAZ_ISLAND)
+                    {
+                        _soundId = LIGHTHOUSEFOGHORN;
+                    }
+                    else
+                    {
+                        _soundId = BELLTOLLALLIANCE;
+                    }
+                    break;
+                default:
+                    _soundId = BELLTOLLALLIANCE;
+                    break;
+                }
+                break;
+            }
+            case GO_KHARAZHAN_BELL:
+            {
+                _soundId = BELLTOLLKHARAZHAN;
+                break;
+            }
+            break;
+            }
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once)
+            {
+                // Reset
+                once = false;
+                _events.ScheduleEvent(EVENT_TIME, 1000);
+            }
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TIME:
+                {
+                    // Get how many times it should ring
+                    time_t t = time(nullptr);
+                    tm local_tm;
+                    tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
+                    localtime_r(&t, &local_tm);
+                    uint8 _rings = (local_tm.tm_hour) % 12;
+                    _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Schedule ring event
+                    for (auto i = 0; i < _rings; ++i)
+                    {
+                        _events.ScheduleEvent(EVENT_RING_BELL, (i * 4 + 1) * 1000);
+                    }
+                    break;
+                }
+                case EVENT_RING_BELL:
+                {
+                    me->PlayDirectSound(_soundId);
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+
+    private:
+        EventMap _events;
+        uint32   _soundId;
+        bool     once;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_bellsAI(go);
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1656,4 +1851,5 @@ void AddSC_go_scripts()
     new go_hive_pod();
     new go_massive_seaforium_charge();
     new go_veil_skith_cage();
+    new go_bells();
 }

@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -144,8 +157,9 @@ public:
     }
 };
 
-struct ManaVoidSelector : public Acore::unary_function<Unit*, bool>
+struct ManaVoidSelector
 {
+public:
     explicit ManaVoidSelector(WorldObject const* source) : _source(source) { }
 
     bool operator()(Unit* unit) const
@@ -153,6 +167,7 @@ struct ManaVoidSelector : public Acore::unary_function<Unit*, bool>
         return unit->getPowerType() == POWER_MANA && _source->GetDistance(unit) > 15.0f;
     }
 
+private:
     WorldObject const* _source;
 };
 
@@ -349,8 +364,13 @@ public:
                 Talk(SAY_VALITHRIA_75_PERCENT);
             }
             else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
+            {
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                {
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
+                    _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
+                }
+            }
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -572,7 +592,7 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
                 if (!threatList.empty())
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* target = (*itr)->getTarget())

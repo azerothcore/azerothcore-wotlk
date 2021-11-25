@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -188,10 +201,10 @@ private:
 };
 
 // xinef: malleable goo selector, check for target validity
-struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
+struct MalleableGooSelector
 {
-    const Unit* me;
-    MalleableGooSelector(Unit const* unit) : me(unit) {}
+public:
+    MalleableGooSelector(Unit const* unit) : me(unit) { }
 
     bool operator()(Unit const* target) const
     {
@@ -203,6 +216,8 @@ struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
 
         return me->IsValidAttackTarget(target);
     }
+private:
+    const Unit* me;
 };
 
 class boss_professor_putricide : public CreatureScript
@@ -1525,8 +1540,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             TempSummon* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id);
             if (!summon || !summon->IsVehicle())
                 return;
