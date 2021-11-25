@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "CreatureGroups.h"
+#include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
-#include "Log.h"
 
 FormationMgr::~FormationMgr()
 {
@@ -223,6 +223,47 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 
         if (pMember->IsValidAttackTarget(target) && pMember->AI())
             pMember->AI()->AttackStart(target);
+    }
+}
+
+void CreatureGroup::MemberEvaded(Creature* member)
+{
+    uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+    {
+        return;
+    }
+
+    for (auto const& itr : m_members)
+    {
+        Creature* pMember = itr.first;
+
+        //Skip one check
+        if (pMember == member)
+        {
+            continue;
+        }
+
+        if (!pMember->IsAlive())
+        {
+            continue;
+        }
+
+        if (pMember->IsInEvadeMode())
+        {
+            continue;
+        }
+
+        if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+        {
+            if (pMember->IsAIEnabled)
+            {
+                if (CreatureAI* pMemberAI = pMember->AI())
+                {
+                    pMemberAI->EnterEvadeMode();
+                }
+            }
+        }
     }
 }
 

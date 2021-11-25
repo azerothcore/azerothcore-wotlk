@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 enum PriestSpells
@@ -792,7 +793,10 @@ class spell_pri_vampiric_touch : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), 57669, true, nullptr, aurEff);
+        if (Unit* actor = eventInfo.GetActor())
+        {
+            actor->CastSpell(actor, 57669, true, nullptr, aurEff);
+        }
     }
 
     void Register() override

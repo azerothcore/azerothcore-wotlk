@@ -18,14 +18,14 @@
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
 
-#include "MessageBuffer.h"
 #include "Log.h"
+#include "MessageBuffer.h"
 #include <atomic>
-#include <queue>
-#include <memory>
-#include <functional>
-#include <type_traits>
 #include <boost/asio/ip/tcp.hpp>
+#include <functional>
+#include <memory>
+#include <queue>
+#include <type_traits>
 
 using boost::asio::ip::tcp;
 

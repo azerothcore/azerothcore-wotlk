@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
+#include "BattlegroundMgr.h"
 #include "GameGraveyard.h"
 #include "GameObject.h"
 #include "Language.h"
