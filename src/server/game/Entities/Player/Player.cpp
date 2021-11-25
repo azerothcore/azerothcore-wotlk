@@ -9428,7 +9428,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
 
 void Player::LeaveAllArenaTeams(ObjectGuid guid)
 {
-    // xinef: zomg! sync query
+    // xinef: sync query
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ARENA_TEAMS);
     stmt->setUInt32(0, guid.GetCounter());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);

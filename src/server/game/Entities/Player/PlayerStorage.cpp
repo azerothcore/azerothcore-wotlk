@@ -5632,7 +5632,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     _LoadDeclinedNames(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES));
 
-    //m_achievementMgr->CheckAllAchievementCriteria(); // pussywizard: ZOMG! disabled this bullshit
+    //m_achievementMgr->CheckAllAchievementCriteria(); // pussywizard: disabled this bullshit
 
     _LoadEquipmentSets(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
@@ -6056,7 +6056,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 }
                 else
                 {
-                    // xinef: zomg! sync query
+                    // xinef: sync query
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_REFUNDS);
                     stmt->setUInt32(0, item->GetGUID().GetCounter());
                     stmt->setUInt32(1, GetGUID().GetCounter());

@@ -2739,7 +2739,7 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 {
     // pussywizard: calling SendMeleeAttackStop without clearing UNIT_STATE_MELEE_ATTACKING and then AttackStart the same player may spoil npc rotating!
     // pussywizard: this happens in some boss scripts, just add clearing here
-    // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // ZOMG! commented out for now
+    // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // commented out for now
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
