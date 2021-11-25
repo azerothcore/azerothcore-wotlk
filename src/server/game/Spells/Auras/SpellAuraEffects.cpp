@@ -2838,7 +2838,6 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
             }
         }
 
-        
         if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
         {
             if (GetMiscValueB() > 0) // Choose proper modelid
@@ -2859,7 +2858,7 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
                 if (GetSpellInfo()->Effects[i].Effect == SPELL_EFFECT_SUMMON && GetSpellInfo()->Effects[i].MiscValue == GetMiscValue())
                 {
                     displayId = 0;
-                }  
+                }
             }
 
         }
