@@ -9708,7 +9708,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         return false;
     }
 
-    //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: wtf? why having this flag prevents from entering combat? it should just prevent melee attack
+    //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;
 
     // nobody can attack GM in GM-mode
@@ -17600,7 +17600,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         return false;
 
     // Pets already have a properly initialized CharmInfo, don't overwrite it.
-    // Xinef: I need charmInfo for vehicle so bullshit
+    // Xinef: I need charmInfo for vehicle
     if (/*type != CHARM_TYPE_VEHICLE &&*/ !GetCharmInfo())
     {
         InitCharmInfo();
