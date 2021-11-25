@@ -17,6 +17,7 @@
 
 #include "BattlegroundBE.h"
 #include "Language.h"
+#include "Log.h"
 #include "Object.h"
 #include "ObjectMgr.h"
 #include "Player.h"

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Warden.h"
 #include "AccountMgr.h"
 #include "BanMgr.h"
 #include "ByteBuffer.h"
@@ -24,7 +25,6 @@
 #include "Player.h"
 #include "SharedDefines.h"
 #include "Util.h"
-#include "Warden.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AuctionHouseMgr.h"
 #include "AccountMgr.h"
 #include "AsyncAuctionListing.h"
-#include "AuctionHouseMgr.h"
 #include "AvgDiffTracker.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Item.h"
 #include "Logging/Log.h"
 #include "ObjectMgr.h"
@@ -137,10 +137,10 @@ static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrde
             case AUCTION_SORT_OWNER:
             {
                 std::string leftName;
-                sObjectMgr->GetPlayerNameByGUID(left->owner.GetCounter(), leftName);
+                sCharacterCache->GetCharacterNameByGuid(left->owner, leftName);
 
                 std::string rightName;
-                sObjectMgr->GetPlayerNameByGUID(right->owner.GetCounter(), rightName);
+                sCharacterCache->GetCharacterNameByGuid(right->owner, rightName);
 
                 int result = leftName.compare(rightName);
                 if (result == 0)
