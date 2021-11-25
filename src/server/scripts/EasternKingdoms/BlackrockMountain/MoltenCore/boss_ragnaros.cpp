@@ -275,18 +275,22 @@ public:
                         Unit const* victim = me->GetVictim();
                         if (victim && !me->IsWithinMeleeRange(victim))
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
                             {
-                                DoCast(target, SPELL_MAGMA_BLAST);
+                                me->AttackerStateUpdate(target);
                             }
-
-                            if (!_hasYelledMagmaBurst)
+                            else
                             {
-                                Talk(SAY_MAGMABURST);
-                                _hasYelledMagmaBurst = true;
+                                DoCastRandomTarget(SPELL_MAGMA_BLAST);
+
+                                if (!_hasYelledMagmaBurst)
+                                {
+                                    Talk(SAY_MAGMABURST);
+                                    _hasYelledMagmaBurst = true;
+                                }
                             }
                         }
-                        else if (_hasYelledMagmaBurst)
+                        else
                         {
                             _hasYelledMagmaBurst = false;
                         }
@@ -380,6 +384,8 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+
+            me->RemoveAura(SPELL_RAGNA_SUBMERGE_VISUAL);
 
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
             {
