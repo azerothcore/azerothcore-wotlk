@@ -534,13 +534,13 @@ void Map::InitializeObject(T* /*obj*/)
 template<>
 void Map::InitializeObject(Creature*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<>
 void Map::InitializeObject(GameObject*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<class T>

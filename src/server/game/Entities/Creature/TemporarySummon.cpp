@@ -418,7 +418,7 @@ void Puppet::InitSummon()
         else
         {
             LOG_INFO("misc", "Puppet::InitSummon (B1)");
-            //ABORT(); // ZOMG!
+            //ABORT();
         }
     }
 }

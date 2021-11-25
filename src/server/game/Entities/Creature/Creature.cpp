@@ -1564,7 +1564,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         return false;
     }
 
-    // xinef: fix shitness from db
+    // xinef: fix from db
     if ((addToMap || gridLoad) && !data->overwrittenZ)
     {
         float tz = map->GetHeight(data->posX, data->posY, data->posZ + 1.0f, true);
