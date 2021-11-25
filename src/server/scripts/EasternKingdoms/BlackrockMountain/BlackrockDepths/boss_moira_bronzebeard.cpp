@@ -21,10 +21,10 @@
 
 enum Spells
 {
-    SPELL_HEAL                                             = 10917,
+    SPELL_HEAL                                             = 15586,
     SPELL_RENEW                                            = 10929,
     SPELL_SHIELD                                           = 10901,
-    SPELL_MINDBLAST                                        = 10947,
+    SPELL_MINDBLAST                                        = 15587,
     SPELL_SHADOWWORDPAIN                                   = 10894,
     SPELL_SMITE                                            = 10934
 };
