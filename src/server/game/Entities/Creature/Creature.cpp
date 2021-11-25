@@ -63,7 +63,7 @@ CreatureMovementData::CreatureMovementData() : Ground(CreatureGroundMovementType
 
 std::string CreatureMovementData::ToString() const
 {
-    constexpr std::array<char[15], 3> GroundStates = {"None", "Run", "Hover"};
+    constexpr std::array<char const*, 3> GroundStates = {"None", "Run", "Hover"};
     constexpr std::array<char[15], 3> FlightStates = {"None", "DisableGravity", "CanFly"};
     constexpr std::array<char[15], 3> ChaseStates  = {"Run", "CanWalk", "AlwaysWalk"};
     constexpr std::array<char[15], 3> RandomStates = {"Walk", "CanRun", "AlwaysRun"};
