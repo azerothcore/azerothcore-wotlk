@@ -2739,7 +2739,7 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 {
     // pussywizard: calling SendMeleeAttackStop without clearing UNIT_STATE_MELEE_ATTACKING and then AttackStart the same player may spoil npc rotating!
     // pussywizard: this happens in some boss scripts, just add clearing here
-    // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // ZOMG! commented out for now
+    // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // commented out for now
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
@@ -9714,7 +9714,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         return false;
     }
 
-    //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: wtf? why having this flag prevents from entering combat? it should just prevent melee attack
+    //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;
 
     // nobody can attack GM in GM-mode
@@ -11173,7 +11173,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
             if (!spellProto->ValidateAttribute6SpellDamageMods(caster, *i, damagetype == DOT))
                 continue;
 
-            // Only death knight spell with this aura, ZOMG!
+            // Only death knight spell with this aura
             if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
                 if (!caster || caster->GetGUID() != (*i)->GetCasterGUID())
                     continue;
@@ -17611,7 +17611,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         return false;
 
     // Pets already have a properly initialized CharmInfo, don't overwrite it.
-    // Xinef: I need charmInfo for vehicle so bullshit
+    // Xinef: I need charmInfo for vehicle
     if (/*type != CHARM_TYPE_VEHICLE &&*/ !GetCharmInfo())
     {
         InitCharmInfo();
@@ -18180,7 +18180,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
 
     if (IsInWorld())
     {
-        // xinef: ZOMG!, to comment, bellow line should be removed
+        // xinef: to comment, bellow line should be removed
         // pussywizard: goign to other phase (valithria, algalon) should not remove such auras
         //RemoveNotOwnSingleTargetAuras(newPhaseMask, true);            // we can lost access to caster or target
 

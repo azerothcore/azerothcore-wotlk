@@ -1326,7 +1326,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     if (!trapSpell)                                          // checked at load already
         return;
 
-    // xinef: wtf, many spells have range 0 but radius > 0
+    // xinef: many spells have range 0 but radius > 0
     float range = float(target->GetSpellMaxRangeForTarget(GetOwner(), trapSpell));
     if (range < 1.0f)
         range = 5.0f;

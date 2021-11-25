@@ -198,7 +198,7 @@ m_metadataResult(result)
 
     m_rBind = new MySQLBind[m_fieldCount];
 
-    //- for future readers wondering where the fuck this is freed - mysql_stmt_bind_result moves pointers to these
+    //- for future readers wondering where this is freed - mysql_stmt_bind_result moves pointers to these
     // from m_rBind to m_stmt->bind and it is later freed by the `if (m_stmt->bind_result_done)` block just above here
     // MYSQL_STMT lifetime is equal to connection lifetime
     MySQLBool* m_isNull = new MySQLBool[m_fieldCount];
