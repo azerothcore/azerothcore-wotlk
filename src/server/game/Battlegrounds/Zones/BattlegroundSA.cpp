@@ -24,6 +24,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+constexpr Milliseconds BG_SA_BOAT_START    = 1min;
+constexpr Milliseconds BG_SA_WARMUPLENGTH  = 2min;
+constexpr Milliseconds BG_SA_ROUNDLENGTH   = 10min;
+
 BattlegroundSA::BattlegroundSA()
 {
     StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_SA_START_TWO_MINUTES;
