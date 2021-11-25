@@ -15,12 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Unit.h"
 #include "AccountMgr.h"
 #include "ArenaSpectator.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Common.h"
@@ -60,7 +62,6 @@
 #include "Totem.h"
 #include "TotemAI.h"
 #include "Transport.h"
-#include "Unit.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -70,8 +71,8 @@
 #include <math.h>
 
 #ifdef ELUNA
-#include "LuaEngine.h"
 #include "ElunaEventMgr.h"
+#include "LuaEngine.h"
 #endif
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -4678,7 +4679,7 @@ void Unit::RemoveNotOwnSingleTargetAuras()
     }
 }
 
-void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
+void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except, bool isAutoshot /*= false*/)
 {
     if (!(m_interruptMask & flag))
         return;
@@ -4699,10 +4700,16 @@ void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
 
     // interrupt channeled spell
     if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
-        if (spell->getState() == SPELL_STATE_CASTING
-                && (spell->m_spellInfo->ChannelInterruptFlags & flag)
-                && spell->m_spellInfo->Id != except)
-            InterruptNonMeleeSpells(false, spell->m_spellInfo->Id);
+    {
+        if (spell->getState() == SPELL_STATE_CASTING && (spell->m_spellInfo->ChannelInterruptFlags & flag) && spell->m_spellInfo->Id != except)
+        {
+            // Do not interrupt if auto shot
+            if (!(isAutoshot && spell->m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS)))
+            {
+                InterruptNonMeleeSpells(false, spell->m_spellInfo->Id);
+            }
+        }
+    }
 
     UpdateInterruptMask();
 }
@@ -14611,9 +14618,10 @@ void Unit::SetLevel(uint8 lvl, bool showLevelChange)
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetGroup())
         ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_LEVEL);
 
-    // xinef: update global data
     if (GetTypeId() == TYPEID_PLAYER)
-        sWorld->UpdateGlobalPlayerData(ToPlayer()->GetGUID().GetCounter(), PLAYER_UPDATE_DATA_LEVEL, "", lvl);
+    {
+        sCharacterCache->UpdateCharacterLevel(GetGUID(), lvl);
+    }
 }
 
 void Unit::SetHealth(uint32 val)

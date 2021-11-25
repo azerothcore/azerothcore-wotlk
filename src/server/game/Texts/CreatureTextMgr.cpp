@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureTextMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Common.h"
-#include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"

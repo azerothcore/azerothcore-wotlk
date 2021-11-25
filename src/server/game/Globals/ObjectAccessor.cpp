@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectAccessor.h"
 #include "Corpse.h"
 #include "Creature.h"
 #include "DynamicObject.h"
@@ -25,7 +26,6 @@
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapMgr.h"
-#include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"

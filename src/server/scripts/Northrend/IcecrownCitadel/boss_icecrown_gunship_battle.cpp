@@ -16,7 +16,6 @@
  */
 
 #include "CreatureTextMgr.h"
-#include "icecrown_citadel.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ScriptMgr.h"
@@ -24,6 +23,7 @@
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -169,6 +169,7 @@ enum Spells
     SPELL_ON_ORGRIMS_HAMMER_DECK            = 70121,
 
     // Rocket Pack
+    SPELL_CREATE_ROCKET_PACK                = 70055,
     SPELL_ROCKET_PACK_DAMAGE                = 69193,
     SPELL_ROCKET_BURST                      = 69192,
     SPELL_ROCKET_PACK_USEABLE               = 70348,
@@ -1423,7 +1424,7 @@ public:
 
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
-            player->AddItem(ITEM_GOBLIN_ROCKET_PACK, 1);
+            me->CastSpell(player, SPELL_CREATE_ROCKET_PACK);
             player->PlayerTalkClass->SendCloseGossip();
         }
     };

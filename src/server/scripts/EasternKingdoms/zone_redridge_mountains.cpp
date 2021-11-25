@@ -22,9 +22,9 @@ SDComment: Support for quest 219.
 Script Data End */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 enum CorporalKeeshan
 {

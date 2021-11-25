@@ -17,9 +17,9 @@
 
 #ifndef CONT_BUILDER_H
 #define CONT_BUILDER_H
-#include <string>
-#include "WDT.h"
 #include "Define.h"
+#include "WDT.h"
+#include <string>
 
 class ContinentBuilder
 {
