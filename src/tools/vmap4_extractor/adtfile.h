@@ -18,9 +18,9 @@
 #ifndef ADT_H
 #define ADT_H
 
+#include "model.h"
 #include "mpq_libmpq04.h"
 #include "wmo.h"
-#include "model.h"
 
 #define TILESIZE (533.33333f)
 #define CHUNKSIZE ((TILESIZE) / 16.0f)

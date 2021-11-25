@@ -18,8 +18,8 @@
 #ifndef DEF_PINNACLE_H
 #define DEF_PINNACLE_H
 
-#include "Opcodes.h"
 #include "CreatureAIImpl.h"
+#include "Opcodes.h"
 
 #define UtgardePinnacleScriptName "instance_utgarde_pinnacle"
 

@@ -26,6 +26,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Totem.h"
 #include "UnitAI.h"
@@ -444,7 +445,7 @@ class spell_dk_improved_blood_presence_proc : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetDamageInfo()->GetDamage();
+        return eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage();
     }
 
     void Register() override
@@ -461,7 +462,7 @@ class spell_dk_wandering_plague_aura : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || !eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo())
+        if (!spellInfo || !eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo() || !eventInfo.GetActor())
             return false;
 
         if (!roll_chance_f(eventInfo.GetActor()->GetUnitCriticalChance(BASE_ATTACK, eventInfo.GetActionTarget())))
@@ -548,7 +549,7 @@ class spell_dk_blood_caked_blade : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->IsAlive();
+        return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->IsAlive() && eventInfo.GetActor();
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

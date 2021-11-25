@@ -16,8 +16,8 @@
  */
 
 #include "ScriptMgr.h"
-#include "SpellScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "molten_core.h"
 
 enum Texts

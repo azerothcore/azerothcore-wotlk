@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include "DataMap.h"
+#include "G3D/Vector3.h"
 #include "GridDefines.h"
 #include "GridReference.h"
 #include "Map.h"
@@ -29,9 +30,8 @@
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include <set>
-#include <string>
 #include <sstream>
-#include "G3D/Vector3.h"
+#include <string>
 
 #ifdef ELUNA
 class ElunaEventProcessor;
