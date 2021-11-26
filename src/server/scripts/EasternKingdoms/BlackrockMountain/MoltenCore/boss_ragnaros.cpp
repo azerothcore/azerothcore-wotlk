@@ -281,7 +281,7 @@ public:
                             }
                             else
                             {
-                                events.RescheduleEvent(EVENT_MAGMA_BLAST, 3000, PHASE_EMERGED, PHASE_EMERGED);
+                                events.RescheduleEvent(EVENT_MAGMA_BLAST, 4000, PHASE_EMERGED, PHASE_EMERGED);
                             }
                         }
                         else
