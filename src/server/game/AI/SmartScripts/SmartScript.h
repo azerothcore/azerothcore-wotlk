@@ -143,13 +143,17 @@ public:
         return nullptr;
     }
 
-    void StoreCounter(uint32 id, uint32 value, uint32 reset)
+    void StoreCounter(uint32 id, uint32 value, uint32 reset, uint32 subtract)
     {
         CounterMap::iterator itr = mCounterList.find(id);
         if (itr != mCounterList.end())
         {
-            if (reset == 0)
+            if (!reset)
                 itr->second += value;
+            else if (subtract)
+            {
+                itr->second -= value;
+            }
             else
                 itr->second = value;
         }

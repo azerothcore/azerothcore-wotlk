@@ -107,6 +107,10 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
 
         if (eventType == e/* && (!(*i).event.event_phase_mask || IsInPhase((*i).event.event_phase_mask)) && !((*i).event.event_flags & SMART_EVENT_FLAG_NOT_REPEATABLE && (*i).runOnce)*/)
         {
+            if (i->entryOrGuid == 179666)
+            {
+                int acb = 0;
+            }
             ConditionList conds = sConditionMgr->GetConditionsForSmartEvent((*i).entryOrGuid, (*i).event_id, (*i).source_type);
             ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
 
@@ -1698,30 +1702,30 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
         case SMART_ACTION_SET_COUNTER:
             {
-                if (ObjectList* targets = GetTargets(e, unit))
+            if (ObjectList* targets = GetTargets(e, unit))
+            {
+                for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
-                    for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                    if (IsCreature(*itr))
                     {
-                        if (IsCreature(*itr))
-                        {
-                            if (SmartAI* ai = CAST_AI(SmartAI, (*itr)->ToCreature()->AI()))
-                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
-                            else
-                                LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartAI, skipping");
-                        }
-                        else if (IsGameObject(*itr))
-                        {
-                            if (SmartGameObjectAI* ai = CAST_AI(SmartGameObjectAI, (*itr)->ToGameObject()->AI()))
-                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
-                            else
-                                LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartGameObjectAI, skipping");
-                        }
+                        if (SmartAI* ai = CAST_AI(SmartAI, (*itr)->ToCreature()->AI()))
+                            ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
+                        else
+                            LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartAI, skipping");
                     }
-
-                    delete targets;
+                    else if (IsGameObject(*itr))
+                    {
+                        if (SmartGameObjectAI* ai = CAST_AI(SmartGameObjectAI, (*itr)->ToGameObject()->AI()))
+                            ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
+                        else
+                            LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartGameObjectAI, skipping");
+                    }
                 }
-                else
-                    StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
+
+                delete targets;
+            }
+            else
+                StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
 
                 break;
             }
@@ -3707,25 +3711,42 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 if (me)
                 {
                     if (Unit* owner = ObjectAccessor::GetUnit(*me, me->GetCharmerOrOwnerGUID()))
+                    {
                         l->push_back(owner);
+                    }
                     // Xinef: dont add same unit twice
                     else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit())
+                    {
                         l->push_back(me->ToTempSummon()->GetSummonerUnit());
+                    }
+                    else if (WorldObject* wo_summoner = me->ToTempSummon()->GetSummoner())
+                    {
+                        l->push_back(wo_summoner);
+                    }
                 }
                 else if (go)
                 {
                     if (Unit* owner = ObjectAccessor::GetUnit(*go, go->GetOwnerGUID()))
+                    {
                         l->push_back(owner);
+                    }
+                    else if (WorldObject* wo_summoner = me->ToTempSummon()->GetSummoner())
+                    {
+                        l->push_back(wo_summoner);
+                    }
+                        
                 }
 
                 // xinef: Get owner of owner
                 if (e.target.owner.useCharmerOrOwner && !l->empty())
                 {
-                    Unit* owner = l->front()->ToUnit();
-                    l->clear();
+                    if (Unit* owner = l->front()->ToUnit())
+                    {
+                        l->clear();
 
-                    if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->GetCharmerOrOwnerGUID()))
-                        l->push_back(base);
+                        if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->GetCharmerOrOwnerGUID()))
+                            l->push_back(base);
+                    }
                 }
                 break;
             }

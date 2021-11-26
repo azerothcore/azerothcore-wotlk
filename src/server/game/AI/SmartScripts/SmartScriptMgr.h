@@ -989,6 +989,7 @@ struct SmartAction
             uint32 counterId;
             uint32 value;
             uint32 reset;
+            uint32 subtract;
         } setCounter;
 
         struct
