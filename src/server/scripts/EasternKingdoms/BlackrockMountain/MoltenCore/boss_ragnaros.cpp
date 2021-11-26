@@ -58,6 +58,7 @@ enum Events
     EVENT_HAND_OF_RAGNAROS,
     EVENT_MIGHT_OF_RAGNAROS,
     EVENT_LAVA_BURST,
+    EVENT_MAGMA_BLAST_MELEE_CHECK,
     EVENT_MAGMA_BLAST,
     EVENT_SUBMERGE,
 
@@ -270,10 +271,9 @@ public:
                         events.RepeatEvent(10000);
                         break;
                     }
-                    case EVENT_MAGMA_BLAST:
+                    case EVENT_MAGMA_BLAST_MELEE_CHECK:
                     {
-                        Unit const* victim = me->GetVictim();
-                        if (victim && !me->IsWithinMeleeRange(victim))
+                        if (!IsVictimWithinMeleeRange())
                         {
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
                             {
@@ -281,21 +281,30 @@ public:
                             }
                             else
                             {
-                                DoCastRandomTarget(SPELL_MAGMA_BLAST);
-
-                                if (!_hasYelledMagmaBurst)
-                                {
-                                    Talk(SAY_MAGMABURST);
-                                    _hasYelledMagmaBurst = true;
-                                }
+                                events.RescheduleEvent(EVENT_MAGMA_BLAST, 3000, PHASE_EMERGED, PHASE_EMERGED);
                             }
                         }
                         else
                         {
                             _hasYelledMagmaBurst = false;
+                            events.RepeatEvent(500);
+                        }
+                        break;
+                    }
+                    case EVENT_MAGMA_BLAST:
+                    {
+                        if (!IsVictimWithinMeleeRange())
+                        {
+                            DoCastRandomTarget(SPELL_MAGMA_BLAST);
+
+                            if (!_hasYelledMagmaBurst)
+                            {
+                                Talk(SAY_MAGMABURST);
+                                _hasYelledMagmaBurst = true;
+                            }
                         }
 
-                        events.RepeatEvent(500);
+                        events.RescheduleEvent(EVENT_MAGMA_BLAST_MELEE_CHECK, 500, PHASE_EMERGED, PHASE_EMERGED);
                         break;
                     }
                     case EVENT_MIGHT_OF_RAGNAROS:
@@ -399,9 +408,14 @@ public:
             events.RescheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_LAVA_BURST, 10000, PHASE_EMERGED, PHASE_EMERGED);
-            events.RescheduleEvent(EVENT_MAGMA_BLAST, 500, PHASE_EMERGED, PHASE_EMERGED);
+            events.RescheduleEvent(EVENT_MAGMA_BLAST_MELEE_CHECK, 10000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_SUBMERGE, 180000, PHASE_EMERGED, PHASE_EMERGED);
             events.RescheduleEvent(EVENT_MIGHT_OF_RAGNAROS, 11000, PHASE_EMERGED, PHASE_EMERGED);
+        }
+
+        bool IsVictimWithinMeleeRange() const
+        {
+            return me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim());
         }
     };
 
