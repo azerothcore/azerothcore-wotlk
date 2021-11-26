@@ -148,7 +148,7 @@ public:
         CounterMap::iterator itr = mCounterList.find(id);
         if (itr != mCounterList.end())
         {
-            if (!reset)
+            if (!reset && !subtract)
                 itr->second += value;
             else if (subtract)
             {
