@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ruins_of_ahnqiraj.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Emotes
 {
@@ -63,8 +74,8 @@ public:
         {
             BossAI::EnterEvadeMode();
 
-            for (std::list<uint64>::iterator i = Eggs.begin(); i != Eggs.end(); ++i)
-                if (Creature* egg = me->GetMap()->GetCreature(*Eggs.begin()))
+            for (ObjectGuid const& guid : Eggs)
+                if (Creature* egg = me->GetMap()->GetCreature(guid))
                     egg->Respawn();
 
             Eggs.clear();
@@ -114,7 +125,7 @@ public:
             }
         }
 
-        void ManageRespawn(uint64 EggGUID)
+        void ManageRespawn(ObjectGuid EggGUID)
         {
             ChaseNewVictim();
             Eggs.push_back(EggGUID);
@@ -171,7 +182,7 @@ public:
         }
     private:
         uint8 _phase;
-        std::list<uint64> Eggs;
+        GuidList Eggs;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -195,7 +206,7 @@ public:
 
         void EnterCombat(Unit* attacker) override
         {
-            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetData64(DATA_BURU)))
+            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
                 if (!buru->IsInCombat())
                     buru->AI()->AttackStart(attacker);
         }
@@ -203,7 +214,7 @@ public:
         void JustSummoned(Creature* who) override
         {
             if (who->GetEntry() == NPC_HATCHLING)
-                if (Creature* buru = me->GetMap()->GetCreature(_instance->GetData64(DATA_BURU)))
+                if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
                     if (Unit* target = buru->AI()->SelectTarget(SELECT_TARGET_RANDOM))
                         who->AI()->AttackStart(target);
         }
@@ -214,7 +225,7 @@ public:
             DoCastAOE(SPELL_EXPLODE_2, true); // Unknown purpose
             DoCast(me, SPELL_SUMMON_HATCHLING, true);
 
-            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetData64(DATA_BURU)))
+            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
                 if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
                     buruAI->ManageRespawn(me->GetGUID());
         }

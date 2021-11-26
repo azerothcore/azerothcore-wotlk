@@ -1,13 +1,26 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ruby_sanctum.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
+#include "ruby_sanctum.h"
 
 DoorData const doorData[] =
 {
@@ -34,17 +47,6 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-
-            BaltharusTheWarbornGUID  = 0;
-            XerestraszaGUID          = 0;
-            GeneralZarithrianGUID    = 0;
-            memset(ZarithrianSpawnStalkerGUID, 0, 2 * sizeof(uint64));
-
-            HalionGUID               = 0;
-            TwilightHalionGUID       = 0;
-            OrbCarrierGUID           = 0;
-            HalionControllerGUID     = 0;
-            FlameRingGUID            = 0;
         }
 
         void OnPlayerEnter(Player* /*player*/) override
@@ -138,7 +140,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -164,7 +166,7 @@ public:
                     return FlameRingGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -255,16 +257,16 @@ public:
         }
 
     protected:
-        uint64 BaltharusTheWarbornGUID;
-        uint64 XerestraszaGUID;
-        uint64 GeneralZarithrianGUID;
-        uint64 ZarithrianSpawnStalkerGUID[2];
+        ObjectGuid BaltharusTheWarbornGUID;
+        ObjectGuid XerestraszaGUID;
+        ObjectGuid GeneralZarithrianGUID;
+        ObjectGuid ZarithrianSpawnStalkerGUID[2];
 
-        uint64 HalionGUID;
-        uint64 TwilightHalionGUID;
-        uint64 HalionControllerGUID;
-        uint64 OrbCarrierGUID;
-        uint64 FlameRingGUID;
+        ObjectGuid HalionGUID;
+        ObjectGuid TwilightHalionGUID;
+        ObjectGuid HalionControllerGUID;
+        ObjectGuid OrbCarrierGUID;
+        ObjectGuid FlameRingGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

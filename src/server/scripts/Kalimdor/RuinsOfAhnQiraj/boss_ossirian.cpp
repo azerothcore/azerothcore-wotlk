@@ -1,16 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Opcodes.h"
 #include "Player.h"
-#include "ruins_of_ahnqiraj.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "WorldPacket.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Texts
 {
@@ -80,8 +91,8 @@ public:
             SaidIntro = false;
         }
 
-        uint64 TriggerGUID;
-        uint64 CrystalGUID;
+        ObjectGuid TriggerGUID;
+        ObjectGuid CrystalGUID;
         uint8 CrystalIterator;
         bool SaidIntro;
 
@@ -89,8 +100,8 @@ public:
         {
             _Reset();
             CrystalIterator = 0;
-            TriggerGUID = 0;
-            CrystalGUID = 0;
+            TriggerGUID.Clear();
+            CrystalGUID.Clear();
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -135,8 +146,7 @@ public:
 
             for (uint8 i = 0; i < NUM_TORNADOS; ++i)
             {
-                Position Point;
-                me->GetRandomPoint(RoomCenter, RoomRadius, Point);
+                Position Point = me->GetRandomPoint(RoomCenter, RoomRadius);
                 if (Creature* Tornado = me->GetMap()->SummonCreature(NPC_SAND_VORTEX, Point))
                     Tornado->CastSpell(Tornado, SPELL_SAND_STORM, true);
             }
@@ -184,7 +194,7 @@ public:
                 {
                     CrystalGUID = Crystal->GetGUID();
                     ++CrystalIterator;
-                    Crystal->SetOwnerGUID(0);
+                    Crystal->SetOwnerGUID(ObjectGuid::Empty);
                 }
             }
         }

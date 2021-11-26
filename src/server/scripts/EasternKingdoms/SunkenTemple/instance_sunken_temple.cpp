@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureAI.h"
 #include "InstanceScript.h"
@@ -25,9 +38,6 @@ public:
             _statuePhase = 0;
             _defendersKilled = 0;
             memset(&_encounters, 0, sizeof(_encounters));
-
-            _forcefieldGUID = 0;
-            _jammalanGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -39,7 +49,7 @@ public:
                     break;
             }
 
-            if (creature->IsAlive() && creature->GetDBTableGUIDLow() && creature->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && creature->GetEntry() != NPC_SHADE_OF_ERANIKUS)
+            if (creature->IsAlive() && creature->GetSpawnId() && creature->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && creature->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.push_back(creature->GetGUID());
         }
 
@@ -99,9 +109,9 @@ public:
                     }
                     break;
                 case DATA_ERANIKUS_FIGHT:
-                    for (std::list<uint64>::const_iterator itr = _dragonkinList.begin(); itr != _dragonkinList.end(); ++itr)
+                    for (ObjectGuid const& guid : _dragonkinList)
                     {
-                        if (Creature* creature = instance->GetCreature(*itr))
+                        if (Creature* creature = instance->GetCreature(guid))
                             if (instance->IsGridLoaded(creature->GetPositionX(), creature->GetPositionY()))
                                 creature->SetInCombatWithZone();
                     }
@@ -180,9 +190,9 @@ public:
         uint32 _defendersKilled;
         uint32 _encounters[MAX_ENCOUNTERS];
 
-        uint64 _forcefieldGUID;
-        uint64 _jammalanGUID;
-        std::list<uint64> _dragonkinList;
+        ObjectGuid _forcefieldGUID;
+        ObjectGuid _jammalanGUID;
+        GuidList _dragonkinList;
         EventMap _events;
     };
 

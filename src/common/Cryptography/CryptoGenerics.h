@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_CRYPTO_GENERICS_HPP
@@ -13,7 +25,7 @@
 #include <iterator>
 #include <vector>
 
-namespace acore::Impl
+namespace Acore::Impl
 {
     struct CryptoGenericsImpl
     {
@@ -21,7 +33,7 @@ namespace acore::Impl
         static typename Cipher::IV GenerateRandomIV()
         {
             typename Cipher::IV iv;
-            acore::Crypto::GetRandomBytes(iv);
+            Acore::Crypto::GetRandomBytes(iv);
             return iv;
         }
 
@@ -44,7 +56,7 @@ namespace acore::Impl
     };
 }
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     template <typename Cipher>
     void AEEncryptWithRandomIV(std::vector<uint8>& data, typename Cipher::Key const& key)
@@ -52,7 +64,7 @@ namespace acore::Crypto
         using IV = typename Cipher::IV;
         using Tag = typename Cipher::Tag;
         // select random IV
-        IV iv = acore::Impl::CryptoGenericsImpl::GenerateRandomIV<Cipher>();
+        IV iv = Acore::Impl::CryptoGenericsImpl::GenerateRandomIV<Cipher>();
         Tag tag;
 
         // encrypt data
@@ -62,8 +74,8 @@ namespace acore::Crypto
         ASSERT(success);
 
         // append trailing IV and tag
-        acore::Impl::CryptoGenericsImpl::AppendToBack(data, iv);
-        acore::Impl::CryptoGenericsImpl::AppendToBack(data, tag);
+        Acore::Impl::CryptoGenericsImpl::AppendToBack(data, iv);
+        Acore::Impl::CryptoGenericsImpl::AppendToBack(data, tag);
     }
 
     template <typename Cipher>
@@ -80,8 +92,8 @@ namespace acore::Crypto
         // extract trailing IV and tag
         IV iv;
         Tag tag;
-        acore::Impl::CryptoGenericsImpl::SplitFromBack(data, tag);
-        acore::Impl::CryptoGenericsImpl::SplitFromBack(data, iv);
+        Acore::Impl::CryptoGenericsImpl::SplitFromBack(data, tag);
+        Acore::Impl::CryptoGenericsImpl::SplitFromBack(data, iv);
 
         // decrypt data
         Cipher cipher(false);

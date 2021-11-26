@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "eye_of_eternity.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
+#include "eye_of_eternity.h"
 
 bool EoEDrakeEnterVehicleEvent::Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
 {
@@ -37,20 +50,16 @@ public:
         uint32 EncounterStatus;
         std::string str_data;
 
-        uint64 NPC_MalygosGUID;
-        uint64 GO_IrisGUID;
-        uint64 GO_ExitPortalGUID;
-        uint64 GO_PlatformGUID;
+        ObjectGuid NPC_MalygosGUID;
+        ObjectGuid GO_IrisGUID;
+        ObjectGuid GO_ExitPortalGUID;
+        ObjectGuid GO_PlatformGUID;
         bool bPokeAchiev;
 
         void Initialize() override
         {
             EncounterStatus = NOT_STARTED;
 
-            NPC_MalygosGUID = 0;
-            GO_IrisGUID = 0;
-            GO_ExitPortalGUID = 0;
-            GO_PlatformGUID = 0;
             bPokeAchiev = false;
         }
 
@@ -78,7 +87,7 @@ public:
                     if (Creature* c = pPlayer->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                     {
                         c->SetCanFly(true);
-                        c->setFaction(pPlayer->getFaction());
+                        c->SetFaction(pPlayer->GetFaction());
                         //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
                         c->m_Events.AddEvent(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), c->m_Events.CalculateTime(500));
                     }
@@ -173,14 +182,15 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch(type)
             {
                 case DATA_MALYGOS_GUID:
                     return NPC_MalygosGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override

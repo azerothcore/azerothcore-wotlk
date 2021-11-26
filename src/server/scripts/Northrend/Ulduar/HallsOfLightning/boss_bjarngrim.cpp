@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "halls_of_lightning.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
+#include "halls_of_lightning.h"
 
 enum BjarngrimSpells
 {
@@ -125,7 +138,7 @@ public:
             AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0);
             AddWaypoint(14, 1262, -26.9f, 33.5f, 0);
 
-            Start(true, false, 0, nullptr, false, true);
+            Start(true, false, ObjectGuid::Empty, nullptr, false, true);
         }
 
         InstanceScript* m_pInstance;
@@ -372,14 +385,14 @@ public:
         npc_stormforged_lieutenantAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 BjarngrimGUID;
+        ObjectGuid BjarngrimGUID;
 
         void Reset() override
         {
             if (me->IsSummon())
                 BjarngrimGUID = me->ToTempSummon()->GetSummonerGUID();
             else
-                BjarngrimGUID = 0;
+                BjarngrimGUID.Clear();
         }
 
         void EnterCombat(Unit*) override

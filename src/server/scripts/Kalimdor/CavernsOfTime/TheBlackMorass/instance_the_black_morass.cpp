@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
 #include "the_black_morass.h"
@@ -32,16 +45,15 @@ public:
     {
         instance_the_black_morass_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        std::set<uint64> encounterNPCs;
+        GuidSet encounterNPCs;
         uint32 encounters[MAX_ENCOUNTER];
-        uint64 _medivhGUID;
+        ObjectGuid _medivhGUID;
         uint8  _currentRift;
         uint8  _shieldPercent;
 
         void Initialize() override
         {
             memset(&encounters, 0, sizeof(encounters));
-            _medivhGUID = 0;
             _currentRift = 0;
             _shieldPercent = 100;
             encounterNPCs.clear();
@@ -60,9 +72,9 @@ public:
                 medivh->SetRespawnTime(3);
             }
 
-            std::set<uint64> eCopy = encounterNPCs;
-            for (std::set<uint64>::const_iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
-                if (Creature* creature = instance->GetCreature(*itr))
+            GuidSet eCopy = encounterNPCs;
+            for (ObjectGuid const& guid : eCopy)
+                if (Creature* creature = instance->GetCreature(guid))
                     creature->DespawnOrUnsummon();
         }
 
@@ -184,9 +196,9 @@ public:
                                 Unit::Kill(medivh, medivh);
 
                                 // Xinef: delete all spawns
-                                std::set<uint64> eCopy = encounterNPCs;
-                                for (std::set<uint64>::iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
-                                    if (Creature* creature = instance->GetCreature(*itr))
+                                GuidSet eCopy = encounterNPCs;
+                                for (ObjectGuid const& guid : eCopy)
+                                    if (Creature* creature = instance->GetCreature(guid))
                                         creature->DespawnOrUnsummon();
                             }
                     break;
@@ -209,7 +221,7 @@ public:
             return 0;
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_SUMMONED_NPC)
                 encounterNPCs.insert(data);
@@ -217,19 +229,19 @@ public:
                 encounterNPCs.erase(data);
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == DATA_MEDIVH)
                 return _medivhGUID;
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SummonPortalKeeper()
         {
             Creature* rift = nullptr;
-            for (std::set<uint64>::const_iterator itr = encounterNPCs.begin(); itr != encounterNPCs.end(); ++itr)
-                if (Creature* summon = instance->GetCreature(*itr))
+            for (ObjectGuid const& guid : encounterNPCs)
+                if (Creature* summon = instance->GetCreature(guid))
                     if (summon->GetEntry() == NPC_TIME_RIFT)
                     {
                         rift = summon;
@@ -256,8 +268,7 @@ public:
                     break;
             }
 
-            Position pos;
-            rift->GetNearPosition(pos, 10.0f, 2 * M_PI * rand_norm());
+            Position pos = rift->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
             if (TempSummon* summon = instance->SummonCreature(abs(entry), pos))
             {

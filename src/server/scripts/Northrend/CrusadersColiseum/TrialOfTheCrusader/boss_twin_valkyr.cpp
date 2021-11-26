@@ -1,13 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-(!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+    (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
 */
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
@@ -187,7 +203,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     Creature* GetSister()
     {
-        return ObjectAccessor::GetCreature(*me, pInstance->GetData64(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
+        return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
     }
 
     /*void AttackStart(Unit* victim)
@@ -275,7 +291,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if( me->HasUnitState(UNIT_STATE_CASTING) )
             return;
 
-        switch( events.ExecuteEvent() )
+        uint8 eventId = events.ExecuteEvent();
+
+        switch(eventId)
         {
             case 0:
                 break;
@@ -293,7 +311,6 @@ struct boss_twin_valkyrAI : public ScriptedAI
             case EVENT_SUMMON_BALLS_2:
             case EVENT_SUMMON_BALLS_3:
                 {
-                    uint8 eventId = events.ExecuteEvent();
                     uint8 count = 0;
                     if( IsHeroic() )
                         count = eventId == EVENT_SUMMON_BALLS_3 ? 36 : 6;
@@ -371,7 +388,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     events.RepeatEvent(urand(45000,50000));
                     */
 
-                    std::vector<uint64> tList;
+                    GuidVector tList;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                     if (pList.getSize())
                     {
@@ -833,10 +850,15 @@ public:
                             uint32 resist = 0;
                             CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
                             int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
+                            uint32 damage = dmg;
+                            int32 resilienceReduction = damage;
                             if (caster->CanApplyResilience())
                                 Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
-                            uint32 damage = dmg;
-                            Unit::CalcAbsorbResist(caster, plr, GetSpellInfo()->GetSchoolMask(), DOT, damage, &absorb, &resist, GetSpellInfo());
+                            resilienceReduction = damage - resilienceReduction;
+                            damage -= resilienceReduction;
+                            uint32 mitigated_damage = resilienceReduction;
+                            DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
+                            Unit::CalcAbsorbResist(dmgInfo);
                             Unit::DealDamageMods(plr, damage, &absorb);
                             int32 overkill = damage - plr->GetHealth();
                             if (overkill < 0)

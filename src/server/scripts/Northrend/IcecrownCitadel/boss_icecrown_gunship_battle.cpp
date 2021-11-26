@@ -1,9 +1,21 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureTextMgr.h"
-#include "icecrown_citadel.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ScriptMgr.h"
@@ -11,6 +23,7 @@
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -156,6 +169,7 @@ enum Spells
     SPELL_ON_ORGRIMS_HAMMER_DECK            = 70121,
 
     // Rocket Pack
+    SPELL_CREATE_ROCKET_PACK                = 70055,
     SPELL_ROCKET_PACK_DAMAGE                = 69193,
     SPELL_ROCKET_BURST                      = 69192,
     SPELL_ROCKET_PACK_USEABLE               = 70348,
@@ -393,8 +407,13 @@ public:
     void ResetSlots(TeamId teamId, MotionTransport* t)
     {
         _transport = t;
-        memset(_controlledSlots, 0, sizeof(uint64)* MAX_SLOTS);
-        memset(_respawnCooldowns, 0, sizeof(time_t)* MAX_SLOTS);
+
+        for (uint8 i = 0; i < MAX_SLOTS; ++i)
+        {
+            _controlledSlots[i].Clear();
+            _respawnCooldowns[i] = time_t(0);
+        }
+
         _spawnPoint = teamId == TEAM_HORDE ? &OrgrimsHammerAddsSpawnPos : &SkybreakerAddsSpawnPos;
         _slotInfo = teamId == TEAM_HORDE ? OrgrimsHammerSlotInfo : SkybreakerSlotInfo;
     }
@@ -440,7 +459,7 @@ public:
 
     void ClearSlot(PassengerSlots slot)
     {
-        _controlledSlots[slot] = 0;
+        _controlledSlots[slot].Clear();
         _respawnCooldowns[slot] = time(nullptr) + _slotInfo[slot].Cooldown;
     }
 
@@ -457,7 +476,7 @@ private:
         return newPos;
     }
 
-    uint64 _controlledSlots[MAX_SLOTS];
+    ObjectGuid _controlledSlots[MAX_SLOTS];
     time_t _respawnCooldowns[MAX_SLOTS];
     MotionTransport* _transport;
     Position const* _spawnPoint;
@@ -489,7 +508,7 @@ private:
 class ResetEncounterEvent : public BasicEvent
 {
 public:
-    ResetEncounterEvent(Unit* caster, uint32 spellId, uint64 otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
+    ResetEncounterEvent(Unit* caster, uint32 spellId, ObjectGuid otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
 
     bool Execute(uint64, uint32) override
     {
@@ -497,10 +516,10 @@ public:
         _caster->GetTransport()->ToMotionTransport()->UnloadNonStaticPassengers();
         _caster->GetTransport()->AddObjectToRemoveList();
 
-        if (GameObject* go = HashMapHolder<GameObject>::Find(_otherTransport))
+        if (Transport* transport = ObjectAccessor::GetTransport(*_caster, _otherTransport))
         {
-            go->ToMotionTransport()->UnloadNonStaticPassengers();
-            go->AddObjectToRemoveList();
+            transport->ToMotionTransport()->UnloadNonStaticPassengers();
+            transport->AddObjectToRemoveList();
         }
 
         return true;
@@ -509,7 +528,7 @@ public:
 private:
     Unit* _caster;
     uint32 _spellId;
-    uint64 _otherTransport;
+    ObjectGuid _otherTransport;
 };
 
 class npc_gunship : public CreatureScript
@@ -586,7 +605,7 @@ public:
             }
 
             uint32 cannonEntry = _teamIdInInstance == TEAM_HORDE ? NPC_HORDE_GUNSHIP_CANNON : NPC_ALLIANCE_GUNSHIP_CANNON;
-            if (GameObject* go = _instance->instance->GetGameObject(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
+            if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
                 if (MotionTransport* t = go->ToMotionTransport())
                 {
                     Transport::PassengerSet const& passengers = t->GetStaticPassengers();
@@ -598,7 +617,7 @@ public:
                         cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS, true);
 
                         WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, cannon->GetPackGUID().size() + 4);
-                        data.append(cannon->GetPackGUID());
+                        data << cannon->GetPackGUID();
                         data << uint32(0);
                         cannon->SendMessageToSet(&data, true);
 
@@ -618,8 +637,8 @@ public:
 
             if (isVictory)
             {
-                if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                    if (MotionTransport* otherTransport = go->ToMotionTransport())
+                if (Transport * transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                    if (MotionTransport* otherTransport = transport->ToMotionTransport())
                         otherTransport->EnableMovement(true);
 
                 me->GetTransport()->ToMotionTransport()->EnableMovement(true);
@@ -632,7 +651,7 @@ public:
                 }
 
                 for (uint8 i = 0; i < 2; ++i)
-                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetData64(i == 0 ? DATA_ICECROWN_GUNSHIP_BATTLE : DATA_ENEMY_GUNSHIP)))
+                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(i == 0 ? DATA_ICECROWN_GUNSHIP_BATTLE : DATA_ENEMY_GUNSHIP)))
                         if (MotionTransport* t = go->ToMotionTransport())
                         {
                             Transport::PassengerSet const& passengers = t->GetPassengers();
@@ -649,16 +668,16 @@ public:
             else
             {
                 uint32 teleportSpellId = _teamIdInInstance == TEAM_HORDE ? SPELL_TELEPORT_PLAYERS_ON_RESET_H : SPELL_TELEPORT_PLAYERS_ON_RESET_A;
-                me->m_Events.AddEvent(new ResetEncounterEvent(me, teleportSpellId, _instance->GetData64(DATA_ENEMY_GUNSHIP)), me->m_Events.CalculateTime(8000));
+                me->m_Events.AddEvent(new ResetEncounterEvent(me, teleportSpellId, _instance->GetGuidData(DATA_ENEMY_GUNSHIP)), me->m_Events.CalculateTime(8000));
             }
         }
 
-        void SetGUID(uint64 guid, int32 id/* = 0*/) override
+        void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
                 return;
 
-            std::map<uint64, uint32>::iterator itr = _shipVisits.find(guid);
+            std::map<ObjectGuid, uint32>::iterator itr = _shipVisits.find(guid);
             if (itr == _shipVisits.end())
             {
                 if (id == ACTION_SHIP_VISITS_ENEMY)
@@ -693,7 +712,7 @@ public:
             if (id != ACTION_SHIP_VISITS_ENEMY)
                 return 0;
 
-            for (std::map<uint64, uint32>::const_iterator itr = _shipVisits.begin(); itr != _shipVisits.end(); ++itr)
+            for (std::map<ObjectGuid, uint32>::const_iterator itr = _shipVisits.begin(); itr != _shipVisits.end(); ++itr)
                 if (itr->second == 0)
                     return 0;
 
@@ -703,7 +722,7 @@ public:
     private:
         InstanceScript* _instance;
         TeamId _teamIdInInstance;
-        std::map<uint64, uint32> _shipVisits;
+        std::map<ObjectGuid, uint32> _shipVisits;
         bool _died;
         bool _summonedFirstMage;
     };
@@ -951,8 +970,8 @@ public:
                         me->SummonCreature(NPC_TELEPORT_PORTAL, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 21000);
                     }
 
-                    if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                        if (MotionTransport* skybreaker = go->ToMotionTransport())
+                    if (Transport* transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                        if (MotionTransport* skybreaker = transport->ToMotionTransport())
                         {
                             float x, y, z, o;
                             SkybreakerTeleportExit.GetPosition(x, y, z, o);
@@ -1290,8 +1309,8 @@ public:
                         me->SummonCreature(NPC_TELEPORT_PORTAL, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 21000);
                     }
 
-                    if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                        if (MotionTransport* orgrimsHammer = go->ToMotionTransport())
+                    if (Transport* transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                        if (MotionTransport* orgrimsHammer = transport->ToMotionTransport())
                         {
                             float x, y, z, o;
                             OrgrimsHammerTeleportExit.GetPosition(x, y, z, o);
@@ -1405,7 +1424,7 @@ public:
 
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
-            player->AddItem(ITEM_GOBLIN_ROCKET_PACK, 1);
+            me->CastSpell(player, SPELL_CREATE_ROCKET_PACK);
             player->PlayerTalkClass->SendCloseGossip();
         }
     };
@@ -1446,7 +1465,7 @@ void TriggerBurningPitch(Creature* c)
     if (!c->HasSpellCooldown(spellId))
     {
         c->CastSpell((Unit*)nullptr, spellId, false);
-        c->_AddCreatureSpellCooldown(spellId, urand(3000, 4000));
+        c->_AddCreatureSpellCooldown(spellId, 0, urand(3000, 4000));
     }
 }
 
@@ -1570,8 +1589,8 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
             if (!myTransport)
                 return;
 
-            if (GameObject* go = HashMapHolder<GameObject>::Find(Instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                if (Transport* destTransport = go->ToTransport())
+            if (Transport* transport = Instance->instance->GetTransport(Instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                if (Transport* destTransport = transport->ToTransport())
                     destTransport->CalculatePassengerPosition(x, y, z, &o);
 
             float angle = frand(0, M_PI * 2.0f);
@@ -1912,7 +1931,7 @@ public:
                 return;
 
             me->CastSpell((Unit*)nullptr, spellId, true);
-            me->_AddCreatureSpellCooldown(spellId, 9000);
+            me->_AddCreatureSpellCooldown(spellId, 0, 9000);
         }
 
         bool CanAIAttack(const Unit*  /*target*/) const override
@@ -1953,7 +1972,7 @@ public:
 
         void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            SpellInfo const* damageInfo = sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
+            SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
             GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
             GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
         }
@@ -2119,7 +2138,7 @@ public:
         void SelectTransport(WorldObject*& target)
         {
             if (InstanceScript* instance = target->GetInstanceScript())
-                target = HashMapHolder<GameObject>::Find(instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE));
+                target = instance->instance->GetTransport(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
         }
 
         void RelocateDest(SpellEffIndex /*effIndex*/)
@@ -2203,7 +2222,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.remove_if(IgbExplosionCheck(GetCaster()));
-            acore::Containers::RandomResizeList(targets, 1);
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void Register() override
@@ -2225,7 +2244,7 @@ public:
 
     bool operator()(WorldObject* unit)
     {
-        return unit->GetTransGUID() != _inst->GetData64(DATA_ENEMY_GUNSHIP);
+        return unit->GetTransGUID() != _inst->GetGuidData(DATA_ENEMY_GUNSHIP);
     }
 
 private:
@@ -2316,7 +2335,7 @@ public:
                     if (Player* player = passenger->ToPlayer())
                     {
                         WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
-                        data.append(GetUnitOwner()->GetPackGUID());
+                        data << GetUnitOwner()->GetPackGUID();
                         data << uint8(value);
                         player->GetSession()->SendPacket(&data);
                     }
@@ -2410,8 +2429,7 @@ public:
             if (!si)
                 return;
             SpellCastTargets targets;
-            Position dest;
-            GetExplTargetDest()->GetPosition(&dest);
+            Position dest = GetExplTargetDest()->GetPosition();
             targets.SetDst(dest);
             CustomSpellValues values;
             int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
@@ -2472,7 +2490,7 @@ public:
             targets.remove_if(BurningPitchFilterCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
             if (!targets.empty())
             {
-                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2558,7 +2576,7 @@ public:
 
             if (!targets.empty())
             {
-                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2621,15 +2639,20 @@ public:
     {
         PrepareSpellScript(spell_igb_below_zero_SpellScript);
 
-        void RemovePassengers()
+        void RemovePassengers(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             GetHitUnit()->SetPower(POWER_ENERGY, 0);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
         }
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
+            BeforeHit += BeforeSpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
         }
     };
 
@@ -2689,7 +2712,7 @@ class achievement_im_on_a_boat : public AchievementCriteriaScript
 public:
     achievement_im_on_a_boat() : AchievementCriteriaScript("achievement_im_on_a_boat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target->GetAI() && target->GetAI()->GetData(ACTION_SHIP_VISITS_ENEMY) == 1;
     }

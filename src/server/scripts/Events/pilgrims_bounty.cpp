@@ -1,10 +1,25 @@
-// Scripted by Xinef
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
@@ -96,7 +111,7 @@ public:
     {
         npc_pilgrims_bounty_chairAI(Creature* creature) : VehicleAI(creature)
         {
-            plateGUID = 0;
+            plateGUID.Clear();
             timerSpawnPlate = 1;
             timerRotateChair = 0;
             me->SetReactState(REACT_PASSIVE);
@@ -111,7 +126,7 @@ public:
                 who->ToPlayer()->SetClientControl(me, 0, true);
         }
 
-        uint64 plateGUID;
+        ObjectGuid plateGUID;
         uint32 timerSpawnPlate;
         uint32 timerRotateChair;
 
@@ -294,7 +309,7 @@ public:
                 case SPELL_VISUAL_THROW_CRANBERRY:
                 case SPELL_VISUAL_THROW_SWEET_POTATO:
                     if (TempSummon* ts = me->ToTempSummon())
-                        if (Unit* owner = ts->GetSummoner())
+                        if (Unit* owner = ts->GetSummonerUnit())
                             owner->ToCreature()->AI()->DoAction(spellInfo->Id);
                     break;
             }
@@ -361,20 +376,49 @@ public:
         {
             if (Unit* target = GetHitUnit())
             {
+                uint32 spellId = 0;
+                switch (GetSpellInfo()->Id)
+                {
+                    case SPELL_PASS_TURKEY:
+                        spellId = SPELL_STORE_TURKEY;
+                        break;
+                    case SPELL_PASS_STUFFING:
+                        spellId = SPELL_STORE_STUFFING;
+                        break;
+                    case SPELL_PASS_PIE:
+                        spellId = SPELL_STORE_PIE;
+                        break;
+                    case SPELL_PASS_CRANBERRY:
+                        spellId = SPELL_STORE_CRANBERRY;
+                        break;
+                    case SPELL_PASS_SWEET_POTATO:
+                        spellId = SPELL_STORE_SWEET_POTATO;
+                        break;
+                }
+
                 // player case
                 if (target->IsVehicle() && target->ToCreature())
                 {
                     if (Player* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
                         GetCaster()->CastSpell(player, GetVisualThrow(GetSpellInfo()->Id, true), true);
-                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, GetVisualThrow(GetSpellInfo()->Id, true));
+                        if (AuraEffect* aur = target->GetAuraEffectDummy(spellId))
+                        {
+                            if (aur->GetBase()->GetStackAmount() >= 5)
+                            {
+                                if (Player* casterPlayer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())
+                                {
+                                    casterPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, GetVisualThrow(GetSpellInfo()->Id, true));
+                                }
+                            }
+                        }
                     }
                 }
                 // normal case
                 else
                 {
                     if (TempSummon* ts = target->ToTempSummon())
-                        if (Unit* owner = ts->GetSummoner())
+                        if (Unit* owner = ts->GetSummonerUnit())
                             if (owner->GetEntry() == GetCaster()->GetEntry())
                                 return;
 
@@ -536,16 +580,16 @@ public:
                     switch (stackAmount)
                     {
                         case 10:
-                            target->MonsterTextEmote("Turkey Hunter!", target, true);
+                            target->TextEmote("Turkey Hunter!", target, true);
                             break;
                         case 20:
-                            target->MonsterTextEmote("Turkey Domination!", target, true);
+                            target->TextEmote("Turkey Domination!", target, true);
                             break;
                         case 30:
-                            target->MonsterTextEmote("Turkey Slaughter!", target, true);
+                            target->TextEmote("Turkey Slaughter!", target, true);
                             break;
                         case 40:
-                            target->MonsterTextEmote("TURKEY TRIUMPH!", target, true);
+                            target->TextEmote("TURKEY TRIUMPH!", target, true);
                             target->CastSpell(target, SPELL_ACHI_TURKINATOR_CREDIT, true);
                             aurEff->GetBase()->Remove();
                             break;
@@ -671,7 +715,7 @@ class achievement_pb_pilgrims_peril : public AchievementCriteriaScript
 public:
     achievement_pb_pilgrims_peril() : AchievementCriteriaScript("achievement_pb_pilgrims_peril") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/) override
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1))
             return true;
@@ -685,7 +729,7 @@ class achievement_pb_terokkar_turkey_time : public AchievementCriteriaScript
 public:
     achievement_pb_terokkar_turkey_time() : AchievementCriteriaScript("achievement_pb_terokkar_turkey_time") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/) override
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_HAT, 1) && (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1)))
             return true;

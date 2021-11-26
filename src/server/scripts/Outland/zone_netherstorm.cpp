@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -20,10 +31,10 @@ EndContentData */
 
 #include "GameObjectAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*  ###################################
@@ -43,10 +54,7 @@ enum DeathblowToTheLegion
     DEATHBLOW_TO_THE_LEGION = 10409, // Quest ID
     TURNING_POINT           = 10507, // Quest ID
     SOCRETHAR_QUEST_CREDIT  = 35762, // Quest spell
-    SOCRETHAR_TP_STONE      = 29796,
-
-    EXODAR_FACTION          = 1806,
-    EXODAR_ENEMY_FACTION    = 90
+    SOCRETHAR_TP_STONE      = 29796
 };
 
 enum RoleplayActions
@@ -595,7 +603,7 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->setFaction(EXODAR_ENEMY_FACTION);
+            me->SetFaction(FACTION_DEMON);
             adyen   = nullptr;
             orelis  = nullptr;
             karja   = nullptr;
@@ -739,7 +747,7 @@ public:
                     case EVENT_FIGHT_ALDOR:
                         if (GetCreature(KAYLAAN_THE_LOST))
                         {
-                            kaylaan->setFaction(EXODAR_ENEMY_FACTION);
+                            kaylaan->SetFaction(FACTION_DEMON);
                             if (GetCreature(ADYEN_THE_LIGHTBRINGER))
                                 kaylaan->AI()->AttackStart(adyen);
                         }
@@ -747,7 +755,7 @@ public:
                     case EVENT_END_ALDOR_FIGHT:
                         if (GetCreature(KAYLAAN_THE_LOST))
                         {
-                            kaylaan->setFaction(EXODAR_FACTION);
+                            kaylaan->SetFaction(FACTION_DEMON);
                             kaylaan->GetMotionMaster()->MoveTargetedHome();
                             kaylaan->CombatStop();
                             kaylaan->ClearInCombat();
@@ -865,7 +873,7 @@ public:
                         break;
                     case EVENT_FINAL_FIGHT:
                         // Prepare Socrethar for encounter
-                        me->setFaction(EXODAR_ENEMY_FACTION);
+                        me->SetFaction(FACTION_DEMON);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                         me->SetReactState(REACT_AGGRESSIVE);
 
@@ -1040,8 +1048,7 @@ public:
                     _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 4000);
                     break;
                 case EVENT_SPELL_CONSECRATION:
-                    if (me->FindNearestCreature(me->GetVictim()->GetGUID(), 10.0f, true))
-                        me->CastSpell(me, CONSECRATION, false);
+                    me->CastSpell(me->GetVictim(), CONSECRATION, false);
                     _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 14000);
                     break;
             }
@@ -1098,8 +1105,8 @@ public:
         {
             if (!summons.empty())
             {
-                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+                for (ObjectGuid const& guid : summons)
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;
                         cr->GetRespawnPosition(x, y, z, &o);
@@ -1126,7 +1133,7 @@ public:
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void SetGUID(uint64 playerGUID, int32 type) override
+        void SetGUID(ObjectGuid playerGUID, int32 type) override
         {
             if (type == DATA_START_ENCOUNTER)
             {
@@ -1140,7 +1147,7 @@ public:
                 {
                     summons.Summon(*itr);
                     (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    (*itr)->setFaction(250);
+                    (*itr)->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 }
                 cl.clear();
                 me->GetCreaturesWithEntryInRange(cl, 20.0f, NPC_PROTECTORATE_DEFENDER);
@@ -1148,10 +1155,10 @@ public:
                 {
                     summons.Summon(*itr);
                     (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    (*itr)->setFaction(250);
+                    (*itr)->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 }
 
-                me->setFaction(250);
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 Talk(SAY_SAEED_0);
                 events.ScheduleEvent(EVENT_START_WALK, 3000);
             }
@@ -1175,7 +1182,7 @@ public:
         void SummonsAction(Unit* who)
         {
             float i = 0;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
+            for (GuidList::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
                 {
                     if (who == nullptr)
@@ -1280,7 +1287,7 @@ public:
         if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
             creature->AI()->SetGUID(player->GetGUID(), DATA_START_ENCOUNTER);
-            player->KilledMonsterCredit(creature->GetEntry(), 0);
+            player->KilledMonsterCredit(creature->GetEntry());
         }
         else if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
         {
@@ -1363,9 +1370,9 @@ public:
     {
         npc_commander_dawnforgeAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
-        uint64 ardonisGUID;
-        uint64 pathaleonGUID;
+        ObjectGuid PlayerGUID;
+        ObjectGuid ardonisGUID;
+        ObjectGuid pathaleonGUID;
 
         uint32 Phase;
         uint32 PhaseSubphase;
@@ -1374,9 +1381,9 @@ public:
 
         void Reset() override
         {
-            PlayerGUID = 0;
-            ardonisGUID = 0;
-            pathaleonGUID = 0;
+            PlayerGUID.Clear();
+            ardonisGUID.Clear();
+            pathaleonGUID.Clear();
 
             Phase = 1;
             PhaseSubphase = 0;
@@ -1445,9 +1452,7 @@ public:
                 return true;
             }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("scripts.ai", "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
-#endif
+            LOG_DEBUG("scripts.ai", "npc_commander_dawnforge event already in progress, need to wait.");
             return false;
         }
 
@@ -1698,7 +1703,7 @@ public:
         bool Drained;
         uint8 WeakPercent;
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 ManaBurnTimer;
 
@@ -1709,7 +1714,7 @@ public:
             Drained = false;
             WeakPercent = 25 + (rand() % 16); // 25-40
 
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             ManaBurnTimer = 5000 + (rand() % 3 * 1000); // 5-8 sec cd
 
@@ -1745,7 +1750,7 @@ public:
             // some code to cast spell Mana Burn on random target which has mana
             if (ManaBurnTimer <= diff)
             {
-                std::list<HostileReference*> AggroList = me->getThreatManager().getThreatList();
+                std::list<HostileReference*> AggroList = me->getThreatMgr().getThreatList();
                 std::list<Unit*> UnitsWithMana;
 
                 for (std::list<HostileReference*>::const_iterator itr = AggroList.begin(); itr != AggroList.end(); ++itr)
@@ -1758,7 +1763,7 @@ public:
                 }
                 if (!UnitsWithMana.empty())
                 {
-                    DoCast(acore::Containers::SelectRandomContainerElement(UnitsWithMana), SPELL_MANA_BURN);
+                    DoCast(Acore::Containers::SelectRandomContainerElement(UnitsWithMana), SPELL_MANA_BURN);
                     ManaBurnTimer = 8000 + (rand() % 10 * 1000); // 8-18 sec cd
                 }
                 else
@@ -1816,7 +1821,7 @@ public:
     {
         if (quest->GetQuestId() == Q_ALMABTRIEB)
         {
-            creature->setFaction(113);
+            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             creature->AI()->Talk(SAY_BESSY_0);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
@@ -1984,7 +1989,7 @@ public:
         {
             if (npc_maxx_a_million_escortAI* pEscortAI = CAST_AI(npc_maxx_a_million_escort::npc_maxx_a_million_escortAI, creature->AI()))
             {
-                creature->setFaction(113);
+                creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                 pEscortAI->Start(false, false, player->GetGUID());
             }
         }

@@ -1,15 +1,28 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum KologarnSays
 {
@@ -137,8 +150,7 @@ public:
 
     struct boss_kologarnAI : public ScriptedAI
     {
-        boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()),
-            _left(0), _right(0), summons(me), breathReady(false)
+        boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()), summons(me), breathReady(false)
         {
             m_pInstance = me->GetInstanceScript();
             eyebeamTarget = nullptr;
@@ -149,7 +161,7 @@ public:
         InstanceScript* m_pInstance;
 
         Vehicle* vehicle;
-        uint64 _left, _right;
+        ObjectGuid _left, _right;
         EventMap events;
         SummonList summons;
 
@@ -323,7 +335,7 @@ public:
                 // left arm
                 if (who->GetGUID() == _left)
                 {
-                    _left = 0;
+                    _left.Clear();
                     if (me->IsInCombat())
                     {
                         Talk(SAY_LEFT_ARM_GONE);
@@ -332,7 +344,7 @@ public:
                 }
                 else
                 {
-                    _right = 0;
+                    _right.Clear();
                     if (me->IsInCombat())
                     {
                         Talk(SAY_RIGHT_ARM_GONE);
@@ -524,7 +536,7 @@ public:
         {
             if (!_combatStarted)
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_KOLOGARN)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_KOLOGARN)))
                     {
                         _combatStarted = true;
                         if (!cr->IsInCombat() && who)
@@ -561,7 +573,7 @@ public:
                 cr->CastSpell(cr, SPELL_RUBBLE_FALL, true);
 
                 if (me->GetInstanceScript())
-                    if (Creature* kologarn = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_KOLOGARN)))
+                    if (Creature* kologarn = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
                         for (uint8 i = 0; i < 5; ++i)
                             if (Creature* cr2 = kologarn->SummonCreature(NPC_RUBBLE_SUMMON, cr->GetPositionX() + irand(-5, 5), cr->GetPositionY() + irand(-5, 5), cr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                             {
@@ -572,7 +584,7 @@ public:
             }
 
             if (me->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
                     cr->AI()->DoAction(DATA_KOLOGARN_RUBBLE_ACHIEV);
 
             me->ExitVehicle();
@@ -605,7 +617,7 @@ public:
             if (damage > 0 && !_damaged && me->GetInstanceScript())
             {
                 _damaged = true;
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
                     cr->AI()->DoAction(DATA_KOLOGARN_LOOKS_ACHIEV);
             }
         }
@@ -615,7 +627,7 @@ public:
             if (justSpawned)
             {
                 me->DespawnOrUnsummon(10000);
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_KOLOGARN)))
                 {
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
                 }
@@ -636,14 +648,14 @@ public:
 };
 
 // predicate function to select non main tank target
-class StoneGripTargetSelector : public acore::unary_function<Unit*, bool>
+class StoneGripTargetSelector
 {
 public:
     StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
 
     bool operator() (WorldObject* target) const
     {
-        if (target == _victim && _me->getThreatManager().getThreatList().size() > 1)
+        if (target == _victim && _me->getThreatMgr().getThreatList().size() > 1)
             return true;
 
         if (target->GetTypeId() != TYPEID_PLAYER)
@@ -652,6 +664,7 @@ public:
         return false;
     }
 
+private:
     Creature* _me;
     Unit const* _victim;
 };
@@ -814,11 +827,11 @@ class achievement_kologarn_looks_could_kill : public AchievementCriteriaScript
 public:
     achievement_kologarn_looks_could_kill() : AchievementCriteriaScript("achievement_kologarn_looks_could_kill") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
                     return cr->AI()->GetData(DATA_KOLOGARN_LOOKS_ACHIEV);
 
         return false;
@@ -830,11 +843,11 @@ class achievement_kologarn_rubble_and_roll : public AchievementCriteriaScript
 public:
     achievement_kologarn_rubble_and_roll() : AchievementCriteriaScript("achievement_kologarn_rubble_and_roll") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
                     return cr->AI()->GetData(DATA_KOLOGARN_RUBBLE_ACHIEV);
 
         return false;
@@ -846,11 +859,11 @@ class achievement_kologarn_with_open_arms : public AchievementCriteriaScript
 public:
     achievement_kologarn_with_open_arms() : AchievementCriteriaScript("achievement_kologarn_with_open_arms") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
                     return cr->AI()->GetData(DATA_KOLOGARN_ARMS_ACHIEV);
 
         return false;

@@ -1,16 +1,29 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum XT002Spells
 {
@@ -160,7 +173,7 @@ public:
             {
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
                 m_pInstance->SetData(TYPE_XT002, NOT_STARTED);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_ACTIVE);
             }
         }
@@ -190,14 +203,14 @@ public:
             RescheduleEvents(); // Other events are scheduled here
 
             me->setActive(true);
-            me->MonsterYell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL, 0);
+            me->Yell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL);
             me->PlayDirectSound(XT_SOUND_AGGRO);
 
             if (m_pInstance)
             {
                 m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
                 m_pInstance->SetData(TYPE_XT002, IN_PROGRESS);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_READY);
             }
 
@@ -212,12 +225,12 @@ public:
             {
                 if (urand(0, 1))
                 {
-                    me->MonsterYell("I... I think I broke it.", LANG_UNIVERSAL, 0);
+                    me->Yell("I... I think I broke it.", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_SLAY1);
                 }
                 else
                 {
-                    me->MonsterYell("I guess it doesn't bend that way.", LANG_UNIVERSAL, 0);
+                    me->Yell("I guess it doesn't bend that way.", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_SLAY2);
                 }
             }
@@ -225,13 +238,13 @@ public:
 
         void JustDied(Unit* /*victim*/) override
         {
-            me->MonsterYell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
+            me->Yell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL);
             me->PlayDirectSound(XT_SOUND_DEATH);
 
             if (m_pInstance)
             {
                 m_pInstance->SetData(TYPE_XT002, DONE);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -266,7 +279,7 @@ public:
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
-                me->MonsterTextEmote("XT-002 Deconstructor's heart is severed from his body.", 0, true);
+                me->TextEmote("XT-002 Deconstructor's heart is severed from his body.", nullptr, true);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                 return;
             }
@@ -316,7 +329,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_STUNNED);
                         me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
-                        me->MonsterYell("So tired. I will rest for just a moment!", LANG_UNIVERSAL, 0);
+                        me->Yell("So tired. I will rest for just a moment!", LANG_UNIVERSAL);
                         me->PlayDirectSound(XT_SOUND_HEART_OPEN);
 
                         events.CancelEventGroup(1);
@@ -342,21 +355,21 @@ public:
                     events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10000, 1);
                     break;
                 case EVENT_TYMPANIC_TANTARUM:
-                    me->MonsterTextEmote("XT-002 Deconstructor begins to cause the earth to quake.", 0, true);
-                    me->MonsterYell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL, 0);
+                    me->TextEmote("XT-002 Deconstructor begins to cause the earth to quake.", nullptr, true);
+                    me->Yell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_TANTARUM);
                     me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
                     events.RepeatEvent(60000);
                     return;
                 case EVENT_ENRAGE:
-                    me->MonsterYell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL, 0);
+                    me->Yell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_ENRAGE);
                     me->CastSpell(me, SPELL_XT002_ENRAGE, true);
                     break;
 
                 // Animation events
                 case EVENT_START_SECOND_PHASE:
-                    me->MonsterTextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", 0, true);
+                    me->TextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", nullptr, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
@@ -370,7 +383,7 @@ public:
                         return;
                     }
 
-                    me->MonsterYell("I'm ready to play!", LANG_UNIVERSAL, 0);
+                    me->Yell("I'm ready to play!", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
 
                     me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
@@ -458,7 +471,7 @@ public:
             }
             else if (param == ACTION_HIDE_HEART)
             {
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     if (pXT002->AI())
                     {
                         pXT002->AI()->DoAction(_damageDone);
@@ -524,7 +537,7 @@ public:
         {
             me->SetVisible(false);
             if (me->GetInstanceScript())
-                if (Creature* XT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* XT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     if (XT002->AI())
                         XT002->AI()->DoAction(ACTION_HEART_BROKEN);
         }
@@ -566,7 +579,7 @@ public:
             me->SetWalk(true);
 
             if (me->GetInstanceScript())
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
                     if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
                         me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
@@ -586,7 +599,7 @@ public:
                 }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -597,7 +610,7 @@ public:
 
             // we reached the target :)
             if (type == FOLLOW_MOTION_TYPE && me->GetInstanceScript())
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
                     if (pXT002->IsAlive())
                     {
@@ -606,7 +619,7 @@ public:
                     }
 
                     if (!urand(0, 2))
-                        me->MonsterTextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", 0, true);
+                        me->TextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", nullptr, true);
 
                     me->DespawnOrUnsummon(1);
                 }
@@ -617,7 +630,7 @@ public:
             if (!_locked)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     {
                         me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
                         _locked = true;
@@ -737,7 +750,7 @@ public:
             me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
 
             if (me->GetInstanceScript())
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
                     if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
                         me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
@@ -754,8 +767,8 @@ public:
             _boomed = true; // Prevent recursive calls
 
             WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8 + 8 + 4);
-            data << uint64(me->GetGUID());
-            data << uint64(me->GetGUID());
+            data << me->GetGUID();
+            data << me->GetGUID();
             data << uint32(SPELL_BOOM);
             me->SendMessageToSet(&data, false);
 
@@ -786,7 +799,7 @@ public:
             }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -804,7 +817,7 @@ public:
             if (!_locked)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     {
                         me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
                         _locked = true;
@@ -853,6 +866,7 @@ public:
     };
 };
 
+// 62775 - Tympanic Tantrum
 class spell_xt002_tympanic_tantrum : public SpellScriptLoader
 {
 public:
@@ -886,6 +900,7 @@ public:
     }
 };
 
+// 64234, 63024 - Gravity Bomb
 class spell_xt002_gravity_bomb_aura : public SpellScriptLoader
 {
 public:
@@ -941,7 +956,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -956,6 +971,7 @@ public:
     }
 };
 
+// 64233, 63025 - Gravity Bomb
 class spell_xt002_gravity_bomb_damage : public SpellScriptLoader
 {
 public:
@@ -988,6 +1004,7 @@ public:
     }
 };
 
+// 63018, 65121 - Searing Light
 class spell_xt002_searing_light_spawn_life_spark : public SpellScriptLoader
 {
 public:
@@ -1023,7 +1040,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -1043,11 +1060,11 @@ class achievement_xt002_nerf_engineering : public AchievementCriteriaScript
 public:
     achievement_xt002_nerf_engineering() : AchievementCriteriaScript("achievement_xt002_nerf_engineering") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_XT002)))
                     return cr->AI()->GetData(DATA_XT002_NERF_ENGINEERING);
 
         return false;
@@ -1059,11 +1076,11 @@ class achievement_xt002_nerf_gravity_bombs : public AchievementCriteriaScript
 public:
     achievement_xt002_nerf_gravity_bombs() : AchievementCriteriaScript("achievement_xt002_nerf_gravity_bombs") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_XT002)))
                     return cr->AI()->GetData(DATA_XT002_GRAVITY_ACHIEV);
 
         return false;

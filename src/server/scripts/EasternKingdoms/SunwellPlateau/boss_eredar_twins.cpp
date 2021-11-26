@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "sunwell_plateau.h"
 
@@ -101,7 +114,7 @@ public:
         void EnterEvadeMode() override
         {
             BossAI::EnterEvadeMode();
-            if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_GRAND_WARLOCK_ALYTHESS)))
+            if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
             {
                 if (!alythess->IsAlive())
                     alythess->Respawn(true);
@@ -113,7 +126,7 @@ public:
         void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
-            if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_GRAND_WARLOCK_ALYTHESS)))
+            if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
                 if (alythess->IsAlive() && !alythess->IsInCombat())
                     alythess->AI()->AttackStart(who);
 
@@ -140,7 +153,7 @@ public:
                 Talk(YELL_SAC_DEAD);
                 instance->SetBossState(DATA_EREDAR_TWINS, DONE);
             }
-            else if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_GRAND_WARLOCK_ALYTHESS)))
+            else if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
                 alythess->AI()->DoAction(ACTION_SISTER_DIED);
         }
 
@@ -249,7 +262,7 @@ public:
         void EnterEvadeMode() override
         {
             BossAI::EnterEvadeMode();
-            if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_LADY_SACROLASH)))
+            if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
             {
                 if (!scorlash->IsAlive())
                     scorlash->Respawn(true);
@@ -261,7 +274,7 @@ public:
         void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
-            if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_LADY_SACROLASH)))
+            if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
                 if (scorlash->IsAlive() && !scorlash->IsInCombat())
                     scorlash->AI()->AttackStart(who);
 
@@ -288,7 +301,7 @@ public:
                 Talk(YELL_SAC_DEAD);
                 instance->SetBossState(DATA_EREDAR_TWINS, DONE);
             }
-            else if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_LADY_SACROLASH)))
+            else if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
                 scorlash->AI()->DoAction(ACTION_SISTER_DIED);
         }
 
@@ -491,9 +504,9 @@ public:
             if (instance->GetBossState(DATA_EREDAR_TWINS_INTRO) != DONE)
             {
                 instance->SetBossState(DATA_EREDAR_TWINS_INTRO, DONE);
-                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_LADY_SACROLASH)))
+                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_LADY_SACROLASH)))
                     creature->AI()->Talk(YELL_INTRO_SAC);
-                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_GRAND_WARLOCK_ALYTHESS)))
+                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
                     creature->AI()->Talk(YELL_INTRO_ALY);
             }
 

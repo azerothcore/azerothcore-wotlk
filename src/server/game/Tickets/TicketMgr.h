@@ -1,12 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _TICKETMGR_H
 #define _TICKETMGR_H
 
+#include "CharacterCache.h"
 #include "ObjectMgr.h"
 #include <string>
 
@@ -81,23 +93,25 @@ public:
 
     bool IsClosed() const { return  _type != TICKET_TYPE_OPEN; }
     bool IsCompleted() const { return _completed; }
-    bool IsFromPlayer(uint64 guid) const { return guid == _playerGuid; }
-    bool IsAssigned() const { return _assignedTo != 0; }
-    bool IsAssignedTo(uint64 guid) const { return guid == _assignedTo; }
-    bool IsAssignedNotTo(uint64 guid) const { return IsAssigned() && !IsAssignedTo(guid); }
+    bool IsFromPlayer(ObjectGuid guid) const { return guid == _playerGuid; }
+    bool IsAssigned() const { return _assignedTo; }
+    bool IsAssignedTo(ObjectGuid guid) const { return guid == _assignedTo; }
+    bool IsAssignedNotTo(ObjectGuid guid) const { return IsAssigned() && !IsAssignedTo(guid); }
 
     uint32 GetId() const { return _id; }
-    Player* GetPlayer() const { return ObjectAccessor::FindPlayerInOrOutOfWorld(_playerGuid); }
+    Player* GetPlayer() const { return ObjectAccessor::FindConnectedPlayer(_playerGuid); }
     std::string const& GetPlayerName() const { return _playerName; }
     std::string const& GetMessage() const { return _message; }
-    Player* GetAssignedPlayer() const { return ObjectAccessor::FindPlayerInOrOutOfWorld(_assignedTo); }
-    uint64 GetAssignedToGUID() const { return _assignedTo; }
+    Player* GetAssignedPlayer() const { return ObjectAccessor::FindConnectedPlayer(_assignedTo); }
+    ObjectGuid GetAssignedToGUID() const { return _assignedTo; }
     std::string GetAssignedToName() const
     {
         std::string name;
         // save queries if ticket is not assigned
         if (_assignedTo)
-            sObjectMgr->GetPlayerNameByGUID(_assignedTo, name);
+        {
+            sCharacterCache->GetCharacterNameByGuid(_assignedTo, name);
+        }
 
         return name;
     }
@@ -105,7 +119,7 @@ public:
     GMTicketEscalationStatus GetEscalatedStatus() const { return _escalatedStatus; }
 
     void SetEscalatedStatus(GMTicketEscalationStatus escalatedStatus) { _escalatedStatus = escalatedStatus; }
-    void SetAssignedTo(uint64 guid, bool isAdmin)
+    void SetAssignedTo(ObjectGuid guid, bool isAdmin)
     {
         _assignedTo = guid;
         if (isAdmin && _escalatedStatus == TICKET_IN_ESCALATION_QUEUE)
@@ -113,8 +127,8 @@ public:
         else if (_escalatedStatus == TICKET_UNASSIGNED)
             _escalatedStatus = TICKET_ASSIGNED;
     }
-    void SetClosedBy(int64 value) { _closedBy = value; _type = TICKET_TYPE_CLOSED; }
-    void SetResolvedBy(int64 value) { _resolvedBy = value; }
+    void SetClosedBy(ObjectGuid value) { _closedBy = value; _type = TICKET_TYPE_CLOSED; }
+    void SetResolvedBy(ObjectGuid value) { _resolvedBy = value; }
     void SetCompleted() { _completed = true; }
     void SetMessage(std::string const& message)
     {
@@ -130,7 +144,7 @@ public:
     void AppendResponse(std::string const& response) { _response += response; }
 
     bool LoadFromDB(Field* fields);
-    void SaveToDB(SQLTransaction& trans) const;
+    void SaveToDB(CharacterDatabaseTransaction trans) const;
     void DeleteFromDB();
 
     void WritePacket(WorldPacket& data) const;
@@ -145,7 +159,7 @@ public:
 
 private:
     uint32 _id;
-    uint64 _playerGuid;
+    ObjectGuid _playerGuid;
     TicketType _type; // 0 = Open, 1 = Closed, 2 = Character deleted
     std::string _playerName;
     float _posX;
@@ -155,9 +169,9 @@ private:
     std::string _message;
     uint64 _createTime;
     uint64 _lastModifiedTime;
-    int64 _closedBy; // 0 = Open or Closed by Console (if type = 1), playerGuid = GM who closed it or player abandoned ticket or read the GM response message.
-    int64 _resolvedBy; // 0 = Open, -1 = Resolved by Console, GM who resolved it by closing or completing the ticket.
-    uint64 _assignedTo;
+    ObjectGuid _closedBy; // 0 = Open or Closed by Console (if type = 1), playerGuid = GM who closed it or player abandoned ticket or read the GM response message.
+    ObjectGuid _resolvedBy; // 0 = Open, -1 = Resolved by Console, GM who resolved it by closing or completing the ticket.
+    ObjectGuid _assignedTo;
     std::string _comment;
     bool _completed;
     GMTicketEscalationStatus _escalatedStatus;
@@ -191,7 +205,7 @@ public:
         return nullptr;
     }
 
-    GmTicket* GetTicketByPlayer(uint64 playerGuid)
+    GmTicket* GetTicketByPlayer(ObjectGuid playerGuid)
     {
         for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
             if (itr->second && itr->second->IsFromPlayer(playerGuid) && !itr->second->IsClosed())
@@ -210,8 +224,8 @@ public:
     }
 
     void AddTicket(GmTicket* ticket);
-    void CloseTicket(uint32 ticketId, int64 source = -1);
-    void ResolveAndCloseTicket(uint32 ticketId, int64 source); // used when GM resolves a ticket by simply closing it
+    void CloseTicket(uint32 ticketId, ObjectGuid source = ObjectGuid::Empty);
+    void ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source); // used when GM resolves a ticket by simply closing it
     void RemoveTicket(uint32 ticketId);
 
     bool GetStatus() const { return _status; }

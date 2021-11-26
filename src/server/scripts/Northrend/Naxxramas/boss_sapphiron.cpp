@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "naxxramas.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "naxxramas.h"
 
 enum Yells
 {
@@ -86,8 +99,8 @@ public:
         InstanceScript* pInstance;
         uint8 iceboltCount{};
         uint32 spawnTimer{};
-        std::list<uint64> blockList;
-        uint64 currentTarget{};
+        GuidList blockList;
+        ObjectGuid currentTarget;
 
         void InitializeAI() override
         {
@@ -118,7 +131,7 @@ public:
             events.Reset();
             iceboltCount = 0;
             spawnTimer = 0;
-            currentTarget = 0;
+            currentTarget.Clear();
             blockList.clear();
         }
 
@@ -191,12 +204,12 @@ public:
 
         bool IsValidExplosionTarget(WorldObject* target)
         {
-            for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+            for (ObjectGuid const& guid : blockList)
             {
-                if (target->GetGUID() == (*itr))
+                if (target->GetGUID() == guid)
                     return false;
 
-                if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
+                if (Unit* block = ObjectAccessor::GetUnit(*me, guid))
                 {
                     if (block->IsInBetween(me, target, 2.0f) && block->IsWithinDist(target, 10.0f))
                         return false;
@@ -293,7 +306,7 @@ public:
                     me->SendMeleeAttackStop(me->GetVictim());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
-                    currentTarget = 0;
+                    currentTarget.Clear();
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3000);
                     iceboltCount = RAID_MODE(2, 3);
                     return;
@@ -308,15 +321,15 @@ public:
                         }
 
                         std::vector<Unit*> targets;
-                        auto i = me->getThreatManager().getThreatList().begin();
-                        for (; i != me->getThreatManager().getThreatList().end(); ++i)
+                        auto i = me->getThreatMgr().getThreatList().begin();
+                        for (; i != me->getThreatMgr().getThreatList().end(); ++i)
                         {
                             if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
                             {
                                 bool inList = false;
                                 if (!blockList.empty())
                                 {
-                                    for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+                                    for (GuidList::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
                                     {
                                         if ((*i)->getTarget()->GetGUID() == *itr)
                                         {
@@ -349,7 +362,7 @@ public:
                         return;
                     }
                 case EVENT_FLIGHT_BREATH:
-                    currentTarget = 0;
+                    currentTarget.Clear();
                     Talk(EMOTE_BREATH);
                     me->CastSpell(me, SPELL_FROST_MISSILE, false);
                     events.ScheduleEvent(EVENT_FLIGHT_SPELL_EXPLOSION, 8500);
@@ -361,7 +374,7 @@ public:
                 case EVENT_FLIGHT_START_LAND:
                     if (!blockList.empty())
                     {
-                        for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+                        for (GuidList::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
                         {
                             if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
                             {

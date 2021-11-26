@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "deadmines.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "deadmines.h"
 
-enum Spels
+enum Spells
 {
     SPELL_SMITE_STOMP       = 6432,
     SPELL_SMITE_SLAM        = 6435,
@@ -73,10 +86,6 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case EVENT_SMITE_SLAM:
-                    me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
-                    events.ScheduleEvent(EVENT_SMITE_SLAM, 15000);
-                    break;
                 case EVENT_CHECK_HEALTH1:
                     if (me->HealthBelowPct(67) && !health67)
                     {
@@ -106,6 +115,15 @@ public:
                         break;
                     }
                     events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500);
+                    break;
+                case EVENT_SMITE_SLAM:
+                    if (me->HealthBelowPct(33))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
+                        events.ScheduleEvent(EVENT_SMITE_SLAM, 6000);
+                        break;
+                    }
+                    events.ScheduleEvent(EVENT_SMITE_SLAM, 500);
                     break;
                 case EVENT_SWAP_WEAPON1:
                     me->LoadEquipment(EQUIP_TWO_SWORDS);
@@ -139,7 +157,7 @@ public:
             if (type != POINT_MOTION_TYPE)
                 return;
 
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(5.558f);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             events.ScheduleEvent(point == EQUIP_TWO_SWORDS ? EVENT_SWAP_WEAPON1 : EVENT_SWAP_WEAPON2, 1500);

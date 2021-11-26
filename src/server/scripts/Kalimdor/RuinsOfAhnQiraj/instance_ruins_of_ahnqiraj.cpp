@@ -1,12 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "InstanceScript.h"
-#include "ruins_of_ahnqiraj.h"
 #include "ScriptMgr.h"
+#include "ruins_of_ahnqiraj.h"
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
@@ -18,14 +29,6 @@ public:
         instance_ruins_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(NUM_ENCOUNTER);
-
-            _kurinaxxGUID   = 0;
-            _rajaxxGUID     = 0;
-            _moamGUID       = 0;
-            _buruGUID       = 0;
-            _ayamissGUID    = 0;
-            _ossirianGUID   = 0;
-            _paralyzedGUID  = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -61,13 +64,13 @@ public:
             return true;
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_PARALYZED)
                 _paralyzedGUID = data;
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -87,7 +90,7 @@ public:
                     return _paralyzedGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
@@ -134,13 +137,13 @@ public:
         }
 
     private:
-        uint64 _kurinaxxGUID;
-        uint64 _rajaxxGUID;
-        uint64 _moamGUID;
-        uint64 _buruGUID;
-        uint64 _ayamissGUID;
-        uint64 _ossirianGUID;
-        uint64 _paralyzedGUID;
+        ObjectGuid _kurinaxxGUID;
+        ObjectGuid _rajaxxGUID;
+        ObjectGuid _moamGUID;
+        ObjectGuid _buruGUID;
+        ObjectGuid _ayamissGUID;
+        ObjectGuid _ossirianGUID;
+        ObjectGuid _paralyzedGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

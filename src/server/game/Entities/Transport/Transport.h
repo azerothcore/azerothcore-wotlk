@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TRANSPORTS_H
@@ -35,12 +46,12 @@ protected:
 
 class MotionTransport : public Transport
 {
-    friend MotionTransport* TransportMgr::CreateTransport(uint32, uint32, Map*);
+    friend MotionTransport* TransportMgr::CreateTransport(uint32, ObjectGuid::LowType, Map*);
     MotionTransport();
 public:
     ~MotionTransport() override;
 
-    bool CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
+    bool CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
 
@@ -50,8 +61,8 @@ public:
 
     void AddPassenger(WorldObject* passenger, bool withAll = false) override;
     void RemovePassenger(WorldObject* passenger, bool withAll = false) override;
-    Creature* CreateNPCPassenger(uint32 guid, CreatureData const* data);
-    GameObject* CreateGOPassenger(uint32 guid, GameObjectData const* data);
+    Creature* CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data);
+    GameObject* CreateGOPassenger(ObjectGuid::LowType guid, GameObjectData const* data);
 
     void LoadStaticPassengers();
     PassengerSet const& GetStaticPassengers() const { return _staticPassengers; }
@@ -102,7 +113,7 @@ public:
     StaticTransport();
     ~StaticTransport() override;
 
-    bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
+    bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
 

@@ -1,11 +1,24 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
 
@@ -157,8 +170,8 @@ public:
         EventMap events;
         bool bIntro;
         bool bPhase3;
-        uint64 SphereGUID[6];
-        uint64 BurrowGUID[4];
+        ObjectGuid SphereGUID[6];
+        ObjectGuid BurrowGUID[4];
 
         void Reset() override
         {
@@ -171,7 +184,7 @@ public:
                 float dist = rand_norm() * 40.0f;
                 if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
                 {
-                    c->setFaction(31);
+                    c->SetFaction(FACTION_PREY);
                     c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     c->GetMotionMaster()->MoveRandom(15.0f);
                 }
@@ -200,9 +213,9 @@ public:
             if( !IsHeroic() )
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4000);
 
-            for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+            for (ObjectGuid const& guid : summons)
                 if (pInstance)
-                    if(Creature* c = pInstance->instance->GetCreature(*itr) )
+                    if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         c->GetMotionMaster()->MoveIdle();
                         c->StopMoving();
@@ -368,23 +381,6 @@ public:
             Talk(SAY_DEATH);
             if( pInstance )
                 pInstance->SetData(TYPE_ANUBARAK, DONE);
-
-            Player* plr = nullptr;
-            if( !pInstance->instance->GetPlayers().isEmpty() )
-                plr = pInstance->instance->GetPlayers().begin()->GetSource();
-
-            if( !plr )
-                return;
-
-            // remove loot for the other faction (items are invisible for players, done in conditions), so corpse can be skinned
-            for( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
-                if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                    if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        --me->loot.unlootedCount;
-                    }
         }
 
         void KilledUnit(Unit* who) override
@@ -456,7 +452,7 @@ public:
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
             determinationTimer = urand(10000, 50000);
             despawnTimer = 0;
-            if( me->getFaction() == 16 ) // hostile - it's phase 2
+            if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
                 if( Unit* target = me->SelectNearestTarget(250.0f) )
                 {
                     AttackStart(target);
@@ -621,7 +617,7 @@ public:
         {
             // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (uint64 guid = pInstance->GetData64(TYPE_ANUBARAK))
+                if (ObjectGuid guid = pInstance->GetGuidData(TYPE_ANUBARAK))
                     if (Creature* anub = pInstance->instance->GetCreature(guid))
                         CAST_AI(boss_anubarak_trial::boss_anubarak_trialAI, anub->AI())->JustSummoned(me);
         }
@@ -743,7 +739,7 @@ public:
         }
 
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
         void DoAction(int32 param) override
         {
@@ -751,7 +747,7 @@ public:
             {
                 if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
                     target->RemoveAura(SPELL_MARK);
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 me->RemoveAllAuras();
                 me->GetMotionMaster()->MoveIdle();
                 events.Reset();
@@ -764,7 +760,7 @@ public:
             if (TargetGUID)
                 if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
                     target->RemoveAura(SPELL_MARK);
-            TargetGUID = 0;
+            TargetGUID.Clear();
             if (!next)
             {
                 events.Reset();

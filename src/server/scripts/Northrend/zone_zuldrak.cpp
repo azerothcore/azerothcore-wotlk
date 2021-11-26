@@ -1,16 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "Vehicle.h"
@@ -40,27 +51,27 @@ public:
     {
         npc_finklesteinAI(Creature* creature) : ScriptedAI(creature) {}
 
-        std::map<uint64, uint32> questList;
+        std::map<ObjectGuid, uint32> questList;
 
-        void ClearPlayerOnTask(uint64 guid)
+        void ClearPlayerOnTask(ObjectGuid guid)
         {
-            std::map<uint64, uint32>::iterator itr = questList.find(guid);
+            std::map<ObjectGuid, uint32>::iterator itr = questList.find(guid);
             if (itr != questList.end())
                 questList.erase(itr);
         }
 
-        bool IsPlayerOnTask(uint64 guid)
+        bool IsPlayerOnTask(ObjectGuid guid)
         {
-            std::map<uint64, uint32>::const_iterator itr = questList.find(guid);
+            std::map<ObjectGuid, uint32>::const_iterator itr = questList.find(guid);
             return itr != questList.end();
         }
 
-        void RightClickCauldron(uint64 guid)
+        void RightClickCauldron(ObjectGuid guid)
         {
             if (questList.empty())
                 return;
 
-            std::map<uint64, uint32>::iterator itr = questList.find(guid);
+            std::map<ObjectGuid, uint32>::iterator itr = questList.find(guid);
             if (itr == questList.end())
                 return;
 
@@ -88,7 +99,7 @@ public:
                         return;
                     }
                     else
-                        player->KilledMonsterCredit(28248, 0);
+                        player->KilledMonsterCredit(28248);
                 }
                 else
                 {
@@ -100,7 +111,7 @@ public:
         }
 
         // Generate a Task and announce it to the player
-        void StartNextTask(uint64 playerGUID, uint32 counter)
+        void StartNextTask(ObjectGuid playerGUID, uint32 counter)
         {
             if (counter > 6)
                 return;
@@ -121,33 +132,33 @@ public:
             switch (counter)
             {
                 case 1:
-                    me->MonsterTextEmote("Quickly, get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Quickly, get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 2:
-                    me->MonsterTextEmote("Find me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Find me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 3:
-                    me->MonsterTextEmote("I think it needs...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("I think it needs...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 4:
-                    me->MonsterTextEmote("Alright, now fetch me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Alright, now fetch me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 5:
-                    me->MonsterTextEmote("Before it thickens, we must add...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Before it thickens, we must add...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 6:
-                    me->MonsterTextEmote("It's thickening! Quickly get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("It's thickening! Quickly get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
             }
@@ -241,11 +252,11 @@ public:
 
     struct npc_feedin_da_goolzAI : public NullCreatureAI
     {
-        npc_feedin_da_goolzAI(Creature* creature) : NullCreatureAI(creature) { findTimer = 1; checkTimer = 0; ghoulFed = 0; }
+        npc_feedin_da_goolzAI(Creature* creature) : NullCreatureAI(creature) { findTimer = 1; checkTimer = 0; }
 
         uint32 findTimer;
         uint32 checkTimer;
-        uint64 ghoulFed;
+        ObjectGuid ghoulFed;
 
         void UpdateAI(uint32 diff) override
         {
@@ -293,9 +304,9 @@ public:
                             ghoul->GetMotionMaster()->MoveTargetedHome();
                         }
 
-                        if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                        if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                             if (Player* player = owner->ToPlayer())
-                                player->KilledMonsterCredit(me->GetEntry(), 0);
+                                player->KilledMonsterCredit(me->GetEntry());
 
                         me->DespawnOrUnsummon(1);
                     }
@@ -376,8 +387,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 lichGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid lichGUID;
 
         void EnterEvadeMode() override
         {
@@ -385,7 +396,7 @@ public:
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                     if (player->IsWithinDistInMap(me, 80))
                         return;
-            me->setFaction(974);
+            me->SetFaction(FACTION_UNDEAD_SCOURGE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             ScriptedAI::EnterEvadeMode();
         }
@@ -394,9 +405,9 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
-            lichGUID = 0;
-            me->setFaction(974);
+            playerGUID.Clear();
+            lichGUID.Clear();
+            me->SetFaction(FACTION_UNDEAD_SCOURGE);
             me->SetVisible(false);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -462,7 +473,7 @@ public:
                 me->RemoveAllAuras();
                 me->CombatStop();
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 events.Reset();
                 events.ScheduleEvent(EVENT_BETRAYAL_4, 1000);
             }
@@ -563,12 +574,12 @@ public:
                     events.ScheduleEvent(EVENT_BETRAYAL_14, 7000);
                     break;
                 case EVENT_BETRAYAL_14:
-                    playerGUID = 0;
+                    playerGUID.Clear();
                     EnterEvadeMode();
                     break;
             }
 
-            if (me->getFaction() == 35 || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
+            if (me->GetFaction() == FACTION_FRIENDLY || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                 return;
 
             if (!UpdateVictim())
@@ -620,7 +631,7 @@ public:
     {
         npc_drakuru_shacklesAI(Creature* creature) : NullCreatureAI(creature)
         {
-            _rageclawGUID = 0;
+            _rageclawGUID.Clear();
             timer = 0;
         }
 
@@ -660,7 +671,7 @@ public:
         {
             // pointer check not needed
             DoCast(rageclaw, SPELL_FREE_RAGECLAW, true);
-            _rageclawGUID = 0;
+            _rageclawGUID.Clear();
             me->DespawnOrUnsummon(1);
         }
 
@@ -683,7 +694,7 @@ public:
         }
 
     private:
-        uint64 _rageclawGUID;
+        ObjectGuid _rageclawGUID;
         uint32 timer;
     };
 
@@ -715,7 +726,7 @@ public:
 
         void Reset() override
         {
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             DoCast(me, SPELL_KNEEL, true); // Little Hack for kneel - Thanks Illy :P
         }
 
@@ -726,7 +737,7 @@ public:
                 me->RemoveAurasDueToSpell(SPELL_LEFT_CHAIN);
                 me->RemoveAurasDueToSpell(SPELL_RIGHT_CHAIN);
                 me->RemoveAurasDueToSpell(SPELL_KNEEL);
-                me->setFaction(me->GetCreatureTemplate()->faction);
+                me->SetFaction(me->GetCreatureTemplate()->faction);
                 DoCast(me, SPELL_UNSHACKLED, true);
                 Talk(SAY_RAGECLAW);
                 me->GetMotionMaster()->MoveRandom(10);

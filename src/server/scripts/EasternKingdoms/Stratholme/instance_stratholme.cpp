@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stratholme.h"
 
 const Position BlackGuardPos[10] =
@@ -59,15 +72,6 @@ public:
             _slaughterProgress = 0;
             _slaughterNPCs = 0;
             _postboxesOpened = 0;
-
-            _zigguratDoorsGUID1 = 0;
-            _zigguratDoorsGUID2 = 0;
-            _zigguratDoorsGUID3 = 0;
-            _zigguratDoorsGUID4 = 0;
-            _zigguratDoorsGUID5 = 0;
-            _gauntletGateGUID = 0;
-            _slaughterGateGUID = 0;
-            _baronRivendareGUID = 0;
 
             _gateTrapsCooldown[0] = false;
             _gateTrapsCooldown[1] = false;
@@ -384,7 +388,7 @@ public:
                     if (Player* player = itr->GetSource())
                     {
                         // should pet also trigger the trap? could not find any source for it
-                        if (player && !player->IsGameMaster() && player->IsWithinDist2d(aGateTrap[i].m_positionX, aGateTrap[i].m_positionY, 5.5f))
+                        if (!player->IsGameMaster() && player->IsWithinDist2d(aGateTrap[i].m_positionX, aGateTrap[i].m_positionY, 5.5f))
                         {
                             // Check if timer was not already set by another player/pet a few milliseconds before
                             if (_gateTrapsCooldown[i])
@@ -546,18 +550,18 @@ public:
         uint32 _postboxesOpened;
         EventMap events;
 
-        uint64 _zigguratDoorsGUID1;
-        uint64 _zigguratDoorsGUID2;
-        uint64 _zigguratDoorsGUID3;
-        uint64 _zigguratDoorsGUID4;
-        uint64 _zigguratDoorsGUID5;
-        uint64 _slaughterGateGUID;
-        uint64 _gauntletGateGUID;
-        uint64 _baronRivendareGUID;
+        ObjectGuid _zigguratDoorsGUID1;
+        ObjectGuid _zigguratDoorsGUID2;
+        ObjectGuid _zigguratDoorsGUID3;
+        ObjectGuid _zigguratDoorsGUID4;
+        ObjectGuid _zigguratDoorsGUID5;
+        ObjectGuid _slaughterGateGUID;
+        ObjectGuid _gauntletGateGUID;
+        ObjectGuid _baronRivendareGUID;
 
         bool _gateTrapsCooldown[2];
-        uint64 _trappedPlayerGUID;
-        uint64 _trapGatesGUIDs[4];
+        ObjectGuid _trappedPlayerGUID;
+        ObjectGuid _trapGatesGUIDs[4];
 
         void gate_delay(int gate)
         {
@@ -575,7 +579,7 @@ public:
         {
             if (_trappedPlayerGUID)
             {
-                if (Player* pPlayer = instance->GetPlayer(_trappedPlayerGUID))
+                if (Player* pPlayer = ObjectAccessor::GetPlayer(instance, _trappedPlayerGUID))
                 {
                     DoSpawnPlaguedCritters(gate, pPlayer);
                 }

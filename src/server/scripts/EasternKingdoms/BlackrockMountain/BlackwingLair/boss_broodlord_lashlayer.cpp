@@ -1,15 +1,26 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackwing_lair.h"
 
 enum Say
 {
@@ -153,10 +164,10 @@ class go_suppression_device : public GameObjectScript
                     switch (eventId)
                     {
                         case EVENT_SUPPRESSION_CAST:
-                            if (go->GetGoState() == GO_STATE_READY)
+                            if (me->GetGoState() == GO_STATE_READY)
                             {
-                                go->CastSpell(nullptr, SPELL_SUPPRESSION_AURA);
-                                go->SendCustomAnim(0);
+                                me->CastSpell(nullptr, SPELL_SUPPRESSION_AURA);
+                                me->SendCustomAnim(0);
                             }
                             _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
                             break;
@@ -177,7 +188,7 @@ class go_suppression_device : public GameObjectScript
                         _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, 30000, 120000);
                         break;
                     case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
-                        go->SetLootState(GO_READY);
+                        me->SetLootState(GO_READY);
                         break;
                 }
             }
@@ -196,10 +207,10 @@ class go_suppression_device : public GameObjectScript
                 if (_active)
                     return;
                 _active = true;
-                if (go->GetGoState() == GO_STATE_ACTIVE)
-                    go->SetGoState(GO_STATE_READY);
-                go->SetLootState(GO_READY);
-                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                if (me->GetGoState() == GO_STATE_ACTIVE)
+                    me->SetGoState(GO_STATE_READY);
+                me->SetLootState(GO_READY);
+                me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 1000);
             }
 
@@ -208,8 +219,8 @@ class go_suppression_device : public GameObjectScript
                 if (!_active)
                     return;
                 _active = false;
-                go->SetGoState(GO_STATE_ACTIVE);
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                me->SetGoState(GO_STATE_ACTIVE);
+                me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 _events.CancelEvent(EVENT_SUPPRESSION_CAST);
             }
 

@@ -1,22 +1,35 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "GridNotifiers.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum LeviathanSpells
 {
@@ -424,27 +437,27 @@ public:
                         if (Unit* seat = vehicle->GetPassenger(i))
                             if (seat->GetTypeId() == TYPEID_UNIT)
                                 seat->ToCreature()->AI()->EnterEvadeMode();
-                    me->MonsterTextEmote("Flame Leviathan reactivated. Resumming combat functions.", 0, true);
+                    me->TextEmote("Flame Leviathan reactivated. Resumming combat functions.", nullptr, true);
                     return;
                 case EVENT_THORIMS_HAMMER:
                     SummonTowerHelpers(TOWER_OF_STORMS);
                     events.RepeatEvent(60000 + rand() % 60000);
-                    me->MonsterTextEmote("Flame Leviathan activates Thorim's Hammer.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Thorim's Hammer.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
                     return;
                 case EVENT_FREYA:
                     SummonTowerHelpers(TOWER_OF_LIFE);
-                    me->MonsterTextEmote("Flame Leviathan activates Freya's Ward.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Freya's Ward.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
                     return;
                 case EVENT_MIMIRONS_INFERNO:
                     SummonTowerHelpers(TOWER_OF_FLAMES);
-                    me->MonsterTextEmote("Flame Leviathan activates Mimiron's Inferno.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Mimiron's Inferno.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
                     return;
                 case EVENT_HODIRS_FURY:
                     SummonTowerHelpers(TOWER_OF_FROST);
-                    me->MonsterTextEmote("Flame Leviathan activates Hodir's Fury.", 0, true);
+                    me->TextEmote("Flame Leviathan activates Hodir's Fury.", nullptr, true);
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
                     return;
             }
@@ -534,24 +547,24 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _
     {
         // first one is ALWAYS turned on, unless leviathan is beaten
         GameObject* go = nullptr;
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_READY);
 
         if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
-            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_LEVIATHAN_DOORS))))
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
     }
     else
     {
         GameObject* go = nullptr;
         if (_death)
-            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL1))))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL1))))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_LEVIATHAN_DOORS))))
         {
             if (m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL || m_pInstance->GetData(TYPE_LEVIATHAN) == DONE)
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
@@ -569,16 +582,16 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnHealStations(bool _apply)
     GameObject* go = nullptr;
     if (_apply)
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_READY);
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_READY);
     }
     else
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_ACTIVATED);
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_ACTIVATED);
     }
 }
@@ -800,7 +813,7 @@ public:
                 if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
                     device->SetUInt32Value(UNIT_FIELD_FLAGS, 0); // unselectable
 
-            if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetData64(TYPE_LEVIATHAN)))
+            if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(TYPE_LEVIATHAN)))
                 leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
         }
 
@@ -1066,7 +1079,7 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
-            Start(false, false, 0, nullptr, false, true);
+            Start(false, false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
                 aur->SetMaxDuration(-1);
@@ -1176,25 +1189,6 @@ public:
                 me->CastSpell(me, SPELL_BLAZE, true);
         }
     };
-};
-
-enum ScriptedTextNorgannonDellorah
-{
-    DELLORAH_SAY_1 = 0,
-    DELLORAH_SAY_2 = 1,
-    DELLORAH_SAY_3 = 2,
-    DELLORAH_SAY_4 = 3,
-    DELLORAH_SAY_5 = 4,
-    DELLORAH_SAY_6 = 5,
-    DELLORAH_SAY_7 = 6,
-
-    NORGANNON_SAY_1 = 0,
-    NORGANNON_SAY_2 = 1,
-    NORGANNON_SAY_3 = 2,
-    NORGANNON_SAY_4 = 3,
-    NORGANNON_SAY_5 = 4,
-
-    RHYDIAN_EMOTE = 0,
 };
 
 class npc_brann_radio : public CreatureScript
@@ -1529,11 +1523,11 @@ public:
             if (!vehicle)
                 return;
 
-            Player* driver = vehicle->GetPassenger(0) ? vehicle->GetPassenger(0)->ToPlayer() : nullptr;
+            Unit* driver = vehicle->GetPassenger(0);
             if (!driver)
                 return;
 
-            driver->MonsterTextEmote("Automatic repair sequence initiated.", driver, true);
+            driver->TextEmote("Automatic repair sequence initiated.", driver, true);
 
             // Actually should/could use basepoints (100) for this spell effect as percentage of health, but oh well.
             vehicle->GetBase()->SetFullHealth();
@@ -1633,7 +1627,7 @@ public:
         //! Vehicle must be in use by player
         bool playerFound = false;
         for (SeatMap::const_iterator itr = vehicle->Seats.begin(); itr != vehicle->Seats.end() && !playerFound; ++itr)
-            if (IS_PLAYER_GUID(itr->second.Passenger.Guid))
+            if (itr->second.Passenger.Guid.IsPlayer())
                 playerFound = true;
 
         return !playerFound;
@@ -1660,7 +1654,7 @@ public:
             else
             {
                 //! In the end, only one target should be selected
-                WorldObject* _target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 if (_target)
                     targets.push_back(_target);
@@ -1674,7 +1668,7 @@ public:
             if (!target || !caster)
                 return;
 
-            caster->getThreatManager().resetAllAggro();
+            caster->getThreatMgr().resetAllAggro();
             caster->GetAI()->AttackStart(target);    // Chase target
             caster->AddThreat(target, 10000000.0f);
         }
@@ -1709,9 +1703,9 @@ public:
                 {
                     // use 99 because it is 3d search
                     std::list<WorldObject*> targetList;
-                    acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
-                    acore::WorldObjectListSearcher<acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                    GetCaster()->GetMap()->VisitAll(GetCaster()->m_positionX, GetCaster()->m_positionY, 99, searcher);
+                    Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
+                    Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
+                    Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
                     float minDist = 99 * 99;
                     Unit* target = nullptr;
                     for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
@@ -2076,7 +2070,7 @@ public:
     {
     }
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         return target && _towerCount <= target->GetAI()->GetData(DATA_GET_TOWER_COUNT);
     }
@@ -2090,7 +2084,7 @@ class achievement_flame_leviathan_shutout : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_shutout() : AchievementCriteriaScript("achievement_flame_leviathan_shutout") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         if (target)
             if (target->GetAI()->GetData(DATA_GET_SHUTDOWN))
@@ -2107,7 +2101,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (Vehicle* vehicle = player->GetVehicle())
             if (vehicle->GetCreatureEntry() == _entry1 || vehicle->GetCreatureEntry() == _entry2)
@@ -2125,7 +2119,7 @@ class achievement_flame_leviathan_unbroken : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_unbroken() : AchievementCriteriaScript("achievement_flame_leviathan_unbroken") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (player->GetInstanceScript()->GetData(DATA_UNBROKEN_ACHIEVEMENT))

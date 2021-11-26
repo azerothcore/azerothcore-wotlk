@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -103,7 +116,7 @@ public:
     bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
     {
         if (_owner.IsSummon())
-            if (Unit* summoner = _owner.ToTempSummon()->GetSummoner())
+            if (Unit* summoner = _owner.ToTempSummon()->GetSummonerUnit())
             {
                 summoner->GetAI()->DoAction(_action);
                 _owner.SetStandState(UNIT_STAND_STATE_SUBMERGED);
@@ -145,7 +158,7 @@ public:
                 return;
 
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_ESSENCE_OF_SUFFERING, 5000); // ZOMG! 15000);
+            events.ScheduleEvent(EVENT_ESSENCE_OF_SUFFERING, 5000); // 15000);
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
@@ -285,7 +298,7 @@ public:
                 return;
 
             me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_SUFFERING), me->m_Events.CalculateTime(1500));
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
 
@@ -396,7 +409,7 @@ public:
                 return;
 
             me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_DESIRE), me->m_Events.CalculateTime(1500));
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
 
@@ -483,11 +496,11 @@ public:
         boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void Reset() override
         {
-            targetGUID = 0;
+            targetGUID.Clear();
             events.Reset();
         }
 
@@ -514,7 +527,7 @@ public:
         {
             Talk(ANGER_SAY_DEATH);
             if (me->IsSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     Unit::Kill(summoner, summoner);
         }
 
@@ -552,7 +565,7 @@ public:
                 case EVENT_ANGER_SEETHE:
                     if (Unit* victim = me->GetVictim())
                     {
-                        uint64 victimGUID = victim->GetGUID();
+                        ObjectGuid victimGUID = victim->GetGUID();
                         if (targetGUID && targetGUID != victimGUID)
                             me->CastSpell(me, SPELL_SEETHE, false);
                         // victim can be lost
@@ -613,7 +626,7 @@ public:
             if (targets.empty())
                 return;
 
-            targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             WorldObject* target = targets.front();
             targets.clear();
             targets.push_back(target);

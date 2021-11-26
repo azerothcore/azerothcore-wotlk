@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef __BATTLEGROUNDEY_H
 #define __BATTLEGROUNDEY_H
@@ -326,14 +339,14 @@ public:
     void StartingEventOpenDoors() override;
 
     /* BG Flags */
-    uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const override    { return _flagKeeperGUID; }
-    void SetFlagPicker(uint64 guid)     { _flagKeeperGUID = guid; }
+    ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const override    { return _flagKeeperGUID; }
+    void SetFlagPicker(ObjectGuid guid)     { _flagKeeperGUID = guid; }
     uint8 GetFlagState() const          { return _flagState; }
     void RespawnFlag();
     void RespawnFlagAfterDrop();
 
     void RemovePlayer(Player* player) override;
-    void HandleBuffUse(uint64 buff_guid);
+    void HandleBuffUse(ObjectGuid buff_guid);
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
     void HandleKillPlayer(Player* player, Player* killer) override;
     GraveyardStruct const* GetClosestGraveyard(Player* player) override;
@@ -342,8 +355,8 @@ public:
     void EndBattleground(TeamId winnerTeamId) override;
     void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void FillInitialWorldStates(WorldPacket& data) override;
-    void SetDroppedFlagGUID(uint64 guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
-    uint64 GetDroppedFlagGUID() const { return _droppedFlagGUID; }
+    void SetDroppedFlagGUID(ObjectGuid guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
+    ObjectGuid GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 
     /* Battleground Events */
     void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject) override;
@@ -390,8 +403,8 @@ private:
     EventMap _bgEvents;
     uint32 _honorTics;
     uint8 _ownedPointsCount[BG_TEAMS_COUNT];
-    uint64 _flagKeeperGUID;
-    uint64 _droppedFlagGUID;
+    ObjectGuid _flagKeeperGUID;
+    ObjectGuid _droppedFlagGUID;
     uint8 _flagState;
     uint32 _flagCapturedObject;
 };

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SCRIPTEDCREATURE_H_
@@ -21,7 +32,7 @@ class InstanceScript;
 class SummonList
 {
 public:
-    typedef std::list<uint64> StorageType;
+    typedef GuidList StorageType;
     typedef StorageType::iterator iterator;
     typedef StorageType::const_iterator const_iterator;
     typedef StorageType::size_type size_type;
@@ -78,6 +89,8 @@ public:
     void Despawn(Creature const* summon) { storage_.remove(summon->GetGUID()); }
     void DespawnEntry(uint32 entry);
     void DespawnAll();
+    bool IsAnyCreatureAlive() const;
+    bool IsAnyCreatureInCombat() const;
 
     template <typename T>
     void DespawnIf(T const& predicate)
@@ -100,24 +113,26 @@ public:
     }
 
     template <class Predicate>
-    void DoAction(int32 info, Predicate& predicate, uint16 max = 0)
+    void DoAction(int32 info, Predicate&& predicate, uint16 max = 0)
     {
         if (max)
             RemoveNotExisting(); // pussywizard: when max is set, non existing can be chosen and nothing will happen
 
         // We need to use a copy of SummonList here, otherwise original SummonList would be modified
         StorageType listCopy = storage_;
-        acore::Containers::RandomResizeList<uint64, Predicate>(listCopy, predicate, max);
-        for (StorageType::iterator i = listCopy.begin(); i != listCopy.end(); ++i)
+        Acore::Containers::RandomResize<StorageType, Predicate>(listCopy, std::forward<Predicate>(predicate), max);
+
+        for (auto const& guid : listCopy)
         {
-            Creature* summon = ObjectAccessor::GetCreature(*me, *i);
-            if (summon)
+            Creature* summon = ObjectAccessor::GetCreature(*me, guid);
+            if (summon && summon->IsAIEnabled)
             {
-                if (summon->IsAIEnabled)
-                    summon->AI()->DoAction(info);
+                summon->AI()->DoAction(info);
             }
-            else
-                storage_.remove(*i);
+            else if (!summon)
+            {
+                storage_.remove(guid);
+            }
         }
     }
 
@@ -137,7 +152,7 @@ class EntryCheckPredicate
 {
 public:
     EntryCheckPredicate(uint32 entry) : _entry(entry) {}
-    bool operator()(uint64 guid) { return GUID_ENPART(guid) == _entry; }
+    bool operator()(ObjectGuid guid) { return guid.GetEntry() == _entry; }
 
 private:
     uint32 _entry;
@@ -149,7 +164,7 @@ public:
     bool operator() (WorldObject* unit) const
     {
         if (unit->GetTypeId() != TYPEID_PLAYER)
-            if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
+            if (!unit->ToUnit()->GetOwnerGUID().IsPlayer())
                 return true;
 
         return false;
@@ -416,6 +431,7 @@ public:
 
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
+    void SummonedCreatureDespawnAll() override;
 
     void UpdateAI(uint32 diff) override;
 
@@ -488,8 +504,9 @@ protected:
 
 // SD2 grid searchers.
 Creature* GetClosestCreatureWithEntry(WorldObject* source, uint32 entry, float maxSearchRange, bool alive = true);
-GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange);
+GameObject* GetClosestGameObjectWithEntry(WorldObject* source, uint32 entry, float maxSearchRange, bool onlySpawned = false);
 void GetCreatureListWithEntryInGrid(std::list<Creature*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
 void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& list, WorldObject* source, uint32 entry, float maxSearchRange);
+void GetDeadCreatureListInGrid(std::list<Creature*>& list, WorldObject* source, float maxSearchRange, bool alive = false);
 
 #endif // SCRIPTEDCREATURE_H_

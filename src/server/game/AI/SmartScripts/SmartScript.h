@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_SMARTSCRIPT_H
@@ -156,35 +167,27 @@ public:
         return 0;
     }
 
-    GameObject* FindGameObjectNear(WorldObject* searchObject, uint32 guid) const
+    GameObject* FindGameObjectNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
-        GameObject* gameObject = nullptr;
+        auto bounds = searchObject->GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
+        if (bounds.first == bounds.second)
+            return nullptr;
 
-        CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-        Cell cell(p);
-
-        acore::GameObjectWithDbGUIDCheck goCheck(guid);
-        acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(searchObject, gameObject, goCheck);
-
-        TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
-        cell.Visit(p, objectChecker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
-
-        return gameObject;
+        return bounds.first->second;
     }
 
-    Creature* FindCreatureNear(WorldObject* searchObject, uint32 guid) const
+    Creature* FindCreatureNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
-        Creature* creature = nullptr;
-        CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-        Cell cell(p);
+        auto bounds = searchObject->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
+        if (bounds.first == bounds.second)
+            return nullptr;
 
-        acore::CreatureWithDbGUIDCheck target_check(guid);
-        acore::CreatureSearcher<acore::CreatureWithDbGUIDCheck> checker(searchObject, creature, target_check);
+        auto creatureItr = std::find_if(bounds.first, bounds.second, [](Map::CreatureBySpawnIdContainer::value_type const& pair)
+        {
+            return pair.second->IsAlive();
+        });
 
-        TypeContainerVisitor<acore::CreatureSearcher <acore::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
-        cell.Visit(p, unit_checker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
-
-        return creature;
+        return creatureItr != bounds.second ? creatureItr->second : bounds.first->second;
     }
 
     ObjectListMap* mTargetStorage;
@@ -192,30 +195,39 @@ public:
     void OnReset();
     void ResetBaseObject()
     {
-        if (meOrigGUID)
+        WorldObject* lookupRoot = me;
+        if (!lookupRoot)
+            lookupRoot = go;
+
+        if (lookupRoot)
         {
-            if (Creature* m = HashMapHolder<Creature>::Find(meOrigGUID))
+            if (meOrigGUID)
             {
-                me = m;
-                go = nullptr;
+                if (Creature* m = ObjectAccessor::GetCreature(*lookupRoot, meOrigGUID))
+                {
+                    me = m;
+                    go = nullptr;
+                }
+            }
+
+            if (goOrigGUID)
+            {
+                if (GameObject* o = ObjectAccessor::GetGameObject(*lookupRoot, goOrigGUID))
+                {
+                    me = nullptr;
+                    go = o;
+                }
             }
         }
-        if (goOrigGUID)
-        {
-            if (GameObject* o = HashMapHolder<GameObject>::Find(goOrigGUID))
-            {
-                me = nullptr;
-                go = o;
-            }
-        }
-        goOrigGUID = 0;
-        meOrigGUID = 0;
+
+        goOrigGUID.Clear();
+        meOrigGUID.Clear();
     }
 
     //TIMED_ACTIONLIST (script type 9 aka script9)
     void SetScript9(SmartScriptHolder& e, uint32 entry);
     Unit* GetLastInvoker(Unit* invoker = nullptr);
-    uint64 mLastInvoker;
+    ObjectGuid mLastInvoker;
     typedef std::unordered_map<uint32, uint32> CounterMap;
     CounterMap mCounterList;
 
@@ -262,9 +274,9 @@ private:
     SmartAIEventList mTimedActionList;
     bool isProcessingTimedActionList;
     Creature* me;
-    uint64 meOrigGUID;
+    ObjectGuid meOrigGUID;
     GameObject* go;
-    uint64 goOrigGUID;
+    ObjectGuid goOrigGUID;
     AreaTrigger const* trigger;
     SmartScriptType mScriptType;
     uint32 mEventPhase;

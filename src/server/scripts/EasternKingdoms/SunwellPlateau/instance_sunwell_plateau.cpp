@@ -1,5 +1,18 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "InstanceScript.h"
@@ -29,22 +42,6 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-
-            KalecgosDragonGUID          = 0;
-            SathrovarrGUID              = 0;
-            BrutallusGUID               = 0;
-            MadrigosaGUID               = 0;
-            FelmystGUID                 = 0;
-            AlythessGUID                = 0;
-            SacrolashGUID               = 0;
-            MuruGUID                    = 0;
-            KilJaedenGUID               = 0;
-            KilJaedenControllerGUID     = 0;
-            AnveenaGUID                 = 0;
-            KalecgosKjGUID              = 0;
-
-            IceBarrierGUID              = 0;
-            memset(&blueFlightOrbGUID, 0, sizeof(blueFlightOrbGUID));
         }
 
         void OnPlayerEnter(Player* player) override
@@ -64,7 +61,7 @@ public:
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
                     Player* player = itr->GetSource();
-                    if (player && !player->HasAura(45839, 0))
+                    if (player && !player->HasAura(45839))
                         return player;
                 }
             }
@@ -76,7 +73,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (creature->GetDBTableGUIDLow() > 0 || !IS_PLAYER_GUID(creature->GetOwnerGUID()))
+            if (creature->GetSpawnId() > 0 || !creature->GetOwnerGUID().IsPlayer())
                 creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
 
             switch (creature->GetEntry())
@@ -196,7 +193,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -232,7 +229,8 @@ public:
                 case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4:
                     return blueFlightOrbGUID[id - DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
@@ -279,21 +277,21 @@ public:
         }
 
     protected:
-        uint64 KalecgosDragonGUID;
-        uint64 SathrovarrGUID;
-        uint64 BrutallusGUID;
-        uint64 MadrigosaGUID;
-        uint64 FelmystGUID;
-        uint64 AlythessGUID;
-        uint64 SacrolashGUID;
-        uint64 MuruGUID;
-        uint64 KilJaedenGUID;
-        uint64 KilJaedenControllerGUID;
-        uint64 AnveenaGUID;
-        uint64 KalecgosKjGUID;
+        ObjectGuid KalecgosDragonGUID;
+        ObjectGuid SathrovarrGUID;
+        ObjectGuid BrutallusGUID;
+        ObjectGuid MadrigosaGUID;
+        ObjectGuid FelmystGUID;
+        ObjectGuid AlythessGUID;
+        ObjectGuid SacrolashGUID;
+        ObjectGuid MuruGUID;
+        ObjectGuid KilJaedenGUID;
+        ObjectGuid KilJaedenControllerGUID;
+        ObjectGuid AnveenaGUID;
+        ObjectGuid KalecgosKjGUID;
 
-        uint64 IceBarrierGUID;
-        uint64 blueFlightOrbGUID[4];
+        ObjectGuid IceBarrierGUID;
+        ObjectGuid blueFlightOrbGUID[4];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

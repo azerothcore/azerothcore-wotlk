@@ -1,14 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "forge_of_souls.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "forge_of_souls.h"
 
 enum eTexts
 {
@@ -140,7 +153,7 @@ public:
                 me->SetOrientation(me->GetAngle(target));
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->DisableRotate(true);
-                me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MoveIdle();
@@ -337,7 +350,7 @@ public:
                         t->ToCreature()->SetReactState(REACT_AGGRESSIVE);
                     if (t->GetVictim())
                     {
-                        t->SetUInt64Value(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
+                        t->SetGuidValue(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
                         t->GetMotionMaster()->MoveChase(t->GetVictim());
                     }
                 }

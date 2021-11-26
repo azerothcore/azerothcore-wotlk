@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "black_temple.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "black_temple.h"
 
 DoorData const doorData[] =
 {
@@ -39,18 +52,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
 
-            ShadeOfAkamaGUID            = 0;
-            AkamaShadeGUID              = 0;
-            TeronGorefiendGUID          = 0;
-            ReliquaryGUID               = 0;
             ashtongueGUIDs.clear();
-            GathiosTheShattererGUID     = 0;
-            HighNethermancerZerevorGUID = 0;
-            LadyMalandeGUID             = 0;
-            VerasDarkshadowGUID         = 0;
-            IllidariCouncilGUID         = 0;
-            AkamaGUID                   = 0;
-            IllidanStormrageGUID        = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -116,7 +118,7 @@ public:
             {
                 ashtongueGUIDs.push_back(creature->GetGUID());
                 if (GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
-                    creature->setFaction(FACTION_ASHTONGUE);
+                    creature->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
             }
         }
 
@@ -164,7 +166,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -188,7 +190,7 @@ public:
                     return IllidanStormrageGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -198,9 +200,9 @@ public:
 
             if (type == DATA_SHADE_OF_AKAMA && state == DONE)
             {
-                for (std::list<uint64>::const_iterator itr = ashtongueGUIDs.begin(); itr != ashtongueGUIDs.end(); ++itr)
-                    if (Creature* ashtongue = instance->GetCreature(*itr))
-                        ashtongue->setFaction(FACTION_ASHTONGUE);
+                for (ObjectGuid const& guid : ashtongueGUIDs)
+                    if (Creature* ashtongue = instance->GetCreature(guid))
+                        ashtongue->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
             }
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
             {
@@ -255,18 +257,18 @@ public:
         }
 
     protected:
-        uint64 ShadeOfAkamaGUID;
-        uint64 AkamaShadeGUID;
-        uint64 TeronGorefiendGUID;
-        uint64 ReliquaryGUID;
-        std::list<uint64> ashtongueGUIDs;
-        uint64 GathiosTheShattererGUID;
-        uint64 HighNethermancerZerevorGUID;
-        uint64 LadyMalandeGUID;
-        uint64 VerasDarkshadowGUID;
-        uint64 IllidariCouncilGUID;
-        uint64 AkamaGUID;
-        uint64 IllidanStormrageGUID;
+        ObjectGuid ShadeOfAkamaGUID;
+        ObjectGuid AkamaShadeGUID;
+        ObjectGuid TeronGorefiendGUID;
+        ObjectGuid ReliquaryGUID;
+        GuidList ashtongueGUIDs;
+        ObjectGuid GathiosTheShattererGUID;
+        ObjectGuid HighNethermancerZerevorGUID;
+        ObjectGuid LadyMalandeGUID;
+        ObjectGuid VerasDarkshadowGUID;
+        ObjectGuid IllidariCouncilGUID;
+        ObjectGuid AkamaGUID;
+        ObjectGuid IllidanStormrageGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -304,8 +306,8 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (std::set<uint64>::const_iterator itr = _turtleSet.begin(); itr != _turtleSet.end(); ++itr)
-                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
+            for (ObjectGuid const& guid : _turtleSet)
+                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     turtle->TauntFadeOut(GetUnitOwner());
                     turtle->AddThreat(GetUnitOwner(), -10000000.0f);
@@ -319,7 +321,7 @@ public:
         }
 
     private:
-        std::set<uint64> _turtleSet;
+        GuidSet _turtleSet;
     };
 
     AuraScript* GetAuraScript() const override

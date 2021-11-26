@@ -1,15 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_spire.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_spire.h"
 
 enum Spells
 {
+    SPELL_THRASH                    = 3391,
     SPELL_SNAPKICK                  = 15618,
     SPELL_CLEAVE                    = 15284,
     SPELL_UPPERCUT                  = 10966,
@@ -21,11 +33,26 @@ enum Spells
 enum Events
 {
     EVENT_SNAP_KICK                 = 1,
-    EVENT_CLEAVE                    = 2,
-    EVENT_UPPERCUT                  = 3,
-    EVENT_MORTAL_STRIKE             = 4,
-    EVENT_PUMMEL                    = 5,
-    EVENT_THROW_AXE                 = 6
+    EVENT_CLEAVE,
+    EVENT_UPPERCUT,
+    EVENT_MORTAL_STRIKE,
+    EVENT_PUMMEL,
+    EVENT_THROW_AXE,
+    EVENT_THRASH
+};
+
+enum Phases
+{
+    PHASE_THRASHER = 1,
+    PHASE_BRAWLER,
+    PHASE_WARMASTER,
+};
+
+enum EventGroups
+{
+    GROUP_THRASHER = 1,
+    GROUP_BRAWLER,
+    GROUP_WARMASTER
 };
 
 class boss_warmaster_voone : public CreatureScript
@@ -37,68 +64,67 @@ public:
     {
         boss_warmastervooneAI(Creature* creature) : BossAI(creature, DATA_WARMASTER_VOONE) { }
 
-        void Reset() override
-        {
-            _Reset();
-        }
-
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_SNAP_KICK, 8 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_CLEAVE,   14 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_UPPERCUT, 20 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_MORTAL_STRIKE, 12 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_PUMMEL,   32 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_THROW_AXE, 1 * IN_MILLISECONDS);
+
+            events.SetPhase(PHASE_BRAWLER);
+            events.ScheduleEvent(EVENT_THRASH, 3 * IN_MILLISECONDS, GROUP_BRAWLER, PHASE_BRAWLER);
+            events.ScheduleEvent(EVENT_THROW_AXE, 1 * IN_MILLISECONDS, GROUP_BRAWLER, PHASE_BRAWLER);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {
-            _JustDied();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            if (me->HealthBelowPctDamaged(65, damage) && events.IsInPhase(PHASE_BRAWLER))
             {
-                switch (eventId)
-                {
-                    case EVENT_SNAP_KICK:
-                        DoCastVictim(SPELL_SNAPKICK);
-                        events.ScheduleEvent(EVENT_SNAP_KICK, 6 * IN_MILLISECONDS);
-                        break;
-                    case EVENT_CLEAVE:
-                        DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 12 * IN_MILLISECONDS);
-                        break;
-                    case EVENT_UPPERCUT:
-                        DoCastVictim(SPELL_UPPERCUT);
-                        events.ScheduleEvent(EVENT_UPPERCUT, 14 * IN_MILLISECONDS);
-                        break;
-                    case EVENT_MORTAL_STRIKE:
-                        DoCastVictim(SPELL_MORTALSTRIKE);
-                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, 10 * IN_MILLISECONDS);
-                        break;
-                    case EVENT_PUMMEL:
-                        DoCastVictim(SPELL_PUMMEL);
-                        events.ScheduleEvent(EVENT_MORTAL_STRIKE, 16 * IN_MILLISECONDS);
-                        break;
-                    case EVENT_THROW_AXE:
-                        DoCastVictim(SPELL_THROWAXE);
-                        events.ScheduleEvent(EVENT_THROW_AXE, 8 * IN_MILLISECONDS);
-                        break;
-                }
+                events.SetPhase(PHASE_THRASHER);
+                events.CancelEventGroup(GROUP_BRAWLER);
+                events.ScheduleEvent(EVENT_CLEAVE, 14 * IN_MILLISECONDS, GROUP_THRASHER, PHASE_THRASHER);
+                events.ScheduleEvent(EVENT_MORTAL_STRIKE, 12 * IN_MILLISECONDS, GROUP_THRASHER, PHASE_THRASHER);
             }
-            DoMeleeAttackIfReady();
+            else if (me->HealthBelowPctDamaged(40, damage) && events.IsInPhase(PHASE_THRASHER))
+            {
+                events.SetPhase(PHASE_WARMASTER);
+                events.CancelEventGroup(GROUP_THRASHER);
+                events.ScheduleEvent(EVENT_SNAP_KICK, 8 * IN_MILLISECONDS, GROUP_WARMASTER, PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_UPPERCUT, 20 * IN_MILLISECONDS, GROUP_WARMASTER, PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_PUMMEL, 32 * IN_MILLISECONDS, GROUP_WARMASTER, PHASE_WARMASTER);
+            }
+        }
+
+        void ExecuteEvent(uint32 eventId) override
+        {
+            switch (eventId)
+            {
+                case EVENT_SNAP_KICK:
+                    DoCastVictim(SPELL_SNAPKICK);
+                    events.RepeatEvent(6 * IN_MILLISECONDS);
+                    break;
+                case EVENT_CLEAVE:
+                    DoCastVictim(SPELL_CLEAVE);
+                    events.RepeatEvent(12 * IN_MILLISECONDS);
+                    break;
+                case EVENT_UPPERCUT:
+                    DoCastVictim(SPELL_UPPERCUT);
+                    events.RepeatEvent(14 * IN_MILLISECONDS);
+                    break;
+                case EVENT_MORTAL_STRIKE:
+                    DoCastVictim(SPELL_MORTALSTRIKE);
+                    events.RepeatEvent(10 * IN_MILLISECONDS);
+                    break;
+                case EVENT_PUMMEL:
+                    DoCastVictim(SPELL_PUMMEL);
+                    events.RepeatEvent(16 * IN_MILLISECONDS);
+                    break;
+                case EVENT_THROW_AXE:
+                    DoCastRandomTarget(SPELL_THROWAXE);
+                    events.RepeatEvent(8 * IN_MILLISECONDS);
+                    break;
+                case EVENT_THRASH:
+                    DoCastSelf(SPELL_THRASH);
+                    events.RepeatEvent(10 * IN_MILLISECONDS);
+                    break;
+            }
         }
     };
 

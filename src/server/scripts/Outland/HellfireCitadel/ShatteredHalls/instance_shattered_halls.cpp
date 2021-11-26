@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureTextMgr.h"
 #include "InstanceScript.h"
@@ -24,12 +37,7 @@ public:
         void Initialize() override
         {
             SetBossNumber(ENCOUNTER_COUNT);
-            nethekurseDoor1GUID = 0;
-            nethekurseDoor2GUID = 0;
-            warchiefKargathGUID = 0;
 
-            executionerGUID = 0;
-            memset(&prisonerGUID, 0, sizeof(prisonerGUID));
             TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
         }
@@ -47,12 +55,12 @@ public:
                 case GO_GRAND_WARLOCK_CHAMBER_DOOR_1:
                     nethekurseDoor1GUID = go->GetGUID();
                     if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_GRAND_WARLOCK_CHAMBER_DOOR_2:
                     nethekurseDoor2GUID = go->GetGUID();
                     if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
             }
         }
@@ -132,7 +140,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -143,7 +151,8 @@ public:
                 case DATA_EXECUTIONER:
                     return executionerGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void Update(uint32 diff) override
@@ -223,12 +232,12 @@ public:
         }
 
     protected:
-        uint64 warchiefKargathGUID;
-        uint64 nethekurseDoor1GUID;
-        uint64 nethekurseDoor2GUID;
+        ObjectGuid warchiefKargathGUID;
+        ObjectGuid nethekurseDoor1GUID;
+        ObjectGuid nethekurseDoor2GUID;
 
-        uint64 executionerGUID;
-        uint64 prisonerGUID[3];
+        ObjectGuid executionerGUID;
+        ObjectGuid prisonerGUID[3];
         uint32 RescueTimer;
         TeamId TeamIdInInstance;
     };
@@ -245,7 +254,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            acore::Containers::RandomResizeList(unitList, 1);
+            Acore::Containers::RandomResize(unitList, 1);
         }
 
         void HandleScriptEffect(SpellEffIndex effIndex)

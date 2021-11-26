@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -24,10 +35,10 @@ EndContentData */
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######
@@ -283,7 +294,7 @@ public:
     public:
         npc_clintar_spiritAI(Creature* creature) : npc_escortAI(creature)
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
         uint8 Step;
@@ -291,7 +302,7 @@ public:
         uint32 EventTimer;
         uint32 checkPlayerTimer;
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         bool EventOnWait;
 
@@ -302,7 +313,7 @@ public:
                 Step = 0;
                 CurrWP = 0;
                 EventTimer = 0;
-                PlayerGUID = 0;
+                PlayerGUID.Clear();
                 checkPlayerTimer = 1000;
                 EventOnWait = false;
             }
@@ -311,9 +322,9 @@ public:
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             std::list<Player*> playerOnQuestList;
-            acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
-            me->VisitNearbyWorldObject(5.0f, searcher);
+            Acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
+            Cell::VisitWorldObjects(me, searcher, 5.0f);
             for (std::list<Player*>::const_iterator itr = playerOnQuestList.begin(); itr != playerOnQuestList.end(); ++itr)
             {
                 // Check if found player target has active quest
@@ -339,7 +350,7 @@ public:
             if (player && player->GetQuestStatus(10965) == QUEST_STATUS_INCOMPLETE)
             {
                 player->FailQuest(10965);
-                PlayerGUID = 0;
+                PlayerGUID.Clear();
                 Reset();
             }
         }
@@ -518,7 +529,7 @@ public:
                                 break;
                             case 2:
                                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
-                                PlayerGUID = 0;
+                                PlayerGUID.Clear();
                                 Reset();
                                 me->setDeathState(JUST_DIED);
                                 break;

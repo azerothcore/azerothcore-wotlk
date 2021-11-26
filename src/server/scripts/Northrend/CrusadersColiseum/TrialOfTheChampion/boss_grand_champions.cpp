@@ -1,15 +1,28 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "trial_of_the_champion.h"
 #include "Vehicle.h"
+#include "trial_of_the_champion.h"
 
 enum MountSpells
 {
@@ -146,7 +159,7 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->getHostileRefManager().setOnlineOfflineState(false);
+            me->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
         void OnCharmed(bool apply) override
@@ -263,7 +276,7 @@ public:
                     break;
                 case EVENT_MOUNT_CHARGE:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -283,7 +296,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatManager().resetAllAggro();
+                                me->getThreatMgr().resetAllAggro();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
@@ -294,7 +307,7 @@ public:
                     break;
                 case EVENT_SHIELD_BREAKER:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -346,7 +359,7 @@ public:
             SetDespawnAtEnd(false);
             me->SetReactState(REACT_PASSIVE);
             BossOrder = 0;
-            NewMountGUID = 0;
+            NewMountGUID.Clear();
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
@@ -379,8 +392,8 @@ public:
         EventMap events;
         uint32 BossOrder;
         bool MountPhase;
-        uint64 NewMountGUID;
-        uint64 UnitTargetGUID;
+        ObjectGuid NewMountGUID;
+        ObjectGuid UnitTargetGUID;
 
         void Reset() override
         {
@@ -471,7 +484,7 @@ public:
             if( param == 1 )
             {
                 MountPhase = false;
-                NewMountGUID = 0;
+                NewMountGUID.Clear();
                 me->SetHealth(me->GetMaxHealth());
                 me->SetRegeneratingHealth(true);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -522,7 +535,7 @@ public:
                     return;
             }
 
-            Start(false, true, 0, nullptr);
+            Start(false, true);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -621,7 +634,7 @@ public:
                             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
                             if( pInstance )
                                 pInstance->SetData(DATA_REACHED_NEW_MOUNT, 0);
-                            NewMountGUID = 0;
+                            NewMountGUID.Clear();
                         }
                 }
                 else if( id == 9 )
@@ -637,7 +650,7 @@ public:
                     {
                         char buffer[50];
                         sprintf(buffer, "%s is trampled!", me->GetName().c_str());
-                        me->MonsterTextEmote(buffer, 0);
+                        me->TextEmote(buffer);
                     }
                     break;
             }
@@ -679,7 +692,7 @@ public:
                                             if( Unit* c = v->GetBase() )
                                                 if( c->GetTypeId() == TYPEID_UNIT && c->ToCreature()->GetEntry() == (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_BATTLEWORG : VEHICLE_ARGENT_WARHORSE) )
                                                 {
-                                                    me->GetMotionMaster()->MovementExpired();;
+                                                    me->GetMotionMaster()->MovementExpired();
                                                     me->GetMotionMaster()->MoveIdle();
                                                     me->StopMoving();
                                                     me->CastSpell(me, SPELL_TRAMPLE_STUN, false);
@@ -716,7 +729,7 @@ public:
                     break;
                 case EVENT_MOUNT_CHARGE:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -736,7 +749,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatManager().resetAllAggro();
+                                me->getThreatMgr().resetAllAggro();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
@@ -747,7 +760,7 @@ public:
                     break;
                 case EVENT_SHIELD_BREAKER:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -865,7 +878,7 @@ public:
                                     }
                                 }
                             }
-                            UnitTargetGUID = 0;
+                            UnitTargetGUID.Clear();
                         }
                         events.RepeatEvent(urand(15000, 20000));
                     }

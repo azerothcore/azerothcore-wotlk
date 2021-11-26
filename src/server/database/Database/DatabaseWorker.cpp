@@ -1,40 +1,58 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
 #include "DatabaseWorker.h"
+#include "PCQueue.h"
 #include "SQLOperation.h"
-#include "MySQLConnection.h"
-#include "MySQLThreading.h"
 
-DatabaseWorker::DatabaseWorker(ACE_Activation_Queue* new_queue, MySQLConnection* con) :
-    m_queue(new_queue),
-    m_conn(con)
+DatabaseWorker::DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection)
 {
-    /// Assign thread to task
-    activate();
+    _connection = connection;
+    _queue = newQueue;
+    _cancelationToken = false;
+    _workerThread = std::thread(&DatabaseWorker::WorkerThread, this);
 }
 
-int DatabaseWorker::svc()
+DatabaseWorker::~DatabaseWorker()
 {
-    if (!m_queue)
-        return -1;
+    _cancelationToken = true;
 
-    SQLOperation* request = nullptr;
-    while (1)
+    _queue->Cancel();
+
+    _workerThread.join();
+}
+
+void DatabaseWorker::WorkerThread()
+{
+    if (!_queue)
+        return;
+
+    for (;;)
     {
-        request = (SQLOperation*)(m_queue->dequeue());
-        if (!request)
-            break;
+        SQLOperation* operation = nullptr;
 
-        request->SetConnection(m_conn);
-        request->call();
+        _queue->WaitAndPop(operation);
 
-        delete request;
+        if (_cancelationToken || !operation)
+            return;
+
+        operation->SetConnection(_connection);
+        operation->call();
+
+        delete operation;
     }
-
-    return 0;
 }

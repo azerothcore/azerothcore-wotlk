@@ -1,6 +1,13 @@
 #
-# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-# Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
 #
@@ -68,23 +75,34 @@ function(CopyModuleConfig configDir)
   unset(postPath)
 endfunction()
 
-#
-# Use it like:
-# CollectModulesConfig()
-#
+# Stores the absolut path of the given config module in the variable
+function(GetPathToModuleConfig module variable)
+  set(${variable} "${CMAKE_SOURCE_DIR}/modules/${module}/conf" PARENT_SCOPE)
+endfunction()
 
+# Creates a list of all configs modules
+# and stores it in the given variable.
 function(CollectModulesConfig)
+  file(GLOB LOCALE_MODULE_LIST RELATIVE
+    ${CMAKE_SOURCE_DIR}/modules
+    ${CMAKE_SOURCE_DIR}/modules/*)
+
   message(STATUS "* Modules config list:")
 
-  CU_GET_GLOBAL("MODULE_CONFIG_FILE_LIST")
+  foreach(CONFIG_MODULE ${LOCALE_MODULE_LIST})
+    GetPathToModuleConfig(${CONFIG_MODULE} MODULE_CONFIG_PATH)
 
-  foreach(configFile ${MODULE_CONFIG_FILE_LIST})
-    CopyModuleConfig(${configFile})
-    get_filename_component(file_name ${configFile} NAME)
-    set(CONFIG_LIST ${CONFIG_LIST}${file_name},)
-    message(STATUS "  |- ${file_name}")
+    file(GLOB MODULE_CONFIG_LIST RELATIVE
+      ${MODULE_CONFIG_PATH}
+      ${MODULE_CONFIG_PATH}/*.conf.dist)
+
+    foreach(configFileName ${MODULE_CONFIG_LIST})
+      CopyModuleConfig("${MODULE_CONFIG_PATH}/${configFileName}")
+      set(CONFIG_LIST ${CONFIG_LIST}${configFileName},)
+      message(STATUS "  |- ${configFileName}")
+    endforeach()
+
   endforeach()
-
   message("")
   add_definitions(-DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
 endfunction()

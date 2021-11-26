@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -18,12 +29,12 @@ EndContentData */
 #include "Chat.h"
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
+#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
@@ -64,8 +75,8 @@ public:
         bool secondpart;
         int32 timer;
         uint8 step;
-        uint64 pGUID;
-        uint64 oachanoaGUID;
+        ObjectGuid pGUID;
+        ObjectGuid oachanoaGUID;
 
         void Reset() override
         {
@@ -73,8 +84,8 @@ public:
             secondpart = false;
             timer = 0;
             step = 0;
-            pGUID = 0;
-            oachanoaGUID = 0;
+            pGUID.Clear();
+            oachanoaGUID.Clear();
         }
 
         void NextStep(const uint32 time)
@@ -94,9 +105,9 @@ public:
             }
 
             if (yell)
-                c->MonsterYell(text.c_str(), LANG_UNIVERSAL, player);
+                c->Yell(text.c_str(), LANG_UNIVERSAL, player);
             else
-                c->MonsterWhisper(text.c_str(), player, false);
+                c->Whisper(text.c_str(), LANG_UNIVERSAL, player);
         }
 
         void DespawnOachanoa()
@@ -234,7 +245,7 @@ public:
             }
         }
 
-        void Start(uint64 g)
+        void Start(ObjectGuid g)
         {
             running = true;
             pGUID = g;
@@ -301,8 +312,8 @@ public:
     {
         npc_hourglass_of_eternityAI(Creature* c) : ScriptedAI(c) {}
 
-        uint64 summonerGUID;
-        uint64 futureGUID;
+        ObjectGuid summonerGUID;
+        ObjectGuid futureGUID;
         EventMap events;
         uint8 count[3];
         uint8 phase;
@@ -311,7 +322,7 @@ public:
         void InitializeAI() override
         {
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
                     summonerGUID = summoner->GetGUID();
                     float x, y, z;
@@ -320,7 +331,7 @@ public:
                     {
                         futureGUID = cr->GetGUID();
                         summoner->CastSpell(cr, SPELL_CLONE_CASTER, true);
-                        cr->setFaction(summoner->getFaction());
+                        cr->SetFaction(summoner->GetFaction());
                         cr->SetReactState(REACT_AGGRESSIVE);
                     }
                 }
@@ -349,12 +360,12 @@ public:
             {
                 case EVENT_START_EVENT:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", getSummoner());
+                        cr->Whisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", LANG_UNIVERSAL, getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_1, 7000);
                     break;
                 case EVENT_FIGHT_1:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", getSummoner());
+                        cr->Whisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", LANG_UNIVERSAL, getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_2, 6000);
                     break;
                 case EVENT_FIGHT_2:
@@ -405,13 +416,13 @@ public:
                         if (Player* player = getSummoner())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
-                        me->MonsterWhisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", getSummoner());
+                        me->Whisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", LANG_UNIVERSAL, getSummoner());
                         events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
                         break;
                     }
                 case EVENT_FINISH_EVENT:
                     {
-                        me->MonsterWhisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", getSummoner());
+                        me->Whisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", LANG_UNIVERSAL, getSummoner());
                         me->DespawnOrUnsummon(500);
                         if (getFuture())
                             getFuture()->DespawnOrUnsummon(500);
@@ -452,7 +463,7 @@ public:
             }
 
             if (Creature* cr = getFuture())
-                cr->MonsterWhisper(text.c_str(), getSummoner());
+                cr->Whisper(text, LANG_UNIVERSAL, getSummoner());
         }
     };
 };
@@ -479,8 +490,8 @@ public:
 
         void Reset() override
         {
-            if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
-                me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
+            if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
+                me->SetFaction(me->ToTempSummon()->GetSummonerUnit()->GetFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -569,9 +580,9 @@ public:
                 me->RemoveAllAuras();
                 me->DespawnOrUnsummon(1000);
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* owner = summon->GetSummoner())
+                    if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry(), 0);
+                            player->KilledMonsterCredit(me->GetEntry());
             }
         }
     };
@@ -753,7 +764,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void CleanAll(bool fromReset = true)
         {
@@ -773,8 +784,8 @@ public:
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
                 go->Delete();
             WretchedGhoulCleaner cleaner;
-            acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-            me->VisitNearbyGridObject(150.0f, worker);
+            Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+            Cell::VisitGridObjects(me, worker, 150.0f);
         }
 
         void Reset() override
@@ -784,7 +795,7 @@ public:
             events.ScheduleEvent(999, 0);
             events.ScheduleEvent(1, 3000);
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
 
             CleanAll();
 
@@ -800,10 +811,11 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(uint64 guid, int32  /*id*/) override
+        void SetGUID(ObjectGuid guid, int32  /*id*/) override
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
+
             me->setActive(true);
             playerGUID = guid;
             events.ScheduleEvent(2, 900000);
@@ -837,7 +849,7 @@ public:
                     c->CastSpell(c, SPELL_SAC_HOLY_ZONE_AURA, true);
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    playerGUID = 0;
+                    playerGUID.Clear();
                     events.RescheduleEvent(2, 60000);
                 }
             }
@@ -986,8 +998,8 @@ public:
                 case 17: // kill vegard
                     {
                         WretchedGhoulCleaner cleaner;
-                        acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-                        me->VisitNearbyGridObject(150.0f, worker);
+                        Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+                        Cell::VisitGridObjects(me, worker, 150.0f);
 
                         if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
                             if (Creature* v = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
@@ -1192,7 +1204,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            acore::Containers::RandomResizeList(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleScript(SpellEffIndex effIndex)
@@ -1504,8 +1516,13 @@ public:
         void Reset() override
         {
             talkWing = 0;
-            memset(audienceList, 0, sizeof(audienceList));
-            memset(imageList, 0, sizeof(imageList));
+
+            for (uint8 i = 0; i < 10; ++i)
+                audienceList[i].Clear();
+
+            for (uint8 i = 0; i < 5; ++i)
+                imageList[i].Clear();
+
             _events.ScheduleEvent(EVENT_GET_TARGETS, 5000);
             _events.ScheduleEvent(EVENT_START_RANDOM, 20000);
         }
@@ -1614,9 +1631,7 @@ public:
 
         void StoreTargets()
         {
-            uint8 creaturecount;
-
-            creaturecount = 0;
+            uint8 creturesCount = 0;
 
             for (uint8 ii = 0; ii < 3; ++ii)
             {
@@ -1624,10 +1639,10 @@ public:
                 GetCreatureListWithEntryInGrid(creatureList, me, AudienceMobs[ii], 15.0f);
                 for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                 {
-                    if (Creature* creatureList = *itr)
+                    if (Creature* creature = *itr)
                     {
-                        audienceList[creaturecount] = creatureList->GetGUID();
-                        ++creaturecount;
+                        audienceList[creturesCount] = creature->GetGUID();
+                        ++creturesCount;
                     }
                 }
             }
@@ -1730,9 +1745,9 @@ public:
         }
     private:
         EventMap _events;
-        uint64   audienceList[10];
-        uint64   imageList[5];
-        uint8    talkWing;
+        ObjectGuid audienceList[10];
+        ObjectGuid imageList[5];
+        uint8 talkWing;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1754,9 +1769,7 @@ enum StrengthenAncientsMisc
     SPELL_CREATE_ITEM_BARK      = 47550,
     SPELL_CONFUSED              = 47044,
 
-    NPC_LOTHALOR                = 26321,
-
-    FACTION_WALKER_ENEMY        = 14,
+    NPC_LOTHALOR                = 26321
 };
 
 class spell_q12096_q12092_dummy : public SpellScriptLoader // Strengthen the Ancients: On Interact Dummy to Woodlands Walker
@@ -1789,7 +1802,7 @@ public:
             else if (roll == 0) // enemy version
             {
                 tree->AI()->Talk(SAY_WALKER_ENEMY, player);
-                tree->setFaction(FACTION_WALKER_ENEMY);
+                tree->SetFaction(FACTION_MONSTER);
                 tree->Attack(player, true);
             }
         }
@@ -1862,13 +1875,13 @@ public:
     {
         npc_torturer_lecraftAI(Creature* creature) : ScriptedAI(creature)
         {
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
         void Reset() override
         {
             _textCounter = 1;
-            _playerGUID  = 0;
+            _playerGUID.Clear();
         }
 
         void EnterCombat(Unit* who) override
@@ -1896,7 +1909,7 @@ public:
                 Talk(_textCounter, player);
 
                 if (_textCounter == 5)
-                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT, 0);
+                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT);
 
                 ++_textCounter;
 
@@ -1933,7 +1946,7 @@ public:
     private:
         EventMap _events;
         uint8    _textCounter;
-        uint64   _playerGUID;
+        ObjectGuid   _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

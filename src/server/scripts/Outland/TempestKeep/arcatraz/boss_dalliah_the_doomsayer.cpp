@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "arcatraz.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "arcatraz.h"
 
 enum Say
 {
@@ -68,7 +81,7 @@ public:
             _JustDied();
             Talk(SAY_DEATH);
 
-            if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SOCCOTHRATES)))
+            if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SOCCOTHRATES)))
                 if (soccothrates->IsAlive() && !soccothrates->IsInCombat())
                     soccothrates->AI()->SetData(1, 1);
         }
@@ -137,14 +150,14 @@ public:
                     events.ScheduleEvent(EVENT_SHADOW_WAVE, urand(11000, 16000));
                     break;
                 case EVENT_ME_FIRST:
-                    if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SOCCOTHRATES)))
+                    if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SOCCOTHRATES)))
                         if (soccothrates->IsAlive() && !soccothrates->IsInCombat())
                             soccothrates->AI()->Talk(SAY_AGGRO_DALLIAH_FIRST);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(25))
                     {
-                        if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SOCCOTHRATES)))
+                        if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SOCCOTHRATES)))
                             soccothrates->AI()->Talk(SAY_DALLIAH_25_PERCENT);
                         break;
                     }

@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "blood_furnace.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "blood_furnace.h"
 
 enum eKelidan
 {
@@ -63,12 +76,11 @@ public:
         boss_kelidan_the_breakerAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            memset(&channelers, 0, sizeof(channelers));
         }
 
         InstanceScript* instance;
         EventMap events;
-        uint64 channelers[5];
+        ObjectGuid channelers[5];
         uint32 checkTimer;
         bool addYell;
 
@@ -172,7 +184,7 @@ public:
                 if (!channeler)
                     channeler = me->SummonCreature(NPC_CHANNELER, ShadowmoonChannelers[i][0], ShadowmoonChannelers[i][1], ShadowmoonChannelers[i][2], ShadowmoonChannelers[i][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
 
-                channelers[i] = channeler ? channeler->GetGUID() : 0;
+                channelers[i] = channeler ? channeler->GetGUID() : ObjectGuid::Empty;
             }
         }
 
@@ -184,8 +196,8 @@ public:
                 // Xinef: load grid with start doors
                 me->GetMap()->LoadGrid(0, -111.0f);
                 instance->SetData(DATA_KELIDAN, DONE);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR1), true);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR6), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR1), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR6), true);
             }
         }
 
@@ -288,7 +300,7 @@ public:
         Creature* GetKelidan()
         {
             if (me->GetInstanceScript())
-                return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_KELIDAN));
+                return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_KELIDAN));
             return nullptr;
         }
 

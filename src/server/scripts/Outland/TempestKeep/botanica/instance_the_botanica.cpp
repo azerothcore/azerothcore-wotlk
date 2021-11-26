@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
@@ -105,8 +118,8 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (std::set<uint64>::const_iterator itr = _falconSet.begin(); itr != _falconSet.end(); ++itr)
-                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
+            for (ObjectGuid const& guid : _falconSet)
+                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     falcon->TauntFadeOut(GetUnitOwner());
                     falcon->AddThreat(GetUnitOwner(), -10000000.0f);
@@ -120,7 +133,7 @@ public:
         }
 
     private:
-        std::set<uint64> _falconSet;
+        GuidSet _falconSet;
     };
 
     AuraScript* GetAuraScript() const override
@@ -148,7 +161,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
             {
                 if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > time(nullptr))
                     return false;

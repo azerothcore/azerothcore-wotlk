@@ -1,13 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "sunwell_plateau.h"
 
 enum Yells
@@ -193,7 +205,7 @@ public:
             }
             else if (point == POINT_AIR_BREATH_START1)
             {
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SetFacingTo(4.71f);
                 events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 2000);
                 events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 5000);
@@ -208,7 +220,7 @@ public:
             }
             else if (point == POINT_AIR_BREATH_START2)
             {
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SetFacingTo(1.57f);
                 events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 2000);
                 events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 5000);
@@ -308,7 +320,7 @@ public:
                     break;
                 case EVENT_FLIGHT_SEQ:
                     Talk(YELL_TAKEOFF);
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
                     me->SendMovementFlagUpdate();
@@ -534,7 +546,7 @@ public:
             return true;
 
         Creature* cr = object->ToCreature();
-        return cr->GetDBTableGUIDLow() != 54780 && cr->GetDBTableGUIDLow() != 54787 && cr->GetDBTableGUIDLow() != 54801;
+        return cr->GetSpawnId() != 54780 && cr->GetSpawnId() != 54787 && cr->GetSpawnId() != 54801;
     }
 };
 

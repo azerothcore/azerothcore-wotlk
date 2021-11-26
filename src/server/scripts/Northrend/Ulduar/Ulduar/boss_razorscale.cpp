@@ -1,17 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "WaypointMgr.h"
 #include "ulduar.h"
-#include "WaypointManager.h"
 
 #define SPELL_FLAMEBUFFET_10                64016
 #define SPELL_FLAMEBUFFET_25                64023
@@ -30,15 +42,15 @@
 #define SPELL_CHAIN_3                       49683
 #define SPELL_CHAIN_4                       49684
 #define SPELL_LAUNCH_CHAIN                  62505
-#define SPELL_HARPOON_SHOT_BUFF             62509
-#define SPELL_HARPOON_FIRE_STATE            62696
+//#define SPELL_HARPOON_SHOT_BUFF             62509
+//#define SPELL_HARPOON_FIRE_STATE            62696
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
 #define SPELL_DEVOURINGFLAME_SUMMON         63308
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
-#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
-#define NPC_DEVOURINGFLAME                  34188
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
+//#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
+//#define NPC_DEVOURINGFLAME                  34188
 #define SPELL_STORMSTRIKE                   51876
 #define SPELL_WHIRLWIND                     63808
 #define SPELL_LIGHTINGBOLT                  63809
@@ -49,10 +61,10 @@
 #define NPC_DARK_RUNE_WATCHER               33453
 #define NPC_EXPEDITION_ENGINEER             33287
 #define NPC_EXPEDITION_COMMANDER            33210
-#define NPC_EXPEDITION_DEFENDER             33816
-#define NPC_EXPEDITION_TRAPPER              33259
+//#define NPC_EXPEDITION_DEFENDER             33816
+//#define NPC_EXPEDITION_TRAPPER              33259
 #define NPC_RAZORSCALE                      33186
-#define NPC_HARPOON_FIRE_STATE              33282
+//#define NPC_HARPOON_FIRE_STATE              33282
 
 #define GO_DRILL                            195305
 #define GO_HARPOON_GUN_1                    194519
@@ -127,26 +139,31 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 ExpeditionEngineerGUIDs[3];
-        uint64 CommanderGUID;
+        ObjectGuid ExpeditionEngineerGUIDs[3];
+        ObjectGuid CommanderGUID;
         float cords[4][2];
         bool bGroundPhase;
         bool startPath;
         uint8 flyTimes;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->setActive(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            memset(&ExpeditionEngineerGUIDs, 0, sizeof(ExpeditionEngineerGUIDs));
-            CommanderGUID = 0;
+
+            for (uint8 i = 0; i < 3; ++i)
+                ExpeditionEngineerGUIDs[i].Clear();
+
+            CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
-
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
-            me->setActive(true);
 
             if( pInstance )
                 pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
@@ -178,7 +195,7 @@ public:
                     break;
                 ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
                 if (!i)
-                    (*itr)->MonsterYell(TEXT_EE_AGGRO, LANG_UNIVERSAL, 0);
+                    (*itr)->Yell(TEXT_EE_AGGRO, LANG_UNIVERSAL);
                 ++i;
             }
             if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
@@ -205,16 +222,22 @@ public:
             {
                 case SPELL_LAUNCH_CHAIN:
                     {
-                        uint32 spell = 0;
-                        if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1) )
-                            spell = SPELL_CHAIN_1;
-                        else if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_2) )
-                            spell = SPELL_CHAIN_2;
-                        else if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_3) )
-                            spell = SPELL_CHAIN_3;
-                        else
-                            spell = SPELL_CHAIN_4;
-                        caster->CastSpell(me, spell, true);
+                        uint32 spellId = SPELL_CHAIN_4;
+
+                        if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
+                        {
+                            spellId = SPELL_CHAIN_1;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
+                        {
+                            spellId = SPELL_CHAIN_2;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
+                        {
+                            spellId = SPELL_CHAIN_3;
+                        }
+
+                        caster->CastSpell(me, spellId, true);
                     }
                     break;
                 case SPELL_CHAIN_1:
@@ -243,7 +266,7 @@ public:
                             events.CancelEvent(EVENT_SPELL_FIREBALL);
                             events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
                             events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
-                            me->SetTarget(0);
+                            me->SetTarget();
                             me->SendMeleeAttackStop(me->GetVictim());
                             me->GetMotionMaster()->MoveLand(0, CORDS_GROUND, 25.0f);
                         }
@@ -281,7 +304,6 @@ public:
                 me->DisableRotate(true);
                 me->SetOrientation((float)(M_PI + 0.01) / 2);
                 me->SetFacingTo(M_PI / 2);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->CastSpell(me, 62794, true);
                 events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
@@ -338,7 +360,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -432,7 +454,7 @@ public:
                     }
                     break;
                 case EVENT_WARN_DEEP_BREATH:
-                    me->MonsterTextEmote(TEXT_DEEP_BREATH, 0, true);
+                    me->TextEmote(TEXT_DEEP_BREATH, nullptr, true);
                     me->RemoveAura(62794);
                     events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
                     break;
@@ -444,7 +466,7 @@ public:
                     me->SetInCombatWithZone(); // just in case
                     if (pInstance)
                         for( int i = 0; i < 4; ++i )
-                            if( uint64 guid = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( ObjectGuid guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* hfs = ObjectAccessor::GetCreature(*me, guid) )
                                 {
                                     me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
@@ -494,9 +516,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
                     }
@@ -507,7 +527,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -570,6 +590,7 @@ public:
 
         void EnterEvadeMode() override
         {
+            me->SetDisableGravity(true);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
@@ -594,7 +615,7 @@ public:
         if (instance->GetData(TYPE_RAZORSCALE) == DONE)
             return true;
 
-        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetData64(TYPE_RAZORSCALE));
+        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
         if (!razorscale || razorscale->IsInCombat())
             return true;
 
@@ -614,12 +635,12 @@ public:
             if (!instance || instance->GetData(TYPE_RAZORSCALE) == DONE)
                 return true;
 
-            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetData64(TYPE_RAZORSCALE));
+            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
             if (razorscale && !razorscale->IsInCombat())
             {
                 // reset npcs NPC_HARPOON_FIRE_STATE
                 for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i)))
+                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i)))
                         hfs->AI()->SetData(1, 0);
 
                 if (razorscale->AI())
@@ -696,11 +717,11 @@ public:
         {
             if (pInstance)
             {
-                if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1) )
+                if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
                     return GO_HARPOON_GUN_1;
-                else if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_2) )
+                else if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
                     return GO_HARPOON_GUN_2;
-                else if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_3) )
+                else if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
                     return GO_HARPOON_GUN_3;
                 else
                     return GO_HARPOON_GUN_4;
@@ -737,7 +758,7 @@ public:
                             if( GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
                             {
                                 me->RemoveGameObject(wh, false);
-                                me->MonsterTextEmote(TEXT_TURRET_READY, 0, true);
+                                me->TextEmote(TEXT_TURRET_READY, nullptr, true);
                             }
                         }
                     }
@@ -745,7 +766,7 @@ public:
                 case 3: // shoot
                     if (pInstance)
                     {
-                        Creature* razorscale = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_RAZORSCALE));
+                        Creature* razorscale = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_RAZORSCALE));
                         if (!razorscale)
                             return;
                         if (!razorscale->HasAura(value))
@@ -787,13 +808,13 @@ public:
         InstanceScript* pInstance;
         bool working;
         uint16 timer;
-        uint64 fixingGUID;
+        ObjectGuid fixingGUID;
 
         void Reset() override
         {
             working = false;
             timer = 0;
-            fixingGUID = 0;
+            fixingGUID.Clear();
         }
 
         void SetData(uint32 id, uint32  /*value*/) override
@@ -803,7 +824,7 @@ public:
                 case 1: // start/resume repairing
                     working = true;
                     timer = 0;
-                    fixingGUID = 0;
+                    fixingGUID.Clear();
                     break;
                 case 2: // stop repairing
                     Reset();
@@ -834,14 +855,14 @@ public:
 
                                 c->AI()->SetData(2, 0);
                                 if (c->AI()->GetData(2))
-                                    fixingGUID = 0;
+                                    fixingGUID.Clear();
                             }
                     }
 
                     if (!fixingGUID)
                     {
                         Creature* razorscale = nullptr;
-                        if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
+                        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
                             razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
 
                         if( !razorscale || !razorscale->IsInCombat() )
@@ -852,7 +873,7 @@ public:
                         }
 
                         for( int i = 0; i < 4; ++i )
-                            if( uint64 fs_GUID = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( ObjectGuid fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* fs = ObjectAccessor::GetCreature(*me, fs_GUID) )
                                     if (!fs->AI()->GetData(2))
                                     {
@@ -890,7 +911,7 @@ public:
             return true;
 
         Creature* rs = nullptr;
-        if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
+        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
             rs = ObjectAccessor::GetCreature(*go, rsGUID);
 
         if( !rs || !rs->IsInCombat() )
@@ -922,7 +943,7 @@ public:
                 break;
         }
 
-        if( uint64 g = pInstance->GetData64(npc) )
+        if( ObjectGuid g = pInstance->GetGuidData(npc) )
             if( Creature* hfs = ObjectAccessor::GetCreature(*go, g) )
                 hfs->AI()->SetData(3, spell);
 
@@ -1093,7 +1114,7 @@ class achievement_quick_shave : public AchievementCriteriaScript
 public:
     achievement_quick_shave() : AchievementCriteriaScript("achievement_quick_shave") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
     }
@@ -1104,7 +1125,7 @@ class achievement_iron_dwarf_medium_rare : public AchievementCriteriaScript
 public:
     achievement_iron_dwarf_medium_rare() : AchievementCriteriaScript("achievement_iron_dwarf_medium_rare") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_RAZORSCALE;
     }

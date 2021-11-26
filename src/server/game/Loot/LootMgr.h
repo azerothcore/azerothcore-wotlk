@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_LOOTMGR_H
@@ -10,10 +21,12 @@
 #include "ByteBuffer.h"
 #include "ConditionMgr.h"
 #include "ItemEnchantmentMgr.h"
-#include "RefManager.h"
+#include "ObjectGuid.h"
+#include "RefMgr.h"
 #include "SharedDefines.h"
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 enum RollType
@@ -115,7 +128,7 @@ struct Loot;
 struct LootStoreItem
 {
     uint32  itemid;                                         // id of the item
-    uint32  reference;                                      // referenced TemplateleId
+    int32   reference;                                      // referenced TemplateleId
     float   chance;                                         // chance to drop for both quest and non-quest items, chance to be used for refs
     bool    needs_quest : 1;                                // quest drop (quest is required for item to drop)
     uint16  lootmode;
@@ -126,7 +139,7 @@ struct LootStoreItem
 
     // Constructor
     // displayid is filled in IsValid() which must be called after
-    LootStoreItem(uint32 _itemid, uint32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
+    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
         : itemid(_itemid), reference(_reference), chance(_chance), needs_quest(_needs_quest),
           lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
     {}
@@ -136,16 +149,17 @@ struct LootStoreItem
     // Checks correctness of values
 };
 
-typedef std::set<uint32> AllowedLooterSet;
+typedef GuidSet AllowedLooterSet;
 
 struct LootItem
 {
     uint32  itemid;
+    uint32  itemIndex;
     uint32  randomSuffix;
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
     AllowedLooterSet allowedGUIDs;
-    uint64  rollWinnerGUID;                                 // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
+    ObjectGuid rollWinnerGUID;                              // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
     uint8   count             : 8;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
@@ -184,7 +198,7 @@ class LootTemplate;
 
 typedef std::vector<QuestItem> QuestItemList;
 typedef std::vector<LootItem> LootItemList;
-typedef std::map<uint32, QuestItemList*> QuestItemMap;
+typedef std::map<ObjectGuid, QuestItemList*> QuestItemMap;
 typedef std::list<LootStoreItem*> LootStoreItemList;
 typedef std::unordered_map<uint32, LootTemplate*> LootTemplateMap;
 
@@ -241,7 +255,7 @@ public:
     // Rolls for every item in the template and adds the rolled items the the loot
     void Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
     void CopyConditions(ConditionList conditions);
-    void CopyConditions(LootItem* li) const;
+    bool CopyConditions(LootItem* li, uint32 conditionLootId = 0) const;
 
     // True if template includes at least 1 quest drop entry
     [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store, uint8 groupId = 0) const;
@@ -275,13 +289,13 @@ public:
 
 //=====================================================
 
-class LootValidatorRefManager : public RefManager<Loot, LootValidatorRef>
+class LootValidatorRefMgr : public RefMgr<Loot, LootValidatorRef>
 {
 public:
     typedef LinkedListHead::Iterator< LootValidatorRef > iterator;
 
-    LootValidatorRef* getFirst() { return (LootValidatorRef*)RefManager<Loot, LootValidatorRef>::getFirst(); }
-    LootValidatorRef* getLast() { return (LootValidatorRef*)RefManager<Loot, LootValidatorRef>::getLast(); }
+    LootValidatorRef* getFirst() { return (LootValidatorRef*)RefMgr<Loot, LootValidatorRef>::getFirst(); }
+    LootValidatorRef* getLast() { return (LootValidatorRef*)RefMgr<Loot, LootValidatorRef>::getLast(); }
 
     iterator begin() { return iterator(getFirst()); }
     iterator end() { return iterator(nullptr); }
@@ -307,12 +321,13 @@ struct Loot
     std::vector<LootItem> quest_items;
     uint32 gold;
     uint8 unlootedCount{0};
-    uint64 roundRobinPlayer{0};                                // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
-    LootType loot_type{LOOT_NONE};                                     // required for achievement system
+    ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    ObjectGuid lootOwnerGUID;
+    LootType loot_type{LOOT_NONE};      // required for achievement system
 
-    // GUIDLow of container that holds this loot (item_instance.entry), set for items that can be looted
-    uint32 containerId{0};
-    GameObject* sourceGameObject;
+    // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
+    ObjectGuid containerGUID;
+    GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
@@ -320,7 +335,7 @@ struct Loot
     // if loot becomes invalid this reference is used to inform the listener
     void addLootValidatorRef(LootValidatorRef* pLootValidatorRef)
     {
-        i_LootValidatorRefManager.insertFirst(pLootValidatorRef);
+        i_LootValidatorRefMgr.insertFirst(pLootValidatorRef);
     }
 
     // void clear();
@@ -343,8 +358,8 @@ struct Loot
         quest_items.clear();
         gold = 0;
         unlootedCount = 0;
-        roundRobinPlayer = 0;
-        i_LootValidatorRefManager.clearReferences();
+        roundRobinPlayer.Clear();
+        i_LootValidatorRefMgr.clearReferences();
         loot_type = LOOT_NONE;
     }
 
@@ -354,11 +369,11 @@ struct Loot
     void NotifyItemRemoved(uint8 lootIndex);
     void NotifyQuestItemRemoved(uint8 questIndex);
     void NotifyMoneyRemoved();
-    void AddLooter(uint64 GUID) { PlayersLooting.insert(GUID); }
-    void RemoveLooter(uint64 GUID) { PlayersLooting.erase(GUID); }
+    void AddLooter(ObjectGuid GUID) { PlayersLooting.insert(GUID); }
+    void RemoveLooter(ObjectGuid GUID) { PlayersLooting.erase(GUID); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
-    bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT);
+    bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT, WorldObject* lootSource = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
     void AddItem(LootStoreItem const& item);
@@ -368,21 +383,21 @@ struct Loot
     bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
+    void FillNotNormalLootFor(Player* player);
 
 private:
-    void FillNotNormalLootFor(Player* player, bool presentAtLooting);
     QuestItemList* FillFFALoot(Player* player);
     QuestItemList* FillQuestLoot(Player* player);
-    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);
+    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
 
-    typedef std::set<uint64> PlayersLootingSet;
+    typedef GuidSet PlayersLootingSet;
     PlayersLootingSet PlayersLooting;
     QuestItemMap PlayerQuestItems;
     QuestItemMap PlayerFFAItems;
     QuestItemMap PlayerNonQuestNonFFAConditionalItems;
 
     // All rolls are registered here. They need to know, when the loot is not valid anymore
-    LootValidatorRefManager i_LootValidatorRefManager;
+    LootValidatorRefMgr i_LootValidatorRefMgr;
 };
 
 struct LootView
@@ -406,6 +421,7 @@ extern LootStore LootTemplates_Skinning;
 extern LootStore LootTemplates_Disenchant;
 extern LootStore LootTemplates_Prospecting;
 extern LootStore LootTemplates_Spell;
+extern LootStore LootTemplates_Player;
 
 void LoadLootTemplates_Creature();
 void LoadLootTemplates_Fishing();
@@ -420,6 +436,8 @@ void LoadLootTemplates_Prospecting();
 
 void LoadLootTemplates_Spell();
 void LoadLootTemplates_Reference();
+
+void LoadLootTemplates_Player();
 
 inline void LoadLootTables()
 {
@@ -436,6 +454,8 @@ inline void LoadLootTables()
     LoadLootTemplates_Spell();
 
     LoadLootTemplates_Reference();
+
+    LoadLootTemplates_Player();
 }
 
 #endif

@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "arcatraz.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "arcatraz.h"
 
 enum Say
 {
@@ -89,7 +102,7 @@ public:
             _JustDied();
             Talk(SAY_DEATH);
 
-            if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+            if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                 if (dalliah->IsAlive() && !dalliah->IsInCombat())
                     dalliah->AI()->SetData(1, 1);
         }
@@ -133,7 +146,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case EVENT_PREFIGHT_1:
-                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                         dalliah->AI()->Talk(SAY_DALLIAH_CONVO_1);
                     events2.ScheduleEvent(EVENT_PREFIGHT_2, 3000);
                     break;
@@ -142,7 +155,7 @@ public:
                     events2.ScheduleEvent(EVENT_PREFIGHT_3, 3000);
                     break;
                 case EVENT_PREFIGHT_3:
-                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                         dalliah->AI()->Talk(SAY_DALLIAH_CONVO_2);
                     events2.ScheduleEvent(EVENT_PREFIGHT_4, 6000);
                     break;
@@ -151,7 +164,7 @@ public:
                     events2.ScheduleEvent(EVENT_PREFIGHT_5, 2000);
                     break;
                 case EVENT_PREFIGHT_5:
-                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                         dalliah->AI()->Talk(SAY_DALLIAH_CONVO_3);
                     events2.ScheduleEvent(EVENT_PREFIGHT_6, 3000);
                     break;
@@ -160,7 +173,7 @@ public:
                     events2.ScheduleEvent(EVENT_PREFIGHT_7, 2000);
                     break;
                 case EVENT_PREFIGHT_7:
-                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                         dalliah->GetMotionMaster()->MovePoint(0, 118.6048f, 96.84852f, 22.44115f);
                     events2.ScheduleEvent(EVENT_PREFIGHT_8, 4000);
                     break;
@@ -169,7 +182,7 @@ public:
                     events2.ScheduleEvent(EVENT_PREFIGHT_9, 4000);
                     break;
                 case EVENT_PREFIGHT_9:
-                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                     {
                         dalliah->SetFacingToObject(me);
                         dalliah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -217,14 +230,14 @@ public:
                     me->CastSpell(me, SPELL_FELFIRE, true);
                     break;
                 case EVENT_ME_FIRST:
-                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                    if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                         if (dalliah->IsAlive() && !dalliah->IsInCombat())
                             dalliah->AI()->Talk(SAY_AGGRO_SOCCOTHRATES_FIRST);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(25))
                     {
-                        if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                        if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DALLIAH)))
                             dalliah->AI()->Talk(SAY_SOCCOTHRATES_25_PERCENT);
                         break;
                     }

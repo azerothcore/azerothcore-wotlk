@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -33,12 +44,12 @@ public:
         bool IsBossDied[3];
 
         //Storing Skeram, Vem and Kri.
-        uint64 SkeramGUID;
-        uint64 VemGUID;
-        uint64 KriGUID;
-        uint64 VeklorGUID;
-        uint64 VeknilashGUID;
-        uint64 ViscidusGUID;
+        ObjectGuid SkeramGUID;
+        ObjectGuid VemGUID;
+        ObjectGuid KriGUID;
+        ObjectGuid VeklorGUID;
+        ObjectGuid VeknilashGUID;
+        ObjectGuid ViscidusGUID;
 
         uint32 BugTrioDeathCount;
 
@@ -49,13 +60,6 @@ public:
             IsBossDied[0] = false;
             IsBossDied[1] = false;
             IsBossDied[2] = false;
-
-            SkeramGUID = 0;
-            VemGUID = 0;
-            KriGUID = 0;
-            VeklorGUID = 0;
-            VeknilashGUID = 0;
-            ViscidusGUID = 0;
 
             BugTrioDeathCount = 0;
 
@@ -121,7 +125,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -138,8 +142,9 @@ public:
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
             }
-            return 0;
-        }                                                       // end GetData64
+
+            return ObjectGuid::Empty;
+        }
 
         void SetData(uint32 type, uint32 data) override
         {

@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "trial_of_the_crusader.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
+#include "trial_of_the_crusader.h"
 
 /***********
 ** GORMOK
@@ -76,13 +89,13 @@ public:
         npc_snobold_vassalAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
-            TargetGUID = 0;
+            TargetGUID.Clear();
             me->SetReactState(REACT_PASSIVE);
         }
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
         void Reset() override
         {
@@ -124,7 +137,7 @@ public:
                 me->CombatStop(true);
                 me->SetHealth(me->GetMaxHealth());
                 if( pInstance )
-                    if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK)) )
+                    if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) )
                         if( gormok->IsAlive() )
                             if( Vehicle* vk = gormok->GetVehicleKit() )
                                 for( uint8 i = 0; i < 4; ++i )
@@ -134,7 +147,7 @@ public:
                                         Reset();
                                         break;
                                     }
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 return;
             }
 
@@ -161,9 +174,9 @@ public:
                     {
                         if( t->GetTypeId() != TYPEID_PLAYER && pInstance )
                         {
-                            std::vector<uint64> validPlayers;
+                            GuidVector validPlayers;
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK));
+                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK));
 
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             {
@@ -234,13 +247,13 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -298,7 +311,7 @@ public:
                         for( uint8 i = 0; i < 4; ++i )
                             if( Unit* snobold = vk->GetPassenger(i) )
                             {
-                                std::vector<uint64> validPlayers;
+                                GuidVector validPlayers;
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {
@@ -358,7 +371,7 @@ public:
                                         snobold->ToCreature()->DespawnOrUnsummon();
                                 }
                         }
-                        PlayerGUID = 0;
+                        PlayerGUID.Clear();
                     }
                     break;
             }
@@ -561,7 +574,7 @@ struct boss_jormungarAI : public ScriptedAI
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if( pInstance )
-                        if( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetData64(_TYPE_OTHER)) )
+                        if( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(_TYPE_OTHER)) )
                             c->AI()->DoAction(-1);
 
                     events.Reset();
@@ -647,7 +660,7 @@ struct boss_jormungarAI : public ScriptedAI
     {
         if( pInstance )
         {
-            if( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(_TYPE_OTHER)) )
+            if( Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(_TYPE_OTHER)) )
                 if( c->IsAlive() )
                     c->AI()->DoAction(-2);
             pInstance->SetData(TYPE_JORMUNGAR, DONE);
@@ -776,7 +789,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
         float destX, destY, destZ;
 
         void AttackStart(Unit* who) override
@@ -882,7 +895,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), 40.0f, 12.0f);
-                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     events.Reset();
                     events.RescheduleEvent(EVENT_SPELL_MASSIVE_CRASH, 2000);
                     break;
@@ -893,10 +906,10 @@ public:
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
                     {
                         TargetGUID = target->GetGUID();
-                        me->SetUInt64Value(UNIT_FIELD_TARGET, TargetGUID);
+                        me->SetGuidValue(UNIT_FIELD_TARGET, TargetGUID);
                         me->SetFacingToObject(target);
                         Talk(EMOTE_TRAMPLE_STARE, target);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
@@ -958,7 +971,7 @@ public:
                     me->DisableSpline();
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
-                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100);
 
                     break;
@@ -1001,23 +1014,6 @@ public:
                 return;
 
             pInstance->SetData(TYPE_ICEHOWL, DONE);
-
-            Player* plr = nullptr;
-            if( !pInstance->instance->GetPlayers().isEmpty() )
-                plr = pInstance->instance->GetPlayers().begin()->GetSource();
-
-            if( !plr )
-                return;
-
-            // remove loot for the other faction (items are invisible for players, done in conditions), so corpse can be skinned
-            for( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
-                if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                    if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        --me->loot.unlootedCount;
-                    }
         }
     };
 };

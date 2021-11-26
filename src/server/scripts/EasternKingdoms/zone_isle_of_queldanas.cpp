@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -19,8 +30,8 @@ EndContentData */
 #include "PassiveAI.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 
@@ -122,8 +133,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 morlenGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid morlenGUID;
 
         void Reset() override
         {
@@ -131,8 +142,8 @@ public:
             me->SetRegeneratingHealth(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            playerGUID = 0;
-            morlenGUID = 0;
+            playerGUID.Clear();
+            morlenGUID.Clear();
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
                 c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -307,8 +318,7 @@ public:
                             // emerge cast tr false 66947
                             case EVENT_SPAWN_WAVE_1:
                                 {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
+                                    Position spawnPos = c->GetPosition();
                                     spawnPos.m_orientation = 5.80f;
                                     spawnPos.m_positionX += 5.0f * cos(4.5f);
                                     spawnPos.m_positionY += 5.0f * sin(4.5f);
@@ -322,8 +332,7 @@ public:
                                 break;
                             case EVENT_SPAWN_WAVE_2:
                                 {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
+                                    Position spawnPos = c->GetPosition();
                                     spawnPos.m_orientation = 5.80f;
                                     spawnPos.m_positionX += 7.0f * cos(4.0f);
                                     spawnPos.m_positionY += 7.0f * sin(4.0f);
@@ -338,8 +347,7 @@ public:
                                 break;
                             case EVENT_SPAWN_WAVE_3:
                                 {
-                                    Position spawnPos;
-                                    c->GetPosition(&spawnPos);
+                                    Position spawnPos = c->GetPosition();
                                     spawnPos.m_orientation = 5.80f;
                                     spawnPos.m_positionX += 8.0f * cos(4.0f);
                                     spawnPos.m_positionY += 8.0f * sin(4.0f);
@@ -378,7 +386,7 @@ public:
                     break;
                 case EVENT_OUTRO_KNEEL:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
-                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT, 0);
+                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
                     break;
@@ -492,13 +500,13 @@ public:
         npc_grand_magister_rommathAI(Creature* c) : NullCreatureAI(c)
         {
             announced = false;
-            playerGUID = 0;
+            playerGUID.Clear();
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
         EventMap events;
         bool announced;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void MoveInLineOfSight(Unit* who) override
         {

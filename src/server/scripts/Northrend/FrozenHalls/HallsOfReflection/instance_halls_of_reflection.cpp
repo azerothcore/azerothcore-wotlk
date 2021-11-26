@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "halls_of_reflection.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Transport.h"
+#include "halls_of_reflection.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -117,28 +130,28 @@ public:
 
         uint32 EncounterMask;
         TeamId TeamIdInInstance;
-        uint64 NPC_FalricGUID;
-        uint64 NPC_MarwynGUID;
-        uint64 NPC_LichKingIntroGUID;
-        uint64 NPC_LeaderIntroGUID;
-        uint64 NPC_GuardGUID;
-        uint64 NPC_UtherGUID;
-        uint64 NPC_LichKingGUID;
-        uint64 NPC_LeaderGUID;
-        uint64 NPC_IceWallTargetGUID[4];
-        uint64 NPC_AltarBunnyGUID;
-        uint64 NPC_QuelDelarGUID;
-        uint64 NPC_ShipCaptainGUID;
-        uint64 GO_FrostmourneGUID;
-        uint64 GO_FrostmourneAltarGUID;
-        uint64 GO_FrontDoorGUID;
-        uint64 GO_ArthasDoorGUID;
-        uint64 GO_CaveInGUID;
-        uint64 GO_DoorBeforeThroneGUID;
-        uint64 GO_DoorAfterThroneGUID;
-        uint64 GO_IceWallGUID;
+        ObjectGuid NPC_FalricGUID;
+        ObjectGuid NPC_MarwynGUID;
+        ObjectGuid NPC_LichKingIntroGUID;
+        ObjectGuid NPC_LeaderIntroGUID;
+        ObjectGuid NPC_GuardGUID;
+        ObjectGuid NPC_UtherGUID;
+        ObjectGuid NPC_LichKingGUID;
+        ObjectGuid NPC_LeaderGUID;
+        ObjectGuid NPC_IceWallTargetGUID[4];
+        ObjectGuid NPC_AltarBunnyGUID;
+        ObjectGuid NPC_QuelDelarGUID;
+        ObjectGuid NPC_ShipCaptainGUID;
+        ObjectGuid GO_FrostmourneGUID;
+        ObjectGuid GO_FrostmourneAltarGUID;
+        ObjectGuid GO_FrontDoorGUID;
+        ObjectGuid GO_ArthasDoorGUID;
+        ObjectGuid GO_CaveInGUID;
+        ObjectGuid GO_DoorBeforeThroneGUID;
+        ObjectGuid GO_DoorAfterThroneGUID;
+        ObjectGuid GO_IceWallGUID;
 
-        uint64 NPC_TrashGUID[NUM_OF_TRASH];
+        ObjectGuid NPC_TrashGUID[NUM_OF_TRASH];
         bool TrashActive[NUM_OF_TRASH];
         uint8 TrashCounter;
         uint32 chosenComposition[8][5];
@@ -152,8 +165,8 @@ public:
         bool IsDuringLKFight;
         uint32 BatteredHiltStatus;
 
-        uint64 NPC_FrostswornGeneralGUID;
-        uint64 NPC_SpiritualReflectionGUID[5];
+        ObjectGuid NPC_FrostswornGeneralGUID;
+        ObjectGuid NPC_SpiritualReflectionGUID[5];
 
         uint32 outroTimer;
         uint8 outroStep;
@@ -163,28 +176,6 @@ public:
         {
             EncounterMask = 0;
             TeamIdInInstance = TEAM_NEUTRAL;
-            NPC_FalricGUID = 0;
-            NPC_MarwynGUID = 0;
-            NPC_LichKingIntroGUID = 0;
-            NPC_LeaderIntroGUID = 0;
-            NPC_GuardGUID = 0;
-            NPC_UtherGUID = 0;
-            NPC_LichKingGUID = 0;
-            NPC_LeaderGUID = 0;
-            memset(&NPC_IceWallTargetGUID, 0, sizeof(NPC_IceWallTargetGUID));
-            NPC_AltarBunnyGUID = 0;
-            NPC_QuelDelarGUID = 0;
-            NPC_ShipCaptainGUID = 0;
-            GO_FrostmourneGUID = 0;
-            GO_FrostmourneAltarGUID = 0;
-            GO_FrontDoorGUID = 0;
-            GO_ArthasDoorGUID = 0;
-            GO_CaveInGUID = 0;
-            GO_DoorBeforeThroneGUID = 0;
-            GO_DoorAfterThroneGUID = 0;
-            GO_IceWallGUID = 0;
-
-            memset(&NPC_TrashGUID, 0, sizeof(NPC_TrashGUID));
             memset(&TrashActive, 0, sizeof(TrashActive));
             TrashCounter = 0;
             memset(&chosenComposition, 0, sizeof(chosenComposition));
@@ -197,9 +188,6 @@ public:
             reqKillCount = 0;
             IsDuringLKFight = false;
             BatteredHiltStatus = 0;
-
-            NPC_FrostswornGeneralGUID = 0;
-            memset(&NPC_SpiritualReflectionGUID, 0, sizeof(NPC_SpiritualReflectionGUID));
 
             outroTimer = 0;
             outroStep = 0;
@@ -378,7 +366,7 @@ public:
             {
                 case GO_FROSTMOURNE:
                     GO_FrostmourneGUID = go->GetGUID();
-                    HandleGameObject(0, false, go);
+                    HandleGameObject(ObjectGuid::Empty, false, go);
                     if (EncounterMask & (1 << DATA_INTRO))
                         go->SetPhaseMask(2, true);
                     break;
@@ -387,11 +375,11 @@ public:
                     break;
                 case GO_FRONT_DOOR:
                     GO_FrontDoorGUID = go->GetGUID();
-                    HandleGameObject(0, true, go);
+                    HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ARTHAS_DOOR:
                     GO_ArthasDoorGUID = go->GetGUID();
-                    HandleGameObject(0, (EncounterMask & (1 << DATA_MARWYN)), go);
+                    HandleGameObject(ObjectGuid::Empty, (EncounterMask & (1 << DATA_MARWYN)), go);
                     break;
                 case GO_CAVE_IN:
                     GO_CaveInGUID = go->GetGUID();
@@ -573,7 +561,7 @@ public:
                     [[fallthrough]];
                 case ACTION_DELETE_ICE_WALL:
                     HandleGameObject(GO_IceWallGUID, true);
-                    GO_IceWallGUID = 0;
+                    GO_IceWallGUID.Clear();
                     break;
                 case DATA_LICH_KING:
                     if (data == DONE)
@@ -683,7 +671,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch(type)
             {
@@ -714,7 +702,7 @@ public:
                     return GO_FrontDoorGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
@@ -1041,7 +1029,7 @@ public:
                                         a->SetDuration(8000);
                                 }
 
-                                pMarwyn->MonsterTextEmote("Spirits appear and surround the altar!", 0, true);
+                                pMarwyn->TextEmote("Spirits appear and surround the altar!", nullptr, true);
                             }
                             ++ResumeFirstEventStep;
                             ResumeFirstEventTimer = 7500;
@@ -1198,7 +1186,7 @@ public:
                             outroTimer = 0;
                             for (Map::PlayerList::const_iterator itr = instance->GetPlayers().begin(); itr != instance->GetPlayers().end(); ++itr)
                                 if (Player* p = itr->GetSource())
-                                    p->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT, 0);
+                                    p->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT);
                             if (TeamIdInInstance == TEAM_ALLIANCE)
                                 if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                                 {

@@ -1,19 +1,32 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
-#include "eye_of_eternity.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
+#include "eye_of_eternity.h"
 
 enum MovementInformPoints
 {
@@ -206,6 +219,12 @@ public:
         uint8 IntroCounter;
         bool bLockHealthCheck;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -220,9 +239,6 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
 
             if (pInstance)
             {
@@ -274,7 +290,6 @@ public:
                 switch (id)
                 {
                     case MI_POINT_INTRO_LAND:
-                        me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         events.RescheduleEvent(EVENT_START_FIGHT, 0, 1);
                         break;
@@ -282,12 +297,11 @@ public:
                         events.RescheduleEvent(EVENT_VORTEX_FLY_TO_CENTER, 0, 1);
                         break;
                     case MI_POINT_VORTEX_LAND:
-                        me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         events.RescheduleEvent(EVENT_VORTEX_LAND_1, 0, 1);
                         break;
                     case MI_POINT_CENTER_AIR_PH_2:
-                        me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_ARCANE_RUNES, 5 * IN_MILLISECONDS);
+                        me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_ARCANE_RUNES, 5s);
                         break;
                     case MI_POINT_PH_3_FIGHT_POSITION:
                         events.RescheduleEvent(EVENT_START_PHASE_3, 6000, 1);
@@ -328,7 +342,7 @@ public:
 
             if (me->GetVictim() && me->GetVictim()->GetGUID() == victim->GetGUID() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
             {
-                if (!me->GetUInt64Value(UNIT_FIELD_TARGET))
+                if (!me->GetGuidValue(UNIT_FIELD_TARGET))
                     me->SetTarget(victim->GetGUID());
             }
             else if (me->Attack(victim, true))
@@ -336,7 +350,7 @@ public:
                 if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
                     me->GetMotionMaster()->MoveChase(victim);
                 else
-                    me->SetTarget(0);
+                    me->SetTarget();
             }
         }
 
@@ -449,13 +463,11 @@ public:
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->SetTarget((uint64)0);
+                        me->SetTarget();
 
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
                         events.DelayEvents(25000, 1); // don't delay berserk (group 0)
@@ -479,7 +491,6 @@ public:
 
                         if (Creature* vp = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
                         {
-                            vp->SetCanFly(true);
                             vp->SetDisableGravity(true);
 
                             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
@@ -491,9 +502,9 @@ public:
                                             continue;
 
                                         Position plrpos;
-                                        float angle = CenterPos.GetAngle(pPlayer);
-                                        plrpos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 5.0f;
-                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(angle) * 5.0f;
+                                        float playerAngle = CenterPos.GetAngle(pPlayer);
+                                        plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
+                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(playerAngle) * 5.0f;
                                         plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
                                         plrpos.m_orientation = plrpos.GetAngle(&CenterPos);
 
@@ -517,11 +528,17 @@ public:
 
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
                                             pPlayer->SetDisableGravity(true, true);
+
+                                            sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
+
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                                            data.append(pPlayer->GetPackGUID());
+                                            data << pPlayer->GetPackGUID();
                                             pPlayer->SendMessageToSet(&data, true);
 
-                                            pPlayer->SetUInt64Value(PLAYER_FARSIGHT, vp->GetGUID());
+                                            sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                            sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
+
+                                            pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
                                             c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                         }
                                     }
@@ -553,7 +570,7 @@ public:
                     Talk(SAY_END_P1);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                     me->SendMeleeAttackStop();
-                    me->SetTarget((uint64)0);
+                    me->SetTarget();
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
                     me->GetMotionMaster()->MovePoint(MI_POINT_CENTER_GROUND_PH_2, CenterPos);
@@ -564,10 +581,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->DisableSpline();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        //me->SetHover(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_CENTER_AIR_PH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 32.0f, 7.0f);
                         events.RescheduleEvent(EVENT_START_PHASE_2_MOVE_TO_SIDE, 22500, 1);
                         break;
@@ -655,7 +669,7 @@ public:
                     break;
                 case EVENT_CLEAR_TARGET:
                     me->SendMeleeAttackStop();
-                    me->SetTarget(0);
+                    me->SetTarget();
                     break;
                 case EVENT_CHECK_TRASH_DEAD:
                     {
@@ -664,7 +678,7 @@ public:
                         else
                         {
                             me->SendMeleeAttackStop();
-                            me->SetTarget(0);
+                            me->SetTarget();
                             events.CancelEventGroup(1);
                             summons.DespawnAll();
                             // start phase 3
@@ -679,16 +693,16 @@ public:
                     }
                     break;
                 case EVENT_LIGHT_DIMENSION_CHANGE:
-                    me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_CHANGE_DIMENSIONS, 2 * IN_MILLISECONDS);
+                    me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_CHANGE_DIMENSIONS, 2s);
                     break;
                 case EVENT_DESTROY_PLATFORM_0:
                     if (Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 3000))
                     {
-                        c->setFaction(me->getFaction());
+                        c->SetFaction(me->GetFaction());
                         c->CastSpell(c, SPELL_DESTROY_PLATFORM_VISUAL, true);
                         c->CastSpell(c, SPELL_DESTROY_PLATFORM_EFFECT, false);
                     }
-                    me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_SPACE, 1 * IN_MILLISECONDS);
+                    me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_SPACE, 1s);
                     events.RescheduleEvent(EVENT_MOVE_TO_PHASE_3_POSITION, 2000, 1);
                     break;
                 case EVENT_MOVE_TO_PHASE_3_POSITION:
@@ -704,12 +718,15 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
+                                    sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                    sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
+
                                     if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
                                         continue;
 
                                     if (Creature* c = me->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                                     {
-                                        c->setFaction(pPlayer->getFaction());
+                                        c->SetFaction(pPlayer->GetFaction());
                                         //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
                                         c->m_Events.AddEvent(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), c->m_Events.CalculateTime(500));
                                         AttackStart(c);
@@ -724,7 +741,7 @@ public:
                     break;
                 case EVENT_START_PHASE_3:
                     events.SetPhase(PHASE_THREE);
-                    me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_ARCANE_RUNES, 1 * IN_MILLISECONDS);
+                    me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_ARCANE_RUNES, 1s);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
                     if (Unit* target = me->GetVictim())
@@ -799,7 +816,8 @@ public:
 
         void EnterEvadeMode() override
         {
-            me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_GET_DEFAULT_FOR_MAP, 1 * IN_MILLISECONDS);
+            me->SetDisableGravity(true);
+            me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_GET_DEFAULT_FOR_MAP, 1s);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::EnterEvadeMode();
         }
@@ -883,7 +901,11 @@ public:
                 plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
-                plr->SetUInt64Value(PLAYER_FARSIGHT, 0);;
+                plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
+
+                sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
+                sScriptMgr->AnticheatSetUnderACKmount(plr);
+                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
             }
         }
 
@@ -921,6 +943,10 @@ public:
                             {
                                 bUpdatedFlying = true;
                                 plr->SetDisableGravity(true, true);
+
+                                sScriptMgr->AnticheatSetCanFlybyServer(plr, true);
+                                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
+                                sScriptMgr->AnticheatSetUnderACKmount(plr);
                             }
 
                             plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
@@ -1007,7 +1033,7 @@ public:
             if (CheckTimer <= diff)
             {
                 if (pInstance)
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MALYGOS_GUID)))
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MALYGOS_GUID)))
                         if (me->IsWithinDist3d(c, 12.0f))
                         {
                             me->CastSpell(c, SPELL_POWER_SPARK_MALYGOS_BUFF, true);
@@ -1024,7 +1050,7 @@ public:
                 if (MoveTimer <= diff)
                 {
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MALYGOS_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MALYGOS_GUID)))
                             me->GetMotionMaster()->MovePoint(0, *c);
                     MoveTimer = 2000;
                 }
@@ -1168,7 +1194,7 @@ public:
                     break;
                 case EVENT_SCION_OF_ETERNITY_ARCANE_BARRAGE:
                     {
-                        std::vector<uint64> guids;
+                        GuidVector guids;
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -1462,11 +1488,10 @@ public:
     {
         PrepareSpellScript(spell_eoe_ph3_surge_of_power_SpellScript);
 
-        uint64 DrakeGUID[3];
+        ObjectGuid DrakeGUID[3];
 
         bool Load() override
         {
-            memset(&DrakeGUID, 0, sizeof(DrakeGUID));
             if (Unit* caster = GetCaster())
                 if (Creature* c = caster->ToCreature())
                 {

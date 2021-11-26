@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -11,7 +11,7 @@
 #
 
 # Require version Cmake
-cmake_minimum_required(VERSION 3.16...3.21)
+cmake_minimum_required(VERSION 3.16...3.22)
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
@@ -39,9 +39,11 @@ list(APPEND CMAKE_MODULE_PATH
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
+include(ConfigureScripts)
+include(ConfigureModules)
 
 # some utils for cmake
-include(deps/drassil/cmake-utils/utils.cmake)
+include(deps/acore/cmake-utils/utils.cmake)
 
 include(src/cmake/ac_macros.cmake)
 
@@ -69,7 +71,6 @@ FOREACH(subdir ${sub_DIRS})
 
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir_rel}")
         add_subdirectory("${subdir_rel}")
     endif()
 ENDFOREACH()
@@ -77,8 +78,8 @@ ENDFOREACH()
 CU_RUN_HOOK("AFTER_LOAD_CONF")
 
 # build in Release-mode by default if not explicitly set
-if( NOT CMAKE_BUILD_TYPE )
-    set(CMAKE_BUILD_TYPE "Release")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)
@@ -99,10 +100,6 @@ CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
-find_package(ACE REQUIRED)
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    add_definitions(-DACE_LACKS_AUTO_PTR=1)
-endif()
 find_package(MySQL REQUIRED)
 
 if(UNIX AND WITH_PERFTOOLS)

@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "onyxias_lair.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "onyxias_lair.h"
 
 class instance_onyxias_lair : public InstanceMapScript
 {
@@ -20,17 +33,16 @@ public:
     {
         instance_onyxias_lair_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        uint64 m_uiOnyxiasGUID;
+        ObjectGuid m_uiOnyxiasGUID;
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
         uint16 ManyWhelpsCounter;
-        std::vector<uint64> minions;
+        GuidVector minions;
         bool bDeepBreath;
 
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            m_uiOnyxiasGUID = 0;
             ManyWhelpsCounter = 0;
             bDeepBreath = true;
         }
@@ -80,8 +92,8 @@ public:
                     bDeepBreath = true;
                     if( uiData == NOT_STARTED )
                     {
-                        for( std::vector<uint64>::iterator itr = minions.begin(); itr != minions.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
+                        for (ObjectGuid const& guid : minions)
+                            if (Creature* c = instance->GetCreature(guid))
                                 c->DespawnOrUnsummon();
                         minions.clear();
                     }
@@ -109,15 +121,15 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
-            switch(uiData)
+            switch (uiData)
             {
                 case DATA_ONYXIA:
                     return m_uiOnyxiasGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

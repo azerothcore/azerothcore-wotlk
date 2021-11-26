@@ -1,20 +1,31 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "MotionMaster.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "TemporarySummon.h"
+#include "blackwing_lair.h"
 
 DoorData const doorData[] =
 {
@@ -71,11 +82,14 @@ public:
 
             switch (creature->GetEntry())
             {
+                case NPC_RAZORGORE:
+                    razorgoreGUID = creature->GetGUID();
+                    break;
                 case NPC_BLACKWING_DRAGON:
                 case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_WARLOCK:
-                    if (Creature* razor = instance->GetCreature(DATA_RAZORGORE_THE_UNTAMED))
+                    if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
                     break;
@@ -140,12 +154,6 @@ public:
                     if (GetBossState(DATA_VAELASTRAZ_THE_CORRUPT) != DONE)
                         return false;
                     break;
-                case DATA_FIREMAW:
-                case DATA_EBONROC:
-                case DATA_FLAMEGOR:
-                    if (GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
-                        return false;
-                    break;
                 case DATA_CHROMAGGUS:
                     if (GetBossState(DATA_FIREMAW) != DONE
                         || GetBossState(DATA_EBONROC) != DONE
@@ -169,8 +177,8 @@ public:
                 case DATA_RAZORGORE_THE_UNTAMED:
                     if (state == DONE)
                     {
-                        for (std::list<uint64>::const_iterator itr = EggList.begin(); itr != EggList.end(); ++itr)
-                            if (GameObject* egg = instance->GetGameObject((*itr)))
+                        for (ObjectGuid const& guid : EggList)
+                            if (GameObject* egg = instance->GetGameObject(guid))
                                 egg->SetPhaseMask(2, true);
                     }
                     SetData(DATA_EGG_EVENT, NOT_STARTED);
@@ -179,7 +187,7 @@ public:
                     switch (state)
                     {
                         case NOT_STARTED:
-                            if (Creature* nefarian = instance->GetCreature(DATA_NEFARIAN))
+                            if (Creature* nefarian = instance->GetCreature(GetGuidData(DATA_NEFARIAN)))
                                 nefarian->DespawnOrUnsummon();
                             break;
                         case FAIL:
@@ -213,7 +221,7 @@ public:
                     case SPECIAL:
                         if (++EggCount == 15)
                         {
-                            if (Creature* razor = instance->GetCreature(DATA_RAZORGORE_THE_UNTAMED))
+                            if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             {
                                 SetData(DATA_EGG_EVENT, DONE);
                                 razor->RemoveAurasDueToSpell(42013); // MindControl
@@ -227,6 +235,19 @@ public:
                         break;
                 }
             }
+        }
+
+        ObjectGuid GetGuidData(uint32 type) const override
+        {
+            switch (type)
+            {
+                case DATA_RAZORGORE_THE_UNTAMED:
+                    return razorgoreGUID;
+                default:
+                    break;
+            }
+
+            return ObjectGuid::Empty;
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -255,11 +276,11 @@ public:
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
-                        if (Creature* razor = instance->GetCreature(DATA_RAZORGORE_THE_UNTAMED))
+                        if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             razor->AI()->DoAction(ACTION_PHASE_TWO);
                         break;
                     case EVENT_RESPAWN_NEFARIUS:
-                        if (Creature* nefarius = instance->GetCreature(DATA_LORD_VICTOR_NEFARIUS))
+                        if (Creature* nefarius = instance->GetCreature(GetGuidData(DATA_LORD_VICTOR_NEFARIUS)))
                         {
                             nefarius->SetPhaseMask(1, true);
                             nefarius->setActive(true);
@@ -276,9 +297,10 @@ public:
         EventMap _events;
 
         // Razorgore
+        ObjectGuid razorgoreGUID;
         uint8 EggCount;
         uint32 EggEvent;
-        std::list<uint64> EggList;
+        GuidList EggList;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const

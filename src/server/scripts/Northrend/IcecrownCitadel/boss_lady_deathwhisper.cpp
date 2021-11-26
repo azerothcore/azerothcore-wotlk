@@ -1,14 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "icecrown_citadel.h"
 #include <random>
 
 enum ScriptTexts
@@ -230,13 +243,13 @@ public:
 
     struct boss_lady_deathwhisperAI : public BossAI
     {
-        boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false), _darnavanGUID(0) { }
+        boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false) { }
 
         void Reset() override
         {
             if (Creature* darnavan = ObjectAccessor::GetCreature(*me, _darnavanGUID))
                 darnavan->DespawnOrUnsummon();
-            _darnavanGUID = 0;
+            _darnavanGUID.Clear();
             _waveCounter = 0;
             _Reset();
             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
@@ -286,7 +299,7 @@ public:
             if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
             {
                 // reset threat
-                ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                 {
                     Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->getUnitGuid());
@@ -369,8 +382,8 @@ public:
                                     {
                                         // shouldn't be casted on any victim of summoned mobs
                                         bool valid = true;
-                                        for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                            if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
+                                        for (ObjectGuid const& guid : summons)
+                                            if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                                                 if (c->IsAlive() && c->GetVictim() && c->GetVictim()->GetGUID() == plr->GetGUID())
                                                 {
                                                     valid = false;
@@ -501,7 +514,7 @@ public:
                 if (darnavan->IsAlive())
                 {
                     darnavan->RemoveAllAuras();
-                    darnavan->setFaction(35);
+                    darnavan->SetFaction(FACTION_FRIENDLY);
                     darnavan->DeleteThreatList();
                     darnavan->CombatStop(true);
                     darnavan->GetMotionMaster()->MoveIdle();
@@ -516,10 +529,10 @@ public:
                             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                                 if (Player* member = itr->GetSource())
                                     if (member->IsInMap(owner))
-                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                         }
                         else
-                            owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                            owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                     }
                 }
             }
@@ -618,7 +631,7 @@ public:
                 return;
 
             // select random cultist
-            Creature* cultist = acore::Containers::SelectRandomContainerElement(temp);
+            Creature* cultist = Acore::Containers::SelectRandomContainerElement(temp);
             if (!cultist)
                 return;
 
@@ -642,7 +655,7 @@ public:
 
     private:
         bool _introDone;
-        uint64 _darnavanGUID;
+        ObjectGuid _darnavanGUID;
         uint32 _waveCounter;
     };
 
@@ -739,7 +752,7 @@ public:
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_FANATIC_S_DETERMINATION);
 
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
@@ -860,7 +873,7 @@ public:
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_ADHERENT_S_DETERMINATION);
 
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
@@ -898,11 +911,11 @@ public:
         {
             me->SetControlled(true, UNIT_STATE_ROOT);
             unroot_timer = 500;
-            targetGUID = 0;
+            targetGUID.Clear();
         }
 
         uint16 unroot_timer;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void Reset() override
         {
@@ -917,7 +930,7 @@ public:
             ScriptedAI::AttackStart(who);
             if (!targetGUID)
             {
-                me->getThreatManager().resetAllAggro();
+                me->getThreatMgr().resetAllAggro();
                 me->AddThreat(who, 1000000.0f);
                 targetGUID = who->GetGUID();
             }
@@ -1130,6 +1143,32 @@ public:
     }
 };
 
+// 69483 - Dark Reckoning
+class spell_deathwhisper_dark_reckoning : public AuraScript
+{
+    PrepareAuraScript(spell_deathwhisper_dark_reckoning);
+
+    bool Validate(SpellInfo const* spell) override
+    {
+        return ValidateSpellInfo({ spell->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+        {
+            uint32 spellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+            caster->CastSpell(GetTarget(), spellId, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathwhisper_dark_reckoning::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 class at_lady_deathwhisper_entrance : public AreaTriggerScript
 {
 public:
@@ -1140,7 +1179,7 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
                 if (!player->IsGameMaster())
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
         return true;
     }
@@ -1148,11 +1187,17 @@ public:
 
 void AddSC_boss_lady_deathwhisper()
 {
+    // Creatures
     new boss_lady_deathwhisper();
     new npc_cult_fanatic();
     new npc_cult_adherent();
     new npc_vengeful_shade();
     new npc_darnavan();
+
+    // Spells
     new spell_deathwhisper_mana_barrier();
+    RegisterSpellScript(spell_deathwhisper_dark_reckoning);
+
+    // AreaTriggers
     new at_lady_deathwhisper_entrance();
 }

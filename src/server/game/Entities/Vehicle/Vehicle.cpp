@@ -1,9 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Vehicle.h"
 #include "BattlefieldWG.h"
 #include "Common.h"
 #include "CreatureAI.h"
@@ -13,13 +25,10 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "WorldPacket.h"
-#include "ZoneScript.h"
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE)
@@ -50,15 +59,14 @@ Vehicle::~Vehicle()
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
         if (itr->second.Passenger.Guid)
         {
-            if (Unit* unit = ObjectAccessor::FindUnit(itr->second.Passenger.Guid))
+            if (Unit* unit = ObjectAccessor::GetUnit(*_me, itr->second.Passenger.Guid))
             {
-                LOG_INFO("server", "ZOMG! ~Vehicle(), unit: %s, entry: %u, typeid: %u, this_entry: %u, this_typeid: %u!", unit->GetName().c_str(), unit->GetEntry(), unit->GetTypeId(), _me ? _me->GetEntry() : 0, _me ? _me->GetTypeId() : 0);
+                LOG_FATAL("vehicles", "Vehicle(), unit: %s, entry: %u, typeid: %u, this_entry: %u, this_typeid: %u!", unit->GetName().c_str(), unit->GetEntry(), unit->GetTypeId(), _me ? _me->GetEntry() : 0, _me ? _me->GetTypeId() : 0);
                 unit->_ExitVehicle();
             }
             else
-                LOG_INFO("server", "ZOMG! ~Vehicle(), unknown guid!");
+                LOG_FATAL("vehicles", "Vehicle(), unknown guid!");
         }
-    //ASSERT(!itr->second.IsEmpty());
 }
 
 void Vehicle::Install()
@@ -95,14 +103,12 @@ void Vehicle::Uninstall()
     /// @Prevent recursive uninstall call. (Bad script in OnUninstall/OnRemovePassenger/PassengerBoarded hook.)
     if (_status == STATUS_UNINSTALLING && !GetBase()->HasUnitTypeMask(UNIT_MASK_MINION))
     {
-        LOG_ERROR("server", "Vehicle GuidLow: %u, Entry: %u attempts to uninstall, but already has STATUS_UNINSTALLING! "
-                       "Check Uninstall/PassengerBoarded script hooks for errors.", _me->GetGUIDLow(), _me->GetEntry());
+        LOG_ERROR("vehicles", "Vehicle %s attempts to uninstall, but already has STATUS_UNINSTALLING! "
+                       "Check Uninstall/PassengerBoarded script hooks for errors.", _me->GetGUID().ToString().c_str());
         return;
     }
     _status = STATUS_UNINSTALLING;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("vehicles", "Vehicle::Uninstall Entry: %u, GuidLow: %u", _creatureEntry, _me->GetGUIDLow());
-#endif
+    LOG_DEBUG("vehicles", "Vehicle::Uninstall %s", _me->GetGUID().ToString().c_str());
     RemoveAllPassengers();
 
     if (GetBase()->GetTypeId() == TYPEID_UNIT)
@@ -111,9 +117,7 @@ void Vehicle::Uninstall()
 
 void Vehicle::Reset(bool evading /*= false*/)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("vehicles", "Vehicle::Reset Entry: %u, GuidLow: %u", _creatureEntry, _me->GetGUIDLow());
-#endif
+    LOG_DEBUG("vehicles", "Vehicle::Reset: %s", _me->GetGUID().ToString().c_str());
     if (_me->GetTypeId() == TYPEID_PLAYER)
     {
         if (_usableSeatNum)
@@ -154,7 +158,7 @@ void Vehicle::ApplyAllImmunities()
         //_me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_UNATTACKABLE, true);
         _me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SHIELD, true);
         _me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_IMMUNE_SHIELD, true);
-        if (_me->GetZoneId() == BATTLEFIELD_WG_ZONEID || _me->ToCreature()->GetDBTableGUIDLow() || (_me->FindMap() && _me->FindMap()->Instanceable()))
+        if (_me->GetZoneId() == BATTLEFIELD_WG_ZONEID || _me->ToCreature()->GetSpawnId() || (_me->FindMap() && _me->FindMap()->Instanceable()))
             _me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_SCHOOL_ABSORB, true);
 
         // ... Resistance, Split damage, Change stats ...
@@ -197,9 +201,7 @@ void Vehicle::ApplyAllImmunities()
 
 void Vehicle::RemoveAllPassengers()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("vehicles", "Vehicle::RemoveAllPassengers. Entry: %u, GuidLow: %u", _creatureEntry, _me->GetGUIDLow());
-#endif
+    LOG_DEBUG("vehicles", "Vehicle::RemoveAllPassengers. %s", _me->GetGUID().ToString().c_str());
 
     // Passengers always cast an aura with SPELL_AURA_CONTROL_VEHICLE on the vehicle
     // We just remove the aura and the unapply handler will make the target leave the vehicle.
@@ -263,14 +265,12 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
     /// @Prevent adding accessories when vehicle is uninstalling. (Bad script in OnUninstall/OnRemovePassenger/PassengerBoarded hook.)
     if (_status == STATUS_UNINSTALLING)
     {
-        LOG_ERROR("server", "Vehicle GuidLow: %u, Entry: %u attempts to install accessory Entry: %u on seat %d with STATUS_UNINSTALLING! "
-                       "Check Uninstall/PassengerBoarded script hooks for errors.", _me->GetGUIDLow(), _me->GetEntry(), entry, (int32)seatId);
+        LOG_ERROR("vehicles", "Vehicle %s attempts to install accessory Entry: %u on seat %d with STATUS_UNINSTALLING! "
+                       "Check Uninstall/PassengerBoarded script hooks for errors.", _me->GetGUID().ToString().c_str(), entry, (int32)seatId);
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("vehicles", "Vehicle: Installing accessory entry %u on vehicle entry %u (seat:%i)", entry, GetCreatureEntry(), seatId);
-#endif
     if (Unit* passenger = GetPassenger(seatId))
     {
         // already installed
@@ -309,9 +309,8 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     /// @Prevent adding passengers when vehicle is uninstalling. (Bad script in OnUninstall/OnRemovePassenger/PassengerBoarded hook.)
     if (_status == STATUS_UNINSTALLING)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("vehicles", "Passenger GuidLow: %u, Entry: %u, attempting to board vehicle GuidLow: %u, Entry: %u during uninstall! SeatId: %i", unit->GetGUIDLow(), unit->GetEntry(), _me->GetGUIDLow(), _me->GetEntry(), (int32)seatId);
-#endif
+        LOG_DEBUG("vehicles", "Passenger %s, attempting to board vehicle %s during uninstall! SeatId: %i",
+            unit->GetGUID().ToString().c_str(), _me->GetGUID().ToString().c_str(), (int32)seatId);
         return false;
     }
 
@@ -339,15 +338,14 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
             if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), seat->second.Passenger.Guid))
                 passenger->ExitVehicle();
 
-            seat->second.Passenger.Guid = 0;
+            seat->second.Passenger.Guid.Clear();
         }
 
         ASSERT(seat->second.IsEmpty());
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("vehicles", "Unit %s enter vehicle entry %u id %u dbguid %u seat %d", unit->GetName().c_str(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUIDLow(), (int32)seat->first);
-#endif
+    LOG_DEBUG("vehicles", "Unit %s enter vehicle entry %u id %u (%s) seat %d",
+        unit->GetName().c_str(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUID().ToString().c_str(), (int32)seat->first);
 
     seat->second.Passenger.Guid = unit->GetGUID();
     seat->second.Passenger.IsUnselectable = unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -382,7 +380,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     unit->m_movementInfo.transport.seat = seat->first;
     unit->m_movementInfo.transport.guid = _me->GetGUID();
 
-    // xinef: removed retarded seat->first == 0 check...
+    // xinef: removed seat->first == 0 check...
     if (_me->GetTypeId() == TYPEID_UNIT
             && unit->GetTypeId() == TYPEID_PLAYER
             && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
@@ -394,15 +392,15 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         }
         catch (...)
         {
-            LOG_INFO("server", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy()!");
-            LOG_INFO("server", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u", _me ? 1 : 0);
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy()!");
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u", _me ? 1 : 0);
             if (!_me)
                 return false;
-            LOG_INFO("server", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is: %u!", _me->IsInWorld());
-            LOG_INFO("server", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is2: %u!", _me->IsDuringRemoveFromWorld());
-            LOG_INFO("server", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s!", _me->GetName().c_str());
-            LOG_INFO("server", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). typeid: %u!", _me->GetTypeId());
-            LOG_INFO("server", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s, typeid: %u, in world: %u, duringremove: %u has wrong CharmType! Charmer %s, typeid: %u, in world: %u, duringremove: %u.", _me->GetName().c_str(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName().c_str(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is: %u!", _me->IsInWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is2: %u!", _me->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s!", _me->GetName().c_str());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). typeid: %u!", _me->GetTypeId());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s, typeid: %u, in world: %u, duringremove: %u has wrong CharmType! Charmer %s, typeid: %u, in world: %u, duringremove: %u.", _me->GetName().c_str(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName().c_str(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
             return false;
         }
     }
@@ -454,11 +452,14 @@ void Vehicle::RemovePassenger(Unit* unit)
     // but the unit is not on the vehicles seat yet, thus crashing at ASSERT(seat != Seats.end());
     // ASSERT(seat != Seats.end());
     if (seat == Seats.end())
+    {
+        LOG_ERROR("vehicles", "Vehicle::RemovePassenger: Vehicle entry (%u) id (%u) is dissmised and removed all existing passangers, but the unit (%s) was not on the vehicle!",
+            _me->GetEntry(), _vehicleInfo->m_ID, unit->GetName().c_str());
         return;
+    }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("vehicles", "Unit %s exit vehicle entry %u id %u dbguid %u seat %d", unit->GetName().c_str(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUIDLow(), (int32)seat->first);
-#endif
+    LOG_DEBUG("vehicles", "Unit %s exit vehicle entry %u id %u (%s) seat %d",
+        unit->GetName().c_str(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUID().ToString().c_str(), (int32)seat->first);
 
     if (seat->second.SeatInfo->CanEnterOrExit() && ++_usableSeatNum)
         _me->SetFlag(UNIT_NPC_FLAGS, (_me->GetTypeId() == TYPEID_PLAYER ? UNIT_NPC_FLAG_PLAYER_VEHICLE : UNIT_NPC_FLAG_SPELLCLICK));
@@ -524,9 +525,7 @@ void Vehicle::Dismiss()
     if (GetBase()->GetTypeId() != TYPEID_UNIT)
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("vehicles", "Vehicle::Dismiss Entry: %u, GuidLow %u", _creatureEntry, _me->GetGUIDLow());
-#endif
+    LOG_DEBUG("vehicles", "Vehicle::Dismiss %s", _me->GetGUID().ToString().c_str());
     Uninstall();
     GetBase()->ToCreature()->DespawnOrUnsummon();
 }

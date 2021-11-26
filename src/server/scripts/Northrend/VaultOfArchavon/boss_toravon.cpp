@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "vault_of_archavon.h"
 
@@ -35,12 +48,6 @@ enum Events
     EVENT_FROZEN_ORB_STALKER            = 2,
     EVENT_CAST_WHITEOUT                 = 3,
     EVENT_CAST_WHITEOUT_GROUND_EFFECT   = 4,
-};
-
-enum Misc
-{
-    NPC_FROZEN_ORB                      = 38456,
-    NPC_FROZEN_ORB_STALKER              = 38461,
 };
 
 class boss_toravon : public CreatureScript
@@ -104,6 +111,7 @@ public:
                 pInstance->SetData(EVENT_TORAVON, DONE);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WHITEOUT);
             }
+            summons.DespawnAll();
         }
 
         void JustSummoned(Creature* cr) override
@@ -183,7 +191,7 @@ public:
             if (switchTimer >= 10000)
             {
                 switchTimer = 0;
-                me->getThreatManager().resetAllAggro();
+                me->getThreatMgr().resetAllAggro();
                 if (Player* player = SelectTargetFromPlayerList(100.0f))
                     me->AddThreat(player, 100000.0f);
             }
@@ -215,7 +223,7 @@ public:
         void JustSummoned(Creature* cr) override
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* toravon = ObjectAccessor::GetCreature(*me, pInstance->GetData64(EVENT_TORAVON)))
+                if (Creature* toravon = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(EVENT_TORAVON)))
                     if (toravon->AI())
                         toravon->AI()->JustSummoned(cr);
         }

@@ -2,7 +2,7 @@
 
 ROOTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
 
-source $ROOTPATH"/apps/bash_shared/includes.sh"
+source "$ROOTPATH/apps/bash_shared/includes.sh"
 
 if [ -f "./config.sh"  ]; then
     source "./config.sh" # should overwrite previous
@@ -24,7 +24,7 @@ function export() {
 
     var_base_path="DB_"$database"_PATHS"
     base_path=${!var_base_path%/}
-    
+
     base_conf="TPATH="$base_path";\
                CLEANFOLDER=1; \
                CHMODE=0; \
@@ -33,15 +33,15 @@ function export() {
                FULL=0; \
                DUMPOPTS='--skip-comments --skip-set-charset --routines --extended-insert --order-by-primary --single-transaction --quick'; \
                "
-    
+
     var_base_conf="DB_"$database"_CONF"
     base_conf=$base_conf${!var_base_conf}
-    
+
     var_base_name="DB_"$database"_NAME"
     base_name=${!var_base_name}
 
 
-    bash $AC_PATH_DEPS"/drassil/mysql-tools/mysql-tools" dump "" $base_name "" "$base_conf"
+    bash "$AC_PATH_DEPS/acore/mysql-tools/mysql-tools" "dump" "" "$base_name" "" "$base_conf"
 }
 
 for db in ${DATABASES[@]}

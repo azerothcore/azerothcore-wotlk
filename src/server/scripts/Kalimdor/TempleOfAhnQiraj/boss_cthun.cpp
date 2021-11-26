@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -12,8 +23,8 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
 /*
@@ -268,13 +279,13 @@ public:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         {
-                            Creature* Spawned = nullptr;
-
                             //Spawn claw tentacle on the random target
-                            Spawned = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500);
+                            Creature* spawned = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500);
 
-                            if (Spawned && Spawned->AI())
-                                Spawned->AI()->AttackStart(target);
+                            if (spawned && spawned->AI())
+                            {
+                                spawned->AI()->AttackStart(target);
+                            }
                         }
 
                         //One claw tentacle every 12.5 seconds
@@ -292,7 +303,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
 
                         //Remove any target
-                        me->SetTarget(0);
+                        me->SetTarget();
 
                         //Select random target for dark beam to start on
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
@@ -379,7 +390,7 @@ public:
                 //Transition phase
                 case PHASE_CTHUN_TRANSITION:
                     //Remove any target
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->SetHealth(0);
                     me->SetVisible(false);
                     break;
@@ -415,7 +426,7 @@ public:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
                     //Remove Target field
-                    me->SetTarget(0);
+                    me->SetTarget();
 
                     //Death animation/respawning;
                     instance->SetData(DATA_CTHUN_PHASE, PHASE_CTHUN_TRANSITION);
@@ -470,7 +481,7 @@ public:
         //-------------------
 
         //Phase transition
-        uint64 HoldPlayer;
+        ObjectGuid HoldPlayer;
 
         //Body Phase
         uint32 EyeTentacleTimer;
@@ -480,10 +491,10 @@ public:
         uint32 StomachAcidTimer;
         uint32 StomachEnterTimer;
         uint32 StomachEnterVisTimer;
-        uint64 StomachEnterTarget;
+        ObjectGuid StomachEnterTarget;
 
         //Stomach map, bool = true then in stomach
-        std::unordered_map<uint64, bool> Stomach_Map;
+        std::unordered_map<ObjectGuid, bool> Stomach_Map;
 
         void Reset() override
         {
@@ -494,7 +505,7 @@ public:
             PhaseTimer = 10000;                                 //Emerge in 10 seconds
 
             //No hold player for transition
-            HoldPlayer = 0;
+            HoldPlayer.Clear();
 
             //Body Phase
             EyeTentacleTimer = 30000;
@@ -504,7 +515,7 @@ public:
             StomachAcidTimer = 4000;                            //Every 4 seconds
             StomachEnterTimer = 10000;                          //Every 10 seconds
             StomachEnterVisTimer = 0;                           //Always 3.5 seconds after Stomach Enter Timer
-            StomachEnterTarget = 0;                             //Target to be teleported to stomach
+            StomachEnterTarget.Clear();                         //Target to be teleported to stomach
 
             //Clear players in stomach and outside
             Stomach_Map.clear();
@@ -536,7 +547,7 @@ public:
             if (Stomach_Map.empty())
                 return nullptr;
 
-            std::unordered_map<uint64, bool>::const_iterator i = Stomach_Map.begin();
+            std::unordered_map<ObjectGuid, bool>::const_iterator i = Stomach_Map.begin();
 
             std::list<Unit*> temp;
             std::list<Unit*>::const_iterator j;
@@ -548,7 +559,7 @@ public:
                 Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
 
                 //Only units out of stomach
-                if (unit && i->second == false)
+                if (unit && !i->second)
                     temp.push_back(unit);
 
                 ++i;
@@ -599,7 +610,7 @@ public:
                 return;
             }
 
-            me->SetTarget(0);
+            me->SetTarget();
 
             uint32 currentPhase = instance->GetData(DATA_CTHUN_PHASE);
             if (currentPhase == PHASE_CTHUN_STOMACH || currentPhase == PHASE_CTHUN_WEAK)
@@ -648,7 +659,7 @@ public:
                         //Place all units in threat list on outside of stomach
                         Stomach_Map.clear();
 
-                        for (std::list<HostileReference*>::const_iterator i = me->getThreatManager().getThreatList().begin(); i != me->getThreatManager().getThreatList().end(); ++i)
+                        for (std::list<HostileReference*>::const_iterator i = me->getThreatMgr().getThreatList().begin(); i != me->getThreatMgr().getThreatList().end(); ++i)
                             Stomach_Map[(*i)->getUnitGuid()] = false;   //Outside stomach
 
                         //Spawn 2 flesh tentacles
@@ -671,7 +682,7 @@ public:
                 //Body Phase
                 case PHASE_CTHUN_STOMACH:
                     //Remove Target field
-                    me->SetTarget(0);
+                    me->SetTarget();
 
                     //Weaken
                     if (FleshTentaclesKilled > 1)
@@ -683,7 +694,7 @@ public:
 
                         DoCast(me, SPELL_PURPLE_COLORATION, true);
 
-                        std::unordered_map<uint64, bool>::iterator i = Stomach_Map.begin();
+                        std::unordered_map<ObjectGuid, bool>::iterator i = Stomach_Map.begin();
 
                         //Kick all players out of stomach
                         while (i != Stomach_Map.end())
@@ -692,7 +703,7 @@ public:
                             Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
 
                             //Only move units in stomach
-                            if (unit && i->second == true)
+                            if (unit && i->second)
                             {
                                 //Teleport each player out
                                 DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10, float(rand() % 6));
@@ -715,7 +726,7 @@ public:
                     if (StomachAcidTimer <= diff)
                     {
                         //Apply aura to all players in stomach
-                        std::unordered_map<uint64, bool>::iterator i = Stomach_Map.begin();
+                        std::unordered_map<ObjectGuid, bool>::iterator i = Stomach_Map.begin();
 
                         while (i != Stomach_Map.end())
                         {
@@ -723,7 +734,7 @@ public:
                             Unit* unit = ObjectAccessor::GetUnit(*me, i->first);
 
                             //Only apply to units in stomach
-                            if (unit && i->second == true)
+                            if (unit && i->second)
                             {
                                 //Cast digestive acid on them
                                 DoCast(unit, SPELL_DIGESTIVE_ACID, true);
@@ -779,7 +790,7 @@ public:
                                 DoTeleportPlayer(unit, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
                             }
 
-                            StomachEnterTarget = 0;
+                            StomachEnterTarget.Clear();
                             StomachEnterVisTimer = 0;
                         }
                         else StomachEnterVisTimer -= diff;
@@ -906,7 +917,6 @@ public:
     {
         eye_tentacleAI(Creature* creature) : ScriptedAI(creature)
         {
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -918,7 +928,7 @@ public:
 
         uint32 MindflayTimer;
         uint32 KillSelfTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -985,7 +995,6 @@ public:
         {
             SetCombatMovement(false);
 
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -996,7 +1005,7 @@ public:
         uint32 GroundRuptureTimer;
         uint32 HamstringTimer;
         uint32 EvadeTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1098,7 +1107,6 @@ public:
         {
             SetCombatMovement(false);
 
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -1110,7 +1118,7 @@ public:
         uint32 ThrashTimer;
         uint32 HamstringTimer;
         uint32 EvadeTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1221,7 +1229,6 @@ public:
         {
             SetCombatMovement(false);
 
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -1230,7 +1237,7 @@ public:
         }
 
         uint32 BeamTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1290,7 +1297,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* summoner = summon->GetSummoner())
+                if (Unit* summoner = summon->GetSummonerUnit())
                     if (summoner->IsAIEnabled)
                         summoner->GetAI()->DoAction(ACTION_FLESH_TENTACLE_KILLED);
         }

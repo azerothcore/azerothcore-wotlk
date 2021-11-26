@@ -1,9 +1,24 @@
-// Scripted by Xinef
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -40,7 +55,7 @@ public:
         npc_midsummer_bonfireAI(Creature* c) : ScriptedAI(c)
         {
             me->IsAIEnabled = true;
-            goGUID = 0;
+            goGUID.Clear();
             if (GameObject* go = me->SummonGameObject(GO_MIDSUMMER_BONFIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
             {
                 goGUID = go->GetGUID();
@@ -48,7 +63,7 @@ public:
             }
         }
 
-        uint64 goGUID;
+        ObjectGuid goGUID;
 
         void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
@@ -90,20 +105,20 @@ public:
             teleTimer = 0;
             startTimer = 1;
             posVec.clear();
-            playerGUID = 0;
+            playerGUID.Clear();
             me->CastSpell(me, 43313, true);
             counter = 0;
             maxCount = 0;
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint32 startTimer;
         uint32 teleTimer;
         std::vector<Position> posVec;
         uint8 counter;
         uint8 maxCount;
 
-        void SetPlayerGUID(uint64 guid, uint8 cnt)
+        void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
         {
             playerGUID = guid;
             maxCount = cnt;
@@ -225,7 +240,7 @@ public:
             if (Unit* caster = GetCaster())
             {
                 caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
-                caster->setFaction(88);
+                caster->SetFaction(FACTION_BLACKFATHOM);
             }
         }
 
@@ -330,11 +345,11 @@ public:
 
         bool Load() override
         {
-            torchGUID = 0;
+            torchGUID.Clear();
             return true;
         }
 
-        uint64 torchGUID;
+        ObjectGuid torchGUID;
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
@@ -387,15 +402,23 @@ public:
         bool handled;
         bool Load() override { handled = false; return true; }
 
+        SpellCastResult CheckCast()
+        {
+            GetCaster()->GetCreaturesWithEntryInRange(_crList, 100.0f, NPC_TORCH_TARGET);
+            if (_crList.empty())
+            {
+                return SPELL_FAILED_NOT_HERE;
+            }
+
+            return SPELL_CAST_OK;
+        }
+
         void ThrowNextTorch(Unit* caster)
         {
-            std::list<Creature*> crList;
-            caster->GetCreaturesWithEntryInRange(crList, 100.0f, NPC_TORCH_TARGET);
-
-            uint8 rand = urand(0, crList.size() - 1);
+            uint8 rand = urand(0, _crList.size() - 1);
             Position pos;
             pos.Relocate(0.0f, 0.0f, 0.0f);
-            for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr, --rand)
+            for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr, --rand)
             {
                 if (caster->GetDistance(*itr) < 5)
                 {
@@ -471,8 +494,14 @@ public:
         {
             AfterCast += SpellCastFn(spell_midsummer_fling_torch_SpellScript::HandleFinish);
             if (m_scriptSpellId == 45671)
+            {
+                OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch_SpellScript::CheckCast);
                 OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
         }
+
+    private:
+        std::list<Creature*> _crList;
     };
 
     SpellScript* GetSpellScript() const override

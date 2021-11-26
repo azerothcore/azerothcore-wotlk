@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _LFGQUEUE_H
@@ -55,7 +66,7 @@ namespace lfg
     };
 
     typedef std::map<uint32, LfgWaitTime> LfgWaitTimesContainer;
-    typedef std::map<uint64, LfgQueueData> LfgQueueDataContainer;
+    typedef std::map<ObjectGuid, LfgQueueData> LfgQueueDataContainer;
     typedef std::list<Lfg5Guids> LfgCompatibleContainer;
 
     /**
@@ -65,10 +76,10 @@ namespace lfg
     {
     public:
         // Add/Remove from queue
-        void AddToQueue(uint64 guid, bool failedProposal = false);
-        void RemoveFromQueue(uint64 guid, bool partial = false); // xinef: partial remove, dont delete data from list!
-        void AddQueueData(uint64 guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
-        void RemoveQueueData(uint64 guid);
+        void AddToQueue(ObjectGuid guid, bool failedProposal = false);
+        void RemoveFromQueue(ObjectGuid guid, bool partial = false); // xinef: partial remove, dont delete data from list!
+        void AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
+        void RemoveQueueData(ObjectGuid guid);
 
         // Update Timers (when proposal success)
         void UpdateWaitTimeAvg(int32 waitTime, uint32 dungeonId);
@@ -78,7 +89,7 @@ namespace lfg
 
         // Update Queue timers
         void UpdateQueueTimers(uint32 diff);
-        time_t GetJoinTime(uint64 guid);
+        time_t GetJoinTime(ObjectGuid guid);
 
         // Find new group
         uint8 FindGroups();
@@ -86,17 +97,17 @@ namespace lfg
     private:
         void SetQueueUpdateData(std::string const& strGuids, LfgRolesMap const& proposalRoles);
 
-        void AddToNewQueue(uint64 guid, bool front);
-        void RemoveFromNewQueue(uint64 guid);
+        void AddToNewQueue(ObjectGuid guid, bool front);
+        void RemoveFromNewQueue(ObjectGuid guid);
 
-        void RemoveFromCompatibles(uint64 guid);
+        void RemoveFromCompatibles(ObjectGuid guid);
         void AddToCompatibles(Lfg5Guids const& key);
 
         uint32 FindBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue);
         void UpdateBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue, Lfg5Guids const& key);
 
-        LfgCompatibility FindNewGroups(const uint64& newGuid);
-        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const uint64& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
+        LfgCompatibility FindNewGroups(const ObjectGuid& newGuid);
+        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
 
         // Queue
         uint32 m_QueueStatusTimer;                         ///< used to check interval of sending queue status

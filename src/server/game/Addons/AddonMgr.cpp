@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AddonMgr.h"
@@ -33,8 +44,8 @@ namespace AddonMgr
         QueryResult result = CharacterDatabase.Query("SELECT name, crc FROM addons");
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 known addons. DB table `addons` is empty!");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 known addons. DB table `addons` is empty!");
+            LOG_INFO("server.loading", " ");
             return;
         }
 
@@ -52,14 +63,14 @@ namespace AddonMgr
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server", ">> Loaded %u known addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded %u known addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", " ");
 
         oldMSTime = getMSTime();
         result = CharacterDatabase.Query("SELECT id, name, version, UNIX_TIMESTAMP(timestamp) FROM banned_addons");
         if (result)
         {
-            uint32 count = 0;
+            uint32 count2 = 0;
             uint32 offset = 102;
 
             do
@@ -78,11 +89,11 @@ namespace AddonMgr
 
                 m_bannedAddons.push_back(addon);
 
-                ++count;
+                ++count2;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u banned addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u banned addons in %u ms", count2, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
@@ -90,7 +101,7 @@ namespace AddonMgr
     {
         std::string name = addon.Name;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ADDON);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ADDON);
 
         stmt->setString(0, name);
         stmt->setUInt32(1, addon.CRC);

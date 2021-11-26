@@ -1,11 +1,24 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "blood_furnace.h"
 #include "CreatureAI.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "blood_furnace.h"
 
 class instance_blood_furnace : public InstanceMapScript
 {
@@ -17,28 +30,20 @@ public:
         instance_blood_furnace_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
         uint32 _auiEncounter[MAX_ENCOUNTER];
-        uint64 _bossGUIDs[3];
-        uint64 _doorGUIDs[6];
-        uint64 _prisonGUIDs[4];
+        ObjectGuid _bossGUIDs[3];
+        ObjectGuid _doorGUIDs[6];
+        ObjectGuid _prisonGUIDs[4];
 
-        std::set<uint64> _prisonersCell[4];
+        GuidSet _prisonersCell[4];
 
         uint8 _prisonerCounter[4];
 
-        uint64 _broggokLeverGUID;
+        ObjectGuid _broggokLeverGUID;
 
         void Initialize() override
         {
             memset(&_auiEncounter, 0, sizeof(_auiEncounter));
-            memset(&_bossGUIDs, 0, sizeof(_bossGUIDs));
-            memset(&_doorGUIDs, 0, sizeof(_doorGUIDs));
-            memset(&_prisonGUIDs, 0, sizeof(_prisonGUIDs));
             memset(&_prisonerCounter, 0, sizeof(_prisonerCounter));
-
-            for (uint8 i = 0; i < 4; ++i)
-                _prisonersCell[i].clear();
-
-            _broggokLeverGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -102,7 +107,7 @@ public:
                 _broggokLeverGUID = go->GetGUID();       //Broggok lever
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -125,7 +130,8 @@ public:
                 case DATA_PRISON_CELL4:
                     return _prisonGUIDs[data - DATA_PRISON_CELL1];
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -223,10 +229,10 @@ public:
             }
         }
 
-        void ResetPrisoners(std::set<uint64> prisoners)
+        void ResetPrisoners(GuidSet prisoners)
         {
-            for (std::set<uint64>::iterator i = prisoners.begin(); i != prisoners.end(); ++i)
-                if (Creature* prisoner = instance->GetCreature(*i))
+            for (ObjectGuid const& guid : prisoners)
+                if (Creature* prisoner = instance->GetCreature(guid))
                     ResetPrisoner(prisoner);
         }
 
@@ -274,7 +280,7 @@ public:
             }
         }
 
-        void PrisonerDied(uint64 guid)
+        void PrisonerDied(ObjectGuid guid)
         {
             if (_prisonersCell[0].find(guid) != _prisonersCell[0].end() && --_prisonerCounter[0] <= 0)
                 ActivateCell(DATA_PRISON_CELL2);
@@ -299,16 +305,16 @@ public:
                     break;
                 case DATA_DOOR5:
                     HandleGameObject(_doorGUIDs[4], true);
-                    if (Creature* broggok = instance->GetCreature(GetData64(DATA_BROGGOK)))
+                    if (Creature* broggok = instance->GetCreature(GetGuidData(DATA_BROGGOK)))
                         broggok->AI()->DoAction(ACTION_ACTIVATE_BROGGOK);
                     break;
             }
         }
 
-        void ActivatePrisoners(std::set<uint64> prisoners)
+        void ActivatePrisoners(GuidSet prisoners)
         {
-            for (std::set<uint64>::iterator i = prisoners.begin(); i != prisoners.end(); ++i)
-                if (Creature* prisoner = instance->GetCreature(*i))
+            for (ObjectGuid const& guid : prisoners)
+                if (Creature* prisoner = instance->GetCreature(guid))
                 {
                     prisoner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                     prisoner->SetInCombatWithZone();

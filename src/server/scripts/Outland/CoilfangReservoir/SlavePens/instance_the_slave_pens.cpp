@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,10 +16,10 @@
  */
 
 /*
-This placeholder for the instance is needed for dungeon finding to be able
-to give credit after the boss defined in lastEncounterDungeon is killed.
-Without it, the party doing random dungeon won't get satchel of spoils and
-gets instead the deserter debuff.
+    This placeholder for the instance is needed for dungeon finding to be able
+    to give credit after the boss defined in lastEncounterDungeon is killed.
+    Without it, the party doing random dungeon won't get satchel of spoils and
+    gets instead the deserter debuff.
 */
 
 #include "Creature.h"
@@ -77,7 +77,7 @@ public:
                     LumaGUID = creature->GetGUID();
                     break;
                 case NPC_EARTHEN_RING_FLAMECALLER:
-                    SetData64(counter, creature->GetGUID());
+                    SetGuidData(counter, creature->GetGUID());
                     ++counter;
                     break;
                 default:
@@ -85,7 +85,7 @@ public:
             }
         }
 
-        void SetData64(uint32 data, uint64 guid) override
+        void SetGuidData(uint32 data, ObjectGuid guid) override
         {
             switch (data)
             {
@@ -103,7 +103,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -136,17 +136,18 @@ public:
                 default:
                     break;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
     protected:
-        uint64 AhuneGUID;
-        uint64 AhuneBunnyGUID;
-        uint64 FrozenCoreGUID;
-        uint64 LumaGUID;
-        uint64 FlameCallerGUIDs[3];
-        uint64 BonfireBunnyGUIDs[3];
-        uint64 BeamBunnyGUIDs[3];
+        ObjectGuid AhuneGUID;
+        ObjectGuid AhuneBunnyGUID;
+        ObjectGuid FrozenCoreGUID;
+        ObjectGuid LumaGUID;
+        ObjectGuid FlameCallerGUIDs[3];
+        ObjectGuid BonfireBunnyGUIDs[3];
+        ObjectGuid BeamBunnyGUIDs[3];
         uint8 counter;
     };
 

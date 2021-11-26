@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -10,8 +21,8 @@ SD%Complete: 85%
 SDComment:
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "zulaman.h"
 
@@ -127,9 +138,9 @@ public:
         }
         InstanceScript* instance;
 
-        uint64 SpiritGUID[4];
-        uint64 ClawTargetGUID;
-        uint64 TankGUID;
+        ObjectGuid SpiritGUID[4];
+        ObjectGuid ClawTargetGUID;
+        ObjectGuid TankGUID;
 
         uint32 Phase;
         uint32 health_20;
@@ -180,8 +191,8 @@ public:
             Flame_Breath_Timer = 6000;
             Pillar_Of_Fire_Timer = 7000;
 
-            ClawTargetGUID = 0;
-            TankGUID = 0;
+            ClawTargetGUID.Clear();
+            TankGUID.Clear();
 
             Summons.DespawnAll();
 
@@ -252,10 +263,9 @@ public:
 
         void SpawnAdds()
         {
-            Creature* creature = nullptr;
             for (uint8 i = 0; i < 4; ++i)
             {
-                creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
+                Creature* creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
                 if (creature)
                 {
                     creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
@@ -278,7 +288,7 @@ public:
                         temp->setDeathState(DEAD);
                     }
                 }
-                SpiritGUID[i] = 0;
+                SpiritGUID[i].Clear();
             }
         }
 
@@ -449,7 +459,7 @@ public:
                                             Claw_Rage_Timer = urand(15000, 20000);
                                             me->SetSpeed(MOVE_RUN, 1.2f);
                                             AttackStart(ObjectAccessor::GetUnit(*me, TankGUID));
-                                            TankGUID = 0;
+                                            TankGUID.Clear();
                                             return;
                                         }
                                         else
@@ -499,7 +509,7 @@ public:
                                         Lynx_Rush_Timer = urand(15000, 20000);
                                         me->SetSpeed(MOVE_RUN, 1.2f);
                                         AttackStart(ObjectAccessor::GetUnit(*me, TankGUID));
-                                        TankGUID = 0;
+                                        TankGUID.Clear();
                                     }
                                     else
                                         AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));

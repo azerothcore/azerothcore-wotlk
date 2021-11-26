@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -74,10 +87,10 @@ public:
     {
         boss_festergutAI(Creature* creature) : BossAI(creature, DATA_FESTERGUT)
         {
-            _gasDummyGUID = 0;
+            _gasDummyGUID.Clear();
         }
 
-        uint64 _gasDummyGUID;
+        ObjectGuid _gasDummyGUID;
         uint32 _maxInoculatedStack;
         uint32 _inhaleCounter;
 
@@ -118,7 +131,7 @@ public:
 
             if (Creature* gasDummy = me->FindNearestCreature(NPC_GAS_DUMMY, 100.0f, true))
                 _gasDummyGUID = gasDummy->GetGUID();
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->DoAction(ACTION_FESTERGUT_COMBAT);
         }
 
@@ -126,7 +139,7 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->DoAction(ACTION_FESTERGUT_DEATH);
 
             RemoveBlight();
@@ -141,7 +154,7 @@ public:
         void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->EnterEvadeMode();
         }
 
@@ -238,7 +251,7 @@ public:
                     break;
                 case EVENT_FESTERGUT_GOO:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
-                        if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                        if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                             professor->CastSpell(target, SPELL_MALLABLE_GOO_H, true);
                     events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(15000, 20000));
                 default:
@@ -297,7 +310,7 @@ public:
             caster->ToCreature()->AI()->Talk(EMOTE_PUNGENT_BLIGHT);
 
             if (InstanceScript* inst = caster->GetInstanceScript())
-                if (Creature* professor = ObjectAccessor::GetCreature(*caster, inst->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                if (Creature* professor = ObjectAccessor::GetCreature(*caster, inst->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                     professor->AI()->DoAction(ACTION_FESTERGUT_GAS);
         }
 
@@ -342,7 +355,7 @@ public:
             }
             GetTarget()->CastSpell(GetTarget(), SPELL_INOCULATED, true);
             if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-                if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetData64(DATA_FESTERGUT)))
+                if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_FESTERGUT)))
                     festergut->AI()->SetData(DATA_INOCULATED_STACK, inoculatedStack);
         }
 
@@ -399,7 +412,7 @@ class achievement_flu_shot_shortage : public AchievementCriteriaScript
 public:
     achievement_flu_shot_shortage() : AchievementCriteriaScript("achievement_flu_shot_shortage") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target && target->GetTypeId() == TYPEID_UNIT)
             return target->ToCreature()->AI()->GetData(DATA_INOCULATED_STACK) < 3;
@@ -463,7 +476,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (InstanceScript* _instance = me->GetInstanceScript())
-                if (Creature* festergut = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_FESTERGUT)))
+                if (Creature* festergut = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_FESTERGUT)))
                     if (festergut->IsAlive())
                         festergut->AI()->Talk(SAY_STINKY_DEAD);
         }

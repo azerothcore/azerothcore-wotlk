@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "magisters_terrace.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "magisters_terrace.h"
 
 enum Says
 {
@@ -59,7 +72,7 @@ public:
         InstanceScript* instance;
         EventMap events;
         SummonList summons;
-        uint64 CrystalGUID;
+        ObjectGuid CrystalGUID;
 
         bool CanAIAttack(const Unit* who) const override
         {
@@ -94,7 +107,7 @@ public:
             summons.DespawnAll();
             SpawnCrystals();
             instance->SetData(DATA_SELIN_EVENT, NOT_STARTED);
-            CrystalGUID = 0;
+            CrystalGUID.Clear();
             me->SetPower(POWER_MANA, 0);
         }
 
@@ -130,7 +143,7 @@ public:
             if (summons.empty())
                 return;
 
-            CrystalGUID = 0;
+            CrystalGUID.Clear();
             Unit* crystal = nullptr;
             for (SummonList::const_iterator i = summons.begin(); i != summons.end(); )
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *i++))

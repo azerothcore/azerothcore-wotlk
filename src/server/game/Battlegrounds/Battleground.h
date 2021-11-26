@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __BATTLEGROUND_H
@@ -136,7 +147,9 @@ enum BattlegroundTimeIntervals
 };
 
 #define RESURRECTION_INTERVAL (sWorld->getIntConfig(CONFIG_BATTLEGROUND_PLAYER_RESPAWN) * IN_MILLISECONDS)
-#define BUFF_RESPAWN_TIME (sWorld->getIntConfig(CONFIG_BATTLEGROUND_BUFF_RESPAWN))
+#define RESTORATION_BUFF_RESPAWN_TIME (sWorld->getIntConfig(CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN))
+#define BERSERKING_BUFF_RESPAWN_TIME (sWorld->getIntConfig(CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN))
+#define SPEED_BUFF_RESPAWN_TIME (sWorld->getIntConfig(CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN))
 
 enum BattlegroundStartTimeIntervals
 {
@@ -274,7 +287,7 @@ class ArenaLogEntryData
 {
 public:
     ArenaLogEntryData()  {}
-    void Fill(const char* name, uint32 guid, uint32 acc, uint32 arenaTeamId, std::string ip)
+    void Fill(const char* name, ObjectGuid::LowType guid, uint32 acc, uint32 arenaTeamId, std::string ip)
     {
         Name = std::string(name);
         Guid = guid;
@@ -284,7 +297,7 @@ public:
     }
 
     std::string Name;
-    uint32 Guid{0};
+    ObjectGuid::LowType Guid{0};
     uint32 Acc;
     uint32 ArenaTeamId{0};
     std::string IP;
@@ -400,28 +413,28 @@ public:
     [[nodiscard]] uint32 GetMaxFreeSlots() const;
 
     typedef std::set<Player*> SpectatorList;
-    typedef std::map<uint64, uint64> ToBeTeleportedMap;
+    typedef std::map<ObjectGuid, ObjectGuid> ToBeTeleportedMap;
     void AddSpectator(Player* p) { m_Spectators.insert(p); }
     void RemoveSpectator(Player* p) { m_Spectators.erase(p); }
     bool HaveSpectators() { return !m_Spectators.empty(); }
     [[nodiscard]] const SpectatorList& GetSpectators() const { return m_Spectators; }
-    void AddToBeTeleported(uint64 spectator, uint64 participant) { m_ToBeTeleported[spectator] = participant; }
-    void RemoveToBeTeleported(uint64 spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
+    void AddToBeTeleported(ObjectGuid spectator, ObjectGuid participant) { m_ToBeTeleported[spectator] = participant; }
+    void RemoveToBeTeleported(ObjectGuid spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
     void SpectatorsSendPacket(WorldPacket& data);
 
     [[nodiscard]] bool isArena() const        { return m_IsArena; }
     [[nodiscard]] bool isBattleground() const { return !m_IsArena; }
     [[nodiscard]] bool isRated() const        { return m_IsRated; }
 
-    typedef std::map<uint64, Player*> BattlegroundPlayerMap;
+    typedef std::map<ObjectGuid, Player*> BattlegroundPlayerMap;
     [[nodiscard]] BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
     [[nodiscard]] uint32 GetPlayersSize() const { return m_Players.size(); }
 
     void ReadyMarkerClicked(Player* p); // pussywizard
-    std::set<uint32> readyMarkerClickedSet; // pussywizard
+    GuidSet readyMarkerClickedSet; // pussywizard
 
-    typedef std::map<uint64, BattlegroundScore*> BattlegroundScoreMap;
-    typedef std::map<uint64, ArenaLogEntryData> ArenaLogEntryDataMap;// pussywizard
+    typedef std::map<ObjectGuid, BattlegroundScore*> BattlegroundScoreMap;
+    typedef std::map<ObjectGuid, ArenaLogEntryData> ArenaLogEntryDataMap;// pussywizard
     ArenaLogEntryDataMap ArenaLogEntries; // pussywizard
     [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresBegin() const { return PlayerScores.begin(); }
     [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresEnd() const { return PlayerScores.end(); }
@@ -429,11 +442,11 @@ public:
 
     [[nodiscard]] uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
 
-    void AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid);
+    void AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid);
     void RemovePlayerFromResurrectQueue(Player* player);
 
     /// Relocate all players in ReviveQueue to the closest graveyard
-    void RelocateDeadPlayers(uint64 queueIndex);
+    void RelocateDeadPlayers(ObjectGuid queueIndex);
 
     void StartBattleground();
 
@@ -532,7 +545,7 @@ public:
     virtual void EventPlayerUsedGO(Player* /*player*/, GameObject* /*go*/) {}
 
     // this function can be used by spell to interact with the BG map
-    virtual void DoAction(uint32 /*action*/, uint64 /*var*/) {}
+    virtual void DoAction(uint32 /*action*/, ObjectGuid /*var*/) {}
 
     virtual void HandlePlayerResurrect(Player* /*player*/) {}
 
@@ -550,17 +563,17 @@ public:
     void SetHoliday(bool is_holiday);
 
     // TODO: make this protected:
-    typedef std::vector<uint64> BGObjects;
-    typedef std::vector<uint64> BGCreatures;
+    typedef GuidVector BGObjects;
+    typedef GuidVector BGCreatures;
     BGObjects BgObjects;
     BGCreatures BgCreatures;
-    void SpawnBGObject(uint32 type, uint32 respawntime);
+    void SpawnBGObject(uint32 type, uint32 respawntime, uint32 forceRespawnDelay = 0);
     bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0, GOState goState = GO_STATE_READY);
     Creature* AddCreature(uint32 entry, uint32 type, float x, float y, float z, float o, uint32 respawntime = 0, MotionTransport* transport = nullptr);
     bool DelCreature(uint32 type);
     bool DelObject(uint32 type);
     bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId);
-    int32 GetObjectType(uint64 guid);
+    int32 GetObjectType(ObjectGuid guid);
 
     void DoorOpen(uint32 type);
     void DoorClose(uint32 type);
@@ -571,15 +584,15 @@ public:
 
     // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
     static TeamId GetOtherTeamId(TeamId teamId);
-    [[nodiscard]] bool IsPlayerInBattleground(uint64 guid) const;
+    [[nodiscard]] bool IsPlayerInBattleground(ObjectGuid guid) const;
 
     [[nodiscard]] bool ToBeDeleted() const { return m_SetDeleteThis; }
     //void SetDeleteThis() { m_SetDeleteThis = true; }
 
     void RewardXPAtKill(Player* killer, Player* victim);
 
-    [[nodiscard]] virtual uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return 0; }
-    virtual void SetDroppedFlagGUID(uint64 /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
+    [[nodiscard]] virtual ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return ObjectGuid::Empty; }
+    virtual void SetDroppedFlagGUID(ObjectGuid /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
     [[nodiscard]] uint32 GetTeamScore(TeamId teamId) const;
 
     virtual TeamId GetPrematureWinner();
@@ -637,9 +650,9 @@ protected:
     virtual void RemovePlayer(Player* /*player*/) {}
 
     // Player lists, those need to be accessible by inherited classes
-    BattlegroundPlayerMap  m_Players;
+    BattlegroundPlayerMap m_Players;
     // Spirit Guide guid + Player list GUIDS
-    std::map<uint64, std::vector<uint64> >  m_ReviveQueue;
+    std::map<ObjectGuid, GuidVector> m_ReviveQueue;
 
     // these are important variables used for starting messages
     uint8 m_Events;
@@ -708,8 +721,8 @@ private:
     virtual void PostUpdateImpl(uint32 /* diff */) { }
 
     // Player lists
-    std::vector<uint64> m_ResurrectQueue;               // Player GUID
-    std::deque<uint64> m_OfflineQueue;                  // Player GUID
+    GuidVector m_ResurrectQueue;                // Player GUID
+    GuidDeque m_OfflineQueue;                   // Player GUID
 
     // Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction
     // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG

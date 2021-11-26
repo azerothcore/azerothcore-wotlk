@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureAI.h"
 #include "InstanceScript.h"
@@ -31,8 +44,6 @@ public:
         void Initialize() override
         {
             memset(&_encounters, 0, sizeof(_encounters));
-            archaedasTempleDoorGUID = 0;
-            ancientVaultDoorGUID = 0;
         }
 
         void OnGameObjectCreate(GameObject* gameobject) override
@@ -43,18 +54,18 @@ public:
                 case GO_KEYSTONE:
                     if (_encounters[DATA_IRONAYA_DOORS] == DONE)
                     {
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                         gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_TEMPLE_DOOR:
                     if (_encounters[DATA_STONE_KEEPERS] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_ANCIENT_VAULT_DOOR:
                     ancientVaultDoorGUID = gameobject->GetGUID();
                     if (_encounters[DATA_ARCHAEDAS] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_ARCHAEDAS_TEMPLE_DOOR:
                     archaedasTempleDoorGUID = gameobject->GetGUID();
@@ -79,6 +90,15 @@ public:
 
             if (data == DONE)
                 SaveToDB();
+        }
+
+        uint32 GetData(uint32 data) const override
+        {
+            if (data < MAX_ENCOUNTERS)
+            {
+                return _encounters[data];
+            }
+            return 0;
         }
 
         std::string GetSaveData() override
@@ -121,8 +141,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        uint64 archaedasTempleDoorGUID;
-        uint64 ancientVaultDoorGUID;
+        ObjectGuid archaedasTempleDoorGUID;
+        ObjectGuid ancientVaultDoorGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -158,6 +178,11 @@ public:
     }
 };
 
+enum UldamanStonedEnum
+{
+    MAP_ULDAMAN = 70
+};
+
 class spell_uldaman_stoned : public SpellScriptLoader
 {
 public:
@@ -169,7 +194,7 @@ public:
 
         bool Load() override
         {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
         }
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -211,7 +236,8 @@ public:
         void HandleSendEvent(SpellEffIndex  /*effIndex*/)
         {
             InstanceScript* instance = GetCaster()->GetInstanceScript();
-            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)
+
+            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS || instance->GetData(DATA_ARCHAEDAS) == DONE)
                 return;
 
             instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);

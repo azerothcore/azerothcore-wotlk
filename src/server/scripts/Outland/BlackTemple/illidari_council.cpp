@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -86,21 +99,24 @@ enum Misc
     EVENT_KILL_TALK                     = 100
 };
 
-struct HammerOfJusticeSelector : public acore::unary_function<Unit*, bool>
+struct HammerOfJusticeSelector
 {
-    Unit const* _me;
+public:
     HammerOfJusticeSelector(Unit* me) : _me(me) { }
 
     bool operator()(Unit const* target) const
     {
         return target && target->GetTypeId() == TYPEID_PLAYER && _me->IsInRange(target, 10.0f, 40.0f, true);
     }
+
+private:
+    Unit const* _me;
 };
 
 class VerasEnvenom : public BasicEvent
 {
 public:
-    VerasEnvenom(Unit& owner, uint64 targetGUID) : _owner(owner), _targetGUID(targetGUID) { }
+    VerasEnvenom(Unit& owner, ObjectGuid targetGUID) : _owner(owner), _targetGUID(targetGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -116,7 +132,7 @@ public:
 
 private:
     Unit& _owner;
-    uint64 _targetGUID;
+    ObjectGuid _targetGUID;
 };
 
 class boss_illidari_council : public CreatureScript
@@ -133,10 +149,9 @@ public:
     {
         boss_illidari_councilAI(Creature* creature) : BossAI(creature, DATA_ILLIDARI_COUNCIL)
         {
-            memset(councilGUIDs, 0, sizeof(councilGUIDs));
         }
 
-        uint64 councilGUIDs[4];
+        ObjectGuid councilGUIDs[4];
 
         void Reset() override
         {
@@ -155,10 +170,10 @@ public:
             if (!me->isActiveObject() && param == ACTION_START_ENCOUNTER)
             {
                 me->setActive(true);
-                councilGUIDs[0] = instance->GetData64(NPC_GATHIOS_THE_SHATTERER);
-                councilGUIDs[1] = instance->GetData64(NPC_HIGH_NETHERMANCER_ZEREVOR);
-                councilGUIDs[2] = instance->GetData64(NPC_LADY_MALANDE);
-                councilGUIDs[3] = instance->GetData64(NPC_VERAS_DARKSHADOW);
+                councilGUIDs[0] = instance->GetGuidData(NPC_GATHIOS_THE_SHATTERER);
+                councilGUIDs[1] = instance->GetGuidData(NPC_HIGH_NETHERMANCER_ZEREVOR);
+                councilGUIDs[2] = instance->GetGuidData(NPC_LADY_MALANDE);
+                councilGUIDs[3] = instance->GetGuidData(NPC_VERAS_DARKSHADOW);
 
                 bool spoken = false;
                 for (uint8 i = 0; i < 4; ++i)
@@ -226,7 +241,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
 
     void EnterEvadeMode() override
     {
-        me->SetOwnerGUID(0);
+        me->SetOwnerGUID(ObjectGuid::Empty);
         ScriptedAI::EnterEvadeMode();
     }
 
@@ -251,13 +266,13 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     void JustDied(Unit*) override
     {
         Talk(SAY_COUNCIL_DEATH);
-        if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ILLIDARI_COUNCIL)))
+        if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
             council->GetAI()->DoAction(ACTION_END_ENCOUNTER);
     }
 
     void EnterCombat(Unit*  /*who*/) override
     {
-        if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ILLIDARI_COUNCIL)))
+        if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
             council->GetAI()->DoAction(ACTION_START_ENCOUNTER);
     }
 };
@@ -279,14 +294,14 @@ public:
         Creature* SelectCouncilMember()
         {
             if (roll_chance_i(50))
-                return ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_LADY_MALANDE));
+                return ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_MALANDE));
 
             if (roll_chance_i(20))
-                if (Creature* veras = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VERAS_DARKSHADOW)))
+                if (Creature* veras = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VERAS_DARKSHADOW)))
                     if (!veras->HasAura(SPELL_VANISH))
                         return veras;
 
-            return ObjectAccessor::GetCreature(*me, instance->GetData64(RAND(NPC_GATHIOS_THE_SHATTERER, NPC_HIGH_NETHERMANCER_ZEREVOR)));
+            return ObjectAccessor::GetCreature(*me, instance->GetGuidData(RAND(NPC_GATHIOS_THE_SHATTERER, NPC_HIGH_NETHERMANCER_ZEREVOR)));
         }
 
         void EnterCombat(Unit* who) override
@@ -538,7 +553,7 @@ public:
                     break;
                 case EVENT_SPELL_ENRAGE:
                     DoResetThreat();
-                    if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ILLIDARI_COUNCIL)))
+                    if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ILLIDARI_COUNCIL)))
                         council->GetAI()->DoAction(ACTION_ENRAGE);
                     break;
             }

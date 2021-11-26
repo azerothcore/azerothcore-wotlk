@@ -1,13 +1,26 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GridNotifiers.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -118,13 +131,17 @@ public:
         }
 
         uint32 infectionCooldown;
-        uint64 _oozeFloodDummyGUIDs[4][2];
+        ObjectGuid _oozeFloodDummyGUIDs[4][2];
         uint8 _oozeFloodStage;
 
         void Reset() override
         {
             infectionCooldown = 14000;
-            memset(&_oozeFloodDummyGUIDs, 0, sizeof(_oozeFloodDummyGUIDs));
+
+            for (uint8 i = 0; i < 4; ++i)
+                for (uint8 j = 0; j < 2; ++j)
+                    _oozeFloodDummyGUIDs[i][j].Clear();
+
             _oozeFloodStage = 0;
             _Reset();
             events.Reset();
@@ -152,7 +169,7 @@ public:
             Talk(SAY_AGGRO);
             DoZoneInCombat();
 
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->DoAction(ACTION_ROTFACE_COMBAT);
 
             instance->SetData(DATA_OOZE_DANCE_ACHIEVEMENT, uint32(true)); // reset
@@ -178,7 +195,7 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(MUTATED_INFECTION);
             _JustDied();
             Talk(SAY_DEATH);
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->DoAction(ACTION_ROTFACE_DEATH);
         }
 
@@ -207,7 +224,7 @@ public:
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->EnterEvadeMode();
         }
 
@@ -285,7 +302,7 @@ public:
                     events.ScheduleEvent(EVENT_MUTATED_INFECTION, infectionCooldown);
                     break;
                 case EVENT_ROTFACE_OOZE_FLOOD:
-                    if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                    if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                     {
                         professor->AI()->Talk(SAY_ROTFACE_OOZE_FLOOD);
                         me->CastSpell((Unit*)nullptr, oozeFloodSpells[_oozeFloodStage], true);
@@ -304,7 +321,7 @@ public:
                             minDist = -5.0f;
 
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
-                            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                                 professor->CastSpell(target, SPELL_VILE_GAS_H, true); // triggered, to skip LoS check
                     }
                     events.ScheduleEvent(EVENT_ROTFACE_VILE_GAS, urand(15000, 20000));
@@ -333,7 +350,7 @@ public:
         npc_little_oozeAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript())
         {
             firstUpdate = true;
-            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ROTFACE)))
+            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->JustSummoned(me);
         }
 
@@ -352,7 +369,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ROTFACE)))
+            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->SummonedCreatureDespawn(me);
             me->DespawnOrUnsummon(0);
         }
@@ -369,7 +386,7 @@ public:
                 DoResetThreat();
                 me->SetInCombatWithZone();
                 if (TempSummon* ts = me->ToTempSummon())
-                    if (Unit* summoner = ts->GetSummoner())
+                    if (Unit* summoner = ts->GetSummonerUnit())
                     {
                         me->AddThreat(summoner, 500000.0f);
                         AttackStart(summoner);
@@ -412,7 +429,7 @@ public:
         npc_big_oozeAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript())
         {
             firstUpdate = true;
-            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ROTFACE)))
+            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->JustSummoned(me);
         }
 
@@ -428,7 +445,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ROTFACE)))
+            if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->SummonedCreatureDespawn(me);
             me->DespawnOrUnsummon();
         }
@@ -506,12 +523,12 @@ public:
         {
             // remove targets with this aura already
             // tank is not on this list
-            targets.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+            targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
             targets.remove(GetCaster()->GetVictim());
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _target = target;
@@ -650,7 +667,7 @@ public:
                 GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
                 GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_ROTFACE)))
+                    if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ROTFACE)))
                         if (rotface->IsAlive())
                         {
                             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
@@ -713,7 +730,7 @@ public:
                     GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
                     GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
                     if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                        if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_ROTFACE)))
+                        if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ROTFACE)))
                             if (rotface->IsAlive())
                             {
                                 if (GetCaster()->GetTypeId() == TYPEID_UNIT)
@@ -804,7 +821,7 @@ public:
             GetExplTargetDest()->GetPosition(x, y, z);
             // let Rotface handle the cast - caster dies before this executes
             if (InstanceScript* script = GetCaster()->GetInstanceScript())
-                if (Creature* rotface = script->instance->GetCreature(script->GetData64(DATA_ROTFACE)))
+                if (Creature* rotface = script->instance->GetCreature(script->GetGuidData(DATA_ROTFACE)))
                     rotface->CastSpell(x, y, z, triggered_spell_id, true/*, nullptr, nullptr, GetCaster()->GetGUID()*/); // caster not available on clientside, no log in such case
         }
 
@@ -893,7 +910,7 @@ public:
         {
             summons.DespawnAll();
             if (InstanceScript* _instance = me->GetInstanceScript())
-                if (Creature* rotface = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ROTFACE)))
+                if (Creature* rotface = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_ROTFACE)))
                     if (rotface->IsAlive())
                         rotface->AI()->Talk(SAY_PRECIOUS_DIES);
         }

@@ -1,19 +1,29 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
-#include "PetAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
@@ -73,7 +83,7 @@ public:
         void SetControl(Player* player, bool on)
         {
             WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size() + 1);
-            data.append(me->GetPackGUID());
+            data << me->GetPackGUID();
             data << uint8(on ? 1 : 0);
             player->GetSession()->SendPacket(&data);
         }
@@ -163,7 +173,6 @@ enum deathsChallenge
     SAY_DUEL                    = 0,
 
     QUEST_DEATH_CHALLENGE       = 12733,
-    FACTION_HOSTILE             = 2068,
 
     DATA_IN_PROGRESS            = 0,
 
@@ -208,7 +217,7 @@ public:
             if (player->IsInCombat() || creature->IsInCombat())
                 return true;
 
-            if (!creature->AI()->GetData(player->GetGUIDLow()))
+            if (!creature->AI()->GetGUID(player->GetGUID().GetCounter()))
                 AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -226,7 +235,7 @@ public:
         npc_death_knight_initiateAI(Creature* creature) : CombatAI(creature) { }
 
         bool _duelInProgress;
-        uint64 _duelGUID;
+        ObjectGuid _duelGUID;
         EventMap events;
         std::set<uint32> playerGUIDs;
         uint32 timer = 0;
@@ -242,7 +251,7 @@ public:
         void Reset() override
         {
             _duelInProgress = false;
-            _duelGUID = 0;
+            _duelGUID.Clear();
             me->RestoreFaction();
             CombatAI::Reset();
 
@@ -253,7 +262,7 @@ public:
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {
-                playerGUIDs.insert(caster->GetGUIDLow());
+                playerGUIDs.insert(caster->GetGUID().GetCounter());
                 _duelGUID = caster->GetGUID();
                 _duelInProgress = true;
 
@@ -280,7 +289,7 @@ public:
                     damage = 0;
                     events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
                     events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6000);
-                    _duelGUID = 0;
+                    _duelGUID.Clear();
                     _duelInProgress = 0;
 
                     attacker->RemoveGameObject(SPELL_DUEL_FLAG, true);
@@ -327,7 +336,7 @@ public:
                     Talk(SAY_DUEL + 4, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+5:
-                    me->setFaction(FACTION_HOSTILE);
+                    me->SetFaction(FACTION_UNDEAD_SCOURGE_2);
                     if (Player* player = ObjectAccessor::GetPlayer(*me, _duelGUID))
                         AttackStart(player);
                     return;
@@ -453,11 +462,10 @@ public:
         }
 
         EventMap events;
-        uint64 gothikGUID;
+        ObjectGuid gothikGUID;
 
         void InitializeAI() override
         {
-            gothikGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::InitializeAI();
             me->SetReactState(REACT_PASSIVE);
@@ -472,7 +480,7 @@ public:
                 AttackStart(attacker);
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
@@ -673,14 +681,14 @@ uint32 acherus_soul_prison[12] =
     191590
 };
 
-uint32 acherus_unworthy_initiate[5] =
-{
-    29519,
-    29520,
-    29565,
-    29566,
-    29567
-};
+//uint32 acherus_unworthy_initiate[5] =
+//{
+//    29519,
+//    29520,
+//    29565,
+//    29566,
+//    29567
+//};
 
 class npc_unworthy_initiate : public CreatureScript
 {
@@ -701,20 +709,20 @@ public:
                 me->SetCurrentEquipmentId(me->GetOriginalEquipmentId());
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         UnworthyInitiatePhase phase;
         uint32 wait_timer;
         float anchorX, anchorY;
-        uint64 anchorGUID;
+        ObjectGuid anchorGUID;
 
         EventMap events;
 
         void Reset() override
         {
-            anchorGUID = 0;
+            anchorGUID.Clear();
             phase = PHASE_CHAINED;
             events.Reset();
-            me->setFaction(7);
+            me->SetFaction(FACTION_CREATURE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
@@ -783,7 +791,7 @@ public:
                         {
                             if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
                             {
-                                if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
+                                if (me->IsWithinDist(temp_prison, dist, false))
                                 {
                                     dist = me->GetDistance2d(temp_prison);
                                     prison = temp_prison;
@@ -816,7 +824,7 @@ public:
                             wait_timer -= diff;
                         else
                         {
-                            me->setFaction(14);
+                            me->SetFaction(FACTION_MONSTER);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                             phase = PHASE_ATTACKING;
 
@@ -880,17 +888,17 @@ public:
 
     struct npc_unworthy_initiate_anchorAI : public PassiveAI
     {
-        npc_unworthy_initiate_anchorAI(Creature* creature) : PassiveAI(creature), prisonerGUID(0) {}
+        npc_unworthy_initiate_anchorAI(Creature* creature) : PassiveAI(creature) {}
 
-        uint64 prisonerGUID;
+        ObjectGuid prisonerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
         }
 
-        uint64 GetGUID(int32 /*id*/) const override
+        ObjectGuid GetGUID(int32 /*id*/) const override
         {
             return prisonerGUID;
         }
@@ -905,7 +913,7 @@ public:
     bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (Creature* anchor = go->FindNearestCreature(29521, 15))
-            if (uint64 prisonerGUID = anchor->AI()->GetGUID())
+            if (ObjectGuid prisonerGUID = anchor->AI()->GetGUID())
                 if (Creature* prisoner = ObjectAccessor::GetCreature(*player, prisonerGUID))
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
 
@@ -935,16 +943,16 @@ public:
 
     struct npc_scarlet_miner_cartAI : public PassiveAI
     {
-        npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature), minerGUID(0)
+        npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
 
-        uint64 minerGUID;
+        ObjectGuid minerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }
@@ -961,7 +969,7 @@ public:
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
                 me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -1004,11 +1012,11 @@ public:
 
         uint32 IntroTimer;
         uint32 IntroPhase;
-        uint64 carGUID;
+        ObjectGuid carGUID;
 
         void Reset() override
         {
-            carGUID = 0;
+            carGUID.Clear();
             IntroTimer = 0;
             IntroPhase = 0;
         }
@@ -1071,7 +1079,7 @@ public:
                         me->SetFacingToObject(car);
                         // xinef: add some flags
                         car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                        car->setFaction(35);
+                        car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);
                     SetRun(true);

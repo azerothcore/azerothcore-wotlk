@@ -1,17 +1,31 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GameObjectAI.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Player.h"
-#include "ruby_sanctum.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "WorldSession.h"
+#include "ruby_sanctum.h"
 
 enum Texts
 {
@@ -237,7 +251,7 @@ public:
                     summon->CastSpell(summon, SPELL_METEOR_STRIKE_FIRE_AURA_2, true);
                     if (summons.GetEntryCount(NPC_METEOR_STRIKE_FLAME) <= 16)
                         summon->CastSpell(summon, SPELL_METEOR_STRIKE_SPREAD, true);
-                    if (Unit* summoner = summon->ToTempSummon()->GetSummoner())
+                    if (Unit* summoner = summon->ToTempSummon()->GetSummonerUnit())
                         summon->SetOrientation(summoner->GetAngle(summon));
                     break;
             }
@@ -275,7 +289,7 @@ public:
         void JustReachedHome() override
         {
             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_HALION_CONTROLLER)))
+            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
                 controller->AI()->DoAction(ACTION_RESET_ENCOUNTER);
             BossAI::JustReachedHome();
         }
@@ -312,11 +326,11 @@ public:
             instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
             me->CastSpell(me, SPELL_CLEAR_DEBUFFS, false);
 
-            if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_TWILIGHT_HALION)))
+            if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_TWILIGHT_HALION)))
                 if (twilightHalion->IsAlive())
                     Unit::Kill(twilightHalion, twilightHalion);
 
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_HALION_CONTROLLER)))
+            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
                 if (controller->IsAlive())
                     Unit::Kill(controller, controller);
         }
@@ -329,7 +343,7 @@ public:
             if (!attacker || !me->InSamePhase(attacker))
                 return;
 
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_HALION_CONTROLLER)))
+            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
                 controller->AI()->SetData(DATA_MATERIAL_DAMAGE_TAKEN, damage);
         }
 
@@ -344,7 +358,7 @@ public:
                     break;
                 case EVENT_TRIGGER_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_TWILIGHT_HALION)))
+                    if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_TWILIGHT_HALION)))
                         twilightHalion->CastSpell(twilightHalion, SPELL_BERSERK, true);
                     break;
             }
@@ -375,8 +389,8 @@ public:
                     events.ScheduleEvent(EVENT_BREATH, urand(10000, 12000));
                     break;
                 case EVENT_ACTIVATE_FIREWALL:
-                    instance->HandleGameObject(instance->GetData64(GO_FLAME_RING), false, nullptr);
-                    instance->HandleGameObject(instance->GetData64(GO_TWILIGHT_FLAME_RING), false, nullptr);
+                    instance->HandleGameObject(instance->GetGuidData(GO_FLAME_RING), false, nullptr);
+                    instance->HandleGameObject(instance->GetGuidData(GO_TWILIGHT_FLAME_RING), false, nullptr);
                     break;
                 case EVENT_METEOR_STRIKE:
                     _livingEmberCount = summons.GetEntryCount(NPC_LIVING_EMBER);
@@ -424,7 +438,7 @@ public:
     {
         boss_twilight_halionAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
-            Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_HALION));
+            Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_HALION));
             if (!halion)
                 return;
 
@@ -474,7 +488,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_HALION)))
+            if (Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_HALION)))
             {
                 // Ensure looting
                 if (me->IsDamageEnoughForLootingAndReward())
@@ -484,7 +498,7 @@ public:
                     Unit::Kill(killer, halion);
             }
 
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_HALION_CONTROLLER)))
+            if (Creature* controller = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_HALION_CONTROLLER)))
                 if (controller->IsAlive())
                     Unit::Kill(controller, controller);
 
@@ -497,7 +511,7 @@ public:
             if (!attacker || !me->InSamePhase(attacker))
                 return;
 
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_HALION_CONTROLLER)))
+            if (Creature* controller = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_HALION_CONTROLLER)))
                 controller->AI()->SetData(DATA_TWILIGHT_DAMAGE_TAKEN, damage);
         }
 
@@ -549,7 +563,7 @@ public:
                     _events.ScheduleEvent(EVENT_SHADOW_PULSARS_SHOOT, 5000);
                     break;
                 case EVENT_SHADOW_PULSARS_SHOOT:
-                    if (Creature* orbCarrier = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_ORB_CARRIER)))
+                    if (Creature* orbCarrier = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_ORB_CARRIER)))
                         orbCarrier->AI()->DoAction(ACTION_SHOOT);
                     break;
             }
@@ -642,7 +656,7 @@ public:
                     _events.ScheduleEvent(EVENT_INTRO_PROGRESS_4, 500);
                     break;
                 case EVENT_INTRO_PROGRESS_4:
-                    if (Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_HALION)))
+                    if (Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_HALION)))
                     {
                         halion->SetVisible(true);
                         halion->SetReactState(REACT_AGGRESSIVE);
@@ -708,14 +722,14 @@ public:
             _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, _corporeality * 10);
             _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 100 - _corporeality * 10);
 
-            if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_TWILIGHT_HALION)))
+            if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_TWILIGHT_HALION)))
             {
                 twilightHalion->RemoveAurasDueToSpell(_corporealityReference[MAX_CORPOREALITY_STATE - 1 - oldValue]);
                 twilightHalion->CastSpell(twilightHalion, _corporealityReference[MAX_CORPOREALITY_STATE - 1 - _corporeality], true);
                 twilightHalion->AI()->Talk(oldValue < _corporeality ? EMOTE_CORPOREALITY_TOT : EMOTE_CORPOREALITY_TIT);
             }
 
-            if (Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_HALION)))
+            if (Creature* halion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_HALION)))
             {
                 halion->RemoveAurasDueToSpell(_corporealityReference[oldValue]);
                 halion->CastSpell(halion, _corporealityReference[_corporeality], true);
@@ -928,7 +942,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(_markSpell, 0, 0, AURA_REMOVE_BY_EXPIRE);
+            GetTarget()->RemoveAurasDueToSpell(_markSpell, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -978,7 +992,7 @@ public:
 
             if (Unit* dispelledUnit = GetUnitOwner())
                 if (dispelledUnit->HasAura(_removeSpellId))
-                    dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, 0, 0, AURA_REMOVE_BY_EXPIRE);
+                    dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
         }
 
         void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1032,8 +1046,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             if (Creature* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id))
             {
                 bool heroic = summon->GetMap()->IsHeroic();
@@ -1145,7 +1158,7 @@ public:
             GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->getThreatManager().clearReferences();
+            GetTarget()->getThreatMgr().clearReferences();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }
@@ -1155,7 +1168,7 @@ public:
             GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->getThreatManager().clearReferences();
+            GetTarget()->getThreatMgr().clearReferences();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }
@@ -1188,7 +1201,7 @@ public:
             if (!target)
                 return;
 
-            target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
             if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
                 return;
             GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
@@ -1221,7 +1234,7 @@ public:
             if (!target)
                 return;
 
-            target->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            target->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
@@ -1373,8 +1386,8 @@ public:
         void HandleDummy(SpellEffIndex  /*effIndex*/)
         {
             InstanceScript* instance = GetCaster()->GetInstanceScript();
-            Creature* controller = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_HALION_CONTROLLER));
-            Creature* halion = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_HALION));
+            Creature* controller = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_HALION_CONTROLLER));
+            Creature* halion = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_HALION));
 
             if (!controller || !halion)
                 return;
@@ -1449,7 +1462,7 @@ public:
             me->CastSpell(me, SPELL_BLAZING_AURA, true);
 
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_HALION_CONTROLLER)))
+                if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_HALION_CONTROLLER)))
                     controller->AI()->JustSummoned(me);
         }
 

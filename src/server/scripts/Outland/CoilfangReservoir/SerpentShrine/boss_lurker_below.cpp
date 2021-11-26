@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "serpent_shrine.h"
 
 enum Spells
@@ -137,7 +150,7 @@ public:
                     me->CastSpell(me, SPELL_SPOUT_VISUAL, TRIGGERED_IGNORE_SET_FACING);
                     me->SetReactState(REACT_PASSIVE);
                     me->SetFacingToObject(me->GetVictim());
-                    me->SetTarget(0);
+                    me->SetTarget();
                     events.ScheduleEvent(EVENT_SPELL_SPOUT, 60000);
                     events.RescheduleEvent(EVENT_SPELL_WHIRL, 18000);
                     events.RescheduleEvent(EVENT_SPELL_GEYSER, 25000);
@@ -174,7 +187,7 @@ public:
                 target = me->GetVictim();
             else
             {
-                ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                     if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                         if (me->IsWithinMeleeRange(threatTarget))
@@ -205,7 +218,7 @@ public:
             if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
             {
                 player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
-                if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetData64(NPC_THE_LURKER_BELOW)))
+                if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetGuidData(NPC_THE_LURKER_BELOW)))
                     lurker->AI()->DoAction(ACTION_START_EVENT);
                 return true;
             }

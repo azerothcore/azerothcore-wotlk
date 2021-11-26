@@ -1,8 +1,19 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /* ScriptData
 SDName: Karazhan
@@ -19,10 +30,10 @@ EndContentData */
 
 #include "karazhan.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -126,7 +137,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 m_uiSpotlightGUID;
+        ObjectGuid m_uiSpotlightGUID;
 
         uint32 TalkCount;
         uint32 TalkTimer;
@@ -138,7 +149,7 @@ public:
 
         void Reset() override
         {
-            m_uiSpotlightGUID = 0;
+            m_uiSpotlightGUID.Clear();
 
             TalkCount = 0;
             TalkTimer = 2000;
@@ -168,7 +179,7 @@ public:
             {
                 case 0:
                     DoCast(me, SPELL_TUXEDO, false);
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
                     break;
                 case 4:
                     TalkCount = 0;
@@ -184,12 +195,12 @@ public:
                     }
                     break;
                 case 8:
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
                     PerformanceReady = true;
                     break;
                 case 9:
                     PrepareEncounter();
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_CURTAINS));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_CURTAINS));
                     break;
             }
         }
@@ -228,9 +239,7 @@ public:
 
         void PrepareEncounter()
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
-#endif
+            LOG_DEBUG("scripts.ai", "Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 
@@ -437,7 +446,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 ArcanagosGUID;
+        ObjectGuid ArcanagosGUID;
 
         uint32 YellTimer;
         uint8 Step;
@@ -448,11 +457,11 @@ public:
 
         void Reset() override
         {
-            ArcanagosGUID = 0;
+            ArcanagosGUID.Clear();
             MTimer = 0;
             ATimer = 0;
 
-            if (instance && instance->GetData64(DATA_IMAGE_OF_MEDIVH) == 0)
+            if (instance && !instance->GetGuidData(DATA_IMAGE_OF_MEDIVH))
             {
                 Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 if (!Arcanagos)
@@ -461,7 +470,7 @@ public:
                     return;
                 }
 
-                instance->SetData64(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
+                instance->SetGuidData(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
                 EventStarted = true;
                 ArcanagosGUID = Arcanagos->GetGUID();
 
@@ -476,30 +485,30 @@ public:
 
         void EnterCombat(Unit* /*who*/) override {}
 
-        uint32 NextStep(uint32 Step)
+        uint32 NextStep(uint32 nextStep)
         {
-            switch(Step)
+            switch(nextStep)
             {
                 case 1:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL);
                     return 10000;
                 case 2:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL);
                     return 20000;
                 case 3:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL);
                     return 10000;
                 case 4:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL);
                     return 20000;
                 case 5:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL);
                     return 20000;
                 case 6:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL);
 
                     ATimer = 5500;
                     MTimer = 6600;
@@ -510,7 +519,7 @@ public:
                     me->CastSpell(me, SPELL_MANA_SHIELD, true);
                     return 5500;
                 case 9:
-                    me->MonsterTextEmote(EMOTE_DIALOG_MEDIVH_7, 0, false);
+                    me->TextEmote(EMOTE_DIALOG_MEDIVH_7);
                     me->CastSpell(me, 30972, true);
                     return 10000;
                 case 10:
@@ -520,7 +529,7 @@ public:
                     return 1000;
                 case 11:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL);
                     return 5000;
                 case 12:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
@@ -531,7 +540,7 @@ public:
                     }
                     return 10000;
                 case 13:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL);
                     return 10000;
                 case 14:
                     if (me->GetMap()->IsDungeon())

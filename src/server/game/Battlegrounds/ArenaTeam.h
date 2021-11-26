@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_ARENATEAM_H
@@ -59,7 +70,7 @@ enum ArenaTeamEvents
 };
 
 // PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
-enum ArenaTeamInfoType
+enum ArenaTeamInfoType : uint8
 {
     ARENA_TEAM_ID                = 0,
     ARENA_TEAM_TYPE              = 1,                       // new in 3.2 - team type?
@@ -79,6 +90,7 @@ ERR_ARENA_TEAM_TOO_MANY_MEMBERS_S
 ERR_ARENA_TEAM_LEVEL_TOO_LOW_I
 */
 
+// EnumUtils: DESCRIBE THIS
 enum ArenaTeamTypes
 {
     ARENA_TEAM_2v2      = 2,
@@ -95,7 +107,7 @@ enum ArenaSlot
 
 struct ArenaTeamMember
 {
-    uint64 Guid;
+    ObjectGuid Guid;
     std::string Name;
     uint8 Class;
     uint16 WeekGames;
@@ -128,7 +140,7 @@ public:
     ArenaTeam();
     ~ArenaTeam();
 
-    bool Create(uint64 captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
+    bool Create(ObjectGuid captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
     void Disband(WorldSession* session);
     void Disband();
 
@@ -139,7 +151,7 @@ public:
     [[nodiscard]] uint8  GetSlot() const            { return GetSlotByType(GetType()); }
     static uint8 GetSlotByType(uint32 type);
     static uint8 GetReqPlayersForType(uint32 type);
-    [[nodiscard]] uint64 GetCaptain() const  { return CaptainGuid; }
+    [[nodiscard]] ObjectGuid GetCaptain() const { return CaptainGuid; }
     [[nodiscard]] std::string const& GetName() const       { return TeamName; }
     [[nodiscard]] const ArenaTeamStats& GetStats() const { return Stats; }
     void SetArenaTeamStats(ArenaTeamStats& stats) { Stats = stats; }
@@ -147,22 +159,22 @@ public:
     [[nodiscard]] uint32 GetRating() const          { return Stats.Rating; }
     uint32 GetAverageMMR(Group* group) const;
 
-    void SetCaptain(uint64 guid);
+    void SetCaptain(ObjectGuid guid);
     bool SetName(std::string const& name);
-    bool AddMember(uint64 playerGuid);
+    bool AddMember(ObjectGuid playerGuid);
 
-    // Shouldn't be uint64 ed, because than can reference guid from members on Disband
+    // Shouldn't be ObjectGuid, because than can reference guid from members on Disband
     // and this method removes given record from list. So invalid reference can happen.
-    void DelMember(uint64 guid, bool cleanDb);
+    void DelMember(ObjectGuid guid, bool cleanDb);
 
     [[nodiscard]] size_t GetMembersSize() const         { return Members.size(); }
     [[nodiscard]] bool   Empty() const                  { return Members.empty(); }
     MemberList::iterator m_membersBegin() { return Members.begin(); }
     MemberList::iterator m_membersEnd()   { return Members.end(); }
     MemberList& GetMembers() { return Members; }
-    [[nodiscard]] bool IsMember(uint64 guid) const;
+    [[nodiscard]] bool IsMember(ObjectGuid guid) const;
 
-    ArenaTeamMember* GetMember(uint64 guid);
+    ArenaTeamMember* GetMember(ObjectGuid guid);
     ArenaTeamMember* GetMember(std::string const& name);
 
     [[nodiscard]] bool IsFighting() const;
@@ -173,7 +185,7 @@ public:
     void SaveToDB();
 
     void BroadcastPacket(WorldPacket* packet);
-    void BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
+    void BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
     void NotifyStatsChanged();
 
     void MassInviteToEvent(WorldSession* session);
@@ -181,7 +193,7 @@ public:
     void Roster(WorldSession* session);
     void Query(WorldSession* session);
     void SendStats(WorldSession* session);
-    void Inspect(WorldSession* session, uint64 guid);
+    void Inspect(WorldSession* session, ObjectGuid guid);
 
     uint32 GetPoints(uint32 MemberRating);
     int32  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
@@ -192,7 +204,7 @@ public:
     int32  LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap);
     void   MemberLost(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange = -12);
 
-    void UpdateArenaPointsHelper(std::map<uint32, uint32>& PlayerPoints);
+    void UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& PlayerPoints);
 
     void FinishWeek();
     void FinishGame(int32 mod, const Map* bgMap);
@@ -207,7 +219,7 @@ protected:
     uint32      TeamId;
     uint8       Type;
     std::string TeamName;
-    uint64      CaptainGuid;
+    ObjectGuid  CaptainGuid;
 
     uint32 BackgroundColor; // ARGB format
     uint8  EmblemStyle;     // icon id
