@@ -113,28 +113,21 @@ class boss_onyxia : public CreatureScript
 public:
     boss_onyxia() : CreatureScript("boss_onyxia") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    struct boss_onyxiaAI : public BossAI
     {
-        return GetOnyxiasLairAI<boss_onyxiaAI>(pCreature);
-    }
-
-    struct boss_onyxiaAI : public ScriptedAI
-    {
-        boss_onyxiaAI(Creature* pCreature) : ScriptedAI(pCreature)
+        boss_onyxiaAI(Creature* pCreature) : BossAI(pCreature, DATA_ONYXIA)
         {
-            m_pInstance = me->GetInstanceScript();
+            Initialize();
         }
 
-        EventMap events;
-
-        InstanceScript* m_pInstance;
-        uint8 Phase;
-        int8 CurrentWP;
-
-        bool whelpSpam;
-        uint8 whelpCount;
-        int32 whelpSpamTimer;
-        bool bManyWhelpsAvailable;
+        void Initialize()
+        {
+            CurrentWP = 0;
+            whelpSpam = false;
+            whelpCount = 0;
+            whelpSpamTimer = 0;
+            bManyWhelpsAvailable = false;
+        }
 
         void SetPhase(uint8 ph)
         {
@@ -161,41 +154,13 @@ public:
 
         void Reset() override
         {
-            CurrentWP = 0;
+            Initialize();
             SetPhase(0);
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
-
-            whelpSpam = false;
-            whelpCount = 0;
-            whelpSpamTimer = 0;
-            bManyWhelpsAvailable = false;
-
-            if (m_pInstance)
-            {
-                m_pInstance->SetData(DATA_ONYXIA, NOT_STARTED);
-                m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            m_pInstance->SetData(DATA_ONYXIA, DONE);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (me->GetVictim() || me->GetDistance(who) > 30.0f)
-            {
-                return;
-            }
-
-            if (who->GetTypeId() == TYPEID_PLAYER)
-            {
-                AttackStart(who);
-            }
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         }
 
         void DoAction(int32 param) override
@@ -203,32 +168,22 @@ public:
             switch (param)
             {
                 case -1:
-                    if (bManyWhelpsAvailable && m_pInstance)
+                    if (bManyWhelpsAvailable)
                     {
-                        m_pInstance->SetData(DATA_WHELP_SUMMONED, 1);
+                        instance->SetData(DATA_WHELP_SUMMONED, 1);
                     }
                     break;
             }
         }
 
-        void BindPlayers()
-        {
-            me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
-        }
-
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            DoZoneInCombat();
             SetPhase(1);
 
-            if (m_pInstance)
-            {
-                m_pInstance->SetData(DATA_ONYXIA, IN_PROGRESS);
-                m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
-                m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-            }
-            BindPlayers();
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+            BossAI::EnterCombat(who);
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -357,25 +312,25 @@ public:
                     break;
                 case EVENT_SPELL_WINGBUFFET:
                     {
-                        me->CastSpell(me, SPELL_WINGBUFFET, false);
+                        DoCastAOE(SPELL_WINGBUFFET);
                         events.RepeatEvent(urand(15000, 30000));
                     }
                     break;
                 case EVENT_SPELL_FLAMEBREATH:
                     {
-                        me->CastSpell(me, SPELL_FLAMEBREATH, false);
+                        DoCastAOE(SPELL_FLAMEBREATH);
                         events.RepeatEvent(urand(10000, 20000));
                     }
                     break;
                 case EVENT_SPELL_TAILSWEEP:
                     {
-                        me->CastSpell(me, SPELL_TAILSWEEP, false);
+                        DoCastAOE(SPELL_TAILSWEEP);
                         events.RepeatEvent(urand(15000, 20000));
                     }
                     break;
                 case EVENT_SPELL_CLEAVE:
                     {
-                        me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
+                        DoCastVictim(SPELL_CLEAVE);
                         events.RepeatEvent(urand(2000, 5000));
                     }
                     break;
@@ -442,7 +397,7 @@ public:
                         if (Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                         {
                             me->SetFacingToObject(v);
-                            me->CastSpell(v, SPELL_FIREBALL, false);
+                            DoCast(v, SPELL_FIREBALL);
                         }
 
                         events.ScheduleEvent(EVENT_SPELL_FIREBALL_SECOND, 4000);
@@ -453,7 +408,7 @@ public:
                         if (Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                         {
                             me->SetFacingToObject(v);
-                            me->CastSpell(v, SPELL_FIREBALL, false);
+                            DoCast(v, SPELL_FIREBALL);
                         }
 
                         uint8 rand = urand(0, 99);
@@ -495,7 +450,7 @@ public:
                     {
                         me->SetFacingTo(OnyxiaMoveData[CurrentWP].o);
                         me->TextEmote("Onyxia takes in a deep breath...", nullptr, true);
-                        me->CastSpell(me, OnyxiaMoveData[CurrentWP].spellId, false);
+                        DoCastAOE(OnyxiaMoveData[CurrentWP].spellId);
 
                         events.ScheduleEvent(EVENT_SPELL_BREATH, 8250);
                     }
@@ -516,8 +471,13 @@ public:
                 case EVENT_PHASE_3_ATTACK:
                     {
                         me->SetReactState(REACT_AGGRESSIVE);
-                        AttackStart(SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0, false));
-                        me->CastSpell(me, SPELL_BELLOWINGROAR, false);
+
+                        if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0, false))
+                        {
+                            AttackStart(target);
+                        }
+
+                        DoCastAOE(SPELL_BELLOWINGROAR);
 
                         events.ScheduleEvent(EVENT_ERUPTION, 0);
                         events.ScheduleEvent(EVENT_SPELL_WINGBUFFET, urand(10000, 20000));
@@ -530,7 +490,7 @@ public:
                     break;
                 case EVENT_SPELL_BELLOWINGROAR:
                     {
-                        me->CastSpell(me, SPELL_BELLOWINGROAR, false);
+                        DoCastAOE(SPELL_BELLOWINGROAR);
                         events.RepeatEvent(22000);
                         events.ScheduleEvent(EVENT_ERUPTION, 0);
                     }
@@ -559,10 +519,24 @@ public:
         {
             if (target->IsPlayer() && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
             {
-                m_pInstance->SetData(DATA_DEEP_BREATH_FAILED, 1);
+                instance->SetData(DATA_DEEP_BREATH_FAILED, 1);
             }
         }
+
+        private:
+            uint8 Phase;
+            int8  CurrentWP;
+
+            bool  whelpSpam;
+            uint8 whelpCount;
+            int32 whelpSpamTimer;
+            bool  bManyWhelpsAvailable;
     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetOnyxiasLairAI<boss_onyxiaAI>(creature);
+    }
 };
 
 class npc_onyxian_lair_guard : public CreatureScript
@@ -585,19 +559,6 @@ public:
         }
 
         EventMap events;
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (me->GetVictim() || me->GetDistance(who) > 20.0f)
-            {
-                return;
-            }
-
-            if (who->GetTypeId() == TYPEID_PLAYER)
-            {
-                AttackStart(who);
-            }
-        }
 
         void UpdateAI(uint32 diff) override
         {
@@ -650,58 +611,8 @@ public:
     };
 };
 
-class npc_onyxia_whelp : public CreatureScript
-{
-public:
-    npc_onyxia_whelp() : CreatureScript("npc_onyxia_whelp") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetOnyxiasLairAI<npc_onyxia_whelpAI>(pCreature);
-    }
-
-    struct npc_onyxia_whelpAI : public ScriptedAI
-    {
-        npc_onyxia_whelpAI(Creature* pCreature) : ScriptedAI(pCreature) {}
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (me->GetVictim() || me->GetDistance(who) > 20.0f)
-            {
-                return;
-            }
-
-            if (who->GetTypeId() == TYPEID_PLAYER)
-            {
-                AttackStart(who);
-            }
-        }
-    };
-};
-
-class npc_onyxia_trigger : public CreatureScript
-{
-public:
-    npc_onyxia_trigger() : CreatureScript("npc_onyxia_trigger") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetOnyxiasLairAI<npc_onyxia_triggerAI>(pCreature);
-    }
-
-    struct npc_onyxia_triggerAI : public ScriptedAI
-    {
-        npc_onyxia_triggerAI(Creature* pCreature) : ScriptedAI(pCreature) {}
-
-        void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void UpdateAI(uint32  /*diff*/) override {}
-    };
-};
-
 void AddSC_boss_onyxia()
 {
     new boss_onyxia();
     new npc_onyxian_lair_guard();
-    new npc_onyxia_whelp();
-    new npc_onyxia_trigger();
 }
