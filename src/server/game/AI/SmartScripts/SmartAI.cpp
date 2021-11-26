@@ -47,7 +47,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mCanRepeatPath = false;
 
     // spawn in run mode
-    // Xinef: spawn in run mode and set mRun to run... this overrides SetWalk EVERYWHERE, RETARDS
+    // Xinef: spawn in run mode and set mRun to run... this overrides SetWalk EVERYWHERE
     mRun = true;
 
     mCanAutoAttack = true;
@@ -337,7 +337,7 @@ void SmartAI::EndPath(bool fail)
         }
     }
 
-    // Xinef: if the escort failed - DO NOT PROCESS ANYTHING, ITS RETARDED
+    // Xinef: if the escort failed - DO NOT PROCESS ANYTHING
     // Xinef: End Path events should be only processed if it was SUCCESSFUL stop or stop called by SMART_ACTION_WAYPOINT_STOP
     if (fail)
     {
