@@ -50,7 +50,8 @@ enum DataTypes
     DATA_HALL_RUNE_5                = 20,
     DATA_HALL_RUNE_6                = 21,
     DATA_HALL_RUNE_7                = 22,
-    DATA_SOLAKAR_FLAMEWREATH        = 23
+    DATA_SOLAKAR_FLAMEWREATH        = 23,
+    DATA_MOR_GRAYHOOF               = 24
 };
 
 enum CreaturesIds
@@ -58,6 +59,7 @@ enum CreaturesIds
     NPC_HIGHLORD_OMOKK              = 9196,
     NPC_SHADOW_HUNTER_VOSHGAJIN     = 9236,
     NPC_WARMASTER_VOONE             = 9237,
+    NPC_MOR_GRAYHOOF                = 16080,
     NPC_MOTHER_SMOLDERWEB           = 10596,
     NPC_UROK_DOOMHOWL               = 10584,
     NPC_QUARTERMASTER_ZIGRIS        = 9736,
