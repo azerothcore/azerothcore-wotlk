@@ -129,7 +129,7 @@ public:
                             _sleepTargetGUID = target->GetGUID();
                             _sleepTargetThreat = me->getThreatMgr().getThreat(target);
                             me->getThreatMgr().modifyThreatPercent(target, -100);
-                            _scheduler.Schedule(Seconds(10), [this](TaskContext context)
+                            _scheduler.Schedule(Seconds(10), [this](TaskContext /*context*/)
                                 {
                                     if (Unit* sleepTarget = ObjectAccessor::GetUnit(*me, _sleepTargetGUID))
                                     {
