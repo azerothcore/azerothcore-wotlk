@@ -148,7 +148,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {
             if (_phase == PHASE_HUMAN && me->HealthBelowPct(75.f))
             {
