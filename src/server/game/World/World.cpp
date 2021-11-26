@@ -2119,6 +2119,7 @@ void World::SetInitialWorldSettings()
 
     if (sConfigMgr->isDryRun())
     {
+        sMapMgr->UnloadAll();
         LOG_INFO("server.loading", "AzerothCore dry run completed, terminating.");
         exit(0);
     }

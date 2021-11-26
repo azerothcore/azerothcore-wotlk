@@ -678,7 +678,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED))
         return false;
 
-    // pussywizard: ZOMG! TEMP!
+    // pussywizard: TEMP!
     if (!me->GetCharmInfo())
     {
         LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %s", me->GetEntry(), me->GetOwnerGUID().ToString().c_str());
