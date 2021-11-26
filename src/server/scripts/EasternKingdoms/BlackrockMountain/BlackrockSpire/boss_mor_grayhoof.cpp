@@ -194,7 +194,6 @@ public:
             }
         }
 
-
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
