@@ -1,4 +1,5 @@
-# Copyright (C) TrinityCore, AzerothCore
+#
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -7,6 +8,7 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
 
 # User has manually chosen to ignore the git-tests, so throw them a warning.
 # This is done EACH compile so they can be alerted about the consequences.
@@ -20,6 +22,8 @@ if(WITHOUT_GIT)
   set(rev_date "1970-01-01 00:00:00 +0000")
   set(rev_hash "unknown")
   set(rev_branch "Archived")
+  # No valid git commit date, use today
+  string(TIMESTAMP rev_date_fallback "%Y-%m-%d %H:%M:%S" UTC)
 else()
   # Workaround for not correctly detecting git
   if (NOT GIT_EXECUTABLE)
@@ -65,11 +69,21 @@ else()
     set(rev_date "1970-01-01 00:00:00 +0000")
     set(rev_hash "unknown")
     set(rev_branch "Archived")
+    # No valid git commit date, use today
+    string(TIMESTAMP rev_date_fallback "%Y-%m-%d %H:%M:%S" UTC)
   else()
+    # We have valid date from git commit, use that
+    set(rev_date_fallback ${rev_date})
     # Extract information required to build a proper versionstring
     string(REGEX REPLACE 0.1-|[0-9]+-g "" rev_hash ${rev_info})
   endif()
 endif()
+
+# For package/copyright information we always need a proper date - keep "Archived/1970" for displaying git info but a valid year elsewhere
+string(REGEX MATCH "([0-9]+)-([0-9]+)-([0-9]+)" rev_date_fallback_match ${rev_date_fallback})
+set(rev_year ${CMAKE_MATCH_1})
+set(rev_month ${CMAKE_MATCH_2})
+set(rev_day ${CMAKE_MATCH_3})
 
 # Create the actual revision.h file from the above params
 if(NOT "${rev_hash_cached}" STREQUAL "${rev_hash}" OR NOT "${rev_branch_cached}" STREQUAL "${rev_branch}" OR NOT EXISTS "${BUILDDIR}/revision.h")

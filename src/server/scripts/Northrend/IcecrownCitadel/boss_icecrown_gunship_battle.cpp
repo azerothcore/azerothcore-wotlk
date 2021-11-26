@@ -1,9 +1,21 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureTextMgr.h"
-#include "icecrown_citadel.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ScriptMgr.h"
@@ -11,6 +23,7 @@
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -156,6 +169,7 @@ enum Spells
     SPELL_ON_ORGRIMS_HAMMER_DECK            = 70121,
 
     // Rocket Pack
+    SPELL_CREATE_ROCKET_PACK                = 70055,
     SPELL_ROCKET_PACK_DAMAGE                = 69193,
     SPELL_ROCKET_BURST                      = 69192,
     SPELL_ROCKET_PACK_USEABLE               = 70348,
@@ -1410,7 +1424,7 @@ public:
 
         void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
-            player->AddItem(ITEM_GOBLIN_ROCKET_PACK, 1);
+            me->CastSpell(player, SPELL_CREATE_ROCKET_PACK);
             player->PlayerTalkClass->SendCloseGossip();
         }
     };
@@ -1451,7 +1465,7 @@ void TriggerBurningPitch(Creature* c)
     if (!c->HasSpellCooldown(spellId))
     {
         c->CastSpell((Unit*)nullptr, spellId, false);
-        c->_AddCreatureSpellCooldown(spellId, urand(3000, 4000));
+        c->_AddCreatureSpellCooldown(spellId, 0, urand(3000, 4000));
     }
 }
 
@@ -1917,7 +1931,7 @@ public:
                 return;
 
             me->CastSpell((Unit*)nullptr, spellId, true);
-            me->_AddCreatureSpellCooldown(spellId, 9000);
+            me->_AddCreatureSpellCooldown(spellId, 0, 9000);
         }
 
         bool CanAIAttack(const Unit*  /*target*/) const override
@@ -1958,7 +1972,7 @@ public:
 
         void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            SpellInfo const* damageInfo = sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
+            SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
             GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
             GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
         }
@@ -2208,7 +2222,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.remove_if(IgbExplosionCheck(GetCaster()));
-            acore::Containers::RandomResizeList(targets, 1);
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void Register() override
@@ -2415,8 +2429,7 @@ public:
             if (!si)
                 return;
             SpellCastTargets targets;
-            Position dest;
-            GetExplTargetDest()->GetPosition(&dest);
+            Position dest = GetExplTargetDest()->GetPosition();
             targets.SetDst(dest);
             CustomSpellValues values;
             int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
@@ -2477,7 +2490,7 @@ public:
             targets.remove_if(BurningPitchFilterCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
             if (!targets.empty())
             {
-                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2563,7 +2576,7 @@ public:
 
             if (!targets.empty())
             {
-                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2626,15 +2639,20 @@ public:
     {
         PrepareSpellScript(spell_igb_below_zero_SpellScript);
 
-        void RemovePassengers()
+        void RemovePassengers(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             GetHitUnit()->SetPower(POWER_ENERGY, 0);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
         }
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
+            BeforeHit += BeforeSpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
         }
     };
 
@@ -2694,7 +2712,7 @@ class achievement_im_on_a_boat : public AchievementCriteriaScript
 public:
     achievement_im_on_a_boat() : AchievementCriteriaScript("achievement_im_on_a_boat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target->GetAI() && target->GetAI()->GetData(ACTION_SHIP_VISITS_ENEMY) == 1;
     }

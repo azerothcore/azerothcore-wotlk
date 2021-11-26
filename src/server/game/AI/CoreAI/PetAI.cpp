@@ -1,23 +1,32 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PetAI.h"
 #include "Creature.h"
-#include "DBCStores.h"
 #include "Errors.h"
 #include "Group.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
-#include "PetAI.h"
 #include "Player.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
-#include "World.h"
 #include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
@@ -58,13 +67,11 @@ void PetAI::_stopAttack()
 {
     if (!me->IsAlive())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Creature stoped attacking cuz his dead [%s]", me->GetGUID().ToString().c_str());
-#endif
+        LOG_DEBUG("entities.unit.ai", "Creature stoped attacking cuz his dead [%s]", me->GetGUID().ToString().c_str());
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop();
-        me->getHostileRefManager().deleteReferences();
+        me->getHostileRefMgr().deleteReferences();
         return;
     }
 
@@ -156,9 +163,7 @@ void PetAI::UpdateAI(uint32 diff)
 
         if (_needToStop())
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "Pet AI stopped attacking [%s]", me->GetGUID().ToString().c_str());
-#endif
+            LOG_DEBUG("entities.unit.ai", "Pet AI stopped attacking [%s]", me->GetGUID().ToString().c_str());
             _stopAttack();
             return;
         }
@@ -272,7 +277,7 @@ void PetAI::UpdateAI(uint32 diff)
                 // No enemy, check friendly
                 if (!spellUsed)
                 {
-                    for (ObjectGuid const guid : m_AllySet)
+                    for (ObjectGuid const& guid : m_AllySet)
                     {
                         Unit* ally = ObjectAccessor::GetUnit(*me, guid);
 
@@ -335,11 +340,6 @@ void PetAI::UpdateAI(uint32 diff)
         for (TargetSpellList::const_iterator itr = targetSpellStore.begin(); itr != targetSpellStore.end(); ++itr)
             delete itr->second;
     }
-
-    // Update speed as needed to prevent dropping too far behind and despawning
-    me->UpdateSpeed(MOVE_RUN, true);
-    me->UpdateSpeed(MOVE_WALK, true);
-    me->UpdateSpeed(MOVE_FLIGHT, true);
 }
 
 void PetAI::UpdateAllies()
@@ -678,7 +678,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED))
         return false;
 
-    // pussywizard: ZOMG! TEMP!
+    // pussywizard: TEMP!
     if (!me->GetCharmInfo())
     {
         LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %s", me->GetEntry(), me->GetOwnerGUID().ToString().c_str());
@@ -690,7 +690,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
         return me->GetCharmInfo()->IsCommandAttack();
 
     // CC - mobs under crowd control can be attacked if owner commanded
-    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS)))
+    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_REACTIVE_DAMAGE_PROC)))
         return me->GetCharmInfo()->IsCommandAttack();
 
     // Returning - pets ignore attacks only if owner clicked follow

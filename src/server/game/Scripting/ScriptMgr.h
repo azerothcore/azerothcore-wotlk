@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SC_SCRIPTMGR_H
@@ -20,6 +31,8 @@
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SharedDefines.h"
+#include "Tuples.h"
+#include "Types.h"
 #include "Weather.h"
 #include "World.h"
 #include <atomic>
@@ -30,7 +43,6 @@ class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
 class Channel;
-class ChatCommand;
 class Creature;
 class CreatureAI;
 class DynamicObject;
@@ -70,8 +82,14 @@ struct OutdoorPvPData;
 struct GroupQueueInfo;
 struct TargetInfo;
 
+namespace Acore::ChatCommands
+{
+    struct ChatCommandBuilder;
+}
+
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
+// Check out our guide on how to create new hooks in our wiki! https://www.azerothcore.org/wiki/hooks-script
 /*
     TODO: Add more script type classes.
 
@@ -79,72 +97,6 @@ struct TargetInfo;
     CollisionScript
     ArenaTeamScript
 
-*/
-
-/*
-    Standard procedure when adding new script type classes:
-
-    First of all, define the actual class, and have it inherit from ScriptObject, like so:
-
-    class MyScriptType : public ScriptObject
-    {
-        uint32 _someId;
-
-        private:
-
-            void RegisterSelf();
-
-        protected:
-
-            MyScriptType(const char* name, uint32 someId)
-                : ScriptObject(name), _someId(someId)
-            {
-                ScriptRegistry<MyScriptType>::AddScript(this);
-            }
-
-        public:
-
-            // If a virtual function in your script type class is not necessarily
-            // required to be overridden, just declare it virtual with an empty
-            // body. If, on the other hand, it's logical only to override it (i.e.
-            // if it's the only method in the class), make it pure virtual, by adding
-            // = 0 to it.
-            virtual void OnSomeEvent(uint32 someArg1, std::string& someArg2) { }
-
-            // This is a pure virtual function:
-            virtual void OnAnotherEvent(uint32 someArg) = 0;
-    }
-
-    Next, you need to add a specialization for ScriptRegistry. Put this in the bottom of
-    ScriptMgr.cpp:
-
-    template class ScriptRegistry<MyScriptType>;
-
-    Now, add a cleanup routine in ScriptMgr::~ScriptMgr:
-
-    SCR_CLEAR(MyScriptType);
-
-    Now your script type is good to go with the script system. What you need to do now
-    is add functions to ScriptMgr that can be called from the core to actually trigger
-    certain events. For example, in ScriptMgr.h:
-
-    void OnSomeEvent(uint32 someArg1, std::string& someArg2);
-    void OnAnotherEvent(uint32 someArg);
-
-    In ScriptMgr.cpp:
-
-    void ScriptMgr::OnSomeEvent(uint32 someArg1, std::string& someArg2)
-    {
-        FOREACH_SCRIPT(MyScriptType)->OnSomeEvent(someArg1, someArg2);
-    }
-
-    void ScriptMgr::OnAnotherEvent(uint32 someArg)
-    {
-        FOREACH_SCRIPT(MyScriptType)->OnAnotherEvent(someArg1, someArg2);
-    }
-
-    Now you simply call these two functions from anywhere in the core to trigger the
-    event on all registered scripts of that type.
 */
 
 class ScriptObject
@@ -209,11 +161,11 @@ public:
     virtual void OnNetworkStop() { }
 
     // Called when a remote socket establishes a connection to the server. Do not store the socket object.
-    virtual void OnSocketOpen(WorldSocket* /*socket*/) { }
+    virtual void OnSocketOpen(std::shared_ptr<WorldSocket> /*socket*/) { }
 
     // Called when a socket is closed. Do not store the socket object, and do not rely on the connection
     // being open; it is not.
-    virtual void OnSocketClose(WorldSocket* /*socket*/, bool /*wasNew*/) { }
+    virtual void OnSocketClose(std::shared_ptr<WorldSocket> /*socket*/) { }
 
     // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
     // and modifying it is safe.
@@ -259,6 +211,13 @@ public:
 
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
+
+    /**
+     * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
+     *
+     * @param version The cache version that we will be sending to the Client.
+     */
+    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) {}
 };
 
 class FormulaScript : public ScriptObject
@@ -312,7 +271,7 @@ public:
         _mapEntry = sMapStore.LookupEntry(_mapId);
 
         if (!_mapEntry)
-            LOG_ERROR("server", "Invalid MapScript for %u; no such map ID.", _mapId);
+            LOG_ERROR("maps.script", "Invalid MapScript for %u; no such map ID.", _mapId);
     }
 
     // Gets the MapEntry structure associated with this script. Can return nullptr.
@@ -353,7 +312,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsWorldMap())
-            LOG_ERROR("server", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -370,7 +329,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsDungeon())
-            LOG_ERROR("server", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
     }
 
     // Gets an InstanceScript object for this instance.
@@ -390,7 +349,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsBattleground())
-            LOG_ERROR("server", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -595,6 +554,19 @@ public:
     [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
+class OnlyOnceAreaTriggerScript : public AreaTriggerScript
+{
+    using AreaTriggerScript::AreaTriggerScript;
+
+public:
+    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) override;
+
+protected:
+    virtual bool _OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) = 0;
+    void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
+    void ResetAreaTriggerDone(Player const* /*player*/, AreaTrigger const* /*trigger*/);
+};
+
 class BattlegroundScript : public ScriptObject
 {
 protected:
@@ -626,7 +598,7 @@ protected:
 
 public:
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-    [[nodiscard]] virtual std::vector<ChatCommand> GetCommands() const = 0;
+    [[nodiscard]] virtual std::vector<Acore::ChatCommands::ChatCommandBuilder> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -753,8 +725,7 @@ protected:
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
-    // deprecated/legacy
-    [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
+    [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/, uint32 /*criteria_id*/) { return true; };
 };
 
 class PlayerScript : public ScriptObject
@@ -777,6 +748,9 @@ public:
     // Called when a player kills another player
     virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
 
+    // Called when a player toggles pvp
+    virtual void OnPlayerPVPFlagChange(Player* /*player*/, bool /*state*/) { }
+
     // Called when a player kills a creature
     virtual void OnCreatureKill(Player* /*killer*/, Creature* /*killed*/) { }
 
@@ -797,6 +771,7 @@ public:
 
     // Called for player::update
     virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
+    virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) { }
 
     // Called when a player's money is modified (before the modification is done)
     virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
@@ -888,20 +863,29 @@ public:
     // Called when a player is added to battleground
     virtual void OnAddToBattleground(Player* /*player*/, Battleground* /*bg*/) { }
 
+    // Called when a player queues a Random Dungeon using the RDF (Random Dungeon Finder)
+    virtual void OnQueueRandomDungeon(Player* /*player*/, uint32 & /*rDungeonId*/) { }
+
     // Called when a player is removed from battleground
     virtual void OnRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) { }
 
     // Called when a player complete an achievement
     virtual void OnAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { }
 
+    // Called before player complete an achievement, can be used to disable achievements in certain conditions
+    virtual bool OnBeforeAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { return true; }
+
     // Called when a player complete an achievement criteria
     virtual void OnCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { }
 
+    //  Called before player complete an achievement criteria, can be used to disable achievement criteria in certain conditions
+    virtual bool OnBeforeCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { return true; }
+
     // Called when an Achievement is saved to DB
-    virtual void OnAchiSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
+    virtual void OnAchiSave(CharacterDatabaseTransaction /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
 
     // Called when an Criteria is saved to DB
-    virtual void OnCriteriaSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
+    virtual void OnCriteriaSave(CharacterDatabaseTransaction /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
 
     // Called when a player selects an option in a player gossip window
     virtual void OnGossipSelect(Player* /*player*/, uint32 /*menu_id*/, uint32 /*sender*/, uint32 /*action*/) { }
@@ -1006,7 +990,7 @@ public:
 
     [[nodiscard]] virtual bool CanGiveMailRewardAtGiveLevel(Player* /*player*/, uint8 /*level*/) { return true; }
 
-    virtual void OnDeleteFromDB(SQLTransaction& /*trans*/, uint32 /*guid*/) { }
+    virtual void OnDeleteFromDB(CharacterDatabaseTransaction /*trans*/, uint32 /*guid*/) { }
 
     [[nodiscard]] virtual bool CanRepopAtGraveyard(Player* /*player*/) { return true; }
 
@@ -1079,6 +1063,16 @@ public:
     virtual void OnSetServerSideVisibility(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
     virtual void OnSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
+
+    // Passive Anticheat System
+    virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
+    virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
+    virtual void AnticheatSetUnderACKmount(Player* /*player*/) { }
+    virtual void AnticheatSetRootACKUpd(Player* /*player*/) { }
+    virtual void AnticheatSetJumpingbyOpcode(Player* /*player*/, bool /*jump*/) { }
+    virtual void AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) { }
+    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
 };
 
 class AccountScript : public ScriptObject
@@ -1188,14 +1182,14 @@ protected:
 
 public:
     // items
-    virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
+    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
     virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
 
     // loot
     virtual void OnAfterRefCount(Player const* /*player*/, LootStoreItem* /*LootStoreItem*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, uint32& /*maxcount*/, LootStore const& /*store*/) { }
     virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, LootStoreItem* /*LootStoreItem*/, LootStore const& /*store*/) { }
-    virtual void OnItemRoll(Player const* /*player*/, LootStoreItem const* /*LootStoreItem*/, float& /*chance*/, Loot& /*loot*/, LootStore const& /*store*/) { };
-
+    virtual bool OnItemRoll(Player const* /*player*/, LootStoreItem const* /*LootStoreItem*/, float& /*chance*/, Loot& /*loot*/, LootStore const& /*store*/) { return true; };
+    virtual bool OnBeforeLootEqualChanced(Player const* /*player*/, LootStoreItemList /*EqualChanced*/, Loot& /*loot*/, LootStore const& /*store*/) { return true; }
     virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/, lfg::LFGDungeonData const* /*dungeon*/) { }
     virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
 
@@ -1248,7 +1242,26 @@ public:
 
     [[nodiscard]] virtual bool CanSendMessageBGQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSendMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, bool /*IsJoin*/) { return true; }
+    /**
+     * @brief This hook runs before sending the join message during the arena queue, allowing you to run extra operations or disabling the join message
+     *
+     * @param queue Contains information about the Arena queue
+     * @param leader Contains information about the player leader
+     * @param ginfo Contains information about the group of the queue
+     * @param bracketEntry Contains information about the bracket
+     * @param isRated Contains information about rated arena or skirmish
+     * @return True if you want to continue sending the message, false if you want to disable the message
+     */
+    [[nodiscard]] virtual bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/) { return true; }
+
+    /**
+     * @brief This hook runs before sending the exit message during the arena queue, allowing you to run extra operations or disabling the exit message
+     *
+     * @param queue Contains information about the Arena queue
+     * @param ginfo Contains information about the group of the queue
+     * @return True if you want to continue sending the message, false if you want to disable the message
+     */
+    [[nodiscard]] virtual bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
 };
 
 class ArenaTeamScript : public ScriptObject
@@ -1442,7 +1455,20 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+     virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+};
+
+class DatabaseScript : public ScriptObject
+{
+protected:
+
+    DatabaseScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) {}
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1461,10 +1487,19 @@ public: /* Initialization */
     void FillSpellSummary();
     void CheckIfScriptsInDatabaseExist();
 
-    const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
+    const char* ScriptsVersion() const { return "Integrated Azeroth Scripts"; }
 
     void IncrementScriptCount() { ++_scriptCount; }
     uint32 GetScriptCount() const { return _scriptCount; }
+
+    typedef void(*ScriptLoaderCallbackType)();
+
+    /// Sets the script loader callback which is invoked to load scripts
+    /// (Workaround for circular dependency game <-> scripts)
+    void SetScriptLoader(ScriptLoaderCallbackType script_loader_callback)
+    {
+        _script_loader_callback = script_loader_callback;
+    }
 
 public: /* Unloading */
     void Unload();
@@ -1477,8 +1512,8 @@ public: /* SpellScriptLoader */
 public: /* ServerScript */
     void OnNetworkStart();
     void OnNetworkStop();
-    void OnSocketOpen(WorldSocket* socket);
-    void OnSocketClose(WorldSocket* socket, bool wasNew);
+    void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
+    void OnSocketClose(std::shared_ptr<WorldSocket> socket);
     void OnPacketReceive(WorldSession* session, WorldPacket const& packet);
     void OnPacketSend(WorldSession* session, WorldPacket const& packet);
 
@@ -1487,6 +1522,7 @@ public: /* WorldScript */
     void OnOpenStateChange(bool open);
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
+    void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
     void OnMotdChange(std::string& newMotd);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();
@@ -1562,7 +1598,7 @@ public: /* OutdoorPvPScript */
     OutdoorPvP* CreateOutdoorPvP(OutdoorPvPData const* data);
 
 public: /* CommandScript */
-    std::vector<ChatCommand> GetChatCommands();
+    std::vector<Acore::ChatCommands::ChatCommandBuilder> GetChatCommands();
 
 public: /* WeatherScript */
     void OnWeatherChange(Weather* weather, WeatherState state, float grade);
@@ -1603,13 +1639,15 @@ public: /* TransportScript */
     void OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId, float x, float y, float z);
 
 public: /* AchievementCriteriaScript */
-    bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target);
+    bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id);
 
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
+    void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
+    void OnPlayerPVPFlagChange(Player* player, bool state);
     void OnCreatureKill(Player* killer, Creature* killed);
     void OnCreatureKilledByPet(Player* petOwner, Creature* killed);
     void OnPlayerKilledByCreature(Creature* killer, Player* killed);
@@ -1647,11 +1685,14 @@ public: /* PlayerScript */
     bool OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit* target);
     void OnPlayerUpdateFaction(Player* player);
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
+    void OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
     void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
+    bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
     void OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
-    void OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
-    void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
+    bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
+    void OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
+    void OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
     void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
     void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
     void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
@@ -1695,7 +1736,7 @@ public: /* PlayerScript */
     void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
     void OnRewardKillRewarder(Player* player, bool isDungeon, float& rate);
     bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
-    void OnDeleteFromDB(SQLTransaction& trans, uint32 guid);
+    void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
     bool CanAreaExploreAndOutdoor(Player* player);
@@ -1732,6 +1773,14 @@ public: /* PlayerScript */
     bool CanInitTrade(Player* player, Player* target);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
+    void AnticheatSetCanFlybyServer(Player* player, bool apply);
+    void AnticheatSetUnderACKmount(Player* player);
+    void AnticheatSetRootACKUpd(Player* player);
+    void AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo);
+    void AnticheatSetJumpingbyOpcode(Player* player, bool jump);
+    bool AnticheatHandleDoubleJump(Player* player, Unit* mover);
+    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
@@ -1767,12 +1816,13 @@ public: /* GroupScript */
     void OnCreate(Group* group, Player* leader);
 
 public: /* GlobalScript */
-    void OnGlobalItemDelFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
+    void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display);
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
     void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
-    void OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store);
+    bool OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store);
+    bool OnBeforeLootEqualChanced(Player const* player, LootStoreItemList EqualChanced, Loot& loot, LootStore const& store);
     void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData, lfg::LFGDungeonData const* dungeon);
     void OnAfterInitializeLockedDungeons(Player* player);
     void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
@@ -1828,7 +1878,8 @@ public: /* BGScript */
                                         BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
     void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
     bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
-    bool CanSendMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo, bool IsJoin);
+    bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
+    bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
@@ -1902,12 +1953,97 @@ public: /* AchievementScript */
 
         void OnHandleDevCommand(Player* player, std::string& argstr);
 
+    public: /* DatabaseScript */
+
+        void OnAfterDatabasesLoaded(uint32 updateFlags);
+
 private:
     uint32 _scriptCount;
 
     //atomic op counter for active scripts amount
     std::atomic<long> _scheduledScripts;
+
+    ScriptLoaderCallbackType _script_loader_callback;
 };
+
+namespace Acore::SpellScripts
+{
+    template<typename T>
+    using is_SpellScript = std::is_base_of<SpellScript, T>;
+
+    template<typename T>
+    using is_AuraScript = std::is_base_of<AuraScript, T>;
+}
+
+template <typename... Ts>
+class GenericSpellAndAuraScriptLoader : public SpellScriptLoader
+{
+    using SpellScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_SpellScript, Ts...>;
+    using AuraScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_AuraScript, Ts...>;
+    using ArgsType = typename Acore::find_type_if_t<Acore::is_tuple, Ts...>;
+
+public:
+    GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
+
+private:
+    SpellScript* GetSpellScript() const override
+    {
+        if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<SpellScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    AuraScript* GetAuraScript() const override
+    {
+        if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<AuraScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    ArgsType _args;
+};
+
+#define RegisterSpellScriptWithArgs(spell_script, script_name, ...) new GenericSpellAndAuraScriptLoader<spell_script, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellScript(spell_script) RegisterSpellScriptWithArgs(spell_script, #spell_script)
+#define RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, script_name, ...) new GenericSpellAndAuraScriptLoader<script_1, script_2, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellAndAuraScriptPair(script_1, script_2) RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, #script_1)
+
+template <class AI>
+class GenericCreatureScript : public CreatureScript
+{
+    public:
+        GenericCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return new AI(me); }
+};
+#define RegisterCreatureAI(ai_name) new GenericCreatureScript<ai_name>(#ai_name)
+
+template <class AI, AI*(*AIFactory)(Creature*)>
+class FactoryCreatureScript : public CreatureScript
+{
+    public:
+        FactoryCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return AIFactory(me); }
+};
+#define RegisterCreatureAIWithFactory(ai_name, factory_fn) new FactoryCreatureScript<ai_name, &factory_fn>(#ai_name)
+
+template <class AI>
+class GenericGameObjectScript : public GameObjectScript
+{
+    public:
+        GenericGameObjectScript(char const* name) : GameObjectScript(name) { }
+        GameObjectAI* GetAI(GameObject* go) const override { return new AI(go); }
+};
+#define RegisterGameObjectAI(ai_name) new GenericGameObjectScript<ai_name>(#ai_name)
 
 #define sScriptMgr ScriptMgr::instance()
 
@@ -1969,31 +2105,31 @@ public:
                 if (id)
                 {
                     // Try to find an existing script.
-                    bool existing = false;
-                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                    TScript const* oldScript = nullptr;
+                    for (auto iterator = ScriptPointerList.begin(); iterator != ScriptPointerList.end(); ++iterator)
                     {
                         // If the script names match...
-                        if (it->second->GetName() == script->GetName())
+                        if (iterator->second->GetName() == script->GetName())
                         {
                             // ... It exists.
-                            existing = true;
+                            oldScript = iterator->second;
                             break;
                         }
                     }
 
-                    // If the script isn't assigned -> assign it!
-                    if (!existing)
+                    // If the script is already assigned -> delete it!
+                    if (oldScript)
                     {
-                        ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
+                        delete oldScript;
                     }
-                    else
-                    {
-                        // If the script is already assigned -> delete it!
-                        LOG_ERROR("server", "Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
-                                       script->GetName().c_str());
 
-                        ABORT(); // Error that should be fixed ASAP.
+                    // Assign new script!
+                    ScriptPointerList[id] = script;
+
+                    // Increment script count only with new scripts
+                    if (!oldScript)
+                    {
+                        sScriptMgr->IncrementScriptCount();
                     }
                 }
                 else
@@ -2034,7 +2170,7 @@ private:
         {
             if (it->second == script)
             {
-                LOG_ERROR("server", "Script '%s' has same memory pointer as '%s'.",
+                LOG_ERROR("scripts", "Script '%s' has same memory pointer as '%s'.",
                                script->GetName().c_str(), it->second->GetName().c_str());
 
                 return false;

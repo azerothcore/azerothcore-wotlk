@@ -1,22 +1,33 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "LogCommon.h"
 #include "Define.h"
+#include "LogCommon.h"
 #include "SmartEnum.h"
 #include <stdexcept>
 
-namespace acore::Impl::EnumUtilsImpl
+namespace Acore::Impl::EnumUtilsImpl
 {
 
 /************************************************************\
 |* data for enum 'LogLevel' in 'LogCommon.h' auto-generated *|
 \************************************************************/
 template <>
-EnumText EnumUtils<LogLevel>::ToString(LogLevel value)
+AC_API_EXPORT EnumText EnumUtils<LogLevel>::ToString(LogLevel value)
 {
     switch (value)
     {
@@ -32,10 +43,10 @@ EnumText EnumUtils<LogLevel>::ToString(LogLevel value)
 }
 
 template <>
-size_t EnumUtils<LogLevel>::Count() { return 7; }
+AC_API_EXPORT size_t EnumUtils<LogLevel>::Count() { return 7; }
 
 template <>
-LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
+AC_API_EXPORT LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
 {
     switch (index)
     {
@@ -51,7 +62,7 @@ LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
 }
 
 template <>
-size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
+AC_API_EXPORT size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
 {
     switch (value)
     {
@@ -70,7 +81,7 @@ size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
 |* data for enum 'AppenderType' in 'LogCommon.h' auto-generated *|
 \****************************************************************/
 template <>
-EnumText EnumUtils<AppenderType>::ToString(AppenderType value)
+AC_API_EXPORT EnumText EnumUtils<AppenderType>::ToString(AppenderType value)
 {
     switch (value)
     {
@@ -83,10 +94,10 @@ EnumText EnumUtils<AppenderType>::ToString(AppenderType value)
 }
 
 template <>
-size_t EnumUtils<AppenderType>::Count() { return 4; }
+AC_API_EXPORT size_t EnumUtils<AppenderType>::Count() { return 4; }
 
 template <>
-AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
+AC_API_EXPORT AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
 {
     switch (index)
     {
@@ -99,7 +110,7 @@ AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
 }
 
 template <>
-size_t EnumUtils<AppenderType>::ToIndex(AppenderType value)
+AC_API_EXPORT size_t EnumUtils<AppenderType>::ToIndex(AppenderType value)
 {
     switch (value)
     {

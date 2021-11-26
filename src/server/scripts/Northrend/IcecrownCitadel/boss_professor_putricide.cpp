@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -188,10 +201,10 @@ private:
 };
 
 // xinef: malleable goo selector, check for target validity
-struct MalleableGooSelector : public acore::unary_function<Unit*, bool>
+struct MalleableGooSelector
 {
-    const Unit* me;
-    MalleableGooSelector(Unit const* unit) : me(unit) {}
+public:
+    MalleableGooSelector(Unit const* unit) : me(unit) { }
 
     bool operator()(Unit const* target) const
     {
@@ -203,6 +216,8 @@ struct MalleableGooSelector : public acore::unary_function<Unit*, bool>
 
         return me->IsValidAttackTarget(target);
     }
+private:
+    const Unit* me;
 };
 
 class boss_professor_putricide : public CreatureScript
@@ -874,7 +889,7 @@ public:
 
         void ScaleRange(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
         }
 
         // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
@@ -1024,10 +1039,10 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             // vanish rank 1-3, mage invisibility
-            targets.remove_if(acore::UnitAuraCheck(true, 11327));
-            targets.remove_if(acore::UnitAuraCheck(true, 11329));
-            targets.remove_if(acore::UnitAuraCheck(true, 26888));
-            targets.remove_if(acore::UnitAuraCheck(true, 32612));
+            targets.remove_if(Acore::UnitAuraCheck(true, 11327));
+            targets.remove_if(Acore::UnitAuraCheck(true, 11329));
+            targets.remove_if(Acore::UnitAuraCheck(true, 26888));
+            targets.remove_if(Acore::UnitAuraCheck(true, 32612));
         }
 
         void Register() override
@@ -1098,8 +1113,8 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             // dbc has only 1 field for excluding, this will prevent anyone from getting both at the same time
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
 
             if (targets.empty())
             {
@@ -1108,7 +1123,7 @@ public:
                 return;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _target = target;
@@ -1197,7 +1212,7 @@ public:
                 return;
 
             uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(triggerSpell);
+            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(triggerSpell);
             spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, caster);
 
             int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
@@ -1256,8 +1271,8 @@ public:
                 }
             }
 
-            targets.remove_if(acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
-            acore::Containers::RandomResizeList(targets, 1);
+            targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -1525,8 +1540,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             TempSummon* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id);
             if (!summon || !summon->IsVehicle())
                 return;
@@ -1627,7 +1641,7 @@ public:
             if (targets.empty())
                 return;
 
-            targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             WorldObject* target = targets.front();
             targets.clear();
             targets.push_back(target);

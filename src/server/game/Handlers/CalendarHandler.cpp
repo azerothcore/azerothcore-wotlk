@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -25,6 +36,7 @@ Copied events should probably have a new owner
 #include "ArenaTeamMgr.h"
 #include "CalendarMgr.h"
 #include "DatabaseEnv.h"
+#include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
@@ -33,8 +45,8 @@ Copied events should probably have a new owner
 #include "Opcodes.h"
 #include "Player.h"
 #include "SocialMgr.h"
-#include "utf8.h"
 #include "WorldSession.h"
+#include "utf8.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
@@ -145,6 +157,11 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     {
         HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(entry);
 
+        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, sGameEventMgr->GetHolidayEventId(holiday->Id), nullptr))
+        {
+            continue;
+        }
+
         data << uint32(holiday->Id);                        // m_ID
         data << uint32(holiday->Region);                    // m_region, might be looping
         data << uint32(holiday->Looping);                   // m_looping, might be region
@@ -210,7 +227,7 @@ bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, 
 {
     if (!utf8::is_valid(s.begin(), s.end()))
     {
-        LOG_INFO("server", "CalendarHandler: Player (%s) attempt to %s an event with invalid name or description (packet modification)",
+        LOG_INFO("network.opcode", "CalendarHandler: Player (%s) attempt to %s an event with invalid name or description (packet modification)",
             playerGUID.ToString().c_str(), action.c_str());
         recvData.rfinish();
         return false;
@@ -329,7 +346,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
             throw;
         }
 
-        SQLTransaction trans;
+        CharacterDatabaseTransaction trans;
         if (inviteCount > 1)
             trans = CharacterDatabase.BeginTransaction();
 
@@ -489,7 +506,7 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
         sCalendarMgr->AddEvent(newEvent, CALENDAR_SENDTYPE_COPY);
 
         CalendarInviteStore invites = sCalendarMgr->GetEventInvites(eventId);
-        SQLTransaction trans;
+        CharacterDatabaseTransaction trans;
         if (invites.size() > 1)
             trans = CharacterDatabase.BeginTransaction();
 
@@ -532,13 +549,13 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     else
     {
         // xinef: Get Data From global storage
-        if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
+        if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name))
         {
-            if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
+            if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid))
             {
                 inviteeGuid = guid;
-                inviteeTeamId = Player::TeamIdForRace(playerData->race);
-                inviteeGuildId = playerData->guildId;
+                inviteeTeamId = Player::TeamIdForRace(playerData->Race);
+                inviteeGuildId = playerData->GuildId;
             }
         }
     }
@@ -555,7 +572,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
         return;
     }
 
-    // xinef: zomg! sync query
+    // xinef: sync query
     if (QueryResult result = CharacterDatabase.PQuery("SELECT flags FROM character_social WHERE guid = %u AND friend = %u", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
     {
         Field* fields = result->Fetch();
@@ -708,8 +725,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
         if (CalendarInvite* invite = sCalendarMgr->GetInvite(inviteId))
         {
             invite->SetStatus((CalendarInviteStatus)status);
-            // not sure if we should set response time when moderator changes invite status
-            //invite->SetStatusTime(time(nullptr));
+            invite->SetStatusTime(time(nullptr));
 
             sCalendarMgr->UpdateInvite(invite);
             sCalendarMgr->SendCalendarEventStatus(*calendarEvent, *invite);
@@ -794,7 +810,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     instanceBind->extended = (bool)toggleExtendOn;
 
     // update in db
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
     stmt->setUInt8(0, toggleExtendOn ? 1 : 0);
     stmt->setUInt32(1, GetPlayer()->GetGUID().GetCounter());
     stmt->setUInt32(2, instanceBind->save->GetInstanceId());

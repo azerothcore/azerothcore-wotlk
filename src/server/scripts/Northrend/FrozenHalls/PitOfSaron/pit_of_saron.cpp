@@ -1,14 +1,27 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "CreatureGroups.h"
-#include "MapManager.h"
-#include "PassiveAI.h"
 #include "pit_of_saron.h"
+#include "CreatureGroups.h"
+#include "MapMgr.h"
+#include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SmartAI.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
@@ -958,7 +971,7 @@ public:
 
                 TSSpawnPos.GetAngle(&TSMidPos);
 
-                for (ObjectGuid guid : summons)
+                for (ObjectGuid const& guid : summons)
                     if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         float hx, hy, hz, ho;
@@ -974,7 +987,7 @@ public:
                 if (pInstance)
                     if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
                     {
-                        for (ObjectGuid guid : summons)
+                        for (ObjectGuid const& guid : summons)
                             if (Creature* s = pInstance->instance->GetCreature(guid))
                                 if (s->IsAlive())
                                     Unit::Kill(c, s);
@@ -1026,7 +1039,7 @@ public:
                     me->SetFacingTo(5.26f);
                     me->SetOrientation(5.26f);
                     me->SetHomePosition(*me);
-                    for (ObjectGuid guid : summons)
+                    for (ObjectGuid const& guid : summons)
                         if (Creature* c = pInstance->instance->GetCreature(guid))
                         {
                             c->SetFacingTo(5.26f);
@@ -1056,7 +1069,7 @@ public:
                             float offset = frand(0.0f, 10.0f);
                             c->GetMotionMaster()->MovePoint(0, 1047.0f + offset, 118.0f + offset, 628.2f);
                             c->SetHomePosition(*me);
-                            for (ObjectGuid guid : summons)
+                            for (ObjectGuid const& guid : summons)
                                 if (Creature* s = pInstance->instance->GetCreature(guid))
                                 {
                                     if (s->GetEntry() == NPC_FALLEN_WARRIOR)

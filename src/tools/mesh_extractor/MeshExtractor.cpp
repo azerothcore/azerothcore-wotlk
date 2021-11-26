@@ -1,26 +1,37 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MPQManager.h"
-#include "WDT.h"
-#include "ContinentBuilder.h"
 #include "Cache.h"
-#include "DBC.h"
 #include "Constants.h"
+#include "ContinentBuilder.h"
+#include "DBC.h"
+#include "MPQMgr.h"
 #include "Model.h"
+#include "WDT.h"
 
-#include "Recast.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
+#include "Recast.h"
 
 #include <stdio.h>
 
 #include <set>
 
-MPQManager* MPQHandler;
+MPQMgr* MPQHandler;
 CacheClass* Cache;
 
 void ExtractMMaps(std::set<uint32>& mapIds, uint32 threads)
@@ -72,15 +83,15 @@ void ExtractDBCs()
     // Iterate over all available locales
     for (std::set<uint32>::iterator itr = MPQHandler->AvailableLocales.begin(); itr != MPQHandler->AvailableLocales.end(); ++itr)
     {
-        printf("Extracting DBCs for locale %s\n", MPQManager::Languages[*itr]);
+        printf("Extracting DBCs for locale %s\n", MPQMgr::Languages[*itr]);
         std::string path = baseDBCPath;
         if (*itr != uint32(MPQHandler->BaseLocale))
         {
-            path += std::string(MPQManager::Languages[*itr]) + "/";
+            path += std::string(MPQMgr::Languages[*itr]) + "/";
             Utils::CreateDir(path);
         }
 
-        std::string component = "component.wow-" + std::string(MPQManager::Languages[*itr]) + ".txt";
+        std::string component = "component.wow-" + std::string(MPQMgr::Languages[*itr]) + ".txt";
         // Extract the component file
         Utils::SaveToDisk(MPQHandler->GetFileFrom(component, MPQHandler->LocaleFiles[*itr]), path + component);
         // Extract the DBC files for the given locale
@@ -369,7 +380,7 @@ int main(int argc, char* argv[])
     }
 
     Cache = new CacheClass();
-    MPQHandler = new MPQManager();
+    MPQHandler = new MPQMgr();
     MPQHandler->Initialize();
 
     if (extractFlags & Constants::EXTRACT_FLAG_DBC)

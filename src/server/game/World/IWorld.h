@@ -1,11 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Callback.h"
+#include "AsyncCallbackProcessor.h"
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
@@ -15,34 +28,29 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class WorldPacket;
 class WorldSession;
 class Player;
 
 /// Storage class for commands issued for delayed execution
-struct CliCommandHolder
+struct AC_GAME_API CliCommandHolder
 {
-    typedef void Print(void*, const char*);
-    typedef void CommandFinished(void*, bool success);
+    using Print = void(*)(void*, std::string_view);
+    using CommandFinished = void(*)(void*, bool success);
 
     void* m_callbackArg;
     char* m_command;
-    Print* m_print;
+    Print m_print;
+    CommandFinished m_commandFinished;
 
-    CommandFinished* m_commandFinished;
+    CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished);
+    ~CliCommandHolder();
 
-    CliCommandHolder(void* callbackArg, const char* command, Print* zprint, CommandFinished* commandFinished)
-            : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
-    {
-        // TODO: fix Codacy warning
-        //  "Does not handle strings that are not \0-terminated; if given one it may perform an over-read (it could cause a crash if unprotected) (CWE-126)."
-        size_t len = strlen(command) + 1;
-        m_command = new char[len];
-        memcpy(m_command, command, len);
-    }
-
-    ~CliCommandHolder() { delete[] m_command; }
+private:
+    CliCommandHolder(CliCommandHolder const& right) = delete;
+    CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
 typedef std::unordered_map<uint32, WorldSession*> SessionMap;
@@ -81,7 +89,6 @@ enum WorldBoolConfigs
     CONFIG_INSTANCE_IGNORE_RAID,
     CONFIG_INSTANCE_GMSUMMON_PLAYER,
     CONFIG_INSTANCE_SHARED_ID,
-    CONFIG_GM_LOG_TRADE,
     CONFIG_ALLOW_GM_GROUP,
     CONFIG_ALLOW_GM_FRIEND,
     CONFIG_GM_LOWER_SECURITY,
@@ -107,14 +114,15 @@ enum WorldBoolConfigs
     CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
-    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMITED_ENABLE,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED,
     CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE,
     CONFIG_BATTLEGROUND_TRACK_DESERTERS,
     CONFIG_BG_XP_FOR_KILL,
     CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
     CONFIG_ARENA_SEASON_IN_PROGRESS,
     CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE,
+    CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
@@ -161,6 +169,8 @@ enum WorldBoolConfigs
     CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE,
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     CONFIG_SET_BOP_ITEM_TRADEABLE,
+    CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
+    CONFIG_REALM_LOGIN_ENABLED,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -253,6 +263,7 @@ enum WorldIntConfigs
     CONFIG_CHATFLOOD_MUTE_TIME,
     CONFIG_EVENT_ANNOUNCE,
     CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY,
+    CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD,
     CONFIG_CREATURE_FAMILY_FLEE_DELAY,
     CONFIG_WORLD_BOSS_LEVEL_DIFF,
     CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF,
@@ -277,13 +288,18 @@ enum WorldIntConfigs
     CONFIG_INSTANT_LOGOUT,
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
     CONFIG_BATTLEGROUND_REPORT_AFK_TIMER,
     CONFIG_BATTLEGROUND_REPORT_AFK,
     CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_BATTLEGROUND_PLAYER_RESPAWN,
-    CONFIG_BATTLEGROUND_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
@@ -374,6 +390,9 @@ enum WorldIntConfigs
     CONFIG_NPC_EVADE_IF_NOT_REACHABLE,
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
+    CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
+    CONFIG_LFG_MAX_KICK_COUNT,
+    CONFIG_LFG_KICK_PREVENTION_TIMER,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -466,22 +485,6 @@ enum Rates
     MAX_RATES
 };
 
-// xinef: global storage
-struct GlobalPlayerData
-{
-    ObjectGuid::LowType guidLow;
-    uint32 accountId;
-    std::string name;
-    uint8 race;
-    uint8 playerClass;
-    uint8 gender;
-    uint8 level;
-    uint16 mailCount;
-    uint32 guildId;
-    uint32 groupId;
-    std::map<uint8, uint32> arenaTeamId;
-};
-
 class IWorld
 {
 public:
@@ -542,9 +545,9 @@ public:
     virtual void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr) = 0;
     virtual bool IsShuttingDown() const = 0;
     virtual uint32 GetShutDownTimeLeft() const = 0;
-    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode) = 0;
+    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) = 0;
     virtual void ShutdownCancel() = 0;
-    virtual void ShutdownMsg(bool show = false, Player* player = nullptr) = 0;
+    virtual void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) = 0;
     virtual void Update(uint32 diff) = 0;
     virtual void UpdateSessions(uint32 diff) = 0;
     virtual void setRate(Rates rate, float value) = 0;
@@ -563,24 +566,17 @@ public:
     virtual void KickAll() = 0;
     virtual void KickAllLess(AccountTypes sec) = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
-    virtual void LoadGlobalPlayerDataStore() = 0;
-    virtual ObjectGuid GetGlobalPlayerGUID(std::string const& name) const = 0;
-    virtual GlobalPlayerData const* GetGlobalPlayerData(ObjectGuid::LowType guid) const = 0;
-    virtual void AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0) = 0;
-    virtual void UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add = true) = 0;
-    virtual void UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId) = 0;
-    virtual void UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId) = 0;
-    virtual void UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName) = 0;
-    virtual void DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name) = 0;
     virtual void ProcessCliCommands() = 0;
     virtual void QueueCliCommand(CliCommandHolder* commandHolder) = 0;
     virtual void ForceGameEventUpdate() = 0;
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
     virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
+    virtual void LoadDBRevision() = 0;
     virtual char const* GetDBVersion() const = 0;
+    virtual char const* GetWorldDBRevision() const = 0;
+    virtual char const* GetCharacterDBRevision() const = 0;
+    virtual char const* GetAuthDBRevision() const = 0;
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     virtual uint32 GetCleaningFlags() const = 0;

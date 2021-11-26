@@ -1,22 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /** \file
     \ingroup world
 */
 
-#include "Log.h"
-#include "ObjectMgr.h"
+#include "Weather.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Util.h"
-#include "Weather.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 /// Create the Weather object
 Weather::Weather(uint32 zone, WeatherData const* weatherChances)
@@ -26,9 +34,7 @@ Weather::Weather(uint32 zone, WeatherData const* weatherChances)
     m_type = WEATHER_TYPE_FINE;
     m_grade = 0;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (uint32)(m_timer.GetInterval() / (MINUTE * IN_MILLISECONDS)));
-#endif
+    LOG_DEBUG("weather", "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (uint32)(m_timer.GetInterval() / (MINUTE * IN_MILLISECONDS)));
 }
 
 /// Launch a weather update
@@ -87,10 +93,8 @@ bool Weather::ReGenerate()
     localtime_r(&gtime, &ltime);
     uint32 season = ((ltime.tm_yday - 78 + 365) / 91) % 4;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
-    LOG_DEBUG("server", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
-#endif
+    LOG_DEBUG("weather", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
 
     if ((u < 60) && (m_grade < 0.33333334f))                // Get fair
     {
@@ -210,7 +214,6 @@ bool Weather::UpdateWeather()
     if (!sWorld->SendZoneMessage(m_zone, &data))
         return false;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     ///- Log the event
     char const* wthstr;
     switch (state)
@@ -257,8 +260,7 @@ bool Weather::UpdateWeather()
             break;
     }
 
-    LOG_DEBUG("server", "Change the weather of zone %u to %s.", m_zone, wthstr);
-#endif
+    LOG_DEBUG("weather", "Change the weather of zone %u to %s.", m_zone, wthstr);
     sScriptMgr->OnWeatherChange(this, state, m_grade);
     return true;
 }

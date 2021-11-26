@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_ITEM_H
@@ -24,6 +35,7 @@ struct ItemSetEffect
     SpellInfo const* spells[8];
 };
 
+// EnumUtils: DESCRIBE THIS
 enum InventoryResult
 {
     EQUIP_ERR_OK                                 = 0,
@@ -117,6 +129,7 @@ enum InventoryResult
     EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED  = 89
 };
 
+// EnumUtils: DESCRIBE THIS
 enum BuyResult
 {
     BUY_ERR_CANT_FIND_ITEM                      = 0,
@@ -130,6 +143,7 @@ enum BuyResult
     BUY_ERR_REPUTATION_REQUIRE                  = 12
 };
 
+// EnumUtils: DESCRIBE THIS
 enum SellResult
 {
     SELL_ERR_CANT_FIND_ITEM                      = 1,       // The item was not found.
@@ -218,14 +232,14 @@ public:
     bool IsBindedNotWith(Player const* player) const;
     [[nodiscard]] bool IsBoundByEnchant() const;
     [[nodiscard]] bool IsBoundByTempEnchant() const;
-    virtual void SaveToDB(SQLTransaction& trans);
+    virtual void SaveToDB(CharacterDatabaseTransaction trans);
     virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
-    static void DeleteFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
-    virtual void DeleteFromDB(SQLTransaction& trans);
-    static void DeleteFromInventoryDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
-    void DeleteFromInventoryDB(SQLTransaction& trans);
+    static void DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
+    virtual void DeleteFromDB(CharacterDatabaseTransaction trans);
+    static void DeleteFromInventoryDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
+    void DeleteFromInventoryDB(CharacterDatabaseTransaction trans);
     void SaveRefundDataToDB();
-    void DeleteRefundDataFromDB(SQLTransaction* trans);
+    void DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans);
 
     Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return nullptr; }
     [[nodiscard]] const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return nullptr; }
@@ -317,7 +331,7 @@ public:
     [[nodiscard]] bool IsConjuredConsumable() const { return GetTemplate()->IsConjuredConsumable(); }
 
     // Item Refund system
-    void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = nullptr);
+    void SetNotRefundable(Player* owner, bool changestate = true, CharacterDatabaseTransaction* trans = nullptr);
     void SetRefundRecipient(ObjectGuid::LowType pGuidLow) { m_refundRecipient = pGuidLow; }
     void SetPaidMoney(uint32 money) { m_paidMoney = money; }
     void SetPaidExtendedCost(uint32 iece) { m_paidExtendedCost = iece; }

@@ -1,15 +1,28 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum KologarnSays
 {
@@ -635,14 +648,14 @@ public:
 };
 
 // predicate function to select non main tank target
-class StoneGripTargetSelector : public acore::unary_function<Unit*, bool>
+class StoneGripTargetSelector
 {
 public:
     StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
 
     bool operator() (WorldObject* target) const
     {
-        if (target == _victim && _me->getThreatManager().getThreatList().size() > 1)
+        if (target == _victim && _me->getThreatMgr().getThreatList().size() > 1)
             return true;
 
         if (target->GetTypeId() != TYPEID_PLAYER)
@@ -651,6 +664,7 @@ public:
         return false;
     }
 
+private:
     Creature* _me;
     Unit const* _victim;
 };
@@ -813,7 +827,7 @@ class achievement_kologarn_looks_could_kill : public AchievementCriteriaScript
 public:
     achievement_kologarn_looks_could_kill() : AchievementCriteriaScript("achievement_kologarn_looks_could_kill") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -829,7 +843,7 @@ class achievement_kologarn_rubble_and_roll : public AchievementCriteriaScript
 public:
     achievement_kologarn_rubble_and_roll() : AchievementCriteriaScript("achievement_kologarn_rubble_and_roll") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -845,7 +859,7 @@ class achievement_kologarn_with_open_arms : public AchievementCriteriaScript
 public:
     achievement_kologarn_with_open_arms() : AchievementCriteriaScript("achievement_kologarn_with_open_arms") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())

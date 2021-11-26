@@ -1,11 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
 #include "ChannelMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
@@ -70,7 +82,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
         {
             _channelDBId = ++ChannelMgr::_channelIdMax;
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL);
             stmt->setUInt32(0, _channelDBId);
             stmt->setString(1, name);
             stmt->setUInt32(2, _teamId);
@@ -90,28 +102,26 @@ void Channel::UpdateChannelInDB() const
 {
     if (_IsSaved)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHANNEL);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHANNEL);
         stmt->setBool(0, _announce);
         stmt->setString(1, _password);
         stmt->setUInt32(2, _channelDBId);
         CharacterDatabase.Execute(stmt);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("chat.system", "Channel(%s) updated in database", _name.c_str());
-#endif
     }
 }
 
 void Channel::UpdateChannelUseageInDB() const
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHANNEL_USAGE);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHANNEL_USAGE);
     stmt->setUInt32(0, _channelDBId);
     CharacterDatabase.Execute(stmt);
 }
 
 void Channel::AddChannelBanToDB(ObjectGuid guid, uint32 time) const
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL_BAN);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL_BAN);
     stmt->setUInt32(0, _channelDBId);
     stmt->setUInt32(1, guid.GetCounter());
     stmt->setUInt32(2, time);
@@ -120,7 +130,7 @@ void Channel::AddChannelBanToDB(ObjectGuid guid, uint32 time) const
 
 void Channel::RemoveChannelBanFromDB(ObjectGuid guid) const
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL_BAN);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL_BAN);
     stmt->setUInt32(0, _channelDBId);
     stmt->setUInt32(1, guid.GetCounter());
     CharacterDatabase.Execute(stmt);
@@ -130,9 +140,9 @@ void Channel::CleanOldChannelsInDB()
 {
     if (sWorld->getIntConfig(CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION) > 0)
     {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_CHANNELS);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_CHANNELS);
         stmt->setUInt32(0, sWorld->getIntConfig(CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION) * DAY);
         trans->Append(stmt);
 
@@ -347,14 +357,15 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (ban && (AccountMgr::IsGMAccount(sec) || isGoodConstantModerator))
         {
-            if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
-                if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid.GetCounter()))
+            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+            {
+                if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(guid))
                 {
-                    if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->getRace()))
+                    if (Player::TeamIdForRace(gpd->Race) == Player::TeamIdForRace(player->getRace()))
                     {
                         banOffline = true;
-                        victim = guid;
-                        badAccId = gpd->accountId;
+                        victim     = guid;
+                        badAccId   = gpd->AccountId;
                     }
                     else
                     {
@@ -362,6 +373,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
                         return;
                     }
                 }
+            }
 
             if (!banOffline)
             {
@@ -484,8 +496,10 @@ void Channel::UnBan(Player const* player, std::string const& badname)
     }
 
     ObjectGuid victim;
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
+    if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+    {
         victim = guid;
+    }
 
     if (!victim || !IsBanned(victim))
     {
@@ -696,9 +710,7 @@ void Channel::List(Player const* player)
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST %s Channel: %s", player->GetSession()->GetPlayerInfo().c_str(), GetName().c_str());
-#endif
     WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + playersStore.size() * (8 + 1));
     data << uint8(1);                                   // channel type?
     data << GetName();                                  // channel name
@@ -816,32 +828,6 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
         ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, _name);
 
     SendToAll(&data, pinfo.IsModerator() ? ObjectGuid::Empty : guid);
-}
-
-void Channel::EveryoneSayToSelf(const char* what)
-{
-    if (!what)
-        return;
-
-    uint32 messageLength = strlen(what) + 1;
-
-    WorldPacket data(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + _name.size() + 1 + 8 + 4 + messageLength + 1);
-    data << (uint8)CHAT_MSG_CHANNEL;
-    data << (uint32)LANG_UNIVERSAL;
-    data << uint64(0); // put player guid here
-    data << uint32(0);
-    data << _name;
-    data << uint64(0); // put player guid here
-    data << messageLength;
-    data << what;
-    data << uint8(0);
-
-    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-    {
-        data.put(5, i->first);
-        data.put(17 + _name.size() + 1, i->first);
-        i->second.plrPtr->GetSession()->SendPacket(&data);
-    }
 }
 
 void Channel::Invite(Player const* player, std::string const& newname)
@@ -1061,7 +1047,7 @@ void Channel::MakeChannelOwner(WorldPacket* data)
 {
     std::string name = "";
 
-    if (!sObjectMgr->GetPlayerNameByGUID(_ownerGUID.GetCounter(), name) || name.empty())
+    if (!sCharacterCache->GetCharacterNameByGuid(_ownerGUID, name) || name.empty())
         name = "PLAYER_NOT_FOUND";
 
     MakeNotifyPacket(data, CHAT_CHANNEL_OWNER_NOTICE);

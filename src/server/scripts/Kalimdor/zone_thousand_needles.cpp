@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -20,10 +31,10 @@ go_panther_cage
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 # npc_lakota_windsong
@@ -39,7 +50,6 @@ enum Lakota
 
     QUEST_FREE_AT_LAST          = 4904,
     NPC_GRIM_BANDIT             = 10758,
-    FACTION_ESCORTEE_LAKO       = 232,                      //guessed
 
     ID_AMBUSH_1                 = 0,
     ID_AMBUSH_2                 = 2,
@@ -66,7 +76,7 @@ public:
         if (quest->GetQuestId() == QUEST_FREE_AT_LAST)
         {
             creature->AI()->Talk(SAY_LAKO_START, player);
-            creature->setFaction(FACTION_ESCORTEE_LAKO);
+            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); //guessed
 
             if (npc_lakota_windsongAI* pEscortAI = CAST_AI(npc_lakota_windsong::npc_lakota_windsongAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -127,8 +137,7 @@ enum Packa
     SAY_COMPLETE        = 2,
 
     QUEST_HOMEWARD      = 4770,
-    NPC_WYVERN          = 4107,
-    FACTION_ESCORTEE    = 232                               //guessed
+    NPC_WYVERN          = 4107
 };
 
 Position const WyvernLoc[3] =
@@ -148,7 +157,7 @@ public:
         if (quest->GetQuestId() == QUEST_HOMEWARD)
         {
             creature->AI()->Talk(SAY_START, player);
-            creature->setFaction(FACTION_ESCORTEE);
+            creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); // guessed
 
             if (npc_paoka_swiftmountainAI* pEscortAI = CAST_AI(npc_paoka_swiftmountain::npc_paoka_swiftmountainAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID(), quest);
@@ -201,7 +210,6 @@ public:
 
 enum Plucky
 {
-    FACTION_FRIENDLY        = 35,
     QUEST_SCOOP             = 1950,
     SPELL_PLUCKY_HUMAN      = 9192,
     SPELL_PLUCKY_CHICKEN    = 9220
@@ -242,7 +250,7 @@ public:
 
     struct npc_pluckyAI : public ScriptedAI
     {
-        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->getFaction(); }
+        npc_pluckyAI(Creature* creature) : ScriptedAI(creature) { NormFaction = creature->GetFaction(); }
 
         uint32 NormFaction;
         uint32 ResetTimer;
@@ -251,8 +259,8 @@ public:
         {
             ResetTimer = 120000;
 
-            if (me->getFaction() != NormFaction)
-                me->setFaction(NormFaction);
+            if (me->GetFaction() != NormFaction)
+                me->SetFaction(NormFaction);
 
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -266,7 +274,7 @@ public:
             {
                 if (TextEmote == TEXT_EMOTE_BECKON)
                 {
-                    me->setFaction(FACTION_FRIENDLY);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                 }
@@ -278,7 +286,7 @@ public:
                     return;
                 else
                 {
-                    me->setFaction(FACTION_FRIENDLY);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     DoCast(me, SPELL_PLUCKY_HUMAN, false);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);

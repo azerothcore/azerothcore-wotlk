@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -10,6 +21,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Realm.h"
 #include "SocialMgr.h"
 #include "World.h"
 #include "WorldSession.h"
@@ -39,20 +51,19 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
 
     LOG_DEBUG("network", "WORLD: %s asked to add friend : '%s'", GetPlayer()->GetName().c_str(), friendName.c_str());
 
-    // xinef: Get Data From global storage
-    ObjectGuid friendGuid = sWorld->GetGlobalPlayerGUID(friendName);
+    ObjectGuid friendGuid = sCharacterCache->GetCharacterGuidByName(friendName);
     if (!friendGuid)
         return;
 
-    GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(friendGuid.GetCounter());
+    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(friendGuid);
     if (!playerData)
         return;
 
-    uint32 friendAccountId = playerData->accountId;
-    TeamId teamId = Player::TeamIdForRace(playerData->race);
+    uint32 friendAccountId = playerData->AccountId;
+    TeamId teamId = Player::TeamIdForRace(playerData->Race);
     FriendsResult friendResult = FRIEND_NOT_FOUND;
 
-    if (!AccountMgr::IsPlayerAccount(GetSecurity()) || sWorld->getBoolConfig(CONFIG_ALLOW_GM_FRIEND)|| AccountMgr::IsPlayerAccount(AccountMgr::GetSecurity(friendAccountId, realmID)))
+    if (!AccountMgr::IsPlayerAccount(GetSecurity()) || sWorld->getBoolConfig(CONFIG_ALLOW_GM_FRIEND)|| AccountMgr::IsPlayerAccount(AccountMgr::GetSecurity(friendAccountId, realm.Id.Realm)))
     {
         if (friendGuid)
         {
@@ -106,7 +117,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
 
     LOG_DEBUG("network", "WORLD: %s asked to Ignore: '%s'", GetPlayer()->GetName().c_str(), ignoreName.c_str());
 
-    ObjectGuid ignoreGuid = sWorld->GetGlobalPlayerGUID(ignoreName);
+    ObjectGuid ignoreGuid = sCharacterCache->GetCharacterGuidByName(ignoreName);
     if (!ignoreGuid)
         return;
 

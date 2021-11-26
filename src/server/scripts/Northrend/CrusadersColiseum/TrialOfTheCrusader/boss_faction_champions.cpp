@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
 
@@ -89,16 +102,16 @@ struct boss_faction_championsAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
         for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatManager().getThreat(pUnit) )
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatMgr().getThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->getThreatManager().modifyThreatPercent(pUnit, -100);
-                //me->getThreatManager().doAddThreat(pUnit, 10000000.0f * threatMod);
-                if (HostileReference* ref = me->getThreatManager().getOnlineContainer().getReferenceByTarget(pUnit))
+                me->getThreatMgr().modifyThreatPercent(pUnit, -100);
+                //me->getThreatMgr().doAddThreat(pUnit, 10000000.0f * threatMod);
+                if (HostileReference* ref = me->getThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
                     ref->addThreat(10000000.0f * threatMod);
             }
         }
@@ -164,7 +177,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     uint32 EnemiesInRange(float distance)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
         uint32 count = 0;
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
@@ -178,7 +191,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     Unit* SelectEnemyCaster(bool casting, float range)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
         {
@@ -1130,7 +1143,7 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_FROST_NOVA, false);
                         events.RepeatEvent(15000);
                         EventMapGCD(events, 1500);
-                        // blink disabled, fucking movement shit not working
+                        // blink disabled, movement not working
                     }
                     else
                         events.RepeatEvent(6000);
@@ -2429,34 +2442,6 @@ public:
     };
 };
 
-class go_toc_champions_cache : public GameObjectScript
-{
-public:
-    go_toc_champions_cache() : GameObjectScript("go_toc_champions_cache") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (player->IsGameMaster())
-            return false;
-
-        if (!go->loot.items.size())
-            return false;
-
-        for(std::vector<LootItem>::iterator itr = go->loot.items.begin(); itr != go->loot.items.end(); ++itr)
-            if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId() != TEAM_ALLIANCE) )
-                    if (!((*itr).is_looted))
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        if (go->loot.unlootedCount)
-                            --go->loot.unlootedCount;
-                    }
-
-        return false;
-    }
-};
-
 class spell_faction_champion_warl_unstable_affliction : public SpellScriptLoader
 {
 public:
@@ -2507,6 +2492,5 @@ void AddSC_boss_faction_champions()
     new npc_toc_retro_paladin();
     new npc_toc_pet_warlock();
     new npc_toc_pet_hunter();
-    new go_toc_champions_cache();
     new spell_faction_champion_warl_unstable_affliction();
 }

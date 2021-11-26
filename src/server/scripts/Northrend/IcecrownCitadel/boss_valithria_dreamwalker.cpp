@@ -1,16 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -144,8 +157,9 @@ public:
     }
 };
 
-struct ManaVoidSelector : public acore::unary_function<Unit*, bool>
+struct ManaVoidSelector
 {
+public:
     explicit ManaVoidSelector(WorldObject const* source) : _source(source) { }
 
     bool operator()(Unit* unit) const
@@ -153,6 +167,7 @@ struct ManaVoidSelector : public acore::unary_function<Unit*, bool>
         return unit->getPowerType() == POWER_MANA && _source->GetDistance(unit) > 15.0f;
     }
 
+private:
     WorldObject const* _source;
 };
 
@@ -205,8 +220,8 @@ public:
 
     bool Execute(uint64 /*currTime*/, uint32 /*diff*/) override
     {
-        acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
-        _creature->VisitNearbyGridObject(333.0f, worker);
+        Acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
+        Cell::VisitGridObjects(_creature, worker, 333.0f);
         _creature->AI()->Reset();
         _creature->setActive(false);
         return true;
@@ -349,8 +364,13 @@ public:
                 Talk(SAY_VALITHRIA_75_PERCENT);
             }
             else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
+            {
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                {
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
+                    _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
+                }
+            }
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -525,8 +545,8 @@ public:
 
             std::list<Creature*> archmages;
             RisenArchmageCheck check;
-            acore::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
-            me->VisitNearbyGridObject(100.0f, searcher);
+            Acore::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
+            Cell::VisitGridObjects(me, searcher, 100.0f);
             for (std::list<Creature*>::iterator itr = archmages.begin(); itr != archmages.end(); ++itr)
                 (*itr)->AI()->DoAction(ACTION_ENTER_COMBAT);
         }
@@ -572,7 +592,7 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
                 if (!threatList.empty())
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* target = (*itr)->getTarget())
@@ -1305,9 +1325,9 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
             std::list<WorldObject*> list_copy = targets;
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
             if (targets.empty())
             {
                 if (list_copy.empty())
@@ -1315,7 +1335,7 @@ public:
                 targets = list_copy;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }
@@ -1361,14 +1381,14 @@ public:
             std::list<Creature*> summoners;
             caster->GetCreaturesWithEntryInRange(summoners, 200.0f, NPC_WORLD_TRIGGER);
             std::list<Creature*> list_copy = summoners;
-            summoners.remove_if(acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+            summoners.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
             if (summoners.empty())
             {
                 if (list_copy.empty())
                     return;
                 summoners = list_copy;
             }
-            acore::Containers::RandomResizeList(summoners, 2);
+            Acore::Containers::RandomResize(summoners, 2);
 
             for (uint32 i = 0; i < 3; ++i)
                 caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);
@@ -1489,7 +1509,7 @@ class achievement_portal_jockey : public AchievementCriteriaScript
 public:
     achievement_portal_jockey() : AchievementCriteriaScript("achievement_portal_jockey") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VALITHRIA_DREAMWALKER && !target->GetAI()->GetData(MISSED_PORTALS);
     }

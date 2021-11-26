@@ -1,21 +1,33 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "halls_of_stone.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "halls_of_stone.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
 #define GOSSIP_ITEM_3       "We dont have time for this right now, we have to keep going."
 #define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
 #define TEXT_ID_START       13100
-#define YELL_AGGRO          "You be dead soon enough!"
 
 enum NPCs
 {
@@ -302,7 +314,7 @@ public:
             SetDespawnAtEnd(false);
             ResetEvent();
 
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetReactState(REACT_PASSIVE);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
@@ -329,7 +341,7 @@ public:
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             {
-                                me->setFaction(i->GetSource()->getFaction());
+                                me->SetFaction(i->GetSource()->GetFaction());
                                 break;
                             }
 
@@ -344,13 +356,13 @@ public:
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
                     break;
                 case ACTION_START_SJONNIR_FIGHT:
-                    me->setFaction(35);
-                    me->MonsterYell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL, 0);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    me->Yell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL);
                     me->PlayDirectSound(14274);
                     SetEscortPaused(false);
                     break;
                 case ACTION_SJONNIR_DEAD:
-                    me->MonsterYell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL, 0);
+                    me->Yell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL);
                     me->PlayDirectSound(14278);
                     events.ScheduleEvent(EVENT_END, 14000);
                     break;
@@ -526,7 +538,7 @@ public:
                             pInstance->SetData(BRANN_BRONZEBEARD, 6);
 
                         me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                        me->MonsterYell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL, 0);
+                        me->Yell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL);
                         me->PlayDirectSound(14279);
                         break;
                     }
@@ -556,7 +568,7 @@ public:
 
                     if (cs)
                     {
-                        cs->MonsterYell(Conversation[SpeechCount].text, LANG_UNIVERSAL, 0);
+                        cs->Yell(Conversation[SpeechCount].text, LANG_UNIVERSAL);
                         cs->PlayDirectSound(Conversation[SpeechCount].sound);
                     }
 

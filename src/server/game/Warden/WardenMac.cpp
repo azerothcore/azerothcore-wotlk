@@ -1,19 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WardenMac.h"
 #include "ByteBuffer.h"
-#include "Common.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SessionKeyGenerator.h"
 #include "Util.h"
-#include "WardenMac.h"
 #include "WardenModuleMac.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include <openssl/md5.h>
@@ -30,7 +39,7 @@ void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
 {
     _session = pClient;
     // Generate Warden Key
-    SessionKeyGenerator<acore::Crypto::SHA1> WK(K);
+    SessionKeyGenerator<Acore::Crypto::SHA1> WK(K);
     WK.Generate(_inputKey, 16);
     WK.Generate(_outputKey, 16);
     /*
@@ -47,20 +56,16 @@ void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Server side warden for client %u initializing...", pClient->GetAccountId());
-    LOG_DEBUG("warden", "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
-    LOG_DEBUG("warden", "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey, 16 ).c_str());
-    LOG_DEBUG("warden", "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
+    LOG_DEBUG("warden", "C->S Key: %s", Acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
+    LOG_DEBUG("warden", "S->C Key: %s", Acore::Impl::ByteArrayToHexStr(_outputKey, 16 ).c_str());
+    LOG_DEBUG("warden", "  Seed: %s", Acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
     LOG_DEBUG("warden", "Loading Module...");
-#endif
 
     _module = GetModuleForClient();
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
-    LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
-#endif
+    LOG_DEBUG("warden", "Module Key: %s", Acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
+    LOG_DEBUG("warden", "Module ID: %s", Acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
     RequestModule();
 }
 
@@ -87,16 +92,12 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 
 void WardenMac::InitializeModule()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Initialize module");
-#endif
 }
 
 void WardenMac::RequestHash()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request hash");
-#endif
 
     // Create packet structure
     WardenHashRequest Request;
@@ -155,7 +156,7 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 
     buff.rpos(buff.wpos());
 
-    acore::Crypto::SHA1 sha1;
+    Acore::Crypto::SHA1 sha1;
     sha1.UpdateData((uint8*)keyIn, 16);
     sha1.Finalize();
 
@@ -164,16 +165,12 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
     // Verify key
     if (memcmp(buff.contents() + 1, sha1.GetDigest().data(), 20) != 0)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "Request hash reply: failed");
-#endif
         ApplyPenalty(0, "Request hash reply: failed");
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request hash reply: succeed");
-#endif
 
     // client 7F96EEFDA5B63D20A4DF8E00CBF48304
     //const uint8 client_key[16] = { 0x7F, 0x96, 0xEE, 0xFD, 0xA5, 0xB6, 0x3D, 0x20, 0xA4, 0xDF, 0x8E, 0x00, 0xCB, 0xF4, 0x83, 0x04 };
@@ -193,9 +190,7 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 
 void WardenMac::RequestChecks()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request data");
-#endif
 
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
@@ -219,9 +214,7 @@ void WardenMac::RequestChecks()
 
 void WardenMac::HandleData(ByteBuffer& buff)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Handle data");
-#endif
 
     _dataSent = false;
     _clientResponseTimer = 0;
@@ -243,20 +236,18 @@ void WardenMac::HandleData(ByteBuffer& buff)
 
     std::string str = "Test string!";
 
-    acore::Crypto::SHA1 sha1;
+    Acore::Crypto::SHA1 sha1;
     sha1.UpdateData(str);
     uint32 magic = 0xFEEDFACE;                              // unsure
     sha1.UpdateData((uint8*)&magic, 4);
     sha1.Finalize();
 
-    std::array<uint8, acore::Crypto::SHA1::DIGEST_LENGTH> sha1Hash;
+    std::array<uint8, Acore::Crypto::SHA1::DIGEST_LENGTH> sha1Hash;
     buff.read(sha1Hash.data(), sha1Hash.size());
 
     if (sha1Hash != sha1.GetDigest())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "Handle data failed: SHA1 hash is wrong!");
-#endif
         //found = true;
     }
 
@@ -271,9 +262,7 @@ void WardenMac::HandleData(ByteBuffer& buff)
 
     if (memcmp(ourMD5Hash, theirsMD5Hash, 16))
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "Handle data failed: MD5 hash is wrong!");
-#endif
         //found = true;
     }
 
