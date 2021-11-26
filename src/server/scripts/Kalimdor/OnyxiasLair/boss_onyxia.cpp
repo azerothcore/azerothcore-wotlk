@@ -180,6 +180,11 @@ public:
             }
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            m_pInstance->SetData(DATA_ONYXIA, DONE);
+        }
+
         void MoveInLineOfSight(Unit* who) override
         {
             if (me->GetVictim() || me->GetDistance(who) > 30.0f)
@@ -211,7 +216,7 @@ public:
             me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -224,14 +229,6 @@ public:
                 m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
             }
             BindPlayers();
-        }
-
-        void JustDied(Unit*  /*killer*/) override
-        {
-            if (m_pInstance)
-            {
-                m_pInstance->SetData(DATA_ONYXIA, DONE);
-            }
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
@@ -318,7 +315,7 @@ public:
                 if (whelpCount < 40)
                 {
                     whelpSpamTimer -= diff;
-                    if( whelpSpamTimer <= 0 )
+                    if (whelpSpamTimer <= 0)
                     {
                         float angle = rand_norm() * 2 * M_PI;
                         float dist = rand_norm() * 4.0f;
@@ -347,12 +344,14 @@ public:
             events.Update(diff);
             HandleWhelpSpam(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -451,7 +450,7 @@ public:
                     break;
                 case EVENT_SPELL_FIREBALL_SECOND:
                     {
-                        if(Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        if (Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                         {
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
@@ -475,16 +474,20 @@ public:
                 case EVENT_PHASE_2_STEP_CW:
                     {
                         uint8 newWP = CurrentWP + 1;
-                        if( newWP > 8 )
+                        if (newWP > 8)
+                        {
                             newWP = 1;
+                        }
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
                     }
                     break;
                 case EVENT_PHASE_2_STEP_ACW:
                     {
                         uint8 newWP = CurrentWP - 1;
-                        if( newWP < 1 )
+                        if (newWP < 1)
+                        {
                             newWP = 8;
+                        }
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
                     }
                     break;
@@ -554,12 +557,9 @@ public:
 
         void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
-            if (target->GetTypeId() == TYPEID_PLAYER && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
+            if (target->IsPlayer() && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
             {
-                if (m_pInstance)
-                {
-                    m_pInstance->SetData(DATA_DEEP_BREATH_FAILED, 1);
-                }
+                m_pInstance->SetData(DATA_DEEP_BREATH_FAILED, 1);
             }
         }
     };

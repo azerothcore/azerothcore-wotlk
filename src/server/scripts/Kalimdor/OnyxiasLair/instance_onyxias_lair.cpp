@@ -81,7 +81,7 @@ public:
 
         void SetData(uint32 uiType, uint32 uiData) override
         {
-            switch(uiType)
+            switch (uiType)
             {
                 case DATA_ONYXIA:
                     m_auiEncounter[0] = uiData;
@@ -108,7 +108,9 @@ public:
             }
 
             if (uiType < MAX_ENCOUNTER && uiData == DONE)
+            {
                 SaveToDB();
+            }
         }
 
         uint32 GetData(uint32 uiType) const override
