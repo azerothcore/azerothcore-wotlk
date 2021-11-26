@@ -239,13 +239,13 @@ public:
             switch (Phase)
             {
                 case 1:
-                    if(me->GetHealth() * 100 / me->GetMaxHealth() <= 65)
+                    if (me->GetHealth() * 100 / me->GetMaxHealth() <= 65)
                     {
                         SetPhase(2);
                     }
                     break;
                 case 2:
-                    if(me->GetHealth() * 100 / me->GetMaxHealth() <= 40)
+                    if (me->GetHealth() * 100 / me->GetMaxHealth() <= 40)
                     {
                         me->InterruptNonMeleeSpells(false);
                         SetPhase(3);
