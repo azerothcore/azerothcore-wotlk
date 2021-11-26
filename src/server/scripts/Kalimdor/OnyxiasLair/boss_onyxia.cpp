@@ -206,18 +206,20 @@ public:
             }
         }
 
-        void JustSummoned(Creature* pSummoned) override
+        void JustSummoned(Creature* summon) override
         {
-            if (pSummoned->GetEntry() != NPC_ONYXIAN_WHELP && pSummoned->GetEntry() != NPC_ONYXIAN_LAIR_GUARD)
+            if (summon->GetEntry() != NPC_ONYXIAN_WHELP && summon->GetEntry() != NPC_ONYXIAN_LAIR_GUARD)
             {
                 return;
             }
 
-            if (Unit* target = pSummoned->SelectNearestTarget(300.0f))
+            if (Unit* target = summon->SelectNearestTarget(300.0f))
             {
-                pSummoned->AI()->AttackStart(target);
-                DoZoneInCombat(pSummoned);
+                summon->AI()->AttackStart(target);
+                DoZoneInCombat(summon);
             }
+
+            summons.Summon(summon);
         }
 
         void MovementInform(uint32 type, uint32 id) override

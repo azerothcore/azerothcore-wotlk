@@ -40,7 +40,6 @@ public:
 
         std::string str_data;
         uint16 ManyWhelpsCounter;
-        GuidVector minions;
         bool bDeepBreath;
 
         void Initialize() override
@@ -49,19 +48,6 @@ public:
             ManyWhelpsCounter = 0;
             bDeepBreath = true;
             LoadObjectData(creatureData, nullptr);
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_ONYXIAN_WHELP:
-                case NPC_ONYXIAN_LAIR_GUARD:
-                    minions.push_back(creature->GetGUID());
-                    break;
-            }
-
-            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -78,25 +64,24 @@ public:
             }
         }
 
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+            {
+                return false;
+            }
+
+            if (type == DATA_ONYXIA && state == NOT_STARTED)
+            {
+                ManyWhelpsCounter = 0;
+                bDeepBreath = true;
+            }
+        }
+
         void SetData(uint32 uiType, uint32 uiData) override
         {
             switch (uiType)
             {
-                case DATA_ONYXIA:
-                    ManyWhelpsCounter = 0;
-                    bDeepBreath = true;
-                    if(uiData == NOT_STARTED)
-                    {
-                        for (ObjectGuid const& guid : minions)
-                        {
-                            if (Creature* c = instance->GetCreature(guid))
-                            {
-                                c->DespawnOrUnsummon();
-                            }
-                        }
-                        minions.clear();
-                    }
-                    break;
                 case DATA_WHELP_SUMMONED:
                     ++ManyWhelpsCounter;
                     break;
