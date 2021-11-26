@@ -19,6 +19,11 @@
 #include "ScriptedCreature.h"
 #include "onyxias_lair.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_ONYXIA, DATA_ONYXIA }
+};
+
 class instance_onyxias_lair : public InstanceMapScript
 {
 public:
@@ -33,7 +38,6 @@ public:
     {
         instance_onyxias_lair_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        ObjectGuid m_uiOnyxiasGUID;
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
         uint16 ManyWhelpsCounter;
@@ -47,37 +51,29 @@ public:
             bDeepBreath = true;
         }
 
-        bool IsEncounterInProgress() const override
+        void OnCreatureCreate(Creature* creature) override
         {
-            for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
-                if( m_auiEncounter[i] == IN_PROGRESS )
-                    return true;
-
-            return false;
-        }
-
-        void OnCreatureCreate(Creature* pCreature) override
-        {
-            switch( pCreature->GetEntry() )
+            switch (creature->GetEntry())
             {
-                case NPC_ONYXIA:
-                    m_uiOnyxiasGUID = pCreature->GetGUID();
-                    break;
                 case NPC_ONYXIAN_WHELP:
                 case NPC_ONYXIAN_LAIR_GUARD:
-                    minions.push_back(pCreature->GetGUID());
+                    minions.push_back(creature->GetGUID());
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch( go->GetEntry() )
+            switch (go->GetEntry())
             {
                 case GO_WHELP_SPAWNER:
                     go->CastSpell((Unit*)nullptr, 17646);
-                    if( Creature* onyxia = instance->GetCreature(m_uiOnyxiasGUID) )
+                    if (Creature* onyxia = GetCreature(DATA_ONYXIA))
+                    {
                         onyxia->AI()->DoAction(-1);
+                    }
                     break;
             }
         }
@@ -90,11 +86,15 @@ public:
                     m_auiEncounter[0] = uiData;
                     ManyWhelpsCounter = 0;
                     bDeepBreath = true;
-                    if( uiData == NOT_STARTED )
+                    if(uiData == NOT_STARTED)
                     {
                         for (ObjectGuid const& guid : minions)
+                        {
                             if (Creature* c = instance->GetCreature(guid))
+                            {
                                 c->DespawnOrUnsummon();
+                            }
+                        }
                         minions.clear();
                     }
                     break;
@@ -112,24 +112,13 @@ public:
 
         uint32 GetData(uint32 uiType) const override
         {
-            switch(uiType)
+            switch (uiType)
             {
                 case DATA_ONYXIA:
                     return m_auiEncounter[0];
             }
 
             return 0;
-        }
-
-        ObjectGuid GetGuidData(uint32 uiData) const override
-        {
-            switch (uiData)
-            {
-                case DATA_ONYXIA:
-                    return m_uiOnyxiasGUID;
-            }
-
-            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
