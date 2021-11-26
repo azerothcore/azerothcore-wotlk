@@ -49,6 +49,7 @@ public:
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             ManyWhelpsCounter = 0;
             bDeepBreath = true;
+            LoadObjectData(creatureData, nullptr);
         }
 
         void OnCreatureCreate(Creature* creature) override
