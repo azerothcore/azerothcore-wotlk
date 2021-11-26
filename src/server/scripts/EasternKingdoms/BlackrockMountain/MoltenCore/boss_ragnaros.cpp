@@ -394,7 +394,7 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
 
-            me->RemoveAura(SPELL_RAGNA_SUBMERGE_VISUAL);
+            me->RemoveAurasDueToSpell(SPELL_RAGNA_SUBMERGE_VISUAL);
 
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
             {
