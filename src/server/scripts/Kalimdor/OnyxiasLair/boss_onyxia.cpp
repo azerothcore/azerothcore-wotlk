@@ -161,6 +161,7 @@ public:
             me->SetDisableGravity(false);
             me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
             instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+            BossAI::Reset();
         }
 
         void DoAction(int32 param) override

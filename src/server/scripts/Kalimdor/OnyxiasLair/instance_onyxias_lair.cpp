@@ -76,6 +76,8 @@ public:
                 ManyWhelpsCounter = 0;
                 bDeepBreath = true;
             }
+
+            return true;
         }
 
         void SetData(uint32 uiType, uint32 uiData) override
