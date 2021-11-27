@@ -1,5 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1637692848290406800');
 
+ALTER TABLE `creature_template` DROP `InhabitType`;
+
 DROP TABLE IF EXISTS `creature_movement_override`;
 CREATE TABLE `creature_movement_override` (
 	`SpawnId` INT UNSIGNED NOT NULL DEFAULT '0',
@@ -34,8 +36,6 @@ DELETE FROM `creature_movement_override` WHERE `SpawnId`=120772;
 INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (120772, 1, 0, 1, 1, 0, 0, NULL);
 DELETE FROM `creature_movement_override` WHERE `SpawnId`=120906;
 INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (120906, 1, 0, 1, 1, 0, 0, NULL);
-
-ALTER TABLE `creature_template` DROP `InhabitType`;
 
 UPDATE `acore_string` SET `content_default`='Movement type: %s' WHERE `entry`=11008;
 
