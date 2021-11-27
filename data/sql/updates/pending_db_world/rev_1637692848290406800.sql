@@ -48,19 +48,19 @@ DELETE FROM `command` WHERE `name`='reload creature_movement_override';
 INSERT INTO `command` (`name`,`security`,`help`) VALUES
 ('reload creature_movement_override',3,'Syntax: .reload creature_movement_override\nReload creature_movement_override table.');
 
--- Dumping structure for table world.creature_template_movement
 DROP TABLE IF EXISTS `creature_template_movement`;
-CREATE TABLE IF NOT EXISTS `creature_template_movement` (
-  `CreatureId` int(10) unsigned NOT NULL DEFAULT '0',
-  `Ground` tinyint(3) unsigned DEFAULT NULL,
-  `Swim` tinyint(3) unsigned DEFAULT NULL,
-  `Flight` tinyint(3) unsigned DEFAULT NULL,
-  `Rooted` tinyint(3) unsigned DEFAULT NULL,
-  `Chase` tinyint(3) unsigned DEFAULT NULL,
-  `Random` tinyint(3) unsigned DEFAULT NULL,
-  `InteractionPauseTimer` int(10) unsigned DEFAULT NULL COMMENT 'Time (in milliseconds) during which creature will not move after interaction with player',
-  PRIMARY KEY (`CreatureId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `creature_template_movement` (
+	`CreatureId` INT UNSIGNED NOT NULL DEFAULT '0',
+	`Ground` TINYINT UNSIGNED NULL DEFAULT NULL,
+	`Swim` TINYINT UNSIGNED NULL DEFAULT NULL,
+	`Flight` TINYINT UNSIGNED NULL DEFAULT NULL,
+	`Rooted` TINYINT UNSIGNED NULL DEFAULT NULL,
+	`Chase` TINYINT UNSIGNED NULL DEFAULT NULL,
+	`Random` TINYINT UNSIGNED NULL DEFAULT NULL,
+	`InteractionPauseTimer` INT UNSIGNED NULL DEFAULT NULL COMMENT 'Time (in milliseconds) during which creature will not move after interaction with player',
+	PRIMARY KEY (`CreatureId`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci' ENGINE=MyISAM;
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId`=40468;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (40468, 1, 1, 2, 0, 0, 0, NULL);
