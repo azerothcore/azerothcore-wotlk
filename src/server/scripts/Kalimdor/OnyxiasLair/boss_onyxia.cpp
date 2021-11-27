@@ -21,7 +21,7 @@
 #include "SpellInfo.h"
 #include "onyxias_lair.h"
 
-enum // Spells
+enum Spells
 {
     SPELL_WINGBUFFET                = 18500,
     SPELL_FLAMEBREATH               = 18435,
@@ -47,7 +47,7 @@ enum // Spells
     SPELL_BREATH_NE_TO_SW           = 18617,
 };
 
-enum // Events
+enum Events
 {
     EVENT_SPELL_WINGBUFFET          = 1,
     EVENT_SPELL_FLAMEBREATH         = 2,
@@ -73,7 +73,15 @@ enum // Events
     EVENT_LIFTOFF                   = 31,
     EVENT_FLY_S_TO_N                = 32,
     EVENT_LAND                      = 33,
-    EVENT_END_MANY_WHELPS_TIME,
+    EVENT_END_MANY_WHELPS_TIME
+};
+
+enum Phases
+{
+    PHASE_NONE,
+    PHASE_GROUNDED,
+    PHASE_AIRPHASE,
+    PHASE_LANDED
 };
 
 struct sOnyxMove
@@ -180,7 +188,7 @@ public:
         void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            SetPhase(1);
+            SetPhase(PHASE_GROUNDED);
 
             instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
@@ -189,21 +197,14 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            switch (Phase)
+            if (me->HealthBelowPctDamaged(65, damage) && Phase == PHASE_GROUNDED)
             {
-                case 1:
-                    if (me->HealthBelowPctDamaged(damage, 65))
-                    {
-                        SetPhase(2);
-                    }
-                    break;
-                case 2:
-                    if (me->HealthBelowPctDamaged(damage, 40))
-                    {
-                        me->InterruptNonMeleeSpells(false);
-                        SetPhase(3);
-                    }
-                    break;
+                SetPhase(PHASE_AIRPHASE);
+            }
+            else if (me->HealthBelowPctDamaged(40, damage) && Phase == PHASE_AIRPHASE)
+            {
+                me->InterruptNonMeleeSpells(false);
+                SetPhase(PHASE_LANDED);
             }
         }
 
@@ -232,7 +233,7 @@ public:
 
             if (id < 9)
             {
-                if (id > 0 && Phase == 2)
+                if (id > 0 && Phase == PHASE_AIRPHASE)
                 {
                     me->SetFacingTo(OnyxiaMoveData[id].o);
                     me->SetSpeed(MOVE_RUN, 1.6f, false);
@@ -311,8 +312,6 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
                 case EVENT_SPELL_WINGBUFFET:
                     {
                         DoCastAOE(SPELL_WINGBUFFET);
