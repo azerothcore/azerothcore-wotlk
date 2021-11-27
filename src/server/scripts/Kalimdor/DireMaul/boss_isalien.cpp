@@ -59,7 +59,7 @@ public:
 
             _scheduler.SetValidator([this]
                 {
-                    return me->HasUnitState(UNIT_STATE_CASTING);
+                    return !me->HasUnitState(UNIT_STATE_CASTING);
                 });
         }
 
