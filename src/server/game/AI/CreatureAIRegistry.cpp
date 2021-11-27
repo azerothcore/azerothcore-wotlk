@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureAIRegistry.h"
 #include "CombatAI.h"
 #include "CreatureAIFactory.h"
-#include "CreatureAIRegistry.h"
 #include "GuardAI.h"
 #include "MovementGeneratorImpl.h"
 #include "PassiveAI.h"

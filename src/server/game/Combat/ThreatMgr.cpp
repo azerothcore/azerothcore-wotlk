@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ThreatMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Map.h"
@@ -23,7 +24,6 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "ThreatMgr.h"
 #include "Unit.h"
 #include "UnitEvents.h"
 

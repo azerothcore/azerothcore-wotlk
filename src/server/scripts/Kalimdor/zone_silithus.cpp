@@ -29,15 +29,16 @@ EndContentData */
 
 #include "AccountMgr.h"
 #include "BanMgr.h"
-#include "Group.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "Spell.h"
-#include "SpellInfo.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "Group.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "Spell.h"
+#include "SpellInfo.h"
+#include "WorldSession.h"
 
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
