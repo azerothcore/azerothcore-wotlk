@@ -43,8 +43,7 @@ enum GoIds
 enum NpcIds
 {
     NPC_IMMOL_THAR                  = 11496,
-    NPC_HIGHBORNE_SUMMONER          = 11466,
-    NPC_ISALIEN                     = 16097
+    NPC_HIGHBORNE_SUMMONER          = 11466
 };
 
 template <class AI, class T>

@@ -45,14 +45,9 @@ enum Points
     POINT_RANDOM = 1
 };
 
-class boss_isalien : public CreatureScript
-{
-public:
-    boss_isalien() : CreatureScript("boss_isalien") { }
-
-    struct boss_isalienAI : public BossAI
+    struct boss_isalien : public BossAI
     {
-        boss_isalienAI(Creature* creature) : BossAI(creature, DATA_ISALIEN) { }
+        boss_isalien(Creature* creature) : BossAI(creature, DATA_ISALIEN) { }
 
         void Reset() override
         {
@@ -141,13 +136,7 @@ public:
             uint8 _phase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetDireMaulAI<boss_isalienAI>(creature);
-    }
-};
-
 void AddSC_boss_isalien()
 {
-    new boss_isalien();
+    RegisterDireMaulCreatureAI(boss_isalien);
 }
