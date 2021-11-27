@@ -5,6 +5,7 @@ ALTER TABLE `creature_loot_template` DROP PRIMARY KEY, ADD PRIMARY KEY (`Entry`,
 
 SET @REF := 20000;
 DELETE FROM `reference_loot_template` WHERE `Entry` BETWEEN @REF AND @REF + 18;
+DELETE FROM `reference_loot_template` WHERE `Entry`=24072;
 
 SET @REFGREY0 := @REF;
 -- Correct ref loot for various grey level 1 to 5 Vanilla
