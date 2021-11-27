@@ -187,18 +187,18 @@ public:
             BossAI::EnterCombat(who);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             switch (Phase)
             {
                 case 1:
-                    if (me->GetHealth() * 100 / me->GetMaxHealth() <= 65)
+                    if (me->HealthBelowPctDamaged(damage, 65))
                     {
                         SetPhase(2);
                     }
                     break;
                 case 2:
-                    if (me->GetHealth() * 100 / me->GetMaxHealth() <= 40)
+                    if (me->HealthBelowPctDamaged(damage, 40))
                     {
                         me->InterruptNonMeleeSpells(false);
                         SetPhase(3);
@@ -451,10 +451,9 @@ public:
                     break;
                 case EVENT_PHASE_2_STEP_ACROSS:
                     {
+                        Talk(EMOTE_BREATH);
                         me->SetFacingTo(OnyxiaMoveData[CurrentWP].o);
-                        me->TextEmote("Onyxia takes in a deep breath...", nullptr, true);
                         DoCastAOE(OnyxiaMoveData[CurrentWP].spellId);
-
                         events.ScheduleEvent(EVENT_SPELL_BREATH, 8250);
                     }
                     break;
