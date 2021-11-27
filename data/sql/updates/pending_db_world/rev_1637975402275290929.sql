@@ -196,7 +196,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (@NPC,0,@REFFOOD0,30,0,1,0,1,1, 'Kobold Vermin - (Food 1-5 EXP 0 ReferenceTable)'),
 (@NPC,0,@REFGREY0,30,0,1,1,1,1, 'Kobold Vermin - (Grey 1-5 EXP 0 ReferenceTable)'),
 (@NPC,0,11111,.2,0,1,0,1,1, 'Kobold Vermin - (Small Pouch ReferenceTable)'),
-(@NPC,0,755,20,0,1,0,1,1, 'Kobold Vermin - Melted Candle');
+(@NPC,755,0,20,0,1,0,1,1, 'Kobold Vermin - Melted Candle');
 
 -- Update loot for Entry 257 : Kobold Worker
 SET @NPC := 257;
@@ -205,7 +205,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (@NPC,0,@REFFOOD0,30,0,1,0,1,1, 'Kobold Worker - (Food 1-5 EXP 0 ReferenceTable)'),
 (@NPC,0,@REFGREY0,30,0,1,1,1,1, 'Kobold Worker - (Grey 1-5 EXP 0 ReferenceTable)'),
 (@NPC,0,11111,.2,0,1,0,1,1, 'Kobold Worker - (Small Pouch ReferenceTable)'),
-(@NPC,0,755,20,0,1,0,1,1, 'Kobold Worker - Melted Candle');
+(@NPC,755,0,20,0,1,0,1,1, 'Kobold Worker - Melted Candle');
 
 -- Update loot for Entry 80 : Kobold Laborer
 SET @NPC := 80;
@@ -214,7 +214,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (@NPC,0,@REFFOOD0,30,0,1,0,1,1, 'Kobold Laborer - (Food 1-5 EXP 0 ReferenceTable)'),
 (@NPC,0,@REFGREY0,30,0,1,1,1,1, 'Kobold Laborer - (Grey 1-5 EXP 0 ReferenceTable)'),
 (@NPC,0,11111,.2,0,1,0,1,1, 'Kobold Laborer - (Small Pouch ReferenceTable)'),
-(@NPC,0,755,20,0,1,0,1,1, 'Kobold Laborer - Melted Candle'),
+(@NPC,755,0,20,0,1,0,1,1, 'Kobold Laborer - Melted Candle'),
 (@NPC,2055,0,2,0,1,0,1,1, 'Kobold Laborer - Small Wooden Hammer');
 
 -- Entry 38 : Defias Thug
