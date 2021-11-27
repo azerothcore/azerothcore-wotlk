@@ -140,7 +140,7 @@ public:
         {
             events.Reset();
             Phase = ph;
-            switch( ph )
+            switch (ph)
             {
                 case 0:
                     break;
@@ -173,29 +173,40 @@ public:
             whelpSpamTimer = 0;
             bManyWhelpsAvailable = false;
 
-            if( m_pInstance )
+            if (m_pInstance)
             {
                 m_pInstance->SetData(DATA_ONYXIA, NOT_STARTED);
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
             }
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            m_pInstance->SetData(DATA_ONYXIA, DONE);
+        }
+
         void MoveInLineOfSight(Unit* who) override
         {
-            if( me->GetVictim() || me->GetDistance(who) > 30.0f )
+            if (me->GetVictim() || me->GetDistance(who) > 30.0f)
+            {
                 return;
+            }
 
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+            {
                 AttackStart(who);
+            }
         }
 
         void DoAction(int32 param) override
         {
-            switch( param )
+            switch (param)
             {
                 case -1:
-                    if( bManyWhelpsAvailable && m_pInstance )
+                    if (bManyWhelpsAvailable && m_pInstance)
+                    {
                         m_pInstance->SetData(DATA_WHELP_SUMMONED, 1);
+                    }
                     break;
             }
         }
@@ -205,13 +216,13 @@ public:
             me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             SetPhase(1);
 
-            if( m_pInstance )
+            if (m_pInstance)
             {
                 m_pInstance->SetData(DATA_ONYXIA, IN_PROGRESS);
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
@@ -220,22 +231,18 @@ public:
             BindPlayers();
         }
 
-        void JustDied(Unit*  /*killer*/) override
-        {
-            if( m_pInstance )
-                m_pInstance->SetData(DATA_ONYXIA, DONE);
-        }
-
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
-            switch( Phase )
+            switch (Phase)
             {
                 case 1:
-                    if( me->GetHealth() * 100 / me->GetMaxHealth() <= 65 )
+                    if (me->GetHealth() * 100 / me->GetMaxHealth() <= 65)
+                    {
                         SetPhase(2);
+                    }
                     break;
                 case 2:
-                    if( me->GetHealth() * 100 / me->GetMaxHealth() <= 40 )
+                    if (me->GetHealth() * 100 / me->GetMaxHealth() <= 40)
                     {
                         me->InterruptNonMeleeSpells(false);
                         SetPhase(3);
@@ -246,11 +253,12 @@ public:
 
         void JustSummoned(Creature* pSummoned) override
         {
-            if( !pSummoned )
+            if (pSummoned->GetEntry() != NPC_ONYXIAN_WHELP && pSummoned->GetEntry() != NPC_ONYXIAN_LAIR_GUARD)
+            {
                 return;
-            if( pSummoned->GetEntry() != NPC_ONYXIAN_WHELP && pSummoned->GetEntry() != NPC_ONYXIAN_LAIR_GUARD )
-                return;
-            if( Unit* target = pSummoned->SelectNearestTarget(300.0f) )
+            }
+
+            if (Unit* target = pSummoned->SelectNearestTarget(300.0f))
             {
                 pSummoned->AI()->AttackStart(target);
                 DoZoneInCombat(pSummoned);
@@ -259,12 +267,14 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if( type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE )
-                return;
-
-            if( id < 9 )
+            if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
             {
-                if( id > 0 && Phase == 2 )
+                return;
+            }
+
+            if (id < 9)
+            {
+                if (id > 0 && Phase == 2)
                 {
                     me->SetFacingTo(OnyxiaMoveData[id].o);
                     me->SetSpeed(MOVE_RUN, 1.6f, false);
@@ -272,7 +282,9 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL_FIRST, 1000);
                 }
             }
-            else switch( id )
+            else
+            {
+                switch (id)
                 {
                     case 10:
                         me->SetFacingTo(OnyxiaMoveData[0].o);
@@ -293,16 +305,17 @@ public:
                         events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0);
                         break;
                 }
+            }
         }
 
         void HandleWhelpSpam(const uint32 diff)
         {
-            if( whelpSpam )
+            if (whelpSpam)
             {
-                if( whelpCount < 40 )
+                if (whelpCount < 40)
                 {
                     whelpSpamTimer -= diff;
-                    if( whelpSpamTimer <= 0 )
+                    if (whelpSpamTimer <= 0)
                     {
                         float angle = rand_norm() * 2 * M_PI;
                         float dist = rand_norm() * 4.0f;
@@ -323,18 +336,22 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
             HandleWhelpSpam(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -422,7 +439,7 @@ public:
                     break;
                 case EVENT_SPELL_FIREBALL_FIRST:
                     {
-                        if( Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true) )
+                        if (Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                         {
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
@@ -433,34 +450,44 @@ public:
                     break;
                 case EVENT_SPELL_FIREBALL_SECOND:
                     {
-                        if( Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true) )
+                        if (Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                         {
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
                         }
 
                         uint8 rand = urand(0, 99);
-                        if( rand < 33 )
+                        if (rand < 33)
+                        {
                             events.ScheduleEvent(EVENT_PHASE_2_STEP_CW, 4000);
-                        else if( rand < 66 )
+                        }
+                        else if (rand < 66)
+                        {
                             events.ScheduleEvent(EVENT_PHASE_2_STEP_ACW, 4000);
+                        }
                         else
+                        {
                             events.ScheduleEvent(EVENT_PHASE_2_STEP_ACROSS, 4000);
+                        }
                     }
                     break;
                 case EVENT_PHASE_2_STEP_CW:
                     {
                         uint8 newWP = CurrentWP + 1;
-                        if( newWP > 8 )
+                        if (newWP > 8)
+                        {
                             newWP = 1;
+                        }
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
                     }
                     break;
                 case EVENT_PHASE_2_STEP_ACW:
                     {
                         uint8 newWP = CurrentWP - 1;
-                        if( newWP < 1 )
+                        if (newWP < 1)
+                        {
                             newWP = 8;
+                        }
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
                     }
                     break;
@@ -510,8 +537,10 @@ public:
                     break;
                 case EVENT_ERUPTION:
                     {
-                        if( Creature* trigger = me->SummonCreature(12758, *me, TEMPSUMMON_TIMED_DESPAWN, 1000) )
+                        if (Creature* trigger = me->SummonCreature(12758, *me, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                        {
                             trigger->CastSpell(trigger, 17731, false);
+                        }
                     }
                     break;
                 case EVENT_SUMMON_WHELP:
@@ -528,9 +557,10 @@ public:
 
         void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
-            if (target->GetTypeId() == TYPEID_PLAYER && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
-                if (m_pInstance)
-                    m_pInstance->SetData(DATA_DEEP_BREATH_FAILED, 1);
+            if (target->IsPlayer() && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
+            {
+                m_pInstance->SetData(DATA_DEEP_BREATH_FAILED, 1);
+            }
         }
     };
 };
@@ -558,24 +588,32 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if( me->GetVictim() || me->GetDistance(who) > 20.0f )
+            if (me->GetVictim() || me->GetDistance(who) > 20.0f)
+            {
                 return;
+            }
 
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+            {
                 AttackStart(who);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -585,7 +623,9 @@ public:
                     break;
                 case EVENT_OLG_SPELL_IGNITEWEAPON:
                     if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+                    {
                         events.RepeatEvent(5000);
+                    }
                     else
                     {
                         me->CastSpell(me, SPELL_OLG_IGNITEWEAPON, false);
@@ -595,9 +635,15 @@ public:
             }
 
             if (!me->HasUnitState(UNIT_STATE_CASTING) && me->isAttackReady())
+            {
                 if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+                {
                     if (me->HasAura(SPELL_OLG_IGNITEWEAPON))
+                    {
                         me->RemoveAura(SPELL_OLG_IGNITEWEAPON);
+                    }
+                }
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -620,11 +666,15 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if( me->GetVictim() || me->GetDistance(who) > 20.0f )
+            if (me->GetVictim() || me->GetDistance(who) > 20.0f)
+            {
                 return;
+            }
 
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if (who->GetTypeId() == TYPEID_PLAYER)
+            {
                 AttackStart(who);
+            }
         }
     };
 };
