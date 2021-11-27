@@ -53,4 +53,6 @@ inline AI* GetDireMaulAI(T* obj)
     return GetInstanceAI<AI>(obj, DMScriptName);
 }
 
+#define RegisterDireMaulCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetDireMaulAI)
+
 #endif
