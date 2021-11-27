@@ -58,6 +58,6 @@ inline AI* GetOnyxiasLairAI(T* obj)
     return GetInstanceAI<AI>(obj, OnyxiasLairScriptName);
 }
 
-#define RegisterOnyxiaLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetOnyxiasLairAI)
+#define RegisterOnyxiasLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetOnyxiasLairAI)
 
 #endif

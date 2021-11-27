@@ -592,6 +592,6 @@ public:
 
 void AddSC_boss_onyxia()
 {
-    RegisterOnyxiaLairCreatureAI(boss_onyxia);
-    RegisterOnyxiaLairCreatureAI(npc_onyxian_lair_guard);
+    RegisterOnyxiasLairCreatureAI(boss_onyxia);
+    RegisterOnyxiasLairCreatureAI(npc_onyxian_lair_guard);
 }
