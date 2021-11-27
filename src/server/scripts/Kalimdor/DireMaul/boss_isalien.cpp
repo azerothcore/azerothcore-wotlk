@@ -28,7 +28,6 @@ enum Texts
 enum Spells
 {
     SPELL_CALL_EMPYREAN = 27639,
-    SPELL_SHOOT         = 22907,
     SPELL_MULTI_SHOT    = 14443,
     SPELL_NET           = 12024,
     SPELL_STARSHARDS    = 27636,
@@ -39,6 +38,11 @@ enum Phases
 {
     PHASE_NONE = 0,
     PHASE_REGROWTH
+};
+
+enum Points
+{
+    POINT_RANDOM = 1
 };
 
 class boss_isalien : public CreatureScript
@@ -70,7 +74,14 @@ public:
                 _phase = PHASE_REGROWTH;
                 _scheduler.Schedule(25s, 30s, [this](TaskContext context)
                     {
-                        DoCastSelf(SPELL_REGROWTH);
+                        Position randomPos = me->GetRandomPoint(me->GetPosition(), 15.f);
+                        me->GetMotionMaster()->MovePoint(POINT_RANDOM, randomPos);
+                        context.Schedule(3s, [this](TaskContext /*context*/)
+                            {
+                                me->GetMotionMaster()->Clear();
+                                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                                DoCastSelf(SPELL_REGROWTH);
+                            });
                         context.Repeat(25s, 30s);
                     });
             }
@@ -84,20 +95,15 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            _scheduler.Schedule(3s, 4s, [this](TaskContext context)
-                {
-                    DoCastVictim(SPELL_SHOOT);
-                    context.Repeat(3s, 4s);
-                })
-            .Schedule(7s, 12s, [this](TaskContext context)
-                {
-                    DoCastVictim(SPELL_MULTI_SHOT);
-                    context.Repeat(7s, 12s);
-                })
-            .Schedule(4s, 5s, [this](TaskContext context)
+            _scheduler.Schedule(4s, 5s, [this](TaskContext context)
                 {
                     DoCastRandomTarget(SPELL_NET);
                     context.Repeat(12s, 15s);
+                })
+            .Schedule(7s, 12s, [this](TaskContext context)
+                {
+                    DoCastRandomTarget(SPELL_MULTI_SHOT);
+                    context.Repeat(7s, 12s);
                 })
             .Schedule(20s, 30s, [this](TaskContext context)
                 {
