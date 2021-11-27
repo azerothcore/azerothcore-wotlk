@@ -17,9 +17,9 @@
 
 #ifndef DBC_H
 #define DBC_H
-#include <vector>
-#include <string>
 #include "Define.h"
+#include <string>
+#include <vector>
 
 class Record;
 

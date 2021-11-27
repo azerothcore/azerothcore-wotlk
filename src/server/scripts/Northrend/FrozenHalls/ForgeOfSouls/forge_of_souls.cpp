@@ -17,9 +17,9 @@
 
 #include "forge_of_souls.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
 
 enum Yells

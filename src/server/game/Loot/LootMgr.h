@@ -421,6 +421,7 @@ extern LootStore LootTemplates_Skinning;
 extern LootStore LootTemplates_Disenchant;
 extern LootStore LootTemplates_Prospecting;
 extern LootStore LootTemplates_Spell;
+extern LootStore LootTemplates_Player;
 
 void LoadLootTemplates_Creature();
 void LoadLootTemplates_Fishing();
@@ -435,6 +436,8 @@ void LoadLootTemplates_Prospecting();
 
 void LoadLootTemplates_Spell();
 void LoadLootTemplates_Reference();
+
+void LoadLootTemplates_Player();
 
 inline void LoadLootTables()
 {
@@ -451,6 +454,8 @@ inline void LoadLootTables()
     LoadLootTemplates_Spell();
 
     LoadLootTemplates_Reference();
+
+    LoadLootTemplates_Player();
 }
 
 #endif

@@ -99,9 +99,13 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
         _guid = ObjectGuid::Create<HighGuid::Player>(val.get<ObjectGuid::LowType>());
 
         if ((_player = ObjectAccessor::FindPlayerByLowGUID(_guid.GetCounter())))
+        {
             _name = _player->GetName();
-        else if (!sObjectMgr->GetPlayerNameByGUID(_guid.GetCounter(), _name))
+        }
+        else if (!sCharacterCache->GetCharacterNameByGuid(_guid, _name))
+        {
             return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_GUID_NO_EXIST, _guid.ToString().c_str());
+        }
 
         return next;
     }
@@ -116,9 +120,13 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
             return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_NAME_INVALID, STRING_VIEW_FMT_ARG(_name));
 
         if ((_player = ObjectAccessor::FindPlayerByName(_name)))
+        {
             _guid = _player->GetGUID();
-        else if (!(_guid = sObjectMgr->GetPlayerGUIDByName(_name)))
+        }
+        else if (!(_guid = sCharacterCache->GetCharacterGuidByName(_name)))
+        {
             return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_NAME_NO_EXIST, STRING_VIEW_FMT_ARG(_name));
+        }
 
         return next;
     }
