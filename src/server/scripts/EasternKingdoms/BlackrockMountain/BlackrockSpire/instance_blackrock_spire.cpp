@@ -121,9 +121,6 @@ public:
                 case NPC_WARMASTER_VOONE:
                     WarMasterVoone = creature->GetGUID();
                     break;
-                case NPC_MOR_GRAYHOOF:
-                    MorGrayhoof = creature->GetGUID();
-                    break;
                 case NPC_MOTHER_SMOLDERWEB:
                     MotherSmolderweb = creature->GetGUID();
                     break;
@@ -455,8 +452,6 @@ public:
                     return ShadowHunterVoshgajin;
                 case DATA_WARMASTER_VOONE:
                     return WarMasterVoone;
-                case DATA_MOR_GRAYHOOF:
-                    return MorGrayhoof;
                 case DATA_MOTHER_SMOLDERWEB:
                     return MotherSmolderweb;
                 case DATA_UROK_DOOMHOWL:
@@ -701,7 +696,6 @@ public:
         ObjectGuid HighlordOmokk;
         ObjectGuid ShadowHunterVoshgajin;
         ObjectGuid WarMasterVoone;
-        ObjectGuid MorGrayhoof;
         ObjectGuid MotherSmolderweb;
         ObjectGuid UrokDoomhowl;
         ObjectGuid QuartermasterZigris;

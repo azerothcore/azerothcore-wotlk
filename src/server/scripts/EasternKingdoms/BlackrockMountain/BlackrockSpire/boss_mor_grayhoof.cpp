@@ -70,174 +70,165 @@ std::vector<uint32> humanSpells = { SPELL_HURRICANE, SPELL_MOONFIRE, SPELL_SHOCK
 std::vector<uint32> bearSpells = { SPELL_DEMORALIZING_ROAR, SPELL_MAUL, SPELL_SWIPE };
 std::vector<uint32> faerieSpells = { SPELL_ARCANE_EXPLOSION, SPELL_REFLECTION, SPELL_CHAIN_LIGHTING, SPELL_SLEEP };
 
-class boss_mor_grayhoof : public CreatureScript
+
+struct boss_mor_grayhoof : public BossAI
 {
-public:
-    boss_mor_grayhoof() : CreatureScript("boss_mor_grayhoof") { }
-
-    struct boss_mor_grayhoofAI : public BossAI
+    boss_mor_grayhoof(Creature* creature) : BossAI(creature, DATA_MOR_GRAYHOOF)
     {
-        boss_mor_grayhoofAI(Creature* creature) : BossAI(creature, DATA_MOR_GRAYHOOF)
-        {
-            _scheduler.SetValidator([this]
-                {
-                    return !me->HasUnitState(UNIT_STATE_CASTING);
-                });
-
-            _sleepTargetThreat = 0.f;
-        }
-
-        void Reset() override
-        {
-            _scheduler.CancelAll();
-            _phase = PHASE_HUMAN;
-        }
-
-        void CastRandomSpell(uint8 phase)
-        {
-            uint32 spell;
-            switch (phase)
+        _scheduler.SetValidator([this]
             {
-                case PHASE_HUMAN:
-                    spell = Acore::Containers::SelectRandomContainerElement(humanSpells);
-                    if (spell == SPELL_REJUVENATION || spell == SPELL_HEALING_TOUCH)
-                    {
-                        DoCastSelf(spell);
-                    }
-                    else
-                    {
-                        DoCastAOE(spell);
-                    }
-                    break;
-                case PHASE_BEAR:
-                    spell = Acore::Containers::SelectRandomContainerElement(bearSpells);
-                    DoCastVictim(spell);
-                    break;
-                case PHASE_CAT:
-                    spell = Acore::Containers::SelectRandomContainerElement(catSpells);
-                    DoCastVictim(spell);
-                    break;
-                case PHASE_FAERIE:
-                    spell = Acore::Containers::SelectRandomContainerElement(faerieSpells);
-                    if (spell == SPELL_SLEEP)
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.f, true))
-                        {
-                            me->CastSpell(target, SPELL_SLEEP);
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
 
-                            // Sleep can target tank, we need to drop threat temporarily on the target.
-                            _sleepTargetGUID = target->GetGUID();
-                            _sleepTargetThreat = me->getThreatMgr().getThreat(target);
-                            me->getThreatMgr().modifyThreatPercent(target, -100);
-                            _scheduler.Schedule(Seconds(10), [this](TaskContext /*context*/)
-                                {
-                                    if (Unit* sleepTarget = ObjectAccessor::GetUnit(*me, _sleepTargetGUID))
-                                    {
-                                        me->getThreatMgr().addThreat(sleepTarget, _sleepTargetThreat);
-                                    }
-                                });
-                        }
-                    }
-                    else
-                    {
-                        DoCastVictim(spell);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
-        {
-            if (_phase == PHASE_HUMAN && me->HealthBelowPct(75.f))
-            {
-                _phase = PHASE_BEAR;
-                me->CastStop();
-                _scheduler.DelayGroup(PHASE_HUMAN, Seconds(10));
-                DoCastSelf(SPELL_BEAR_FORM);
-                _scheduler.Schedule(Seconds(3), PHASE_BEAR, [this](TaskContext context)
-                    {
-                        CastRandomSpell(PHASE_BEAR);
-                        if (context.GetRepeatCounter() <= 3)
-                        {
-                            context.Repeat();
-                        }
-                    });
-            }
-            else if (_phase == PHASE_BEAR && me->HealthBelowPct(50.f))
-            {
-                _phase = PHASE_CAT;
-                _scheduler.DelayGroup(PHASE_HUMAN, Seconds(10));
-                me->CastStop();
-                DoCastSelf(SPELL_CAT_FORM);
-                _scheduler.Schedule(Seconds(3), PHASE_CAT, [this](TaskContext context)
-                    {
-                        CastRandomSpell(PHASE_CAT);
-                        if (context.GetRepeatCounter() <= 3)
-                        {
-                            context.Repeat();
-                        }
-                    });
-            }
-            else if (_phase == PHASE_CAT && me->HealthBelowPct(25.f))
-            {
-                _phase = PHASE_FAERIE;
-                _scheduler.CancelGroup(PHASE_HUMAN);
-                me->CastStop();
-                DoCastSelf(SPELL_FAERIE_DRAGON_FORM);
-                _scheduler.Schedule(Seconds(5), Seconds(10), PHASE_FAERIE, [this](TaskContext context)
-                    {
-                        CastRandomSpell(PHASE_FAERIE);
-                        context.Repeat(Seconds(5), Seconds(10));
-                    });
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
-            Talk(SAY_AGGRO);
-            _scheduler.Schedule(Seconds(5), Seconds(10), PHASE_HUMAN, [this](TaskContext context)
-                {
-                    CastRandomSpell(PHASE_HUMAN);
-                    context.Repeat();
-                });
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-            {
-                return;
-            }
-
-            _scheduler.Update(diff, [this]
-                {
-                    DoMeleeAttackIfReady();
-                });
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
-
-        protected:
-            TaskScheduler _scheduler;
-            uint8 _phase;
-            ObjectGuid _sleepTargetGUID;
-            float _sleepTargetThreat;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockSpireAI<boss_mor_grayhoofAI>(creature);
+        _sleepTargetThreat = 0.f;
     }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        _phase = PHASE_HUMAN;
+    }
+
+    void CastRandomSpell(uint8 phase)
+    {
+        uint32 spell;
+        switch (phase)
+        {
+            case PHASE_HUMAN:
+                spell = Acore::Containers::SelectRandomContainerElement(humanSpells);
+                if (spell == SPELL_REJUVENATION || spell == SPELL_HEALING_TOUCH)
+                {
+                    DoCastSelf(spell);
+                }
+                else
+                {
+                    DoCastAOE(spell);
+                }
+                break;
+            case PHASE_BEAR:
+                spell = Acore::Containers::SelectRandomContainerElement(bearSpells);
+                DoCastVictim(spell);
+                break;
+            case PHASE_CAT:
+                spell = Acore::Containers::SelectRandomContainerElement(catSpells);
+                DoCastVictim(spell);
+                break;
+            case PHASE_FAERIE:
+                spell = Acore::Containers::SelectRandomContainerElement(faerieSpells);
+                if (spell == SPELL_SLEEP)
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.f, true))
+                    {
+                        me->CastSpell(target, SPELL_SLEEP);
+
+                        // Sleep can target tank, we need to drop threat temporarily on the target.
+                        _sleepTargetGUID = target->GetGUID();
+                        _sleepTargetThreat = me->getThreatMgr().getThreat(target);
+                        me->getThreatMgr().modifyThreatPercent(target, -100);
+                        _scheduler.Schedule(10s, [this](TaskContext /*context*/)
+                            {
+                                if (Unit* sleepTarget = ObjectAccessor::GetUnit(*me, _sleepTargetGUID))
+                                {
+                                    me->getThreatMgr().addThreat(sleepTarget, _sleepTargetThreat);
+                                }
+                            });
+                    }
+                }
+                else
+                {
+                    DoCastVictim(spell);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+    {
+        if (_phase == PHASE_HUMAN && me->HealthBelowPct(75.f))
+        {
+            _phase = PHASE_BEAR;
+            me->CastStop();
+            _scheduler.DelayGroup(PHASE_HUMAN, 10s);
+            DoCastSelf(SPELL_BEAR_FORM);
+            _scheduler.Schedule(3s, PHASE_BEAR, [this](TaskContext context)
+                {
+                    CastRandomSpell(PHASE_BEAR);
+                    if (context.GetRepeatCounter() <= 3)
+                    {
+                        context.Repeat();
+                    }
+                });
+        }
+        else if (_phase == PHASE_BEAR && me->HealthBelowPct(50.f))
+        {
+            _phase = PHASE_CAT;
+            _scheduler.DelayGroup(PHASE_HUMAN, 10s);
+            me->CastStop();
+            DoCastSelf(SPELL_CAT_FORM);
+            _scheduler.Schedule(3s, PHASE_CAT, [this](TaskContext context)
+                {
+                    CastRandomSpell(PHASE_CAT);
+                    if (context.GetRepeatCounter() <= 3)
+                    {
+                        context.Repeat();
+                    }
+                });
+        }
+        else if (_phase == PHASE_CAT && me->HealthBelowPct(25.f))
+        {
+            _phase = PHASE_FAERIE;
+            _scheduler.CancelGroup(PHASE_HUMAN);
+            me->CastStop();
+            DoCastSelf(SPELL_FAERIE_DRAGON_FORM);
+            _scheduler.Schedule(5s, 10s, PHASE_FAERIE, [this](TaskContext context)
+                {
+                    CastRandomSpell(PHASE_FAERIE);
+                    context.Repeat(5s, 10s);
+                });
+        }
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _EnterCombat();
+        Talk(SAY_AGGRO);
+        _scheduler.Schedule(5s, 10s, PHASE_HUMAN, [this](TaskContext context)
+            {
+                CastRandomSpell(PHASE_HUMAN);
+                context.Repeat();
+            });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
+
+protected:
+    TaskScheduler _scheduler;
+    uint8 _phase;
+    ObjectGuid _sleepTargetGUID;
+    float _sleepTargetThreat;
 };
+
 
 void AddSC_boss_mor_grayhoof()
 {
-    new boss_mor_grayhoof();
+    RegisterBlackrockSpireCreatureAI(boss_mor_grayhoof);
 }
