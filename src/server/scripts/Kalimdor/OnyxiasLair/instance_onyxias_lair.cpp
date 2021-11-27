@@ -89,11 +89,6 @@ public:
                     bDeepBreath = false;
                     break;
             }
-
-            if (uiType < MAX_ENCOUNTER && uiData == DONE)
-            {
-                SaveToDB();
-            }
         }
 
         std::string GetSaveData() override
