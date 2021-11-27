@@ -18,7 +18,7 @@
 #ifndef DEF_DIRE_MAUL_H
 #define DEF_DIRE_MAUL_H
 
-#include "UnitAI.h"
+#include "CreatureAIImpl.h"
 
 constexpr auto DMScriptName = "instance_dire_maul";
 
