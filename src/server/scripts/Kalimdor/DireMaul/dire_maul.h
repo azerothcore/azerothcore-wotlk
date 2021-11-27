@@ -20,6 +20,8 @@
 
 #include "UnitAI.h"
 
+constexpr auto DMScriptName = "instance_dire_maul";
+
 enum DataTypes
 {
     TYPE_EAST_WING_PROGRESS         = 0,
@@ -27,6 +29,7 @@ enum DataTypes
     TYPE_PYLONS_STATE               = 2,
     TYPE_NORTH_WING_PROGRESS        = 3,
     TYPE_NORTH_WING_BOSSES          = 4,
+    DATA_ISALIEN                    = 32,
 
     ALL_PYLONS_OFF                  = 0x1F
 };
@@ -40,7 +43,14 @@ enum GoIds
 enum NpcIds
 {
     NPC_IMMOL_THAR                  = 11496,
-    NPC_HIGHBORNE_SUMMONER          = 11466
+    NPC_HIGHBORNE_SUMMONER          = 11466,
+    NPC_ISALIEN                     = 16097
 };
+
+template <class AI, class T>
+inline AI* GetDireMaulAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, DMScriptName);
+}
 
 #endif

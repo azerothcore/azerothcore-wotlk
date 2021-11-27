@@ -64,6 +64,9 @@ public:
                     }
                     HighborneSummoners.push_back(creature->GetGUID());
                     break;
+                case NPC_ISALIEN:
+                    Isalien = creature->GetGUID();
+                    break;
             }
         }
 
@@ -132,6 +135,17 @@ public:
             SaveToDB();
         }
 
+        ObjectGuid GetGuidData(uint32 type) const override
+        {
+            switch (type)
+            {
+                case DATA_ISALIEN:
+                    return Isalien;
+            }
+
+            return ObjectGuid::Empty;
+        }
+
         uint32 GetData(uint32 type) const override
         {
             if (type == TYPE_EAST_WING_PROGRESS)
@@ -177,6 +191,7 @@ public:
         uint32 _northWingBosses;
 
         ObjectGuid _immoltharGUID;
+        ObjectGuid Isalien;
         std::vector<ObjectGuid> HighborneSummoners;
     };
 
