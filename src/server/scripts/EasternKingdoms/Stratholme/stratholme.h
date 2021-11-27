@@ -33,6 +33,8 @@ enum DataTypes
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
+    DATA_JARIEN                         = 2,
+    DATA_SOTHOS                         = 3
 };
 
 enum CreatureIds
@@ -47,6 +49,8 @@ enum CreatureIds
     NPC_PLAGUED_RAT                     = 10441,
     NPC_PLAGUED_INSECT                  = 10461,
     NPC_PLAGUED_MAGGOT                  = 10536,
+    NPC_JARIEN                          = 16101,
+    NPC_SOTHOS                          = 16102,
 };
 
 enum GameobjectIds
@@ -97,5 +101,7 @@ inline AI* GetStratholmeAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, StratholmeScriptName);
 }
+
+#define RegisterStratholmeCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetStratholmeAI)
 
 #endif
