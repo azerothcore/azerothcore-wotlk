@@ -70,7 +70,6 @@ std::vector<uint32> humanSpells = { SPELL_HURRICANE, SPELL_MOONFIRE, SPELL_SHOCK
 std::vector<uint32> bearSpells = { SPELL_DEMORALIZING_ROAR, SPELL_MAUL, SPELL_SWIPE };
 std::vector<uint32> faerieSpells = { SPELL_ARCANE_EXPLOSION, SPELL_REFLECTION, SPELL_CHAIN_LIGHTING, SPELL_SLEEP };
 
-
 struct boss_mor_grayhoof : public BossAI
 {
     boss_mor_grayhoof(Creature* creature) : BossAI(creature, DATA_MOR_GRAYHOOF)
@@ -226,7 +225,6 @@ protected:
     ObjectGuid _sleepTargetGUID;
     float _sleepTargetThreat;
 };
-
 
 void AddSC_boss_mor_grayhoof()
 {
