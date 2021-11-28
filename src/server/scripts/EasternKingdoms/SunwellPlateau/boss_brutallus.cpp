@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "WorldSession.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -371,7 +372,7 @@ public:
                     break;
                 case EVENT_MAD_20:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
                     {
                         brutallus->AI()->Talk(YELL_INTRO_TAUNT);

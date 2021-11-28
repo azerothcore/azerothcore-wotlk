@@ -29,10 +29,10 @@ go_elune_fire
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 // Theirs
@@ -297,7 +297,7 @@ public:
         if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
         {
             creature->AI()->Talk(SAY_QUEST_START);
-            creature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+            creature->SetFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
             if (npc_ranshallaAI* escortAI = dynamic_cast<npc_ranshallaAI*>(creature->AI()))
                 escortAI->Start(false, false, player->GetGUID(), quest);

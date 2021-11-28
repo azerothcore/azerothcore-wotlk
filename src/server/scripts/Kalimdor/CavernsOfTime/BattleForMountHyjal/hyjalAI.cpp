@@ -22,14 +22,14 @@ SDComment:
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
+#include "hyjalAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "hyjal_trash.h"
-#include "hyjalAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "hyjal_trash.h"
 
 enum Spawns
 {
@@ -910,7 +910,7 @@ void hyjalAI::HideNearPos(float x, float y)
         for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
         {
             (*itr)->SetVisible(false);
-            (*itr)->setFaction(35);//make them friendly so mobs won't attack them
+            (*itr)->SetFaction(FACTION_FRIENDLY); // make them friendly so mobs won't attack them
         }
     }
 }
@@ -988,7 +988,7 @@ void hyjalAI::DoOverrun(uint32 faction, const uint32 diff)
                     if ((*itr) && (*itr)->IsAlive())
                     {
                         (*itr)->CastSpell(*itr, SPELL_TELEPORT_VISUAL, true);
-                        (*itr)->setFaction(35);//make them friendly so mobs won't attack them
+                        (*itr)->SetFaction(FACTION_FRIENDLY); // make them friendly so mobs won't attack them
                         (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     }
                 }

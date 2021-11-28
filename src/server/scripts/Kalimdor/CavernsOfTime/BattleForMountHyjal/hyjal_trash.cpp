@@ -16,9 +16,9 @@
  */
 
 #include "hyjal_trash.h"
-#include "hyjal.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "hyjal.h"
 
 enum Spells
 {
@@ -471,7 +471,7 @@ public:
                 if (trigger)
                 {
                     trigger->SetVisible(false);
-                    trigger->setFaction(me->getFaction());
+                    trigger->SetFaction(me->GetFaction());
                     trigger->SetDisableGravity(true);
                     trigger->CastSpell(me, SPELL_METEOR, true);
                 }

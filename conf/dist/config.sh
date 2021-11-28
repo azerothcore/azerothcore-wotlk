@@ -29,6 +29,16 @@ BINPATH="$AC_PATH_ROOT/env/dist"
 # DATAPATH="$BINPATH/bin"
 # DATAPATH_ZIP="$DATAPATH/data.zip"
 
+# azerothcore's official remote source address to pull from
+# by default git will fetch form the azrothcore remote 
+# You can change it to "origin" if you want to fetch/pull from the set remote
+ORIGIN_REMOTE="https://github.com/azerothcore/azerothcore-wotlk.git"
+
+# Branch configuration for the installer to pull from. 
+# By default git will select the current working branch 
+# You can set it to "master" if you want the latest updates
+INSTALLER_PULL_FROM=
+
 ##############################################
 #
 #  COMPILER_CONFIGURATIONS
@@ -70,6 +80,8 @@ CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=${CSCRIPTPCH:-ON}
 CCOREPCH=${CCOREPCH:-ON}
+# compile with C++20
+CUSE_CPP_20=${CUSE_CPP_20:-OFF}
 
 # Skip specific modules from compilation (cmake reconfigure needed)
 # use semicolon ; to separate modules

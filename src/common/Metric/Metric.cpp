@@ -21,8 +21,8 @@
 #include "DeadlineTimer.h"
 #include "Log.h"
 #include "Strand.h"
-#include "Util.h"
 #include "Tokenize.h"
+#include "Util.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/ip/tcp.hpp>
 

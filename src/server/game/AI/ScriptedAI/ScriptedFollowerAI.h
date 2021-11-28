@@ -19,6 +19,7 @@
 #define SC_FOLLOWERAI_H
 
 #include "ScriptSystem.h"
+#include "ScriptedCreature.h"
 
 enum eFollowState
 {
@@ -35,7 +36,7 @@ class FollowerAI : public ScriptedAI
 {
 public:
     explicit FollowerAI(Creature* creature);
-    ~FollowerAI() override {}
+    ~FollowerAI() override { }
 
     //virtual void WaypointReached(uint32 uiPointId) = 0;
 

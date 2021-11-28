@@ -22,10 +22,10 @@ SDComment:
 SDCategory: Npc
 EndScriptData */
 
+#include "ScriptedEscortAI.h"
 #include "Group.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 
 enum ePoints
 {
@@ -184,7 +184,7 @@ void npc_escortAI::JustRespawned()
     //add a small delay before going to first waypoint, normal in near all cases
     m_uiWPWaitTimer = 1000;
 
-    if (me->getFaction() != me->GetCreatureTemplate()->faction)
+    if (me->GetFaction() != me->GetCreatureTemplate()->faction)
         me->RestoreFaction();
 
     Reset();

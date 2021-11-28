@@ -1114,7 +1114,8 @@ enum AcoreStrings
     LANG_CMDPARSER_ITEM_NO_EXIST          = 1513,
     LANG_CMDPARSER_SPELL_NO_EXIST         = 1514,
     LANG_CMDPARSER_EXACT_SEQ_MISMATCH     = 1515,
-    // FREE IDS                             1516-1499
+    LANG_CMDPARSER_QUEST_NO_EXIST         = 1516,
+    // FREE IDS                             1517-1499
 
     // Ticket Strings 2000-2030
     LANG_COMMAND_TICKETNEW              = 2000,
@@ -1220,7 +1221,16 @@ enum AcoreStrings
 
     LANG_NPCINFO_SPELL_SCHOOL_IMMUNE    = 5062,
 
-    // Room for more strings    5063-9999
+    LANG_COMMAND_CACHE_INFO             = 5063,
+    LANG_COMMAND_CACHE_DELETE           = 5064,
+    LANG_COMMAND_CACHE_REFRESH          = 5065,
+    LANG_COMMAND_CACHE_NOT_FOUND        = 5066,
+
+    LANG_COMMAND_QUEST_ADD              = 5067,
+    LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG = 5068,
+    LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
+
+    // Room for more strings    5070-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

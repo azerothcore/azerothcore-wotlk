@@ -19,11 +19,12 @@
 #include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "TaskScheduler.h"
@@ -1199,8 +1200,7 @@ public:
                 events.CancelEvent(EVENT_HORSEMAN_CLEAVE);
 
                 // Summon Head
-                Position pos;
-                me->GetNearPosition(pos, 15.0f, rand_norm() * 2 * M_PI);
+                Position pos = me->GetNearPosition(15.0f, rand_norm() * 2 * M_PI);
                 if (Creature* cr = me->SummonCreature(NPC_HORSEMAN_HEAD, pos))
                 {
                     if (health)

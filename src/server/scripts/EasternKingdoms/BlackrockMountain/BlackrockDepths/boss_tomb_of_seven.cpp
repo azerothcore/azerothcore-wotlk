@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_depths.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "blackrock_depths.h"
 
 enum Spells
 {
@@ -178,7 +178,7 @@ public:
             Voidwalkers = false;
             // Reset his gossip menu
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            me->setFaction(FACTION_FRIEND);
+            me->SetFaction(FACTION_FRIENDLY);
 
             // was set before event start, so set again
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);

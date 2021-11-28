@@ -290,6 +290,67 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
 }
 
 template<class T>
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
+{
+    if (!DBUpdaterUtil::CheckExecutable())
+    {
+        return false;
+    }
+
+    Path const sourceDirectory(BuiltInConfig::GetSourceDirectory());
+    if (!is_directory(sourceDirectory))
+    {
+        return false;
+    }
+
+    auto CheckUpdateTable = [&](std::string const& tableName)
+    {
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '%s'", tableName.c_str()));
+        if (!checkTable)
+        {
+            Path const temp(GetBaseFilesDirectory() + tableName + ".sql");
+            try
+            {
+                DBUpdater<T>::ApplyFile(pool, temp);
+            }
+            catch (UpdateException&)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    };
+
+    if (!CheckUpdateTable("updates") || !CheckUpdateTable("updates_include"))
+    {
+        return false;
+    }
+
+    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
+    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
+    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), setDirectories);
+
+    UpdateResult result;
+    try
+    {
+        result = updateFetcher.Update(
+                     sConfigMgr->GetOption<bool>("Updates.Redundancy", true),
+                     sConfigMgr->GetOption<bool>("Updates.AllowRehash", true),
+                     sConfigMgr->GetOption<bool>("Updates.ArchivedRedundancy", false),
+                     sConfigMgr->GetOption<int32>("Updates.CleanDeadRefMaxCount", 3));
+    }
+    catch (UpdateException&)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+template<class T>
 bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 {
     {
@@ -417,8 +478,17 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
     // Set max allowed packet to 1 GB
     args.emplace_back("--max-allowed-packet=1GB");
 
+#if !defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80000
+
+    if (ssl == "ssl")
+        args.emplace_back("--ssl-mode=REQUIRED");
+
+#else
+
     if (ssl == "ssl")
         args.emplace_back("--ssl");
+
+#endif
 
     // Database
     if (!database.empty())

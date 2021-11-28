@@ -18,8 +18,8 @@
 #ifndef DEF_STEAM_VAULT_H
 #define DEF_STEAM_VAULT_H
 
-#include "PassiveAI.h"
 #include "CreatureAIImpl.h"
+#include "PassiveAI.h"
 
 #define SteamVaultScriptName "instance_steam_vault"
 

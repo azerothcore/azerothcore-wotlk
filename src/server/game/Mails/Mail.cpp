@@ -15,18 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Mail.h"
 #include "AuctionHouseMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
+#include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Log.h"
-#include "Mail.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Unit.h"
 #include "World.h"
+#include "WorldSession.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
@@ -146,7 +148,9 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
 
     uint32 rc_account = 0;
     if (!receiver)
-        rc_account = sObjectMgr->GetPlayerAccountIdByGUID(receiver_guid);
+    {
+        rc_account = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver_guid));
+    }
 
     if (!receiver && !rc_account)                            // sender not exist
     {
@@ -250,8 +254,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         trans->Append(stmt);
     }
 
-    // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(receiver.GetPlayerGUIDLow(), 1);
+    sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver.GetPlayerGUIDLow()));
 
     // For online receiver update in game mail status and data
     if (pReceiver)

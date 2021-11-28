@@ -21,11 +21,12 @@
 #include "Cryptography/BigNumber.h"
 #include <map>
 
-enum WardenActions
+// EnumUtils: DESCRIBE THIS
+enum WardenActions : uint8
 {
-    WARDEN_ACTION_LOG   = 0,
-    WARDEN_ACTION_KICK  = 1,
-    WARDEN_ACTION_BAN   = 2,
+    WARDEN_ACTION_LOG,  // TITLE Log
+    WARDEN_ACTION_KICK, // TITLE Kick
+    WARDEN_ACTION_BAN   // TITLE Ban
 };
 
 constexpr uint8 MAX_WARDEN_ACTION = 3;
