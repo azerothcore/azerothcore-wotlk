@@ -247,7 +247,7 @@ public:
     [[nodiscard]] Unit* SelectNearestTargetInAttackDistance(float dist) const;
 
     void DoFleeToGetAssistance();
-    void CallForHelp(float fRadius);
+    void CallForHelp(float fRadius, Unit* target = nullptr);
     void CallAssistance(Unit* target = nullptr);
     void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
     void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
@@ -255,7 +255,6 @@ public:
     bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
     bool _IsTargetAcceptable(const Unit* target) const;
     bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
-    bool _CanDetectFeignDeathOf(const Unit* target) const; // pussywizard
 
     // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
     void UpdateMoveInLineOfSightState();
@@ -330,7 +329,8 @@ public:
     void UpdateWaypointID(uint32 wpID) { m_waypointID = wpID; }
 
     void SearchFormation();
-    [[nodiscard]] CreatureGroup* GetFormation() const { return m_formation; }
+    [[nodiscard]] CreatureGroup const* GetFormation() const { return m_formation; }
+    [[nodiscard]] CreatureGroup* GetFormation() { return m_formation; }
     void SetFormation(CreatureGroup* formation) { m_formation = formation; }
 
     Unit* SelectVictim();

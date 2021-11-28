@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "SpellMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 

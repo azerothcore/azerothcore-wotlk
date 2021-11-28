@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MovementPacketBuilder.h"
-#include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "MoveSpline.h"
+#include "MovementPacketBuilder.h"
 #include "Opcodes.h"
 #include "Transport.h"
 #include "Unit.h"
