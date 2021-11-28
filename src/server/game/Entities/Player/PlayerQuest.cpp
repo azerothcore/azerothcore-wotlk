@@ -726,7 +726,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     bool rewarded = IsQuestRewarded(quest_id) && !quest->IsDFQuest();
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this) * GetQuestRate());
+    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(getLevel()) * GetQuestRate());
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
@@ -744,7 +744,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
-    if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(this))
+    if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(getLevel()))
     {
         moneyRew += rewOrReqMoney;
     }
@@ -1481,7 +1481,7 @@ void Player::RemoveRewardedQuest(uint32 questId, bool update /*= true*/)
 void Player::SendQuestUpdate(uint32 questId)
 {
     uint32 zone = 0, area = 0;
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 oldSpellId = 0;
 
     SpellAreaForQuestMapBounds saBounds = sSpellMgr->GetSpellAreaForQuestMapBounds(questId);
@@ -1505,7 +1505,7 @@ void Player::SendQuestUpdate(uint32 questId)
 
     saBounds = sSpellMgr->GetSpellAreaForQuestEndMapBounds(questId);
 
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 skipSpellId = 0;
     oldSpellId = 0;
     if (saBounds.first != saBounds.second)
@@ -2278,12 +2278,12 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         data << uint32(XP);
-        data << uint32(quest->GetRewOrReqMoney(this));
+        data << uint32(quest->GetRewOrReqMoney(getLevel()));
     }
     else
     {
         data << uint32(0);
-        data << uint32(quest->GetRewOrReqMoney(this) + quest->GetRewMoneyMaxLevel());
+        data << uint32(quest->GetRewOrReqMoney(getLevel()) + quest->GetRewMoneyMaxLevel());
     }
 
     data << uint32(10 * quest->CalculateHonorGain(GetQuestLevel(quest)));

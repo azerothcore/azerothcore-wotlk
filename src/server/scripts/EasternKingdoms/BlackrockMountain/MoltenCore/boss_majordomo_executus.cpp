@@ -40,6 +40,7 @@ enum Texts
     // Majordomo
     SAY_RAG_SUM_1                           = 9,
     SAY_RAG_SUM_2                           = 10,
+    SAY_DEATH                               = 11,
 
     // Ragnaros
     SAY_ARRIVAL1_RAG                        = 1,
@@ -74,7 +75,6 @@ enum Events
 {
     EVENT_MAGIC_REFLECTION                  = 1,
     EVENT_DAMAGE_REFLECTION,
-    EVENT_BLAST_WAVE,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -130,8 +130,11 @@ public:
     {
         boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
 
-        // Disabled events
-        void JustDied(Unit* /*killer*/) override {}
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_DEATH);
+            me->DespawnOrUnsummon(10s, 0s);
+        }
 
         void JustSummoned(Creature* summon) override
         {
@@ -221,7 +224,6 @@ public:
 
             events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
 
@@ -252,18 +254,7 @@ public:
                 }
                 else if (!remainingAdds)
                 {
-                    if (!static_minionsGUIDS.empty())
-                    {
-                        for (ObjectGuid const& guid : static_minionsGUIDS)
-                        {
-                            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
-                            {
-                                minion->DespawnOrUnsummon();
-                            }
-                        }
-
-                        static_minionsGUIDS.clear();
-                    }
+                    static_minionsGUIDS.clear();
 
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);
@@ -342,12 +333,6 @@ public:
                             {
                                 DoCastSelf(SPELL_DAMAGE_REFLECTION);
                                 events.RepeatEvent(30000);
-                                break;
-                            }
-                            case EVENT_BLAST_WAVE:
-                            {
-                                DoCastVictim(SPELL_BLAST_WAVE);
-                                events.RepeatEvent(10000);
                                 break;
                             }
                             case EVENT_TELEPORT_RANDOM:
