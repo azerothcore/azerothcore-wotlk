@@ -149,16 +149,22 @@ public:
         if (itr != mCounterList.end())
         {
             if (!reset && !subtract)
+            {
                 itr->second += value;
+            }
             else if (subtract)
             {
                 itr->second -= value;
             }
             else
+            {
                 itr->second = value;
+            }
         }
         else
+        {
             mCounterList.insert(std::make_pair(id, value));
+        }
 
         ProcessEventsFor(SMART_EVENT_COUNTER_SET, nullptr, id);
     }
