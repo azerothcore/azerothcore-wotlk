@@ -1480,6 +1480,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
         {
             movement.Ground = static_cast<CreatureGroundMovementType>(fields[1].GetUInt8());
         }
+
         if (!fields[2].IsNull())
         {
             movement.Swim = fields[2].GetBool();
