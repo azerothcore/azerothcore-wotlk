@@ -1504,6 +1504,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
         {
             movement.Random = static_cast<CreatureRandomMovementType>(fields[6].GetUInt8());
         }
+
         if (!fields[7].IsNull())
         {
             movement.InteractionPauseTimer = fields[7].GetUInt32();
