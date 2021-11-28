@@ -2344,7 +2344,7 @@ public:
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
     [[nodiscard]] const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
-    virtual MovementGeneratorType GetDefaultMovementType() const;
+    [[nodiscard]] virtual MovementGeneratorType GetDefaultMovementType() const;
 
     [[nodiscard]] bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
     void StopMoving();
