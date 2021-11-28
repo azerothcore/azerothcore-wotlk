@@ -545,9 +545,9 @@ public:
     virtual void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr) = 0;
     virtual bool IsShuttingDown() const = 0;
     virtual uint32 GetShutDownTimeLeft() const = 0;
-    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode) = 0;
+    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) = 0;
     virtual void ShutdownCancel() = 0;
-    virtual void ShutdownMsg(bool show = false, Player* player = nullptr) = 0;
+    virtual void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) = 0;
     virtual void Update(uint32 diff) = 0;
     virtual void UpdateSessions(uint32 diff) = 0;
     virtual void setRate(Rates rate, float value) = 0;

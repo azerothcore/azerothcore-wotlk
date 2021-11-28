@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackfathom_deeps.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "blackfathom_deeps.h"
 
 class instance_blackfathom_deeps : public InstanceMapScript
 {

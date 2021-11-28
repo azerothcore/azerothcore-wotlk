@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellInfo.h"
 #include "Battleground.h"
 #include "Chat.h"
 #include "ConditionMgr.h"
@@ -24,7 +25,6 @@
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
-#include "SpellInfo.h"
 #include "SpellMgr.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
@@ -392,7 +392,7 @@ bool SpellEffectInfo::IsFarUnitTargetEffect() const
            || (Effect == SPELL_EFFECT_SUMMON_RAF_FRIEND)
            || (Effect == SPELL_EFFECT_RESURRECT)
            || (Effect == SPELL_EFFECT_RESURRECT_NEW)
-           /*|| (Effect == SPELL_EFFECT_SKIN_PLAYER_CORPSE) Xinef: This is not Far Unit Target Effect... what a bullshit*/;
+           /*|| (Effect == SPELL_EFFECT_SKIN_PLAYER_CORPSE) Xinef: This is not Far Unit Target Effect*/;
 }
 
 bool SpellEffectInfo::IsFarDestTargetEffect() const

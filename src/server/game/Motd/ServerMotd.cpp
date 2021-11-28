@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ServerMotd.h"
 #include "Common.h"
 #include "Opcodes.h"
 #include "ScriptMgr.h"
-#include "ServerMotd.h"
 #include "Util.h"
 #include "WorldPacket.h"
 #include <iterator>

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "UnitAI.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
 #include "Player.h"
@@ -23,7 +24,6 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "UnitAI.h"
 
 void UnitAI::AttackStart(Unit* victim)
 {
