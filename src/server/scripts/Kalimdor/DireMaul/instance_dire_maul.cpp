@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dire_maul.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "dire_maul.h"
 
 class instance_dire_maul : public InstanceMapScript
 {

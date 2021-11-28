@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Unit.h"
 #include "AccountMgr.h"
 #include "ArenaSpectator.h"
 #include "Battlefield.h"
@@ -61,7 +62,6 @@
 #include "Totem.h"
 #include "TotemAI.h"
 #include "Transport.h"
-#include "Unit.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -71,8 +71,8 @@
 #include <math.h>
 
 #ifdef ELUNA
-#include "LuaEngine.h"
 #include "ElunaEventMgr.h"
+#include "LuaEngine.h"
 #endif
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -2739,7 +2739,7 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 {
     // pussywizard: calling SendMeleeAttackStop without clearing UNIT_STATE_MELEE_ATTACKING and then AttackStart the same player may spoil npc rotating!
     // pussywizard: this happens in some boss scripts, just add clearing here
-    // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // ZOMG! commented out for now
+    // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // commented out for now
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
@@ -4695,7 +4695,7 @@ void Unit::RemoveNotOwnSingleTargetAuras()
     }
 }
 
-void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
+void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except, bool isAutoshot /*= false*/)
 {
     if (!(m_interruptMask & flag))
         return;
@@ -4716,10 +4716,16 @@ void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
 
     // interrupt channeled spell
     if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
-        if (spell->getState() == SPELL_STATE_CASTING
-                && (spell->m_spellInfo->ChannelInterruptFlags & flag)
-                && spell->m_spellInfo->Id != except)
-            InterruptNonMeleeSpells(false, spell->m_spellInfo->Id);
+    {
+        if (spell->getState() == SPELL_STATE_CASTING && (spell->m_spellInfo->ChannelInterruptFlags & flag) && spell->m_spellInfo->Id != except)
+        {
+            // Do not interrupt if auto shot
+            if (!(isAutoshot && spell->m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS)))
+            {
+                InterruptNonMeleeSpells(false, spell->m_spellInfo->Id);
+            }
+        }
+    }
 
     UpdateInterruptMask();
 }
@@ -9724,7 +9730,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         return false;
     }
 
-    //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: wtf? why having this flag prevents from entering combat? it should just prevent melee attack
+    //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;
 
     // nobody can attack GM in GM-mode
@@ -11183,7 +11189,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
             if (!spellProto->ValidateAttribute6SpellDamageMods(caster, *i, damagetype == DOT))
                 continue;
 
-            // Only death knight spell with this aura, ZOMG!
+            // Only death knight spell with this aura
             if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
                 if (!caster || caster->GetGUID() != (*i)->GetCasterGUID())
                     continue;
@@ -17616,7 +17622,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
         return false;
 
     // Pets already have a properly initialized CharmInfo, don't overwrite it.
-    // Xinef: I need charmInfo for vehicle so bullshit
+    // Xinef: I need charmInfo for vehicle
     if (/*type != CHARM_TYPE_VEHICLE &&*/ !GetCharmInfo())
     {
         InitCharmInfo();
@@ -18185,7 +18191,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
 
     if (IsInWorld())
     {
-        // xinef: ZOMG!, to comment, bellow line should be removed
+        // xinef: to comment, bellow line should be removed
         // pussywizard: goign to other phase (valithria, algalon) should not remove such auras
         //RemoveNotOwnSingleTargetAuras(newPhaseMask, true);            // we can lost access to caster or target
 

@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvPNA.h"
 #include "GameGraveyard.h"
-#include "MapMgr.h"
 #include "Language.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "OutdoorPvPNA.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "World.h"

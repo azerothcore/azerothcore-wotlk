@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "LFG.h"
 #include "LFGGroupData.h"
+#include "LFG.h"
 #include "World.h"
 
 namespace lfg

@@ -15,18 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PetAI.h"
 #include "Creature.h"
 #include "Errors.h"
 #include "Group.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
-#include "PetAI.h"
 #include "Player.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
+#include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
 {
@@ -677,7 +678,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED))
         return false;
 
-    // pussywizard: ZOMG! TEMP!
+    // pussywizard: TEMP!
     if (!me->GetCharmInfo())
     {
         LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %s", me->GetEntry(), me->GetOwnerGUID().ToString().c_str());
