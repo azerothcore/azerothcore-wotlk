@@ -21,9 +21,9 @@
 #include "Common.h"
 #include "Define.h"
 #include "Map.h"
+#include "MapInstanced.h"
 #include "MapUpdater.h"
 #include "Object.h"
-#include "MapInstanced.h"
 
 #include <mutex>
 

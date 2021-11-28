@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "LogCommon.h"
 #include "Define.h"
+#include "LogCommon.h"
 #include "SmartEnum.h"
 #include <stdexcept>
 
