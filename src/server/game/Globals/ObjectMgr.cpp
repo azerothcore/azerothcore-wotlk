@@ -1489,6 +1489,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
         {
             movement.Flight = static_cast<CreatureFlightMovementType>(fields[3].GetUInt8());
         }
+
         if (!fields[4].IsNull())
         {
             movement.Rooted = fields[4].GetBool();
