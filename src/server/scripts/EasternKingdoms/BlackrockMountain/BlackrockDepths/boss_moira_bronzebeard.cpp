@@ -22,35 +22,26 @@
 enum Spells
 {
     SPELL_HEAL                                             = 15586,
-    SPELL_RENEW                                            = 10929,
-    SPELL_SHIELD                                           = 10901,
-    SPELL_MINDBLAST                                        = 15587,
-    SPELL_SHADOWWORDPAIN                                   = 10894,
-    SPELL_SMITE                                            = 10934
+    SPELL_RENEW                                            = 8362,
+    SPELL_MINDBLAST                                        = 15587
 };
 
 enum SpellTimers
 {
-    TIMER_HEAL        = 12000, // These times are probably wrong
+    TIMER_HEAL        = 12000,
     TIMER_MINDBLAST   = 16000,
-    TIMER_SHADOW_WORD = 14000,
-    TIMER_SMITE       = 8000,
-    TIMER_SHIELD      = 12000,
     TIMER_RENEW       = 12000
 };
 
 struct boss_moira_bronzebeardAI : public BossAI
 {
-    boss_moira_bronzebeardAI(Creature* creature) : BossAI(creature, DATA_MOIRA) {}
-    boss_moira_bronzebeardAI(Creature* creature, uint32 data) : BossAI(creature, data) {}
+    // use a default value so we can inherit for priestess
+    boss_moira_bronzebeardAI(Creature* creature, uint32 data = DATA_MOIRA) : BossAI(creature, data) {}
     void EnterCombat(Unit* /*who*/) override
     {
         _EnterCombat();
         events.ScheduleEvent(SPELL_MINDBLAST, urand(17000, 20000));
-        events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(1000, 1500));
         events.ScheduleEvent(SPELL_HEAL, urand(2000, 5000));
-        events.ScheduleEvent(SPELL_SMITE, urand(4000, 8000));
-        events.ScheduleEvent(SPELL_SHIELD, urand(8000, 10000));
         events.ScheduleEvent(SPELL_RENEW, urand(TIMER_RENEW, TIMER_RENEW));
     }
 
@@ -74,19 +65,8 @@ struct boss_moira_bronzebeardAI : public BossAI
                     DoCastVictim(SPELL_MINDBLAST);
                     events.ScheduleEvent(SPELL_MINDBLAST, urand(TIMER_MINDBLAST - 2000, TIMER_MINDBLAST + 2000));
                     break;
-                case SPELL_SHADOWWORDPAIN:
-                    DoCastVictim(SPELL_SHADOWWORDPAIN);
-                    events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(TIMER_SHADOW_WORD - 2000, TIMER_SHADOW_WORD + 2000));
-                    break;
-                case SPELL_SMITE:
-                    DoCastVictim(SPELL_SMITE);
-                    events.ScheduleEvent(SPELL_SMITE, urand(TIMER_SMITE - 2000, TIMER_SMITE + 2000));
-                    break;
                 case SPELL_HEAL:
                     CastOnEmperorIfPossible(SPELL_HEAL, TIMER_HEAL);
-                    break;
-                case SPELL_SHIELD:
-                    CastOnEmperorIfPossible(SPELL_SHIELD, TIMER_SHIELD);
                     break;
                 case SPELL_RENEW:
                     CastOnEmperorIfPossible(SPELL_RENEW, TIMER_RENEW);

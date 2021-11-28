@@ -28,8 +28,8 @@ enum Yells
 
 enum Spells
 {
-    SPELL_HANDOFTHAURISSAN                                 = 17492,
-    SPELL_AVATAROFFLAME                                    = 15636
+    SPELL_HANDOFTHAURISSAN      = 17492,
+    SPELL_AVATAROFFLAME         = 15636
 };
 
 #define DATA_PERCENT_DEAD_SENATORS 0
