@@ -135,6 +135,7 @@ struct CreatureMovementData
     {
         return Ground != CreatureGroundMovementType::None;
     }
+
     bool IsSwimAllowed() const
     {
         return Swim;
