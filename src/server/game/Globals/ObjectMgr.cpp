@@ -1494,6 +1494,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
         {
             movement.Rooted = fields[4].GetBool();
         }
+
         if (!fields[5].IsNull())
         {
             movement.Chase = static_cast<CreatureChaseMovementType>(fields[5].GetUInt8());
