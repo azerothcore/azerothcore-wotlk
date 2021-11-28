@@ -3209,72 +3209,28 @@ void Creature::UpdateMovementFlags()
     bool canHover = CanHover();
     bool isInAir  = (G3D::fuzzyGt(GetPositionZ(), ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
 
-    bool swim = false;
-
-    LiquidData const& liquidData = GetLiquidData();
-    if (liquidData.Status == LIQUID_MAP_NO_WATER)
+    if (GetMovementTemplate().IsFlightAllowed() && isInAir && !IsFalling())
     {
-        if (ground > INVALID_HEIGHT)
-            isInAir = G3D::fuzzyGt(z, ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(z, ground - GROUND_HEIGHT_TOLERANCE); // Can be underground too, prevent the falling
+        if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly)
+            SetCanFly(true);
         else
-            isInAir = true;
+            SetDisableGravity(true);
+
+        if (!HasAuraType(SPELL_AURA_HOVER))
+            SetHover(false);
     }
     else
     {
-        switch (liquidData.Status)
-        {
-            case LIQUID_MAP_ABOVE_WATER:
-                isInAir = true;
-                break;
-            case LIQUID_MAP_WATER_WALK:
-                isInAir = true;
-                [[fallthrough]];
-            case LIQUID_MAP_IN_WATER:
-                swim = z - liquidData.DepthLevel > GetCollisionHeight() * 0.75f; // Shallow water at ~75% of collision height
-                break;
-            case LIQUID_MAP_UNDER_WATER:
-                swim = true;
-                break;
-            default:
-                break;
-        }
+        SetCanFly(false);
+        SetDisableGravity(false);
+        if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
+            SetHover(true);
     }
 
-    SetSwim(GetMovementTemplate().IsSwimAllowed() && IsInWater());
+    if (!isInAir)
+        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
-    if (GetMovementTemplate().IsFlightAllowed() && isInAir)
-    {
-        if (GetMovementTemplate().IsFlightAllowed() && isInAir && !IsFalling())
-        {
-            if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly)
-            {
-                SetCanFly(true);
-                SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-            }
-            else
-                SetDisableGravity(true);
-
-            if (!HasAuraType(SPELL_AURA_HOVER))
-                SetHover(false);
-        }
-        else
-        {
-            SetCanFly(false);
-            SetDisableGravity(false);
-
-            if (CanHover() || HasAuraType(SPELL_AURA_HOVER))
-            {
-                SetHover(true);
-            }
-
-            if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
-            {
-                SetHover(true);
-            }
-        }
-    }
-    else if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY) && IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
-        SetHover(true);
+    SetSwim(CanSwim() && IsInWater());
 }
 
 void Creature::SetObjectScale(float scale)

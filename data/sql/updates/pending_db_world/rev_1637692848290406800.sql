@@ -8759,6 +8759,8 @@ DELETE FROM `creature_template_movement` WHERE `CreatureId`=15047;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (15047, 1, 1, 0, 1, 0, 0, NULL);
 DELETE FROM `creature_template_movement` WHERE `CreatureId`=17123;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (17123, 1, 1, 0, 0, 0, 0, 0);
+DELETE FROM `creature_template_movement` WHERE `CreatureId`=10716;
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (10716, 0, 0, 2, 0, 0, 0, NULL);
 
 DELETE FROM `creature_template_movement` WHERE `CreatureID` IN (20064,28654);
 INSERT INTO `creature_template_movement` (`CreatureID`,`Ground`,`Swim`,`Flight`,`Rooted`,`Chase`,`Random`,`InteractionPauseTimer`) VALUES
