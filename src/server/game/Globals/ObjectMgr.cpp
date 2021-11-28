@@ -1161,7 +1161,7 @@ void ObjectMgr::CheckCreatureMovement(char const* table, uint64 id, CreatureMove
         creatureMovement.Chase = CreatureChaseMovementType::Run;
     }
 
-        if (creatureMovement.Random >= CreatureRandomMovementType::Max)
+    if (creatureMovement.Random >= CreatureRandomMovementType::Max)
     {
         LOG_ERROR("sql.sql", "`%s`.`Random` wrong value (%u) for Id " UI64FMTD ", setting to Walk.", table, uint32(creatureMovement.Random), id);
         creatureMovement.Random = CreatureRandomMovementType::Walk;
