@@ -621,6 +621,7 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
         creatureTemplate.Movement.Random   = static_cast<CreatureRandomMovementType>(fields[55].GetUInt8());
     if (!fields[56].IsNull())
         creatureTemplate.Movement.InteractionPauseTimer = fields[56].GetUInt32();
+
     creatureTemplate.HoverHeight           = fields[57].GetFloat();
     creatureTemplate.ModHealth             = fields[58].GetFloat();
     creatureTemplate.ModMana               = fields[59].GetFloat();
