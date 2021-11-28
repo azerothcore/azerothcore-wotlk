@@ -168,12 +168,23 @@ public:
     // being open; it is not.
     virtual void OnSocketClose(std::shared_ptr<WorldSocket> /*socket*/) { }
 
-    // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
-    // and modifying it is safe.
+    /**
+     * @brief This hook called when a packet is sent to a client. The packet object is a copy of the original packet, so reading and modifying it is safe.
+     *
+     * @param session Contains information about the WorldSession
+     * @param packet Contains information about the WorldPacket
+     * @return True if you want to continue sending the packet, false if you want to disallow sending the packet
+     */
     [[nodiscard]] virtual bool CanPacketSend(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
 
-    // Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
-    // reading and modifying it is safe. Make sure to check WorldSession pointer before usage, it might be null in case of auth packets
+    /**
+     * @brief Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
+     * reading and modifying it is safe. Make sure to check WorldSession pointer before usage, it might be null in case of auth packets
+     *
+     * @param session Contains information about the WorldSession
+     * @param packet Contains information about the WorldPacket
+     * @return True if you want to continue receive the packet, false if you want to disallow receive the packet
+     */
     [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
 };
 
@@ -433,6 +444,12 @@ public:
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
 
+    /**
+     * @brief This hook runs in Unit::Update
+     *
+     * @param unit Contains information about the Unit
+     * @param diff Contains information about the diff time
+     */
     virtual void OnUnitUpdate(Unit* /*unit*/, uint32 /*diff*/) { }
 };
 
@@ -452,20 +469,61 @@ protected:
     AllMapScript(const char* name);
 
 public:
-    // Called when a player enters any Map
+    /**
+     * @brief This hook called when a player enters any Map
+     *
+     * @param map Contains information about the Map
+     * @param player Contains information about the Player
+     */
     virtual void OnPlayerEnterAll(Map* /*map*/, Player* /*player*/) { }
 
-    // Called when a player leave any Map
+    /**
+     * @brief This hook called when a player leave any Map
+     *
+     * @param map Contains information about the Map
+     * @param player Contains information about the Player
+     */
     virtual void OnPlayerLeaveAll(Map* /*map*/, Player* /*player*/) { }
 
+    /**
+     * @brief This hook called before create instance script
+     *
+     * @param instanceMap Contains information about the WorldSession
+     * @param instanceData Contains information about the WorldPacket
+     * @param load if true loading instance save data
+     * @param data Contains information about the instance save data
+     * @param completedEncounterMask Contains information about the completed encouter mask
+     */
     virtual void OnBeforeCreateInstanceScript(InstanceMap* /*instanceMap*/, InstanceScript* /*instanceData*/, bool /*load*/, std::string /*data*/, uint32 /*completedEncounterMask*/) { }
 
+    /**
+     * @brief This hook called before destroy instance
+     *
+     * @param mapInstanced Contains information about the MapInstanced
+     * @param map Contains information about the Map
+     */
     virtual void OnDestroyInstance(MapInstanced* /*mapInstanced*/, Map* /*map*/) { }
 
+    /**
+     * @brief This hook called before creating map
+     *
+     * @param map Contains information about the Map
+     */
     virtual void OnCreateMap(Map* /*map*/) { }
 
+    /**
+     * @brief This hook called before destroing map
+     *
+     * @param map Contains information about the Map
+     */
     virtual void OnDestroyMap(Map* /*map*/) { }
 
+    /**
+     * @brief This hook called before updating map
+     *
+     * @param map Contains information about the Map
+     * @param diff Contains information about the diff time
+     */
     virtual void OnMapUpdate(Map* /*map*/, uint32 /*diff*/) { }
 };
 
@@ -1112,22 +1170,101 @@ public:
 
     virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
 
+    /**
+     * @brief This hook called before player sending message in default chat
+     *
+     * @param player Contains information about the Player sender
+     * @param type Contains information about the chat message type
+     * @param language Contains information about the language type
+     * @param msg Contains information about the message
+     *
+     * @return True if you want to continue sending the message, false if you want to disable sending the message
+     */
     [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/) { return true; }
 
+    /**
+     * @brief This hook called before player sending message to other player via private
+     *
+     * @param player Contains information about the Player sender
+     * @param type Contains information about the chat message type
+     * @param language Contains information about the language type
+     * @param msg Contains information about the message
+     * @param receiver Contains information about the Player receiver
+     *
+     * @return True if you want to continue sending the message, false if you want to disable sending the message
+     */
     [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Player* /*receiver*/) { return true; }
 
+    /**
+     * @brief This hook called before player sending message to group
+     *
+     * @param player Contains information about the Player sender
+     * @param type Contains information about the chat message type
+     * @param language Contains information about the language type
+     * @param msg Contains information about the message
+     * @param group Contains information about the Group
+     *
+     * @return True if you want to continue sending the message, false if you want to disable sending the message
+     */
     [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Group* /*group*/) { return true; }
 
+    /**
+     * @brief This hook called before player sending message to guild
+     *
+     * @param player Contains information about the Player sender
+     * @param type Contains information about the chat message type
+     * @param language Contains information about the language type
+     * @param msg Contains information about the message
+     * @param guild Contains information about the Guild
+     *
+     * @return True if you want to continue sending the message, false if you want to disable sending the message
+     */
     [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Guild* /*guild*/) { return true; }
 
+    /**
+     * @brief This hook called before player sending message to channel
+     *
+     * @param player Contains information about the Player sender
+     * @param type Contains information about the chat message type
+     * @param language Contains information about the language type
+     * @param msg Contains information about the message
+     * @param channel Contains information about the Channel
+     *
+     * @return True if you want to continue sending the message, false if you want to disable sending the message
+     */
     [[nodiscard]] virtual bool CanPlayerUseChat(Player* /*player*/, uint32 /*type*/, uint32 /*language*/, std::string& /*msg*/, Channel* /*channel*/) { return true; }
 
+    /**
+     * @brief This hook called after player learning talents
+     *
+     * @param player Contains information about the Player
+     * @param talentId Contains information about the talent id
+     * @param talentRank Contains information about the talent rank
+     * @param spellid Contains information about the spell id
+     */
     virtual void OnPlayerLearnTalents(Player* /*player*/, uint32 /*talentId*/, uint32 /*talentRank*/, uint32 /*spellid*/) { }
 
+    /**
+     * @brief This hook called after player entering combat
+     *
+     * @param player Contains information about the Player
+     * @param Unit Contains information about the Unit
+     */
     virtual void OnPlayerEnterCombat(Player* /*player*/, Unit* /*enemy*/) { }
 
+    /**
+     * @brief This hook called after player leave combat
+     *
+     * @param player Contains information about the Player
+     */
     virtual void OnPlayerLeaveCombat(Player* /*player*/) { }
 
+    /**
+     * @brief This hook called after player abandoning quest
+     *
+     * @param player Contains information about the Player
+     * @param questId Contains information about the quest id
+     */
     virtual void OnQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
 
     // Passive Anticheat System
@@ -1400,10 +1537,34 @@ public:
 
     virtual void OnBeforeAuraRankForLevel(SpellInfo const* /*spellInfo*/, SpellInfo const* /*latestSpellInfo*/, uint8 /*level*/) { }
 
+    /**
+     * @brief This hook called after spell dummy effect
+     *
+     * @param caster Contains information about the WorldObject
+     * @param spellID Contains information about the spell id
+     * @param effIndex Contains information about the SpellEffIndex
+     * @param gameObjTarget Contains information about the GameObject
+     */
     virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, GameObject* /*gameObjTarget*/) { }
 
+    /**
+     * @brief This hook called after spell dummy effect
+     *
+     * @param caster Contains information about the WorldObject
+     * @param spellID Contains information about the spell id
+     * @param effIndex Contains information about the SpellEffIndex
+     * @param creatureTarget Contains information about the Creature
+     */
     virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, Creature* /*creatureTarget*/) { }
 
+    /**
+     * @brief This hook called after spell dummy effect
+     *
+     * @param caster Contains information about the WorldObject
+     * @param spellID Contains information about the spell id
+     * @param effIndex Contains information about the SpellEffIndex
+     * @param itemTarget Contains information about the Item
+     */
     virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, Item* /*itemTarget*/) { }
 };
 
@@ -1480,6 +1641,11 @@ public:
 
     [[nodiscard]] virtual bool CanResetTalents(Pet* /*pet*/) { return true; }
 
+    /**
+     * @brief This hook called after add pet in world
+     *
+     * @param pet Contains information about the Pet
+     */
     virtual void OnPetAddToWorld(Pet* /*pet*/) { }
 };
 
@@ -1544,6 +1710,12 @@ public:
 
     virtual void OnInstanceSave(InstanceSave* /*instanceSave*/) { }
 
+    /**
+     * @brief This hook called before get Quest Dialog Status
+     *
+     * @param player Contains information about the Player
+     * @param questgiver Contains information about the Object
+     */
     virtual void GetDialogStatus(Player* /*player*/, Object* /*questgiver*/) { }
 };
 
@@ -1578,7 +1750,7 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) {}
+    virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
 };
 
 class WorldObjectScript : public ScriptObject
@@ -1591,14 +1763,40 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
+    /**
+     * @brief This hook called before destroy world object
+     *
+     * @param object Contains information about the WorldObject
+     */
     virtual void OnWorldObjectDestroy(WorldObject* /*object*/) { }
 
+    /**
+     * @brief This hook called after create world object
+     *
+     * @param object Contains information about the WorldObject
+     */
     virtual void OnWorldObjectCreate(WorldObject* /*object*/) { }
 
+    /**
+     * @brief This hook called after world object set to map
+     *
+     * @param object Contains information about the WorldObject
+     */
     virtual void OnWorldObjectSetMap(WorldObject* /*object*/, Map* /*map*/ ) { }
 
+    /**
+     * @brief This hook called after world object reset
+     *
+     * @param object Contains information about the WorldObject
+     */
     virtual void OnWorldObjectResetMap(WorldObject* /*object*/) { }
 
+    /**
+     * @brief This hook called after world object update
+     *
+     * @param object Contains information about the WorldObject
+     * @param diff Contains information about the diff time
+     */
     virtual void OnWorldObjectUpdate(WorldObject* /*object*/, uint32 /*diff*/) { }
 };
 
@@ -1612,6 +1810,12 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
+    /**
+     * @brief This hook called before money loot
+     *
+     * @param player Contains information about the Player
+     * @param gold Contains information about money
+     */
     virtual void OnLootMoney(Player* /*player*/, uint32 /*gold*/) { }
 };
 
@@ -1625,13 +1829,39 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    // Called when a player opens a gossip dialog with the creature.
+    /**
+     * @brief This hook called when a player opens a gossip dialog with the creature.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the Creature
+     *
+     * @return False if you want to continue, true if you want to disable
+     */
     [[nodiscard]] virtual bool OnGossipHello(Player* /*player*/, Creature* /*creature*/) { return false; }
 
-    // Called when a player selects a gossip item in the creature's gossip menu.
+    /**
+     * @brief This hook called when a player selects a gossip item in the creature's gossip menu.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the Creature
+     * @param sender Contains information about the sender type
+     * @param action Contains information about the action id
+     *
+     * @return False if you want to continue, true if you want to disable
+     */
     [[nodiscard]] virtual bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
 
-    // Called when a player selects a gossip with a code in the creature's gossip menu.
+    /**
+     * @brief This hook called when a player selects a gossip with a code in the creature's gossip menu.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the Creature
+     * @param sender Contains information about the sender type
+     * @param action Contains information about the action id
+     * @param code Contains information about the code entered
+     *
+     * @return True if you want to continue, false if you want to disable
+     */
     [[nodiscard]] virtual bool OnGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
 };
 
