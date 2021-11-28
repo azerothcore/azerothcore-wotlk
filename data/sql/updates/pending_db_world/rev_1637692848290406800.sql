@@ -32,10 +32,10 @@ DELETE FROM `creature_movement_override` WHERE `SpawnId`=117672;
 INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (117672, 1, 0, 1, 0, 0, 0, NULL);
 DELETE FROM `creature_movement_override` WHERE `SpawnId`=117677;
 INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (117677, 1, 0, 1, 0, 0, 0, NULL);
-DELETE FROM `creature_movement_override` WHERE `SpawnId`=120772;
-INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (120772, 1, 0, 1, 1, 0, 0, NULL);
-DELETE FROM `creature_movement_override` WHERE `SpawnId`=120906;
-INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (120906, 1, 0, 1, 1, 0, 0, NULL);
+DELETE FROM `creature_movement_override` WHERE `SpawnId`=247156;
+INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (247156, 1, 0, 1, 1, 0, 0, NULL);
+DELETE FROM `creature_movement_override` WHERE `SpawnId`=247157;
+INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES (247157, 1, 0, 1, 1, 0, 0, NULL);
 
 UPDATE `acore_string` SET `content_default`='Movement type: %s' WHERE `entry`=11008;
 
