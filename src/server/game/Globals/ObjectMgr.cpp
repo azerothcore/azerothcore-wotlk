@@ -1485,6 +1485,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
         {
             movement.Swim = fields[2].GetBool();
         }
+
         if (!fields[3].IsNull())
         {
             movement.Flight = static_cast<CreatureFlightMovementType>(fields[3].GetUInt8());
