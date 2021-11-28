@@ -140,6 +140,7 @@ struct CreatureMovementData
     {
         return Swim;
     }
+
     bool IsFlightAllowed() const
     {
         return Flight != CreatureFlightMovementType::None;
