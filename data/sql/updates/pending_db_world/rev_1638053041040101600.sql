@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638053041040101600');
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'boss_jarien' WHERE `entry` = 16101;
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'boss_sothos' WHERE `entry` = 16102;
 
-DELETE FROM `creature_text` WHERE `CreatureID` IN (16101, 16102);
+DELETE FROM `creature_text` WHERE `CreatureID` IN (16101, 16102, 16103, 16104);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (16101, 0, 0, 'Hello, brother.', 14, 0, 100, 0, 0, 0, 11971, 0, 'Jarien - ON SUMMON'),
 (16101, 1, 0, 'Would-be interlopers, I\'m afraid.', 14, 0, 100, 0, 0, 0, 11973, 0, 'Jarien - ON SUMMON - 1'),
@@ -11,7 +11,9 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (16101, 3, 0, '%s goes into a rage after seeing $n fall in battle!', 16, 0, 100, 0, 0, 0, 11939, 0, 'Jarien - ON SOTHOS DEATH'),
 (16102, 0, 0, 'Hello, sister. What have we here?', 14, 0, 100, 0, 0, 0, 11972, 0, 'Sothos - ON SUMMON'),
 (16102, 1, 0, 'Shall we slay them for the impertinence of disturbing our sleep?', 14, 0, 100, 0, 0, 0, 11974, 0, 'Sothos - ON SUMMON - 1'),
-(16102, 2, 0, '%s goes into a rage after seeing $n fall in battle!', 16, 0, 100, 0, 0, 0, 11939, 0, 'Sothos - ON JARIEN DEATH');
+(16102, 2, 0, '%s goes into a rage after seeing $n fall in battle!', 16, 0, 100, 0, 0, 0, 11939, 0, 'Sothos - ON JARIEN DEATH'),
+(16103, 0, 0, 'Thank you for freeing me, my brother, and all of you! We can finally rest in peace now.', 14, 0, 100, 0, 0, 0, 11819, 0, 'Spirit of Jarien - ON BOTH DEATHS'),
+(16104, 0, 0, 'Thank you for freeing me, my sister, and all of you! We can finally rest in peace now.', 14, 0, 100, 0, 0, 0, 11859, 0, 'Spirit of Sothos - ON BOTH DEATHS');
 
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (16101, 16102);
 
