@@ -1498,6 +1498,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
         {
             movement.Chase = static_cast<CreatureChaseMovementType>(fields[5].GetUInt8());
         }
+
         if (!fields[6].IsNull())
         {
             movement.Random = static_cast<CreatureRandomMovementType>(fields[6].GetUInt8());
