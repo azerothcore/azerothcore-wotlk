@@ -2791,7 +2791,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 effectMask &= ~(1 << effectNumber);
             // Xinef: Buggs out polymorph
             // Xinef: And this is checked in MagicSpellHitResult, why we check resistance twice?
-            // Xinef: And why we check every spell effect basing on rand and generic dispel info? some effects will be appliend and some wont? WTF?
+            // Xinef: And why we check every spell effect basing on rand and generic dispel info? some effects will be appliend and some wont?
             /*else if (m_spellInfo->Effects[effectNumber].IsAura() && !m_spellInfo->IsPositiveEffect(effectNumber))
             {
                 int32 debuff_resist_chance = unit->GetMaxPositiveAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(m_spellInfo->Dispel));
@@ -3719,7 +3719,7 @@ void Spell::_cast(bool skipCheck)
     SendSpellGo();
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
-    if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this shit || m_spellInfo->Id == 14157*/)
+    if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this || m_spellInfo->Id == 14157*/)
     {
         // Remove used for cast item if need (it can be already nullptr after TakeReagents call
         // in case delayed spell remove item at cast delay start
@@ -4624,7 +4624,7 @@ void Spell::WriteSpellGoTargets(WorldPacket* data)
         if ((*ihit).missCondition == SPELL_MISS_NONE)       // Add only hits
         {
             *data << ihit->targetGUID;
-            // Xinef: WTF is this? No channeled spell checked, no anything
+            // Xinef: No channeled spell checked, no anything
             //m_channelTargetEffectMask |=ihit->effectMask;
             ++hit;
         }
@@ -6318,7 +6318,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
         m_targets.SetUnitTarget(target);
     }
 
-    // xinef: Calculate power cost here, so funciton checking power can work properly and dont return shit results
+    // xinef: Calculate power cost here, so funciton checking power can work properly and dont return bad results
     m_powerCost = m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask, this);
 
     // cooldown
@@ -6568,7 +6568,7 @@ SpellCastResult Spell::CheckRange(bool strict)
     {
         if (target != m_caster)
         {
-            // Xinef: WHAT DA FUCK IS THIS SHIT? Spells with 5yd range can hit target 9yd away? >.>
+            // Xinef: Spells with 5yd range can hit target 9yd away?
             if (range_type == SPELL_RANGE_MELEE)
             {
                 float real_max_range = max_range;
@@ -7435,7 +7435,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
         return true;
     }
 
-    // todo: shit below shouldn't be here, but it's temporary
+    // todo: below shouldn't be here, but it's temporary
     //Check targets for LOS visibility (except spells without range limitations)
     switch (m_spellInfo->Effects[eff].Effect)
     {
@@ -7818,7 +7818,7 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier,
     critChance = unit->SpellTakenCritChance(caster, m_spellInfo, m_spellSchoolMask, critChance, m_attackType, false);
     targetInfo.crit = roll_chance_f(std::max(0.0f, critChance));
 
-    // Sweeping strikes wtf shit ;d
+    // Sweeping strikes
     if (m_caster->getClass() == CLASS_WARRIOR && ssEffect < MAX_SPELL_EFFECTS && m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR &&
             ((m_spellInfo->Id != 50622 && m_spellInfo->Id != 44949) || firstTarget))
     {
