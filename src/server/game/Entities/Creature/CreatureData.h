@@ -145,6 +145,7 @@ struct CreatureMovementData
     {
         return Flight != CreatureFlightMovementType::None;
     }
+
     bool IsRooted() const
     {
         return Rooted;
