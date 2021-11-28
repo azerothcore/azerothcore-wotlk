@@ -22,14 +22,14 @@
 enum Grizzle
 {
     SPELL_GROUNDTREMOR      = 6524,
-    SPELL_FRENZY            = 28371,
+    SPELL_FRENZY            = 8269,
     EMOTE_FRENZY_KILL       = 0
 };
 
 enum Timer
 {
-    TIMER_GROUNDTREMOR = 10000,
-    TIMER_FRENZY = 15000
+    TIMER_GROUNDTREMOR  = 10000,
+    TIMER_FRENZY        = 15000
 };
 
 class boss_grizzle : public CreatureScript

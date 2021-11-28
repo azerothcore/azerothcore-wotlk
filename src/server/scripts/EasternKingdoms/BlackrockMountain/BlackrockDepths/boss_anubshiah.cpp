@@ -21,10 +21,10 @@
 
 enum Spells
 {
-    SPELL_SHADOWBOLT         = 17228,
+    SPELL_SHADOWBOLT         = 15472,
     SPELL_CURSE_TONGUES      = 15470,
-    SPELL_CURSE_WEAKNESS     = 17227,
-    SPELL_DEMON_ARMOR        = 11735,
+    SPELL_CURSE_WEAKNESS     = 12493,
+    SPELL_DEMON_ARMOR        = 13787,
     SPELL_ENVELOPING_WEB     = 15471
 };
 
@@ -33,7 +33,7 @@ enum Timers
     TIMER_SHADOWBOLT = 7000,
     TIMER_CURSE_TONGUES = 24000,
     TIMER_CURSE_WEAKNESS = 12000,
-    TIMER_DEMON_ARMOR = 300000, // virtually only cast once
+    TIMER_DEMON_ARMOR = 3000, // virtually only cast once
     TIMER_ENVELOPING_WEB = 16000
 };
 
@@ -57,7 +57,7 @@ public:
             events.ScheduleEvent(SPELL_SHADOWBOLT, 0.2 * (int)TIMER_SHADOWBOLT);
             events.ScheduleEvent(SPELL_CURSE_TONGUES, 0.2 * (int)TIMER_CURSE_TONGUES);
             events.ScheduleEvent(SPELL_CURSE_WEAKNESS, 0.2 * (int)TIMER_CURSE_WEAKNESS);
-            events.ScheduleEvent(SPELL_DEMON_ARMOR, 500);
+            events.ScheduleEvent(SPELL_DEMON_ARMOR, 0.2 * (int)TIMER_DEMON_ARMOR);
             events.ScheduleEvent(SPELL_ENVELOPING_WEB, 0.2 * (int)TIMER_ENVELOPING_WEB);
         }
 

@@ -29,7 +29,7 @@ enum Spells
 enum Timers
 {
     TIMER_WHIRLWIND = 12000,
-    TIMER_MORTAL = 22000,
+    TIMER_MORTAL    = 22000,
     TIMER_BLOODLUST = 30000
 };
 
