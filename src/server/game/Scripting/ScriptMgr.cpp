@@ -15,24 +15,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Config.h"
 #include "CreatureAI.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "GossipDef.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "ScriptSystem.h"
+#include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "SmartAI.h"
 #include "WorldPacket.h"
 
 #ifdef ELUNA

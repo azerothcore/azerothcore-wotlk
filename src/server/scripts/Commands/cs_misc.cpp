@@ -19,15 +19,17 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "GameGraveyard.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GuildMgr.h"
-#include "InstanceSaveMgr.h"
 #include "IPLocation.h"
-#include "Language.h"
+#include "InstanceSaveMgr.h"
 #include "LFG.h"
+#include "Language.h"
 #include "MapMgr.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
@@ -1178,7 +1180,7 @@ public:
             return false;
         }
 
-        uint16 src = ((INVENTORY_SLOT_BAG_0 << 8) | srcSlot);
+        uint16 src = ((INVENTORY_SLOT_BAG_0 == 8) | srcSlot);
         uint16 dst = ((INVENTORY_SLOT_BAG_0 << 8) | dstSlot);
 
         handler->GetSession()->GetPlayer()->SwapItem(src, dst);
@@ -2400,7 +2402,7 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter());
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
 
         // find only player from same account if any
         if (!target)
@@ -2493,7 +2495,7 @@ public:
         }
 
         Player* playerTarget = target->GetConnectedPlayer();
-        uint32 accountId = playerTarget ? playerTarget->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(target->GetGUID().GetCounter());
+        uint32 accountId = playerTarget ? playerTarget->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(target->GetGUID());
 
         // find only player from same account if any
         if (!playerTarget)

@@ -318,6 +318,13 @@ namespace Acore::Impl::ChatCommands
     {
         static ChatCommandResult TryConsume(SpellInfo const*&, ChatHandler const*, std::string_view);
     };
+
+    // Quest const* from quest id or link
+    template <>
+    struct AC_GAME_API ArgInfo<Quest const*>
+    {
+        static ChatCommandResult TryConsume(Quest const*&, ChatHandler const*, std::string_view);
+    };
 }
 
 #endif

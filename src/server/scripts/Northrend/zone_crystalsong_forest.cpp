@@ -25,8 +25,8 @@ Script Data End */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"

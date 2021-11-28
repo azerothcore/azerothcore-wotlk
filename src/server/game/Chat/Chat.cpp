@@ -63,7 +63,7 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
     if (target)
         target_session = target->GetSession();
     else if (guid)
-        target_account = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
+        target_account = sCharacterCache->GetCharacterAccountIdByGuid(guid);
 
     if (!target_session && !target_account)
     {
@@ -633,7 +633,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
                 if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
                     return player->GetGUID().GetCounter();
 
-                if (ObjectGuid guid = sObjectMgr->GetPlayerGUIDByName(name))
+                if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name))
                     return guid.GetCounter();
 
                 return 0;
@@ -699,7 +699,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
             *player = pl;
 
         // if need guid value from DB (in name case for check player existence)
-        ObjectGuid guid = !pl && (player_guid || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : ObjectGuid::Empty;
+        ObjectGuid guid = !pl && (player_guid || player_name) ? sCharacterCache->GetCharacterGuidByName(name) : ObjectGuid::Empty;
 
         // if allowed player guid (if no then only online players allowed)
         if (player_guid)
@@ -851,7 +851,9 @@ bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player
 
             player = ObjectAccessor::FindPlayerByName(name, false);
             if (offline)
-                guid = sObjectMgr->GetPlayerGUIDByName(name.c_str());
+            {
+                guid = sCharacterCache->GetCharacterGuidByName(name);
+            }
         }
     }
 
