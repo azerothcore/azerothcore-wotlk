@@ -1048,49 +1048,76 @@ bool Aura::IsRemovedOnShapeLost(Unit* target) const
 
 bool Aura::CanBeSaved() const
 {
-    if (IsPassive() || (GetSpellInfo()->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && GetSpellInfo()->Stances))
+    SpellInfo const* spellInfo = GetSpellInfo();
+
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_FORCE_AURA_SAVING))
+    {
+        return true;
+    }
+
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_REJECT_AURA_SAVING))
+    {
         return false;
+    }
+
+    if (IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
+    {
+        return false;
+    }
 
     // Xinef: do not save channel auras
     if (GetSpellInfo()->IsChanneled())
+    {
         return false;
+    }
 
     // Xinef: Check if aura is single target, not only spell info
-    if (GetCasterGUID() != GetOwner()->GetGUID())
-        if (GetSpellInfo()->IsSingleTarget() || IsSingleTarget())
-            return false;
+    if (GetCasterGUID() != GetOwner()->GetGUID() && (GetSpellInfo()->IsSingleTarget() || IsSingleTarget()))
+    {
+        return false;
+    }
 
     // Xinef: Dont save control vehicle auras - caster may not exist
     if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
+    {
         return false;
+    }
 
     // Can't be saved - aura handler relies on calculated amount and changes it
     if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
+    {
         return false;
+    }
 
     // No point in saving this, since the stable dialog can't be open on aura load anyway.
     if (HasEffectType(SPELL_AURA_OPEN_STABLE))
+    {
         return false;
+    }
 
     // xinef: do not save bind sight auras!
     if (HasEffectType(SPELL_AURA_BIND_SIGHT))
+    {
         return false;
+    }
 
     // xinef: no charming auras (taking direct control)
     if (HasEffectType(SPELL_AURA_MOD_POSSESS) || HasEffectType(SPELL_AURA_MOD_POSSESS_PET))
+    {
         return false;
+    }
 
     // xinef: no charming auras can be saved
     if (HasEffectType(SPELL_AURA_MOD_CHARM) || HasEffectType(SPELL_AURA_AOE_CHARM))
+    {
         return false;
-
-    // Xinef: Raise Ally control aura
-    if (GetId() == 46619)
-        return false;
+    }
 
     // don't save auras removed by proc system
     if (IsUsingCharges() && !GetCharges())
+    {
         return false;
+    }
 
     return true;
 }

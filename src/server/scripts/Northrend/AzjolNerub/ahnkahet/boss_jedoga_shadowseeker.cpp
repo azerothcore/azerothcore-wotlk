@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ahnkahet.h"
 #include "Containers.h"
 #include "ObjectAccessor.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "SpellScript.h"
 #include "TemporarySummon.h"
+#include "ahnkahet.h"
 
 enum Yells
 {
@@ -572,7 +572,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<boss_jedoga_shadowseekerAI>(creature);
+        return GetAhnKahetAI<boss_jedoga_shadowseekerAI>(creature);
     }
 };
 
@@ -686,7 +686,7 @@ public:
 
     CreatureAI *GetAI(Creature *creature) const override
     {
-        return GetAhnkahetAI<npc_twilight_volunteerAI>(creature);
+        return GetAhnKahetAI<npc_twilight_volunteerAI>(creature);
     }
 };
 

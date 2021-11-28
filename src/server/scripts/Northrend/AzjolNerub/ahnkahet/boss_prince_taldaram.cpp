@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ahnkahet.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "Player.h"
-#include "PassiveAI.h"
+#include "ahnkahet.h"
 
 enum Spells
 {
@@ -207,7 +207,7 @@ public:
 
     CreatureAI *GetAI(Creature *creature) const override
     {
-        return GetAhnkahetAI<npc_taldaram_flamesphereAI>(creature);
+        return GetAhnKahetAI<npc_taldaram_flamesphereAI>(creature);
     }
 };
 
@@ -508,7 +508,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<boss_taldaramAI>(creature);
+        return GetAhnKahetAI<boss_taldaramAI>(creature);
     }
 };
 

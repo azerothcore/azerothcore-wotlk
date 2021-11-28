@@ -25,12 +25,17 @@
 #include "QuestDef.h"
 #include <list>
 
-class GameObjectAI
+class GameObject;
+class Unit;
+class SpellInfo;
+
+class AC_GAME_API GameObjectAI
 {
 protected:
-    GameObject* const go;
+    GameObject* const me;
+
 public:
-    explicit GameObjectAI(GameObject* g) : go(g) {}
+    explicit GameObjectAI(GameObject* go) : me(go) {}
     virtual ~GameObjectAI() {}
 
     virtual void UpdateAI(uint32 /*diff*/) {}
@@ -65,7 +70,7 @@ public:
 class NullGameObjectAI : public GameObjectAI
 {
 public:
-    explicit NullGameObjectAI(GameObject* g);
+    explicit NullGameObjectAI(GameObject* go);
 
     void UpdateAI(uint32 /*diff*/) override {}
 

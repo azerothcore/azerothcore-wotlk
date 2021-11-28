@@ -16,21 +16,21 @@ npc_sergeant_bly
 npc_weegli_blastfuse
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptSystem.h"
+#include "zulfarrak.h"
+#include "Cell.h"
+#include "CellImpl.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptSystem.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "zulfarrak.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 
 /*######
 ## npc_sergeant_bly
@@ -273,7 +273,7 @@ public:
     private:
         void initBlyCrewMember(uint32 entry, float x, float y, float z)
         {
-            if (Creature* crew = ObjectAccessor::GetCreature(*go, instance->GetGuidData(entry)))
+            if (Creature* crew = ObjectAccessor::GetCreature(*me, instance->GetGuidData(entry)))
             {
                 crew->SetReactState(REACT_AGGRESSIVE);
                 crew->SetWalk(true);

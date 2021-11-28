@@ -15,24 +15,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Config.h"
 #include "CreatureAI.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "GossipDef.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "ScriptSystem.h"
+#include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "SmartAI.h"
 #include "WorldPacket.h"
 
 #ifdef ELUNA
@@ -117,6 +117,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(PetScript);
     SCR_CLEAR(ArenaScript);
     SCR_CLEAR(CommandSC);
+    SCR_CLEAR(DatabaseScript);
 
 #undef SCR_CLEAR
 
@@ -190,7 +191,8 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<PetScript>::GetScriptById(sid) &&
                 !ScriptRegistry<CommandSC>::GetScriptById(sid) &&
                 !ScriptRegistry<ArenaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GroupScript>::GetScriptById(sid))
+                !ScriptRegistry<GroupScript>::GetScriptById(sid) &&
+                !ScriptRegistry<DatabaseScript>::GetScriptById(sid))
                 {
                     LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
                 }
@@ -3148,6 +3150,11 @@ void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
     FOREACH_SCRIPT(CommandSC)->OnHandleDevCommand(player, argstr);
 }
 
+void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
+{
+    FOREACH_SCRIPT(DatabaseScript)->OnAfterDatabasesLoaded(updateFlags);
+}
+
 ///-
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
@@ -3426,6 +3433,11 @@ CommandSC::CommandSC(const char* name)
     ScriptRegistry<CommandSC>::AddScript(this);
 }
 
+DatabaseScript::DatabaseScript(const char* name) : ScriptObject(name)
+{
+    ScriptRegistry<DatabaseScript>::AddScript(this);
+}
+
 // Specialize for each script type class like so:
 template class ScriptRegistry<SpellScriptLoader>;
 template class ScriptRegistry<ServerScript>;
@@ -3467,3 +3479,4 @@ template class ScriptRegistry<MiscScript>;
 template class ScriptRegistry<PetScript>;
 template class ScriptRegistry<ArenaScript>;
 template class ScriptRegistry<CommandSC>;
+template class ScriptRegistry<DatabaseScript>;

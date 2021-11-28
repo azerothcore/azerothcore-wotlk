@@ -22,8 +22,8 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "ScriptMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
@@ -431,7 +431,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
     // impossible have online own another character (use this for speedup check in case online owner)
     Player* auction_owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    if (!auction_owner && sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter()) == GetAccountId())
+    if (!auction_owner && sCharacterCache->GetCharacterAccountIdByGuid(auction->owner) == GetAccountId())
     {
         //you cannot bid your another character auction:
         SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_BID_OWN);
@@ -727,28 +727,40 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     uint8 getAll;
     recvData >> getAll;
 
-    // this block looks like it uses some lame byte packing or similar...
-    uint8 unkCnt;
-    recvData >> unkCnt;
-    for (uint8 i = 0; i < unkCnt; i++)
+    // Read sort block
+    uint8 sortOrderCount;
+    recvData >> sortOrderCount;
+    AuctionSortOrderVector sortOrder;
+    for (uint8 i = 0; i < sortOrderCount; i++)
     {
-        recvData.read_skip<uint8>();
-        recvData.read_skip<uint8>();
+        uint8 sortMode;
+        uint8 isDesc;
+        recvData >> sortMode;
+        recvData >> isDesc;
+        AuctionSortInfo sortInfo;
+        sortInfo.isDesc = (isDesc == 1);
+        sortInfo.sortOrder = static_cast<AuctionSortOrder>(sortMode);
+        sortOrder.push_back(std::move(sortInfo));
     }
 
     // remove fake death
     if (_player->HasUnitState(UNIT_STATE_DIED))
+    {
         _player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+    }
 
     // pussywizard:
     const uint32 delay = 2000;
     const uint32 now = World::GetGameTimeMS();
     uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
     if (diff > delay)
+    {
         diff = delay;
+    }
     _lastAuctionListItemsMSTime = now + delay - diff;
     std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
-    AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
+    AsyncAuctionListingMgr::GetTempList().push_back(AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID,
+        auctionMainCategory, auctionSubCategory, quality, getAll, sortOrder));
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket& recvData)

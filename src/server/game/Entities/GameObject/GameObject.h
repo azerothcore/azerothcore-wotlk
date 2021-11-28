@@ -854,16 +854,8 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
-    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
-    {
-        for (ObjectGuid const& guid : m_SkillupList)
-            if (guid == playerGuid)
-                return true;
-
-        return false;
-    }
-    void ClearSkillupList() { m_SkillupList.clear(); }
+    void AddToSkillupList(ObjectGuid playerGuid);
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const;
 
     void AddUniqueUse(Player* player);
     void AddUse() { ++m_usetimes; }
@@ -991,7 +983,7 @@ protected:
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
     // For traps this: spell casting cooldown, for doors/buttons: reset time.
-    GuidList m_SkillupList;
+    std::unordered_map<ObjectGuid, int32> m_SkillupList;
 
     ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
     GuidSet m_unique_users;

@@ -18,8 +18,8 @@
 #ifndef _WARDEN_MAC_H
 #define _WARDEN_MAC_H
 
-#include "ByteBuffer.h"
 #include "ARC4.h"
+#include "ByteBuffer.h"
 #include "Warden.h"
 #include <map>
 

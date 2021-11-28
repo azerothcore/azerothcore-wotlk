@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_spire.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_spire.h"
 
 enum Spells
 {
@@ -39,23 +39,6 @@ enum Events
     EVENT_RAGE
 };
 
-enum ChromaticEliteGuardEvents
-{
-    EVENT_MORTAL_STRIKE = 1,
-    EVENT_KNOCKDOWN     = 2,
-    EVENT_STRIKE        = 3
-};
-
-enum ChromaticEliteGuardSpells
-{
-    SPELL_MORTAL_STRIKE = 15708,
-    SPELL_KNOCKDOWN     = 16790,
-    SPELL_STRIKE        = 15580
-};
-
-constexpr uint32 ChromaticEliteGuardEntry  = 10814;
-constexpr uint32 GeneralDrakkisathEntry    = 10814;
-
 class boss_drakkisath : public CreatureScript
 {
 public:
@@ -65,37 +48,15 @@ public:
     {
         boss_drakkisathAI(Creature* creature) : BossAI(creature, DATA_GENERAL_DRAKKISATH) { }
 
-        void Reset() override
-        {
-            _Reset();
-        }
-
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            CallForHelp();
             events.ScheduleEvent(EVENT_FLAMESTRIKE, 6000);
             events.ScheduleEvent(EVENT_CLEAVE,    8000);
             events.ScheduleEvent(EVENT_CONFLAGRATION, 15000);
             events.ScheduleEvent(EVENT_THUNDERCLAP,    17000);
             events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5000);
             events.ScheduleEvent(EVENT_RAGE, 1000);
-        }
-
-        // Will make his two adds engage combat
-        void CallForHelp()
-        {
-            std::list<Creature*> ChromaticEliteGuards;
-            me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
-            for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
-            {
-                (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
         }
 
         void UpdateAI(uint32 diff) override
@@ -121,10 +82,7 @@ public:
                         events.ScheduleEvent(EVENT_CLEAVE, 8000);
                         break;
                     case EVENT_CONFLAGRATION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
-                        {
-                            DoCast(target, SPELL_CONFLAGRATION);
-                        }
+                        DoCastVictim(SPELL_CONFLAGRATION);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 18000);
                         break;
                     case EVENT_THUNDERCLAP:
@@ -151,73 +109,7 @@ public:
     }
 };
 
-class chromatic_elite_guard : public CreatureScript
-{
-public:
-    chromatic_elite_guard() : CreatureScript("chromatic_elite_guard") { }
-
-    struct chromatic_elite_guardAI : public ScriptedAI
-    {
-        chromatic_elite_guardAI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap _events;
-
-        void EnterCombat(Unit* who) override
-        {
-            _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
-            _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
-            _events.ScheduleEvent(EVENT_STRIKE, urand(12000, 20800));
-
-            std::list<Creature*> GeneralDrakkisath;
-            me->GetCreaturesWithEntryInRange(GeneralDrakkisath, 15.0f, GeneralDrakkisathEntry);
-            for (std::list<Creature*>::const_iterator itr = GeneralDrakkisath.begin(); itr != GeneralDrakkisath.end(); ++itr)
-            {
-                (*itr)->ToCreature()->AI()->AttackStart(who);
-            }
-
-            std::list<Creature*> ChromaticEliteGuards;
-            me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
-            for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
-            {
-                (*itr)->ToCreature()->AI()->AttackStart(who);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            switch (_events.ExecuteEvent())
-            {
-                case EVENT_MORTAL_STRIKE:
-                    DoCastVictim(SPELL_MORTAL_STRIKE);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 13000);
-                    break;
-                case EVENT_KNOCKDOWN:
-                    DoCastVictim(SPELL_KNOCKDOWN);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(11200, 25700));
-                    break;
-                case EVENT_STRIKE:
-                    DoCastVictim(SPELL_STRIKE);
-                    _events.ScheduleEvent(EVENT_MORTAL_STRIKE, 9000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new chromatic_elite_guardAI(creature);
-    }
-};
-
 void AddSC_boss_drakkisath()
 {
     new boss_drakkisath();
-    new chromatic_elite_guard();
 }

@@ -33,6 +33,7 @@
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
 #include "WeatherMgr.h"
@@ -156,8 +157,7 @@ void Player::Update(uint32 p_time)
 
     m_achievementMgr->UpdateTimedAchievements(p_time);
 
-    if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) &&
-        !HasUnitState(UNIT_STATE_CASTING))
+    if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING) && !HasUnitState(UNIT_STATE_CHARGING))
     {
         if (Unit* victim = GetVictim())
         {
@@ -599,7 +599,7 @@ void Player::UpdateRating(CombatRating cr)
                                          (*i)->GetAmount()));
     if (amount < 0)
         amount = 0;
-    SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr, uint32(amount));
+    SetUInt32Value(static_cast<uint16>(PLAYER_FIELD_COMBAT_RATING_1) + static_cast<uint16>(cr), uint32(amount));
 
     bool affectStats = CanModifyStats();
 
@@ -798,8 +798,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 {
     LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid %d", spellid);
 
-    SkillLineAbilityMapBounds bounds =
-        sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
+    SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first;
          _spell_idx != bounds.second; ++_spell_idx)
