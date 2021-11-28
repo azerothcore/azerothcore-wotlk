@@ -28,10 +28,10 @@ npc_kaya_flathoof
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_braug_dimspirit

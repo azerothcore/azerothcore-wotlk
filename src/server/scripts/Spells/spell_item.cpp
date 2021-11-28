@@ -23,11 +23,12 @@
 
 #include "Battleground.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "WorldSession.h"
 
 class spell_item_massive_seaforium_charge : public SpellScript
 {
@@ -1497,6 +1498,7 @@ enum DeviateFishSpells
     SPELL_SHRINK            = 8066,
     SPELL_PARTY_TIME        = 8067,
     SPELL_HEALTHY_SPIRIT    = 8068,
+    SPELL_REJUVENATION      = 8070
 };
 
 class spell_item_deviate_fish : public SpellScript
@@ -1510,22 +1512,70 @@ class spell_item_deviate_fish : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        for (uint32 spellId = SPELL_SLEEPY; spellId <= SPELL_HEALTHY_SPIRIT; ++spellId)
-            if (!sSpellMgr->GetSpellInfo(spellId))
-                return false;
-        return true;
+        return ValidateSpellInfo({ SPELL_SLEEPY, SPELL_INVIGORATE, SPELL_SHRINK, SPELL_PARTY_TIME, SPELL_HEALTHY_SPIRIT, SPELL_REJUVENATION });
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        uint32 spellId = urand(SPELL_SLEEPY, SPELL_HEALTHY_SPIRIT);
+        uint32 spellId = RAND(SPELL_SLEEPY, SPELL_INVIGORATE, SPELL_SHRINK, SPELL_PARTY_TIME, SPELL_HEALTHY_SPIRIT, SPELL_REJUVENATION);
         caster->CastSpell(caster, spellId, true, nullptr);
     }
 
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_item_deviate_fish::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class PartyTimeEmoteEvent : public BasicEvent
+{
+public:
+    PartyTimeEmoteEvent(Player* player) : _player(player) { }
+
+    bool Execute(uint64 /*time*/, uint32 /*diff*/) override
+    {
+        if (!_player->HasAura(SPELL_PARTY_TIME))
+        {
+            return true;
+        }
+
+        if (_player->isMoving())
+        {
+            _player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
+        }
+        else
+        {
+            _player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_DANCESPECIAL, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
+        }
+
+        _player->m_Events.AddEvent(this, RAND(_player->m_Events.CalculateTime(5000), _player->m_Events.CalculateTime(10000), _player->m_Events.CalculateTime(15000)));
+
+        return false; // do not delete re-added event in EventProcessor::Update
+    }
+
+private:
+    Player* _player;
+};
+
+class spell_item_party_time : public AuraScript
+{
+    PrepareAuraScript(spell_item_party_time);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetOwner()->ToPlayer();
+        if (!player)
+        {
+            return;
+        }
+
+        player->m_Events.AddEvent(new PartyTimeEmoteEvent(player), RAND(player->m_Events.CalculateTime(5000), player->m_Events.CalculateTime(10000), player->m_Events.CalculateTime(15000)));
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_item_party_time::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1728,83 +1778,52 @@ class spell_item_make_a_wish : public SpellScript
     }
 };
 
+enum MingoFortune
+{
+    SPELL_CREATE_FORTUNE_1       = 40804,
+    SPELL_CREATE_FORTUNE_2       = 40805,
+    SPELL_CREATE_FORTUNE_3       = 40806,
+    SPELL_CREATE_FORTUNE_4       = 40807,
+    SPELL_CREATE_FORTUNE_5       = 40808,
+    SPELL_CREATE_FORTUNE_6       = 40809,
+    SPELL_CREATE_FORTUNE_7       = 40908,
+    SPELL_CREATE_FORTUNE_8       = 40910,
+    SPELL_CREATE_FORTUNE_9       = 40911,
+    SPELL_CREATE_FORTUNE_10      = 40912,
+    SPELL_CREATE_FORTUNE_11      = 40913,
+    SPELL_CREATE_FORTUNE_12      = 40914,
+    SPELL_CREATE_FORTUNE_13      = 40915,
+    SPELL_CREATE_FORTUNE_14      = 40916,
+    SPELL_CREATE_FORTUNE_15      = 40918,
+    SPELL_CREATE_FORTUNE_16      = 40919,
+    SPELL_CREATE_FORTUNE_17      = 40920,
+    SPELL_CREATE_FORTUNE_18      = 40921,
+    SPELL_CREATE_FORTUNE_19      = 40922,
+    SPELL_CREATE_FORTUNE_20      = 40923
+};
+
+std::array<uint32, 20> const CreateFortuneSpells =
+{
+    SPELL_CREATE_FORTUNE_1, SPELL_CREATE_FORTUNE_2, SPELL_CREATE_FORTUNE_3, SPELL_CREATE_FORTUNE_4, SPELL_CREATE_FORTUNE_5,
+    SPELL_CREATE_FORTUNE_6, SPELL_CREATE_FORTUNE_7, SPELL_CREATE_FORTUNE_8, SPELL_CREATE_FORTUNE_9, SPELL_CREATE_FORTUNE_10,
+    SPELL_CREATE_FORTUNE_11, SPELL_CREATE_FORTUNE_12, SPELL_CREATE_FORTUNE_13, SPELL_CREATE_FORTUNE_14, SPELL_CREATE_FORTUNE_15,
+    SPELL_CREATE_FORTUNE_16, SPELL_CREATE_FORTUNE_17, SPELL_CREATE_FORTUNE_18, SPELL_CREATE_FORTUNE_19, SPELL_CREATE_FORTUNE_20
+};
+
 // http://www.wowhead.com/item=32686 Mingo's Fortune Giblets
 // 40802 Mingo's Fortune Generator
 class spell_item_mingos_fortune_generator : public SpellScript
 {
     PrepareSpellScript(spell_item_mingos_fortune_generator);
 
-    void HandleDummy(SpellEffIndex effIndex)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        // Selecting one from Bloodstained Fortune item
-        uint32 newitemid;
-        switch (urand(1, 20))
-        {
-            case 1:
-                newitemid = 32688;
-                break;
-            case 2:
-                newitemid = 32689;
-                break;
-            case 3:
-                newitemid = 32690;
-                break;
-            case 4:
-                newitemid = 32691;
-                break;
-            case 5:
-                newitemid = 32692;
-                break;
-            case 6:
-                newitemid = 32693;
-                break;
-            case 7:
-                newitemid = 32700;
-                break;
-            case 8:
-                newitemid = 32701;
-                break;
-            case 9:
-                newitemid = 32702;
-                break;
-            case 10:
-                newitemid = 32703;
-                break;
-            case 11:
-                newitemid = 32704;
-                break;
-            case 12:
-                newitemid = 32705;
-                break;
-            case 13:
-                newitemid = 32706;
-                break;
-            case 14:
-                newitemid = 32707;
-                break;
-            case 15:
-                newitemid = 32708;
-                break;
-            case 16:
-                newitemid = 32709;
-                break;
-            case 17:
-                newitemid = 32710;
-                break;
-            case 18:
-                newitemid = 32711;
-                break;
-            case 19:
-                newitemid = 32712;
-                break;
-            case 20:
-                newitemid = 32713;
-                break;
-            default:
-                return;
-        }
+        return ValidateSpellInfo(CreateFortuneSpells);
+    }
 
-        CreateItem(effIndex, newitemid);
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), Acore::Containers::SelectRandomContainerElement(CreateFortuneSpells), true);
     }
 
     void Register() override
@@ -3528,6 +3547,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScriptWithArgs(spell_item_defibrillate, "spell_item_gnomish_army_knife", 33);
     RegisterSpellScript(spell_item_desperate_defense);
     RegisterSpellScript(spell_item_deviate_fish);
+    RegisterSpellScript(spell_item_party_time);
     RegisterSpellScript(spell_item_echoes_of_light);
     RegisterSpellScript(spell_item_fate_rune_of_unsurpassed_vigor);
     RegisterSpellScript(spell_item_flask_of_the_north);

@@ -16,10 +16,10 @@
  */
 
 #include "Geometry.h"
-#include "Constants.h"
 #include "ADT.h"
-#include "WorldModelHandler.h"
+#include "Constants.h"
 #include "DoodadHandler.h"
+#include "WorldModelHandler.h"
 #include <limits.h>
 
 Geometry::Geometry() : Transform(false)

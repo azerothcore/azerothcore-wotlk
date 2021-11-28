@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "arcatraz.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "arcatraz.h"
 
 DoorData const doorData[] =
 {

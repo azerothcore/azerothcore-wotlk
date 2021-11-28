@@ -18,10 +18,10 @@
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "naxxramas.h"
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "naxxramas.h"
 
 const float HeiganPos[2] = {2796, -3707};
 const float HeiganEruptionSlope[3] =
