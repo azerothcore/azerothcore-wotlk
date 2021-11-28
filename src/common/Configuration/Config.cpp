@@ -83,7 +83,7 @@ namespace
 #endif
 
                 return;
-            }            
+            }
         }
 
         // Check exit option
