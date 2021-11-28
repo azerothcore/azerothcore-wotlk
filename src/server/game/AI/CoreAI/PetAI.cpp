@@ -15,18 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PetAI.h"
 #include "Creature.h"
 #include "Errors.h"
 #include "Group.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
-#include "PetAI.h"
 #include "Player.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
+#include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
 {
@@ -55,9 +56,6 @@ bool PetAI::_needToStop()
     if (Unit* owner = me->GetCharmerOrOwner())
         if (owner->GetExactDist(me) >= (owner->GetVisibilityRange() - 10.0f))
             return true;
-
-    if (!me->_CanDetectFeignDeathOf(me->GetVictim()))
-        return true;
 
     return !me->CanCreatureAttack(me->GetVictim());
 }
@@ -471,7 +469,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Check pet attackers first so we don't drag a bunch of targets to the owner
     if (Unit* myAttacker = me->getAttackerForHelper())
-        if (!myAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(myAttacker) && me->CanCreatureAttack(myAttacker))
+        if (!myAttacker->HasBreakableByDamageCrowdControlAura() && me->CanCreatureAttack(myAttacker))
             return myAttacker;
 
     // Check pet's attackers first to prevent dragging mobs back to owner
@@ -481,7 +479,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
         if (!tauntAuras.empty())
             for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
                 if (Unit* caster = (*itr)->GetCaster())
-                    if (me->_CanDetectFeignDeathOf(caster) && me->CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, me->GetGUID()))
+                    if (me->CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, me->GetGUID()))
                         return caster;
     }
 
@@ -492,13 +490,13 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
-        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(ownerAttacker) && me->CanCreatureAttack(ownerAttacker))
+        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura() && me->CanCreatureAttack(ownerAttacker))
             return ownerAttacker;
 
     // Check owner victim
     // 3.0.2 - Pets now start attacking their owners victim in defensive mode as soon as the hunter does
     if (Unit* ownerVictim = owner->GetVictim())
-        if (me->_CanDetectFeignDeathOf(ownerVictim) && me->CanCreatureAttack(ownerVictim))
+        if (me->CanCreatureAttack(ownerVictim))
             return ownerVictim;
 
     // Neither pet or owner had a target and aggressive pets can pick any target
@@ -677,7 +675,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED))
         return false;
 
-    // pussywizard: ZOMG! TEMP!
+    // pussywizard: TEMP!
     if (!me->GetCharmInfo())
     {
         LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %s", me->GetEntry(), me->GetOwnerGUID().ToString().c_str());

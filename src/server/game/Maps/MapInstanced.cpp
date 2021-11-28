@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapInstanced.h"
 #include "Battleground.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
-#include "MapInstanced.h"
-#include "MapMgr.h"
 #include "MMapFactory.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "VMapFactory.h"

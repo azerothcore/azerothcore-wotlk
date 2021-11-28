@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureAISelector.h"
 #include "Creature.h"
 #include "CreatureAIFactory.h"
-#include "CreatureAISelector.h"
 #include "MovementGenerator.h"
 #include "PassiveAI.h"
 #include "Pet.h"

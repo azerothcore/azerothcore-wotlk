@@ -287,7 +287,7 @@ protected:
 
     void TeamCastSpell(TeamId team, int32 spellId, Player* sameMapPlr = nullptr);
 
-    // Hack to store map because this code is just shit
+    // Hack to store map
     void SetMapFromZone(uint32 zone);
     std::map<ObjectGuid::LowType, GameObject*> m_GoScriptStore;
     std::map<ObjectGuid::LowType, Creature*> m_CreatureScriptStore;

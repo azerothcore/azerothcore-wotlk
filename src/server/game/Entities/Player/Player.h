@@ -20,6 +20,7 @@
 
 #include "ArenaTeam.h"
 #include "Battleground.h"
+#include "CharacterCache.h"
 #include "DatabaseEnvFwd.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
@@ -356,16 +357,24 @@ struct PvPInfo
     time_t FFAPvPEndTimer{0};                  ///> Time when player unflags himself for FFA PvP (flag removed after 30 sec)
 };
 
+enum DuelState
+{
+    DUEL_STATE_CHALLENGED,
+    DUEL_STATE_COUNTDOWN,
+    DUEL_STATE_IN_PROGRESS,
+    DUEL_STATE_COMPLETED
+};
+
 struct DuelInfo
 {
-    DuelInfo()  {}
+    DuelInfo(Player* opponent, Player* initiator, bool isMounted) : Opponent(opponent), Initiator(initiator), IsMounted(isMounted) {}
 
-    Player* initiator{nullptr};
-    Player* opponent{nullptr};
-    time_t startTimer{0};
-    time_t startTime{0};
-    time_t outOfBound{0};
-    bool isMounted{false};
+    Player* const Opponent;
+    Player* const Initiator;
+    bool const IsMounted;
+    DuelState State = DUEL_STATE_CHALLENGED;
+    time_t StartTime = 0;
+    time_t OutOfBoundsTime = 0;
 };
 
 struct Areas
@@ -1500,7 +1509,6 @@ public:
     static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
     static float  GetFloatValueFromArray(Tokenizer const& data, uint16 index);
     static uint32 GetZoneIdFromDB(ObjectGuid guid);
-    static uint32 GetLevelFromStorage(ObjectGuid::LowType guid);
     static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
 
     static bool IsValidGender(uint8 Gender) { return Gender <= GENDER_FEMALE; }
@@ -1814,7 +1822,7 @@ public:
     }
 
     /** todo: -maybe move UpdateDuelFlag+DuelComplete to independent DuelHandler.. **/
-    DuelInfo* duel;
+    std::unique_ptr<DuelInfo> duel;
     void UpdateDuelFlag(time_t currTime);
     void CheckDuelDistance(time_t currTime);
     void DuelComplete(DuelCompleteType type);
@@ -1832,16 +1840,13 @@ public:
     {
         SetUInt32Value(PLAYER_GUILDID, GuildId);
         // xinef: update global storage
-        sWorld->UpdateGlobalPlayerGuild(GetGUID().GetCounter(), GuildId);
+        sCharacterCache->UpdateCharacterGuildId(GetGUID(), GetGuildId());
     }
     void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
     [[nodiscard]] uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }
     void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
     [[nodiscard]] uint32 GetGuildId() const { return GetUInt32Value(PLAYER_GUILDID);  }
     [[nodiscard]] Guild* GetGuild() const;
-    static uint32 GetGuildIdFromStorage(ObjectGuid::LowType guid);
-    static uint32 GetGroupIdFromStorage(ObjectGuid::LowType guid);
-    static uint32 GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot);
     uint32 GetGuildIdInvited() { return m_GuildIdInvited; }
     static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
 

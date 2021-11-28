@@ -17,8 +17,8 @@
 
 #include "CreatureTextMgr.h"
 #include "MoveSplineInit.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "sunwell_plateau.h"
 
 enum Yells

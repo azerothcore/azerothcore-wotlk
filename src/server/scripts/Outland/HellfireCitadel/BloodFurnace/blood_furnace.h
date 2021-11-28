@@ -18,8 +18,8 @@
 #ifndef DEF_BLOOD_FURNACE_H
 #define DEF_BLOOD_FURNACE_H
 
-#include "Player.h"
 #include "CreatureAIImpl.h"
+#include "Player.h"
 
 #define BloodFurnaceScriptName "instance_blood_furnace"
 
