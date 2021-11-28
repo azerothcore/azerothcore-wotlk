@@ -1897,7 +1897,7 @@ public: /* Initialization */
     }
 
     /// Sets the modules loader callback which is invoked to load modules
-    /// (Workaround for circular dependency game <-> scripts)
+    /// (Workaround for circular dependency game <-> modules)
     void SetModulesLoader(ModulesLoaderCallbackType script_loader_callback)
     {
         _modules_loader_callback = script_loader_callback;
