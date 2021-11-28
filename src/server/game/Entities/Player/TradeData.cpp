@@ -16,6 +16,7 @@
  */
 
 #include "Player.h"
+#include "WorldSession.h"
 
 TradeData* TradeData::GetTraderData() const
 {

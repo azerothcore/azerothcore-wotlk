@@ -156,6 +156,11 @@ class spell_mage_molten_armor : public AuraScript
         if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
             return true;
 
+        if (!eventInfo.GetActionTarget())
+        {
+            return false;
+        }
+
         // Xinef: Molten Shields talent
         if (AuraEffect* aurEff = eventInfo.GetActionTarget()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_MAGE, 16, EFFECT_0))
             return roll_chance_i(aurEff->GetSpellInfo()->GetRank() * 50);
@@ -803,7 +808,7 @@ class spell_mage_master_of_elements : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         _spellInfo = eventInfo.GetSpellInfo();
-        if (!_spellInfo)
+        if (!_spellInfo || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
         {
             return false;
         }

@@ -15,18 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LFGMgr.h"
+#include "CharacterCache.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "Language.h"
+#include "InstanceSaveMgr.h"
 #include "LFGGroupData.h"
-#include "LFGMgr.h"
 #include "LFGPlayerData.h"
 #include "LFGQueue.h"
 #include "LFGScripts.h"
+#include "Language.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -37,7 +39,6 @@
 
 namespace lfg
 {
-
     LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
     {
         new LFGPlayerScript();
@@ -1060,11 +1061,11 @@ namespace lfg
                         talents[0] = 0;
                         talents[1] = 0;
                         talents[2] = 0;
-                        if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(mitr->guid.GetCounter()))
+                        if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(mitr->guid))
                         {
-                            level = gpd->level;
-                            Class = gpd->playerClass;
-                            race = gpd->race;
+                            level = gpd->Level;
+                            Class = gpd->Class;
+                            race = gpd->Race;
                         }
                         Player* mplr = ObjectAccessor::FindConnectedPlayer(guid);
                         if (mplr)
@@ -1695,7 +1696,7 @@ namespace lfg
         {
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
-                if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
+                if (player->GetGroup() != grp) // pussywizard: could not add because group was full
                     continue;
 
                 // Add the cooldown spell if queued for a random dungeon

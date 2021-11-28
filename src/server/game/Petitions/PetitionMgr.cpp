@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PetitionMgr.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
-#include "PetitionMgr.h"
+#include "ObjectAccessor.h"
 #include "Player.h"
 #include "QueryResult.h"
 #include "Timer.h"
