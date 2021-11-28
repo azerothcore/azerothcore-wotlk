@@ -16,6 +16,7 @@
  */
 
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stratholme.h"
 #include "TaskScheduler.h"
 
@@ -30,7 +31,10 @@ enum Texts
     SAY_JARIEN_ON_SUMMON_0     = 0,
     SAY_JARIEN_ON_SUMMON_1     = 1,
     SAY_JARIEN_ON_SUMMON_2     = 2,
-    EMOTE_JARIEN_VENGEANCE     = 3
+    EMOTE_JARIEN_VENGEANCE     = 3,
+
+    // Spirit
+    SAY_SPIRIT_BOTH_DEAD       = 0
 };
 
 enum Spells
@@ -63,6 +67,40 @@ enum Actions
     ACTION_PARTNER_DEAD = 0
 };
 
+const Position heirloomsPosition = { 3423.389893f, -3055.571045f, 136.49837f, 5.707379f };
+
+void HandleBothDead(Creature* creature, bool jarien, Unit* killer)
+{
+    // Spirit talk
+    if (jarien)
+    {
+        if (Creature* spirit = creature->FindNearestCreature(NPC_SPIRIT_OF_JARIEN, 100.f))
+        {
+            spirit->AttackStop();
+            spirit->SetReactState(REACT_PASSIVE);
+            spirit->AI()->Talk(SAY_SPIRIT_BOTH_DEAD);
+        }
+    }
+    else
+    {
+        if (Creature* spirit = creature->FindNearestCreature(NPC_SPIRIT_OF_SOTHOS, 100.f))
+        {
+            spirit->AttackStop();
+            spirit->SetReactState(REACT_PASSIVE);
+            spirit->AI()->Talk(SAY_SPIRIT_BOTH_DEAD);
+        }
+    }
+
+    // chest spawn
+    if (GameObject* chest = killer->SummonGameObject(GO_JARIEN_AND_SOTHOS_HEIRLOOMS, heirloomsPosition.GetPositionX(), heirloomsPosition.GetPositionY(), heirloomsPosition.GetPositionZ(), heirloomsPosition.GetOrientation(), 0.f, 0.f, 0.f, 0.f, 0))
+    {
+        chest->setActive(true);
+        chest->SetGoState(GO_STATE_READY);
+        chest->SetLootState(GO_READY);
+        chest->SetUInt32Value(GAMEOBJECT_FACTION, 35);
+    }
+}
+
 struct boss_jarien : public BossAI
 {
     boss_jarien(Creature* creature) : BossAI(creature, DATA_JARIEN)
@@ -80,6 +118,14 @@ struct boss_jarien : public BossAI
     {
         _scheduler.CancelAll();
         _phase = _talked ? PHASE_FIGHT : PHASE_TALK;
+        if (_sothosDied)
+        {
+            if (Creature* sothos = me->FindNearestCreature(NPC_SOTHOS, 200.f, false))
+            {
+                sothos->Respawn();
+            }
+        }
+        _sothosDied = false;
         _Reset();
     }
 
@@ -103,12 +149,19 @@ struct boss_jarien : public BossAI
             });
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
         _JustDied();
         if (Creature * sothos = me->FindNearestCreature(NPC_SOTHOS, 200.f))
         {
             sothos->AI()->DoAction(ACTION_PARTNER_DEAD);
+        }
+
+        me->SummonCreature(NPC_SPIRIT_OF_JARIEN, me->GetPosition());
+
+        if (_sothosDied)
+        {
+            HandleBothDead(me, true, killer);
         }
     }
 
@@ -119,6 +172,7 @@ struct boss_jarien : public BossAI
             me->SetFullHealth();
             DoCastSelf(SPELL_VENGEANCE);
             Talk(EMOTE_JARIEN_VENGEANCE);
+            _sothosDied = true;
         }
     }
 
@@ -164,6 +218,7 @@ struct boss_jarien : public BossAI
         TaskScheduler _scheduler;
         uint8 _phase;
         bool _talked;
+        bool _sothosDied;
 };
 
 struct boss_sothos : public BossAI
@@ -183,6 +238,14 @@ struct boss_sothos : public BossAI
     {
         _scheduler.CancelAll();
         _phase = _talked ? PHASE_FIGHT : PHASE_TALK;
+        if (_jarienDied)
+        {
+            if (Creature* jarien = me->FindNearestCreature(NPC_JARIEN, 200.f, false))
+            {
+                jarien->Respawn();
+            }
+        }
+        _jarienDied = false;
         _Reset();
     }
 
@@ -208,12 +271,19 @@ struct boss_sothos : public BossAI
             });
     }
 
-    void JustDied(Unit* /*killer*/) override
+    void JustDied(Unit* killer) override
     {
         _JustDied();
         if (Creature* jarien = me->FindNearestCreature(NPC_JARIEN, 200.f))
         {
             jarien->AI()->DoAction(ACTION_PARTNER_DEAD);
+        }
+
+        me->SummonCreature(NPC_SPIRIT_OF_SOTHOS, me->GetPosition());
+
+        if (_jarienDied)
+        {
+            HandleBothDead(me, false, killer);
         }
     }
 
@@ -224,6 +294,7 @@ struct boss_sothos : public BossAI
             me->SetFullHealth();
             DoCastSelf(SPELL_VENGEANCE);
             Talk(EMOTE_SOTHOS_VENGEANCE);
+            _jarienDied = true;
         }
     }
 
@@ -274,6 +345,7 @@ struct boss_sothos : public BossAI
         TaskScheduler _scheduler;
         uint8 _phase;
         bool _talked;
+        bool _jarienDied;
 };
 
 void AddSC_boss_jarien_and_sothos()

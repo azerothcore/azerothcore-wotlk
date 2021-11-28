@@ -110,12 +110,6 @@ public:
                     if (_slaughterProgress == 3)
                         ++_slaughterNPCs;
                     break;
-                case NPC_JARIEN:
-                    _jarienGUID = creature->GetGUID();
-                    break;
-                case NPC_SOTHOS:
-                    _sothosGUID = creature->GetGUID();
-                    break;
             }
         }
 
@@ -325,50 +319,6 @@ public:
             }
 
             SaveToDB();
-        }
-
-        bool SetBossState(uint32 bossId, EncounterState state) override
-        {
-            if (bossId == DATA_JARIEN || bossId == DATA_SOTHOS)
-            {
-                switch (state)
-                {
-                    case NOT_STARTED:
-                    case FAIL:
-                        if (Creature* jarien = instance->GetCreature(_jarienGUID))
-                        {
-                            if (jarien->isDead())
-                            {
-                                jarien->Respawn();
-                            }
-                        }
-
-                        if (Creature* sothos = instance->GetCreature(_sothosGUID))
-                        {
-                            if (sothos->isDead())
-                            {
-                                sothos->Respawn();
-                            }
-                        }
-                        break;
-                    case IN_PROGRESS:
-                        if (Creature* jarien = instance->GetCreature(_jarienGUID))
-                        {
-                            jarien->AI()->DoZoneInCombat();
-                        }
-
-                        if (Creature* sothos = instance->GetCreature(_sothosGUID))
-                        {
-                            sothos->AI()->DoZoneInCombat();
-                        }
-                        break;
-                    case DONE:
-                        // handle loot chest respawn
-                        break;
-                }
-            }
-
-            return true;
         }
 
         std::string GetSaveData() override
@@ -608,8 +558,6 @@ public:
         ObjectGuid _slaughterGateGUID;
         ObjectGuid _gauntletGateGUID;
         ObjectGuid _baronRivendareGUID;
-        ObjectGuid _jarienGUID;
-        ObjectGuid _sothosGUID;
 
         bool _gateTrapsCooldown[2];
         ObjectGuid _trappedPlayerGUID;

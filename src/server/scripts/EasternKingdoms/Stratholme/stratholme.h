@@ -51,6 +51,8 @@ enum CreatureIds
     NPC_PLAGUED_MAGGOT                  = 10536,
     NPC_JARIEN                          = 16101,
     NPC_SOTHOS                          = 16102,
+    NPC_SPIRIT_OF_JARIEN                = 16103,
+    NPC_SPIRIT_OF_SOTHOS                = 16104
 };
 
 enum GameobjectIds
@@ -68,6 +70,7 @@ enum GameobjectIds
     GO_PORT_TRAP_GATE_2                 = 175350,  // Gate trap scarlet side
     GO_PORT_TRAP_GATE_3                 = 175355,  // Gate trap undead side
     GO_PORT_TRAP_GATE_4                 = 175354,
+    GO_JARIEN_AND_SOTHOS_HEIRLOOMS      = 181083
 };
 
 enum MiscIds
