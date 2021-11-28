@@ -13917,7 +13917,7 @@ Unit* Creature::SelectVictim()
     if (!tauntAuras.empty())
         for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
             if (Unit* caster = (*itr)->GetCaster())
-                if (_CanDetectFeignDeathOf(caster) && CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, GetGUID()))
+                if (CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, GetGUID()))
                 {
                     target = caster;
                     break;
@@ -13950,7 +13950,7 @@ Unit* Creature::SelectVictim()
     else
         return nullptr;
 
-    if (target && _CanDetectFeignDeathOf(target) && CanCreatureAttack(target))
+    if (target && CanCreatureAttack(target))
     {
         SetInFront(target);
         return target;
