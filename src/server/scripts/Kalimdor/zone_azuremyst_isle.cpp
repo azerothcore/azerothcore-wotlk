@@ -35,10 +35,10 @@ EndContentData */
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_draenei_survivor
@@ -462,8 +462,7 @@ public:
                 Talk(CAPITIVE_SAY, owner);
                 _playerGUID = owner->GetGUID();
             }
-            Position pos;
-            me->GetNearPosition(pos, 3.0f, 0.0f);
+            Position pos = me->GetNearPosition(3.0f, 0.0f);
             me->GetMotionMaster()->MovePoint(POINT_INIT, pos);
         }
 

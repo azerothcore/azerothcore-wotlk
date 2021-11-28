@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Containers.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ahnkahet.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "Containers.h"
+#include "ahnkahet.h"
 
 enum Misc
 {
@@ -303,7 +303,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<boss_elder_nadoxAI>(creature);
+        return GetAhnKahetAI<boss_elder_nadoxAI>(creature);
     }
 };
 
@@ -344,7 +344,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetAhnkahetAI<npc_ahnkahar_nerubianAI>(creature);
+        return GetAhnKahetAI<npc_ahnkahar_nerubianAI>(creature);
     }
 };
 

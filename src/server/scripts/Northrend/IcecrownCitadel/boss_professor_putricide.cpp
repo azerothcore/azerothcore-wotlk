@@ -17,13 +17,13 @@
 
 #include "GridNotifiers.h"
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum ScriptTexts
 {
@@ -201,10 +201,10 @@ private:
 };
 
 // xinef: malleable goo selector, check for target validity
-struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
+struct MalleableGooSelector
 {
-    const Unit* me;
-    MalleableGooSelector(Unit const* unit) : me(unit) {}
+public:
+    MalleableGooSelector(Unit const* unit) : me(unit) { }
 
     bool operator()(Unit const* target) const
     {
@@ -216,6 +216,8 @@ struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
 
         return me->IsValidAttackTarget(target);
     }
+private:
+    const Unit* me;
 };
 
 class boss_professor_putricide : public CreatureScript
@@ -1538,8 +1540,7 @@ public:
             SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
             uint32 duration = uint32(GetSpellInfo()->GetDuration());
 
-            Position pos;
-            caster->GetPosition(&pos);
+            Position pos = caster->GetPosition();
             TempSummon* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id);
             if (!summon || !summon->IsVehicle())
                 return;

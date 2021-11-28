@@ -18,11 +18,13 @@
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "scholomance.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "scholomance.h"
+
+Position KirtonosSpawn = Position(315.028, 70.5385, 102.15, 0.385971);
 
 class instance_scholomance : public InstanceMapScript
 {
@@ -81,6 +83,9 @@ public:
                 case GO_GATE_GANDLING_ENTRANCE:
                     GandlingGatesGUID[6] = go->GetGUID();
                     break;
+                case GO_BRAZIER_KIRTONOS:
+                    BrazierKirtonosGUID = go->GetGUID();
+                    break;
             }
         }
 
@@ -90,6 +95,8 @@ public:
             {
                 case GO_GATE_KIRTONOS:
                     return GateKirtonosGUID;
+                case GO_BRAZIER_KIRTONOS:
+                    return BrazierKirtonosGUID;
                 case GO_GATE_GANDLING_DOWN_NORTH:
                     return GandlingGatesGUID[0];
                 case GO_GATE_GANDLING_DOWN_EAST:
@@ -115,7 +122,46 @@ public:
             switch (type)
             {
                 case DATA_KIRTONOS_THE_HERALD:
-                    _kirtonosState = data;
+                    switch (data)
+                    {
+                        case IN_PROGRESS:
+                            // summon kirtonos and close door
+                            if (_kirtonosState == NOT_STARTED)
+                            {
+                                instance->SummonCreature(NPC_KIRTONOS, KirtonosSpawn);
+                                if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                                {
+                                    gate->SetGoState(GO_STATE_READY);
+                                }
+                            }
+                            _kirtonosState = data;
+                            break;
+                        case FAIL:
+                            // open door and reset brazier
+                            if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                            {
+                                gate->SetGoState(GO_STATE_ACTIVE);
+                            }
+
+                            if (GameObject* brazier = instance->GetGameObject(GetGuidData(GO_BRAZIER_KIRTONOS)))
+                            {
+                                brazier->SetGoState(GO_STATE_READY);
+                                brazier->SetLootState(GO_JUST_DEACTIVATED);
+                                brazier->Respawn();
+                            }
+                            _kirtonosState = NOT_STARTED;
+                            break;
+                        case DONE:
+                            // open door
+                            if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                            {
+                                gate->SetGoState(GO_STATE_ACTIVE);
+                            }
+                            [[fallthrough]];
+                        default:
+                            _kirtonosState = data;
+                            break;
+                    }
                     break;
                 case DATA_MINI_BOSSES:
                     ++_miniBosses;
@@ -145,7 +191,6 @@ public:
                     _rasHuman = data;
                     break;
             }
-
             SaveToDB();
         }
 
@@ -197,6 +242,7 @@ public:
         ObjectGuid GateRavenianGUID;
         ObjectGuid GateBarovGUID;
         ObjectGuid GateIlluciaGUID;
+        ObjectGuid BrazierKirtonosGUID;
 
         ObjectGuid GandlingGatesGUID[7]; // 6 is the entrance
         ObjectGuid GandlingGUID; // boss
@@ -462,6 +508,7 @@ public:
                 case 4:
                     me->CastSpell(me->GetVictim(), SHADOWBOLT_VOLLEY_SPELL, true);
                     events.RepeatEvent(urand(11000, 17000));
+                    break;
             }
 
             DoMeleeAttackIfReady();

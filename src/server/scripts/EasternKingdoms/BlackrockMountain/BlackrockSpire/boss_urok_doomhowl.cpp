@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_spire.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_spire.h"
 
 enum Spells
 {
@@ -49,15 +49,22 @@ public:
     {
         boss_urok_doomhowlAI(Creature* creature) : BossAI(creature, DATA_UROK_DOOMHOWL) {}
 
-        void Reset() override
-        {
-            _Reset();
-        }
-
         void InitializeAI() override
         {
             me->CastSpell(me, SPELL_UROK_SPAWN, true);
             BossAI::InitializeAI();
+            Talk(SAY_SUMMON);
+            DoZoneInCombat(nullptr, 100.0f);
+
+            if (GameObject* challenge = instance->instance->GetGameObject(instance->GetGuidData(GO_UROK_CHALLENGE)))
+            {
+                challenge->Delete();
+            }
+
+            if (GameObject* pile = instance->instance->GetGameObject(instance->GetGuidData(GO_UROK_PILE)))
+            {
+                pile->DespawnOrUnsummon(0ms, Seconds(MONTH));
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -65,12 +72,7 @@ public:
             _EnterCombat();
             events.ScheduleEvent(SPELL_REND, urand(17000, 20000));
             events.ScheduleEvent(SPELL_STRIKE, urand(10000, 12000));
-            Talk(SAY_AGGRO);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
+            events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, urand(25000, 30000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -94,6 +96,10 @@ public:
                     case SPELL_STRIKE:
                         DoCastVictim(SPELL_STRIKE);
                         events.ScheduleEvent(SPELL_STRIKE, urand(8000, 10000));
+                        break;
+                    case SPELL_INTIMIDATING_ROAR:
+                        DoCastVictim(SPELL_INTIMIDATING_ROAR);
+                        events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, urand(40000, 45000));
                         break;
                     default:
                         break;

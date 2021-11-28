@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
@@ -31,7 +32,6 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -1473,20 +1473,35 @@ void SpellMgr::LoadSpellLearnSkills()
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (entry->Effects[i].Effect == SPELL_EFFECT_SKILL)
+            SpellLearnSkillNode dbc_node;
+            switch (entry->Effects[i].Effect)
             {
-                SpellLearnSkillNode dbc_node;
-                dbc_node.skill = entry->Effects[i].MiscValue;
-                dbc_node.step  = entry->Effects[i].CalcValue();
-                if (dbc_node.skill != SKILL_RIDING)
+                case SPELL_EFFECT_SKILL:
+                    dbc_node.skill = entry->Effects[i].MiscValue;
+                    dbc_node.step  = entry->Effects[i].CalcValue();
+                    if (dbc_node.skill != SKILL_RIDING)
+                    {
+                        dbc_node.value = 1;
+                    }
+                    else
+                    {
+                        dbc_node.value = dbc_node.step * 75;
+                    }
+                    dbc_node.maxvalue = dbc_node.step * 75;
+                    break;
+                case SPELL_EFFECT_DUAL_WIELD:
+                    dbc_node.skill = SKILL_DUAL_WIELD;
+                    dbc_node.step = 1;
                     dbc_node.value = 1;
-                else
-                    dbc_node.value = dbc_node.step * 75;
-                dbc_node.maxvalue = dbc_node.step * 75;
-                mSpellLearnSkills[spell] = dbc_node;
-                ++dbc_count;
-                break;
+                    dbc_node.maxvalue = 1;
+                    break;
+                default:
+                    continue;
             }
+
+            mSpellLearnSkills[spell] = dbc_node;
+            ++dbc_count;
+            break;
         }
     }
 
@@ -2726,58 +2741,75 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
 
 void SpellMgr::LoadSpellCustomAttr()
 {
-    uint32 oldMSTime = getMSTime();
-    uint32 customAttrTime = getMSTime();
+    uint32 const oldMSTime = getMSTime();
+    uint32 const customAttrTime = getMSTime();
     uint32 count;
 
     QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes FROM spell_custom_attr");
 
     if (!result)
+    {
         LOG_INFO("server.loading", ">> Loaded 0 spell custom attributes from DB. DB table `spell_custom_attr` is empty.");
+    }
     else
     {
         for (count = 0; result->NextRow(); ++count)
         {
-            Field* fields = result->Fetch();
+            Field const* fields = result->Fetch();
 
-            uint32 spellId = fields[0].GetUInt32();
+            uint32 const spellId = fields[0].GetUInt32();
             uint32 attributes = fields[1].GetUInt32();
 
             SpellInfo* spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
             {
-                LOG_INFO("spells", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
+                LOG_INFO("sql.sql", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
                 continue;
             }
 
-            if ((attributes & SPELL_ATTR0_CU_NEGATIVE) != 0)
+            if (attributes & SPELL_ATTR0_CU_NEGATIVE)
             {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (spellInfo->Effects[i].IsEffect())
-                        continue;
-
-                    if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
                     {
-                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) && (attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
+                        {
+                            LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u and SPELL_ATTR0_CU_POSITIVE_EFF%u attributes for spell %u which cannot stack together. Attributes will not get applied", static_cast<uint32>(i), static_cast<uint32>(i), spellId);
+                            attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)|(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
+                        }
                         continue;
+                    }
+
+                    if (attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i))
+                    {
+                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", static_cast<uint32>(i), spellId, static_cast<uint32>(i));
+                        attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i);
                     }
                 }
             }
 
-            if ((attributes & SPELL_ATTR0_CU_POSITIVE) != 0)
+            if (attributes & SPELL_ATTR0_CU_POSITIVE)
             {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (spellInfo->Effects[i].IsEffect())
-                        continue;
-
-                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
                     {
-                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
                         continue;
                     }
+
+                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
+                    {
+                        LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
+                        attributes &= ~(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
+                    }
                 }
+            }
+
+            if ((attributes & SPELL_ATTR0_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_REJECT_AURA_SAVING))
+            {
+                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u. Both attributes will get applied", spellId);
+                attributes &= ~(SPELL_ATTR0_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_REJECT_AURA_SAVING);
             }
 
             spellInfo->AttributesCu |= attributes;
@@ -3265,6 +3297,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
             case 63978: // Ulduar(Rubble): Stone Nova
+            case 15502: // Sunder Armor
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
@@ -4079,10 +4112,17 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Dispel = DISPEL_NONE;
     });
 
-    //////////////////////////////////////////
-    ////////// ULDUAR
-    //////////////////////////////////////////
-    ApplySpellFix({ 64014, 64032, 64028, 64031, 64030, 64029, 64024, 64025, 65042 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({
+        64014,  // Expedition Base Camp Teleport
+        64032,  // Formation Grounds Teleport
+        64028,  // Colossal Forge Teleport
+        64031,  // Scrapyard Teleport
+        64030,  // Antechamber Teleport
+        64029,  // Shattered Walkway Teleport
+        64024,  // Conservatory Teleport
+        64025,  // Halls of Invention Teleport
+        65042   // Prison of Yogg-Saron Teleport
+        }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetB[EFFECT_1] = TARGET_DEST_DB;
     });
@@ -7060,8 +7100,16 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_DEST_AREA_ENTRY;
     });
 
-    // Mangletooth Quests (http://www.wowhead.com/npc=3430)
-    ApplySpellFix({ 7764, 10767, 16610, 16612, 16618, 17013 }, [](SpellEntry* spellInfo)
+    // Mangletooth
+    ApplySpellFix({
+        7764,   // Wisdom of Agamaggan
+        10767,  // Rising Spirit
+        16610,  // Razorhide
+        16612,  // Agamaggan's Strength
+        16618,  // Spirit of the Wind
+        17013   // Agamaggan's Agility
+        }, [](SpellEntry* spellInfo)
+
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT;
@@ -7109,7 +7157,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_CHARM;
     });
 
-    // Persistent Shield (fixes idiocity)
+    // Persistent Shield
     ApplySpellFix({ 26467 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
@@ -7276,7 +7324,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_NEARBY_ENTRY;
     });
 
-    // Various food
+    // Food
     ApplySpellFix({ 65418 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectTriggerSpell[2] = 65410;
@@ -7324,7 +7372,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ANY;
     });
 
-    // Check for SPELL_ATTR7_CAN_CAUSE_INTERRUPT
     ApplySpellFix({
         47476,  // Deathknight - Strangulate
         15487,  // Priest - Silence
@@ -7336,10 +7383,10 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_CAN_CAUSE_INTERRUPT;
     });
 
-    // Clicking on Warlock Summoning portal should not require mana
+    // Ritual of Summoning
     ApplySpellFix({ 61994 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->ManaCostPercentage = 0;
+        spellInfo->ManaCostPercentage = 0; // Clicking on Warlock Summoning portal should not require mana
     });
 
     // Shadowmeld
@@ -7354,13 +7401,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Speed = 0.0f;
     });
 
-    // 53651 Light's Beacon
+    // Light's Beacon
     ApplySpellFix({ 53651 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
     });
 
-    // 16097 Shadow Hunter Vosh'gajin - Hex
+    // Shadow Hunter Vosh'gajin - Hex
     ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
     {
         spellInfo->CastingTimeIndex = 16;
@@ -7372,27 +7419,27 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 5; // 40yd
     });
 
-    // 29519 - Silithyst
+    // Silithyst
     ApplySpellFix({ 29519 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_DECREASE_SPEED;
         spellInfo->EffectBasePoints[EFFECT_0] = -25;
     });
 
-    // Ulduar: Kologarn Focused Eyebeam Summon Trigger
+    // Focused Eyebeam Summon Trigger
     ApplySpellFix({ 63342 }, [](SpellEntry* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
         spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
     });
 
-    // Item: Luffa removes only 1 bleed effect
+    // Luffa
     ApplySpellFix({ 23595 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectBasePoints[EFFECT_0] = 1;
+        spellInfo->EffectBasePoints[EFFECT_0] = 1; // Remove only 1 bleed effect
     });
 
-    // Eye of Kilrogg Passive
+    // Eye of Kilrogg Passive (DND)
     ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
@@ -7402,6 +7449,31 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Serverside - Summon Arcane Disruptor
+    ApplySpellFix({ 49591 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 37889;
+    });
+
+    // Serverside - Create Rocket Pack
+    ApplySpellFix({ 70055 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 49278;
+    });
+
+    // Ashenvale Outrunner Sneak
+    // Stealth
+    ApplySpellFix({ 20540, 32199 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

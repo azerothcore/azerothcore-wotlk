@@ -15,17 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WorldSocketMgr.h"
 #include "Config.h"
 #include "NetworkThread.h"
 #include "ScriptMgr.h"
 #include "WorldSocket.h"
-#include "WorldSocketMgr.h"
 #include <boost/system/error_code.hpp>
-
-static void OnSocketAccept(tcp::socket&& sock, uint32 threadIndex)
-{
-    sWorldSocketMgr.OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
-}
 
 class WorldSocketThread : public NetworkThread<WorldSocket>
 {
@@ -73,7 +68,7 @@ bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::s
     if (!BaseSocketMgr::StartNetwork(ioContext, bindIp, port, threadCount))
         return false;
 
-    _acceptor->AsyncAcceptWithCallback<&OnSocketAccept>();
+    _acceptor->AsyncAcceptWithCallback<&WorldSocketMgr::OnSocketAccept>();
 
     sScriptMgr->OnNetworkStart();
     return true;
