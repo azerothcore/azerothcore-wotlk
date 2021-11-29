@@ -589,7 +589,7 @@ public:
 
                 // AIR PHASE EVENTS BELOW:
                 case EVENT_AIR_PHASE:
-                    // pussywizard: unroot may be scheduled after this event cos of events shitness (time must be unique)
+                    // pussywizard: unroot may be scheduled after this event cos of events (time must be unique)
                     if (me->HasUnitState(UNIT_STATE_ROOT))
                     {
                         events.CancelEvent(EVENT_UNROOT);

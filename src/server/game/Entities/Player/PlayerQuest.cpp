@@ -1491,7 +1491,7 @@ void Player::RemoveRewardedQuest(uint32 questId, bool update /*= true*/)
 void Player::SendQuestUpdate(uint32 questId)
 {
     uint32 zone = 0, area = 0;
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 oldSpellId = 0;
 
     SpellAreaForQuestMapBounds saBounds = sSpellMgr->GetSpellAreaForQuestMapBounds(questId);
@@ -1515,7 +1515,7 @@ void Player::SendQuestUpdate(uint32 questId)
 
     saBounds = sSpellMgr->GetSpellAreaForQuestEndMapBounds(questId);
 
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 skipSpellId = 0;
     oldSpellId = 0;
     if (saBounds.first != saBounds.second)

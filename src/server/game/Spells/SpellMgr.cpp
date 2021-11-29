@@ -7476,6 +7476,27 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
     });
 
+     // Arcane Bolt
+    ApplySpellFix({ 15979 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 3; // 20y
+    });
+
+    // Mortal Shots
+    ApplySpellFix({ 19485, 19487, 19488, 19489, 19490 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectSpellClassMask[EFFECT_0][EFFECT_0] |= 0x00004000;
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
+
+    // Item - Death Knight T9 Melee 4P Bonus
+    // Item - Hunter T9 2P Bonus
+    // Item - Paladin T9 Retribution 2P Bonus (Righteous Vengeance)
+    ApplySpellFix({ 67118, 67150, 67188 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
