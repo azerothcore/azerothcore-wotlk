@@ -798,7 +798,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (75115, 1732, 530, 0, 0, 1, 1, 6830.76, -6491.14, 18.6179, -1.16937, 0, 0, 0.551937, -0.833886, 900, 255, 1, '', 0),
 (75118, 1732, 530, 0, 0, 1, 1, 6873.19, -6164.61, 35.753, 1.3439, 0, 0, 0, 1, 900, 255, 1, '', 0);
 
--- Updating these pools temporarily until we get new pools for Silver
+-- Updating these pools temporarily until we get new pool_gameobject for Silver
 -- Silver pools will be the next ones pooled like vmangos
 UPDATE pool_gameobject SET pool_gameobject.chance = 100 WHERE pool_gameobject.description LIKE 'Spawn Point% - Silver' AND pool_gameobject.chance = 30;
 UPDATE pool_gameobject SET pool_gameobject.chance = 100 WHERE pool_gameobject.description LIKE 'Ghostlands Spawn Point%Silver%' AND pool_gameobject.chance = 30;
