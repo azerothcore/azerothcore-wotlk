@@ -1696,7 +1696,7 @@ namespace lfg
         {
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
-                if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
+                if (player->GetGroup() != grp) // pussywizard: could not add because group was full
                     continue;
 
                 // Add the cooldown spell if queued for a random dungeon
