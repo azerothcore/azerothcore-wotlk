@@ -7476,6 +7476,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
     });
 
+     // Arcane Bolt
+    ApplySpellFix({ 15979 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 3; // 20y
+    });
+
     // Mortal Shots
     ApplySpellFix({ 19485, 19487, 19488, 19489, 19490 }, [](SpellEntry* spellInfo)
     {

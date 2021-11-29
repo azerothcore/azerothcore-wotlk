@@ -983,34 +983,47 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->CheckAllAchievementCriteria();
     }
 
-    // Reputations if "StartAllReputation" is enabled, -- TODO: Fix this in a better way
-    if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
+    bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);
+    if (firstLogin)
     {
-        ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 
-        auto SendFullReputation = [&repMgr](std::initializer_list<uint32> factionsList)
+        // start with every map explored
+        if (sWorld->getBoolConfig(CONFIG_START_ALL_EXPLORED))
         {
-            for (auto const& itr : factionsList)
-            {
-                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999, false);
-            }
-        };
-
-        SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077, 1106, 1104, 1090, 1098, 1156, 1073, 1105, 1119, 1091 });
-
-        switch (pCurrChar->GetFaction())
-        {
-            case ALLIANCE:
-                SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946, 1037, 1068, 1126, 1094, 1050 });
-                break;
-            case HORDE:
-                SendFullReputation({ 76, 68, 81, 911, 729, 941, 530, 947, 1052, 1067, 1124, 1064, 1085 });
-                break;
-            default:
-                break;
+            for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; i++)
+                pCurrChar->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
         }
 
-        repMgr.SendStates();
+        // Reputations if "StartAllReputation" is enabled, -- TODO: Fix this in a better way
+        if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
+        {
+            ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
+
+            auto SendFullReputation = [&repMgr](std::initializer_list<uint32> factionsList)
+            {
+                for (auto const& itr : factionsList)
+                {
+                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999, false);
+                }
+            };
+
+            SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077, 1106, 1104, 1090, 1098, 1156, 1073, 1105, 1119, 1091 });
+
+            switch (pCurrChar->GetFaction())
+            {
+                case ALLIANCE:
+                    SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946, 1037, 1068, 1126, 1094, 1050 });
+                    break;
+                case HORDE:
+                    SendFullReputation({ 76, 68, 81, 911, 729, 941, 530, 947, 1052, 1067, 1124, 1064, 1085 });
+                    break;
+                default:
+                    break;
+            }
+
+            repMgr.SendStates();
+        }
     }
 
     // show time before shutdown if shutdown planned.
