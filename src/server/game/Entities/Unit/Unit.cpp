@@ -12988,7 +12988,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
         if (controlled->GetTypeId() == TYPEID_UNIT && controlled->ToCreature()->HasReactState(REACT_PASSIVE))
             continue;
 
-        controlled->SetInCombatState(PvP, enemy);
+        controlled->SetInCombatState(PvP, enemy, duration);
     }
 #ifdef ELUNA
     if (Player* player = this->ToPlayer())
