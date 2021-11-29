@@ -75,7 +75,6 @@ enum Events
 {
     EVENT_MAGIC_REFLECTION                  = 1,
     EVENT_DAMAGE_REFLECTION,
-    EVENT_BLAST_WAVE,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -225,7 +224,6 @@ public:
 
             events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
 
@@ -335,12 +333,6 @@ public:
                             {
                                 DoCastSelf(SPELL_DAMAGE_REFLECTION);
                                 events.RepeatEvent(30000);
-                                break;
-                            }
-                            case EVENT_BLAST_WAVE:
-                            {
-                                DoCastVictim(SPELL_BLAST_WAVE);
-                                events.RepeatEvent(10000);
                                 break;
                             }
                             case EVENT_TELEPORT_RANDOM:
