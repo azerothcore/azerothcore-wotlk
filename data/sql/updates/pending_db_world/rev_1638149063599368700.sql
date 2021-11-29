@@ -388,7 +388,7 @@ DELETE FROM `gameobject` WHERE `id` IN (1732, 2054, 3764, 103711, 181249);
 
 -- 329 Tin Vein gameobjects
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`) VALUES 
-(@TIN_GAMEOBJECT_ENTRY := @TIN_GAMEOBJECT_ENTRY + 1, 1732, 0, -3590, -3243, 23.62, 3.169, 0, 0, 0, 0, 900, 100),
+(@TIN_GAMEOBJECT_ENTRY := @TIN_GAMEOBJECT_ENTRY + 0, 1732, 0, -3590, -3243, 23.62, 3.169, 0, 0, 0, 0, 900, 100),
 (@TIN_GAMEOBJECT_ENTRY := @TIN_GAMEOBJECT_ENTRY + 1, 1732, 0, -10450, -1020, 53.24, 1.501, 0, 0, 0.681998, 0.731354, 900, 100),
 (@TIN_GAMEOBJECT_ENTRY := @TIN_GAMEOBJECT_ENTRY + 1, 1732, 0, -11105.8, -1170.61, 42.2928, -0.349066, 0, 0, 0.173648, -0.984808, 900, 100),
 (@TIN_GAMEOBJECT_ENTRY := @TIN_GAMEOBJECT_ENTRY + 1, 1732, 0, -10643.7, -985.37, 68.1491, -0.314159, 0, 0, 0.156434, -0.987688, 900, 100),
@@ -797,3 +797,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (75112, 1732, 530, 0, 0, 1, 1, 7379.89, -7913.66, 158.573, -0.802851, 0, 0, 0.390731, -0.920505, 900, 255, 1, '', 0),
 (75115, 1732, 530, 0, 0, 1, 1, 6830.76, -6491.14, 18.6179, -1.16937, 0, 0, 0.551937, -0.833886, 900, 255, 1, '', 0),
 (75118, 1732, 530, 0, 0, 1, 1, 6873.19, -6164.61, 35.753, 1.3439, 0, 0, 0, 1, 900, 255, 1, '', 0);
+
+-- Updating these pools temporarily until we get new pools for Silver
+-- Silver pools will be the next ones pooled like vmangos
+UPDATE pool_gameobject SET pool_gameobject.chance = 100 WHERE pool_gameobject.description LIKE 'Spawn Point% - Silver' AND pool_gameobject.chance = 30;
+UPDATE pool_gameobject SET pool_gameobject.chance = 100 WHERE pool_gameobject.description LIKE 'Ghostlands Spawn Point%Silver%' AND pool_gameobject.chance = 30;
