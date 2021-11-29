@@ -24,9 +24,9 @@ SDCategory: Dalaran
 Script Data End */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "World.h"
 
 // Ours

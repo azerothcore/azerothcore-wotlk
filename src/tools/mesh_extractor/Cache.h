@@ -17,13 +17,13 @@
 
 #ifndef CACHE_H
 #define CACHE_H
-#include <string>
-#include <map>
 #include "Define.h"
-#include "PolicyLock.h"
-#include <mutex>
-#include "WorldModelRoot.h"
 #include "Model.h"
+#include "PolicyLock.h"
+#include "WorldModelRoot.h"
+#include <map>
+#include <mutex>
+#include <string>
 
 template<class K, class T>
 class GenericCache

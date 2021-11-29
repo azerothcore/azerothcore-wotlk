@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
@@ -31,7 +32,6 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -1473,20 +1473,35 @@ void SpellMgr::LoadSpellLearnSkills()
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (entry->Effects[i].Effect == SPELL_EFFECT_SKILL)
+            SpellLearnSkillNode dbc_node;
+            switch (entry->Effects[i].Effect)
             {
-                SpellLearnSkillNode dbc_node;
-                dbc_node.skill = entry->Effects[i].MiscValue;
-                dbc_node.step  = entry->Effects[i].CalcValue();
-                if (dbc_node.skill != SKILL_RIDING)
+                case SPELL_EFFECT_SKILL:
+                    dbc_node.skill = entry->Effects[i].MiscValue;
+                    dbc_node.step  = entry->Effects[i].CalcValue();
+                    if (dbc_node.skill != SKILL_RIDING)
+                    {
+                        dbc_node.value = 1;
+                    }
+                    else
+                    {
+                        dbc_node.value = dbc_node.step * 75;
+                    }
+                    dbc_node.maxvalue = dbc_node.step * 75;
+                    break;
+                case SPELL_EFFECT_DUAL_WIELD:
+                    dbc_node.skill = SKILL_DUAL_WIELD;
+                    dbc_node.step = 1;
                     dbc_node.value = 1;
-                else
-                    dbc_node.value = dbc_node.step * 75;
-                dbc_node.maxvalue = dbc_node.step * 75;
-                mSpellLearnSkills[spell] = dbc_node;
-                ++dbc_count;
-                break;
+                    dbc_node.maxvalue = 1;
+                    break;
+                default:
+                    continue;
             }
+
+            mSpellLearnSkills[spell] = dbc_node;
+            ++dbc_count;
+            break;
         }
     }
 
@@ -7461,10 +7476,10 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
     });
 
-    // Panic
-    ApplySpellFix({ 19408 }, [](SpellEntry* spellInfo)
+    // Arcane Bolt
+    ApplySpellFix({ 15979 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_30_YARDS;
+        spellInfo->RangeIndex = 3; // 20y
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
