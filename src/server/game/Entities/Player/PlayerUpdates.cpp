@@ -1115,6 +1115,15 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
     if (!Unit::UpdatePosition(x, y, z, orientation, teleport))
         return false;
 
+    // Update player zone if needed
+    if (m_needsZoneUpdate)
+    {
+        uint32 newZone, newArea;
+        GetZoneAndAreaId(newZone, newArea);
+        UpdateZone(newZone, newArea);
+        m_needsZoneUpdate = false;
+    }
+
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
