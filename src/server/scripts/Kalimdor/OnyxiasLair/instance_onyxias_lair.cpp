@@ -19,6 +19,11 @@
 #include "ScriptedCreature.h"
 #include "onyxias_lair.h"
 
+ObjectData const creatureData[] =
+{
+    { NPC_ONYXIA, DATA_ONYXIA }
+};
+
 class instance_onyxias_lair : public InstanceMapScript
 {
 public:
@@ -33,71 +38,52 @@ public:
     {
         instance_onyxias_lair_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        ObjectGuid m_uiOnyxiasGUID;
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
         uint16 ManyWhelpsCounter;
-        GuidVector minions;
         bool bDeepBreath;
 
         void Initialize() override
         {
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+            SetBossNumber(MAX_ENCOUNTER);
             ManyWhelpsCounter = 0;
             bDeepBreath = true;
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
-                if( m_auiEncounter[i] == IN_PROGRESS )
-                    return true;
-
-            return false;
-        }
-
-        void OnCreatureCreate(Creature* pCreature) override
-        {
-            switch( pCreature->GetEntry() )
-            {
-                case NPC_ONYXIA:
-                    m_uiOnyxiasGUID = pCreature->GetGUID();
-                    break;
-                case NPC_ONYXIAN_WHELP:
-                case NPC_ONYXIAN_LAIR_GUARD:
-                    minions.push_back(pCreature->GetGUID());
-                    break;
-            }
+            LoadObjectData(creatureData, nullptr);
         }
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch( go->GetEntry() )
+            switch (go->GetEntry())
             {
                 case GO_WHELP_SPAWNER:
                     go->CastSpell((Unit*)nullptr, 17646);
-                    if( Creature* onyxia = instance->GetCreature(m_uiOnyxiasGUID) )
+                    if (Creature* onyxia = GetCreature(DATA_ONYXIA))
+                    {
                         onyxia->AI()->DoAction(-1);
+                    }
                     break;
             }
         }
 
-        void SetData(uint32 uiType, uint32 uiData) override
+        bool SetBossState(uint32 type, EncounterState state) override
         {
-            switch(uiType)
+            if (!InstanceScript::SetBossState(type, state))
             {
-                case DATA_ONYXIA:
-                    m_auiEncounter[0] = uiData;
-                    ManyWhelpsCounter = 0;
-                    bDeepBreath = true;
-                    if( uiData == NOT_STARTED )
-                    {
-                        for (ObjectGuid const& guid : minions)
-                            if (Creature* c = instance->GetCreature(guid))
-                                c->DespawnOrUnsummon();
-                        minions.clear();
-                    }
-                    break;
+                return false;
+            }
+
+            if (type == DATA_ONYXIA && state == NOT_STARTED)
+            {
+                ManyWhelpsCounter = 0;
+                bDeepBreath = true;
+            }
+
+            return true;
+        }
+
+        void SetData(uint32 uiType, uint32 /*uiData*/) override
+        {
+            switch (uiType)
+            {
                 case DATA_WHELP_SUMMONED:
                     ++ManyWhelpsCounter;
                     break;
@@ -105,38 +91,13 @@ public:
                     bDeepBreath = false;
                     break;
             }
-
-            if (uiType < MAX_ENCOUNTER && uiData == DONE)
-                SaveToDB();
-        }
-
-        uint32 GetData(uint32 uiType) const override
-        {
-            switch(uiType)
-            {
-                case DATA_ONYXIA:
-                    return m_auiEncounter[0];
-            }
-
-            return 0;
-        }
-
-        ObjectGuid GetGuidData(uint32 uiData) const override
-        {
-            switch (uiData)
-            {
-                case DATA_ONYXIA:
-                    return m_uiOnyxiasGUID;
-            }
-
-            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
-            saveStream << "O L " << m_auiEncounter[0];
+            saveStream << "O L " << GetBossSaveData();
             str_data = saveStream.str();
             OUT_SAVE_INST_DATA_COMPLETE;
             return str_data;
@@ -144,7 +105,7 @@ public:
 
         void Load(const char* in) override
         {
-            if( !in )
+            if (!in)
             {
                 OUT_LOAD_INST_DATA_FAIL;
                 return;
@@ -157,13 +118,18 @@ public:
             std::istringstream loadStream(in);
             loadStream >> dataHead1 >> dataHead2 >> data0;
 
-            if( dataHead1 == 'O' && dataHead2 == 'L' )
+            if (dataHead1 == 'O' && dataHead2 == 'L')
             {
-                m_auiEncounter[0] = data0;
-
-                for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
-                    if( m_auiEncounter[i] == IN_PROGRESS )
-                        m_auiEncounter[i] = NOT_STARTED;
+                for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState == FAIL || tmpState > SPECIAL)
+                    {
+                        tmpState = NOT_STARTED;
+                    }
+                    SetBossState(i, EncounterState(tmpState));
+                }
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
