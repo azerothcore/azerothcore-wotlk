@@ -22,11 +22,10 @@ Comment: All list related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Creature.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -34,6 +33,7 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Random.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "WorldSession.h"
 

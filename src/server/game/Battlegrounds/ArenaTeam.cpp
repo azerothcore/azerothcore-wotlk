@@ -132,7 +132,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     else if (GetRating() >= 1000)
         personalRating = 1000;
 
-    // xinef: zomg! sync query
+    // xinef: sync query
     // Try to get player's match maker rating from db and fall back to config setting if not found
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MATCH_MAKER_RATING);
     stmt->setUInt32(0, playerGuid.GetCounter());

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
@@ -31,7 +32,6 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -7474,6 +7474,12 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 20540, 32199 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
+    });
+
+    // Arcane Bolt
+    ApplySpellFix({ 15979 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 3; // 20y
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
