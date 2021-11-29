@@ -1149,7 +1149,7 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& des
             if( pItem->IsBag() && pItem->IsNotEmptyBag() )
                 return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
 
-        // Xinef: Removed next bullshit loot generated check
+        // Xinef: Removed next loot generated check
         if (pItem->GetGUID() == GetLootGUID())
         {
             if (no_space_count)
@@ -1629,7 +1629,7 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
         if (!pProto)
             return EQUIP_ERR_ITEM_NOT_FOUND;
 
-        // Xinef: Removed next bullshit loot generated check
+        // Xinef: Removed next loot generated check
         if (pItem->GetGUID() == GetLootGUID())
             return EQUIP_ERR_ALREADY_LOOTED;
 
@@ -2065,7 +2065,7 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest
     if (!pProto)
         return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_ITEM_NOT_FOUND;
 
-    // Xinef: Removed next bullshit loot generated check
+    // Xinef: Removed next loot generated check
     if (pItem->GetGUID() == GetLootGUID())
         return EQUIP_ERR_ALREADY_LOOTED;
 
@@ -3641,7 +3641,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (pDstItem)
     {
-        // Xinef: Removed next bullshit loot generated check
+        // Xinef: Removed next loot generated check
         if (pDstItem->GetGUID() == GetLootGUID())                       // prevent swap looting item
         {
             //best error message found for attempting to swap while looting
@@ -3940,7 +3940,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             {
                 if (Item* bagItem = bag->GetItemByPos(i))
                 {
-                    // Xinef: Removed next bullshit loot generated check
+                    // Xinef: Removed next loot generated check
                     if (bagItem->GetGUID() == GetLootGUID())
                     {
                         m_session->DoLootRelease(GetLootGUID());
@@ -3958,7 +3958,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             {
                 if (Item* bagItem = bag->GetItemByPos(i))
                 {
-                    // Xinef: Removed next bullshit loot generated check
+                    // Xinef: Removed next loot generated check
                     if (bagItem->GetGUID() == GetLootGUID())
                     {
                         m_session->DoLootRelease(GetLootGUID());
@@ -5632,7 +5632,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     _LoadDeclinedNames(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES));
 
-    //m_achievementMgr->CheckAllAchievementCriteria(); // pussywizard: ZOMG! disabled this bullshit
+    //m_achievementMgr->CheckAllAchievementCriteria(); // pussywizard: disabled this
 
     _LoadEquipmentSets(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
@@ -6056,7 +6056,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 }
                 else
                 {
-                    // xinef: zomg! sync query
+                    // xinef: sync query
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_REFUNDS);
                     stmt->setUInt32(0, item->GetGUID().GetCounter());
                     stmt->setUInt32(1, GetGUID().GetCounter());
@@ -7587,7 +7587,7 @@ void Player::_SaveQuestStatus(CharacterDatabaseTransaction trans)
     {
         if (saveItr->second)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_QUESTSTATUS_REWARDED);
-        else // xinef: what the fuck is this shit? quest can be removed by spelleffect if (!keepAbandoned)
+        else // xinef: what the is this? quest can be removed by spelleffect if (!keepAbandoned)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
 
         stmt->setUInt32(0, GetGUID().GetCounter());
