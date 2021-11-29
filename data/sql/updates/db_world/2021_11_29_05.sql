@@ -1,3 +1,19 @@
+-- DB update 2021_11_29_04 -> 2021_11_29_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_11_29_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_11_29_04 2021_11_29_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1637592933273396000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1637592933273396000');
 
 -- Query used to get Gameobjects based on pool_gameobject's pool_entry
@@ -3214,3 +3230,13 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (75111, 1731, 530, 0, 0, 1, 1, 7379.89, -7913.66, 158.573, -0.802851, 0, 0, 0.390731, -0.920505, 900, 255, 1),
 (75114, 1731, 530, 0, 0, 1, 1, 6830.76, -6491.14, 18.6179, -1.16937, 0, 0, 0.551937, -0.833886, 900, 255, 1),
 (75117, 1731, 530, 0, 0, 1, 1, 6873.19, -6164.61, 35.753, 1.3439, 0, 0, 0, 1, 900, 255, 1);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_11_29_05' WHERE sql_rev = '1637592933273396000';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
