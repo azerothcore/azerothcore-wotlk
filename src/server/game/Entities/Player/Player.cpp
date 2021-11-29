@@ -582,13 +582,6 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     SetHonorPoints(sWorld->getIntConfig(CONFIG_START_HONOR_POINTS));
     SetArenaPoints(sWorld->getIntConfig(CONFIG_START_ARENA_POINTS));
 
-    // start with every map explored
-    if (sWorld->getBoolConfig(CONFIG_START_ALL_EXPLORED))
-    {
-        for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; i++)
-            SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
-    }
-
     // Played time
     m_Last_tick = time(nullptr);
     m_Played_time[PLAYED_TIME_TOTAL] = 0;
