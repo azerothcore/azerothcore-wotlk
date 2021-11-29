@@ -20,6 +20,7 @@
 #include "AuctionHouseMgr.h"
 #include "Battleground.h"
 #include "CalendarMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -27,14 +28,17 @@
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerDump.h"
+#include "QueryHolder.h"
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -43,15 +47,14 @@
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "QueryHolder.h"
-#include "StringConvert.h"
-#include "Tokenize.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -520,7 +523,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             }
 
             // Check name uniqueness in the same step as saving to database
-            if (sWorld->GetGlobalPlayerGUID(createInfo->Name))
+            if (sCharacterCache->GetCharacterGuidByName(createInfo->Name))
             {
                 SendCharCreate(CHAR_CREATE_NAME_IN_USE);
                 return;
@@ -571,8 +574,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                 {
                     LOG_INFO("entities.player.character", "Account: %u (IP: %s) Create Character: %s %s", GetAccountId(), GetRemoteAddress().c_str(), newChar->GetName().c_str(), newChar->GetGUID().ToString().c_str());
                     sScriptMgr->OnPlayerCreate(newChar.get());
-                    sWorld->AddGlobalPlayerData(newChar->GetGUID().GetCounter(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->getLevel(), 0, 0);
-
+                    sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->getLevel());
                     SendCharCreate(CHAR_CREATE_SUCCESS);
                 }
                 else
@@ -628,11 +630,11 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
+    if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid))
     {
-        accountId = playerData->accountId;
-        name = playerData->name;
-        level = playerData->level;
+        accountId = playerData->AccountId;
+        name = playerData->Name;
+        level = playerData->Level;
     }
 
     // prevent deleting other players' characters using cheating tools
@@ -658,22 +660,28 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
     Player::DeleteFromDB(guid.GetCounter(), GetAccountId(), true, false);
 
-    sWorld->DeleteGlobalPlayerData(guid.GetCounter(), name);
+    sCharacterCache->DeleteCharacterCacheEntry(guid, name);
     SendCharDelete(CHAR_DELETE_SUCCESS);
 }
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
-    if (PlayerLoading() || GetPlayer() != nullptr)
-    {
-        LOG_ERROR("network", "Player tries to login again, AccountId = %d", GetAccountId());
-        KickPlayer("WorldSession::HandlePlayerLoginOpcode Another client logging in");
-        return;
-    }
-
     m_playerLoading = true;
     ObjectGuid playerGuid;
     recvData >> playerGuid;
+
+    if (PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
+    {
+        // limit player interaction with the world
+        if (!sWorld->getBoolConfig(CONFIG_REALM_LOGIN_ENABLED))
+        {
+            WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
+            // see LoginFailureReason enum for more reasons
+            data << uint8(LoginFailureReason::NoWorld);
+            SendPacket(&data);
+            return;
+        }
+    }
 
     if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
     {
@@ -829,7 +837,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
     }
 
-    if (uint32 guildId = Player::GetGuildIdFromStorage(pCurrChar->GetGUID().GetCounter()))
+    if (uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(pCurrChar->GetGUID()))
     {
         Guild* guild = sGuildMgr->GetGuildById(guildId);
         Guild::Member const* member = guild ? guild->GetMember(pCurrChar->GetGUID()) : nullptr;
@@ -951,7 +959,9 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
 
     if (pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
-        pCurrChar->SetContestedPvP();
+    {
+        pCurrChar->SetContestedPvP(nullptr, false);
+    }
 
     // Apply at_login requests
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
@@ -973,34 +983,47 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->CheckAllAchievementCriteria();
     }
 
-    // Reputations if "StartAllReputation" is enabled, -- TODO: Fix this in a better way
-    if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
+    bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);
+    if (firstLogin)
     {
-        ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 
-        auto SendFullReputation = [&repMgr](std::initializer_list<uint32> factionsList)
+        // start with every map explored
+        if (sWorld->getBoolConfig(CONFIG_START_ALL_EXPLORED))
         {
-            for (auto const& itr : factionsList)
-            {
-                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999, false);
-            }
-        };
-
-        SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077 });
-
-        switch (pCurrChar->getFaction())
-        {
-            case ALLIANCE:
-                SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946 });
-                break;
-            case HORDE:
-                SendFullReputation({ 76, 68, 81, 911, 729, 941, 530, 947 });
-                break;
-            default:
-                break;
+            for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; i++)
+                pCurrChar->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
         }
 
-        repMgr.SendStates();
+        // Reputations if "StartAllReputation" is enabled, -- TODO: Fix this in a better way
+        if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
+        {
+            ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
+
+            auto SendFullReputation = [&repMgr](std::initializer_list<uint32> factionsList)
+            {
+                for (auto const& itr : factionsList)
+                {
+                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999, false);
+                }
+            };
+
+            SendFullReputation({ 942, 935, 936, 1011, 970, 967, 989, 932, 934, 1038, 1077, 1106, 1104, 1090, 1098, 1156, 1073, 1105, 1119, 1091 });
+
+            switch (pCurrChar->GetFaction())
+            {
+                case ALLIANCE:
+                    SendFullReputation({ 72, 47, 69, 930, 730, 978, 54, 946, 1037, 1068, 1126, 1094, 1050 });
+                    break;
+                case HORDE:
+                    SendFullReputation({ 76, 68, 81, 911, 729, 941, 530, 947, 1052, 1067, 1124, 1064, 1085 });
+                    break;
+                default:
+                    break;
+            }
+
+            repMgr.SendStates();
+        }
     }
 
     // show time before shutdown if shutdown planned.
@@ -1085,6 +1108,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
         sScriptMgr->OnFirstLogin(pCurrChar);
     }
+
+    METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 }
 
 void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
@@ -1383,8 +1408,7 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
     SendCharRename(RESPONSE_SUCCESS, renameInfo.get());
 
     // xinef: update global data
-    sWorld->UpdateGlobalNameData(guidLow, oldName, renameInfo->Name);
-    sWorld->UpdateGlobalPlayerData(guidLow, PLAYER_UPDATE_DATA_NAME, renameInfo->Name);
+    sCharacterCache->UpdateCharacterData(renameInfo->Guid, renameInfo->Name);
 }
 
 void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
@@ -1398,7 +1422,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 
     // not accept declined names for unsupported languages
     std::string name;
-    if (!sObjectMgr->GetPlayerNameByGUID(guid.GetCounter(), name))
+    if (!sCharacterCache->GetCharacterNameByGuid(guid, name))
     {
         SendSetPlayerDeclinedNamesResult(DECLINED_NAMES_RESULT_ERROR, guid);
         return;
@@ -1610,7 +1634,7 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
     }
 
     // get the players old (at this moment current) race
-    GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(customizeInfo->Guid.GetCounter());
+    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(customizeInfo->Guid);
     if (!playerData)
     {
         SendCharCustomize(CHAR_CREATE_ERROR, customizeInfo.get());
@@ -1654,7 +1678,7 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
     }
 
     // character with this name already exist
-    if (ObjectGuid newguid = sObjectMgr->GetPlayerGUIDByName(customizeInfo->Name))
+    if (ObjectGuid newguid = sCharacterCache->GetCharacterGuidByName(customizeInfo->Name))
     {
         if (newguid != customizeInfo->Guid)
         {
@@ -1691,9 +1715,7 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
 
     CharacterDatabase.CommitTransaction(trans);
 
-    // xinef: update global data
-    sWorld->UpdateGlobalNameData(lowGuid, playerData->name, customizeInfo->Name);
-    sWorld->UpdateGlobalPlayerData(lowGuid, PLAYER_UPDATE_DATA_NAME | PLAYER_UPDATE_DATA_GENDER, customizeInfo->Name, 0, customizeInfo->Gender);
+    sCharacterCache->UpdateCharacterData(customizeInfo->Guid, customizeInfo->Name, customizeInfo->Gender);
 
     SendCharCustomize(RESPONSE_SUCCESS, customizeInfo.get());
 
@@ -1905,16 +1927,16 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     ObjectGuid::LowType lowGuid = factionChangeInfo->Guid.GetCounter();
 
     // get the players old (at this moment current) race
-    GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(lowGuid);
-    if (!playerData) // pussywizard: restoring character via www spoils nameData (it's not restored so it may be null)
+    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(factionChangeInfo->Guid);
+    if (!playerData)
     {
         SendCharFactionChange(CHAR_CREATE_ERROR, factionChangeInfo.get());
         return;
     }
 
-    uint8 oldRace = playerData->race;
-    uint8 playerClass = playerData->playerClass;
-    uint8 level = playerData->level;
+    uint8 oldRace = playerData->Race;
+    uint8 playerClass = playerData->Class;
+    uint8 level = playerData->Level;
 
     if (!sObjectMgr->GetPlayerInfo(factionChangeInfo->Race, playerClass))
     {
@@ -1938,7 +1960,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     if (factionChangeInfo->FactionChange)
     {
         // if player is in a guild
-        if (playerData->guildId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
+        if (playerData->GuildId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
         {
             SendCharFactionChange(CHAR_CREATE_CHARACTER_IN_GUILD, factionChangeInfo.get());
             return;
@@ -1952,7 +1974,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         }
 
         // check mailbox
-        if (playerData->mailCount)
+        if (playerData->MailCount)
         {
             SendCharFactionChange(CHAR_CREATE_CHARACTER_DELETE_MAIL, factionChangeInfo.get());
             return;
@@ -1963,7 +1985,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
         for (uint8 i = 0; i < 2; ++i) // check both neutral and faction-specific AH
         {
-            AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(i == 0 ? 0 : (((1 << (playerData->race - 1)) & RACEMASK_ALLIANCE) ? 12 : 29));
+            AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(i == 0 ? 0 : (((1 << (playerData->Race - 1)) & RACEMASK_ALLIANCE) ? 12 : 29));
 
             for (auto const& [auID, Aentry] : auctionHouse->GetAuctions())
             {
@@ -2046,7 +2068,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     }
 
     // character with this name already exist
-    if (ObjectGuid newguid = sObjectMgr->GetPlayerGUIDByName(factionChangeInfo->Name))
+    if (ObjectGuid newguid = sCharacterCache->GetCharacterGuidByName(factionChangeInfo->Name))
     {
         if (newguid != factionChangeInfo->Guid)
         {
@@ -2088,11 +2110,10 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     }
 
     LOG_INFO("entities.player.character", "Account: %d (IP: %s), Character [%s] (guid: %u) Changed Race/Faction to: %s",
-        GetAccountId(), GetRemoteAddress().c_str(), playerData->name.c_str(), lowGuid, factionChangeInfo->Name.c_str());
+        GetAccountId(), GetRemoteAddress().c_str(), playerData->Name.c_str(), lowGuid, factionChangeInfo->Name.c_str());
 
     // xinef: update global data
-    sWorld->UpdateGlobalNameData(lowGuid, playerData->name, factionChangeInfo->Name);
-    sWorld->UpdateGlobalPlayerData(lowGuid, PLAYER_UPDATE_DATA_NAME | PLAYER_UPDATE_DATA_RACE | PLAYER_UPDATE_DATA_GENDER, factionChangeInfo->Name, 0, factionChangeInfo->Gender, factionChangeInfo->Race);
+    sCharacterCache->UpdateCharacterData(factionChangeInfo->Guid, factionChangeInfo->Name);
 
     if (oldRace != factionChangeInfo->Race)
     {
@@ -2190,7 +2211,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             // Reset guild
             if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
             {
-                if (uint32 guildId = playerData->guildId)
+                if (uint32 guildId = playerData->GuildId)
                     if (Guild* guild = sGuildMgr->GetGuildById(guildId))
                         guild->DeleteMember(factionChangeInfo->Guid, false, false, true);
             }

@@ -23,24 +23,19 @@
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "Types.h"
 #include "World.h"
 
-bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args)
+bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)
 {
     Player* player = handler->GetSession()->GetPlayer();
     std::list<std::string> errors;
-
-    if (!*args)
-    {
-        handler->SendSysMessage("Missing player name.");
-        return true;
-    }
 
     if (player->IsSpectator())
     {
         if (player->FindMap() && player->FindMap()->IsBattleArena())
         {
-            HandleSpectatorWatchCommand(handler, args);
+            HandleSpectatorWatchCommand(handler, name);
             return true;
         }
         handler->PSendSysMessage("You are already spectacting arena.");
@@ -53,7 +48,6 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
         return true;
     }
 
-    std::string name = std::string(args);
     Player* spectate = ObjectAccessor::FindPlayerByName(name);
     if (!spectate)
     {
@@ -180,11 +174,8 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     return true;
 }
 
-bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, char const* args)
+bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, std::string const& name)
 {
-    if (!*args)
-        return true;
-
     Player* player = handler->GetSession()->GetPlayer();
     if (!player->IsSpectator())
         return true;
@@ -196,7 +187,6 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, char cons
     if (!bg || bg->GetStatus() != STATUS_IN_PROGRESS)
         return true;
 
-    std::string name = std::string(args);
     Player* spectate = ObjectAccessor::FindPlayerByName(name);
     if (!spectate || !spectate->IsAlive() || spectate->IsSpectator() || spectate->GetGUID() == player->GetGUID() || !spectate->IsInWorld() || !spectate->FindMap() || spectate->IsBeingTeleported() || spectate->FindMap() != player->FindMap() || !bg->IsPlayerInBattleground(spectate->GetGUID()))
         return true;

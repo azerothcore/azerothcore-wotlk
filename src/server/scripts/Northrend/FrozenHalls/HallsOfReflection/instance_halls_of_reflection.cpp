@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "halls_of_reflection.h"
 #include "MapMgr.h"
 #include "Transport.h"
+#include "halls_of_reflection.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -1029,7 +1029,7 @@ public:
                                         a->SetDuration(8000);
                                 }
 
-                                pMarwyn->MonsterTextEmote("Spirits appear and surround the altar!", 0, true);
+                                pMarwyn->TextEmote("Spirits appear and surround the altar!", nullptr, true);
                             }
                             ++ResumeFirstEventStep;
                             ResumeFirstEventTimer = 7500;

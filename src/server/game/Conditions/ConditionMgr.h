@@ -147,7 +147,8 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_TERRAIN_SWAP                   = 25, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_PHASE                          = 26, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
-    CONDITION_SOURCE_TYPE_MAX                            = 28  // placeholder
+    CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE           = 28,
+    CONDITION_SOURCE_TYPE_MAX                            = 29  // placeholder
 };
 
 enum RelationType

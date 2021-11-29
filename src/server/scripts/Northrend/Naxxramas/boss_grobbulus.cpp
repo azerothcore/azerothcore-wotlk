@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "naxxramas.h"
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "SpellScript.h"
-#include "SpellAuras.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "naxxramas.h"
 
 enum Spells
 {
@@ -211,7 +211,7 @@ public:
             sizeTimer = 0;
             auraVisualTimer = 1;
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f);
-            me->setFaction(21);
+            me->SetFaction(FACTION_BOOTY_BAY);
         }
 
         void KilledUnit(Unit* who) override

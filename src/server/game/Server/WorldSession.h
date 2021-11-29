@@ -23,8 +23,8 @@
 #define __WORLDSESSION_H
 
 #include "AccountMgr.h"
-#include "AuthDefines.h"
 #include "AddonMgr.h"
+#include "AuthDefines.h"
 #include "BanMgr.h"
 #include "CircularBuffer.h"
 #include "Common.h"
@@ -33,8 +33,8 @@
 #include "Packet.h"
 #include "SharedDefines.h"
 #include "World.h"
-#include <utility>
 #include <map>
+#include <utility>
 
 class Creature;
 class GameObject;
@@ -308,6 +308,13 @@ public:
     void LogoutPlayer(bool save);
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
+
+    // Returns true if all contained hyperlinks are valid
+    // May kick player on false depending on world config (handler should abort)
+    bool ValidateHyperlinksAndMaybeKick(std::string_view str);
+    // Returns true if the message contains no hyperlinks
+    // May kick player on false depending on world config (handler should abort)
+    bool DisallowHyperlinksAndMaybeKick(std::string_view str);
 
     void QueuePacket(WorldPacket* new_packet);
     bool Update(uint32 diff, PacketFilter& updater);
@@ -1078,7 +1085,6 @@ private:
     LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
     ObjectGuid m_currentBankerGUID;
-    time_t timeWhoCommandAllowed;
     uint32 _offlineTime;
     bool _kicked;
     bool _shouldSetOfflineInDB;

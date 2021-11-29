@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_depths.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "blackrock_depths.h"
 
 enum Spells
 {
@@ -35,6 +35,11 @@ enum Quests
 enum Misc
 {
     DATA_SKILLPOINT_MIN                           = 230
+};
+
+enum Says
+{
+    SAY_START_FIGHT = 0
 };
 
 enum Gossip
@@ -135,7 +140,10 @@ public:
                 // Start encounter
                 InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
-                    instance->SetGuidData(DATA_EVENSTARTER, player->GetGUID());
+                {
+                    instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
+                }
+                creature->AI()->Talk(SAY_START_FIGHT);
                 break;
         }
         return true;
@@ -170,16 +178,19 @@ public:
             Voidwalkers = false;
             // Reset his gossip menu
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-            me->setFaction(FACTION_FRIEND);
+            me->SetFaction(FACTION_FRIENDLY);
 
             // was set before event start, so set again
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
 
-            if (instance->GetData(DATA_GHOSTKILL) >= 7)
+            if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
+            {
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            }
             else
+            {
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -200,12 +211,6 @@ public:
             if (me->IsAlive())
                 me->GetMotionMaster()->MoveTargetedHome();
             me->SetLootRecipient(nullptr);
-            instance->SetGuidData(DATA_EVENSTARTER, ObjectGuid::Empty);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(DATA_GHOSTKILL, 1);
         }
 
         void UpdateAI(uint32 diff) override

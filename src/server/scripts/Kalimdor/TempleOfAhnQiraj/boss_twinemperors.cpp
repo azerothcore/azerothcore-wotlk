@@ -23,11 +23,11 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "Item.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
-#include "temple_of_ahnqiraj.h"
 #include "WorldPacket.h"
+#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -213,7 +213,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         Creature* pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
         {
-            //me->MonsterYell("Teleporting ...", LANG_UNIVERSAL, 0);
+            //me->Yell("Teleporting ...", LANG_UNIVERSAL);
             Position thisPos;
             thisPos.Relocate(me);
             Position otherPos;
@@ -257,7 +257,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 me->ClearUnitState(UNIT_STATE_STUNNED);
                 if (Unit* nearu = me->SelectNearestTarget(100))
                 {
-                    //DoYell(nearu->GetName(), LANG_UNIVERSAL, 0);
+                    //DoYell(nearu->GetName(), LANG_UNIVERSAL);
                     AttackStart(nearu);
                     me->AddThreat(nearu, 10000);
                 }
@@ -289,7 +289,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (!who || me->GetVictim())
             return;
 
-        if (me->_CanDetectFeignDeathOf(who) && me->CanCreatureAttack(who))
+        if (me->CanCreatureAttack(who))
         {
             if (me->IsWithinDistInMap(who, PULL_RANGE, true, false) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
             {
@@ -319,7 +319,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 if (c->isDead())
                 {
                     c->Respawn();
-                    c->setFaction(7);
+                    c->SetFaction(FACTION_CREATURE);
                     c->RemoveAllAuras();
                 }
                 if (c->IsWithinDistInMap(me, ABUSE_BUG_RANGE))
@@ -414,7 +414,7 @@ public:
 
         void CastSpellOnBug(Creature* target) override
         {
-            target->setFaction(14);
+            target->SetFaction(FACTION_MONSTER);
             target->AI()->AttackStart(me->getThreatMgr().getHostilTarget());
             target->AddAura(SPELL_MUTATE_BUG, target);
             target->SetFullHealth();
@@ -503,7 +503,7 @@ public:
 
         void CastSpellOnBug(Creature* target) override
         {
-            target->setFaction(14);
+            target->SetFaction(FACTION_MONSTER);
             target->AddAura(SPELL_EXPLODEBUG, target);
             target->SetFullHealth();
         }

@@ -19,11 +19,11 @@
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -157,8 +157,9 @@ public:
     }
 };
 
-struct ManaVoidSelector : public Acore::unary_function<Unit*, bool>
+struct ManaVoidSelector
 {
+public:
     explicit ManaVoidSelector(WorldObject const* source) : _source(source) { }
 
     bool operator()(Unit* unit) const
@@ -166,6 +167,7 @@ struct ManaVoidSelector : public Acore::unary_function<Unit*, bool>
         return unit->getPowerType() == POWER_MANA && _source->GetDistance(unit) > 15.0f;
     }
 
+private:
     WorldObject const* _source;
 };
 
@@ -362,8 +364,13 @@ public:
                 Talk(SAY_VALITHRIA_75_PERCENT);
             }
             else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
+            {
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                {
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
+                    _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
+                }
+            }
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

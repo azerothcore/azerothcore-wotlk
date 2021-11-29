@@ -22,8 +22,8 @@
 #include "Common.h"
 #include "DBCEnums.h"
 #include "EventProcessor.h"
-#include <deque>
 #include <array>
+#include <deque>
 
 #define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
 
@@ -55,6 +55,8 @@ enum BattlegroundQueueGroupTypes
     BG_QUEUE_PREMADE_HORDE,
     BG_QUEUE_NORMAL_ALLIANCE,
     BG_QUEUE_NORMAL_HORDE,
+
+    BG_QUEUE_CFBG,
 
     BG_QUEUE_MAX = 10
 };
@@ -128,8 +130,8 @@ public:
     ArenaType GetArenaType() { return m_arenaType; }
     BattlegroundTypeId GetBGTypeID() { return m_bgTypeId; }
 
-    void SetQueueAnnouncementTimer(uint32 bracketId, int32 timer) { _queueAnnouncementTimer[bracketId] = timer; }
-    [[nodiscard]] int32 GetQueueAnnouncementTimer(uint32 bracketId) { return _queueAnnouncementTimer[bracketId]; }
+    void SetQueueAnnouncementTimer(uint32 bracketId, int32 timer, bool isCrossFactionBG = true);
+    [[nodiscard]] int32 GetQueueAnnouncementTimer(uint32 bracketId) const;
 
 private:
     BattlegroundTypeId m_bgTypeId;
@@ -141,6 +143,7 @@ private:
     EventProcessor m_events;
 
     std::array<int32, BG_BRACKET_ID_LAST> _queueAnnouncementTimer;
+    bool _queueAnnouncementCrossfactioned;
 };
 
 /*

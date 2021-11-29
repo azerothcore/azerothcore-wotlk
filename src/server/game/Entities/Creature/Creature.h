@@ -247,15 +247,14 @@ public:
     [[nodiscard]] Unit* SelectNearestTargetInAttackDistance(float dist) const;
 
     void DoFleeToGetAssistance();
-    void CallForHelp(float fRadius);
-    void CallAssistance();
+    void CallForHelp(float fRadius, Unit* target = nullptr);
+    void CallAssistance(Unit* target = nullptr);
     void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
     void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
     bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
     bool _IsTargetAcceptable(const Unit* target) const;
     bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
-    bool _CanDetectFeignDeathOf(const Unit* target) const; // pussywizard
 
     // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
     void UpdateMoveInLineOfSightState();
@@ -267,7 +266,8 @@ public:
 
     void RemoveCorpse(bool setSpawnTime = true, bool skipVisibility = false);
 
-    void DespawnOrUnsummon(uint32 msTimeToDespawn = 0);
+    void DespawnOrUnsummon(Milliseconds msTimeToDespawn, Seconds forcedRespawnTimer);
+    void DespawnOrUnsummon(uint32 msTimeToDespawn = 0) { DespawnOrUnsummon(Milliseconds(msTimeToDespawn), 0s); };
     void DespawnOnEvade();
     void RespawnOnEvade();
 
@@ -329,7 +329,8 @@ public:
     void UpdateWaypointID(uint32 wpID) { m_waypointID = wpID; }
 
     void SearchFormation();
-    [[nodiscard]] CreatureGroup* GetFormation() const { return m_formation; }
+    [[nodiscard]] CreatureGroup const* GetFormation() const { return m_formation; }
+    [[nodiscard]] CreatureGroup* GetFormation() { return m_formation; }
     void SetFormation(CreatureGroup* formation) { m_formation = formation; }
 
     Unit* SelectVictim();
@@ -358,7 +359,7 @@ public:
     void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
-    bool IsMovementPreventedByCasting() const;
+    bool IsMovementPreventedByCasting() const override;
 
     // Part of Evade mechanics
     [[nodiscard]] time_t GetLastDamagedTime() const;
@@ -438,7 +439,7 @@ protected:
     bool CanAlwaysSee(WorldObject const* obj) const override;
 
 private:
-    void ForcedDespawn(uint32 timeMSToDespawn = 0);
+    void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forcedRespawnTimer = 0s);
 
     [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;
 
@@ -483,11 +484,12 @@ private:
 class ForcedDespawnDelayEvent : public BasicEvent
 {
 public:
-    ForcedDespawnDelayEvent(Creature& owner) : BasicEvent(), m_owner(owner) { }
+    ForcedDespawnDelayEvent(Creature& owner, Seconds respawnTimer) : BasicEvent(), m_owner(owner), m_respawnTimer(respawnTimer) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 private:
     Creature& m_owner;
+    Seconds const m_respawnTimer;
 };
 
 #endif

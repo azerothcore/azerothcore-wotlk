@@ -17,11 +17,11 @@
 
 #include "CombatAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "utgarde_pinnacle.h"
 #include "Vehicle.h"
+#include "utgarde_pinnacle.h"
 
 enum Misc
 {
@@ -365,7 +365,7 @@ public:
                     if (m_pInstance)
                         m_pInstance->SetData(SKADI_IN_RANGE, 1);
 
-                    me->MonsterTextEmote(EMOTE_IN_RANGE, 0, true);
+                    me->TextEmote(EMOTE_IN_RANGE, nullptr, true);
                     me->SetFacingTo(M_PI);
                     break;
             }

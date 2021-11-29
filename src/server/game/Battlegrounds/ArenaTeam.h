@@ -70,7 +70,7 @@ enum ArenaTeamEvents
 };
 
 // PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
-enum ArenaTeamInfoType
+enum ArenaTeamInfoType : uint8
 {
     ARENA_TEAM_ID                = 0,
     ARENA_TEAM_TYPE              = 1,                       // new in 3.2 - team type?
@@ -90,6 +90,7 @@ ERR_ARENA_TEAM_TOO_MANY_MEMBERS_S
 ERR_ARENA_TEAM_LEVEL_TOO_LOW_I
 */
 
+// EnumUtils: DESCRIBE THIS
 enum ArenaTeamTypes
 {
     ARENA_TEAM_2v2      = 2,

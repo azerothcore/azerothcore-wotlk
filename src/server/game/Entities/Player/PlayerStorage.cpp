@@ -28,9 +28,9 @@
 #include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
-#include "Config.h"
 #include "Common.h"
 #include "ConditionMgr.h"
+#include "Config.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
@@ -43,8 +43,8 @@
 #include "Guild.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapMgr.h"
@@ -55,8 +55,8 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "QuestDef.h"
 #include "QueryHolder.h"
+#include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
@@ -74,6 +74,7 @@
 #include "WeatherMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSession.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -1148,7 +1149,7 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& des
             if( pItem->IsBag() && pItem->IsNotEmptyBag() )
                 return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
 
-        // Xinef: Removed next bullshit loot generated check
+        // Xinef: Removed next loot generated check
         if (pItem->GetGUID() == GetLootGUID())
         {
             if (no_space_count)
@@ -1628,7 +1629,7 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
         if (!pProto)
             return EQUIP_ERR_ITEM_NOT_FOUND;
 
-        // Xinef: Removed next bullshit loot generated check
+        // Xinef: Removed next loot generated check
         if (pItem->GetGUID() == GetLootGUID())
             return EQUIP_ERR_ALREADY_LOOTED;
 
@@ -2064,7 +2065,7 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest
     if (!pProto)
         return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_ITEM_NOT_FOUND;
 
-    // Xinef: Removed next bullshit loot generated check
+    // Xinef: Removed next loot generated check
     if (pItem->GetGUID() == GetLootGUID())
         return EQUIP_ERR_ALREADY_LOOTED;
 
@@ -2370,7 +2371,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
 
 InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObject const* lootedObject) const
 {
-    if (!GetGroup() || !GetGroup()->isLFGGroup())
+    if (!GetGroup() || !GetGroup()->isLFGGroup(true))
         return EQUIP_ERR_OK;    // not in LFG group
 
     // check if looted object is inside the lfg dungeon
@@ -3640,7 +3641,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (pDstItem)
     {
-        // Xinef: Removed next bullshit loot generated check
+        // Xinef: Removed next loot generated check
         if (pDstItem->GetGUID() == GetLootGUID())                       // prevent swap looting item
         {
             //best error message found for attempting to swap while looting
@@ -3939,7 +3940,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             {
                 if (Item* bagItem = bag->GetItemByPos(i))
                 {
-                    // Xinef: Removed next bullshit loot generated check
+                    // Xinef: Removed next loot generated check
                     if (bagItem->GetGUID() == GetLootGUID())
                     {
                         m_session->DoLootRelease(GetLootGUID());
@@ -3957,7 +3958,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             {
                 if (Item* bagItem = bag->GetItemByPos(i))
                 {
-                    // Xinef: Removed next bullshit loot generated check
+                    // Xinef: Removed next loot generated check
                     if (bagItem->GetGUID() == GetLootGUID())
                     {
                         m_session->DoLootRelease(GetLootGUID());
@@ -4420,9 +4421,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                                     // Search enchant_amount
                                     for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                                     {
-                                        if (item_rand->enchant_id[k] == enchant_id)
+                                        if (item_rand->Enchantment[k] == enchant_id)
                                         {
-                                            basepoints = int32((item_rand->prefix[k] * item->GetItemSuffixFactor()) / 10000);
+                                            basepoints = int32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                             break;
                                         }
                                     }
@@ -4446,9 +4447,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                             {
-                                if (item_rand->enchant_id[k] == enchant_id)
+                                if (item_rand->Enchantment[k] == enchant_id)
                                 {
-                                    enchant_amount = uint32((item_rand->prefix[k] * item->GetItemSuffixFactor()) / 10000);
+                                    enchant_amount = uint32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                     break;
                                 }
                             }
@@ -4466,9 +4467,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
                             {
-                                if (item_rand_suffix->enchant_id[k] == enchant_id)
+                                if (item_rand_suffix->Enchantment[k] == enchant_id)
                                 {
-                                    enchant_amount = uint32((item_rand_suffix->prefix[k] * item->GetItemSuffixFactor()) / 10000);
+                                    enchant_amount = uint32((item_rand_suffix->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                     break;
                                 }
                             }
@@ -4830,7 +4831,7 @@ void Player::_LoadArenaTeamInfo()
     memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32) * MAX_ARENA_SLOT * ARENA_TEAM_END);
 
     for (auto const& itr : ArenaTeam::ArenaSlotByType)
-        if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUID().GetCounter(), itr.second))
+        if (uint32 arenaTeamId = sCharacterCache->GetCharacterArenaTeamIdByGuid(GetGUID(), itr.second))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
             if (!arenaTeam)
@@ -5104,7 +5105,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     //Need to call it to initialize m_team (m_team can be calculated from race)
     //Other way is to saves m_team into characters table.
-    setFactionForRace(getRace(true));
+    SetFactionForRace(getRace(true));
 
     // pussywizard: create empty instance bind containers if necessary
     sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(playerGuid);
@@ -5631,7 +5632,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     _LoadDeclinedNames(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES));
 
-    //m_achievementMgr->CheckAllAchievementCriteria(); // pussywizard: ZOMG! disabled this bullshit
+    //m_achievementMgr->CheckAllAchievementCriteria(); // pussywizard: disabled this
 
     _LoadEquipmentSets(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
@@ -6055,7 +6056,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 }
                 else
                 {
-                    // xinef: zomg! sync query
+                    // xinef: sync query
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_REFUNDS);
                     stmt->setUInt32(0, item->GetGUID().GetCounter());
                     stmt->setUInt32(1, GetGUID().GetCounter());
@@ -6295,6 +6296,7 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
         } while (mailItemsResult->NextRow());
     }
 
+    CharacterDatabase.CommitTransaction(pendingAuctionsTrans);
     UpdateNextMailTimeAndUnreads();
 }
 
@@ -6563,12 +6565,16 @@ void Player::_LoadSpells(PreparedQueryResult result)
 
 void Player::_LoadGroup()
 {
-    if (uint32 groupId = GetGroupIdFromStorage(GetGUID().GetCounter()))
-        if (Group* group = sGroupMgr->GetGroupByGUID(groupId))
+    if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(GetGUID()))
+    {
+        if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
+        {
             if (group->GetMemberGroup(GetGUID()) <= MAX_RAID_SUBGROUPS)
             {
                 if (group->IsLeader(GetGUID()))
+                {
                     SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+                }
 
                 uint8 subgroup = group->GetMemberGroup(GetGUID());
                 SetGroup(group, subgroup);
@@ -6577,6 +6583,8 @@ void Player::_LoadGroup()
                 SetDungeonDifficulty(group->GetDungeonDifficulty());
                 SetRaidDifficulty(group->GetRaidDifficulty());
             }
+        }
+    }
 
     if (!GetGroup() || !GetGroup()->IsLeader(GetGUID()))
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
@@ -6720,7 +6728,7 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
             continue;
         }
 
-        std::string name = *achievementEntry->name;
+        std::string name = achievementEntry->name[sObjectMgr->GetDBCLocaleIndex()];
 
         std::stringstream stream;
         stream << "|cffff7c0a|Hachievement:";
@@ -7579,7 +7587,7 @@ void Player::_SaveQuestStatus(CharacterDatabaseTransaction trans)
     {
         if (saveItr->second)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_QUESTSTATUS_REWARDED);
-        else // xinef: what the fuck is this shit? quest can be removed by spelleffect if (!keepAbandoned)
+        else // xinef: what the is this? quest can be removed by spelleffect if (!keepAbandoned)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
 
         stmt->setUInt32(0, GetGUID().GetCounter());

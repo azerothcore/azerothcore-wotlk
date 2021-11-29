@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "trial_of_the_champion.h"
 
@@ -249,7 +249,7 @@ public:
                 case EVENT_ANNOUNCER_SAY_ZOMBIE:
                     if( pInstance && !summons.empty() )
                         if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
-                            ghoul->MonsterYell("[Zombie] .... . Brains ....", LANG_UNIVERSAL, 0);
+                            ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL);
 
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:

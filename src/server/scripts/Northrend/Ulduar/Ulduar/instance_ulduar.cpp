@@ -16,13 +16,13 @@
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Transport.h"
-#include "ulduar.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "ulduar.h"
 
 class instance_ulduar : public InstanceMapScript
 {
@@ -795,7 +795,7 @@ public:
                 case DATA_BRANN_MEMOTESAY:
                     if (Creature* cr = instance->GetCreature(m_brannBronzebeardBaseCamp))
                     {
-                        cr->MonsterTextEmote("Go to your vehicles!", 0, true);
+                        cr->TextEmote("Go to your vehicles!", nullptr, true);
                     }
                     break;
                 case DATA_BRANN_EASY_MODE:

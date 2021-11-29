@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "utgarde_pinnacle.h"
 
 enum Misc
@@ -320,7 +320,7 @@ public:
 
         void JustDied(Unit*  /*pKiller*/) override
         {
-            me->SendPlaySound(SOUND_DEATH, false);
+            me->PlayDirectSound(SOUND_DEATH);
             if(m_pInstance)
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, DONE);
         }

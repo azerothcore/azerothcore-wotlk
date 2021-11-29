@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "halls_of_lightning.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "halls_of_lightning.h"
 
 enum VolkahnSpells
 {
@@ -203,7 +203,7 @@ public:
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_MOLTEN_GOLEM)
             {
-                summon->setFaction(me->getFaction());
+                summon->SetFaction(me->GetFaction());
 
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                     summon->AI()->AttackStart(target);

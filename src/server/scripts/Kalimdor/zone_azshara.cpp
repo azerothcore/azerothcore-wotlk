@@ -29,9 +29,9 @@ npc_depth_charge
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######
@@ -356,7 +356,7 @@ public:
                 {
                     Talk(SAY_RIZZLE_FINAL);
                     me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->MoveIdle();
                     me->RemoveAurasDueToSpell(SPELL_PERIODIC_DEPTH_CHARGE);
                     Reached = true;

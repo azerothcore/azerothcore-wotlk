@@ -16,10 +16,13 @@
  */
 
 #include "BattlegroundMgr.h"
+#include "GossipDef.h"
 #include "Language.h"
+#include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "WorldSession.h"
 
 /*********************************************************/
 /***                    GOSSIP SYSTEM                  ***/
@@ -161,6 +164,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
+            // search in broadcast_text and broadcast_text_locale
             std::string strOptionText, strBoxText;
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextID);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextID);
@@ -176,16 +180,17 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             else
                 strBoxText = itr->second.BoxText;
 
+            // if the language is not default and the texts weren't found, maybe they're in gossip_menu_option_locale table
             if (locale != DEFAULT_LOCALE)
             {
-                if (!optionBroadcastText)
+                if (strOptionText.empty())
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
                         ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
                 }
 
-                if (!boxBroadcastText)
+                if (strBoxText.empty())
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))

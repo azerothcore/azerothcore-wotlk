@@ -18,8 +18,8 @@
 #include "ObjectGuid.h"
 #include "Log.h"
 #include "World.h"
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 ObjectGuid const ObjectGuid::Empty = ObjectGuid();
 

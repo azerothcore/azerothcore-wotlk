@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AccountMgr.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "WorldSession.h"
 
 /*********************************************************/
 /***               FLOOD FILTER SYSTEM                 ***/
@@ -401,18 +403,96 @@ void Player::UpdateFFAPvPFlag(time_t currTime)
 
 void Player::UpdateDuelFlag(time_t currTime)
 {
-    if (!duel || duel->startTimer == 0 || currTime < duel->startTimer + 3)
-        return;
+    if (duel && duel->State == DUEL_STATE_COUNTDOWN && duel->StartTime <= currTime)
+    {
+        sScriptMgr->OnPlayerDuelStart(this, duel->Opponent);
 
-    sScriptMgr->OnPlayerDuelStart(this, duel->opponent);
+        SetUInt32Value(PLAYER_DUEL_TEAM, 1);
+        duel->Opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 2);
 
-    SetUInt32Value(PLAYER_DUEL_TEAM, 1);
-    duel->opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 2);
-
-    duel->startTimer = 0;
-    duel->startTime  = currTime;
-    duel->opponent->duel->startTimer = 0;
-    duel->opponent->duel->startTime  = currTime;
+        duel->State = DUEL_STATE_IN_PROGRESS;
+        duel->Opponent->duel->State = DUEL_STATE_IN_PROGRESS;
+    }
 }
 
 /*********************************************************/
+
+void Player::SendItemRetrievalMail(uint32 itemEntry, uint32 count)
+{
+    SendItemRetrievalMail({ { itemEntry, count } });
+}
+
+void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems)
+{
+    if (mailItems.empty())
+    {
+        // Skip send if empty items
+        FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Attempt to send almost with items without items. Player {}", GetGUID().ToString());
+        return;
+    }
+
+    using SendMailTempateVector = std::vector<std::pair<uint32, uint32>>;
+
+    std::vector<SendMailTempateVector> allItems;
+
+    auto AddMailItem = [&allItems](uint32 itemEntry, uint32 itemCount)
+    {
+        SendMailTempateVector toSendItems;
+
+        ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemEntry);
+        if (!itemTemplate)
+        {
+            FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Item id {} is invalid", itemEntry);
+            return;
+        }
+
+        if (itemCount < 1 || (itemTemplate->MaxCount > 0 && itemCount > static_cast<uint32>(itemTemplate->MaxCount)))
+        {
+            FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Incorrect item count ({}) for item id {}", itemEntry, itemCount);
+            return;
+        }
+
+        while (itemCount > itemTemplate->GetMaxStackSize())
+        {
+            if (toSendItems.size() <= MAX_MAIL_ITEMS)
+            {
+                toSendItems.emplace_back(itemEntry, itemTemplate->GetMaxStackSize());
+                itemCount -= itemTemplate->GetMaxStackSize();
+            }
+            else
+            {
+                allItems.emplace_back(toSendItems);
+                toSendItems.clear();
+            }
+        }
+
+        toSendItems.emplace_back(itemEntry, itemCount);
+        allItems.emplace_back(toSendItems);
+    };
+
+    for (auto& [itemEntry, itemCount] : mailItems)
+    {
+        AddMailItem(itemEntry, itemCount);
+    }
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    for (auto const& items : allItems)
+    {
+        MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
+        MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed."); // This is the text used in Cataclysm, it probably wasn't changed.
+
+        for (auto const& [itemEntry, itemCount] : items)
+        {
+            if (Item* mailItem = Item::CreateItem(itemEntry, itemCount))
+            {
+                mailItem->SaveToDB(trans);
+                draft.AddItem(mailItem);
+            }
+        }
+
+        draft.SendMailTo(trans, MailReceiver(this, GetGUID().GetCounter()), sender);
+    }
+
+    CharacterDatabase.CommitTransaction(trans);
+}

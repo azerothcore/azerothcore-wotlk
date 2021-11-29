@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapUpdater.h"
 #include "AvgDiffTracker.h"
 #include "LFGMgr.h"
 #include "Map.h"
-#include "MapUpdater.h"
+#include "Metric.h"
 
 class UpdateRequest
 {
@@ -39,9 +40,11 @@ public:
 
     void call() override
     {
+        METRIC_TIMER("map_update_time_diff", METRIC_TAG("map_id", std::to_string(m_map.GetId())));
         m_map.Update(m_diff, s_diff);
         m_updater.update_finished();
     }
+
 private:
     Map& m_map;
     MapUpdater& m_updater;
@@ -69,11 +72,6 @@ private:
 
 MapUpdater::MapUpdater(): pending_requests(0)
 {
-}
-
-MapUpdater::~MapUpdater()
-{
-    deactivate();
 }
 
 void MapUpdater::activate(size_t num_threads)

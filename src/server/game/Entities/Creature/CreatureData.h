@@ -18,9 +18,9 @@
 #ifndef AZEROTHCORE_CREATUREDATA_H
 #define AZEROTHCORE_CREATUREDATA_H
 
-#include "DBCEnums.h"
 #include "Cell.h"
 #include "Common.h"
+#include "DBCEnums.h"
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
@@ -38,10 +38,11 @@
 #define MAX_CREATURE_QUEST_ITEMS 6
 
 #define MAX_EQUIPMENT_ITEMS 3
-
+enum class VisibilityDistanceType : uint8;
+// TODO: Implement missing flags from TC in places that custom flags from xinef&pussywizzard use flag values.
+// EnumUtils: DESCRIBE THIS
 enum CreatureFlagsExtra : uint32
 {
-    // TODO: Implement missing flags from TC in places that custom flags from xinef&pussywizzard use flag values.
     CREATURE_FLAG_EXTRA_INSTANCE_BIND                   = 0x00000001,   // creature kill bind instance with killer and killer's group
     CREATURE_FLAG_EXTRA_CIVILIAN                        = 0x00000002,   // not aggro (ignore faction/reputation hostility)
     CREATURE_FLAG_EXTRA_NO_PARRY                        = 0x00000004,   // creature can't parry
@@ -51,7 +52,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_NO_XP                           = 0x00000040,   // creature kill does not provide XP
     CREATURE_FLAG_EXTRA_TRIGGER                         = 0x00000080,   // trigger creature
     CREATURE_FLAG_EXTRA_NO_TAUNT                        = 0x00000100,   // creature is immune to taunt auras and 'attack me' effects
-    CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE            = 0x00000200, // creature won't update movement flags
+    CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE            = 0x00000200,   // creature won't update movement flags
     CREATURE_FLAG_EXTRA_GHOST_VISIBILITY                = 0x00000400,   // creature will only be visible to dead players
     CREATURE_FLAG_EXTRA_UNUSED_12                       = 0x00000800,   // TODO: Implement CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK (creature will use offhand attacks)
     CREATURE_FLAG_EXTRA_NO_SELL_VENDOR                  = 0x00001000,   // players can't sell items to this vendor
@@ -77,8 +78,9 @@ enum CreatureFlagsExtra : uint32
 
     // Masks
     CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_12 | CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 |
-                                                           CREATURE_FLAG_EXTRA_UNUSED_27 | CREATURE_FLAG_EXTRA_UNUSED_28),
-    CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS))
+                                                           CREATURE_FLAG_EXTRA_UNUSED_27 | CREATURE_FLAG_EXTRA_UNUSED_28), // SKIP
+
+    CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS)) // SKIP
 };
 
 // from `creature_template` table
@@ -285,6 +287,7 @@ struct CreatureData
     uint32 npcflag{0};
     uint32 unit_flags{0};                                      // enum UnitFlags mask values
     uint32 dynamicflags{0};
+    uint32 ScriptId;
     bool dbData{true};
     bool overwrittenZ{false};
 };
@@ -339,6 +342,7 @@ struct CreatureAddon
     uint32 emote;
     bool isLarge;
     std::vector<uint32> auras;
+    VisibilityDistanceType visibilityDistanceType;
 };
 
 typedef std::unordered_map<uint32, CreatureAddon> CreatureAddonContainer;

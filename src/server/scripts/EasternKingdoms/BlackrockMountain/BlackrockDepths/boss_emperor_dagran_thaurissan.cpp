@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_depths.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_depths.h"
 
 enum Yells
 {
@@ -76,7 +76,7 @@ public:
             if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOIRA)))
             {
                 Moira->AI()->EnterEvadeMode();
-                Moira->setFaction(35);
+                Moira->SetFaction(FACTION_FRIENDLY);
             }
         }
 

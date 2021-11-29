@@ -23,11 +23,11 @@ SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
 #include "Chat.h"
-#include "hyjal_trash.h"
 #include "InstanceScript.h"
 #include "Opcodes.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
+#include "hyjal_trash.h"
 
 /* Battle of Mount Hyjal encounters:
 0 - Rage Winterchill event
@@ -194,15 +194,12 @@ public:
 
                                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     {
-                                        if (i->GetSource())
+                                        if (Player* player = i->GetSource())
                                         {
                                             WorldPacket packet;
-                                            ChatHandler::BuildChatPacket(packet, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, unit, i->GetSource(), YELL_EFFORTS);
-                                            i->GetSource()->GetSession()->SendPacket(&packet);
-
-                                            WorldPacket data2(SMSG_PLAY_SOUND, 4);
-                                            data2 << 10986;
-                                            i->GetSource()->GetSession()->SendPacket(&data2);
+                                            ChatHandler::BuildChatPacket(packet, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, unit, player, YELL_EFFORTS);
+                                            player->SendDirectMessage(&packet);
+                                            player->PlayDirectSound(10986, player);
                                         }
                                     }
                                 }

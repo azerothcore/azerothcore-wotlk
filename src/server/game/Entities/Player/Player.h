@@ -20,6 +20,7 @@
 
 #include "ArenaTeam.h"
 #include "Battleground.h"
+#include "CharacterCache.h"
 #include "DatabaseEnvFwd.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
@@ -356,16 +357,24 @@ struct PvPInfo
     time_t FFAPvPEndTimer{0};                  ///> Time when player unflags himself for FFA PvP (flag removed after 30 sec)
 };
 
+enum DuelState
+{
+    DUEL_STATE_CHALLENGED,
+    DUEL_STATE_COUNTDOWN,
+    DUEL_STATE_IN_PROGRESS,
+    DUEL_STATE_COMPLETED
+};
+
 struct DuelInfo
 {
-    DuelInfo()  {}
+    DuelInfo(Player* opponent, Player* initiator, bool isMounted) : Opponent(opponent), Initiator(initiator), IsMounted(isMounted) {}
 
-    Player* initiator{nullptr};
-    Player* opponent{nullptr};
-    time_t startTimer{0};
-    time_t startTime{0};
-    time_t outOfBound{0};
-    bool isMounted{false};
+    Player* const Opponent;
+    Player* const Initiator;
+    bool const IsMounted;
+    DuelState State = DUEL_STATE_CHALLENGED;
+    time_t StartTime = 0;
+    time_t OutOfBoundsTime = 0;
 };
 
 struct Areas
@@ -1159,10 +1168,18 @@ public:
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
-    void Say(std::string const& text, const uint32 language);
-    void Yell(std::string const& text, const uint32 language);
-    void TextEmote(std::string const& text);
-    void Whisper(std::string const& text, const uint32 language, ObjectGuid receiver);
+    /// Handles said message in regular chat based on declared language and in config pre-defined Range.
+    void Say(std::string_view text, Language language, WorldObject const* = nullptr) override;
+    void Say(uint32 textId, WorldObject const* target = nullptr) override;
+    /// Handles yelled message in regular chat based on declared language and in config pre-defined Range.
+    void Yell(std::string_view text, Language language, WorldObject const* = nullptr) override;
+    void Yell(uint32 textId, WorldObject const* target = nullptr) override;
+    /// Outputs an universal text which is supposed to be an action.
+    void TextEmote(std::string_view text, WorldObject const* = nullptr, bool = false) override;
+    void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false) override;
+    /// Handles whispers from Addons and players based on sender, receiver's guid and language.
+    void Whisper(std::string_view text, Language language, Player* receiver, bool = false) override;
+    void Whisper(uint32 textId, Player* target, bool isBossWhisper = false) override;
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
@@ -1492,7 +1509,6 @@ public:
     static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
     static float  GetFloatValueFromArray(Tokenizer const& data, uint16 index);
     static uint32 GetZoneIdFromDB(ObjectGuid guid);
-    static uint32 GetLevelFromStorage(ObjectGuid::LowType guid);
     static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
 
     static bool IsValidGender(uint8 Gender) { return Gender <= GENDER_FEMALE; }
@@ -1580,6 +1596,8 @@ public:
     Mail* GetMail(uint32 id);
 
     PlayerMails const& GetMails() const { return m_mail; }
+    void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
+    void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
@@ -1804,7 +1822,7 @@ public:
     }
 
     /** todo: -maybe move UpdateDuelFlag+DuelComplete to independent DuelHandler.. **/
-    DuelInfo* duel;
+    std::unique_ptr<DuelInfo> duel;
     void UpdateDuelFlag(time_t currTime);
     void CheckDuelDistance(time_t currTime);
     void DuelComplete(DuelCompleteType type);
@@ -1822,16 +1840,13 @@ public:
     {
         SetUInt32Value(PLAYER_GUILDID, GuildId);
         // xinef: update global storage
-        sWorld->UpdateGlobalPlayerGuild(GetGUID().GetCounter(), GuildId);
+        sCharacterCache->UpdateCharacterGuildId(GetGUID(), GetGuildId());
     }
     void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
     [[nodiscard]] uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }
     void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
     [[nodiscard]] uint32 GetGuildId() const { return GetUInt32Value(PLAYER_GUILDID);  }
     [[nodiscard]] Guild* GetGuild() const;
-    static uint32 GetGuildIdFromStorage(ObjectGuid::LowType guid);
-    static uint32 GetGroupIdFromStorage(ObjectGuid::LowType guid);
-    static uint32 GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot);
     uint32 GetGuildIdInvited() { return m_GuildIdInvited; }
     static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
 
@@ -2038,7 +2053,7 @@ public:
 
     static TeamId TeamIdForRace(uint8 race);
     [[nodiscard]] TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };
-    void setFactionForRace(uint8 race);
+    void SetFactionForRace(uint8 race);
     void setTeamId(TeamId teamid) { m_team = teamid; };
 
     void InitDisplayIds();
@@ -2485,6 +2500,7 @@ public:
     [[nodiscard]] bool HasTitle(uint32 bitIndex) const;
     bool HasTitle(CharTitlesEntry const* title) const { return HasTitle(title->bit_index); }
     void SetTitle(CharTitlesEntry const* title, bool lost = false);
+    void SetCurrentTitle(CharTitlesEntry const* title, bool clear = false) { SetUInt32Value(PLAYER_CHOSEN_TITLE, clear ? 0 : title->bit_index); };
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
@@ -2500,6 +2516,7 @@ public:
     void ClearWhisperWhiteList() { WhisperList.clear(); }
     void AddWhisperWhiteList(ObjectGuid guid) { WhisperList.push_back(guid); }
     bool IsInWhisperWhiteList(ObjectGuid guid);
+    void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
     bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
@@ -2731,6 +2748,7 @@ public:
 
     RewardedQuestSet m_RewardedQuests;
     QuestStatusSaveMap m_RewardedQuestsSave;
+    void SendQuestGiverStatusMultiple();
 
     SkillStatusMap mSkillStatus;
 

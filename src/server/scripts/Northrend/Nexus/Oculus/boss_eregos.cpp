@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "oculus.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "oculus.h"
 
 enum Spells
 {
@@ -219,7 +219,7 @@ public:
                     }
                     break;
                 case EVENT_SPELL_PLANAR_SHIFT:
-                    //me->MonsterYell(TEXT_PLANAR_SHIFT_SAY, LANG_UNIVERSAL, 0);
+                    //me->Yell(TEXT_PLANAR_SHIFT_SAY, LANG_UNIVERSAL);
                     Talk(SAY_SHIELD);
                     me->CastSpell(me, SPELL_PLANAR_SHIFT, false);
                     for( uint8 i = 0; i < 3; ++i )

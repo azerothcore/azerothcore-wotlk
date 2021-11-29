@@ -22,12 +22,12 @@ SDComment: Doomfires not completely offlike due to core limitations for random m
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
-#include "hyjal.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "hyjal.h"
 
 enum Texts
 {
@@ -233,8 +233,7 @@ public:
                 }
                 else
                 {
-                    Position pos;
-                    me->GetRandomNearPosition(pos, 40);
+                    Position pos = me->GetRandomNearPosition(40);
                     me->GetMotionMaster()->MovePoint(0, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
                 }
 
@@ -464,7 +463,7 @@ public:
                 summoned->AI()->AttackStart(me);
             else
             {
-                summoned->setFaction(me->getFaction());
+                summoned->SetFaction(me->GetFaction());
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
@@ -553,15 +552,15 @@ public:
             if (!me->IsInCombat())
             {
                 // Do not let the raid skip straight to Archimonde. Visible and hostile ONLY if Azagalor is finished.
-                if ((instance->GetData(DATA_AZGALOREVENT) < DONE) && (me->IsVisible() || (me->getFaction() != 35)))
+                if ((instance->GetData(DATA_AZGALOREVENT) < DONE) && (me->IsVisible() || (me->GetFaction() != FACTION_FRIENDLY)))
                 {
                     me->SetVisible(false);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                 }
 
-                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->getFaction() == 35)))
+                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->GetFaction() == FACTION_FRIENDLY)))
                 {
-                    me->setFaction(1720);
+                    me->SetFaction(FACTION_DRAGONKIN);
                     me->SetVisible(true);
                 }
 

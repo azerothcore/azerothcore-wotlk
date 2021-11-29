@@ -31,6 +31,8 @@
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SharedDefines.h"
+#include "Tuples.h"
+#include "Types.h"
 #include "Weather.h"
 #include "World.h"
 #include <atomic>
@@ -41,7 +43,6 @@ class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
 class Channel;
-class ChatCommand;
 class Creature;
 class CreatureAI;
 class DynamicObject;
@@ -80,6 +81,11 @@ struct ItemTemplate;
 struct OutdoorPvPData;
 struct GroupQueueInfo;
 struct TargetInfo;
+
+namespace Acore::ChatCommands
+{
+    struct ChatCommandBuilder;
+}
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
@@ -548,6 +554,19 @@ public:
     [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
+class OnlyOnceAreaTriggerScript : public AreaTriggerScript
+{
+    using AreaTriggerScript::AreaTriggerScript;
+
+public:
+    [[nodiscard]] bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) override;
+
+protected:
+    virtual bool _OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) = 0;
+    void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
+    void ResetAreaTriggerDone(Player const* /*player*/, AreaTrigger const* /*trigger*/);
+};
+
 class BattlegroundScript : public ScriptObject
 {
 protected:
@@ -579,7 +598,7 @@ protected:
 
 public:
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-    [[nodiscard]] virtual std::vector<ChatCommand> GetCommands() const = 0;
+    [[nodiscard]] virtual std::vector<Acore::ChatCommands::ChatCommandBuilder> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -1436,7 +1455,20 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+     virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+};
+
+class DatabaseScript : public ScriptObject
+{
+protected:
+
+    DatabaseScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) {}
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1566,7 +1598,7 @@ public: /* OutdoorPvPScript */
     OutdoorPvP* CreateOutdoorPvP(OutdoorPvPData const* data);
 
 public: /* CommandScript */
-    std::vector<ChatCommand> GetChatCommands();
+    std::vector<Acore::ChatCommands::ChatCommandBuilder> GetChatCommands();
 
 public: /* WeatherScript */
     void OnWeatherChange(Weather* weather, WeatherState state, float grade);
@@ -1921,6 +1953,10 @@ public: /* AchievementScript */
 
         void OnHandleDevCommand(Player* player, std::string& argstr);
 
+    public: /* DatabaseScript */
+
+        void OnAfterDatabasesLoaded(uint32 updateFlags);
+
 private:
     uint32 _scriptCount;
 
@@ -1929,6 +1965,85 @@ private:
 
     ScriptLoaderCallbackType _script_loader_callback;
 };
+
+namespace Acore::SpellScripts
+{
+    template<typename T>
+    using is_SpellScript = std::is_base_of<SpellScript, T>;
+
+    template<typename T>
+    using is_AuraScript = std::is_base_of<AuraScript, T>;
+}
+
+template <typename... Ts>
+class GenericSpellAndAuraScriptLoader : public SpellScriptLoader
+{
+    using SpellScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_SpellScript, Ts...>;
+    using AuraScriptType = typename Acore::find_type_if_t<Acore::SpellScripts::is_AuraScript, Ts...>;
+    using ArgsType = typename Acore::find_type_if_t<Acore::is_tuple, Ts...>;
+
+public:
+    GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
+
+private:
+    SpellScript* GetSpellScript() const override
+    {
+        if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<SpellScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    AuraScript* GetAuraScript() const override
+    {
+        if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
+        {
+            return Acore::new_from_tuple<AuraScriptType>(_args);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    ArgsType _args;
+};
+
+#define RegisterSpellScriptWithArgs(spell_script, script_name, ...) new GenericSpellAndAuraScriptLoader<spell_script, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellScript(spell_script) RegisterSpellScriptWithArgs(spell_script, #spell_script)
+#define RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, script_name, ...) new GenericSpellAndAuraScriptLoader<script_1, script_2, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellAndAuraScriptPair(script_1, script_2) RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, #script_1)
+
+template <class AI>
+class GenericCreatureScript : public CreatureScript
+{
+    public:
+        GenericCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return new AI(me); }
+};
+#define RegisterCreatureAI(ai_name) new GenericCreatureScript<ai_name>(#ai_name)
+
+template <class AI, AI*(*AIFactory)(Creature*)>
+class FactoryCreatureScript : public CreatureScript
+{
+    public:
+        FactoryCreatureScript(char const* name) : CreatureScript(name) { }
+        CreatureAI* GetAI(Creature* me) const override { return AIFactory(me); }
+};
+#define RegisterCreatureAIWithFactory(ai_name, factory_fn) new FactoryCreatureScript<ai_name, &factory_fn>(#ai_name)
+
+template <class AI>
+class GenericGameObjectScript : public GameObjectScript
+{
+    public:
+        GenericGameObjectScript(char const* name) : GameObjectScript(name) { }
+        GameObjectAI* GetAI(GameObject* go) const override { return new AI(go); }
+};
+#define RegisterGameObjectAI(ai_name) new GenericGameObjectScript<ai_name>(#ai_name)
 
 #define sScriptMgr ScriptMgr::instance()
 
@@ -1990,31 +2105,31 @@ public:
                 if (id)
                 {
                     // Try to find an existing script.
-                    bool existing = false;
+                    TScript const* oldScript = nullptr;
                     for (auto iterator = ScriptPointerList.begin(); iterator != ScriptPointerList.end(); ++iterator)
                     {
                         // If the script names match...
                         if (iterator->second->GetName() == script->GetName())
                         {
                             // ... It exists.
-                            existing = true;
+                            oldScript = iterator->second;
                             break;
                         }
                     }
 
-                    // If the script isn't assigned -> assign it!
-                    if (!existing)
+                    // If the script is already assigned -> delete it!
+                    if (oldScript)
                     {
-                        ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
+                        delete oldScript;
                     }
-                    else
-                    {
-                        // If the script is already assigned -> delete it!
-                        LOG_ERROR("scripts", "Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
-                                       script->GetName().c_str());
 
-                        ABORT(); // Error that should be fixed ASAP.
+                    // Assign new script!
+                    ScriptPointerList[id] = script;
+
+                    // Increment script count only with new scripts
+                    if (!oldScript)
+                    {
+                        sScriptMgr->IncrementScriptCount();
                     }
                 }
                 else

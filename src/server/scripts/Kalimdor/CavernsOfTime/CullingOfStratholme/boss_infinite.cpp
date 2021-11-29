@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "culling_of_stratholme.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "culling_of_stratholme.h"
 
 enum Spells
 {
@@ -98,7 +98,7 @@ public:
                     {
                         cr->DespawnOrUnsummon(5000);
                         cr->RemoveAllAuras();
-                        cr->MonsterSay("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL, 0);
+                        cr->Say("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL);
                     }
                 }
             }

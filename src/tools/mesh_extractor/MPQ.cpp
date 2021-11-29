@@ -17,8 +17,8 @@
 
 #include "MPQ.h"
 #include "MPQMgr.h"
-#include <deque>
 #include <cstdio>
+#include <deque>
 
 MPQArchive::MPQArchive(const char* filename)
 {

@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DBCStores.h"
 #include "BattlegroundMgr.h"
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
-#include "DBCStores.h"
 #include "Errors.h"
 #include "Log.h"
 #include "SharedDefines.h"
@@ -340,7 +340,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sSkillLineStore,                       "SkillLine.dbc",                        "skillline_dbc");
     LOAD_DBC(sSkillLineAbilityStore,                "SkillLineAbility.dbc",                 "skilllineability_dbc");
     LOAD_DBC(sSkillRaceClassInfoStore,              "SkillRaceClassInfo.dbc",               "skillraceclassinfo_dbc");
-    LOAD_DBC(sSkillTiersStore,                      "SkillTiers.dbc",                       nullptr); // TODO: add the SQL table!
+    LOAD_DBC(sSkillTiersStore,                      "SkillTiers.dbc",                       "skilltiers_dbc");
     LOAD_DBC(sSoundEntriesStore,                    "SoundEntries.dbc",                     "soundentries_dbc");
     LOAD_DBC(sSpellStore,                           "Spell.dbc",                            "spell_dbc");
     LOAD_DBC(sSpellCastTimesStore,                  "SpellCastTimes.dbc",                   "spellcasttimes_dbc");
@@ -903,7 +903,7 @@ SimpleFactionsList const* GetFactionTeamList(uint32 faction)
     return nullptr;
 }
 
-char* GetPetName(uint32 petfamily, uint32 dbclang)
+char const* GetPetName(uint32 petfamily, uint32 dbclang)
 {
     if (!petfamily)
         return nullptr;
@@ -912,7 +912,7 @@ char* GetPetName(uint32 petfamily, uint32 dbclang)
     if (!pet_family)
         return nullptr;
 
-    return pet_family->Name[dbclang] ? pet_family->Name[dbclang] : nullptr;
+    return pet_family->Name[dbclang];
 }
 
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId)

@@ -115,7 +115,7 @@ void Pet::RemoveFromWorld()
     }
 }
 
-SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetType mandatoryPetType /*= MAX_PET_TYPE*/)
+SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetType mandatoryPetType /*= MAX_PET_TYPE*/, bool checkDead /*= false*/)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT_SYNS);
     stmt->setUInt32(0, owner->GetGUID().GetCounter());
@@ -151,10 +151,17 @@ SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetT
     if (current && isTemporarySummoned)
         return SPELL_FAILED_NO_PET;
 
-    if (!savedHealth)
+    if (!checkDead)
     {
-        owner->ToPlayer()->SendTameFailure(PET_TAME_DEAD);
-        return SPELL_FAILED_TARGETS_DEAD;
+        if (!savedHealth)
+        {
+            owner->ToPlayer()->SendTameFailure(PET_TAME_DEAD);
+            return SPELL_FAILED_TARGETS_DEAD;
+        }
+    }
+    else if (savedHealth)
+    {
+        return SPELL_FAILED_TARGET_NOT_DEAD;
     }
 
     if (mandatoryPetType != MAX_PET_TYPE && petType != mandatoryPetType)
@@ -1829,7 +1836,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= nullptr*/)
     // now need only reset for offline pets (all pets except online case)
     uint32 except_petnumber = online_pet ? online_pet->GetCharmInfo()->GetPetNumber() : 0;
 
-    // xinef: zomg! sync query
+    // xinef: sync query
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET);
     stmt->setUInt32(0, owner->GetGUID().GetCounter());
     stmt->setUInt32(1, except_petnumber);
@@ -1839,7 +1846,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= nullptr*/)
     if (!resultPets)
         return;
 
-    // xinef: zomg! sync query
+    // xinef: sync query
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL_LIST);
     stmt->setUInt32(0, owner->GetGUID().GetCounter());
     stmt->setUInt32(1, except_petnumber);
@@ -2224,7 +2231,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
         if (info->m_createdBySpell)
             pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, info->m_createdBySpell);
         pet->SetCreatorGUID(player->GetGUID());
-        pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->getFaction());
+        pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->GetFaction());
 
         pet->setPowerType(POWER_MANA);
         pet->SetUInt32Value(UNIT_NPC_FLAGS, 0);
