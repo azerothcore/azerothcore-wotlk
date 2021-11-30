@@ -1452,7 +1452,9 @@ void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= 
         m_QuestStatus[questId].Status = status;
 
         if (quest->GetQuestMethod() && !quest->IsAutoComplete())
+        {
             m_QuestStatusSave[questId] = true;
+        }
     }
 
     if (update)
