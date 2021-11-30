@@ -1447,10 +1447,12 @@ bool Player::CanShareQuest(uint32 quest_id) const
 
 void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= true*/)
 {
-    if (sObjectMgr->GetQuestTemplate(questId))
+    if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         m_QuestStatus[questId].Status = status;
-        m_QuestStatusSave[questId] = true;
+
+        if (quest->GetQuestMethod() && !quest->IsAutoComplete())
+            m_QuestStatusSave[questId] = true;
     }
 
     if (update)
