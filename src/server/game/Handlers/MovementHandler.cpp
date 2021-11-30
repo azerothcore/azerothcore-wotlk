@@ -997,6 +997,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
         movementInfo.time = (uint32)movementTime;
     }
 
+    if (G3D::fuzzyEq(movementInfo.fallTime, 0.f))
+    {
+        movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FALLING);
+    }
+
     movementInfo.guid = mover->GetGUID();
     mover->m_movementInfo = movementInfo;
     mover->UpdatePosition(movementInfo.pos);
