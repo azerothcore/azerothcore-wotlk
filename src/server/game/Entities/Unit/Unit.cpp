@@ -40,6 +40,7 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "MovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
@@ -16016,6 +16017,26 @@ void Unit::StopMoving()
     init.Stop();
 }
 
+void Unit::PauseMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
+{
+    if (slot >= MAX_MOTION_SLOT)
+        return;
+
+    if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(slot))
+        movementGenerator->Pause(timer);
+
+    StopMoving();
+}
+
+void Unit::ResumeMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
+{
+    if (slot >= MAX_MOTION_SLOT)
+        return;
+
+    if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(slot))
+        movementGenerator->Resume(timer);
+}
+
 void Unit::StopMovingOnCurrentPos() // pussywizard
 {
     ClearUnitState(UNIT_STATE_MOVING);
@@ -17589,8 +17610,16 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     if (GetTypeId() == TYPEID_UNIT)
     {
+        if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE))
+        {
+            movementGenerator->Pause(0);
+        }
+
+        GetMotionMaster()->Clear(MOTION_SLOT_ACTIVE);
+
+        StopMoving();
+
         ToCreature()->AI()->OnCharmed(true);
-        GetMotionMaster()->MoveIdle();
 
         // Xinef: If creature can fly, add normal player flying flag (fixes speed)
         if (charmer->GetTypeId() == TYPEID_PLAYER && ToCreature()->CanFly())

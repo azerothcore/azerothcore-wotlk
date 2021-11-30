@@ -91,7 +91,8 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
     // Stop the npc if moving
     //if (!creature->GetTransport()) // pussywizard: reverted with new spline (old: without this check, npc would stay in place and the transport would continue moving, so the npc falls off. NPCs on transports don't have waypoints, so stopmoving is not needed)
-    creature->StopMoving();
+    if (uint32 pause = creature->GetMovementTemplate().GetInteractionPauseTimer())
+        creature->PauseMovement(pause);
 
 #ifdef ELUNA
     if (sEluna->OnGossipHello(_player, creature))

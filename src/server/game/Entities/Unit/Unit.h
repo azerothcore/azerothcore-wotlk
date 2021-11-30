@@ -2349,6 +2349,8 @@ public:
     [[nodiscard]] bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
     void StopMoving();
     void StopMovingOnCurrentPos();
+    virtual void PauseMovement(uint32 timer = 0, uint8 slot = 0); // timer in ms
+    void ResumeMovement(uint32 timer = 0, uint8 slot = 0);
 
     void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
     void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
