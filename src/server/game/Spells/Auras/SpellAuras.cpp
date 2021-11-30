@@ -894,11 +894,18 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
     Unit* caster = GetCaster();
 
     if (!caster)
+    {
         return;
+    }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
         if (AuraEffect* aurEff = m_effects[i])
+        {
             aurEff->CalculatePeriodic(caster, periodicReset, false);
+            aurEff->CalculatePeriodicData();
+        }
+    }
 }
 
 void Aura::SetCharges(uint8 charges)
