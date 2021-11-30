@@ -69,8 +69,10 @@ std::string CreatureMovementData::ToString() const
     constexpr std::array<char const*, 3> RandomStates = {"Walk", "CanRun", "AlwaysRun"};
 
     std::ostringstream str;
-    str << std::boolalpha << "Ground: " << GroundStates[AsUnderlyingType(Ground)]
-        << ", Swim: " << Swim << ", Flight: " << FlightStates[AsUnderlyingType(Flight)]
+    str << std::boolalpha
+        << "Ground: " << GroundStates[AsUnderlyingType(Ground)]
+        << ", Swim: " << Swim
+        << ", Flight: " << FlightStates[AsUnderlyingType(Flight)]
         << ", Chase: " << ChaseStates[AsUnderlyingType(Chase)]
         << ", Random: " << RandomStates[AsUnderlyingType(Random)];
     if (Rooted)

@@ -213,6 +213,12 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     init.SetWalk(walk);
     init.Launch();
 
+    ++_moveCount;
+    if (roll_chance_i((int32) _moveCount * 25 + 10))
+    {
+        _moveCount = 0;
+        _nextMoveTime.Reset(urand(4000, 8000));
+    }
     if (sWorld->getBoolConfig(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS))
         _preComputedPaths.erase(pathIdx);
 
