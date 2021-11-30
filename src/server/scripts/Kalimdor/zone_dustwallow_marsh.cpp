@@ -18,7 +18,7 @@
 /* ScriptData
 SDName: Dustwallow_Marsh
 SD%Complete: 95
-SDComment: Quest support: 11180, 11126, 11142, 11174, Vendor Nat Pagle
+SDComment: Quest support: 11180, 11126, 11174, Vendor Nat Pagle
 SDCategory: Dustwallow Marsh
 EndScriptData */
 
