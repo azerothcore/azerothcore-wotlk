@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DBCStores.h"
 #include "Group.h"
 #include "LFGMgr.h"
+#include "LFGPackets.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -43,11 +45,10 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& l
     }
 }
 
-void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
+void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
 {
     if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER | lfg::LFG_OPTION_ENABLE_SEASONAL_BOSSES))
     {
-        recvData.rfinish();
         return;
     }
 
@@ -55,44 +56,30 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     if (Group* g = GetPlayer()->GetGroup())
         if (g->isLFGGroup() && g->GetLeaderGUID() != GetPlayer()->GetGUID())
         {
-            recvData.rfinish();
             return;
         }
 
-    uint8 numDungeons;
-    uint32 roles;
-
-    recvData >> roles;
-    recvData.read_skip<uint16>();                          // uint8 (always 0) - uint8 (always 0)
-    recvData >> numDungeons;
-    if (!numDungeons)
+    if (packet.Slots.empty())
     {
         LOG_DEBUG("network", "CMSG_LFG_JOIN [%s] no dungeons selected", GetPlayer()->GetGUID().ToString().c_str());
-        recvData.rfinish();
         return;
     }
 
     lfg::LfgDungeonSet newDungeons;
-    for (int8 i = 0; i < numDungeons; ++i)
+    for (uint32 slot : packet.Slots)
     {
-        uint32 dungeon;
-        recvData >> dungeon;
-        dungeon &= 0x00FFFFFF;                             // remove the type from the dungeon entry
-        if (dungeon)
+        uint32 dungeon = slot & 0x00FFFFFF;                             // remove the type from the dungeon entry
+        if (sLFGDungeonStore.LookupEntry(dungeon))
             newDungeons.insert(dungeon);
     }
 
-    recvData.read_skip<uint32>();                          // for 0..uint8 (always 3) { uint8 (always 0) }
+    LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s roles: %u, Dungeons: " SZFMTD ", Comment: %s",
+              GetPlayerInfo().c_str(), packet.Roles, newDungeons.size(), packet.Comment.c_str());
 
-    std::string comment;
-    recvData >> comment;
-    LOG_DEBUG("network", "CMSG_LFG_JOIN [%s] roles: %u, Dungeons: %u, Comment: %s",
-        GetPlayer()->GetGUID().ToString().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
-
-    sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment);
+    sLFGMgr->JoinLfg(GetPlayer(), uint8(packet.Roles), newDungeons, packet.Comment);
 }
 
-void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)
+void WorldSession::HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& /*packet*/)
 {
     Group* group = GetPlayer()->GetGroup();
     ObjectGuid guid = GetPlayer()->GetGUID();

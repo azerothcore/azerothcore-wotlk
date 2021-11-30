@@ -71,6 +71,11 @@ namespace lfg
 
 namespace WorldPackets
 {
+    namespace LFG
+    {
+        class LFGJoin;
+        class LFGLeave;
+    }
 }
 
 enum AccountDataType
@@ -856,8 +861,8 @@ public:                                                 // opcodes handlers
     void HandleLfgSetCommentOpcode(WorldPacket& recvData);
     void HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& recvData);
     void HandleLfgPartyLockInfoRequestOpcode(WorldPacket& recvData);
-    void HandleLfgJoinOpcode(WorldPacket& recvData);
-    void HandleLfgLeaveOpcode(WorldPacket& recvData);
+    void HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& lfgJoin);
+    void HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& lfgleave);
     void HandleLfgSetRolesOpcode(WorldPacket& recvData);
     void HandleLfgProposalResultOpcode(WorldPacket& recvData);
     void HandleLfgSetBootVoteOpcode(WorldPacket& recvData);
