@@ -403,18 +403,16 @@ void Player::UpdateFFAPvPFlag(time_t currTime)
 
 void Player::UpdateDuelFlag(time_t currTime)
 {
-    if (!duel || duel->startTimer == 0 || currTime < duel->startTimer + 3)
-        return;
+    if (duel && duel->State == DUEL_STATE_COUNTDOWN && duel->StartTime <= currTime)
+    {
+        sScriptMgr->OnPlayerDuelStart(this, duel->Opponent);
 
-    sScriptMgr->OnPlayerDuelStart(this, duel->opponent);
+        SetUInt32Value(PLAYER_DUEL_TEAM, 1);
+        duel->Opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 2);
 
-    SetUInt32Value(PLAYER_DUEL_TEAM, 1);
-    duel->opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 2);
-
-    duel->startTimer = 0;
-    duel->startTime  = currTime;
-    duel->opponent->duel->startTimer = 0;
-    duel->opponent->duel->startTime  = currTime;
+        duel->State = DUEL_STATE_IN_PROGRESS;
+        duel->Opponent->duel->State = DUEL_STATE_IN_PROGRESS;
+    }
 }
 
 /*********************************************************/

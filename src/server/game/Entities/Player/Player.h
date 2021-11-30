@@ -357,16 +357,24 @@ struct PvPInfo
     time_t FFAPvPEndTimer{0};                  ///> Time when player unflags himself for FFA PvP (flag removed after 30 sec)
 };
 
+enum DuelState
+{
+    DUEL_STATE_CHALLENGED,
+    DUEL_STATE_COUNTDOWN,
+    DUEL_STATE_IN_PROGRESS,
+    DUEL_STATE_COMPLETED
+};
+
 struct DuelInfo
 {
-    DuelInfo()  {}
+    DuelInfo(Player* opponent, Player* initiator, bool isMounted) : Opponent(opponent), Initiator(initiator), IsMounted(isMounted) {}
 
-    Player* initiator{nullptr};
-    Player* opponent{nullptr};
-    time_t startTimer{0};
-    time_t startTime{0};
-    time_t outOfBound{0};
-    bool isMounted{false};
+    Player* const Opponent;
+    Player* const Initiator;
+    bool const IsMounted;
+    DuelState State = DUEL_STATE_CHALLENGED;
+    time_t StartTime = 0;
+    time_t OutOfBoundsTime = 0;
 };
 
 struct Areas
@@ -1814,7 +1822,7 @@ public:
     }
 
     /** todo: -maybe move UpdateDuelFlag+DuelComplete to independent DuelHandler.. **/
-    DuelInfo* duel;
+    std::unique_ptr<DuelInfo> duel;
     void UpdateDuelFlag(time_t currTime);
     void CheckDuelDistance(time_t currTime);
     void DuelComplete(DuelCompleteType type);
