@@ -19,6 +19,7 @@
     \ingroup u2w
 */
 
+#include "WorldSession.h"
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"
 #include "Common.h"
@@ -48,7 +49,6 @@
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include "WorldSocket.h"
 #include <zlib.h>
 

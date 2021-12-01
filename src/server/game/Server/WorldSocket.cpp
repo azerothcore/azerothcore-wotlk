@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WorldSocket.h"
 #include "AccountMgr.h"
 #include "BigNumber.h"
 #include "Config.h"
@@ -30,7 +31,6 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
-#include "WorldSocket.h"
 #include <memory>
 
 using boost::asio::ip::tcp;

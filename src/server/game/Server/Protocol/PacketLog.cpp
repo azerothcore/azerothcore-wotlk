@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PacketLog.h"
 #include "Config.h"
 #include "GameTime.h"
 #include "IpAddress.h"
-#include "PacketLog.h"
 #include "Timer.h"
 #include "WorldPacket.h"
 

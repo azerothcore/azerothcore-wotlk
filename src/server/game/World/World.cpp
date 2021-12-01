@@ -77,6 +77,7 @@
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
+#include "UpdateTime.h"
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
@@ -88,7 +89,6 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "UpdateTime.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 

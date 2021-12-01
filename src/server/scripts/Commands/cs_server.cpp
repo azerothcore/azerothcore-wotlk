@@ -33,9 +33,9 @@
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "StringConvert.h"
+#include "UpdateTime.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
-#include "UpdateTime.h"
 #include <boost/version.hpp>
 #include <filesystem>
 #include <numeric>

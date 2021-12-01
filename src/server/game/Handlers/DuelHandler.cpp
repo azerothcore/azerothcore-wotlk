@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Log.h"
 #include "GameTime.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "UpdateData.h"
