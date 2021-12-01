@@ -15,18 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WardenWin.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoRandom.h"
 #include "GameTime.h"
 #include "HMAC.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SessionKeyGenerator.h"
 #include "Util.h"
 #include "WardenCheckMgr.h"
 #include "WardenModuleWin.h"
-#include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

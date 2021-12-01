@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Chat.h"
@@ -27,11 +28,11 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
-#include "Map.h"
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
+#include "ObjectGridLoader.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
@@ -69,7 +70,7 @@ Map::~Map()
     {
         WorldObject* obj = *i_worldObjects.begin();
         ASSERT(obj->IsWorldObject());
-        LOG_ERROR("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
+        LOG_DEBUG("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
         //ASSERT(obj->GetTypeId() == TYPEID_CORPSE);
         obj->RemoveFromWorld();
         obj->ResetMap();
@@ -534,13 +535,13 @@ void Map::InitializeObject(T* /*obj*/)
 template<>
 void Map::InitializeObject(Creature*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<>
 void Map::InitializeObject(GameObject*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<class T>

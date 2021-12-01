@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Corpse.h"
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "Log.h"
 #include "GameTime.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"

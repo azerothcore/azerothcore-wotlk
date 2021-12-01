@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Transport.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Common.h"
@@ -27,7 +28,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
-#include "Transport.h"
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldModel.h"

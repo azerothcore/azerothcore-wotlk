@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "BattlegroundMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundAB.h"
@@ -23,7 +24,6 @@
 #include "BattlegroundDS.h"
 #include "BattlegroundEY.h"
 #include "BattlegroundIC.h"
-#include "BattlegroundMgr.h"
 #include "BattlegroundNA.h"
 #include "BattlegroundQueue.h"
 #include "BattlegroundRL.h"

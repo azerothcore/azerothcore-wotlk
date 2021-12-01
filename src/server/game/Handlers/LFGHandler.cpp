@@ -205,9 +205,10 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
 
         if (quest)
         {
+            uint8 playerLevel = GetPlayer() ? GetPlayer()->getLevel() : 0;
             data << uint8(done);
-            data << uint32(quest->GetRewOrReqMoney(GetPlayer()));
-            data << uint32(quest->XPValue(GetPlayer()));
+            data << uint32(quest->GetRewOrReqMoney(playerLevel));
+            data << uint32(quest->XPValue(playerLevel));
             data << uint32(0);
             data << uint32(0);
             data << uint8(quest->GetRewItemsCount());
@@ -492,13 +493,15 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
 
     uint8 itemNum = rewardData.quest->GetRewItemsCount();
 
+    uint8 playerLevel = GetPlayer() ? GetPlayer()->getLevel() : 0;
+
     WorldPacket data(SMSG_LFG_PLAYER_REWARD, 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4 + 1 + itemNum * (4 + 4 + 4));
     data << uint32(rewardData.rdungeonEntry);              // Random Dungeon Finished
     data << uint32(rewardData.sdungeonEntry);              // Dungeon Finished
     data << uint8(rewardData.done);
     data << uint32(1);
-    data << uint32(rewardData.quest->GetRewOrReqMoney(GetPlayer()));
-    data << uint32(rewardData.quest->XPValue(GetPlayer()));
+    data << uint32(rewardData.quest->GetRewOrReqMoney(playerLevel));
+    data << uint32(rewardData.quest->XPValue(playerLevel));
     data << uint32(0);
     data << uint32(0);
     data << uint8(itemNum);

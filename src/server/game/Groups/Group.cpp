@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
-#include "Group.h"
 #include "GroupMgr.h"
 #include "InstanceSaveMgr.h"
 #include "LFG.h"

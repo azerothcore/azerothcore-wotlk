@@ -19,11 +19,11 @@
     \ingroup world
 */
 
+#include "Weather.h"
 #include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Util.h"
-#include "Weather.h"
 #include "World.h"
 #include "WorldPacket.h"
 

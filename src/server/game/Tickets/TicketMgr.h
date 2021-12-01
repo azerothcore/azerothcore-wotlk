@@ -18,6 +18,7 @@
 #ifndef _TICKETMGR_H
 #define _TICKETMGR_H
 
+#include "CharacterCache.h"
 #include "ObjectMgr.h"
 #include <string>
 

@@ -25,6 +25,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+constexpr Milliseconds BG_SA_BOAT_START    = 1min;
+constexpr Milliseconds BG_SA_WARMUPLENGTH  = 2min;
+constexpr Milliseconds BG_SA_ROUNDLENGTH   = 10min;
+
 BattlegroundSA::BattlegroundSA()
 {
     StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_SA_START_TWO_MINUTES;
@@ -39,8 +43,8 @@ BattlegroundSA::BattlegroundSA()
     SignaledRoundTwoHalfMin = false;
     InitSecondRound = false;
     Attackers = TEAM_ALLIANCE;
-    TotalTime = 0;
-    EndRoundTimer = 0;
+    TotalTime = 0s;
+    EndRoundTimer = 0s;
     ShipsStarted = false;
     Status = BG_SA_NOTSTARTED;
 
@@ -50,7 +54,7 @@ BattlegroundSA::BattlegroundSA()
     for (uint8 i = 0; i < 2; i++)
     {
         RoundScores[i].winner = TEAM_ALLIANCE;
-        RoundScores[i].time = 0;
+        RoundScores[i].time = 0s;
     }
 
     //! This is here to prevent an uninitialised variable warning
@@ -67,7 +71,7 @@ void BattlegroundSA::Init()
 {
     Battleground::Init();
 
-    TotalTime = 0;
+    TotalTime = 0s;
     Attackers = ((urand(0, 1)) ? TEAM_ALLIANCE : TEAM_HORDE);
     for (uint8 i = 0; i <= 5; i++)
         GateStatus[i] = BG_SA_GATE_OK;
@@ -170,7 +174,7 @@ bool BattlegroundSA::ResetObjs()
     GetBGObject(BG_SA_TITAN_RELIC)->SetUInt32Value(GAMEOBJECT_FACTION, atF);
     GetBGObject(BG_SA_TITAN_RELIC)->Refresh();
 
-    TotalTime = 0;
+    TotalTime = 0s;
     ShipsStarted = false;
 
     //Graveyards!
@@ -323,14 +327,14 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
             return;
         }
     }
-    TotalTime += diff;
+    TotalTime += Milliseconds(diff);
 
     if (Status == BG_SA_WARMUP)
     {
         EndRoundTimer = BG_SA_ROUNDLENGTH;
         if (TotalTime >= BG_SA_WARMUPLENGTH)
         {
-            TotalTime = 0;
+            TotalTime = 0s;
             ToggleTimer();
             DemolisherStartState(false);
             Status = BG_SA_ROUND_ONE;
@@ -347,10 +351,10 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
         else
             EndRoundTimer = BG_SA_ROUNDLENGTH;
 
-        if (TotalTime >= 60000)
+        if (TotalTime >= 1min)
         {
             SendWarningToAll(LANG_BG_SA_HAS_BEGUN);
-            TotalTime = 0;
+            TotalTime = 0s;
             ToggleTimer();
             DemolisherStartState(false);
             Status = BG_SA_ROUND_TWO;
@@ -361,7 +365,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
                 itr->second->RemoveAurasDueToSpell(SPELL_PREPARATION);
         }
-        if (TotalTime >= 30000)
+        if (TotalTime >= 30s)
         {
             if (!SignaledRoundTwoHalfMin)
             {
@@ -401,7 +405,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
                 _relicClicked = false;
                 Attackers = (Attackers == TEAM_ALLIANCE) ? TEAM_HORDE : TEAM_ALLIANCE;
                 Status = BG_SA_SECOND_WARMUP;
-                TotalTime = 0;
+                TotalTime = 0s;
                 ToggleTimer();
                 SendWarningToAll(LANG_BG_SA_ROUND_ONE_END);
                 UpdateWaitTimer = 5000;
@@ -677,7 +681,7 @@ void BattlegroundSA::HandleKillUnit(Creature* creature, Player* killer)
 }
 
 /*
-  You may ask what the fuck does it do?
+  You may ask what does it do?
   Prevents owner overwriting guns faction with own.
  */
 void BattlegroundSA::OverrideGunFaction()
@@ -819,10 +823,10 @@ GraveyardStruct const* BattlegroundSA::GetClosestGraveyard(Player* player)
 
 void BattlegroundSA::SendTime()
 {
-    uint32 end_of_round = (EndRoundTimer - TotalTime);
-    UpdateWorldState(BG_SA_TIMER_MINS, end_of_round / 60000);
-    UpdateWorldState(BG_SA_TIMER_SEC_TENS, (end_of_round % 60000) / 10000);
-    UpdateWorldState(BG_SA_TIMER_SEC_DECS, ((end_of_round % 60000) % 10000) / 1000);
+    Milliseconds end_of_round = (EndRoundTimer - TotalTime);
+    UpdateWorldState(BG_SA_TIMER_MINS, end_of_round / 1min);
+    UpdateWorldState(BG_SA_TIMER_SEC_TENS, (end_of_round % 1min) / 10s);
+    UpdateWorldState(BG_SA_TIMER_SEC_DECS, ((end_of_round % 1min) % 10s) / 1s);
 }
 
 bool BattlegroundSA::CanInteractWithObject(uint32 objectId)

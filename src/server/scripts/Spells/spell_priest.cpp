@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 enum PriestSpells
@@ -806,6 +807,33 @@ class spell_pri_vampiric_touch : public AuraScript
     }
 };
 
+// 605 - Mind Control
+class spell_pri_mind_control : public SpellScript
+{
+    PrepareSpellScript(spell_pri_mind_control);
+
+    void OnHit()
+    {
+        if (Aura const* aura = GetHitAura())
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    uint32 duration = static_cast<uint32>(aura->GetMaxDuration());
+                    caster->SetInCombatWith(target, duration);
+                    target->SetInCombatWith(caster, duration);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_pri_mind_control::OnHit);
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
@@ -827,4 +855,5 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_renew);
     RegisterSpellScript(spell_pri_shadow_word_death);
     RegisterSpellScript(spell_pri_vampiric_touch);
+    RegisterSpellScript(spell_pri_mind_control);
 }

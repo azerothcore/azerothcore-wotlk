@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LFGMgr.h"
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DBCStores.h"
@@ -23,8 +24,8 @@
 #include "GameTime.h"
 #include "Group.h"
 #include "GroupMgr.h"
+#include "InstanceSaveMgr.h"
 #include "LFGGroupData.h"
-#include "LFGMgr.h"
 #include "LFGPlayerData.h"
 #include "LFGQueue.h"
 #include "LFGScripts.h"
@@ -1698,7 +1699,7 @@ namespace lfg
         {
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
-                if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
+                if (player->GetGroup() != grp) // pussywizard: could not add because group was full
                     continue;
 
                 // Add the cooldown spell if queued for a random dungeon
@@ -2235,7 +2236,7 @@ namespace lfg
 
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             else
             {
                 done = true;
@@ -2243,7 +2244,7 @@ namespace lfg
                 if (!quest)
                     continue;
                 // we give reward without informing client (retail does this)
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             }
 
             // Give rewards

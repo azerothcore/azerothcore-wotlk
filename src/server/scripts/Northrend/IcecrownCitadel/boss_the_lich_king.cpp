@@ -371,7 +371,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
                     player->GetSession()->SendPacket(data);
 }
 
-struct ShadowTrapLKTargetSelector : public Acore::unary_function<Unit*, bool>
+struct ShadowTrapLKTargetSelector
 {
 public:
     ShadowTrapLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist) { }
@@ -397,7 +397,7 @@ private:
     float _maxDist;
 };
 
-struct NonTankLKTargetSelector : public Acore::unary_function<Unit*, bool>
+struct NonTankLKTargetSelector
 {
 public:
     NonTankLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f, uint32 exclude1 = 0, uint32 exclude2 = 0) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist), _exclude1(exclude1), _exclude2(exclude2) { }
@@ -431,7 +431,7 @@ private:
     uint32 _exclude2;
 };
 
-struct DefileTargetSelector : public Acore::unary_function<Unit*, bool>
+struct DefileTargetSelector
 {
 public:
     DefileTargetSelector(Creature* source) : _source(source) { }
@@ -588,7 +588,7 @@ private:
     Creature& _owner;
 };
 
-class NecroticPlagueTargetCheck : public Acore::unary_function<Unit*, bool>
+class NecroticPlagueTargetCheck
 {
 public:
     NecroticPlagueTargetCheck(Unit const* obj, uint32 notAura1, uint32 notAura2) : _sourceObj(obj), _notAura1(notAura1), _notAura2(notAura2) {}
@@ -936,7 +936,7 @@ public:
                     Talk(SAY_LK_REMORSELESS_WINTER);
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_1, false);
-                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, bullshit, 15mins on movies
+                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15mins on movies
                     events.ScheduleEvent(EVENT_QUAKE, 62500);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8000, EVENT_GROUP_ABILITIES);
@@ -948,7 +948,7 @@ public:
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_2, false);
                     summons.DespawnEntry(NPC_VALKYR_SHADOWGUARD);
-                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, bullshit, 15 mins on movies
+                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15 mins on movies
                     events.ScheduleEvent(EVENT_QUAKE_2, 62500);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8000, EVENT_GROUP_ABILITIES);

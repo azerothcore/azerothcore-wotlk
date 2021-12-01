@@ -39,6 +39,7 @@
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "Unit.h"
 #include "Vehicle.h"
 #include <array>
 
@@ -744,11 +745,16 @@ class spell_gen_proc_once_per_cast : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (Player* player = eventInfo.GetActor()->ToPlayer())
+        if (eventInfo.GetActor())
         {
-            if (player->m_spellModTakingSpell == _spellPointer)
-                return false;
-            _spellPointer = player->m_spellModTakingSpell;
+            if (Player* player = eventInfo.GetActor()->ToPlayer())
+            {
+                if (player->m_spellModTakingSpell == _spellPointer)
+                {
+                    return false;
+                }
+                _spellPointer = player->m_spellModTakingSpell;
+            }
         }
         return true;
     }
@@ -2615,6 +2621,30 @@ class spell_gen_gnomish_transporter : public SpellScript
     }
 };
 
+// 69641 - Gryphon/Wyvern Pet - Mounting Check Aura
+class spell_gen_gryphon_wyvern_mount_check : public AuraScript
+{
+    PrepareAuraScript(spell_gen_gryphon_wyvern_mount_check);
+
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        Unit* owner = target->GetOwner();
+
+        if (!owner)
+        {
+            return;
+        }
+
+        target->SetDisableGravity(owner->IsMounted());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_gryphon_wyvern_mount_check::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 enum DalaranDisguiseSpells
 {
     SPELL_SUNREAVER_DISGUISE_TRIGGER       = 69672,
@@ -4415,6 +4445,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_spirit_healer_res);
     RegisterSpellScript(spell_gen_gadgetzan_transporter_backfire);
     RegisterSpellScript(spell_gen_gnomish_transporter);
+    RegisterSpellScript(spell_gen_gryphon_wyvern_mount_check);
     RegisterSpellScriptWithArgs(spell_gen_dalaran_disguise, "spell_gen_sunreaver_disguise");
     RegisterSpellScriptWithArgs(spell_gen_dalaran_disguise, "spell_gen_silver_covenant_disguise");
     RegisterSpellScript(spell_gen_elune_candle);
