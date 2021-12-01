@@ -756,7 +756,7 @@ public:
     virtual void OnGameObjectStateChanged(GameObject* /*go*/, uint32 /*state*/) { }
 
     // Called when a GameObjectAI object is needed for the gameobject.
-    virtual GameObjectAI* GetAI(GameObject* /*go*/) const { return nullptr; }    
+    virtual GameObjectAI* GetAI(GameObject* /*go*/) const { return nullptr; }
 };
 
 class AreaTriggerScript : public ScriptObject
