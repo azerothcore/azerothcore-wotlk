@@ -37,6 +37,7 @@
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
 #include "WeatherMgr.h"
+#include "WorldStatePackets.h"
 
 // Zone Interval should be 1 second
 constexpr auto ZONE_UPDATE_INTERVAL = 1000;
@@ -2266,12 +2267,12 @@ void Player::UpdateSpecCount(uint8 count)
     SendTalentsInfoData(false);
 }
 
-void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
+void Player::SendUpdateWorldState(uint32 variable, uint32 value) const
 {
-    WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-    data << Field;
-    data << Value;
-    GetSession()->SendPacket(&data);
+    WorldPackets::WorldState::UpdateWorldState worldstate;
+    worldstate.VariableID = variable;
+    worldstate.Value = value;
+    SendDirectMessage(worldstate.Write());
 }
 
 void Player::ProcessTerrainStatusUpdate()

@@ -538,9 +538,9 @@ public:
     virtual void SendWorldText(uint32 string_id, ...) = 0;
     virtual void SendGlobalText(const char* text, WorldSession* self) = 0;
     virtual void SendGMText(uint32 string_id, ...) = 0;
-    virtual void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr) = 0;
     virtual bool IsShuttingDown() const = 0;

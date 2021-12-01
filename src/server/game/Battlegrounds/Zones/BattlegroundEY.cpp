@@ -135,14 +135,14 @@ void BattlegroundEY::UpdatePointsState()
     const BattlegroundPlayerMap& bgPlayerMap = GetPlayers();
     for (BattlegroundPlayerMap::const_iterator itr = bgPlayerMap.begin(); itr != bgPlayerMap.end(); ++itr)
     {
-        UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW, itr->second);
+        itr->second->SendUpdateWorldState(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW);
         for (uint8 point = 0; point < EY_POINTS_MAX; ++point)
             if (GameObject* pointObject = pointsVec[point])
                 if (itr->second->CanCaptureTowerPoint() && itr->second->IsWithinDistInMap(pointObject, BG_EY_POINT_RADIUS))
                 {
-                    UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_SHOW, itr->second);
-                    UpdateWorldStateForPlayer(PROGRESS_BAR_PERCENT_GREY, BG_EY_PROGRESS_BAR_PERCENT_GREY, itr->second);
-                    UpdateWorldStateForPlayer(PROGRESS_BAR_STATUS, _capturePointInfo[point]._barStatus, itr->second);
+                    itr->second->SendUpdateWorldState(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_SHOW);
+                    itr->second->SendUpdateWorldState(PROGRESS_BAR_PERCENT_GREY, BG_EY_PROGRESS_BAR_PERCENT_GREY);
+                    itr->second->SendUpdateWorldState(PROGRESS_BAR_STATUS, _capturePointInfo[point]._barStatus);
                     ++_capturePointInfo[point]._playersCount[itr->second->GetTeamId()];
 
                     // Xinef: ugly hax... area trigger is no longer called by client...
