@@ -101,7 +101,7 @@ TEST(FormulasTest, BaseGain)
 
 TEST(FormulasTest, Gain)
 {
-    auto world  Mock = new WorldMock();
+    auto worldMock = new WorldMock();
     sWorld.reset((worldMock));
     // TODO: create mocks of Player and Creature
     // Gain(nullptr, nullptr);
