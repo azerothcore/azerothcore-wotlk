@@ -18,7 +18,6 @@
 #include "AuctionHouseMgr.h"
 #include "AccountMgr.h"
 #include "AsyncAuctionListing.h"
-#include "AvgDiffTracker.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
