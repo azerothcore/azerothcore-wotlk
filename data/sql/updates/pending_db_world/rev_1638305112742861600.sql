@@ -155,6 +155,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 
 SET @FREE_GAMEOBJECT_ENTRY = 9666;
 
+DELETE FROM `gameobject` WHERE (`position_x` >=-4312.458984 AND `position_x` <=1515.065918) AND (`position_y` >=-3850.516113 AND `position_y` <=-1095.623169) AND (`id` = 3764 OR `id` = 103711 OR `id` = 105569 OR `id` = 1733 OR `id` = 1732) AND (`guid` > 10000) AND `map` = 1;
 DELETE FROM `gameobject` WHERE `zoneId` = 17 AND (`id` = 3764 OR `id` = 103711 OR `id` = 105569 OR `id` = 1733 OR `id` = 1732) OR (`guid` IN (120288, 120636, 120592));
 DELETE FROM `gameobject` WHERE `id` >= @FREE_GAMEOBJECT_ENTRY AND `id` <= @FREE_GAMEOBJECT_ENTRY + 98;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `state`) VALUES 
