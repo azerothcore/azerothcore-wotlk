@@ -3235,7 +3235,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
             for (Unit::AuraApplicationMap::iterator i = myAuras.begin(); i != myAuras.end();)
             {
                 Aura const* aura = i->second->GetBase();
-                if (!aura->IsPassive() && aura->CanBeSentToClient())
+                if (!aura->IsPassive() && !OldSummon->IsPetAura(aura) && aura->CanBeSentToClient())
                     OldSummon->RemoveAura(i);
                 else
                     ++i;
