@@ -538,6 +538,147 @@ public:
 
     // Called from End of Creature SelectLevel.
     virtual void Creature_SelectLevel(const CreatureTemplate* /*cinfo*/, Creature* /*creature*/) { }
+
+    /**
+     * @brief This hook runs after add creature in world
+     *
+     * @param creature Contains information about the Creature
+     */
+    virtual void OnCreatureAddWorld(Creature* /*creature*/) { }
+
+    /**
+     * @brief This hook runs after remove creature in world
+     *
+     * @param creature Contains information about the Creature
+     */
+    virtual void OnCreatureRemoveWorld(Creature* /*creature*/) { }
+
+    /**
+     * @brief This hook called when a player opens a gossip dialog with the creature.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the Creature
+     *
+     * @return False if you want to continue, true if you want to disable
+     */
+    [[nodiscard]] virtual bool CanCreatureGossipHello(Player* /*player*/, Creature* /*creature*/) { return false; }
+
+    /**
+     * @brief This hook called when a player selects a gossip item in the creature's gossip menu.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the Creature
+     * @param sender Contains information about the sender type
+     * @param action Contains information about the action id
+     *
+     * @return False if you want to continue, true if you want to disable
+     */
+    [[nodiscard]] virtual bool CanCreatureGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
+
+    /**
+     * @brief This hook called when a player selects a gossip with a code in the creature's gossip menu.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the Creature
+     * @param sender Contains information about the sender type
+     * @param action Contains information about the action id
+     * @param code Contains information about the code entered
+     *
+     * @return True if you want to continue, false if you want to disable
+     */
+    [[nodiscard]] virtual bool CanCreatureGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+
+    // Called when a player accepts a quest from the creature.
+    [[nodiscard]] virtual bool CanCreatureQuestAccept(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
+
+    // Called when a player selects a quest reward.
+    [[nodiscard]] virtual bool CanCreatureQuestReward(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
+
+    // Called when a CreatureAI object is needed for the creature.
+    [[nodiscard]] virtual CreatureAI* GetCreatureAI(Creature* /*creature*/) const { return nullptr; }
+};
+
+class AllItemScript : public ScriptObject
+{
+protected:
+    AllItemScript(const char* name);
+
+public:
+    // Called when a player accepts a quest from the item.
+    [[nodiscard]] virtual bool CanItemQuestAccept(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/) { return true; }
+
+    // Called when a player uses the item.
+    [[nodiscard]] virtual bool CanItemUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
+
+    // Called when the item is destroyed.
+    [[nodiscard]] virtual bool CanItemRemove(Player* /*player*/, Item* /*item*/) { return true; }
+
+    // Called when the item expires (is destroyed).
+    [[nodiscard]] virtual bool CanItemExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return true; }
+
+    // Called when a player selects an option in an item gossip window
+    virtual void OnItemGossipSelect(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
+
+    // Called when a player selects an option in an item gossip window
+    virtual void OnItemGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+};
+
+class AllGameObjectScript : public ScriptObject
+{
+protected:
+    AllGameObjectScript(const char* name);
+
+public:
+    /**
+     * @brief This hook runs after add game object in world
+     *
+     * @param go Contains information about the GameObject
+     */
+    virtual void OnGameObjectAddWorld(GameObject* /*go*/) { }
+
+    /**
+     * @brief This hook runs after remove game object in world
+     *
+     * @param go Contains information about the GameObject
+     */
+    virtual void OnGameObjectRemoveWorld(GameObject* /*go*/) { }
+
+    /**
+     * @brief This hook runs after remove game object in world
+     *
+     * @param go Contains information about the GameObject
+     */
+    virtual void OnGameObjectUpdate(GameObject* /*go*/, uint32 /*diff*/) { }
+
+    // Called when a player opens a gossip dialog with the gameobject.
+    [[nodiscard]] virtual bool CanGameObjectGossipHello(Player* /*player*/, GameObject* /*go*/) { return false; }
+
+    // Called when a player selects a gossip item in the gameobject's gossip menu.
+    [[nodiscard]] virtual bool CanGameObjectGossipSelect(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
+
+    // Called when a player selects a gossip with a code in the gameobject's gossip menu.
+    [[nodiscard]] virtual bool CanGameObjectGossipSelectCode(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+
+    // Called when a player accepts a quest from the gameobject.
+    [[nodiscard]] virtual bool CanGameObjectQuestAccept(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/) { return false; }
+
+    // Called when a player selects a quest reward.
+    [[nodiscard]] virtual bool CanGameObjectQuestReward(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
+
+    // Called when the game object is destroyed (destructible buildings only).
+    virtual void OnGameObjectDestroyed(GameObject* /*go*/, Player* /*player*/) { }
+
+    // Called when the game object is damaged (destructible buildings only).
+    virtual void OnGameObjectDamaged(GameObject* /*go*/, Player* /*player*/) { }
+
+    // Called when the game object loot state is changed.
+    virtual void OnGameObjectLootStateChanged(GameObject* /*go*/, uint32 /*state*/, Unit* /*unit*/) { }
+
+    // Called when the game object state is changed.
+    virtual void OnGameObjectStateChanged(GameObject* /*go*/, uint32 /*state*/) { }
+
+    // Called when a GameObjectAI object is needed for the gameobject.
+    virtual GameObjectAI* GetGameObjectAI(GameObject* /*go*/) const { return nullptr; }
 };
 
 class CreatureScript : public ScriptObject, public UpdatableScript<Creature>
@@ -574,20 +715,6 @@ public:
 
     // Called when a CreatureAI object is needed for the creature.
     virtual CreatureAI* GetAI(Creature* /*creature*/) const { return nullptr; }
-
-    /**
-     * @brief This hook runs after add creature in world
-     *
-     * @param creature Contains information about the Creature
-     */
-    virtual void OnCreatureAddWorld(Creature* /*creature*/) { }
-
-    /**
-     * @brief This hook runs after remove creature in world
-     *
-     * @param creature Contains information about the Creature
-     */
-    virtual void OnCreatureRemoveWorld(Creature* /*creature*/) { }
 };
 
 class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
@@ -629,21 +756,7 @@ public:
     virtual void OnGameObjectStateChanged(GameObject* /*go*/, uint32 /*state*/) { }
 
     // Called when a GameObjectAI object is needed for the gameobject.
-    virtual GameObjectAI* GetAI(GameObject* /*go*/) const { return nullptr; }
-
-    /**
-     * @brief This hook runs after add game object in world
-     *
-     * @param go Contains information about the GameObject
-     */
-    virtual void OnGameObjectAddWorld(GameObject* /*go*/) { }
-
-    /**
-     * @brief This hook runs after remove game object in world
-     *
-     * @param go Contains information about the GameObject
-     */
-    virtual void OnGameObjectRemoveWorld(GameObject* /*go*/) { }
+    virtual GameObjectAI* GetAI(GameObject* /*go*/) const { return nullptr; }    
 };
 
 class AreaTriggerScript : public ScriptObject
@@ -1826,43 +1939,17 @@ protected:
     ElunaScript(const char* name);
 
 public:
-
-    bool IsDatabaseBound() const { return false; }
-
     /**
-     * @brief This hook called when a player opens a gossip dialog with the creature.
+     * @brief This hook called when the weather changes in the zone this script is associated with.
      *
-     * @param player Contains information about the Player
-     * @param creature Contains information about the Creature
-     *
-     * @return False if you want to continue, true if you want to disable
+     * @param weather Contains information about the Weather
+     * @param state Contains information about the WeatherState
+     * @param grade Contains information about the grade
      */
-    [[nodiscard]] virtual bool OnGossipHello(Player* /*player*/, Creature* /*creature*/) { return false; }
+    virtual void OnWeatherChange(Weather* /*weather*/, WeatherState /*state*/, float /*grade*/) { }
 
-    /**
-     * @brief This hook called when a player selects a gossip item in the creature's gossip menu.
-     *
-     * @param player Contains information about the Player
-     * @param creature Contains information about the Creature
-     * @param sender Contains information about the sender type
-     * @param action Contains information about the action id
-     *
-     * @return False if you want to continue, true if you want to disable
-     */
-    [[nodiscard]] virtual bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
-
-    /**
-     * @brief This hook called when a player selects a gossip with a code in the creature's gossip menu.
-     *
-     * @param player Contains information about the Player
-     * @param creature Contains information about the Creature
-     * @param sender Contains information about the sender type
-     * @param action Contains information about the action id
-     * @param code Contains information about the code entered
-     *
-     * @return True if you want to continue, false if you want to disable
-     */
-    [[nodiscard]] virtual bool OnGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+    // Called when the area trigger is activated by a player.
+    [[nodiscard]] virtual bool CanAreaTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
 // Manages registration, loading, and execution of scripts.
