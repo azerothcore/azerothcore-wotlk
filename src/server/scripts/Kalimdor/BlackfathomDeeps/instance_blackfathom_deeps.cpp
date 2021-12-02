@@ -52,8 +52,13 @@ public:
                                      unit->GetEntry() == NPC_MURKSHALLOW_SOFTSHELL || unit->GetEntry() == NPC_AKU_MAI_SNAPJAW))
             {
                 if (--_requiredDeaths == 0)
-                    if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
+                {
+                    if (IsFireEncounterDone())
+                    {
                         HandleGameObject(_akumaiPortalGUID, true);
+                        SetBossState(TYPE_AKU_MAI_EVENT, DONE);
+                    }
+                }
             }
         }
 
@@ -80,7 +85,7 @@ public:
                         gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_AKU_MAI_DOOR:
-                    if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
+                    if (IsFireEncounterDone() && GetBossState(TYPE_AKU_MAI_EVENT) == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     _akumaiPortalGUID = gameobject->GetGUID();
                     break;
@@ -129,6 +134,11 @@ public:
                         _encounters[i] = NOT_STARTED;
                 }
             }
+        }
+
+        bool IsFireEncounterDone()
+        {
+            return _encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE;
         }
 
     private:
