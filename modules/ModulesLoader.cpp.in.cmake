@@ -24,39 +24,37 @@
 #include <vector>
 #include <string>
 
-// Add default scripts include
+// Add deprecated api loaders include
+@AC_SCRIPTS_INCLUDES@
+// Includes list
 @ACORE_SCRIPTS_FORWARD_DECL@
 #ifdef ACORE_IS_DYNAMIC_SCRIPTLOADER
 #  include "revision.h"
-#  define AC_SCRIPT_API AC_API_EXPORT
+#  define AC_MODULES_API AC_API_EXPORT
 extern "C" {
-
-/// Exposed in script modules to return the script module revision hash.
-AC_SCRIPT_API char const* GetScriptModuleRevisionHash()
-{
-    return _HASH;
-}
 
 /// Exposed in script module to return the name of the script module
 /// contained in this shared library.
-AC_SCRIPT_API char const* GetScriptModule()
+AC_MODULES_API char const* GetScriptModule()
 {
     return "@ACORE_CURRENT_SCRIPT_PROJECT@";
 }
 
 #else
-#  include "ScriptLoader.h"
-#  define AC_SCRIPT_API
+#  include "ModulesScriptLoader.h"
+#  define AC_MODULES_API
 #endif
 
 /// Exposed in script modules to register all scripts to the ScriptMgr.
-AC_SCRIPT_API void AddScripts()
+AC_MODULES_API void AddModulesScripts()
 {
-    // Default scripts
-@ACORE_SCRIPTS_INVOKE@}
+    // Modules
+@ACORE_SCRIPTS_INVOKE@
+    // Deprecated api modules
+@AC_SCRIPTS_LIST@}
 
 /// Exposed in script modules to get the build directive of the module.
-AC_SCRIPT_API char const* GetBuildDirective()
+AC_MODULES_API char const* GetModulesBuildDirective()
 {
     return _BUILD_DIRECTIVE;
 }
