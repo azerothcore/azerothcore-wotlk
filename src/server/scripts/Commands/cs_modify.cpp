@@ -801,11 +801,11 @@ public:
 
         char const* delim = " ";
         char* next_token = nullptr;
-        char* token = strtok_s(const_cast<char*>(args), delim, &next_token);
+        char* token = strtok_r(const_cast<char*>(args), delim, &next_token);
         int count = 0;
         while (token)
         {
-            token = strtok_s(NULL, delim, &next_token);
+            token = strtok_r(NULL, delim, &next_token);
             count++;
             if (token)
             {
