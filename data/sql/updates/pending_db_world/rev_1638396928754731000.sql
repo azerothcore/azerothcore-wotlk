@@ -93,7 +93,7 @@ SET @FREE_GAMEOBJECT = 9765;
 
 -- 43 Gameobjects
 DELETE FROM `gameobject` WHERE (`zoneId` = 4) AND (`id` IN (2040, 2047, 1734, 150079, 150082, 324));
-DELETE FROM `gameobject` WHERE `guid` >= @FREE_GAMEOBJECT_ENTRY AND `guid` <= @FREE_GAMEOBJECT_ENTRY + 43;
+DELETE FROM `gameobject` WHERE `guid` >= @FREE_GAMEOBJECT AND `guid` <= @FREE_GAMEOBJECT + 43;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`,`position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `state`) VALUES 
 (@FREE_GAMEOBJECT := @FREE_GAMEOBJECT + 0, 2040, 0, 4, -11542.7, -2919.17, 14.5303, 4.11898, 0, 0, -0.882947, 0.469473, 1800, 1),
 (@FREE_GAMEOBJECT := @FREE_GAMEOBJECT + 1, 2047, 0, 4, -11542.7, -2919.17, 14.5303, 4.11898, 0, 0, -0.882947, 0.469473, 2700, 1),
