@@ -28,7 +28,6 @@ void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
 void AddSC_chat_log(); // location: scripts\World\chat_log.cpp
-void AddSC_character_creation();
 void AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
 void AddSC_player_scripts();
 void AddSC_npc_stave_of_ancients();
@@ -49,7 +48,6 @@ void AddWorldScripts()
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
     AddSC_chat_log(); // location: scripts\World\chat_log.cpp
-    AddSC_character_creation();
     AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
     AddSC_player_scripts();
     AddSC_npc_stave_of_ancients();
