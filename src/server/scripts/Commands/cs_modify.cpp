@@ -527,6 +527,42 @@ public:
         return true;
     }
 
+    static bool CheckModifySpeedFloat(ChatHandler* handler, float& speed, Unit* target, float minimumBound, float maximumBound, bool checkInFlight = true)
+    {
+
+        if (speed > maximumBound || speed < minimumBound)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (Player* player = target->ToPlayer())
+        {
+            // check online security
+            if (handler->HasLowerSecurity(player, ObjectGuid::Empty))
+            {
+                return false;
+            }
+
+            if (player->IsInFlight() && checkInFlight)
+            {
+                handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player).c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     //Edit Player Aspeed
     static bool HandleModifyASpeedCommand(ChatHandler* handler, const char* args)
     {
@@ -802,20 +838,31 @@ public:
             return false;
         }
 
-        char const* mount_cstr = strtok(const_cast<char*>(args), " ");
-        char const* speed_cstr = strtok(nullptr, " ");
+        uint32 mount = 0;
+        float speed = 0.0f;
 
-        if (!mount_cstr)
+        char const* delim = " ";
+        char* next_token = nullptr;
+        char* token = strtok_s(const_cast<char*>(args), delim, &next_token);
+        int count = 0;
+        while (token)
         {
-            return false;
+            token = strtok_s(NULL, delim, &next_token);
+            count++;
+            if (count == 2)
+            {
+                mount = atoi(token);
+            }
+            else if (count == 3)
+            {
+                speed = atof(token);
+            }
+            else if (count > 3)
+            {
+                break;
+            }
         }
 
-        if (!speed_cstr)
-        {
-            speed_cstr = "1";
-        }
-
-        uint32 mount = Acore::StringTo<uint32>(mount_cstr).value();
         if (!sCreatureDisplayInfoStore.LookupEntry(mount))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
@@ -837,8 +884,7 @@ public:
             return false;
         }
 
-        float speed = 0.f;
-        if (!CheckModifySpeed(handler, speed_cstr, target, speed, 0.1f, 50.0f))
+        if (!CheckModifySpeedFloat(handler, speed, target, 0.1f, 50.0f))
         {
             return false;
         }
