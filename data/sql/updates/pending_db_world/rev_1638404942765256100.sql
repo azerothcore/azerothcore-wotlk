@@ -109,7 +109,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 SET @FREE_GAMEOBJECT = 9808;
 
 -- 68 Gameobjects
-DELETE FROM `gameobject` WHERE `guid` IN (120784, 120783, 120662, 120484, 120770, 120263, 120248, 120773, 120774, 120748, 120746, 120782, 120781, 249, 213, 317, 367, 300, 308, 353, 286, 383, 169, 209, 19159);
+DELETE FROM `gameobject` WHERE `guid` IN (120784, 120783, 120662, 120484, 120770, 120263, 120248, 120773, 120774, 120748, 120746, 120782, 120781, 249, 213, 317, 367, 300, 308, 353, 286, 383, 169, 209);
 DELETE FROM `gameobject` WHERE `zoneId` = 490 AND (`id` IN (123848, 123309, 2040, 2047, 1734, 324, 123848, 175404));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `state`) VALUES 
 (@FREE_GAMEOBJECT := @FREE_GAMEOBJECT + 0, 123848, 1, 490, -7945.01, -1286.78, -278.139, 2.61799, 0, 0, 0.965925, 0.258821, 2700, 1),
