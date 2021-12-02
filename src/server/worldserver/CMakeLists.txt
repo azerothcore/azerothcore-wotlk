@@ -57,6 +57,7 @@ target_link_libraries(worldserver
   PRIVATE
     acore-core-interface
   PUBLIC
+    modules
     scripts
     game
     gsoap
@@ -68,9 +69,13 @@ set_target_properties(worldserver
     FOLDER
       "server")
 
+# Add all dynamic projects as dependency to the worldserver
+if(WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES)
+  add_dependencies(worldserver ${WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES})
+endif()
+
 # Install config
 CopyDefaultConfig(worldserver)
-CollectModulesConfig()
 
 if( UNIX )
   install(TARGETS worldserver DESTINATION bin)

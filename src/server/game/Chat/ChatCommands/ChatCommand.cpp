@@ -27,10 +27,6 @@
 #include "Tokenize.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 using ChatSubCommandMap = std::map<std::string_view, Acore::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
 void Acore::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuilder const& builder)
@@ -334,27 +330,24 @@ namespace Acore::Impl::ChatCommands
             if (!handler.IsConsole())
                 LogCommandUsage(*handler.GetSession(), cmdStr);
         }
-        else if (!handler.HasSentErrorMessage())
-        { /* invocation failed, we should show usage */
-#ifdef ELUNA
-            if (!sEluna->OnCommand(handler.IsConsole() ? nullptr : handler.GetSession()->GetPlayer(), std::string(cmdStr).c_str()))
+        else if (!handler.HasSentErrorMessage()) /* invocation failed, we should show usage */
+        {
+            if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
             {
                 return true;
             }
-#endif
 
             cmd->SendCommandHelp(handler);
             handler.SetSentErrorMessage(true);
         }
+
         return true;
     }
 
-#ifdef ELUNA
-    if (!sEluna->OnCommand(handler.IsConsole() ? nullptr : handler.GetSession()->GetPlayer(), std::string(cmdStr).c_str()))
+    if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
     {
         return true;
     }
-#endif
 
     return false;
 }
