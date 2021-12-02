@@ -1,3 +1,19 @@
+-- DB update 2021_12_02_02 -> 2021_12_02_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_02_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_02_02 2021_12_02_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638105320614262889'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638105320614262889');
 
 -- Crimson Templar
@@ -59,3 +75,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (15307,0,1,"My lord will be outraged to learn of this ambush.  Let us hope your death will appease him.",12,0,100,0,0,0,10694,0,"Earthen Templar"),
 (15307,0,2,"It is my duty and honor to die for the Abyssal Council!",12,0,100,0,0,0,10695,0,"Earthen Templar"),
 (15307,0,3,"Your life is a fitting sacrifice for my master, $c.",12,0,100,0,0,0,10696,0,"Earthen Templar");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_02_03' WHERE sql_rev = '1638105320614262889';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
