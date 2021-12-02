@@ -52,8 +52,13 @@ public:
                                      unit->GetEntry() == NPC_MURKSHALLOW_SOFTSHELL || unit->GetEntry() == NPC_AKU_MAI_SNAPJAW))
             {
                 if (--_requiredDeaths == 0)
-                    if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
+                {
+                    if (IsFireEventDone())
+                    {
                         HandleGameObject(_akumaiPortalGUID, true);
+                        _encounters[TYPE_AKU_MAI_EVENT] = DONE;
+                    }
+                }
             }
         }
 
@@ -65,7 +70,7 @@ public:
                 case GO_FIRE_OF_AKU_MAI_2:
                 case GO_FIRE_OF_AKU_MAI_3:
                 case GO_FIRE_OF_AKU_MAI_4:
-                    if (_encounters[gameobject->GetEntry() - GO_FIRE_OF_AKU_MAI_1 + 1] == DONE)
+                    if (_encounters[TYPE_AKU_MAI_EVENT] == DONE)
                     {
                         gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
                         gameobject->SetGoState(GO_STATE_ACTIVE);
@@ -80,7 +85,7 @@ public:
                         gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_AKU_MAI_DOOR:
-                    if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
+                    if (IsFireEventDone() && _encounters[TYPE_AKU_MAI_EVENT] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     _akumaiPortalGUID = gameobject->GetGUID();
                     break;
@@ -97,6 +102,7 @@ public:
                 case TYPE_FIRE3:
                 case TYPE_FIRE4:
                 case TYPE_AKU_MAI:
+                case TYPE_AKU_MAI_EVENT:
                     _encounters[type] = data;
                     break;
             }
@@ -129,6 +135,11 @@ public:
                         _encounters[i] = NOT_STARTED;
                 }
             }
+        }
+
+        bool IsFireEventDone()
+        {
+            return _encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE;
         }
 
     private:

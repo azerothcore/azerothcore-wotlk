@@ -53,6 +53,8 @@
 //  there is probably some underlying problem with imports which should properly addressed
 #include "GridNotifiersImpl.h"
 
+#include "GridNotifiersImpl.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -69,6 +71,8 @@ std::string CreatureMovementData::ToString() const
     constexpr std::array<char const*, 3> RandomStates = {"Walk", "CanRun", "AlwaysRun"};
 
     std::ostringstream str;
+    str << std::boolalpha << "Ground: " << GroundStates[AsUnderlyingType(Ground)]
+        << ", Swim: " << Swim << ", Flight: " << FlightStates[AsUnderlyingType(Flight)]
     str << std::boolalpha
         << "Ground: " << GroundStates[AsUnderlyingType(Ground)]
         << ", Swim: " << Swim
@@ -267,12 +271,8 @@ void Creature::AddToWorld()
         {
             GetZoneScript()->OnCreatureCreate(this);
         }
-#ifdef ELUNA
-        sEluna->OnAddToWorld(this);
 
-    if (IsGuardian() && ToTempSummon() && ToTempSummon()->GetSummonerGUID().IsPlayer())
-        sEluna->OnPetAddedToWorld(ToTempSummon()->GetSummonerUnit()->ToPlayer(), this);
-#endif
+        sScriptMgr->OnCreatureAddWorld(this);
     }
 }
 
@@ -280,9 +280,8 @@ void Creature::RemoveFromWorld()
 {
     if (IsInWorld())
     {
-#ifdef ELUNA
-        sEluna->OnRemoveFromWorld(this);
-#endif
+        sScriptMgr->OnCreatureRemoveWorld(this);
+
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
 
