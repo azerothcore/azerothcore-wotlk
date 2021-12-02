@@ -463,7 +463,6 @@ private:
 
     uint32 m_assistanceTimer;
 
-    void applyInhabitFlags();
 };
 
 class AssistDelayEvent : public BasicEvent
