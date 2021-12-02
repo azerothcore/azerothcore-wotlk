@@ -485,48 +485,6 @@ public:
         return false;
     }
 
-    static bool CheckModifySpeed(ChatHandler* handler, char const* args, Unit* target, float& speed, float minimumBound, float maximumBound, bool checkInFlight = true)
-    {
-        if (!*args)
-        {
-            return false;
-        }
-
-        speed = Acore::StringTo<float>(args).value();
-
-        if (speed > maximumBound || speed < minimumBound)
-        {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (!target)
-        {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (Player* player = target->ToPlayer())
-        {
-            // check online security
-            if (handler->HasLowerSecurity(player, ObjectGuid::Empty))
-            {
-                return false;
-            }
-
-            if (player->IsInFlight() && checkInFlight)
-            {
-                handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player).c_str());
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     static bool CheckModifySpeedFloat(ChatHandler* handler, float& speed, Unit* target, float minimumBound, float maximumBound, bool checkInFlight = true)
     {
 
@@ -849,17 +807,20 @@ public:
         {
             token = strtok_s(NULL, delim, &next_token);
             count++;
-            if (count == 2)
+            if (token)
             {
-                mount = atoi(token);
-            }
-            else if (count == 3)
-            {
-                speed = atof(token);
-            }
-            else if (count > 3)
-            {
-                break;
+                if (count == 2)
+                {
+                    mount = atoi(token);
+                }
+                else if (count == 3)
+                {
+                    speed = atof(token);
+                }
+                else if (count > 3)
+                {
+                    break;
+                }
             }
         }
 
