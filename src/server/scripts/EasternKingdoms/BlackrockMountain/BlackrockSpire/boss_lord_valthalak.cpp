@@ -29,14 +29,24 @@ enum Spells
 
 enum Says
 {
-    EMOTE_FRENZY                    = 0
+    TALK_SUMMON                     = 0,
+    TALK_AGGRO                      = 1,
+    TALK_40_HP                      = 2,
+    TALK_15_HP                      = 3
 };
 
 enum Events
 {
     EVENT_SUMMON_SPECTRAL_ASSASSIN  = 1,
     EVENT_SHADOW_BOLT_VOLLEY        = 2,
-    EVENT_SHADOW_WRATH              = 3
+    EVENT_SHADOW_WRATH              = 3,
+    EVENT_FIGHT                     = 4
+};
+
+enum EventPhase
+{
+    EVENT_PHASE_TALK                = 1,
+    EVENT_PHASE_FIGHT               = 2
 };
 
 class boss_lord_valthalak : public CreatureScript
@@ -50,71 +60,117 @@ public:
 
         void Reset() override
         {
-            _Reset();
+            BossAI::Reset();
+
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+
             frenzy40 = false;
             frenzy15 = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(6000, 8000));
-            events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(9000, 18000));
+            StartTalking(TALK_SUMMON, 8 * IN_MILLISECONDS);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void EnterCombat(Unit* who) override
         {
+            BossAI::EnterCombat(who);
+
+            Talk(TALK_AGGRO);
+
+            events.SetPhase(EVENT_PHASE_FIGHT);
+            events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(6 * IN_MILLISECONDS, 8 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+            events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(9 * IN_MILLISECONDS, 18 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            BossAI::JustDied(killer);
+
             instance->SetData(DATA_LORD_VALTHALAK, DONE);
+        }
+
+        void StartTalking(uint32 talkGroupId, uint32 timer)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->AttackStop();
+
+            Talk(talkGroupId);
+
+            events.SetPhase(EVENT_PHASE_TALK);
+            events.ScheduleEvent(EVENT_FIGHT, timer, 0, EVENT_PHASE_TALK);
+        }
+
+        void StartFighting()
+        {
+            events.SetPhase(EVENT_PHASE_FIGHT);
+
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+
+            DoZoneInCombat();
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (!frenzy40 && me->HealthBelowPctDamaged(40, damage))
+            {
+                frenzy40 = true;
+                DoCast(me, SPELL_FRENZY);
+
+                events.CancelEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN);
+
+                StartTalking(TALK_40_HP, 5 * IN_MILLISECONDS);
+            }
+
+            if (!frenzy15 && me->HealthBelowPctDamaged(15, damage))
+            {
+                frenzy15 = true;
+
+                events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(12 * IN_MILLISECONDS, 19 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
+
+                StartTalking(TALK_15_HP, 5 * IN_MILLISECONDS);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() && !events.IsInPhase(EVENT_PHASE_TALK))
+            {
                 return;
+            }
 
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
+                    case EVENT_FIGHT:
+                        StartFighting();
+                        break;
                     case EVENT_SUMMON_SPECTRAL_ASSASSIN:
                         DoCast(me, SPELL_SUMMON_SPECTRAL_ASSASSIN);
-                        events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(30000, 35000));
+                        events.ScheduleEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN, urand(30 * IN_MILLISECONDS, 35 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
                         break;
                     case EVENT_SHADOW_BOLT_VOLLEY:
                         DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY);
-                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(4000, 6000));
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(4 * IN_MILLISECONDS, 6 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
                         break;
                     case EVENT_SHADOW_WRATH:
                         DoCastVictim(SPELL_SHADOW_WRATH);
-                        events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(19000, 24000));
+                        events.ScheduleEvent(EVENT_SHADOW_WRATH, urand(19 * IN_MILLISECONDS, 24 * IN_MILLISECONDS), 0, EVENT_PHASE_FIGHT);
                         break;
                     default:
                         break;
-                }
-            }
-
-            if (!frenzy40)
-            {
-                if (HealthBelowPct(40))
-                {
-                    DoCast(me, SPELL_FRENZY);
-                    events.CancelEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN);
-                    frenzy40 = true;
-                }
-            }
-
-            if (!frenzy15)
-            {
-                if (HealthBelowPct(15))
-                {
-                    DoCast(me, SPELL_FRENZY);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, urand(7000, 14000));
-                    frenzy15 = true;
                 }
             }
 

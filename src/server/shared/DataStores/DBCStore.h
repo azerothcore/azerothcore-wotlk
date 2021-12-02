@@ -184,7 +184,6 @@ public:
     [[nodiscard]] T const* LookupEntry(uint32 id) const { return (id >= _indexTableSize) ? nullptr : _indexTable.AsT[id]; }
     [[nodiscard]] T const* AssertEntry(uint32 id) const { return ASSERT_NOTNULL(LookupEntry(id)); }
 
-#ifdef ELUNA
     void SetEntry(uint32 id, T* t)
     {
         if (id >= _indexTableSize)
@@ -203,7 +202,6 @@ public:
         delete _indexTable.AsT[id];
         _indexTable.AsT[id] = t;
     }
-#endif
 
     [[nodiscard]] uint32 GetNumRows() const { return _indexTableSize; }
 

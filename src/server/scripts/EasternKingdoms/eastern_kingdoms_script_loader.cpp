@@ -38,6 +38,7 @@ void AddSC_boss_halycon();
 void AddSC_boss_highlordomokk();
 void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_thebeast();
+void AddSC_boss_lord_valthalak();
 void AddSC_boss_warmastervoone();
 void AddSC_boss_pyroguard_emberseer();
 void AddSC_boss_gyth();
@@ -179,6 +180,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_highlordomokk();
     AddSC_boss_overlordwyrmthalak();
     AddSC_boss_thebeast();
+    AddSC_boss_lord_valthalak();
     AddSC_boss_warmastervoone();
     AddSC_boss_pyroguard_emberseer();
     AddSC_boss_gyth();
