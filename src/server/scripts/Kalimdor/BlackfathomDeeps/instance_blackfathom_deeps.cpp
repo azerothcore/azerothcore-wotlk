@@ -70,7 +70,7 @@ public:
                 case GO_FIRE_OF_AKU_MAI_2:
                 case GO_FIRE_OF_AKU_MAI_3:
                 case GO_FIRE_OF_AKU_MAI_4:
-                    if (_encounters[gameobject->GetEntry() - GO_FIRE_OF_AKU_MAI_1 + 1] == DONE)
+                    if (GetBossState(TYPE_AKU_MAI_EVENT) == DONE)
                     {
                         gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
                         gameobject->SetGoState(GO_STATE_ACTIVE);
