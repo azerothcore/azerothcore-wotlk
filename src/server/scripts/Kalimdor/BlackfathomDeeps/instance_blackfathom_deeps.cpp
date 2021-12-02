@@ -102,6 +102,7 @@ public:
                 case TYPE_FIRE3:
                 case TYPE_FIRE4:
                 case TYPE_AKU_MAI:
+                case TYPE_AKU_MAI_EVENT:
                     _encounters[type] = data;
                     break;
             }
