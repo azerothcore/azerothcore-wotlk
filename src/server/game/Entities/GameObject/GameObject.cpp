@@ -34,13 +34,9 @@
 #include "Transport.h"
 #include "UpdateFieldFlags.h"
 #include "World.h"
-#include <G3D/Quat.h>
 #include <G3D/Box.h>
 #include <G3D/CoordinateFrame.h>
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+#include <G3D/Quat.h>
 
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_model(nullptr), m_goValue(), m_AI(nullptr)
@@ -161,9 +157,8 @@ void GameObject::AddToWorld()
         EnableCollision(GetGoState() == GO_STATE_READY || IsTransport()); // pussywizard: this startOpen is unneeded here, collision depends entirely on GOState
 
         WorldObject::AddToWorld();
-#ifdef ELUNA
-        sEluna->OnAddToWorld(this);
-#endif
+
+        sScriptMgr->OnGameObjectAddWorld(this);
     }
 }
 
@@ -172,9 +167,8 @@ void GameObject::RemoveFromWorld()
     ///- Remove the gameobject from the accessor
     if (IsInWorld())
     {
-#ifdef ELUNA
-        sEluna->OnRemoveFromWorld(this);
-#endif
+        sScriptMgr->OnGameObjectRemoveWorld(this);
+
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
 
@@ -298,6 +292,8 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         // used switch since there should be more
         case 181233: // maexxna portal effect
         case 181575: // maexxna portal
+        case 20992: // theramore black shield
+        case 21042: // theramore guard badge
             SetLocalRotation(rotation);
             break;
         default:
@@ -409,9 +405,6 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
 void GameObject::Update(uint32 diff)
 {
-#ifdef ELUNA
-    sEluna->UpdateAI(this, diff);
-#endif
     if (AI())
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
@@ -427,6 +420,26 @@ void GameObject::Update(uint32 diff)
         {
             m_despawnDelay = 0;
             DespawnOrUnsummon(0ms, m_despawnRespawnTime);
+        }
+    }
+
+    for (std::unordered_map<ObjectGuid, int32>::iterator itr = m_SkillupList.begin(); itr != m_SkillupList.end();)
+    {
+        if (itr->second > 0)
+        {
+            if (itr->second > static_cast<int32>(diff))
+            {
+                itr->second -= static_cast<int32>(diff);
+                ++itr;
+            }
+            else
+            {
+                itr = m_SkillupList.erase(itr);
+            }
+        }
+        else
+        {
+            ++itr;
         }
     }
 
@@ -818,6 +831,7 @@ void GameObject::Update(uint32 diff)
                 break;
             }
     }
+
     sScriptMgr->OnGameObjectUpdate(this, diff);
 }
 
@@ -1304,7 +1318,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     if (!trapSpell)                                          // checked at load already
         return;
 
-    // xinef: wtf, many spells have range 0 but radius > 0
+    // xinef: many spells have range 0 but radius > 0
     float range = float(target->GetSpellMaxRangeForTarget(GetOwner(), trapSpell));
     if (range < 1.0f)
         range = 5.0f;
@@ -1402,10 +1416,6 @@ void GameObject::Use(Unit* user)
 
     if (Player* playerUser = user->ToPlayer())
     {
-#ifdef ELUNA
-        if (sEluna->OnGossipHello(playerUser, this))
-            return;
-#endif
         if (sScriptMgr->OnGossipHello(playerUser, this))
             return;
 
@@ -2265,11 +2275,10 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
             break;
         case GO_DESTRUCTIBLE_DAMAGED:
             {
-#ifdef ELUNA
-                sEluna->OnDamaged(this, eventInvoker);
-#endif
                 EventInform(m_goInfo->building.damagedEvent);
+
                 sScriptMgr->OnGameObjectDamaged(this, eventInvoker);
+
                 if (BattlegroundMap* bgMap = GetMap()->ToBattlegroundMap())
                     if (Battleground* bg = bgMap->GetBG())
                         bg->EventPlayerDamagedGO(eventInvoker, this, m_goInfo->building.damagedEvent);
@@ -2296,11 +2305,10 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
             }
         case GO_DESTRUCTIBLE_DESTROYED:
             {
-#ifdef ELUNA
-                sEluna->OnDestroyed(this, eventInvoker);
-#endif
                 sScriptMgr->OnGameObjectDestroyed(this, eventInvoker);
+
                 EventInform(m_goInfo->building.destroyedEvent);
+
                 if (BattlegroundMap* bgMap = GetMap()->ToBattlegroundMap())
                 {
                     if (Battleground* bg = bgMap->GetBG())
@@ -2353,9 +2361,7 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
 void GameObject::SetLootState(LootState state, Unit* unit)
 {
     m_lootState = state;
-#ifdef ELUNA
-    sEluna->OnLootStateChanged(this, state);
-#endif
+
     AI()->OnStateChanged(state, unit);
     sScriptMgr->OnGameObjectLootStateChanged(this, state, unit);
     // pussywizard: lootState has nothing to do with collision, it depends entirely on GOState. Loot state is for timed close/open door and respawning, which then sets GOState
@@ -2378,10 +2384,9 @@ void GameObject::SetLootState(LootState state, Unit* unit)
 void GameObject::SetGoState(GOState state)
 {
     SetByteValue(GAMEOBJECT_BYTES_1, 0, state);
-#ifdef ELUNA
-    sEluna->OnGameObjectStateChanged(this, state);
-#endif
+
     sScriptMgr->OnGameObjectStateChanged(this, state);
+
     if (m_model)
     {
         if (!IsInWorld())
@@ -2847,4 +2852,23 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     }
 
     return nullptr;
+}
+
+void GameObject::AddToSkillupList(ObjectGuid playerGuid)
+{
+    int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;
+    m_SkillupList[playerGuid] = timer;
+}
+
+bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
+{
+    for (auto const& itr : m_SkillupList)
+    {
+        if (itr.first == playerGuid)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

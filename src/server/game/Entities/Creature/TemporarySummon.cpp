@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TemporarySummon.h"
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "TemporarySummon.h"
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) :
     Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
@@ -418,7 +418,7 @@ void Puppet::InitSummon()
         else
         {
             LOG_INFO("misc", "Puppet::InitSummon (B1)");
-            //ABORT(); // ZOMG!
+            //ABORT();
         }
     }
 }

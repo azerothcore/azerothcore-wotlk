@@ -23,8 +23,8 @@
 #include "QueryResult.h"
 #include "Tokenize.h"
 #include "Util.h"
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 using namespace std::filesystem;
 
@@ -42,6 +42,17 @@ UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
                              std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories /*= nullptr*/) :
     _sourceDirectory(std::make_unique<Path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
     _retrieve(retrieve), _dbModuleName(dbModuleName), _setDirectories(setDirectories)
+{
+}
+
+UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
+    std::function<void(std::string const&)> const& apply,
+    std::function<void(Path const& path)> const& applyFile,
+    std::function<QueryResult(std::string const&)> const& retrieve,
+    std::string const& dbModuleName,
+    std::string_view modulesList /*= {}*/) :
+    _sourceDirectory(std::make_unique<Path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
+    _retrieve(retrieve), _dbModuleName(dbModuleName), _setDirectories(nullptr), _modulesList(modulesList)
 {
 }
 
@@ -144,8 +155,10 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
 
         std::vector<std::string> moduleList;
 
-        auto const& _modulesTokens = Acore::Tokenize(AC_MODULES_LIST, ',', true);
-        for (auto const& itr : _modulesTokens) moduleList.emplace_back(itr);
+        for (auto const& itr : Acore::Tokenize(_modulesList, ',', true))
+        {
+            moduleList.emplace_back(itr);
+        }
 
         // data/sql
         for (auto const& itr : moduleList)
@@ -154,9 +167,11 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
 
             Path const p(path);
             if (!is_directory(p))
+            {
                 continue;
+            }
 
-            DirectoryEntry const entry = {p, AppliedFileEntry::StateConvert("MODULE")};
+            DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert("MODULE") };
             directories.push_back(entry);
 
             LOG_TRACE("sql.updates", "Added applied modules file \"%s\" from remote.", p.filename().generic_string().c_str());

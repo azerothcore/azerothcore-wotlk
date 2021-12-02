@@ -92,10 +92,6 @@
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -443,15 +439,6 @@ void World::LoadConfigSettings(bool reload)
 
     // Set realm id and enable db logging
     sLog->SetRealmId(realm.Id.Realm);
-
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    if (!reload)
-    {
-        LOG_INFO("eluna", "Initialize Eluna Lua Engine...");
-        Eluna::Initialize();
-    }
-#endif
 
     sScriptMgr->OnBeforeConfigLoad(reload);
 
@@ -2081,12 +2068,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
 
-#ifdef ELUNA
-    ///- Run eluna scripts.
-    // in multithread foreach: run scripts
-    sEluna->RunScripts();
-    sEluna->OnConfigLoad(false, false); // Must be done after Eluna is initialized and scripts have run.
-#endif
+    sScriptMgr->OnBeforeWorldInitialized();
 
     if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
     {
@@ -2119,6 +2101,7 @@ void World::SetInitialWorldSettings()
 
     if (sConfigMgr->isDryRun())
     {
+        sMapMgr->UnloadAll();
         LOG_INFO("server.loading", "AzerothCore dry run completed, terminating.");
         exit(0);
     }
@@ -2712,7 +2695,7 @@ void World::_UpdateGameTime()
 }
 
 /// Shutdown the server
-void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
+void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason)
 {
     // ignore if server shutdown at next tick
     if (IsStopped())
@@ -2733,14 +2716,14 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
     else
     {
         m_ShutdownTimer = time;
-        ShutdownMsg(true);
+        ShutdownMsg(true, nullptr, reason);
     }
 
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
 /// Display a shutdown message to the user(s)
-void World::ShutdownMsg(bool show, Player* player)
+void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
 {
     // not show messages for idle shutdown mode
     if (m_ShutdownMask & SHUTDOWN_MASK_IDLE)
@@ -2755,6 +2738,11 @@ void World::ShutdownMsg(bool show, Player* player)
             (m_ShutdownTimer > 12 * HOUR && (m_ShutdownTimer % (12 * HOUR)) == 0)) // > 12 h ; every 12 h
     {
         std::string str = secsToTimeString(m_ShutdownTimer).append(".");
+
+        if (!reason.empty())
+        {
+            str += " - " + reason;
+        }
 
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 

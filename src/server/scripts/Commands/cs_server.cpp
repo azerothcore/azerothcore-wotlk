@@ -27,6 +27,7 @@
 #include "Config.h"
 #include "GitRevision.h"
 #include "Language.h"
+#include "ModuleMgr.h"
 #include "MySQLThreading.h"
 #include "Player.h"
 #include "Realm.h"
@@ -35,11 +36,11 @@
 #include "StringConvert.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
-#include <filesystem>
 #include <boost/version.hpp>
+#include <filesystem>
+#include <numeric>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
-#include <numeric>
 
 using namespace Acore::ChatCommands;
 
@@ -219,6 +220,14 @@ public:
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+
+        handler->SendSysMessage("> List enable modules:");
+
+        for (auto const& modName : Acore::Module::GetEnableModulesList())
+        {
+            handler->SendSysMessage(Acore::StringFormatFmt("- {}", modName));
+        }
+
         return true;
     }
 
@@ -267,57 +276,121 @@ public:
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
+    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
     {
+        std::wstring wReason   = std::wstring();
+        std::string  strReason = std::string();
+
+        if (!reason.empty())
+        {
+            if (!Utf8toWStr(reason, wReason))
+            {
+                return false;
+            }
+
+            if (!WStrToUtf8(wReason, strReason))
+            {
+                return false;
+            }
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
             sWorld->ShutdownServ(time, 0, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE);
+            sWorld->ShutdownServ(time, 0, SHUTDOWN_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
+    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
     {
+        std::wstring wReason = std::wstring();
+        std::string strReason    = std::string();
+
+        if (!reason.empty())
+        {
+            if (!Utf8toWStr(reason, wReason))
+            {
+                return false;
+            }
+
+            if (!WStrToUtf8(wReason, strReason))
+            {
+                return false;
+            }
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
+    static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
     {
+        std::wstring wReason   = std::wstring();
+        std::string  strReason = std::string();
+
+        if (!reason.empty())
+        {
+            if (!Utf8toWStr(reason, wReason))
+            {
+                return false;
+            }
+
+            if (!WStrToUtf8(wReason, strReason))
+            {
+                return false;
+            }
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART | SHUTDOWN_MASK_IDLE, RESTART_EXIT_CODE, strReason);
         }
 
         return true;
     }
 
-    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode)
+    static bool HandleServerIdleShutDownCommand(ChatHandler* /*handler*/, int32 time, Optional<int32> exitCode, Tail reason)
     {
+        std::wstring wReason   = std::wstring();
+        std::string  strReason = std::string();
+
+        if (!reason.empty())
+        {
+            if (!Utf8toWStr(reason, wReason))
+            {
+                return false;
+            }
+
+            if (!WStrToUtf8(wReason, strReason))
+            {
+                return false;
+            }
+        }
+
         if (exitCode && *exitCode >= 0 && *exitCode <= 125)
         {
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, *exitCode);
         }
         else
         {
-            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE);
+            sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE, strReason);
         }
 
         return true;

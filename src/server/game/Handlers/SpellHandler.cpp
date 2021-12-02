@@ -32,10 +32,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets)
 {
     // some spell cast packet including more data (for projectiles?)
@@ -641,6 +637,11 @@ void WorldSession::HandleSpellClick(WorldPacket& recvData)
 
     if (!unit)
         return;
+
+    if (_player->IsHostileTo(unit))
+    {
+        return;
+    }
 
     // TODO: Unit::SetCharmedBy: 28782 is not in world but 0 is trying to charm it! -> crash
     if (!unit->IsInWorld())

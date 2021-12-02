@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameEventMgr.h"
 #include "BattlegroundMgr.h"
 #include "DisableMgr.h"
-#include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "Language.h"
@@ -33,10 +33,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include <time.h>
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 
 GameEventMgr* GameEventMgr::instance()
 {
