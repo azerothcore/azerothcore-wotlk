@@ -18,8 +18,8 @@
 #ifndef VEC3D_H
 #define VEC3D_H
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 class Vec3D
 {

@@ -16,8 +16,8 @@
  */
 
 #include "WorldModelGroup.h"
-#include "ChunkedData.h"
 #include "Chunk.h"
+#include "ChunkedData.h"
 #include "Utils.h"
 
 WorldModelGroup::WorldModelGroup( std::string path, int groupIndex ) : GroupIndex(groupIndex), MOBA(nullptr), IsBad(false), HasLiquidData(false)

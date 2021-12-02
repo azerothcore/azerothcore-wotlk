@@ -18,8 +18,6 @@
 #ifndef ACORE_INSTANCE_DATA_H
 #define ACORE_INSTANCE_DATA_H
 
-//#include "GameObject.h"
-//#include "Map.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include "ZoneScript.h"

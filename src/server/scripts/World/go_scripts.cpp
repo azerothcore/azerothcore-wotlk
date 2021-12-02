@@ -45,9 +45,9 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "Spell.h"
 #include "WorldSession.h"
 

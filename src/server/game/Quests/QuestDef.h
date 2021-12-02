@@ -18,8 +18,8 @@
 #ifndef AZEROTHCORE_QUEST_H
 #define AZEROTHCORE_QUEST_H
 
-#include "DatabaseEnv.h"
 #include "DBCEnums.h"
+#include "DatabaseEnv.h"
 #include "Define.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
@@ -107,7 +107,7 @@ enum QuestStatus : uint8
     MAX_QUEST_STATUS
 };
 
-enum QuestGiverStatus
+enum QuestGiverStatus : uint32
 {
     DIALOG_STATUS_NONE                     = 0,
     DIALOG_STATUS_UNAVAILABLE              = 1,
@@ -211,7 +211,7 @@ public:
     void LoadQuestOfferReward(Field* fields);
     void LoadQuestTemplateAddon(Field* fields);
 
-    uint32 XPValue(Player* player) const;
+    uint32 XPValue(uint8 playerLevel = 0) const;
 
     [[nodiscard]] bool HasFlag(uint32 flag) const { return (Flags & flag) != 0; }
     void SetFlag(uint32 flag) { Flags |= flag; }
@@ -260,7 +260,7 @@ public:
     [[nodiscard]] std::string const& GetRequestItemsText() const { return RequestItemsText; }
     [[nodiscard]] std::string const& GetAreaDescription() const { return AreaDescription; }
     [[nodiscard]] std::string const& GetCompletedText() const { return CompletedText; }
-    [[nodiscard]] int32  GetRewOrReqMoney(Player* player = nullptr) const;
+    [[nodiscard]] int32  GetRewOrReqMoney(uint8 playerLevel = 0) const;
     [[nodiscard]] uint32 GetRewHonorAddition() const { return RewardHonor; }
     [[nodiscard]] float GetRewHonorMultiplier() const { return RewardKillHonor; }
     [[nodiscard]] uint32 GetRewMoneyMaxLevel() const; // use in XP calculation at client

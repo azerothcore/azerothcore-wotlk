@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "forge_of_souls.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "forge_of_souls.h"
 
 class instance_forge_of_souls : public InstanceMapScript
 {

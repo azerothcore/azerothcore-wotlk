@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -158,7 +158,7 @@ public:
                 return;
 
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_ESSENCE_OF_SUFFERING, 5000); // ZOMG! 15000);
+            events.ScheduleEvent(EVENT_ESSENCE_OF_SUFFERING, 5000); // 15000);
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
