@@ -53,8 +53,6 @@
 //  there is probably some underlying problem with imports which should properly addressed
 #include "GridNotifiersImpl.h"
 
-#include "GridNotifiersImpl.h"
-
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
