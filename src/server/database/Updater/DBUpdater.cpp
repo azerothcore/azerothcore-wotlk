@@ -214,7 +214,7 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 }
 
 template<class T>
-bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
 {
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
@@ -260,7 +260,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
 
     UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
     [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
-    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName());
+    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);
 
     UpdateResult result;
     try
@@ -478,8 +478,17 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
     // Set max allowed packet to 1 GB
     args.emplace_back("--max-allowed-packet=1GB");
 
+#if !defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80000
+
+    if (ssl == "ssl")
+        args.emplace_back("--ssl-mode=REQUIRED");
+
+#else
+
     if (ssl == "ssl")
         args.emplace_back("--ssl");
+
+#endif
 
     // Database
     if (!database.empty())
