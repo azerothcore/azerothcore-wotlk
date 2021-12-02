@@ -1323,8 +1323,8 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                float z = caster->GetMapHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), caster->GetPositionZ());
-                WorldLocation pPosition = WorldLocation(caster->GetMapId(), caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), z, caster->GetOrientation());
+                WorldLocation pPosition = WorldLocation(*caster);
+                caster->MovePositionToFirstCollision(pPosition, 14.f, 0.f);
                 SetExplTargetDest(pPosition);
             }
 
