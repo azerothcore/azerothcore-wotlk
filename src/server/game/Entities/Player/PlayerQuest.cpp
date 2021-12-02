@@ -655,7 +655,7 @@ void Player::IncompleteQuest(uint32 quest_id)
     }
 }
 
-void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce)
+void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce, bool isLFGReward)
 {
     //this THING should be here to protect code from quest, which cast on player far teleport as a reward
     //should work fine, cause far teleport will be executed in Player::Update()
@@ -750,7 +750,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
     else
     {
-        GiveXP(XP, nullptr);
+        GiveXP(XP, nullptr, isLFGReward);
     }
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
@@ -1447,10 +1447,14 @@ bool Player::CanShareQuest(uint32 quest_id) const
 
 void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= true*/)
 {
-    if (sObjectMgr->GetQuestTemplate(questId))
+    if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         m_QuestStatus[questId].Status = status;
-        m_QuestStatusSave[questId] = true;
+
+        if (quest->GetQuestMethod() && !quest->IsAutoComplete())
+        {
+            m_QuestStatusSave[questId] = true;
+        }
     }
 
     if (update)
@@ -1491,7 +1495,7 @@ void Player::RemoveRewardedQuest(uint32 questId, bool update /*= true*/)
 void Player::SendQuestUpdate(uint32 questId)
 {
     uint32 zone = 0, area = 0;
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 oldSpellId = 0;
 
     SpellAreaForQuestMapBounds saBounds = sSpellMgr->GetSpellAreaForQuestMapBounds(questId);
@@ -1515,7 +1519,7 @@ void Player::SendQuestUpdate(uint32 questId)
 
     saBounds = sSpellMgr->GetSpellAreaForQuestEndMapBounds(questId);
 
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 skipSpellId = 0;
     oldSpellId = 0;
     if (saBounds.first != saBounds.second)

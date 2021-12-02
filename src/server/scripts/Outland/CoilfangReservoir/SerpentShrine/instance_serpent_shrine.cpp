@@ -100,7 +100,7 @@ public:
                 case NPC_COILFANG_SHATTERER:
                 case NPC_COILFANG_PRIESTESS:
                     if (creature->GetPositionX() > -110.0f && creature->GetPositionX() < 155.0f && creature->GetPositionY() > -610.0f && creature->GetPositionY() < -280.0f)
-                        AliveKeepersCount += creature->IsAlive() ? 0 : -1; // retarded SmartAI calls JUST_RESPAWNED in AIInit...
+                        AliveKeepersCount += creature->IsAlive() ? 0 : -1; // SmartAI calls JUST_RESPAWNED in AIInit...
                     break;
                 case NPC_THE_LURKER_BELOW:
                     LurkerBelowGUID = creature->GetGUID();
