@@ -319,7 +319,8 @@ function(GetPathToModuleConfig module variable)
   set(${variable} "${CMAKE_SOURCE_DIR}/modules/${module}/conf" PARENT_SCOPE)
 endfunction()
 
-message(STATUS "* Modules config list:")
+message(STATUS "* Modules config list:
+  |")
 
 foreach(ModuleName ${MODULE_LIST__})
   GetPathToModuleConfig(${ModuleName} MODULE_CONFIG_PATH)
@@ -330,10 +331,12 @@ foreach(ModuleName ${MODULE_LIST__})
     ${MODULE_CONFIG_PATH}
     ${MODULE_CONFIG_PATH}/*.conf.dist)
 
+  message(STATUS "  +- ${ModuleName}")
+
   foreach(configFileName ${MODULE_CONFIG_LIST})
     CopyModuleConfig("${MODULE_CONFIG_PATH}/${configFileName}")
     set(CONFIG_LIST ${CONFIG_LIST}${configFileName},)
-    message(STATUS "  |- ${configFileName}")
+    message(STATUS "  |  * ${configFileName}")
   endforeach()
 endforeach()
 
