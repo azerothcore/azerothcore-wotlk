@@ -107,7 +107,7 @@ public:
                 }
                 else
                 {
-                    spellId = target->GetTeamId() == TEAM_ALLIANCE ? SPELL_WINTER_WONDERVOLT_GREEN_WOMEN : SPELL_WINTER_WONDERVOLT_RED_WOMEN
+                    spellId = target->GetTeamId() == TEAM_ALLIANCE ? SPELL_WINTER_WONDERVOLT_GREEN_WOMEN : SPELL_WINTER_WONDERVOLT_RED_WOMEN;
                 }
 
                 // cast
