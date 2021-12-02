@@ -56,7 +56,7 @@ public:
                     if (IsFireEventDone())
                     {
                         HandleGameObject(_akumaiPortalGUID, true);
-                        SetBossState(TYPE_AKU_MAI_EVENT, DONE);
+                        _encounters[TYPE_AKU_MAI_EVENT] = DONE;
                     }
                 }
             }
@@ -70,7 +70,7 @@ public:
                 case GO_FIRE_OF_AKU_MAI_2:
                 case GO_FIRE_OF_AKU_MAI_3:
                 case GO_FIRE_OF_AKU_MAI_4:
-                    if (GetBossState(TYPE_AKU_MAI_EVENT) == DONE)
+                    if (_encounters[TYPE_AKU_MAI_EVENT] == DONE)
                     {
                         gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
                         gameobject->SetGoState(GO_STATE_ACTIVE);
@@ -85,7 +85,7 @@ public:
                         gameobject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_AKU_MAI_DOOR:
-                    if (IsFireEventDone() && GetBossState(TYPE_AKU_MAI_EVENT) == DONE)
+                    if (IsFireEventDone() && _encounters[TYPE_AKU_MAI_EVENT] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     _akumaiPortalGUID = gameobject->GetGUID();
                     break;
