@@ -95,7 +95,7 @@ public:
     {
         if (Player* player = target->ToPlayer())
         {
-            handler->PSendSysMessage(resourceMessage, handler->GetNameLink(player).c_str(), args...);
+            handler->PSendSysMessage(resourceMessage, handler->GetNameLink(player).c_str(), std::forward<Args>(args)...);
 
             if (handler->needReportToTarget(player))
             {
@@ -316,7 +316,7 @@ public:
     static bool HandleModifySpellCommand(ChatHandler* handler, uint8 spellFlatID, uint8 op, uint16 val, Optional<uint16> mark)
     {
         Player* target = handler->getSelectedPlayer();
-        if (target == nullptr)
+        if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
@@ -329,10 +329,10 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_SPELLFLATID, spellFlatID, val, mark, handler->GetNameLink(target).c_str());
+        handler->PSendSysMessage(LANG_YOU_CHANGE_SPELLFLATID, spellFlatID, val, mark ? *mark : 65535, handler->GetNameLink(target).c_str());
         if (handler->needReportToTarget(target))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_SPELLFLATID_CHANGED, handler->GetNameLink().c_str(), spellFlatID, val, mark);
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_SPELLFLATID_CHANGED, handler->GetNameLink().c_str(), spellFlatID, val, mark ? *mark : 65535);
         }
 
         WorldPacket data(SMSG_SET_FLAT_SPELL_MODIFIER, (1 + 1 + 2 + 2));
