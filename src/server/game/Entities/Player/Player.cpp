@@ -1364,6 +1364,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         RemoveAurasByType(SPELL_AURA_MOD_ROOT);
     }
 
+	RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+
     if (m_transport)
     {
         if (options & TELE_TO_NOT_LEAVE_TRANSPORT)
