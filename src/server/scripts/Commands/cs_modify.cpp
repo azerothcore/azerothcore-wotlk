@@ -796,31 +796,9 @@ public:
             return false;
         }
 
-        uint32 mount = 0;
-        float speed = 0.0f;
-
         char* token = strtok((char*)args, " ");
-        int count = 0;
-        while (token)
-        {
-            token = strtok(nullptr, " ");
-            count++;
-            if (token)
-            {
-                if (count == 2)
-                {
-                    mount = atoi(token);
-                }
-                else if (count == 3)
-                {
-                    speed = atof(token);
-                }
-                else if (count > 3)
-                {
-                    break;
-                }
-            }
-        }
+        int mount   = atoi(token);
+        float speed = atof(strtok(nullptr, " "));
 
         if (!sCreatureDisplayInfoStore.LookupEntry(mount))
         {
