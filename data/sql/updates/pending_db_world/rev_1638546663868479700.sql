@@ -33,7 +33,7 @@ FROM `gameobject`
 INNER JOIN `pool_gameobject` ON pool_gameobject.guid = gameobject.guid
 INNER JOIN `pool_template` ON pool_gameobject.pool_entry = pool_template.entry
 INNER JOIN `pool_pool` ON pool_template.entry = pool_pool.pool_id
-WHERE pool_pool.description LIKE 'Spawn Point%Duskwood%' OR pool_pool.description LIKE '%Master Mineral Pool - Duskwood%';
+WHERE ((pool_pool.description LIKE 'Spawn Point%Duskwood%' OR pool_pool.description LIKE '%Master Mineral Pool - Duskwood%') AND ( gameobject.id IN (1732, 2054, 3764, 103711, 181249, 1735, 1733, 1734)));
 
 DELETE `pool_gameobject`
 FROM `pool_gameobject`
@@ -2663,7 +2663,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (2134737, 1731, 530, 0, 0, 1, 1, -2106.45, -11498.1, 59.5798, 5.5369, 0, 0, -0.364544, 0.931186, 300, 0, 1, '', 0);
 
 -- Duskwood Gameobjects
-DELETE FROM `gameobject` where `id` IN (1732, 2054, 3764, 103711, 181249, 1735, 1733, 1734);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES 
 (73601, 1732, 0, 0, 0, 1, 1, -11045.7, -299.893, 16.2588, -2.53072, 0, 0, 0, 1, 300, 255, 1, '', 0),
 (73602, 1735, 0, 0, 0, 1, 1, -11045.7, -299.893, 16.2588, -2.53072, 0, 0, 0, 1, 300, 255, 1, '', 0),
