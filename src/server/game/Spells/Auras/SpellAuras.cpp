@@ -894,11 +894,18 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
     Unit* caster = GetCaster();
 
     if (!caster)
+    {
         return;
+    }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
         if (AuraEffect* aurEff = m_effects[i])
+        {
             aurEff->CalculatePeriodic(caster, periodicReset, false);
+            aurEff->CalculatePeriodicData();
+        }
+    }
 }
 
 void Aura::SetCharges(uint8 charges)
@@ -1055,7 +1062,7 @@ bool Aura::CanBeSaved() const
         return true;
     }
 
-    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_REJECT_AURA_SAVING))
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED))
     {
         return false;
     }
@@ -1073,42 +1080,6 @@ bool Aura::CanBeSaved() const
 
     // Xinef: Check if aura is single target, not only spell info
     if (GetCasterGUID() != GetOwner()->GetGUID() && (GetSpellInfo()->IsSingleTarget() || IsSingleTarget()))
-    {
-        return false;
-    }
-
-    // Xinef: Dont save control vehicle auras - caster may not exist
-    if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
-    {
-        return false;
-    }
-
-    // Can't be saved - aura handler relies on calculated amount and changes it
-    if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
-    {
-        return false;
-    }
-
-    // No point in saving this, since the stable dialog can't be open on aura load anyway.
-    if (HasEffectType(SPELL_AURA_OPEN_STABLE))
-    {
-        return false;
-    }
-
-    // xinef: do not save bind sight auras!
-    if (HasEffectType(SPELL_AURA_BIND_SIGHT))
-    {
-        return false;
-    }
-
-    // xinef: no charming auras (taking direct control)
-    if (HasEffectType(SPELL_AURA_MOD_POSSESS) || HasEffectType(SPELL_AURA_MOD_POSSESS_PET))
-    {
-        return false;
-    }
-
-    // xinef: no charming auras can be saved
-    if (HasEffectType(SPELL_AURA_MOD_CHARM) || HasEffectType(SPELL_AURA_AOE_CHARM))
     {
         return false;
     }

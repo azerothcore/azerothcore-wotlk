@@ -581,7 +581,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         // pussywizard (excluded charmed)
                         if (!pet->IsCharmed())
                             if (Creature* creaturePet = pet->ToCreature())
-                                if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
+                                if (!creaturePet->CanCreatureAttack(TargetUnit))
                                     return;
 
                         // Not let attack through obstructions

@@ -2806,10 +2806,10 @@ void SpellMgr::LoadSpellCustomAttr()
                 }
             }
 
-            if ((attributes & SPELL_ATTR0_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_REJECT_AURA_SAVING))
+            if ((attributes & SPELL_ATTR0_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED))
             {
-                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u. Both attributes will get applied", spellId);
-                attributes &= ~(SPELL_ATTR0_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_REJECT_AURA_SAVING);
+                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED which cannot stack for spell %u. Both attributes will be ignored.", spellId);
+                attributes &= ~(SPELL_ATTR0_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED);
             }
 
             spellInfo->AttributesCu |= attributes;
@@ -2875,6 +2875,23 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_MOD_INVISIBILITY_DETECT:
                 case SPELL_AURA_WATER_BREATHING:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                    break;
+            }
+
+            switch (spellInfo->Effects[j].ApplyAuraName)
+            {
+                case SPELL_AURA_CONVERT_RUNE:   // Can't be saved - aura handler relies on calculated amount and changes it
+                case SPELL_AURA_OPEN_STABLE:    // No point in saving this, since the stable dialog can't be open on aura load anyway.
+                // Auras that require both caster & target to be in world cannot be saved
+                case SPELL_AURA_CONTROL_VEHICLE:
+                case SPELL_AURA_BIND_SIGHT:
+                case SPELL_AURA_MOD_POSSESS:
+                case SPELL_AURA_MOD_POSSESS_PET:
+                case SPELL_AURA_MOD_CHARM:
+                case SPELL_AURA_AOE_CHARM:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED;
+                    break;
+                default:
                     break;
             }
 
@@ -7474,6 +7491,27 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 20540, 32199 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
+    });
+
+     // Arcane Bolt
+    ApplySpellFix({ 15979 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 3; // 20y
+    });
+
+    // Mortal Shots
+    ApplySpellFix({ 19485, 19487, 19488, 19489, 19490 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectSpellClassMask[EFFECT_0][EFFECT_0] |= 0x00004000;
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
+
+    // Item - Death Knight T9 Melee 4P Bonus
+    // Item - Hunter T9 2P Bonus
+    // Item - Paladin T9 Retribution 2P Bonus (Righteous Vengeance)
+    ApplySpellFix({ 67118, 67150, 67188 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = 0;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
