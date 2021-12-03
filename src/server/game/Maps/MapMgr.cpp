@@ -36,10 +36,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 MapMgr::MapMgr()
 {
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
