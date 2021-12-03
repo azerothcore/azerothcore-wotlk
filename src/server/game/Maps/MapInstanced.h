@@ -26,7 +26,7 @@ class MapInstanced : public Map
 {
     friend class MapMgr;
 public:
-    typedef std::unordered_map< uint32, Map*> InstancedMaps;
+    using InstancedMaps = std::unordered_map<uint32, Map*>;
 
     MapInstanced(uint32 id);
     ~MapInstanced() override {}
