@@ -95,7 +95,7 @@ public:
     {
         if (Player* player = target->ToPlayer())
         {
-            handler->PSendSysMessage(resourceMessage, handler->GetNameLink(player).c_str(), std::forward<Args>(args)...);
+            handler->PSendSysMessage(resourceMessage, std::forward<Args>(args)..., handler->GetNameLink(player).c_str());
 
             if (handler->needReportToTarget(player))
             {
@@ -537,24 +537,6 @@ public:
     //Enable Player mount
     static bool HandleModifyMountCommand(ChatHandler* handler, uint32 creatureDisplayID, Optional<float> speed)
     {
-        /*if (!*args)
-        {
-            return false;
-        }
-
-        char const* mount_cstr = strtok(const_cast<char*>(args), " ");
-        char const* speed_cstr = strtok(nullptr, " ");
-
-        if (!mount_cstr)
-        {
-            return false;
-        }
-
-        if (!speed_cstr)
-        {
-            speed_cstr = "1";
-        }*/
-
         if (!sCreatureDisplayInfoStore.LookupEntry(creatureDisplayID))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
