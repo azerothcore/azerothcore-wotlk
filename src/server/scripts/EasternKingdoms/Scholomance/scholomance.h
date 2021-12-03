@@ -62,23 +62,12 @@ enum GameobjectIds
     GO_GATE_GANDLING_UP_SOUTH   = 177375
 };
 
-enum SpellIds
-{
-    SPELL_SUMMON_BONE_MAGE_FRONT_LEFT           = 27696,
-    SPELL_SUMMON_BONE_MAGE_FRONT_RIGHT          = 27697,
-    SPELL_SUMMON_BONE_MAGE_BACK_RIGHT           = 27698,
-    SPELL_SUMMON_BONE_MAGE_BACK_LEFT            = 27699,
-
-    SPELL_SUMMON_BONE_MINION1                   = 27690,
-    SPELL_SUMMON_BONE_MINION2                   = 27691,
-    SPELL_SUMMON_BONE_MINION3                   = 27692,
-    SPELL_SUMMON_BONE_MINION4                   = 27693
-};
-
 template <class AI, class T>
 inline AI* GetScholomanceAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, ScholomanceScriptName);
 }
+
+#define RegisterScholomanceCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetScholomanceAI)
 
 #endif
