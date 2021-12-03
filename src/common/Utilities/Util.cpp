@@ -19,7 +19,9 @@
 #include "Common.h"
 #include "Containers.h"
 #include "IpAddress.h"
+#include "StringConvert.h"
 #include "StringFormat.h"
+#include "Tokenize.h"
 #include <algorithm>
 #include <boost/core/demangle.hpp>
 #include <cctype>
@@ -185,41 +187,55 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText)
     return str;
 }
 
-int32 MoneyStringToMoney(const std::string& moneyString)
+Optional<int32> MoneyStringToMoney(std::string_view moneyString)
 {
     int32 money = 0;
 
-    if (!(std::count(moneyString.begin(), moneyString.end(), 'g') == 1 ||
-            std::count(moneyString.begin(), moneyString.end(), 's') == 1 ||
-            std::count(moneyString.begin(), moneyString.end(), 'c') == 1))
-    {
-        return 0;    // Bad format
-    }
+    bool hadG = false;
+    bool hadS = false;
+    bool hadC = false;
 
-    Tokenizer tokens(moneyString, ' ');
-    for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
+    for (std::string_view token : Acore::Tokenize(moneyString, ' ', false))
     {
-        std::string tokenString(*itr);
-        size_t gCount = std::count(tokenString.begin(), tokenString.end(), 'g');
-        size_t sCount = std::count(tokenString.begin(), tokenString.end(), 's');
-        size_t cCount = std::count(tokenString.begin(), tokenString.end(), 'c');
-        if (gCount + sCount + cCount != 1)
+        uint32 unit;
+        switch (token[token.length() - 1])
         {
-            return 0;
+        case 'g':
+            if (hadG)
+            {
+                return std::nullopt;
+            }
+            hadG = true;
+            unit = 100 * 100;
+            break;
+        case 's':
+            if (hadS)
+            {
+                return std::nullopt;
+            }
+            hadS = true;
+            unit = 100;
+            break;
+        case 'c':
+            if (hadC)
+            {
+                return std::nullopt;
+            }
+            hadC = true;
+            unit = 1;
+            break;
+        default:
+            return std::nullopt;
         }
 
-        uint32 amount = atoi(*itr);
-        if (gCount == 1)
+        Optional<uint32> amount = Acore::StringTo<uint32>(token.substr(0, token.length() - 1));
+        if (amount)
         {
-            money += amount * 100 * 100;
+            money += (unit * *amount);
         }
-        else if (sCount == 1)
+        else
         {
-            money += amount * 100;
-        }
-        else if (cCount == 1)
-        {
-            money += amount;
+            return std::nullopt;
         }
     }
 
