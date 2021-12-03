@@ -26,6 +26,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "QueryHolder.h"
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -33,7 +34,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "QueryHolder.h"
 
 class LoadPetFromDBQueryHolder : public CharacterDatabaseQueryHolder
 {
@@ -181,7 +181,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     pet->SetLoading(true);
     pet->Relocate(px, py, pz, owner->GetOrientation());
     pet->setPetType(pet_type);
-    pet->setFaction(owner->getFaction());
+    pet->SetFaction(owner->GetFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
 
     if (pet->IsCritter())
@@ -581,7 +581,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         // pussywizard (excluded charmed)
                         if (!pet->IsCharmed())
                             if (Creature* creaturePet = pet->ToCreature())
-                                if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
+                                if (!creaturePet->CanCreatureAttack(TargetUnit))
                                     return;
 
                         // Not let attack through obstructions

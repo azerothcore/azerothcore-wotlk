@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PathGenerator.h"
 #include "Creature.h"
 #include "DetourCommon.h"
 #include "Geometry.h"
 #include "Log.h"
-#include "Map.h"
-#include "Metric.h"
 #include "MMapFactory.h"
 #include "MMapMgr.h"
-#include "PathGenerator.h"
+#include "Map.h"
+#include "Metric.h"
 
  ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :

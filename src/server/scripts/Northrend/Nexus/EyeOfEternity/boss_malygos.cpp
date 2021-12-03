@@ -16,17 +16,17 @@
  */
 
 #include "CombatAI.h"
-#include "eye_of_eternity.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
+#include "eye_of_eternity.h"
 
 enum MovementInformPoints
 {
@@ -698,7 +698,7 @@ public:
                 case EVENT_DESTROY_PLATFORM_0:
                     if (Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 3000))
                     {
-                        c->setFaction(me->getFaction());
+                        c->SetFaction(me->GetFaction());
                         c->CastSpell(c, SPELL_DESTROY_PLATFORM_VISUAL, true);
                         c->CastSpell(c, SPELL_DESTROY_PLATFORM_EFFECT, false);
                     }
@@ -726,7 +726,7 @@ public:
 
                                     if (Creature* c = me->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                                     {
-                                        c->setFaction(pPlayer->getFaction());
+                                        c->SetFaction(pPlayer->GetFaction());
                                         //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
                                         c->m_Events.AddEvent(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), c->m_Events.CalculateTime(500));
                                         AttackStart(c);

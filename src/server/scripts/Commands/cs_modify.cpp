@@ -333,7 +333,7 @@ public:
 
         if (!pfactionid)
         {
-            uint32 factionid = target->getFaction();
+            uint32 factionid = target->GetFaction();
             uint32 flag      = target->GetUInt32Value(UNIT_FIELD_FLAGS);
             uint32 npcflag   = target->GetUInt32Value(UNIT_NPC_FLAGS);
             uint32 dyflag    = target->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
@@ -375,7 +375,7 @@ public:
 
         handler->PSendSysMessage(LANG_YOU_CHANGE_FACTION, target->GetGUID().GetCounter(), factionid, flag, npcflag, dyflag);
 
-        target->setFaction(factionid);
+        target->SetFaction(factionid);
         target->SetUInt32Value(UNIT_FIELD_FLAGS, flag);
         target->SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
         target->SetUInt32Value(UNIT_DYNAMIC_FLAGS, dyflag);
@@ -485,14 +485,8 @@ public:
         return false;
     }
 
-    static bool CheckModifySpeed(ChatHandler* handler, char const* args, Unit* target, float& speed, float minimumBound, float maximumBound, bool checkInFlight = true)
+    static bool CheckModifySpeed(ChatHandler* handler, float& speed, Unit* target, float minimumBound, float maximumBound, bool checkInFlight = true)
     {
-        if (!*args)
-        {
-            return false;
-        }
-
-        speed = Acore::StringTo<float>(args).value();
 
         if (speed > maximumBound || speed < minimumBound)
         {
@@ -802,20 +796,10 @@ public:
             return false;
         }
 
-        char const* mount_cstr = strtok(const_cast<char*>(args), " ");
-        char const* speed_cstr = strtok(nullptr, " ");
+        char* token = strtok((char*)args, " ");
+        int mount   = atoi(token);
+        float speed = atof(strtok(nullptr, " "));
 
-        if (!mount_cstr)
-        {
-            return false;
-        }
-
-        if (!speed_cstr)
-        {
-            speed_cstr = "1";
-        }
-
-        uint32 mount = Acore::StringTo<uint32>(mount_cstr).value();
         if (!sCreatureDisplayInfoStore.LookupEntry(mount))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
@@ -837,8 +821,7 @@ public:
             return false;
         }
 
-        float speed = 0.f;
-        if (!CheckModifySpeed(handler, speed_cstr, target, speed, 0.1f, 50.0f))
+        if (!CheckModifySpeed(handler, speed, target, 0.1f, 50.0f))
         {
             return false;
         }

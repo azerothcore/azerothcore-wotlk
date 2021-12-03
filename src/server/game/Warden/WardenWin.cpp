@@ -15,17 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WardenWin.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoRandom.h"
 #include "HMAC.h"
+#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SessionKeyGenerator.h"
 #include "Util.h"
 #include "WardenCheckMgr.h"
 #include "WardenModuleWin.h"
-#include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -485,7 +486,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
         if (result == 0x00)
         {
             LOG_DEBUG("warden", "TIMING CHECK FAIL result 0x00");
-            ApplyPenalty(0, "TIMING CHECK FAIL result");
+            // ApplyPenalty(0, "TIMING CHECK FAIL result"); Commented out because of too many false postives. Mostly caused by client stutter.
             return;
         }
 

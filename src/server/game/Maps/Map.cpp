@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Chat.h"
@@ -26,22 +27,18 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
-#include "Map.h"
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
+#include "ObjectGridLoader.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
-#include "Vehicle.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+#include "Vehicle.h"
 
 union u_map_magic
 {
@@ -68,7 +65,7 @@ Map::~Map()
     {
         WorldObject* obj = *i_worldObjects.begin();
         ASSERT(obj->IsWorldObject());
-        LOG_ERROR("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
+        LOG_DEBUG("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
         //ASSERT(obj->GetTypeId() == TYPEID_CORPSE);
         obj->RemoveFromWorld();
         obj->ResetMap();
@@ -533,13 +530,13 @@ void Map::InitializeObject(T* /*obj*/)
 template<>
 void Map::InitializeObject(Creature*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<>
 void Map::InitializeObject(GameObject*  /*obj*/)
 {
-    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
+    //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE;
 }
 
 template<class T>
@@ -2998,37 +2995,38 @@ void InstanceMap::AfterPlayerUnlinkFromMap()
 
 void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask)
 {
-    if (instance_data != nullptr)
-        return;
-#ifdef ELUNA
-    bool isElunaAI = false;
-    instance_data = sEluna->GetInstanceData(this);
     if (instance_data)
-        isElunaAI = true;
+    {
+        return;
+    }
+
+    bool isOtherAI = false;
+
+    sScriptMgr->OnBeforeCreateInstanceScript(this, instance_data, load, data, completedEncounterMask);
+
+    if (instance_data)
+        isOtherAI = true;
 
     // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
-    if (!isElunaAI)
+    if (!isOtherAI)
     {
-#endif
         InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(GetId());
         if (mInstance)
         {
             i_script_id = mInstance->ScriptId;
             instance_data = sScriptMgr->CreateInstanceScript(this);
         }
-#ifdef ELUNA
     }
-#endif
 
     if (!instance_data)
         return;
 
-#ifdef ELUNA
     // use mangos behavior if we are dealing with Eluna AI
     // initialize should then be called only if load is false
-    if (!isElunaAI || !load)
-#endif
+    if (!isOtherAI || !load)
+    {
         instance_data->Initialize();
+    }
 
     if (load)
     {
@@ -3410,9 +3408,21 @@ void Map::DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId)
 void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source)
 {
     Difficulty difficulty_fixed = (IsSharedDifficultyMap(GetId()) ? Difficulty(GetDifficulty() % 2) : GetDifficulty());
-    DungeonEncounterList const* encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    DungeonEncounterList const* encounters;
+    // 631 : ICC - 724 : Ruby Sanctum --- For heroic difficulties, for some reason, we don't have an encounter list, so we get the encounter list from normal diff. We shouldn't change difficulty_fixed variable.
+    if ((GetId() == 631 || GetId() == 724) && IsHeroic())
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), !Is25ManRaid() ? RAID_DIFFICULTY_10MAN_NORMAL : RAID_DIFFICULTY_25MAN_NORMAL);
+    }
+    else
+    {
+        encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
+    }
+
     if (!encounters)
+    {
         return;
+    }
 
     uint32 dungeonId = 0;
     bool updated = false;

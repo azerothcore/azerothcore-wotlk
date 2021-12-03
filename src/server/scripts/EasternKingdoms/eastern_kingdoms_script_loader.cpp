@@ -38,11 +38,15 @@ void AddSC_boss_halycon();
 void AddSC_boss_highlordomokk();
 void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_thebeast();
+void AddSC_boss_lord_valthalak();
 void AddSC_boss_warmastervoone();
 void AddSC_boss_pyroguard_emberseer();
 void AddSC_boss_gyth();
 void AddSC_boss_rend_blackhand();
 void AddSC_boss_urok_doomhowl();
+void AddSC_boss_solakar_flamewreath();
+void AddSC_boss_quartermasterzigris();
+void AddSC_boss_mor_grayhoof();
 void AddSC_instance_blackrock_spire();
 void AddSC_boss_razorgore();                 //Blackwing lair
 void AddSC_boss_vaelastrasz();
@@ -74,7 +78,8 @@ void AddSC_boss_selin_fireheart();
 void AddSC_boss_vexallus();
 void AddSC_boss_priestess_delrissa();
 void AddSC_instance_magisters_terrace();
-void AddSC_boss_lucifron();                  //Molten core
+void AddSC_molten_core();                   //Molten core
+void AddSC_boss_lucifron();
 void AddSC_boss_magmadar();
 void AddSC_boss_gehennas();
 void AddSC_boss_garr();
@@ -92,9 +97,11 @@ void AddSC_the_scarlet_enclave_c5();
 void AddSC_instance_scarlet_monastery();     //Scarlet Monastery
 void AddSC_boss_kirtonos_the_herald();
 void AddSC_boss_darkmaster_gandling();
+void AddSC_boss_kormok();
 void AddSC_instance_scholomance();           //Scholomance
 void AddSC_instance_shadowfang_keep();       //Shadowfang keep
 void AddSC_boss_baroness_anastari();
+void AddSC_boss_jarien_and_sothos();
 void AddSC_instance_stratholme();            //Stratholme
 void AddSC_instance_sunken_temple();         //Sunken Temple
 void AddSC_instance_sunwell_plateau();       //Sunwell Plateau
@@ -147,6 +154,7 @@ void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
 //void AddSC_wetlands();
+void AddSC_burning_steppes();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -174,11 +182,15 @@ void AddEasternKingdomsScripts()
     AddSC_boss_highlordomokk();
     AddSC_boss_overlordwyrmthalak();
     AddSC_boss_thebeast();
+    AddSC_boss_lord_valthalak();
     AddSC_boss_warmastervoone();
     AddSC_boss_pyroguard_emberseer();
     AddSC_boss_gyth();
+    AddSC_boss_solakar_flamewreath();
     AddSC_boss_rend_blackhand();
     AddSC_boss_urok_doomhowl();
+    AddSC_boss_quartermasterzigris();
+    AddSC_boss_mor_grayhoof();
     AddSC_instance_blackrock_spire();
     AddSC_boss_razorgore();                 //Blackwing lair
     AddSC_boss_vaelastrasz();
@@ -210,7 +222,8 @@ void AddEasternKingdomsScripts()
     AddSC_boss_vexallus();
     AddSC_boss_priestess_delrissa();
     AddSC_instance_magisters_terrace();
-    AddSC_boss_lucifron();                  //Molten core
+    AddSC_molten_core();                    // Molten core
+    AddSC_boss_lucifron();
     AddSC_boss_magmadar();
     AddSC_boss_gehennas();
     AddSC_boss_garr();
@@ -228,9 +241,11 @@ void AddEasternKingdomsScripts()
     AddSC_instance_scarlet_monastery();     //Scarlet Monastery
     AddSC_boss_kirtonos_the_herald();
     AddSC_boss_darkmaster_gandling();
+    AddSC_boss_kormok();
     AddSC_instance_scholomance();           //Scholomance
     AddSC_instance_shadowfang_keep();       //Shadowfang keep
     AddSC_boss_baroness_anastari();
+    AddSC_boss_jarien_and_sothos();
     AddSC_instance_stratholme();            //Stratholme
     AddSC_instance_sunken_temple();         //Sunken Temple
     AddSC_instance_sunwell_plateau();       //Sunwell Plateau
@@ -283,4 +298,5 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     //AddSC_wetlands();
+    AddSC_burning_steppes();
 }

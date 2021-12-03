@@ -16,9 +16,9 @@
  */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -240,7 +240,7 @@ public:
             if (Unit* caster = GetCaster())
             {
                 caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
-                caster->setFaction(88);
+                caster->SetFaction(FACTION_BLACKFATHOM);
             }
         }
 

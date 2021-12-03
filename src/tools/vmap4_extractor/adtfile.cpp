@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "vmapexport.h"
 #include "adtfile.h"
+#include "vmapexport.h"
 #include <algorithm>
 #include <cstdio>
 

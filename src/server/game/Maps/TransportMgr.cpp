@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TransportMgr.h"
 #include "InstanceScript.h"
 #include "MapMgr.h"
 #include "MoveSpline.h"
 #include "Transport.h"
-#include "TransportMgr.h"
 
 TransportTemplate::~TransportTemplate()
 {
