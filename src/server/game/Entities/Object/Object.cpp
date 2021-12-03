@@ -55,11 +55,6 @@
 //  there is probably some underlying problem with imports which should properly addressed
 #include "GridNotifiersImpl.h"
 
-#ifdef ELUNA
-#include "ElunaEventMgr.h"
-#include "LuaEngine.h"
-#endif
-
 constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max)] =
 {
     DEFAULT_VISIBILITY_DISTANCE,
@@ -87,10 +82,7 @@ Object::Object() : m_PackGUID(sizeof(uint64) + 1)
 
 WorldObject::~WorldObject()
 {
-#ifdef ELUNA
-    delete elunaEvents;
-    elunaEvents = nullptr;
-#endif
+    sScriptMgr->OnWorldObjectDestroy(this);
 
     // this may happen because there are many !create/delete
     if (IsWorldObject() && m_currMap)
@@ -1106,23 +1098,20 @@ void MovementInfo::OutDebug()
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
-#ifdef ELUNA
-    elunaEvents(nullptr),
-#endif
     LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
     m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+
+    sScriptMgr->OnWorldObjectCreate(this);
 }
 
-#ifdef ELUNA
 void WorldObject::Update(uint32 time_diff)
 {
-    elunaEvents->Update(time_diff);
+    sScriptMgr->OnWorldObjectUpdate(this, time_diff);
 }
-#endif
 
 void WorldObject::SetWorldObject(bool on)
 {
@@ -2227,22 +2216,23 @@ void WorldObject::SetMap(Map* map)
 {
     ASSERT(map);
     ASSERT(!IsInWorld());
+
     if (m_currMap == map) // command add npc: first create, than loadfromdb
+    {
         return;
+    }
+
     if (m_currMap)
     {
         LOG_FATAL("entities.object", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
+
     m_currMap = map;
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
 
-#ifdef ELUNA
-    delete elunaEvents;
-    // On multithread replace this with a pointer to map's Eluna pointer stored in a map
-    elunaEvents = new ElunaEventProcessor(&Eluna::GEluna, this);
-#endif
+    sScriptMgr->OnWorldObjectSetMap(this, map);
 
     if (IsWorldObject())
         m_currMap->AddWorldObject(this);
@@ -2252,13 +2242,13 @@ void WorldObject::ResetMap()
 {
     ASSERT(m_currMap);
     ASSERT(!IsInWorld());
-    if (IsWorldObject())
-        m_currMap->RemoveWorldObject(this);
 
-#ifdef ELUNA
-    delete elunaEvents;
-    elunaEvents = nullptr;
-#endif
+    if (IsWorldObject())
+    {
+        m_currMap->RemoveWorldObject(this);
+    }
+
+    sScriptMgr->OnWorldObjectResetMap(this);
 
     m_currMap = nullptr;
     //maybe not for corpse
