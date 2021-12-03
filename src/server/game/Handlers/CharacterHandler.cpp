@@ -987,13 +987,17 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
         PlayerInfo const* info = sObjectMgr->GetPlayerInfo(pCurrChar->getRace(), pCurrChar->getClass());
         for (uint32 spellId : info->castSpells)
+        {
             pCurrChar->CastSpell(pCurrChar, spellId, true);
+        }
 
         // start with every map explored
         if (sWorld->getBoolConfig(CONFIG_START_ALL_EXPLORED))
         {
             for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; i++)
+            {
                 pCurrChar->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+            }
         }
 
         // Reputations if "StartAllReputation" is enabled, -- TODO: Fix this in a better way
