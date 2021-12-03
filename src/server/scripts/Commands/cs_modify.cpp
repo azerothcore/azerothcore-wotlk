@@ -485,7 +485,7 @@ public:
         return false;
     }
 
-    static bool CheckModifySpeedFloat(ChatHandler* handler, float& speed, Unit* target, float minimumBound, float maximumBound, bool checkInFlight = true)
+    static bool CheckModifySpeed(ChatHandler* handler, float& speed, Unit* target, float minimumBound, float maximumBound, bool checkInFlight = true)
     {
 
         if (speed > maximumBound || speed < minimumBound)
@@ -821,7 +821,7 @@ public:
             return false;
         }
 
-        if (!CheckModifySpeedFloat(handler, speed, target, 0.1f, 50.0f))
+        if (!CheckModifySpeed(handler, speed, target, 0.1f, 50.0f))
         {
             return false;
         }
