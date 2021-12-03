@@ -53,10 +53,6 @@
 //  there is probably some underlying problem with imports which should properly addressed
 #include "GridNotifiersImpl.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
@@ -242,12 +238,8 @@ void Creature::AddToWorld()
         {
             GetZoneScript()->OnCreatureCreate(this);
         }
-#ifdef ELUNA
-        sEluna->OnAddToWorld(this);
 
-    if (IsGuardian() && ToTempSummon() && ToTempSummon()->GetSummonerGUID().IsPlayer())
-        sEluna->OnPetAddedToWorld(ToTempSummon()->GetSummonerUnit()->ToPlayer(), this);
-#endif
+        sScriptMgr->OnCreatureAddWorld(this);
     }
 }
 
@@ -255,9 +247,8 @@ void Creature::RemoveFromWorld()
 {
     if (IsInWorld())
     {
-#ifdef ELUNA
-        sEluna->OnRemoveFromWorld(this);
-#endif
+        sScriptMgr->OnCreatureRemoveWorld(this);
+
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
 
@@ -2351,13 +2342,6 @@ bool Creature::_IsTargetAcceptable(const Unit* target) const
     return false;
 }
 
-bool Creature::_CanDetectFeignDeathOf(const Unit* target) const
-{
-    if (target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-        return IsGuard();
-    return true;
-}
-
 void Creature::UpdateMoveInLineOfSightState()
 {
     // xinef: pets, guardians and units with scripts / smartAI should be skipped
@@ -2419,6 +2403,12 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     // cannot attack if is during 5 second grace period, unless being attacked
     if (m_respawnedTime && (sWorld->GetGameTime() - m_respawnedTime) < 5 && victim->getAttackers().empty())
+    {
+        return false;
+    }
+
+    // if victim is in FD and we can't see that
+    if (victim->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) && !CanIgnoreFeignDeath())
     {
         return false;
     }

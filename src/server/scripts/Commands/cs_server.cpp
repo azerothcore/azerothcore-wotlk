@@ -27,6 +27,7 @@
 #include "Config.h"
 #include "GitRevision.h"
 #include "Language.h"
+#include "ModuleMgr.h"
 #include "MySQLThreading.h"
 #include "Player.h"
 #include "Realm.h"
@@ -219,6 +220,14 @@ public:
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+
+        handler->SendSysMessage("> List enable modules:");
+
+        for (auto const& modName : Acore::Module::GetEnableModulesList())
+        {
+            handler->SendSysMessage(Acore::StringFormatFmt("- {}", modName));
+        }
+
         return true;
     }
 
