@@ -25,11 +25,11 @@
 #include <mysqld_error.h>
 #include <thread>
 
-DatabaseLoader::DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask)
-    : _logger(logger), _autoSetup(sConfigMgr->GetOption<bool>("Updates.AutoSetup", true)),
-    _updateFlags(sConfigMgr->GetOption<uint32>("Updates.EnableDatabases", defaultUpdateMask))
-{
-}
+DatabaseLoader::DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask, std::string_view modulesList)
+    : _logger(logger),
+    _modulesList(modulesList),
+    _autoSetup(sConfigMgr->GetOption<bool>("Updates.AutoSetup", true)),
+    _updateFlags(sConfigMgr->GetOption<uint32>("Updates.EnableDatabases", defaultUpdateMask)) { }
 
 template <class T>
 DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::string const& name)
@@ -127,7 +127,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
         _update.push([this, name, &pool]() -> bool
         {
-            if (!DBUpdater<T>::Update(pool))
+            if (!DBUpdater<T>::Update(pool, _modulesList))
             {
                 LOG_ERROR(_logger, "Could not update the %s database, see log for details.", name.c_str());
                 return false;

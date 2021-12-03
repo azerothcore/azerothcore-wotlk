@@ -50,7 +50,8 @@ enum DataTypes
     DATA_HALL_RUNE_5                = 20,
     DATA_HALL_RUNE_6                = 21,
     DATA_HALL_RUNE_7                = 22,
-    DATA_SOLAKAR_FLAMEWREATH        = 23
+    DATA_SOLAKAR_FLAMEWREATH        = 23,
+    DATA_MOR_GRAYHOOF               = 24
 };
 
 enum CreaturesIds
