@@ -18,7 +18,9 @@
 #ifndef DEF_DIRE_MAUL_H
 #define DEF_DIRE_MAUL_H
 
-#include "UnitAI.h"
+#include "CreatureAIImpl.h"
+
+constexpr auto DMScriptName = "instance_dire_maul";
 
 enum DataTypes
 {
@@ -27,6 +29,7 @@ enum DataTypes
     TYPE_PYLONS_STATE               = 2,
     TYPE_NORTH_WING_PROGRESS        = 3,
     TYPE_NORTH_WING_BOSSES          = 4,
+    DATA_ISALIEN                    = 32,
 
     ALL_PYLONS_OFF                  = 0x1F
 };
@@ -42,5 +45,13 @@ enum NpcIds
     NPC_IMMOL_THAR                  = 11496,
     NPC_HIGHBORNE_SUMMONER          = 11466
 };
+
+template <class AI, class T>
+inline AI* GetDireMaulAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, DMScriptName);
+}
+
+#define RegisterDireMaulCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetDireMaulAI)
 
 #endif

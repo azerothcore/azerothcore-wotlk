@@ -42,6 +42,7 @@ void AddSC_boss_mal_ganis();
 void AddSC_boss_meathook();
 void AddSC_culling_of_stratholme();
 void AddSC_instance_culling_of_stratholme();
+void AddSC_boss_isalien();
 void AddSC_instance_dire_maul();             //Dire Maul
 void AddSC_instance_maraudon();              //Maraudon
 void AddSC_boss_onyxia();                    //Onyxia's Lair
@@ -123,6 +124,7 @@ void AddKalimdorScripts()
     AddSC_boss_meathook();
     AddSC_culling_of_stratholme();
     AddSC_instance_culling_of_stratholme();
+    AddSC_boss_isalien();
     AddSC_instance_dire_maul();             //Dire Maul
     AddSC_instance_maraudon();              //Maraudon
     AddSC_boss_onyxia();                    //Onyxia's Lair
