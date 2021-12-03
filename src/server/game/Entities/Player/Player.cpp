@@ -5520,7 +5520,7 @@ void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool
     Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-void Player::SendDirectMessage(WorldPacket* data)
+void Player::SendDirectMessage(WorldPacket const* data) const
 {
     m_session->SendPacket(data);
 }
