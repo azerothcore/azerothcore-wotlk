@@ -8,23 +8,24 @@ UPDATE `creature_addon` SET `auras`='53274' WHERE  `guid`=130896;
 /* Lich King text + voice during phase 3 of DK questline
 */
 
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 0, 'Bow before your king!', 14, 0, 100, 0, 0, 14796, 29511, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 1, 'Come to me, Crusaders. I will remake you!', 14, 0, 100, 0, 0, 14799, 29514, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 3, 'Cower before my terrible creations!', 14, 0, 100, 0, 0, 14800, 29515, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 4, 'Feast, my children! Feast upon the flesh of the living!', 14, 0, 100, 0, 0, 14801, 29516, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 5, 'Lay down your arms and surrender your souls!', 14, 0, 100, 0, 0, 14802, 29517, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 6, 'Leave no survivors!', 14, 0, 100, 0, 0, 14793, 29508, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 7, 'Soon you will belong to the Scourge.', 14, 0, 100, 0, 0, 14794, 29509, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 8, 'The Light has abandoned you!', 14, 0, 100, 0, 0, 14797, 29512, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 9, 'There is no Light. Only darkness!', 14, 0, 100, 0, 0, 14798, 29513, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 10, 'Where is your Light now, Crusaders?', 14, 0, 100, 0, 0, 14795, 29510, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 11, 'This is the end!', 14, 0, 100, 0, 0, 14789, 29503, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 12, 'Suffer, insects!', 14, 0, 100, 0, 0, 14787, 29467, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 13, 'Ravage the living, minions!', 14, 0, 100, 0, 0, 14788, 29502, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 14, 'The sacking of the Scarlet Enclave will be a lesson for history!', 14, 0, 100, 0, 0, 14790, 29504, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 15, 'There is nowhere to run...', 14, 0, 100, 0, 0, 14791, 29505, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES (29110, 250, 16, 'Let the destruction of this place serve as a lesson to all those who would dare oppose the Scourge!', 14, 0, 100, 0, 0, 14792, 29506, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
-
+DELETE FROM `creature_text` WHERE (`CreatureID` = 29110) AND (`GroupID` = 250);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(29110, 250, 0, 'Bow before your king!', 14, 0, 100, 0, 0, 14796, 29511, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 1, 'Come to me, Crusaders. I will remake you!', 14, 0, 100, 0, 0, 14799, 29514, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 3, 'Cower before my terrible creations!', 14, 0, 100, 0, 0, 14800, 29515, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 4, 'Feast, my children! Feast upon the flesh of the living!', 14, 0, 100, 0, 0, 14801, 29516, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 5, 'Lay down your arms and surrender your souls!', 14, 0, 100, 0, 0, 14802, 29517, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 6, 'Leave no survivors!', 14, 0, 100, 0, 0, 14793, 29508, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 7, 'Soon you will belong to the Scourge.', 14, 0, 100, 0, 0, 14794, 29509, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 8, 'The Light has abandoned you!', 14, 0, 100, 0, 0, 14797, 29512, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 9, 'There is no Light. Only darkness!', 14, 0, 100, 0, 0, 14798, 29513, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 10, 'Where is your Light now, Crusaders?', 14, 0, 100, 0, 0, 14795, 29510, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 11, 'This is the end!', 14, 0, 100, 0, 0, 14789, 29503, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 12, 'Suffer, insects!', 14, 0, 100, 0, 0, 14787, 29467, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 13, 'Ravage the living, minions!', 14, 0, 100, 0, 0, 14788, 29502, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 14, 'The sacking of the Scarlet Enclave will be a lesson for history!', 14, 0, 100, 0, 0, 14790, 29504, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 15, 'There is nowhere to run...', 14, 0, 100, 0, 0, 14791, 29505, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
+(29110, 250, 16, 'Let the destruction of this place serve as a lesson to all those who would dare oppose the Scourge!', 14, 0, 100, 0, 0, 14792, 29506, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29110;
 
