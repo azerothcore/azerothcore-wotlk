@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Tokenize.h"
+#include "StringConvert.h"
 #include "Player.h"
 
 /*********************************************************/
@@ -39,7 +41,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
             uint32 source = fields[0].GetUInt32();
             std::string data = fields[1].GetString();
 
-            Tokenizer tokens(data, ' ');
+            std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', true);
 
             PlayerSettingVector setting;
             setting.resize(tokens.size());
@@ -49,7 +51,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
             for (auto token : tokens)
             {
                 PlayerSetting set;
-                set.value = atoi(token);
+                set.value = Acore::StringTo<uint32>(token).value();
                 setting[++count] = set;
             }
 

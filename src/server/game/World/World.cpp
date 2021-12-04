@@ -2580,7 +2580,7 @@ void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
 
     Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
     Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (auto itr : m_sessions)
+    for (auto const& itr : m_sessions)
     {
         if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
         {
