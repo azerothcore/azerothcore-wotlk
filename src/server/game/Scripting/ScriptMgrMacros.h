@@ -38,7 +38,7 @@ inline bool GetReturnBoolScripts(bool ret, TCallBack&& callback)
 }
 
 template<class ScriptName, class T, typename TCallBack>
-inline void GetReturnIndexScripts(T* ret, TCallBack&& callback)
+inline void GetReturnIndexScripts([[maybe_unused]] T* ret, TCallBack&& callback)
 {
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
         return;
