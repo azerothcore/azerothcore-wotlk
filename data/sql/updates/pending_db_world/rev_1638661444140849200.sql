@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638661444140849200');
 
-/* Nathanos Blightcaller Voice Lines
+/* Nathanos Blightcaller Text Lines
 */
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=11878 AND `source_type`=0 AND `id` IN (9, 10);
