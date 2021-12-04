@@ -103,9 +103,9 @@ void Player::UpdatePlayerSetting(uint32 source, uint8 index, uint32 value)
 
     if (itr == m_charSettingsMap.end())
     {
+        // Settings not found, initialize a new entry.
         uint8 size = index ? index : index + 1;
 
-        // Settings not found, initialize a new entry.
         PlayerSettingVector setting;
         setting.resize(size);
 
