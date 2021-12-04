@@ -28,7 +28,6 @@ enum PlayerSettingSources : uint8
 enum CharacterSettingIndexes : uint8
 {
     SETTING_ANNOUNCER_FLAGS,
-    SETTING_GM_CHEATS,
     MAX_CHAR_SETTINGS
 };
 
