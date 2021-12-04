@@ -18,7 +18,7 @@
 #include "Player.h"
 
 /*********************************************************/
-/***                    SETTINGS SYSTEM                ***/
+/***              PLAYER SETTINGS SYSTEM               ***/
 /*********************************************************/
 
 void Player::_LoadCharacterSettings(PreparedQueryResult result)
