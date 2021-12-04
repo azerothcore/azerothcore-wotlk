@@ -33,6 +33,8 @@ inline bool GetReturnBoolScripts(bool ret, TCallBack&& callback)
         if (callback(script))
             return needReturn;
     }
+
+    return ret;
 }
 
 template<class ScriptName, class T, typename TCallBack>
