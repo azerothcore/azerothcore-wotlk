@@ -24,14 +24,14 @@ template<typename ScriptName, typename TCallBack>
 inline bool GetReturnBoolScripts(bool ret, TCallBack&& callback)
 {
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
-        return;
+        return ret;
 
-    bool afterReturn = !ret;
+    bool needReturn = !ret;
 
     for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
     {
         if (callback(script))
-            return afterReturn;
+            return needReturn;
     }
 }
 
@@ -39,17 +39,16 @@ template<class ScriptName, class T, typename TCallBack>
 inline void GetReturnIndexScripts(T* ret, TCallBack&& callback)
 {
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
-        return ret;
+        return;
 
     for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
     {
         if (T* scriptAI = callback(script))
         {
-            return scriptAI;
+            ret = scriptAI;
+            break;
         }
     }
-
-    return ret;
 }
 
 // Utility macros to refer to the script registry.
