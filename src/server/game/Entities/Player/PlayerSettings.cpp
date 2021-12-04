@@ -109,7 +109,7 @@ void Player::UpdatePlayerSetting(uint32 source, uint8 index, uint32 value)
         PlayerSettingVector setting;
         setting.resize(size);
 
-        for (uint32 itr = 0; itr < size; ++itr)
+        for (uint32 itr = 0; itr <= index; ++itr)
         {
             PlayerSetting set;
             set.value = itr == index ? value : 0;
