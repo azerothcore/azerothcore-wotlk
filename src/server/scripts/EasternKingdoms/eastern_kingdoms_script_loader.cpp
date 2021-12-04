@@ -97,9 +97,11 @@ void AddSC_the_scarlet_enclave_c5();
 void AddSC_instance_scarlet_monastery();     //Scarlet Monastery
 void AddSC_boss_kirtonos_the_herald();
 void AddSC_boss_darkmaster_gandling();
+void AddSC_boss_kormok();
 void AddSC_instance_scholomance();           //Scholomance
 void AddSC_instance_shadowfang_keep();       //Shadowfang keep
 void AddSC_boss_baroness_anastari();
+void AddSC_boss_jarien_and_sothos();
 void AddSC_instance_stratholme();            //Stratholme
 void AddSC_instance_sunken_temple();         //Sunken Temple
 void AddSC_instance_sunwell_plateau();       //Sunwell Plateau
@@ -239,9 +241,11 @@ void AddEasternKingdomsScripts()
     AddSC_instance_scarlet_monastery();     //Scarlet Monastery
     AddSC_boss_kirtonos_the_herald();
     AddSC_boss_darkmaster_gandling();
+    AddSC_boss_kormok();
     AddSC_instance_scholomance();           //Scholomance
     AddSC_instance_shadowfang_keep();       //Shadowfang keep
     AddSC_boss_baroness_anastari();
+    AddSC_boss_jarien_and_sothos();
     AddSC_instance_stratholme();            //Stratholme
     AddSC_instance_sunken_temple();         //Sunken Temple
     AddSC_instance_sunwell_plateau();       //Sunwell Plateau
