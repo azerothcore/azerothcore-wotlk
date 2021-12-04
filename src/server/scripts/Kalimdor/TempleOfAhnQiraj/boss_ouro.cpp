@@ -22,8 +22,8 @@ SDComment: No model for submerging. Currently just invisible.
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -32,7 +32,59 @@ enum Spells
     SPELL_SANDBLAST             = 26102,
     SPELL_GROUND_RUPTURE        = 26100,
     SPELL_BIRTH                 = 26262, // The Birth Animation
-    SPELL_DIRTMOUND_PASSIVE     = 26092
+    SPELL_DIRTMOUND_PASSIVE     = 26092,
+    SPELL_SUMMON_OURO           = 26061
+};
+
+class npc_ouro_spawner : public CreatureScript
+{
+public:
+    npc_ouro_spawner() : CreatureScript("npc_ouro_spawner") {}
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ouro_spawnerAI(creature);
+    }
+
+    struct npc_ouro_spawnerAI : public ScriptedAI
+    {
+        npc_ouro_spawnerAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Reset();
+        }
+
+        bool hasSummoned;
+
+        void Reset() override
+        {
+            hasSummoned = false;
+            DoCast(me, SPELL_DIRTMOUND_PASSIVE);
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            // Spawn Ouro on LoS check
+            if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f))
+            {
+                DoCast(me, SPELL_SUMMON_OURO);
+                hasSummoned = true;
+            }
+
+            ScriptedAI::MoveInLineOfSight(who);
+        }
+
+        void JustSummoned(Creature* creature) override
+        {
+            // Despawn when Ouro is spawned
+            if (creature->GetEntry() == NPC_OURO)
+            {
+                creature->SetInCombatWithZone();
+                creature->CastSpell(creature, SPELL_BIRTH, false);
+                me->DespawnOrUnsummon();
+            }
+        }
+
+    };
 };
 
 class boss_ouro : public CreatureScript
@@ -145,5 +197,6 @@ public:
 
 void AddSC_boss_ouro()
 {
+    new npc_ouro_spawner();
     new boss_ouro();
 }
