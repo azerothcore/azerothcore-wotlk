@@ -1140,12 +1140,12 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
     ASSERT(player);
     ASSERT(trigger);
 
-    bool ret = true;
+    bool ret = false;
     FOR_SCRIPTS_RET(ElunaScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanAreaTrigger(player, trigger))
-            ret = false; // we change ret value only when scripts return false
+        if (itr->second->CanAreaTrigger(player, trigger))
+            ret = true; // we change ret value only when scripts return false
 
-    if (!ret)
+    if (ret)
     {
         return false;
     }
