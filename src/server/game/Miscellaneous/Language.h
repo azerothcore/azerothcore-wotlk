@@ -1230,7 +1230,11 @@ enum AcoreStrings
     LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG = 5068,
     LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
 
-    // Room for more strings    5070-9999
+    LANG_CMD_AUTOBROADCAST_LVL_ERROR    = 5070,
+    LANG_CMD_SETTINGS_ANNOUNCER_ON      = 5071,
+    LANG_CMD_SETTINGS_ANNOUNCER_OFF     = 5072,
+
+    // Room for more strings    5073-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

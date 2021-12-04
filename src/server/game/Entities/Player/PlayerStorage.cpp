@@ -7161,6 +7161,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     GetSession()->SaveTutorialsData(trans);                 // changed only while character in game
     _SaveGlyphs(trans);
     _SaveInstanceTimeRestrictions(trans);
+    _SavePlayerSettings(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction

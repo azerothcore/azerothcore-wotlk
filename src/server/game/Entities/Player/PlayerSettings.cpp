@@ -26,6 +26,11 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
 {
     m_charSettingsMap.clear();
 
+    if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+    {
+        return;
+    }
+
     if (result)
     {
         do
@@ -46,8 +51,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
             {
                 PlayerSetting set;
                 set.value = atoi(token);
-                setting[count] = set;
-                ++count;
+                setting[++count] = set;
             }
 
             m_charSettingsMap[source] = setting;
@@ -56,41 +60,67 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
     }
 }
 
-PlayerSetting Player::GetPlayerSetting(uint32 source, uint32 index) const
+PlayerSetting Player::GetPlayerSetting(uint32 source, uint8 index)
 {
     auto itr = m_charSettingsMap.find(source);
 
     if (itr == m_charSettingsMap.end())
     {
-        PlayerSetting setting;
-        setting.value = 0;
-        return setting;
+        // Settings not found, this will initialize a new entry.
+        UpdatePlayerSetting(source, index, 0);
+        return GetPlayerSetting(source, index);
     }
 
     return itr->second[index];
 }
 
-void Player::UpdatePlayerSetting(uint32 source, uint32 index, uint32 value)
+void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
+{
+    if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+    {
+        return;
+    }
+
+    for (auto itr : m_charSettingsMap)
+    {
+        std::ostringstream data;
+
+        for (auto setting : itr.second)
+        {
+            data << setting.value << ' ';
+        }
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_SETTINGS);
+        stmt->setUInt32(0, GetGUID().GetCounter());
+        stmt->setUInt32(1, itr.first);
+        stmt->setString(2, data.str());
+        trans->Append(stmt);
+    }
+}
+
+void Player::UpdatePlayerSetting(uint32 source, uint8 index, uint32 value)
 {
     auto itr = m_charSettingsMap.find(source);
 
     if (itr == m_charSettingsMap.end())
     {
-        return;
-    }
+        uint8 size = index ? index : index + 1;
+        // Settings not found, initialize a new entry.
+        PlayerSettingVector setting;
+        setting.resize(size);
 
-    itr->second[index].value = value;
-}
-
-void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
-{
-    std::string data;
-
-    for (auto itr : m_charSettingsMap)
-    {
-        for (auto setting : itr.second)
+        for (uint32 itr = 0; itr < size; ++itr)
         {
-            data << setting.value;
+            PlayerSetting set;
+            set.value = itr == index ? value : 0;
+
+            setting[itr] = set;
         }
+
+        m_charSettingsMap[source] = setting;
+    }
+    else
+    {
+        itr->second[index].value = value;
     }
 }

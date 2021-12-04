@@ -34,7 +34,9 @@ enum CharacterSettingIndexes : uint8
 
 enum AnnouncerFlags : uint8
 {
-    ANNOUNCER_FLAG_DISABLE_BG_QUEUE = 1
+    ANNOUNCER_FLAG_DISABLE_BG_QUEUE      = 1,
+    ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE   = 2,
+    ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST = 4
 };
 
 struct PlayerSetting
@@ -43,6 +45,8 @@ struct PlayerSetting
 
     [[nodiscard]] bool HasFlag(uint32 flag) { return (value & flag) != 0; }
     [[nodiscard]] bool IsEnabled(uint32 equals = 1) { return value == equals; }
+    void AddFlag(uint32 flag) { value = value | flag; }
+    void RemoveFlag(uint32 flag) { value = value &~ flag; }
 };
 
 typedef std::vector<PlayerSetting> PlayerSettingVector;
