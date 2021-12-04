@@ -6,4 +6,4 @@ CREATE TABLE IF NOT EXISTS `character_settings` (
   `source` INT UNSIGNED NOT NULL,
   `data` TEXT NULL,
   PRIMARY KEY (`guid`, `source`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player Settings'
+) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player Settings';
