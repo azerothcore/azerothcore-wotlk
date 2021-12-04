@@ -18,4 +18,6 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
+#include "MailPackets.h"
+
 #endif // AllPackets_h__

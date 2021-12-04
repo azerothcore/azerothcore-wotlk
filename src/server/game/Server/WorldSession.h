@@ -71,6 +71,18 @@ namespace lfg
 
 namespace WorldPackets
 {
+    namespace Mail
+    {
+        class MailCreateTextItem;
+        class MailDelete;
+        class MailGetList;
+        class MailMarkAsRead;
+        class MailQueryNextMailTime;
+        class MailReturnToSender;
+        class MailTakeItem;
+        class MailTakeMoney;
+        class SendMail;
+    }
 }
 
 enum AccountDataType
@@ -682,16 +694,16 @@ public:                                                 // opcodes handlers
     void HandleAuctionPlaceBid(WorldPacket& recvData);
     void HandleAuctionListPendingSales(WorldPacket& recvData);
 
-    void HandleGetMailList(WorldPacket& recvData);
-    void HandleSendMail(WorldPacket& recvData);
-    void HandleMailTakeMoney(WorldPacket& recvData);
-    void HandleMailTakeItem(WorldPacket& recvData);
-    void HandleMailMarkAsRead(WorldPacket& recvData);
-    void HandleMailReturnToSender(WorldPacket& recvData);
-    void HandleMailDelete(WorldPacket& recvData);
+    void HandleGetMailList(WorldPackets::Mail::MailGetList& getList);
+    void HandleSendMail(WorldPackets::Mail::SendMail& sendMail);
+    void HandleMailTakeMoney(WorldPackets::Mail::MailTakeMoney& takeMoney);
+    void HandleMailTakeItem(WorldPackets::Mail::MailTakeItem& takeItem);
+    void HandleMailMarkAsRead(WorldPackets::Mail::MailMarkAsRead& markAsRead);
+    void HandleMailReturnToSender(WorldPackets::Mail::MailReturnToSender& returnToSender);
+    void HandleMailDelete(WorldPackets::Mail::MailDelete& mailDelete);
     void HandleItemTextQuery(WorldPacket& recvData);
-    void HandleMailCreateTextItem(WorldPacket& recvData);
-    void HandleQueryNextMailTime(WorldPacket& recvData);
+    void HandleMailCreateTextItem(WorldPackets::Mail::MailCreateTextItem& createTextItem);
+    void HandleQueryNextMailTime(WorldPackets::Mail::MailQueryNextMailTime& queryNextMailTime);
     void HandleCancelChanneling(WorldPacket& recvData);
 
     void HandleSplitItemOpcode(WorldPacket& recvPacket);
