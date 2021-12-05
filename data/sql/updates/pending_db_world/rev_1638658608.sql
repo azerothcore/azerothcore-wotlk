@@ -10,3 +10,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 /* Shellfish Trap - Invisible */
 UPDATE gameobject_template SET Data11 = 1 WHERE (entry = 176592);
+
+/* Resonite Crystal Trap - Invisible */
+UPDATE `gameobject_template` SET `Data11` = 1 WHERE (`entry` = 178124);
