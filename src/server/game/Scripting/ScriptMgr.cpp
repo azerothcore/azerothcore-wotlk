@@ -26,6 +26,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"
+#include "ScriptMgrMacros.h"
 #include "ScriptSystem.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
@@ -34,14 +35,13 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
+#include "ScriptMgrMacros.h"
 
 struct TSpellSummary
 {
     uint8 Targets; // set of enum SelectTarget
     uint8 Effects; // set of enum SelectEffect
 }*SpellSummary;
-
-#include "ScriptMgrMacros.h"
 
 ScriptMgr::ScriptMgr()
     : _scriptCount(0),
@@ -120,6 +120,10 @@ void ScriptMgr::Unload()
     SCR_CLEAR(ArenaScript);
     SCR_CLEAR(CommandSC);
     SCR_CLEAR(DatabaseScript);
+    SCR_CLEAR(AllCreatureScript);
+    SCR_CLEAR(AllItemScript);
+    SCR_CLEAR(AllGameObjectScript);
+    SCR_CLEAR(ElunaScript);
 
 #undef SCR_CLEAR
 
@@ -778,12 +782,10 @@ bool ScriptMgr::OnGossipHello(Player* player, Creature* creature)
     ASSERT(player);
     ASSERT(creature);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllCreatureScript, itr, end, ret) // return true by default if not scripts
-        if (itr->second->CanCreatureGossipHello(player, creature))
-            ret = true; // we change ret value only when scripts return false
-
-    if (ret)
+    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    {
+        return script->CanCreatureGossipHello(player, creature);
+    }))
     {
         return true;
     }
@@ -798,12 +800,10 @@ bool ScriptMgr::OnGossipSelect(Player* player, Creature* creature, uint32 sender
     ASSERT(player);
     ASSERT(creature);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllCreatureScript, itr, end, ret) // return true by default if not scripts
-        if (itr->second->CanCreatureGossipSelect(player, creature, sender, action))
-            ret = true; // we change ret value only when scripts return false
-
-    if (ret)
+    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    {
+        return script->CanCreatureGossipSelect(player, creature, sender, action);
+    }))
     {
         return true;
     }
@@ -818,12 +818,10 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, Creature* creature, uint32 se
     ASSERT(creature);
     ASSERT(code);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllCreatureScript, itr, end, ret) // return true by default if not scripts
-        if (itr->second->CanCreatureGossipSelectCode(player, creature, sender, action, code))
-            ret = true; // we change ret value only when scripts return false
-
-    if (ret)
+    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    {
+        return script->CanCreatureGossipSelectCode(player, creature, sender, action, code);
+    }))
     {
         return true;
     }
@@ -838,12 +836,10 @@ bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* q
     ASSERT(creature);
     ASSERT(quest);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllCreatureScript, itr, end, ret) // return true by default if not scripts
-        if (itr->second->CanCreatureQuestAccept(player, creature, quest))
-            ret = true; // we change ret value only when scripts return false
-
-    if (ret)
+    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    {
+        return script->CanCreatureQuestAccept(player, creature, quest);
+    }))
     {
         return true;
     }
@@ -881,12 +877,10 @@ bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* q
     ASSERT(creature);
     ASSERT(quest);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllCreatureScript, itr, end, ret) // return true by default if not scripts
-        if (itr->second->CanCreatureQuestReward(player, creature, quest, opt))
-            ret = true; // we change ret value only when scripts return false
-
-    if (ret)
+    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    {
+        return script->CanCreatureQuestReward(player, creature, quest, opt);
+    }))
     {
         return true;
     }
@@ -911,8 +905,11 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
     ASSERT(creature);
 
     CreatureAI* ret = nullptr;
-    FOR_SCRIPTS_RET(AllCreatureScript, itr, end, ret) // return true by default if not scripts
-        ret = itr->second->GetCreatureAI(creature); // we change ret value only when scripts return false
+
+    GetReturnIndexScripts<AllCreatureScript>(ret, [creature](AllCreatureScript* script)
+    {
+        return script->GetCreatureAI(creature);
+    });
 
     if (ret)
     {
@@ -950,12 +947,10 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
     ASSERT(player);
     ASSERT(go);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllGameObjectScript, itr, end, ret)
-        if (itr->second->CanGameObjectGossipHello(player, go))
-            ret = true;
-
-    if (ret)
+    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    {
+        return script->CanGameObjectGossipHello(player, go);
+    }))
     {
         return true;
     }
@@ -970,12 +965,10 @@ bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, ui
     ASSERT(player);
     ASSERT(go);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllGameObjectScript, itr, end, ret)
-        if (itr->second->CanGameObjectGossipSelect(player, go, sender, action))
-            ret = true;
-
-    if (ret)
+    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    {
+        return script->CanGameObjectGossipSelect(player, go, sender, action);
+    }))
     {
         return true;
     }
@@ -990,12 +983,10 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, GameObject* go, uint32 sender
     ASSERT(go);
     ASSERT(code);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllGameObjectScript, itr, end, ret)
-        if (itr->second->CanGameObjectGossipSelectCode(player, go, sender, action, code))
-            ret = true;
-
-    if (ret)
+    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    {
+        return script->CanGameObjectGossipSelectCode(player, go, sender, action, code);
+    }))
     {
         return true;
     }
@@ -1010,12 +1001,10 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     ASSERT(go);
     ASSERT(quest);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllGameObjectScript, itr, end, ret)
-        if (itr->second->CanGameObjectQuestAccept(player, go, quest))
-            ret = true;
-
-    if (ret)
+    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    {
+        return script->CanGameObjectQuestAccept(player, go, quest);
+    }))
     {
         return true;
     }
@@ -1031,12 +1020,10 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
     ASSERT(go);
     ASSERT(quest);
 
-    bool ret = false;
-    FOR_SCRIPTS_RET(AllGameObjectScript, itr, end, ret)
-        if (itr->second->CanGameObjectQuestReward(player, go, quest, opt))
-            ret = true;
-
-    if (ret)
+    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    {
+        return script->CanGameObjectQuestReward(player, go, quest, opt);
+    }))
     {
         return true;
     }
@@ -1111,8 +1098,11 @@ GameObjectAI* ScriptMgr::GetGameObjectAI(GameObject* go)
     ASSERT(go);
 
     GameObjectAI* ret = nullptr;
-    FOR_SCRIPTS_RET(AllGameObjectScript, itr, end, ret)
-        ret = itr->second->GetGameObjectAI(go);
+
+    GetReturnIndexScripts<AllGameObjectScript>(ret, [go](AllGameObjectScript* script)
+    {
+        return script->GetGameObjectAI(go);
+    });
 
     if (ret)
     {
@@ -1140,12 +1130,10 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
     ASSERT(player);
     ASSERT(trigger);
 
-    bool ret = true;
-    FOR_SCRIPTS_RET(ElunaScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanAreaTrigger(player, trigger))
-            ret = false; // we change ret value only when scripts return false
-
-    if (!ret)
+    if (GetReturnBoolScripts<ElunaScript>(false, [&](ElunaScript* script)
+    {
+        return script->CanAreaTrigger(player, trigger);
+    }))
     {
         return false;
     }
