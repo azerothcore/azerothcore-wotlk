@@ -27,6 +27,9 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (29110, 250, 15, 'There is nowhere to run...', 14, 0, 100, 0, 0, 14791, 29505, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
 (29110, 250, 16, 'Let the destruction of this place serve as a lesson to all those who would dare oppose the Scourge!', 14, 0, 100, 0, 0, 14792, 29506, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines');
 
+/* SAI - Cycle through each voice line every minute
+*/
+
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29110;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 29110) AND (`source_type` = 0) AND (`id` IN (0));
