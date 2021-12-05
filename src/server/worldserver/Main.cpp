@@ -38,6 +38,7 @@
 #include "IoContext.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "ModulesScriptLoader.h"
 #include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
@@ -61,9 +62,7 @@
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+#include "ModuleMgr.h"
 
 #ifdef _WIN32
 #include "ServiceWin32.h"
@@ -279,6 +278,8 @@ int main(int argc, char** argv)
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
     sScriptMgr->SetScriptLoader(AddScripts);
+    sScriptMgr->SetModulesLoader(AddModulesScripts);
+
     std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
     {
         sScriptMgr->Unload();
@@ -315,6 +316,8 @@ int main(int argc, char** argv)
         sMetric->Unload();
     });
 
+    Acore::Module::SetEnableModulesList(AC_MODULES_LIST);
+
     // Loading modules configs
     sConfigMgr->PrintLoadedModulesConfigs();
 
@@ -329,10 +332,6 @@ int main(int argc, char** argv)
 
         sOutdoorPvPMgr->Die();                     // unload it before MapMgr
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
-
-#ifdef ELUNA
-        Eluna::Uninitialize();
-#endif
     });
 
     // Start the Remote Access port (acceptor) if enabled
@@ -448,7 +447,7 @@ bool StartDB()
     MySQL::Library_Init();
 
     // Load databases
-    DatabaseLoader loader("server.worldserver");
+    DatabaseLoader loader("server.worldserver", DatabaseLoader::DATABASE_NONE, AC_MODULES_LIST);
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")
