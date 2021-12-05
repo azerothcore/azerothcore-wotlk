@@ -362,8 +362,6 @@ public:
             {
                 instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, MajordomoRagnaros);
             }
-
-;
         }
 
         bool CheckMajordomoExecutus() const
