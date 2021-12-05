@@ -190,16 +190,30 @@ class spell_dru_omen_of_clarity : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo)
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || spellInfo->IsPassive())
+        {
             return true;
+        }
 
-        // xinef: no mana cost
-        if (spellInfo->ManaCost == 0 && spellInfo->ManaCostPercentage == 0)
+        if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
+        {
+            return spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING) || spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE);
+        }
+
+        // Non-damaged/Non-healing spells - only druid abilities
+        if (!spellInfo->HasAttribute(SpellCustomAttributes(SPELL_ATTR0_CU_DIRECT_DAMAGE | SPELL_ATTR0_CU_NO_INITIAL_THREAT)))
+        {
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_DRUID)
+            {
+                // Exclude shapeshifting
+                return !spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT);
+            }
+
             return false;
+        }
 
-        // xinef: SPELL_ATTR0_CU_NO_INITIAL_THREAT and SPELL_ATTR0_CU_DIRECT_DAMAGE contains spells capable of healing and damaging + some others, but this is taken care of above
-        return spellInfo->HasAttribute(SpellCustomAttributes(SPELL_ATTR0_CU_DIRECT_DAMAGE | SPELL_ATTR0_CU_NO_INITIAL_THREAT));
+        return true;
     }
 
     void Register() override
