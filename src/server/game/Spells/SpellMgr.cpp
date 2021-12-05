@@ -3874,6 +3874,21 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectBasePoints[EFFECT_0] = 100; // 100% chance of procc'ing, not -10% (chance calculated in PrepareTriggersExecutedOnHit)
     });
 
+    // Entangling Roots -- Nature's Grasp Proc
+    ApplySpellFix({
+        19970, // (Rank 6)
+        19971, // (Rank 5)
+        19972, // (Rank 4)
+        19973, // (Rank 3)
+        19974, // (Rank 2)
+        19975, // (Rank 1)
+        27010, // (Rank 7)
+        53313  // (Rank 8)
+    }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1);
+    });
+
     // Easter Lay Noblegarden Egg Aura
     ApplySpellFix({ 61719 }, [](SpellEntry* spellInfo)
     {
