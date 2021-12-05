@@ -7,4 +7,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 /* Make generically spawned traps invisible - They share displayId */
 /* For example, fixes: ZF Grave traps, shellfish traps, resonite crystal traps and more..*/
-UPDATE gameobject_template SET `data11` = 1 WHERE displayid = 327 AND TYPE = 6;
+UPDATE `gameobject_template` SET `data11` = 1 WHERE `displayid` = 327 AND `type` = 6;
