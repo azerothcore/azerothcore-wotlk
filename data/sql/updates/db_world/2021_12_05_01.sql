@@ -24,7 +24,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 
 DELETE FROM `game_event_creature` WHERE `eventEntry` = 24 AND `guid` = 24;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
-(24, 24);
+(2, 24);
 
 --
 -- END UPDATING QUERIES
