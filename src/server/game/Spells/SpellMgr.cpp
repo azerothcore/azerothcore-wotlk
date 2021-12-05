@@ -3884,7 +3884,7 @@ void SpellMgr::LoadDbcDataCorrections()
         19975, // (Rank 1)
         27010, // (Rank 7)
         53313  // (Rank 8)
-    }, [](SpellInfo* spellInfo)
+    }, [](SpellEntry* spellInfo)
     {
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1);
     });
