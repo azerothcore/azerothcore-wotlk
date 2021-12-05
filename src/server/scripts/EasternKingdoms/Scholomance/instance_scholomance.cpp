@@ -289,63 +289,6 @@ public:
     }
 };
 
-class spell_kormok_summon_bone_mages : SpellScriptLoader
-{
-public:
-    spell_kormok_summon_bone_mages() : SpellScriptLoader("spell_kormok_summon_bone_mages") { }
-
-    class spell_kormok_summon_bone_magesSpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_kormok_summon_bone_magesSpellScript);
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            for (uint8 i = 0; i < 2; ++i)
-                GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_BONE_MAGE_FRONT_LEFT + urand(0, 3), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kormok_summon_bone_magesSpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_kormok_summon_bone_magesSpellScript();
-    }
-};
-
-class spell_kormok_summon_bone_minions : SpellScriptLoader
-{
-public:
-    spell_kormok_summon_bone_minions() : SpellScriptLoader("spell_kormok_summon_bone_minions") { }
-
-    class spell_kormok_summon_bone_minionsSpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_kormok_summon_bone_minionsSpellScript);
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-
-            for (uint32 i = 0; i < 4; ++i)
-                GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_BONE_MINION1 + i, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kormok_summon_bone_minionsSpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_kormok_summon_bone_minionsSpellScript();
-    }
-};
-
 class spell_scholomance_boon_of_life : public SpellScriptLoader
 {
 public:
@@ -525,8 +468,6 @@ void AddSC_instance_scholomance()
 {
     new instance_scholomance();
     new spell_scholomance_fixate();
-    new spell_kormok_summon_bone_mages();
-    new spell_kormok_summon_bone_minions();
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }
