@@ -3886,7 +3886,7 @@ void SpellMgr::LoadDbcDataCorrections()
         53313  // (Rank 8)
     }, [](SpellEntry* spellInfo)
     {
-        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1);
+        spellInfo->CastingTimeIndex = 1;
     });
 
     // Easter Lay Noblegarden Egg Aura
