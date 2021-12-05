@@ -23,11 +23,8 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "VMapFactory.h"
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 
 MapInstanced::MapInstanced(uint32 id) : Map(id, 0, DUNGEON_DIFFICULTY_NORMAL)
 {
@@ -253,22 +250,16 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
 bool MapInstanced::DestroyInstance(InstancedMaps::iterator& itr)
 {
     itr->second->RemoveAllPlayers();
+
     if (itr->second->HavePlayers())
     {
         ++itr;
         return false;
     }
 
+    sScriptMgr->OnDestroyInstance(this, itr->second);
+
     itr->second->UnloadAll();
-
-    // Free up the instance id and allow it to be reused for bgs and arenas (other instances are handled in the InstanceSaveMgr)
-    //if (itr->second->IsBattlegroundOrArena())
-    //    sMapMgr->FreeInstanceId(itr->second->GetInstanceId());
-
-#ifdef ELUNA
-    //todo:[ELUNA] I'm not sure this is right.
-    sEluna->FreeInstanceId(itr->second->GetInstanceId());
-#endif
 
     // erase map
     delete itr->second;
