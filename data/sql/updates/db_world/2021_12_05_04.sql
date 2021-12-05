@@ -1,3 +1,19 @@
+-- DB update 2021_12_05_03 -> 2021_12_05_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_05_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_05_03 2021_12_05_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638110187508927447'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638110187508927447');
 
 -- Prince Skaldrenox
@@ -63,3 +79,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (15305,0,1,"You dare!  Outrageous!  I curse you, $c.  I curse you with... death!",14,0,100,0,0,0,10806,0,"Lord Skwol"),
 (15305,0,2,"What?  Such a small, frail thing beckons me?  I shall add your bones to my throne, $r!!",14,0,100,0,0,0,10807,0,"Lord Skwol"),
 (15305,0,3,"Killing you and your cohorts, $c, will amuse me.  I shall make it quick.",14,0,100,0,0,0,10810,0,"Lord Skwol");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_05_04' WHERE sql_rev = '1638110187508927447';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
