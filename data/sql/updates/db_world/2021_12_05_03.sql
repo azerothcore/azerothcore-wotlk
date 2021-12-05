@@ -1,3 +1,19 @@
+-- DB update 2021_12_05_02 -> 2021_12_05_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_05_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_05_02 2021_12_05_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638658608'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638658608');
 
 /* Zul'Farrak Shallow Grave - On Gossip Hello - Despawn after 5min */
@@ -8,3 +24,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 /* Make generically spawned traps invisible - They share displayId */
 /* For example, fixes: ZF Grave traps, shellfish traps, resonite crystal traps and more..*/
 UPDATE `gameobject_template` SET `data11` = 1 WHERE `displayid` = 327 AND `type` = 6;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_05_03' WHERE sql_rev = '1638658608';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
