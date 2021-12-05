@@ -49,6 +49,16 @@ enum Spells
     SPELL_MIGHT_OF_RAGNAROS                 = 21154,
     SPELL_INTENSE_HEAT                      = 21155,
     SPELL_SUMMON_SONS_FLAME                 = 21108,    // Trigger the eight spells summoning the Son of Flame adds (TODO)
+
+    SPELL_LAVA_BURST_A                      = 21886,
+    SPELL_LAVA_BURST_B                      = 21900,
+    SPELL_LAVA_BURST_C                      = 21901,
+    SPELL_LAVA_BURST_D                      = 21902,
+    SPELL_LAVA_BURST_E                      = 21903,
+    SPELL_LAVA_BURST_F                      = 21905,
+    SPELL_LAVA_BURST_G                      = 21906,
+    SPELL_LAVA_BURST_H                      = 21907,
+    SPELL_LAVA_BURST_TRAP                   = 21158
 };
 
 enum Events
@@ -61,6 +71,7 @@ enum Events
     EVENT_MAGMA_BLAST_MELEE_CHECK,
     EVENT_MAGMA_BLAST,
     EVENT_SUBMERGE,
+    EVENT_LAVA_BURST_TRIGGER,
 
     // Submerge
     EVENT_EMERGE,
@@ -125,6 +136,7 @@ public:
             _hasSubmergedOnce = false;
             _isKnockbackEmoteAllowed = true;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+            _lavaBurstGUIDS.clear();
         }
 
         void DoAction(int32 action) override
@@ -142,6 +154,19 @@ public:
             if (summon->GetEntry() == NPC_FLAME_OF_RAGNAROS)
             {
                 summon->CastSpell((Unit*)nullptr, SPELL_INTENSE_HEAT, true, nullptr, nullptr, me->GetGUID());
+            }
+        }
+
+        void SetGUID(ObjectGuid guid, int32 index) override
+        {
+            if (index == GO_LAVA_BURST)
+            {
+                if (_lavaBurstGUIDS.empty())
+                {
+                    extraEvents.ScheduleEvent(EVENT_LAVA_BURST_TRIGGER, 2000);
+                }
+
+                _lavaBurstGUIDS.insert(guid);
             }
         }
 
@@ -222,6 +247,25 @@ public:
                             _isKnockbackEmoteAllowed = true;
                             break;
                         }
+                        case EVENT_LAVA_BURST_TRIGGER:
+                        {
+                            ObjectGuid lavaBurstGUID = Acore::Containers::SelectRandomContainerElement(_lavaBurstGUIDS);
+
+                            if (GameObject* go = ObjectAccessor::GetGameObject(*me, lavaBurstGUID))
+                            {
+                                go->CastSpell(nullptr, SPELL_LAVA_BURST_TRAP);
+                                go->SendCustomAnim(0);
+                            }
+
+                            _lavaBurstGUIDS.erase(lavaBurstGUID);
+
+                            if (!_lavaBurstGUIDS.empty())
+                            {
+                                extraEvents.RepeatEvent(1000);
+                            }
+
+                            break;
+                        }
                     }
                 }
             }
@@ -246,6 +290,7 @@ public:
                     case EVENT_WRATH_OF_RAGNAROS:
                     {
                         DoCastVictim(SPELL_WRATH_OF_RAGNAROS);
+
                         if (urand(0, 1))
                         {
                             Talk(SAY_WRATH);
@@ -377,6 +422,8 @@ public:
         bool _hasSubmergedOnce;
         bool _isKnockbackEmoteAllowed;  // Prevents possible text overlap
 
+        GuidSet _lavaBurstGUIDS;
+
         void HandleEmerge()
         {
             if (events.IsInPhase(PHASE_EMERGED))
@@ -425,7 +472,45 @@ public:
     }
 };
 
+constexpr std::array<uint32, 8> RagnarosLavaBurstSpells = { SPELL_LAVA_BURST_A, SPELL_LAVA_BURST_B, SPELL_LAVA_BURST_C, SPELL_LAVA_BURST_D, SPELL_LAVA_BURST_E, SPELL_LAVA_BURST_F, SPELL_LAVA_BURST_G, SPELL_LAVA_BURST_H };
+
+// 21908 - Lava Burst Randomizer
+class spell_ragnaros_lava_burst_randomizer : public SpellScript
+{
+    PrepareSpellScript(spell_ragnaros_lava_burst_randomizer);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(RagnarosLavaBurstSpells);
+    }
+
+    void HandleScript()
+    {
+        if (Unit* caster = GetCaster())
+        {
+            std::vector<uint32> spells;
+
+            // Select three random spells. Can select the same spell twice.
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                spells.push_back(Acore::Containers::SelectRandomContainerElement(RagnarosLavaBurstSpells));
+            }
+
+            for (uint32 spell : spells)
+            {
+                caster->CastSpell(caster, spell, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_ragnaros_lava_burst_randomizer::HandleScript);
+    }
+};
+
 void AddSC_boss_ragnaros()
 {
     new boss_ragnaros();
+    RegisterSpellScript(spell_ragnaros_lava_burst_randomizer);
 }
