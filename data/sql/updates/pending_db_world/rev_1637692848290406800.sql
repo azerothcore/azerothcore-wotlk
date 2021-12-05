@@ -4380,4 +4380,5 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 (22293, 1, 0, 0, 0, 0, 0, 0),
 (15047, 1, 1, 0, 1, 0, 0, NULL),
 (17123, 1, 1, 0, 0, 0, 0, 0),
-(10716, 0, 0, 2, 0, 0, 0, NULL);
+(10716, 0, 0, 2, 0, 0, 0, NULL),
+(36908, 1, 0, 2, 0, 0, 0, NULL);
