@@ -489,16 +489,10 @@ class spell_ragnaros_lava_burst_randomizer : public SpellScript
     {
         if (Unit* caster = GetCaster())
         {
-            std::vector<uint32> spells;
-
             // Select three random spells. Can select the same spell twice.
             for (uint8 i = 0; i < 3; ++i)
             {
-                spells.push_back(Acore::Containers::SelectRandomContainerElement(RagnarosLavaBurstSpells));
-            }
-
-            for (uint32 spell : spells)
-            {
+                uint32 spell = Acore::Containers::SelectRandomContainerElement(RagnarosLavaBurstSpells);
                 caster->CastSpell(caster, spell, true);
             }
         }
