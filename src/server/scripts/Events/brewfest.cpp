@@ -363,6 +363,14 @@ public:
                 {
                     reveler->SetRespawnDelay(5 * MINUTE);
                     reveler->Respawn();
+
+                    // It's here because SmartAI::JustRespawned restores original faction
+                    // So we need to delay a little bit reloading auras from creature_template_addon
+                    reveler->m_Events.AddEventAtOffset([reveler]()
+                    {
+                        reveler->RemoveAllAuras();
+                        reveler->LoadCreaturesAddon(true);
+                    }, 100ms);
                 }
             }
             revelerGUIDs.clear();
