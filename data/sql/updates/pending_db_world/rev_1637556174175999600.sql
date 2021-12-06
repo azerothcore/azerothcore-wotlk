@@ -1,4 +1,6 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1637556174175999600');
 -- Pathing for Sunstrider Guardian Entry: 15371 GUID 55176 
+-- 0x2044EC42400F02C00000AC000381B3A0 .go xyz 10378.912 -6399.252 49.71716
 SET @NPC := 55176;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=10378.912,`position_y`=-6399.252,`position_z`=49.71716 WHERE `guid`=@NPC;
@@ -6,7 +8,6 @@ DELETE FROM `creature_addon` WHERE `guid`=@NPC;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`, `visibilityDistanceType`, `auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
--- 0x2044EC42400F02C00000AC000381B3A0 .go xyz 10378.912 -6399.252 49.71716
 (@PATH,1,10378.912,-6399.252,49.71716,0,0,0,0,100,0),
 (@PATH,2,10383.641,-6413.364,49.718002,0,0,0,0,100,0),
 (@PATH,3,10380.581,-6423.8926,47.823597,0,0,0,0,100,0),
