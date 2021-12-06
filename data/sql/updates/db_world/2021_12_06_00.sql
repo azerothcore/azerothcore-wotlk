@@ -1,3 +1,19 @@
+-- DB update 2021_12_05_08 -> 2021_12_06_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_05_08';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_05_08 2021_12_06_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638293367351399374'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638293367351399374');
 
 -- SAI from TC for Lady Jaina Proudmoore
@@ -31,3 +47,13 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=15 AND `SourceGroup`=24
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14,2465,3158,0,0,8,0,1267,0,0,0,0,0,'','Lady Jaina Proudmoore Shows gossip text 3158 if quest \'The Missing Diplomat (Part 17)\' is rewarded'),
 (15,2465,0,0,0,47,0,558,10,0,0,0,0,'','Lady Jaina Proudmoore Shows gossip option 2465 if player has quest Jaina\'s Autograph');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_06_00' WHERE sql_rev = '1638293367351399374';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
