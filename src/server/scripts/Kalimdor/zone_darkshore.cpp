@@ -591,7 +591,7 @@ public:
                 case EVENT_POST_QUEST_TWO:
                     if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
                     {
-                        bear->SetUInt32Value(UNIT_FIELD_BYTES_1, 7);   
+                        bear->SetUInt32Value(UNIT_FIELD_BYTES_1, 7);
                     }
                     _events.ScheduleEvent(EVENT_POST_QUEST_THREE, 1000);
                     break;
