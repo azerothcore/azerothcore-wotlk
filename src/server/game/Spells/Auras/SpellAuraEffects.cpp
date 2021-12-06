@@ -40,10 +40,6 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 class Aura;
 //
 // EFFECT HANDLER NOTES
@@ -6231,11 +6227,12 @@ void AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick(Unit* target, Unit*
     }
     else
     {
-#ifdef ELUNA
         Creature* c = target->ToCreature();
         if (c && caster)
-            sEluna->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature());
-#endif
+        {
+            sScriptMgr->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature());
+        }
+
         LOG_DEBUG("spells.aura", "AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick: Spell %u has non-existent spell %u in EffectTriggered[%d] and is therefor not triggered.", GetId(), triggerSpellId, GetEffIndex());
     }
 }

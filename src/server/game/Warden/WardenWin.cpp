@@ -486,7 +486,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
         if (result == 0x00)
         {
             LOG_DEBUG("warden", "TIMING CHECK FAIL result 0x00");
-            ApplyPenalty(0, "TIMING CHECK FAIL result");
+            // ApplyPenalty(0, "TIMING CHECK FAIL result"); Commented out because of too many false postives. Mostly caused by client stutter.
             return;
         }
 
