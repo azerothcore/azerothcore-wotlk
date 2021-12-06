@@ -1,0 +1,9 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638820849350039500');
+
+DELETE FROM `spell_group` WHERE `spell_id` IN (16878,24752,39233,23947,23948);
+INSERT INTO `spell_group` VALUES
+(1023,16878,0),
+(1023,24752,0),
+(1023,39233,0),
+(1024,23947,0), 
+(1024,23948,0);
