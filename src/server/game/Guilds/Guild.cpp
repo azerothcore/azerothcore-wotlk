@@ -2227,7 +2227,7 @@ bool Guild::AddMember(ObjectGuid guid, uint8 rankId)
         member->ResetFlags();
 
         bool ok = false;
-        // xinef: zomg! sync query
+        // xinef: sync query
         // Player must exist
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DATA_FOR_GUILD);
         stmt->setUInt32(0, guid.GetCounter());

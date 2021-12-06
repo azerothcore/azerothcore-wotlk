@@ -74,11 +74,6 @@ MapUpdater::MapUpdater(): pending_requests(0)
 {
 }
 
-MapUpdater::~MapUpdater()
-{
-    deactivate();
-}
-
 void MapUpdater::activate(size_t num_threads)
 {
     _workerThreads.reserve(num_threads);

@@ -1143,7 +1143,7 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_FROST_NOVA, false);
                         events.RepeatEvent(15000);
                         EventMapGCD(events, 1500);
-                        // blink disabled, fucking movement shit not working
+                        // blink disabled, movement not working
                     }
                     else
                         events.RepeatEvent(6000);
