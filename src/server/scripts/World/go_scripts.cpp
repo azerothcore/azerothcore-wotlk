@@ -1883,7 +1883,7 @@ void AddSC_go_scripts()
     new go_tadpole_cage();
     new go_flames();
     new go_heat();
-	new go_bear_trap();
+    new go_bear_trap();
 
     // Theirs
     new go_brewfest_music();
