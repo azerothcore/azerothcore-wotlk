@@ -193,7 +193,7 @@ void WorldSession::HandleMoveWorldportAck()
     {
         if (mEntry->IsDungeon())
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->SpawnCorpseBones();
         }
     }
@@ -203,7 +203,7 @@ void WorldSession::HandleMoveWorldportAck()
         // resurrect character upon entering instance when the corpse is not available anymore
         if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->RemoveCorpse();
         }
     }
