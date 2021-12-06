@@ -52,16 +52,18 @@ public:
 
     static bool HandleItemRestoreCommand(ChatHandler* handler, ItemTemplate const* item, PlayerIdentifier player)
     {
+        if (!HasItemDeletionConfig())
+        {
+            handler->SendSysMessage(LANG_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
        if (!item)
         {
             handler->SendSysMessage(LANG_ITEM_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
-        }
-
-        if (Player* target = player.GetConnectedPlayer())
-        {
-            target->Say("thanks", LANG_UNIVERSAL);
         }
 
         return true;
@@ -101,6 +103,10 @@ public:
         return true;
     }
 
+    static bool HasItemDeletionConfig()
+    {
+      return sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD) || sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR);
+    }
 };
 
 void AddSC_item_commandscript()
