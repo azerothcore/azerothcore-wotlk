@@ -1231,6 +1231,7 @@ enum AcoreStrings
     LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
 
     // Room for more strings    5070-9999
+    LANG_COMMAND_DISABLED               = 5070,
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
