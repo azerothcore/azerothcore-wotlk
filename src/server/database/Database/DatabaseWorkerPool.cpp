@@ -39,6 +39,10 @@
 #include <sstream>
 #endif
 
+#ifdef PLAYERBOTS
+#include "PlayerbotDatabase.h"
+#endif
+
 #if MARIADB_VERSION_ID >= 100600
 #define MIN_MYSQL_SERVER_VERSION 100200u
 #define MIN_MYSQL_CLIENT_VERSION 30203u
@@ -530,3 +534,7 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction<T>& trans, PreparedSt
 template class AC_DATABASE_API DatabaseWorkerPool<LoginDatabaseConnection>;
 template class AC_DATABASE_API DatabaseWorkerPool<WorldDatabaseConnection>;
 template class AC_DATABASE_API DatabaseWorkerPool<CharacterDatabaseConnection>;
+
+#ifdef PLAYERBOTS
+template class AC_DATABASE_API DatabaseWorkerPool<PlayerbotDatabaseConnection>;
+#endif

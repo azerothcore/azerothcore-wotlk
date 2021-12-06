@@ -92,6 +92,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+#ifdef PLAYERBOTS
+#include "Playerbot.h"
+#endif
+
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
@@ -410,6 +414,11 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_isInstantFlightOn = true;
 
+#ifdef PLAYERBOTS
+    _playerbotAI = nullptr;
+    _playerbotMgr = nullptr;
+#endif
+
     sScriptMgr->OnConstructPlayer(this);
 }
 
@@ -461,6 +470,14 @@ Player::~Player()
             u->RemovePlayerFromVision(this);
         } while (!m_isInSharedVisionOf.empty());
     }
+
+#ifdef PLAYERBOTS
+    delete _playerbotAI;
+    _playerbotAI = nullptr;
+
+    delete _playerbotMgr;
+    _playerbotMgr = nullptr;
+#endif
 }
 
 void Player::CleanupsBeforeDelete(bool finalCleanup)
@@ -15435,3 +15452,34 @@ std::string Player::GetPlayerName()
 
     return "|Hplayer:" + name + "|h" + color + name + "|h|r";
 }
+
+#ifdef PLAYERBOTS
+void Player::SetPlayerbotAI(PlayerbotAI* ai)
+{
+    ASSERT(!_playerbotAI && !_playerbotMgr);
+
+    _playerbotAI = ai;
+}
+
+PlayerbotAI* Player::GetPlayerbotAI()
+{
+    return _playerbotAI;
+}
+
+void Player::SetPlayerbotMgr(PlayerbotMgr* mgr)
+{
+    ASSERT(!_playerbotAI && !_playerbotMgr);
+
+    _playerbotMgr = mgr;
+}
+
+PlayerbotMgr* Player::GetPlayerbotMgr()
+{
+    return _playerbotMgr;
+}
+
+void Player::SetBotDeathTimer()
+{
+    m_deathTimer = 0;
+}
+#endif

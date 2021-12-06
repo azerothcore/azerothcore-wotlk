@@ -456,6 +456,14 @@ bool StartDB()
     if (!loader.Load())
         return false;
 
+#ifdef PLAYERBOTS
+    DatabaseLoader playerbotLoader("server.playerbot");
+    playerbotLoader.SetUpdateFlags(sConfigMgr->GetOption<bool>("Playerbot.Updates.EnableDatabases", true) ? DatabaseLoader::DATABASE_PLAYERBOT : 0);
+    playerbotLoader.AddDatabase(PlayerbotDatabase, "Playerbot");
+    if (!playerbotLoader.Load())
+        return false;
+#endif
+
     ///- Get the realm Id from the configuration file
     realm.Id.Realm = sConfigMgr->GetIntDefault("RealmID", 0);
     if (!realm.Id.Realm)
@@ -498,6 +506,10 @@ void StopDB()
     CharacterDatabase.Close();
     WorldDatabase.Close();
     LoginDatabase.Close();
+
+#ifdef PLAYERBOTS
+    PlayerbotDatabase.Close();
+#endif
 
     MySQL::Library_End();
 }

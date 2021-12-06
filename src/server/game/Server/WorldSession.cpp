@@ -51,6 +51,10 @@
 #include "WorldSocket.h"
 #include <zlib.h>
 
+#ifdef PLAYERBOTS
+#include "Playerbot.h"
+#endif
+
 namespace
 {
     std::string const DefaultPlayerName = "<none>";
@@ -211,6 +215,20 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         return;
     }
 
+#ifdef PLAYERBOTS
+    if (Player* player = GetPlayer())
+    {
+        if (PlayerbotAI* playerbotAI = player->GetPlayerbotAI())
+        {
+            playerbotAI->HandleBotOutgoingPacket(*packet);
+        }
+        else if (PlayerbotMgr* playerbotMgr = GetPlayer()->GetPlayerbotMgr())
+        {
+            playerbotMgr->HandleMasterOutgoingPacket(*packet);
+        }
+    }
+#endif
+
     if (!m_Socket)
         return;
 
@@ -287,6 +305,11 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+#ifdef PLAYERBOTS
+    if (GetPlayer() && GetPlayer()->GetPlayerbotAI())
+        return true;
+#endif
+
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
@@ -347,6 +370,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
+
+#ifdef PLAYERBOTS
+                    if (_player && _player->GetPlayerbotMgr())
+                        _player->GetPlayerbotMgr()->HandleMasterIncomingPacket(*packet);
+#endif
                 }
                 break;
             case STATUS_TRANSFER:
@@ -456,6 +484,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     }
 
     ProcessQueryCallbacks();
+
+#ifdef PLAYERBOTS
+    if (GetPlayer() && GetPlayer()->GetPlayerbotMgr())
+        GetPlayer()->GetPlayerbotMgr()->UpdateSessions(0);
+#endif
 
     //check if we are safe to proceed with logout
     //logout procedure should happen only in World::UpdateSessions() method!!!
@@ -613,6 +646,7 @@ void WorldSession::LogoutPlayer(bool save)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
         _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
+#ifndef PLAYERBOTS
         ///- If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
         _player->UninviteFromGroup();
 
@@ -621,6 +655,7 @@ void WorldSession::LogoutPlayer(bool save)
         if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket)
             _player->RemoveFromGroup();
 
+#endif
         // pussywizard: checked second time after being removed from a group
         if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
             _player->RepopAtGraveyard();
@@ -1614,3 +1649,17 @@ void WorldSession::SendTimeSync()
     _timeSyncTimer = _timeSyncNextCounter == 0 ? 5000 : 10000;
     _timeSyncNextCounter++;
 }
+
+#ifdef PLAYERBOTS
+void WorldSession::HandleBotPackets()
+{
+    WorldPacket* packet;
+    while (_recvQueue.next(packet))
+    {
+        OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
+        ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
+        opHandle->Call(this, *packet);
+        delete packet;
+    }
+}
+#endif

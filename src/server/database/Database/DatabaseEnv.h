@@ -25,6 +25,10 @@
 #include "Implementation/LoginDatabase.h"
 #include "Implementation/WorldDatabase.h"
 
+#ifdef PLAYERBOTS
+#include "PlayerbotDatabase.h"
+#endif
+
 #include "Field.h"
 #include "PreparedStatement.h"
 #include "QueryCallback.h"
@@ -37,5 +41,10 @@ AC_DATABASE_API extern DatabaseWorkerPool<WorldDatabaseConnection> WorldDatabase
 AC_DATABASE_API extern DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabase;
 /// Accessor to the realm/login database
 AC_DATABASE_API extern DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase;
+
+#ifdef PLAYERBOTS
+/// Accessor to the playerbot database
+AC_DATABASE_API extern DatabaseWorkerPool<PlayerbotDatabaseConnection> PlayerbotDatabase;
+#endif
 
 #endif

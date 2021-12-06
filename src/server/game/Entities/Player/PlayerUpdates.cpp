@@ -38,6 +38,10 @@
 #include "Vehicle.h"
 #include "WeatherMgr.h"
 
+#ifdef PLAYERBOTS
+#include "Playerbot.h"
+#endif
+
 // Zone Interval should be 1 second
 constexpr auto ZONE_UPDATE_INTERVAL = 1000;
 
@@ -434,6 +438,18 @@ void Player::Update(uint32 p_time)
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
+
+#ifdef PLAYERBOTS
+    if (_playerbotAI)
+    {
+        _playerbotAI->UpdateAI(p_time);
+    }
+
+    if (_playerbotMgr)
+    {
+        _playerbotMgr->UpdateAI(p_time);
+    }
+#endif
 }
 
 void Player::UpdateMirrorTimers()

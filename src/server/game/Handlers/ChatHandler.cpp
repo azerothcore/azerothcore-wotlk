@@ -39,6 +39,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+#ifdef PLAYERBOTS
+#include "Playerbot.h"
+#endif
+
 inline bool isNasty(uint8 c)
 {
     if (c == '\t')
@@ -409,7 +413,16 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
-                GetPlayer()->Whisper(msg, Language(lang), receiver);
+#ifdef PLAYERBOTS
+                if (receiver->GetPlayerbotAI())
+                {
+                    receiver->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
+                    GetPlayer()->m_speakTime = 0;
+                    GetPlayer()->m_speakCount = 0;
+                }
+                else
+#endif
+                    GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
             break;
         case CHAT_MSG_PARTY:
@@ -431,6 +444,21 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     return;
                 }
+
+#ifdef PLAYERBOTS
+                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->GetPlayerbotAI())
+                        {
+                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
+                            GetPlayer()->m_speakTime  = 0;
+                            GetPlayer()->m_speakCount = 0;
+                        }
+                    }
+                }
+#endif
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
@@ -454,6 +482,22 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                         guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                     }
+
+#ifdef PLAYERBOTS
+                    if (PlayerbotMgr* mgr = GetPlayer()->GetPlayerbotMgr())
+                    {
+                        for (PlayerBotMap::const_iterator it = mgr->GetPlayerBotsBegin(); it != mgr->GetPlayerBotsEnd(); ++it)
+                        {
+                            if (Player* const bot = it->second)
+                            {
+                                if (bot->GetGuildId() == GetPlayer()->GetGuildId())
+                                {
+                                    bot->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
+                                }
+                            }
+                        }
+                    }
+#endif
                 }
             }
             break;
@@ -491,6 +535,21 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
                 }
 
+#ifdef PLAYERBOTS
+                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->GetPlayerbotAI())
+                        {
+                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
+                            GetPlayer()->m_speakTime  = 0;
+                            GetPlayer()->m_speakCount = 0;
+                        }
+                    }
+                }
+#endif
+
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
@@ -514,6 +573,21 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
                 }
 
+#ifdef PLAYERBOTS
+                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->GetPlayerbotAI())
+                        {
+                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
+                            GetPlayer()->m_speakTime  = 0;
+                            GetPlayer()->m_speakCount = 0;
+                        }
+                    }
+                }
+#endif
+
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
@@ -531,6 +605,21 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     return;
                 }
+
+#ifdef PLAYERBOTS
+                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->GetPlayerbotAI())
+                        {
+                            player->GetPlayerbotAI()->HandleCommand(type, msg, GetPlayer());
+                            GetPlayer()->m_speakTime  = 0;
+                            GetPlayer()->m_speakCount = 0;
+                        }
+                    }
+                }
+#endif
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
@@ -598,6 +687,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                             return;
                         }
 
+#ifdef PLAYERBOTS
+                        if (_player->GetPlayerbotMgr() && chn->GetFlags() & 0x18)
+                        {
+                            _player->GetPlayerbotMgr()->HandleCommand(type, msg);
+                        }
+
+                        sRandomPlayerbotMgr->HandleCommand(type, msg, _player);
+#endif
                         sScriptMgr->OnPlayerChat(sender, type, lang, msg, chn);
 
                         chn->Say(sender->GetGUID(), msg.c_str(), lang);

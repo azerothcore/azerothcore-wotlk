@@ -401,6 +401,22 @@ namespace lfg
             return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
         }
 
+#ifdef PLAYERBOTS
+        bool nonBotFound = false;
+        for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
+        {
+            ObjectGuid guid = check.guids[i];
+            Player* player = ObjectAccessor::FindPlayer(guid);
+            if (guid.IsGroup() || (player && !player->GetPlayerbotAI()))
+            {
+                nonBotFound = true;
+                break;
+            }
+        }
+        if (!nonBotFound)
+            return LFG_INCOMPATIBLES_HAS_IGNORES;
+#endif
+
         proposal.queues = strGuids;
         proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(proposal.group) != LFG_STATE_DUNGEON;
 

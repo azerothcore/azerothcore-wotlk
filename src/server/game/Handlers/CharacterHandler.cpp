@@ -56,6 +56,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+#ifdef PLAYERBOTS
+#include "Playerbot.h"
+#endif
+
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
 private:
@@ -207,6 +211,22 @@ bool LoginQueryHolder::Initialize()
 
     return res;
 }
+
+#ifdef PLAYERBOTS
+class PlayerbotLoginQueryHolder : public LoginQueryHolder
+{
+    private:
+        uint32 masterAccountId;
+        PlayerbotHolder* playerbotHolder;
+
+    public:
+        PlayerbotLoginQueryHolder(PlayerbotHolder* playerbotHolder, uint32 masterAccount, uint32 accountId, ObjectGuid guid)
+            : LoginQueryHolder(accountId, guid), masterAccountId(masterAccount), playerbotHolder(playerbotHolder) { }
+
+        uint32 GetMasterAccountId() const { return masterAccountId; }
+        PlayerbotHolder* GetPlayerbotHolder() { return playerbotHolder; }
+};
+#endif
 
 void WorldSession::HandleCharEnum(PreparedQueryResult result)
 {
@@ -901,8 +921,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     CharacterDatabase.Execute(stmt);
 
     LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_ONLINE);
-    loginStmt->setUInt32(0, realm.Id.Realm);
-    loginStmt->setUInt32(1, GetAccountId());
+    loginStmt->setUInt32(0, GetAccountId());
     LoginDatabase.Execute(loginStmt);
 
     pCurrChar->SetInGameTime(World::GetGameTimeMS());
@@ -1105,6 +1124,14 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             }
         }
     }
+
+#ifdef PLAYERBOTS
+    if (!pCurrChar->GetPlayerbotAI())
+    {
+        pCurrChar->SetPlayerbotMgr(new PlayerbotMgr(pCurrChar));
+        sRandomPlayerbotMgr->OnPlayerLogin(pCurrChar);
+    }
+#endif
 
     sScriptMgr->OnPlayerLogin(pCurrChar);
 
@@ -2546,3 +2573,65 @@ void WorldSession::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, O
     data << guid;
     SendPacket(&data);
 }
+
+#ifdef PLAYERBOTS
+void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId)
+{
+    // has bot already been added?
+    if (ObjectAccessor::FindConnectedPlayer(playerGuid))
+    {
+        return;
+    }
+
+    uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(playerGuid.GetCounter());
+    if (!accountId)
+    {
+        return;
+    }
+
+    PlayerbotLoginQueryHolder* holder = new PlayerbotLoginQueryHolder(this, masterAccountId, accountId, playerGuid);
+    if (!holder->Initialize())
+    {
+        delete holder;                                      // delete all unprocessed queries
+        return;
+    }
+
+    QueryResultHolderFuture future = CharacterDatabase.DelayQueryHolder(holder);
+    SQLQueryHolder* param;
+    future.get(param);
+
+    PlayerbotHolder* playerbotHolder = holder->GetPlayerbotHolder();
+    uint32 masterAccount = holder->GetMasterAccountId();
+    WorldSession* masterSession = masterAccount ? sWorld->FindSession(masterAccount) : NULL;
+
+    // The bot's WorldSession is owned by the bot's Player object
+    // The bot's WorldSession is deleted by PlayerbotMgr::LogoutPlayerBot
+    uint32 botAccountId = holder->GetAccountId();
+    WorldSession* botSession = new WorldSession(botAccountId, NULL, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0), LOCALE_enUS, false, false, false, 0);
+    botSession->SetAddress("bot");
+    botSession->HandlePlayerLoginFromDB(holder); // will delete lqh
+
+    Player* bot = botSession->GetPlayer();
+    if (!bot)
+    {
+        return;
+    }
+
+    bool allowed = false;
+    if (botAccountId == masterAccount)
+        allowed = true;
+    else if (masterSession && sPlayerbotAIConfig->allowGuildBots && bot->GetGuildId() == masterSession->GetPlayer()->GetGuildId())
+        allowed = true;
+    else if (sPlayerbotAIConfig->IsInRandomAccountList(botAccountId))
+        allowed = true;
+
+    if (allowed)
+        playerbotHolder->OnBotLogin(bot);
+    else if (masterSession)
+    {
+        ChatHandler ch(masterSession);
+        ch.PSendSysMessage("You are not allowed to control bot %s...", bot->GetName());
+        playerbotHolder->LogoutPlayerBot(bot->GetGUID());
+    }
+}
+#endif

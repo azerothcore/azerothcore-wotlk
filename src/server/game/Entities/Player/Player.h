@@ -60,6 +60,9 @@ class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
 
+class PlayerbotAI;
+class PlayerbotMgr;
+
 typedef std::deque<Mail*> PlayerMails;
 typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 
@@ -660,7 +663,7 @@ enum PlayerSlots
 
 #define INVENTORY_SLOT_BAG_0    255
 
-enum EquipmentSlots                                         // 19 slots
+enum EquipmentSlots : uint32                                 // 19 slots
 {
     EQUIPMENT_SLOT_START        = 0,
     EQUIPMENT_SLOT_HEAD         = 0,
@@ -1247,7 +1250,7 @@ public:
     InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
     InventoryResult CanUseItem(Item* pItem, bool not_loading = true) const;
     [[nodiscard]] bool HasItemTotemCategory(uint32 TotemCategory) const;
-    bool IsTotemCategoryCompatiableWith(const ItemTemplate* pProto, uint32 requiredTotemCategoryId) const;
+    bool IsTotemCategoryCompatiableWith(ItemTemplate const* pProto, uint32 requiredTotemCategoryId) const;
     InventoryResult CanUseItem(ItemTemplate const* pItem) const;
     [[nodiscard]] InventoryResult CanUseAmmo(uint32 item) const;
     InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
@@ -1274,7 +1277,7 @@ public:
     void SetAmmo(uint32 item);
     void RemoveAmmo();
     [[nodiscard]] float GetAmmoDPS() const { return m_ammoDPS; }
-    bool CheckAmmoCompatibility(const ItemTemplate* ammo_proto) const;
+    bool CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const;
     void QuickEquipItem(uint16 pos, Item* pItem);
     void VisualizeItem(uint8 slot, Item* pItem);
     void SetVisibleItemSlot(uint8 slot, Item* pItem);
@@ -2589,15 +2592,16 @@ public:
     std::string GetMapAreaAndZoneString();
     std::string GetCoordsMapAreaAndZoneString();
 
-    void SetFarSightDistance(float radius);
-    void ResetFarSightDistance();
-    Optional<float> GetFarSightDistance() const;
+    // Playerbot mod
+    // A Player can either have a playerbotMgr (to manage its bots), or have playerbotAI (if it is a bot), or
+    // neither. Code that enables bots must create the playerbotMgr and set it using SetPlayerbotMgr.
+    void SetPlayerbotAI(PlayerbotAI* ai);
+    PlayerbotAI* GetPlayerbotAI();
+    void SetPlayerbotMgr(PlayerbotMgr* mgr);
+    PlayerbotMgr* GetPlayerbotMgr();
+    void SetBotDeathTimer();
 
-    float GetSightRange(const WorldObject* target = nullptr) const override;
-
-    std::string GetPlayerName();
-
- protected:
+protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
@@ -2952,6 +2956,10 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    // Playerbot mod
+    PlayerbotAI* _playerbotAI;
+    PlayerbotMgr* _playerbotMgr;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

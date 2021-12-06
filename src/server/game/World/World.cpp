@@ -92,6 +92,10 @@
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
+#ifdef PLAYERBOTS
+#include "RandomPlayerbotMgr.h"
+#endif
+
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -2274,6 +2278,11 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
+#ifdef PLAYERBOTS
+    sRandomPlayerbotMgr->UpdateAI(diff);
+    sRandomPlayerbotMgr->UpdateSessions(diff);
+#endif
+
     // pussywizard:
     // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
     // so we don't have to do it in every packet that modifies auctions
@@ -2432,6 +2441,9 @@ void World::Update(uint32 diff)
         CharacterDatabase.KeepAlive();
         LoginDatabase.KeepAlive();
         WorldDatabase.KeepAlive();
+#ifdef PLAYERBOTS
+        PlayerbotDatabase.KeepAlive();
+#endif
     }
 
     {
@@ -2718,6 +2730,10 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
         m_ShutdownTimer = time;
         ShutdownMsg(true, nullptr, reason);
     }
+
+#ifdef PLAYERBOTS
+    sRandomPlayerbotMgr->LogoutAllBots();
+#endif
 
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }

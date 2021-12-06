@@ -260,7 +260,7 @@ enum SocketColor
 
 #define SOCKET_COLOR_ALL (SOCKET_COLOR_META | SOCKET_COLOR_RED | SOCKET_COLOR_YELLOW | SOCKET_COLOR_BLUE)
 
-enum InventoryType
+enum InventoryType : uint32
 {
     INVTYPE_NON_EQUIP                           = 0,
     INVTYPE_HEAD                                = 1,

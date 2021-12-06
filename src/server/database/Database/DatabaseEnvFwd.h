@@ -33,6 +33,10 @@ class CharacterDatabaseConnection;
 class LoginDatabaseConnection;
 class WorldDatabaseConnection;
 
+#ifdef PLAYERBOTS
+class PlayerbotDatabaseConnection;
+#endif
+
 class PreparedStatementBase;
 
 template<typename T>
@@ -41,6 +45,10 @@ class PreparedStatement;
 using CharacterDatabasePreparedStatement = PreparedStatement<CharacterDatabaseConnection>;
 using LoginDatabasePreparedStatement = PreparedStatement<LoginDatabaseConnection>;
 using WorldDatabasePreparedStatement = PreparedStatement<WorldDatabaseConnection>;
+
+#ifdef PLAYERBOTS
+using PlayerbotDatabasePreparedStatement = PreparedStatement<PlayerbotDatabaseConnection>;
+#endif
 
 class PreparedResultSet;
 using PreparedQueryResult = std::shared_ptr<PreparedResultSet>;
@@ -71,6 +79,10 @@ using CharacterDatabaseTransaction = SQLTransaction<CharacterDatabaseConnection>
 using LoginDatabaseTransaction = SQLTransaction<LoginDatabaseConnection>;
 using WorldDatabaseTransaction = SQLTransaction<WorldDatabaseConnection>;
 
+#ifdef PLAYERBOTS
+using PlayerbotDatabaseTransaction = SQLTransaction<PlayerbotDatabaseConnection>;
+#endif
+
 class SQLQueryHolderBase;
 using QueryResultHolderFuture = std::future<void>;
 using QueryResultHolderPromise = std::promise<void>;
@@ -81,6 +93,10 @@ class SQLQueryHolder;
 using CharacterDatabaseQueryHolder = SQLQueryHolder<CharacterDatabaseConnection>;
 using LoginDatabaseQueryHolder = SQLQueryHolder<LoginDatabaseConnection>;
 using WorldDatabaseQueryHolder = SQLQueryHolder<WorldDatabaseConnection>;
+
+#ifdef PLAYERBOTS
+using PlayerbotDatabaseQueryHolder = SQLQueryHolder<PlayerbotDatabaseConnection>;
+#endif
 
 class SQLQueryHolderCallback;
 

@@ -442,6 +442,11 @@ public:
     // Time Synchronisation
     void ResetTimeSync();
     void SendTimeSync();
+
+#ifdef PLAYERBOTS
+    void HandleBotPackets();
+#endif
+
 public:                                                 // opcodes handlers
     void Handle_NULL(WorldPacket& null);                // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
@@ -983,6 +988,8 @@ public:                                                 // opcodes handlers
     void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
     bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
     bool IsSocketClosed() const;
+
+    void SetAddress(std::string const& address) { m_Address = address; }
 
     /*
      * CALLBACKS
