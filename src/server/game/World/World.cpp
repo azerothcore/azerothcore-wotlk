@@ -19,6 +19,7 @@
     \ingroup world
 */
 
+#include "World.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
