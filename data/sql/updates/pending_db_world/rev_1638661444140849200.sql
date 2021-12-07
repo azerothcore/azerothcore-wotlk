@@ -14,7 +14,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11878, 0, 4, 5, 19, 0, 100, 0, 6148, 0, 0, 0, 0, 112, 87, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - On Quest \'The Scarlet Oracle, Demetria\' Taken - Start game event 0'),
 (11878, 0, 5, 0, 61, 0, 100, 0, 6148, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - On Quest \'The Scarlet Oracle, Demetria\' Taken - Set Active On'),
 (11878, 0, 7, 0, 0, 0, 100, 0, 0, 0, 6000, 8000, 0, 11, 18649, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Cast \'Shadow Shot\''),
-(11878, 0, 8, 0, 0, 0, 100, 0, 1000, 2000, 4000, 5000, 0, 12, 12208, 4, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Summon Creature \'Conquered Soul of the Blightcaller\'');
+(11878, 0, 8, 0, 0, 0, 100, 0, 1000, 2000, 4000, 5000, 0, 12, 12208, 6, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Summon Creature \'Conquered Soul of the Blightcaller\'');
 
 /* Nathanos Blightcaller Text Lines
 */
