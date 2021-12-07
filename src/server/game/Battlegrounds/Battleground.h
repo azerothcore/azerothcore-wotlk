@@ -222,7 +222,7 @@ enum ScoreType
     SCORE_DESTROYED_WALL        = 19,
 };
 
-enum ArenaType
+enum ArenaType : uint8
 {
     ARENA_TYPE_2v2          = 2,
     ARENA_TYPE_3v3          = 3,

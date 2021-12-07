@@ -1339,7 +1339,7 @@ enum Mechanics : uint32
     (1<<MECHANIC_SAPPED))
 
 // Spell dispel type
-enum DispelType
+enum DispelType : uint8
 {
     DISPEL_NONE         = 0,
     DISPEL_MAGIC        = 1,
@@ -1601,7 +1601,7 @@ enum GameObjectDestructibleState
 };
 
 // EmotesText.dbc
-enum TextEmotes
+enum TextEmotes : uint32
 {
     TEXT_EMOTE_AGREE                = 1,
     TEXT_EMOTE_AMAZE                = 2,
@@ -3541,7 +3541,7 @@ enum DuelCompleteType
 };
 
 // handle the queue types and bg types separately to enable joining queue for different sized arenas at the same time
-enum BattlegroundQueueTypeId
+enum BattlegroundQueueTypeId : uint32
 {
     BATTLEGROUND_QUEUE_NONE      = 0,
     BATTLEGROUND_QUEUE_AV        = 1,
