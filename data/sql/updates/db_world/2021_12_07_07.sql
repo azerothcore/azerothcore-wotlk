@@ -1,3 +1,19 @@
+-- DB update 2021_12_07_06 -> 2021_12_07_07
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_07_06';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_07_06 2021_12_07_07 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638446845248147600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638446845248147600');
 
 -- Dark Iron Kidnapper SAI (Source: Movies)
@@ -17,3 +33,13 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 (@ID,0,5,"Humbug!  Die!",12,0,100,0,0,0,11402,0,"Dark Iron Kidnapper"),
 (@ID,0,6,"It's a rescue attempt!  Slay them all!",12,0,100,0,0,0,11403,0,"Dark Iron Kidnapper"),
 (@ID,0,7,"The only thing Metzen is going to be doing this Winter Veil is roasting on a spit!",12,0,100,0,0,0,11404,0,"Dark Iron Kidnapper");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_07_07' WHERE sql_rev = '1638446845248147600';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
