@@ -18,13 +18,14 @@
 #include "GameObjectAI.h"
 #include "MapMgr.h"
 #include "Player.h"
-#include "ruby_sanctum.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "WorldSession.h"
+#include "ruby_sanctum.h"
 
 enum Texts
 {

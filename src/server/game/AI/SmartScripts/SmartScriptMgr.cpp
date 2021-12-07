@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SmartScriptMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
@@ -27,7 +28,6 @@
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
-#include "SmartScriptMgr.h"
 #include "SpellMgr.h"
 
 SmartWaypointMgr* SmartWaypointMgr::instance()

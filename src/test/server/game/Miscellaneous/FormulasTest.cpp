@@ -16,8 +16,8 @@
  */
 
 #include "Formulas.h"
-#include "gtest/gtest.h"
 #include "WorldMock.h"
+#include "gtest/gtest.h"
 
 using namespace Acore::Honor;
 using namespace Acore::XP;

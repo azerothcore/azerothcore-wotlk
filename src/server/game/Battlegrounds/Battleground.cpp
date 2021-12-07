@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Battleground.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
-#include "Battleground.h"
 #include "BattlegroundBE.h"
 #include "BattlegroundDS.h"
 #include "BattlegroundMgr.h"
@@ -44,9 +44,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 namespace Acore
 {
     class BattlegroundChatBuilder
@@ -217,9 +214,7 @@ Battleground::~Battleground()
     for (uint32 i = 0; i < size; ++i)
         DelObject(i);
 
-#ifdef ELUNA
-    sEluna->OnBGDestroy(this, GetBgTypeID(), GetInstanceID());
-#endif
+    sScriptMgr->OnBattlegroundDestroy(this);
 
     sBattlegroundMgr->RemoveBattleground(GetBgTypeID(), GetInstanceID());
     // unload map
@@ -513,10 +508,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         StartingEventOpenDoors();
 
-#ifdef ELUNA
-        sEluna->OnBGStart(this, GetBgTypeID(), GetInstanceID());
-#endif
-
         SendWarningToAll(StartMessageIds[BG_STARTING_EVENT_FOURTH]);
         SetStatus(STATUS_IN_PROGRESS);
         SetStartDelayTime(StartDelayTimes[BG_STARTING_EVENT_FOURTH]);
@@ -546,7 +537,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                         if (!aura->IsPermanent()
                                 && aura->GetDuration() <= 30 * IN_MILLISECONDS
                                 && aurApp->IsPositive()
-                                // && (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)) Xinef: bullshit condition, ALL buffs should be removed
+                                // && (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)) Xinef: condition, ALL buffs should be removed
                                 && (!aura->HasEffectType(SPELL_AURA_MOD_INVISIBILITY)))
                             player->RemoveAura(iter);
                         else
@@ -1063,9 +1054,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
     if (winmsg_id)
         SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 
-#ifdef ELUNA
-    sEluna->OnBGEnd(this, GetBgTypeID(), GetInstanceID(), winnerTeamId);
-#endif
+    sScriptMgr->OnBattlegroundEnd(this, winnerTeamId);
 }
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const

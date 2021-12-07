@@ -33,6 +33,7 @@
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
 #include "WeatherMgr.h"
@@ -797,8 +798,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 {
     LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid %d", spellid);
 
-    SkillLineAbilityMapBounds bounds =
-        sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
+    SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first;
          _spell_idx != bounds.second; ++_spell_idx)

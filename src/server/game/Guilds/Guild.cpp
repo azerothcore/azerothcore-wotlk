@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Guild.h"
 #include "CalendarMgr.h"
-#include "Chat.h"
 #include "CharacterCache.h"
+#include "Chat.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-#include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
 #include "Log.h"
@@ -2227,7 +2227,7 @@ bool Guild::AddMember(ObjectGuid guid, uint8 rankId)
         member->ResetFlags();
 
         bool ok = false;
-        // xinef: zomg! sync query
+        // xinef: sync query
         // Player must exist
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DATA_FOR_GUILD);
         stmt->setUInt32(0, guid.GetCounter());

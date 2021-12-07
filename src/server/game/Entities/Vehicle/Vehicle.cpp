@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Vehicle.h"
 #include "BattlefieldWG.h"
 #include "Common.h"
 #include "CreatureAI.h"
@@ -27,7 +28,6 @@
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "WorldPacket.h"
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
@@ -61,11 +61,11 @@ Vehicle::~Vehicle()
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*_me, itr->second.Passenger.Guid))
             {
-                LOG_FATAL("vehicles", "ZOMG! ~Vehicle(), unit: %s, entry: %u, typeid: %u, this_entry: %u, this_typeid: %u!", unit->GetName().c_str(), unit->GetEntry(), unit->GetTypeId(), _me ? _me->GetEntry() : 0, _me ? _me->GetTypeId() : 0);
+                LOG_FATAL("vehicles", "Vehicle(), unit: %s, entry: %u, typeid: %u, this_entry: %u, this_typeid: %u!", unit->GetName().c_str(), unit->GetEntry(), unit->GetTypeId(), _me ? _me->GetEntry() : 0, _me ? _me->GetTypeId() : 0);
                 unit->_ExitVehicle();
             }
             else
-                LOG_FATAL("vehicles", "ZOMG! ~Vehicle(), unknown guid!");
+                LOG_FATAL("vehicles", "Vehicle(), unknown guid!");
         }
 }
 
@@ -392,15 +392,15 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         }
         catch (...)
         {
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy()!");
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u", _me ? 1 : 0);
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy()!");
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u", _me ? 1 : 0);
             if (!_me)
                 return false;
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is: %u!", _me->IsInWorld());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is2: %u!", _me->IsDuringRemoveFromWorld());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s!", _me->GetName().c_str());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). typeid: %u!", _me->GetTypeId());
-            LOG_INFO("vehicles", "ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s, typeid: %u, in world: %u, duringremove: %u has wrong CharmType! Charmer %s, typeid: %u, in world: %u, duringremove: %u.", _me->GetName().c_str(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName().c_str(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is: %u!", _me->IsInWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Is2: %u!", _me->IsDuringRemoveFromWorld());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s!", _me->GetName().c_str());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). typeid: %u!", _me->GetTypeId());
+            LOG_INFO("vehicles", "CRASH! Try-catch in Unit::SetCharmedBy(). Unit %s, typeid: %u, in world: %u, duringremove: %u has wrong CharmType! Charmer %s, typeid: %u, in world: %u, duringremove: %u.", _me->GetName().c_str(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName().c_str(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
             return false;
         }
     }

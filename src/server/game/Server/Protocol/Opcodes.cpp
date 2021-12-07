@@ -18,9 +18,9 @@
 #include "Opcodes.h"
 #include "Log.h"
 #include "WorldSession.h"
-//#include "Packets/AllPackets.h"
 #include <iomanip>
 #include <sstream>
+//#include "Packets/AllPackets.h"
 
 template<class PacketClass, void(WorldSession::* HandlerFunction)(PacketClass&)>
 class PacketHandler : public ClientOpcodeHandler

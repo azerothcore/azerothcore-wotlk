@@ -15,19 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Mail.h"
 #include "AuctionHouseMgr.h"
 #include "BattlegroundMgr.h"
-#include "CharacterCache.h"
 #include "CalendarMgr.h"
+#include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Log.h"
-#include "Mail.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Unit.h"
 #include "World.h"
+#include "WorldSession.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {

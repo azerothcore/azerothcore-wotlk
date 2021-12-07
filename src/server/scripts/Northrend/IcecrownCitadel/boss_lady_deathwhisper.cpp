@@ -16,12 +16,12 @@
  */
 
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "icecrown_citadel.h"
 #include <random>
 
 enum ScriptTexts
@@ -474,7 +474,7 @@ public:
                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     if (Player* p = itr->GetSource())
-                        if (p != me->GetVictim() && summon->GetExactDist(p) < minrange && me->CanCreatureAttack(p) && me->_CanDetectFeignDeathOf(p))
+                        if (p != me->GetVictim() && summon->GetExactDist(p) < minrange && me->CanCreatureAttack(p))
                         {
                             target = p;
                             minrange = summon->GetExactDist(p);

@@ -45,8 +45,8 @@ Copied events should probably have a new owner
 #include "Opcodes.h"
 #include "Player.h"
 #include "SocialMgr.h"
-#include "utf8.h"
 #include "WorldSession.h"
+#include "utf8.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
@@ -572,7 +572,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
         return;
     }
 
-    // xinef: zomg! sync query
+    // xinef: sync query
     if (QueryResult result = CharacterDatabase.PQuery("SELECT flags FROM character_social WHERE guid = %u AND friend = %u", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
     {
         Field* fields = result->Fetch();

@@ -16,14 +16,14 @@
  */
 
 #include "ContinentBuilder.h"
-#include "TileBuilder.h"
-#include "WDT.h"
-#include "Utils.h"
-#include "DetourNavMesh.h"
 #include "Cache.h"
-#include <thread>
-#include "Recast.h"
 #include "DetourCommon.h"
+#include "DetourNavMesh.h"
+#include "Recast.h"
+#include "TileBuilder.h"
+#include "Utils.h"
+#include "WDT.h"
+#include <thread>
 
 class BuilderThread
 {

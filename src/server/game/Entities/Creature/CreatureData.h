@@ -18,9 +18,9 @@
 #ifndef AZEROTHCORE_CREATUREDATA_H
 #define AZEROTHCORE_CREATUREDATA_H
 
-#include "DBCEnums.h"
 #include "Cell.h"
 #include "Common.h"
+#include "DBCEnums.h"
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"

@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
+#include "ReputationMgr.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectGridLoader.h"
 #include "CellImpl.h"
 #include "Corpse.h"
 #include "Creature.h"
@@ -22,7 +23,6 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "ObjectAccessor.h"
-#include "ObjectGridLoader.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"

@@ -16,9 +16,9 @@
  */
 
 #include "InstanceScript.h"
-#include "magtheridons_lair.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "magtheridons_lair.h"
 
 DoorData const doorData[] =
 {

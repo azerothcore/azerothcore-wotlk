@@ -18,6 +18,7 @@
 #ifndef _PLAYER_DUMP_H
 #define _PLAYER_DUMP_H
 
+#include "Define.h"
 #include <map>
 #include <set>
 #include <string>
@@ -69,7 +70,7 @@ protected:
 class PlayerDumpWriter : public PlayerDump
 {
 public:
-    PlayerDumpWriter() {}
+    PlayerDumpWriter() { }
 
     bool GetDump(uint32 guid, std::string& dump);
     DumpReturn WriteDump(std::string const& file, uint32 guid);
@@ -88,7 +89,7 @@ private:
 class PlayerDumpReader : public PlayerDump
 {
 public:
-    PlayerDumpReader() {}
+    PlayerDumpReader() { }
 
     DumpReturn LoadDump(std::string const& file, uint32 account, std::string name, uint32 guid);
 };

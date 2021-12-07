@@ -19,12 +19,11 @@
 #include "CreatureTextMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "CombatAI.h"
 
 // Theirs
 
