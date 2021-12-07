@@ -25,10 +25,16 @@
 #include "SharedDefines.h"
 #include <map>
 
-static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
+constexpr std::array<uint32, MAX_REPUTATION_RANK> ReputationRankStrIndex =
 {
-    LANG_REP_HATED,    LANG_REP_HOSTILE, LANG_REP_UNFRIENDLY, LANG_REP_NEUTRAL,
-    LANG_REP_FRIENDLY, LANG_REP_HONORED, LANG_REP_REVERED,    LANG_REP_EXALTED
+    LANG_REP_HATED,
+    LANG_REP_HOSTILE,
+    LANG_REP_UNFRIENDLY,
+    LANG_REP_NEUTRAL,
+    LANG_REP_FRIENDLY,
+    LANG_REP_HONORED,
+    LANG_REP_REVERED,
+    LANG_REP_EXALTED
 };
 
 typedef uint32 RepListID;
