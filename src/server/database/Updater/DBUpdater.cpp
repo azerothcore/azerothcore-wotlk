@@ -173,10 +173,13 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     LOG_WARN("sql.updates", "Database \"%s\" does not exist, do you want to create it? [yes (default) / no]: ",
              pool.GetConnectionInfo()->database.c_str());
 
-    std::string answer;
-    std::getline(std::cin, answer);
-    if (!answer.empty() && !(answer.substr(0, 1) == "y"))
-        return false;
+    if (!sConfigMgr->isDryRun())
+    {
+        std::string answer;
+        std::getline(std::cin, answer);
+        if (!answer.empty() && !(answer.substr(0, 1) == "y"))
+            return false;
+    }
 
     LOG_INFO("sql.updates", "Creating database \"%s\"...", pool.GetConnectionInfo()->database.c_str());
 
@@ -192,7 +195,6 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     }
 
     file << "CREATE DATABASE `" << pool.GetConnectionInfo()->database << "` DEFAULT CHARACTER SET UTF8MB4 COLLATE utf8mb4_general_ci;\n\n";
-
     file.close();
 
     try
