@@ -62,10 +62,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
     &Spell::EffectNULL,                                     //  0
@@ -621,17 +617,17 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (Player* caster = m_caster->ToPlayer())
                         {
                             // Add Ammo and Weapon damage plus RAP * 0.1
-                            if (Item* item = caster->GetWeaponForAttack(RANGED_ATTACK))
+                            float dmg_min = caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE);
+                            float dmg_max = caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE);
+                            if (dmg_max == 0.0f && dmg_min > dmg_max)
                             {
-                                ItemTemplate const* weaponTemplate = item->GetTemplate();
-                                float dmg_min = weaponTemplate->Damage[0].DamageMin;
-                                float dmg_max = weaponTemplate->Damage[0].DamageMax;
-                                if (dmg_max == 0.0f && dmg_min > dmg_max)
-                                    damage += int32(dmg_min);
-                                else
-                                    damage += irand(int32(dmg_min), int32(dmg_max));
-                                damage += int32(caster->GetAmmoDPS() * weaponTemplate->Delay * 0.001f);
+                                damage += int32(dmg_min);
                             }
+                            else
+                            {
+                                damage += irand(int32(dmg_min), int32(dmg_max));
+                            }
+                            damage += int32(caster->GetAmmoDPS() * caster->GetAttackTime(RANGED_ATTACK) * 0.001f);
                         }
                     }
                     break;
@@ -788,14 +784,19 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     // normal DB scripted effect
     LOG_DEBUG("spells.aura", "Spell ScriptStart spellid %u in EffectDummy(%u)", m_spellInfo->Id, effIndex);
     m_caster->GetMap()->ScriptsStart(sSpellScripts, uint32(m_spellInfo->Id | (effIndex << 24)), m_caster, unitTarget);
-#ifdef ELUNA
+
     if (gameObjTarget)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
+    {
+        sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
+    }
     else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
+    {
+        sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
+    }
     else if (itemTarget)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
-#endif
+    {
+        sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
+    }
 }
 
 void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
