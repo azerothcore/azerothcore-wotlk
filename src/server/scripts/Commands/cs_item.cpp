@@ -46,18 +46,23 @@ public:
         };
         static ChatCommandTable itemCommandTable =
         {
-            { "restore",   HandleItemRestoreCommandTable,       SEC_GAMEMASTER,    Console::No },
+            { "restore",   HandleItemRestoreCommandTable },
             { "move",      HandleItemMoveCommand,               SEC_GAMEMASTER,    Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
-            { "item",     itemCommandTable }
+            { "item",      itemCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleItemRestoreCommand(ChatHandler* handler, ItemTemplate const* item, PlayerIdentifier player)
+    static bool HandleItemRestoreCommand(ChatHandler* handler, PlayerIdentifier player, uint32 restoreId)
     {
+        if (!restoreId)
+        {
+            return false;
+        }
+
         if (!HasItemDeletionConfig())
         {
             handler->SendSysMessage(LANG_COMMAND_DISABLED);
@@ -65,41 +70,28 @@ public:
             return false;
         }
 
-       if (!item)
+        // Check existence of item in recovery table
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM);
+        stmt->setUInt32(0, restoreId);
+        PreparedQueryResult fields = CharacterDatabase.Query(stmt);
+
+        if (!fields || !(*fields)[0].GetUInt32())
         {
-            handler->SendSysMessage(LANG_ITEM_NOT_FOUND);
+            handler->SendSysMessage(LANG_ITEM_RESTORE_MISSING);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
+        // Store item & count for sending to player
+        uint32 itemGuid  = (*fields)[0].GetUInt32();
+        uint32 itemCount = (*fields)[0].GetUInt32();
+
+        // TODO - Mail player item with count
+
         // Remove from recovery table
-        // TODO - Check if exist
-        // CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
-        // stmt->setUInt32(0, player.GetGUID().GetCounter());
-        // stmt->setUInt32(1, item->ItemId);
-        // stmt->setUInt32(2, 1);
-        // CharacterDatabase.Execute(stmt);
-
-        // Add to character.
-        // Check space and find places
-        // int32 count = 1;
-        // uint32 noSpaceForCount = 0;
-        // ItemPosCountVec dest;
-
-        //Player*         player = sCharacterCache->GetCharacterCacheByGuid(player.GetGUID());
-        //InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->Id, count, &noSpaceForCount);
-        //  if (msg != EQUIP_ERR_OK)
-        //    count -= noSpaceForCount;
-
-        // No slots available
-       // if (count == 0 || dest.empty())
-        //{
-           // handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
-          //  handler->SetSentErrorMessage(true);
-            //return false;
-    //    }
-
-        //Item* item = playerTarget->StoreNewItem(dest, itemId, true);
+        CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID);
+        delStmt->setUInt32(0, player.GetGUID().GetCounter());
+        CharacterDatabase.Execute(delStmt);
 
         return true;
     }
@@ -108,24 +100,22 @@ public:
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LIST);
         stmt->setUInt32(0, player.GetGUID().GetCounter());
-
-        CharacterDatabase.Execute(stmt);
         PreparedQueryResult disposedItems = CharacterDatabase.Query(stmt);
 
-        if (disposedItems)
+        if (!disposedItems)
         {
-                Field* fields           = disposedItems->Fetch();
-                uint32 id               = fields[0].GetUInt32();
-                uint32 itemId           = fields[3].GetUInt32();
-                uint32 count            = fields[3].GetUInt32();
-                handler->PSendSysMessage(LANG_ITEMLIST_SLOT, id, itemId, count);
-        }
-        else
-        {
-            handler->SendSysMessage(LANG_COMMAND_NOITEMFOUND);
+            handler->SendSysMessage(LANG_ITEM_RESTORE_LIST_EMPTY);
             handler->SetSentErrorMessage(true);
             return false;
         }
+
+        Field* fields = disposedItems->Fetch();
+        do {
+            uint32 id        = fields[0].GetUInt32();
+            uint32 itemId    = fields[1].GetUInt32();
+            uint32 count     = fields[2].GetUInt32();
+            handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST, id, itemId, count);
+        } while (disposedItems->NextRow());
 
         return true;
     }
