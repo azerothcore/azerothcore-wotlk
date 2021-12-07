@@ -191,9 +191,15 @@ class spell_dru_omen_of_clarity : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || spellInfo->IsPassive())
+        if (!spellInfo)
         {
             return true;
+        }
+
+        // Prevent passive spells to proc. (I.e shapeshift passives & passive talents)
+        if (spellInfo->IsPassive())
+        {
+            return false;
         }
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
