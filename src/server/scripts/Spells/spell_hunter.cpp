@@ -1217,7 +1217,27 @@ class spell_hun_lock_and_load : public AuraScript
 
         AfterProc += AuraProcFn(spell_hun_lock_and_load::ApplyMarker);
     }
+};
 
+// 19577 - Intimidation
+class spell_hun_intimidation : public AuraScript
+{
+    PrepareAuraScript(spell_hun_intimidation);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            return !spellInfo->IsPositive();
+        }
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_intimidation::CheckProc);
+    }
 };
 
 void AddSC_hunter_spell_scripts()
@@ -1248,4 +1268,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_viper_attack_speed);
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);
+    RegisterSpellScript(spell_hun_intimidation);
 }
