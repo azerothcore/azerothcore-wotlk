@@ -463,7 +463,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                     {
-                        if (sScriptMgr->CanPlayerUseChat(GetPlayer(), type, lang, msg, guild))
+                        if (!sScriptMgr->CanPlayerUseChat(GetPlayer(), type, lang, msg, guild))
                         {
                             return;
                         }
