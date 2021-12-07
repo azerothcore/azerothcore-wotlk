@@ -26,7 +26,9 @@ INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`,
 (117672, 1, 0, 1, 0, 0, 0, NULL),
 (117677, 1, 0, 1, 0, 0, 0, NULL),
 (247156, 1, 0, 1, 1, 0, 0, NULL),
-(247157, 1, 0, 1, 1, 0, 0, NULL);
+(247157, 1, 0, 1, 1, 0, 0, NULL),
+(130896, 1, 0, 1, 0, 0, 0, NULL); -- lich king platform hackfix
+
 
 UPDATE `acore_string` SET `content_default`='Movement type: %s' WHERE `entry`=11008;
 
@@ -4382,5 +4384,10 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 (17123, 1, 1, 0, 0, 0, 0, 0),
 (10716, 0, 0, 2, 0, 0, 0, NULL),
 (36908, 1, 0, 2, 0, 0, 0, NULL),
-(1039, 1, 1, 0, 0, 0, 0, NULL);
-
+(1039, 1, 1, 0, 0, 0, 0, NULL),
+(1040, 1, 1, 0, 0, 0, 0, NULL),
+(1025, 1, 1, 0, 0, 0, 0, NULL),
+(1027, 1, 1, 0, 0, 0, 0, NULL),
+(1029, 1, 1, 0, 0, 0, 0, NULL),
+(1030, 1, 1, 0, 0, 0, 0, NULL),
+(6527, 1, 1, 0, 0, 0, 0, NULL);
