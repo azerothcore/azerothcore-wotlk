@@ -1,3 +1,19 @@
+-- DB update 2021_12_07_09 -> 2021_12_07_10
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_07_09';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_07_09 2021_12_07_10 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638611934315329400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638611934315329400');
 
 DELETE FROM `creature` WHERE `guid` IN (91584,93734,93610,93695,244829,244376,244849,244396,93913,93587,91582,93764,91581,92568,93763,93652,93646,93762,91763,
@@ -22,3 +38,13 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) SELECT 24, `guid` FROM 
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) SELECT 26, `guid` FROM `creature` WHERE `id`=20102;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) SELECT 50, `guid` FROM `creature` WHERE `id`=20102;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) SELECT 51, `guid` FROM `creature` WHERE `id`=20102;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_07_10' WHERE sql_rev = '1638611934315329400';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
