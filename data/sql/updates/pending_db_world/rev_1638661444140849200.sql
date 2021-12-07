@@ -16,7 +16,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11878, 0, 7, 0, 0, 0, 100, 0, 0, 0, 6000, 8000, 0, 11, 18649, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Cast \'Shadow Shot\''),
 (11878, 0, 8, 0, 0, 0, 100, 0, 1000, 2000, 10000, 10000, 0, 11, 19096, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Cast \'Summon Conquered Soul\'');
 
-/* Conquered Soul of the Blight Caller Combat Script
+/* Conquered Soul of the Blightcaller Combat Script
 */
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 12208;
