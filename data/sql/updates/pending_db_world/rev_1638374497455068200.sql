@@ -1,9 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638374497455068200');
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` IN (15, 14)) AND (`SourceGroup` = 7083);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` IN (15)) AND (`SourceGroup` = 7083);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(14, 7083, 8335, 0, 0, 47, 0, 8923, 90, 0, 0, 0, 0, '', 'If player got the quest "A Supernatural Device". (Horde)'),
-(14, 7083, 8335, 0, 1, 47, 0, 8922, 90, 0, 0, 0, 0, '', 'If player got the quest "A Supernatural Device". (Alliance)'),
 (15, 7083, 1, 0, 0, 47, 0, 8924, 8, 0, 0, 0, 0, '', 'Display Gossip option if quest not complete "Hunting for Ectoplasm"'),
 (15, 7083, 1, 0, 0, 2, 0, 21946, 1, 0, 1, 0, 0, '', 'If the player does not have "Ectoplasmic Distiller" on his/her inventory.'),
 (15, 7083, 1, 0, 0, 2, 0, 21946, 1, 1, 1, 0, 0, '', 'If the player does not have "Ectoplasmic Distiller" on the bank.'),
