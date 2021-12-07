@@ -150,7 +150,7 @@ public:
         {
             Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
             for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()) && me->_CanDetectFeignDeathOf(itr->GetSource()))
+                if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()))
                     return true;
 
             return false;
