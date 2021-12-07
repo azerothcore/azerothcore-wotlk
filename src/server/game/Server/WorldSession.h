@@ -71,6 +71,16 @@ namespace lfg
 
 namespace WorldPackets
 {
+
+    namespace Character
+    {
+        class LogoutCancel;
+        class LogoutRequest;
+        class ShowingCloak;
+        class ShowingHelm;
+        class PlayerLogout;
+        class PlayedTimeClient;
+    }
 }
 
 enum AccountDataType
@@ -294,7 +304,7 @@ public:
     bool isLogingOut() const { return _logoutTime || m_playerLogout; }
 
     /// Engage the logout process for the user
-    void LogoutRequest(time_t requestTime)
+    void SetLogoutStartTime(time_t requestTime)
     {
         _logoutTime = requestTime;
     }
@@ -467,7 +477,7 @@ public:                                                 // opcodes handlers
     void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid);
 
     // played time
-    void HandlePlayedTime(WorldPacket& recvPacket);
+    void HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet);
 
     // new
     void HandleMoveUnRootAck(WorldPacket& recvPacket);
@@ -487,8 +497,8 @@ public:                                                 // opcodes handlers
     void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
     // character view
-    void HandleShowingHelmOpcode(WorldPacket& recvData);
-    void HandleShowingCloakOpcode(WorldPacket& recvData);
+    void HandleShowingHelmOpcode(WorldPackets::Character::ShowingHelm& packet);
+    void HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloak& packet);
 
     // repair
     void HandleRepairItemOpcode(WorldPacket& recvPacket);
@@ -506,9 +516,9 @@ public:                                                 // opcodes handlers
     void HandleLootReleaseOpcode(WorldPacket& recvPacket);
     void HandleLootMasterGiveOpcode(WorldPacket& recvPacket);
     void HandleWhoOpcode(WorldPacket& recvPacket);
-    void HandleLogoutRequestOpcode(WorldPacket& recvPacket);
-    void HandlePlayerLogoutOpcode(WorldPacket& recvPacket);
-    void HandleLogoutCancelOpcode(WorldPacket& recvPacket);
+    void HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequest& logoutRequest);
+    void HandlePlayerLogoutOpcode(WorldPackets::Character::PlayerLogout& playerLogout);
+    void HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& logoutCancel);
 
     // GM Ticket opcodes
     void HandleGMTicketCreateOpcode(WorldPacket& recvPacket);
