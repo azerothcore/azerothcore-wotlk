@@ -782,10 +782,12 @@ bool ScriptMgr::OnGossipHello(Player* player, Creature* creature)
     ASSERT(player);
     ASSERT(creature);
 
-    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    auto ret = IsValidBoolScript<AllCreatureScript>([&](AllCreatureScript* script)
     {
         return script->CanCreatureGossipHello(player, creature);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -800,10 +802,12 @@ bool ScriptMgr::OnGossipSelect(Player* player, Creature* creature, uint32 sender
     ASSERT(player);
     ASSERT(creature);
 
-    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    auto ret = IsValidBoolScript<AllCreatureScript>([&](AllCreatureScript* script)
     {
         return script->CanCreatureGossipSelect(player, creature, sender, action);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -818,10 +822,12 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, Creature* creature, uint32 se
     ASSERT(creature);
     ASSERT(code);
 
-    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    auto ret = IsValidBoolScript<AllCreatureScript>([&](AllCreatureScript* script)
     {
         return script->CanCreatureGossipSelectCode(player, creature, sender, action, code);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -836,10 +842,12 @@ bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* q
     ASSERT(creature);
     ASSERT(quest);
 
-    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    auto ret = IsValidBoolScript<AllCreatureScript>([&](AllCreatureScript* script)
     {
         return script->CanCreatureQuestAccept(player, creature, quest);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -877,10 +885,12 @@ bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* q
     ASSERT(creature);
     ASSERT(quest);
 
-    if (GetReturnBoolScripts<AllCreatureScript>(false, [&](AllCreatureScript* script)
+    auto ret = IsValidBoolScript<AllCreatureScript>([&](AllCreatureScript* script)
     {
         return script->CanCreatureQuestReward(player, creature, quest, opt);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -947,10 +957,12 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
     ASSERT(player);
     ASSERT(go);
 
-    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    auto ret = IsValidBoolScript<AllGameObjectScript>([&](AllGameObjectScript* script)
     {
         return script->CanGameObjectGossipHello(player, go);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -965,10 +977,12 @@ bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, ui
     ASSERT(player);
     ASSERT(go);
 
-    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    auto ret = IsValidBoolScript<AllGameObjectScript>([&](AllGameObjectScript* script)
     {
         return script->CanGameObjectGossipSelect(player, go, sender, action);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -983,10 +997,12 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, GameObject* go, uint32 sender
     ASSERT(go);
     ASSERT(code);
 
-    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    auto ret = IsValidBoolScript<AllGameObjectScript>([&](AllGameObjectScript* script)
     {
         return script->CanGameObjectGossipSelectCode(player, go, sender, action, code);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -1001,10 +1017,12 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     ASSERT(go);
     ASSERT(quest);
 
-    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    auto ret = IsValidBoolScript<AllGameObjectScript>([&](AllGameObjectScript* script)
     {
         return script->CanGameObjectQuestAccept(player, go, quest);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -1020,10 +1038,12 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
     ASSERT(go);
     ASSERT(quest);
 
-    if (GetReturnBoolScripts<AllGameObjectScript>(false, [&](AllGameObjectScript* script)
+    auto ret = IsValidBoolScript<AllGameObjectScript>([&](AllGameObjectScript* script)
     {
         return script->CanGameObjectQuestReward(player, go, quest, opt);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return true;
     }
@@ -1130,10 +1150,12 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
     ASSERT(player);
     ASSERT(trigger);
 
-    if (GetReturnBoolScripts<ElunaScript>(false, [&](ElunaScript* script)
+    auto ret = IsValidBoolScript<ElunaScript>([&](ElunaScript* script)
     {
         return script->CanAreaTrigger(player, trigger);
-    }))
+    });
+
+    if (ret && *ret)
     {
         return false;
     }
