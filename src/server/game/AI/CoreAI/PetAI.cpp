@@ -60,6 +60,11 @@ bool PetAI::_needToStop()
     return !me->CanCreatureAttack(me->GetVictim());
 }
 
+void PetAI::PetStopAttack()
+{
+    _stopAttack();
+}
+
 void PetAI::_stopAttack()
 {
     if (!me->IsAlive())
