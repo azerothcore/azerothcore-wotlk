@@ -1195,7 +1195,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
                 _mask[i] = uint32(1) << (eff - (32 * i));
                 int32 val = 0;
-                for (auto spellMod : spellMods)
+                for (auto const& spellMod : spellMods)
                     if (spellMod->type == modType && spellMod->mask & _mask)
                         val += spellMod->value;
 
