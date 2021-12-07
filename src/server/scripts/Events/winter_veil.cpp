@@ -100,9 +100,15 @@ public:
                 if (target->HasAuraType(SPELL_AURA_TRANSFORM))
                     return;
 
-                uint32 spellId = target->getGender() == GENDER_MALE
-                        ? RAND(SPELL_WINTER_WONDERVOLT_RED_MAN, SPELL_WINTER_WONDERVOLT_GREEN_MAN)
-                        : RAND(SPELL_WINTER_WONDERVOLT_RED_WOMEN, SPELL_WINTER_WONDERVOLT_GREEN_WOMEN);
+                uint32 spellId = 0;
+                if (target->getGender() == GENDER_MALE)
+                {
+                    spellId = target->GetTeamId() == TEAM_ALLIANCE ? SPELL_WINTER_WONDERVOLT_GREEN_MAN : SPELL_WINTER_WONDERVOLT_RED_MAN;
+                }
+                else
+                {
+                    spellId = target->GetTeamId() == TEAM_ALLIANCE ? SPELL_WINTER_WONDERVOLT_GREEN_WOMEN : SPELL_WINTER_WONDERVOLT_RED_WOMEN;
+                }
 
                 // cast
                 target->CastSpell(target, spellId, true);
