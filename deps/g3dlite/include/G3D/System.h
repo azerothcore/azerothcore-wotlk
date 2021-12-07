@@ -20,7 +20,7 @@
 #include "G3D/BinaryFormat.h"
 #include "G3D/FileNotFound.h"
 #include <string>
-#include <sys/time.h>
+
 #if defined(__aarch64__)
 #include <sys/time.h>
 #endif
