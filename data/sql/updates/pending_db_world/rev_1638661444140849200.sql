@@ -14,7 +14,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11878, 0, 4, 5, 19, 0, 100, 0, 6148, 0, 0, 0, 0, 112, 87, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - On Quest \'The Scarlet Oracle, Demetria\' Taken - Start game event 0'),
 (11878, 0, 5, 0, 61, 0, 100, 0, 6148, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - On Quest \'The Scarlet Oracle, Demetria\' Taken - Set Active On'),
 (11878, 0, 7, 0, 0, 0, 100, 0, 0, 0, 6000, 8000, 0, 11, 18649, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Cast \'Shadow Shot\''),
-(11878, 0, 8, 0, 0, 0, 100, 0, 1000, 2000, 4000, 5000, 0, 12, 12208, 4, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Summon Creature \'Conquered Soul of the Blightcaller\'');
+(11878, 0, 8, 0, 0, 0, 100, 0, 1000, 2000, 4000, 5000, 0, 11, 19096, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nathanos Blightcaller - In Combat - Cast \'Summon Conquered Soul\'');
 
 /* Conquered Soul of the Blight Caller Combat Script
 */
@@ -23,8 +23,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 12208;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 12208) AND (`source_type` = 0) AND (`id` IN (0, 1));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(12208, 0, 0, 0, 0, 0, 100, 0, 1000, 3000, 9000, 12000, 0, 11, 18328, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Conquered Soul of the Blightcaller - In Combat - Cast \'Incapacitating Shout\''),
-(12208, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 20, 1, 0, 0, 0, 0, 0, 17, 0, 30, 0, 0, 0, 0, 0, 0, 'Conquered Soul of the Blightcaller - On Just Summoned - Start Attacking');
+(12208, 0, 0, 0, 0, 0, 100, 0, 1000, 3000, 9000, 12000, 0, 11, 18328, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Conquered Soul of the Blightcaller - In Combat - Cast \'Incapacitating Shout\'');
 
 /* Nathanos Blightcaller Text Lines
 */
