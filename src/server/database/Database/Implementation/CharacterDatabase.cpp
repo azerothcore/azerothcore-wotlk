@@ -593,6 +593,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     // Recovery Item
     PrepareStatement(CHAR_INS_RECOVERY_ITEM, "INSERT INTO recovery_item (Guid, ItemEntry, Count) VALUES (?, ?, ?)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_RECOVERY_ITEM_LIST, "SELECT Id, itemEntry, Count FROM recovery_item WHERE Guid = ?", CONNECTION_SYNCH);
     PrepareStatement(CHAR_DEL_RECOVERY_ITEM, "DELETE FROM recovery_item WHERE Guid = ? AND ItemEntry = ? AND Count = ? ORDER BY Id DESC LIMIT 1", CONNECTION_ASYNC);
 
     // Character names
