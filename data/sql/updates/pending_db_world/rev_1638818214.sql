@@ -19,7 +19,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (5070, 'The comma
 
 -- Add new string: "LANG_ITEM_RESTORE_LIST"
 DELETE FROM `acore_string` WHERE `entry` = 197;
-INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (197, 'Recover id: %u | Item: %u | Count: %u');
+INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (197, 'Recover id: %u | Item: %s (%u) | Count: %u');
 
 -- Add new string: "LANG_ITEM_RESTORE_LIST_EMPTY"
 DELETE FROM `acore_string` WHERE `entry` = 198;

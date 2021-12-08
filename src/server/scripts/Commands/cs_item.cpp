@@ -128,7 +128,14 @@ public:
             uint32 id        = fields[0].GetUInt32();
             uint32 itemId    = fields[1].GetUInt32();
             uint32 count     = fields[2].GetUInt32();
-            handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST, id, itemId, count);
+
+            std::string itemName = "";
+            if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
+            {
+                itemName = item->Name1;
+            }
+
+            handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST, id, itemName, itemId, count);
         } while (disposedItems->NextRow());
 
         return true;
