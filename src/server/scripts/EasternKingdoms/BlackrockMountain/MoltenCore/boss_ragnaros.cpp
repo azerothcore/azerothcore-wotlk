@@ -264,6 +264,10 @@ public:
                             {
                                 extraEvents.RepeatEvent(1000);
                             }
+                            else
+                            {
+                                events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
+                            }
 
                             break;
                         }
@@ -314,7 +318,6 @@ public:
                     case EVENT_LAVA_BURST:
                     {
                         DoCastAOE(SPELL_LAVA_BURST);
-                        events.RepeatEvent(10000);
                         break;
                     }
                     case EVENT_MAGMA_BLAST_MELEE_CHECK:
