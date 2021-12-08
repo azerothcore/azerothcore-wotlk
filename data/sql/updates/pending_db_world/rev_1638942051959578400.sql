@@ -2,6 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638942051959578400');
 
 /* Set quest 6164 to Eastern Plaguelands
 */
+
 UPDATE `quest_poi` SET `WorldMapAreaId`=23 WHERE `QuestID`=6164 AND `id`=0;
 UPDATE `quest_poi` SET `WorldMapAreaId`=23 WHERE `QuestID`=6164 AND `id`=1;
 
@@ -37,3 +38,8 @@ UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1125 AND `id`=1;
 UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1125 AND `id`=2;
 UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1126 AND `id`=0;
 UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1126 AND `id`=1;
+
+/* Set quest 6570 to Dustwallow Marsh
+*/
+
+UPDATE `quest_poi` SET `WorldMapAreaId`=141 WHERE `QuestID`=6570 AND `id`=0;
