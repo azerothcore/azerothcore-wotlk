@@ -85,20 +85,29 @@ public:
         // Mail item to player
         uint32 itemEntry = (*fields)[1].GetUInt32();
         uint32 itemCount = (*fields)[2].GetUInt32();
-        MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
-        MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.");
 
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        // Save to prevent loss at next mail load. Item deletes on fail
-        if (Item* item = Item::CreateItem(itemEntry, itemCount, 0))
+        if (Player* onlinePlayer = player.GetConnectedPlayer())
         {
-            item->SaveToDB(trans);
-            draft.AddItem(item);
+            onlinePlayer->SendItemRetrievalMail({ { itemEntry, itemCount } });
         }
 
-        draft.SendMailTo(trans, MailReceiver(player.GetGUID().GetCounter()), sender);
-        CharacterDatabase.CommitTransaction(trans);
+        else
+        {
+            MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
+            MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.");
+
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+            // Save to prevent loss at next mail load. Item deletes on fail
+            if (Item* item = Item::CreateItem(itemEntry, itemCount, 0))
+            {
+                item->SaveToDB(trans);
+                draft.AddItem(item);
+            }
+
+            draft.SendMailTo(trans, MailReceiver(player.GetGUID().GetCounter()), sender);
+            CharacterDatabase.CommitTransaction(trans);
+        }
 
         // Remove from recovery table
         CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID);
