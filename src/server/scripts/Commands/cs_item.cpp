@@ -75,7 +75,7 @@ public:
         stmt->setUInt32(0, restoreId);
         PreparedQueryResult fields = CharacterDatabase.Query(stmt);
 
-        if (!fields || !(*fields)[0].GetUInt32())
+        if (!fields || !(*fields)[1].GetUInt32())
         {
             handler->SendSysMessage(LANG_ITEM_RESTORE_MISSING);
             handler->SetSentErrorMessage(true);
@@ -83,10 +83,10 @@ public:
         }
 
         // Mail item to player
-        uint32 itemEntry  = (*fields)[0].GetUInt32();
-        uint32 itemCount = (*fields)[0].GetUInt32();
-        MailSender sender(MAIL_NORMAL, player.GetGUID().GetCounter(), MAIL_STATIONERY_GM);
-        MailDraft draft("subject", "text");
+        uint32 itemEntry = (*fields)[1].GetUInt32();
+        uint32 itemCount = (*fields)[2].GetUInt32();
+        MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
+        MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.");
 
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -102,7 +102,7 @@ public:
 
         // Remove from recovery table
         CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID);
-        delStmt->setUInt32(0, player.GetGUID().GetCounter());
+        delStmt->setUInt32(0, (*fields)[0].GetUInt32());
         CharacterDatabase.Execute(delStmt);
 
         std::string nameLink = handler->playerLink(player.GetName());
@@ -123,8 +123,8 @@ public:
             return false;
         }
 
-        Field* fields = disposedItems->Fetch();
         do {
+            Field* fields    = disposedItems->Fetch();
             uint32 id        = fields[0].GetUInt32();
             uint32 itemId    = fields[1].GetUInt32();
             uint32 count     = fields[2].GetUInt32();
