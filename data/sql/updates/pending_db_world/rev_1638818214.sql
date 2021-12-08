@@ -6,7 +6,7 @@ UPDATE `command` SET `name`='item move' WHERE `name`='itemmove';
 -- Add new command: ".item restore"
 DELETE FROM `command` WHERE `name` = 'item restore';
 INSERT INTO `command` (`name`, `security`, `help`)
-VALUES ('item restore', '2', 'Syntax: .item restore [#playername] [#recoveryItemId]\r\n\r\nRestore an disposed item for the specified player.');
+VALUES ('item restore', '2', 'Syntax: .item restore [#recoveryItemId] [#playername]\r\n\r\nRestore an disposed item for the specified player. Get recoveryId from ".item restore list" command.');
 
 -- Add new command: ".item restore list"
 DELETE FROM `command` WHERE `name` = 'item restore list';

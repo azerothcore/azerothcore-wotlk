@@ -56,7 +56,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleItemRestoreCommand(ChatHandler* handler, PlayerIdentifier player, uint32 restoreId)
+    static bool HandleItemRestoreCommand(ChatHandler* handler, uint32 restoreId, PlayerIdentifier player)
     {
         if (!restoreId)
         {
