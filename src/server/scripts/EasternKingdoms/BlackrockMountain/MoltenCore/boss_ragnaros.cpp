@@ -164,7 +164,7 @@ public:
             {
                 if (_lavaBurstGUIDS.empty())
                 {
-                    extraEvents.ScheduleEvent(EVENT_LAVA_BURST_TRIGGER, 2000);
+                    extraEvents.ScheduleEvent(EVENT_LAVA_BURST_TRIGGER, 1);
                 }
 
                 _lavaBurstGUIDS.insert(guid);
@@ -250,18 +250,17 @@ public:
                         }
                         case EVENT_LAVA_BURST_TRIGGER:
                         {
-                            ObjectGuid lavaBurstGUID = Acore::Containers::SelectRandomContainerElement(_lavaBurstGUIDS);
-
-                            if (GameObject* go = ObjectAccessor::GetGameObject(*me, lavaBurstGUID))
-                            {
-                                go->CastSpell(nullptr, SPELL_LAVA_BURST_TRAP);
-                                go->SendCustomAnim(0);
-                            }
-
-                            _lavaBurstGUIDS.erase(lavaBurstGUID);
-
                             if (!_lavaBurstGUIDS.empty())
                             {
+                                ObjectGuid lavaBurstGUID = Acore::Containers::SelectRandomContainerElement(_lavaBurstGUIDS);
+
+                                if (GameObject* go = ObjectAccessor::GetGameObject(*me, lavaBurstGUID))
+                                {
+                                    go->CastSpell(nullptr, SPELL_LAVA_BURST_TRAP);
+                                    go->SendCustomAnim(0);
+                                }
+
+                                _lavaBurstGUIDS.erase(lavaBurstGUID);
                                 extraEvents.RepeatEvent(1000);
                             }
                             else
