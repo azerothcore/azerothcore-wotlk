@@ -28,3 +28,12 @@ UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=901 AND `id`=0;
 UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=901 AND `id`=1;
 UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=902 AND `id`=0;
 UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=3924 AND `id`=3;
+
+/* Set quests 1125 and 1126 to Silithus
+*/
+
+UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1125 AND `id`=0;
+UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1125 AND `id`=1;
+UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1125 AND `id`=2;
+UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1126 AND `id`=0;
+UPDATE `quest_poi` SET `WorldMapAreaId`=261 WHERE `QuestID`=1126 AND `id`=1;
