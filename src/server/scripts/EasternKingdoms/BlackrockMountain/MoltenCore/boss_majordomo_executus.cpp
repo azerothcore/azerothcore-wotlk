@@ -128,7 +128,7 @@ public:
 
     struct boss_majordomoAI : public BossAI
     {
-        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
+        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS) {}
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -166,8 +166,6 @@ public:
                         }
                     }
                 }
-
-                spawnInTextTimer = 10000;
             }
             else
             {
@@ -218,7 +216,6 @@ public:
 
             _EnterCombat();
             DoCastAOE(SPELL_SEPARATION_ANXIETY);
-            spawnInTextTimer = 0;
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
@@ -290,18 +287,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (spawnInTextTimer)
-            {
-                if (spawnInTextTimer <= diff)
-                {
-                    spawnInTextTimer = 0;
-                    Talk(SAY_SPAWN);
-                }
-                else
-                {
-                    spawnInTextTimer -= diff;
-                }
-            }
 
             switch (events.GetPhaseMask())
             {
@@ -510,7 +495,6 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
-        uint32 spawnInTextTimer;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
