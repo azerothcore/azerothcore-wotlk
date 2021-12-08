@@ -3380,12 +3380,12 @@ StrictChannelNames = 0
 
 #
 # Instance.SharedNormalHeroicId
-#  Description:  No description
-#  Default:  0 - Disable
-#      1 - Enable
+#  Description:  Forces ICC and RS Normal and Heroic to share lockouts.  ToC is uneffected and Normal and Heroic will be separate.
+#  Default:  1 - Enable
+#      0 - Disable
 #
 
-Instance.SharedNormalHeroicId = 0
+Instance.SharedNormalHeroicId = 1
 
 #
 #     Instance.ResetTimeRelativeTimestamp
