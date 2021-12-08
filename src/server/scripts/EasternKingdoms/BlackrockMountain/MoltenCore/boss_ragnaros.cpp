@@ -266,7 +266,7 @@ public:
                             }
                             else
                             {
-                                events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
+                                events.RescheduleEvent(EVENT_LAVA_BURST, 10000, PHASE_EMERGED, PHASE_EMERGED);
                             }
 
                             break;
