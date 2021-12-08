@@ -339,6 +339,7 @@ struct PlayerInfo
     uint16 displayId_f{0};
     PlayerCreateInfoItems item;
     PlayerCreateInfoSpells customSpells;
+    PlayerCreateInfoSpells  castSpells;
     PlayerCreateInfoActions action;
     PlayerCreateInfoSkills skills;
 
