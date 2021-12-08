@@ -16,13 +16,13 @@
  */
 
 #include "WorldModelHandler.h"
-#include "WorldModelRoot.h"
-#include "Chunk.h"
 #include "Cache.h"
-#include "Model.h"
+#include "Chunk.h"
 #include "Define.h"
 #include "G3D/Matrix4.h"
 #include "G3D/Quat.h"
+#include "Model.h"
+#include "WorldModelRoot.h"
 #include <cstdio>
 
 WorldModelDefinition WorldModelDefinition::Read( FILE* file )

@@ -17,8 +17,8 @@
 
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
-#include "razorfen_downs.h"
 #include "ScriptMgr.h"
+#include "razorfen_downs.h"
 
 class instance_razorfen_downs : public InstanceMapScript
 {

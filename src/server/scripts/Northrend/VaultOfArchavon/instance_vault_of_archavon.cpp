@@ -18,8 +18,8 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "vault_of_archavon.h"
 

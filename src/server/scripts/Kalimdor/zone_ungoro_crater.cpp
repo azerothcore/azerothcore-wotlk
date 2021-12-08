@@ -28,10 +28,10 @@ npc_ringo
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum AmeData

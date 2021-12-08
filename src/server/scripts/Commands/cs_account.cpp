@@ -22,8 +22,8 @@ Comment: All account related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AccountMgr.h"
 #include "AES.h"
+#include "AccountMgr.h"
 #include "Base32.h"
 #include "Chat.h"
 #include "CryptoGenerics.h"

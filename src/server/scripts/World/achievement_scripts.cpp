@@ -221,7 +221,7 @@ public:
                             areaid == AREA_RING_OF_HORDE_VALIANTS ||
                             areaid == AREA_RING_OF_CHAMPIONS;
 
-        return checkArea && player->duel && player->duel->isMounted;
+        return checkArea && player->duel && player->duel->IsMounted;
     }
 };
 

@@ -16,10 +16,10 @@
  */
 
 #include "GameObject.h"
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "karazhan.h"
 
 enum ShadeOfAran
 {

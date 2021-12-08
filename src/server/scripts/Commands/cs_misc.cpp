@@ -19,16 +19,18 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "GameGraveyard.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "InstanceSaveMgr.h"
 #include "IPLocation.h"
-#include "Language.h"
+#include "InstanceSaveMgr.h"
 #include "LFG.h"
+#include "Language.h"
 #include "MapMgr.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
@@ -46,6 +48,57 @@
 #endif
 
 using namespace Acore::ChatCommands;
+
+static std::array<std::string, MAX_ITEM_QUALITY> itemQualityToString =
+{ {
+        "poor",
+        "normal",
+        "uncommon",
+        "rare",
+        "epic",
+        "legendary",
+        "artifact",
+        "all"
+} };
+
+static std::array<std::string, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsToString =
+{ {
+        "normal",
+        "soul",
+        "herb",
+        "enchanting",
+        "engineering",
+        "gem",
+        "mining",
+        "leatherworking",
+        "inscription"
+} };
+
+constexpr uint32 bagSpecsColors[MAX_ITEM_SUBCLASS_CONTAINER] =
+{
+    0xfff0de18,     //YELLOW - Normal
+    0xffa335ee,     //PURPLE - Souls
+    0xff1eff00,     //GREEN - Herb
+    0xffe37166,     //PINK - Enchanting
+    0xffa68b30,     //BROWN - Engineering
+    0xff0070dd,     //BLUE - Gem
+    0xffc1c8c9,     //GREY - Mining
+    0xfff5a925,     //ORANGE - Leatherworking
+    0xff54504f      //DARK GREY - Inscription
+};
+
+static std::array<std::string, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsColorToString =
+{ {
+        "normal",
+        "soul",
+        "herb",
+        "enchanting",
+        "engineering",
+        "gem",
+        "mining",
+        "leatherworking",
+        "inscription"
+} };
 
 class misc_commandscript : public CommandScript
 {
@@ -77,8 +130,16 @@ public:
         };
         static ChatCommandTable gearCommandTable =
         {
-            { "repair",             SEC_GAMEMASTER,         false,  &HandleGearRepairCommand,              "" },
-            { "stats",              SEC_PLAYER,             false,  &HandleGearStatsCommand,               "" }
+            { "repair",             SEC_GAMEMASTER,         false,  &HandleGearRepairCommand,           "" },
+            { "stats",              SEC_PLAYER,             false,  &HandleGearStatsCommand,            "" }
+        };
+        static ChatCommandTable bagsCommandTable =
+        {
+            { "clear",             SEC_GAMEMASTER,          false,  &HandleBagsClearCommand,            "" },
+        };
+        static ChatCommandTable inventoryCommandTable =
+        {
+            { "count",             HandleInventoryCountCommand, SEC_MODERATOR,  Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -135,7 +196,9 @@ public:
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
             { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
-            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
+            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" },
+            { "bags",               SEC_GAMEMASTER,         false, nullptr,                             "", bagsCommandTable },
+            { "inventory",          SEC_MODERATOR,          false, nullptr,                             "", inventoryCommandTable }
         };
         return commandTable;
     }
@@ -1808,7 +1871,7 @@ public:
 
         ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), targetName))
+        if (sCharacterCache->GetCharacterNameByGuid(parseGUID, targetName))
         {
             target = ObjectAccessor::FindConnectedPlayer(parseGUID);
             targetGuid = parseGUID;
@@ -2256,7 +2319,7 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(player->GetGUID().GetCounter());
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
 
         // find only player from same account if any
         if (!target)
@@ -2332,7 +2395,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(targetGuid);
 
         // find only player from same account if any
         if (!target)
@@ -3132,7 +3195,7 @@ public:
         }
         else if (targetName)
         {
-            if (ObjectGuid playerGUID = sWorld->GetGlobalPlayerGUID(name))
+            if (ObjectGuid playerGUID = sCharacterCache->GetCharacterGuidByName(name))
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
                 stmt->setUInt32(0, playerGUID.GetCounter());
@@ -3254,7 +3317,7 @@ public:
 
         ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), nameTarget))
+        if (sCharacterCache->GetCharacterNameByGuid(parseGUID, nameTarget))
         {
             playerTarget = ObjectAccessor::FindConnectedPlayer(parseGUID);
             guidTarget = parseGUID;
@@ -3267,8 +3330,12 @@ public:
             groupTarget = playerTarget->GetGroup();
 
         if (!groupTarget && guidTarget)
-            if (uint32 groupGUID = Player::GetGroupIdFromStorage(guidTarget.GetCounter()))
-                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
+        {
+            if (ObjectGuid groupGUID = sCharacterCache->GetCharacterGroupGuidByGuid(guidTarget))
+            {
+                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID.GetCounter());
+            }
+        }
 
         if (groupTarget)
         {
@@ -3459,6 +3526,204 @@ public:
                 handler->PSendSysMessage("Armor: |cff00ffff%u|r - Resilience: |cff00ffff%u|r", Armor, Resilience);
             }
         }
+
+        return true;
+    }
+
+    static bool HandleBagsClearCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+        {
+            return false;
+        }
+
+        uint8 itemQuality = MAX_ITEM_QUALITY;
+        std::string argstr = args;
+        for (uint8 i = ITEM_QUALITY_POOR; i < MAX_ITEM_QUALITY; ++i)
+        {
+            if (argstr == itemQualityToString[i])
+            {
+                itemQuality = i;
+                break;
+            }
+        }
+
+        if (itemQuality == MAX_ITEM_QUALITY)
+        {
+            return false;
+        }
+
+        std::array<uint32, MAX_ITEM_QUALITY> removedItems = { };
+
+        // in inventory
+        for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        {
+            if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                if (ItemTemplate const* itemTemplate = item->GetTemplate())
+                {
+                    if (itemTemplate->Quality <= itemQuality)
+                    {
+                        player->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                        ++removedItems[itemTemplate->Quality];
+                    }
+                }
+            }
+        }
+
+        // in inventory bags
+        for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+        {
+            if (Bag* bag = player->GetBagByPos(i))
+            {
+                for (uint32 j = 0; j < bag->GetBagSize(); j++)
+                {
+                    if (Item* item = bag->GetItemByPos(j))
+                    {
+                        if (ItemTemplate const* itemTemplate = item->GetTemplate())
+                        {
+                            if (itemTemplate->Quality <= itemQuality)
+                            {
+                                player->DestroyItem(i, j, true);
+                                ++removedItems[itemTemplate->Quality];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        std::ostringstream str;
+        str << "Removed ";
+        if (itemQuality == ITEM_QUALITY_HEIRLOOM)
+        {
+            str << "all";
+        }
+        else
+        {
+            bool initialize = true;
+            for (uint8 i = ITEM_QUALITY_POOR; i < MAX_ITEM_QUALITY; ++i)
+            {
+                if (uint32 itemCount = removedItems[i])
+                {
+                    std::string itemQualityString = itemQualityToString[i];
+
+                    if (!initialize)
+                    {
+                        str << ", ";
+                    }
+
+                    str << "|c";
+                    str << std::hex << ItemQualityColors[i] << std::dec;
+                    str << itemCount << " " << itemQualityString << "|r";
+
+                    initialize = false;
+                }
+            }
+        }
+
+        str << " items from your bags.";
+
+        handler->SendSysMessage(str.str().c_str());
+
+        return true;
+    };
+
+    static bool HandleInventoryCountCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
+    {
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!player)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target = player->GetConnectedPlayer();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::array<uint32, MAX_ITEM_SUBCLASS_CONTAINER> freeSlotsInBags = { };
+        uint32 freeSlotsForBags = 0;
+        bool haveFreeSlot = false;
+        // Check backpack
+        for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        {
+            if (!target->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            {
+                haveFreeSlot = true;
+                ++freeSlotsInBags[ITEM_SUBCLASS_CONTAINER];
+            }
+        }
+
+        // Check bags
+        for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+        {
+            if (Bag* bag = target->GetBagByPos(i))
+            {
+                if (ItemTemplate const* bagTemplate = bag->GetTemplate())
+                {
+                    if (bagTemplate->Class == ITEM_CLASS_CONTAINER || bagTemplate->Class == ITEM_CLASS_QUIVER)
+                    {
+                        haveFreeSlot = true;
+                        freeSlotsInBags[bagTemplate->SubClass] += bag->GetFreeSlots();
+                    }
+                }
+            }
+            else
+            {
+                ++freeSlotsForBags;
+            }
+        }
+
+        std::ostringstream str;
+        if (haveFreeSlot)
+        {
+            str << "Player " << target->GetName() << " have ";
+            bool initialize = true;
+            for (uint8 i = ITEM_SUBCLASS_CONTAINER; i < MAX_ITEM_SUBCLASS_CONTAINER; ++i)
+            {
+                if (uint32 freeSlots = freeSlotsInBags[i])
+                {
+                    std::string bagSpecString = bagSpecsToString[i];
+                    if (!initialize)
+                    {
+                        str << ", ";
+                    }
+
+                    str << "|c";
+                    str << std::hex << bagSpecsColors[i] << std::dec;
+                    str << freeSlots << " in " << bagSpecString << " bags|r";
+
+                    initialize = false;
+                }
+            }
+        }
+        else
+        {
+            str << "Player " << target->GetName() << " does not have free slots in their bags";
+        }
+
+        if (freeSlotsForBags)
+        {
+            str << " and also has " << freeSlotsForBags << " free slots for bags";
+        }
+
+        str << ".";
+
+        handler->SendSysMessage(str.str().c_str());
 
         return true;
     }

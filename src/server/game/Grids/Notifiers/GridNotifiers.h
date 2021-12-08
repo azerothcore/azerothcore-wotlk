@@ -22,6 +22,7 @@
 #include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "Group.h"
 #include "Object.h"
 #include "ObjectGridLoader.h"
 #include "Optional.h"
@@ -689,10 +690,12 @@ namespace Acore
     class NearestGameObjectEntryInObjectRangeCheck
     {
     public:
-        NearestGameObjectEntryInObjectRangeCheck(WorldObject const& obj, uint32 entry, float range) : i_obj(obj), i_entry(entry), i_range(range) {}
+        NearestGameObjectEntryInObjectRangeCheck(WorldObject const& obj, uint32 entry, float range, bool onlySpawned = false) :
+            i_obj(obj), i_entry(entry), i_range(range), i_onlySpawned(onlySpawned) { }
+
         bool operator()(GameObject* go)
         {
-            if (go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range))
+            if (go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range) && (!i_onlySpawned || go->isSpawned()))
             {
                 i_range = i_obj.GetDistance(go);        // use found GO range as new range limit for next check
                 return true;
@@ -703,6 +706,7 @@ namespace Acore
         WorldObject const& i_obj;
         uint32 i_entry;
         float  i_range;
+        bool   i_onlySpawned;
 
         // prevent clone this object
         NearestGameObjectEntryInObjectRangeCheck(NearestGameObjectEntryInObjectRangeCheck const&);
@@ -1349,6 +1353,55 @@ namespace Acore
         const WorldObject* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
+    };
+
+    class MostHPMissingGroupInRange
+    {
+    public:
+        MostHPMissingGroupInRange(Unit const* obj, float range, uint32 hp) : i_obj(obj), i_range(range), i_hp(hp) {}
+
+        bool operator()(Unit* u)
+        {
+            if (i_obj == u)
+            {
+                return false;
+            }
+
+            Player* player = nullptr;
+            if (u->GetTypeId() == TYPEID_PLAYER)
+            {
+                player = u->ToPlayer();
+            }
+
+            else if (u->IsPet() && u->GetOwner())
+            {
+                player = u->GetOwner()->ToPlayer();
+            }
+
+            if (!player)
+            {
+                return false;
+            }
+
+            Group* group = player->GetGroup();
+            if (!group || !group->IsMember(i_obj->IsPet() ? i_obj->GetOwnerGUID() : i_obj->GetGUID()))
+            {
+                return false;
+            }
+
+            if (u->IsAlive() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) && u->GetMaxHealth() - u->GetHealth() > i_hp)
+            {
+                i_hp = u->GetMaxHealth() - u->GetHealth();
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+        Unit const* i_obj;
+        float       i_range;
+        uint32      i_hp;
     };
 
     class AllDeadCreaturesInRange

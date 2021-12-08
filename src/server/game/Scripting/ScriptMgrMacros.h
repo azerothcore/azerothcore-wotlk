@@ -15,6 +15,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _SCRIPT_MGR_MACRO_H_
+#define _SCRIPT_MGR_MACRO_H_
+
+#include "ScriptMgr.h"
+
+template<typename ScriptName, typename TCallBack>
+inline bool GetReturnBoolScripts(bool ret, TCallBack&& callback)
+{
+    if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
+        return ret;
+
+    bool needReturn = !ret;
+
+    for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
+    {
+        if (callback(script))
+            return needReturn;
+    }
+
+    return ret;
+}
+
+template<class ScriptName, class T, typename TCallBack>
+inline void GetReturnIndexScripts([[maybe_unused]] T* ret, TCallBack&& callback)
+{
+    if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
+        return;
+
+    for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
+    {
+        if (T* scriptAI = callback(script))
+        {
+            ret = scriptAI;
+            break;
+        }
+    }
+}
+
 // Utility macros to refer to the script registry.
 #define SCR_REG_MAP(T) ScriptRegistry<T>::ScriptMap
 #define SCR_REG_ITR(T) ScriptRegistry<T>::ScriptMapIterator
@@ -25,11 +63,13 @@
     if (!SCR_REG_LST(T).empty()) \
         for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
             C != SCR_REG_LST(T).end(); ++C)
+
 #define FOR_SCRIPTS_RET(T, C, E, R) \
     if (SCR_REG_LST(T).empty()) \
         return R; \
     for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
         C != SCR_REG_LST(T).end(); ++C)
+
 #define FOREACH_SCRIPT(T) \
     FOR_SCRIPTS(T, itr, end) \
     itr->second
@@ -39,7 +79,10 @@
     T* V = ScriptRegistry<T>::GetScriptById(I); \
     if (!V) \
         return;
+
 #define GET_SCRIPT_RET(T, I, V, R) \
     T* V = ScriptRegistry<T>::GetScriptById(I); \
     if (!V) \
         return R;
+
+#endif // _SCRIPT_MGR_MACRO_H_

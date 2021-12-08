@@ -28,31 +28,31 @@ npc_prospector_remtravel
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 // Ours
 enum murkdeep
 {
-    NPC_GREYMIST_HUNTER                 = 2206,
-    NPC_GREYMIST_WARRIOR                = 2205,
-    NPC_GREYMIST_COASTRUNNER            = 2202,
+    NPC_GREYMIST_HUNTER      = 2206,
+    NPC_GREYMIST_WARRIOR     = 2205,
+    NPC_GREYMIST_COASTRUNNER = 2202,
 
-    SPELL_SUNDER_ARMOR                  = 11971,
-    SPELL_NET                           = 6533,
+    SPELL_SUNDER_ARMOR = 11971,
+    SPELL_NET          = 6533,
 
-    EVENT_SPELL_SUNDER_ARMOR            = 2,
-    EVENT_SPELL_NET                     = 3,
+    EVENT_SPELL_SUNDER_ARMOR = 2,
+    EVENT_SPELL_NET          = 3,
 };
 
 class npc_murkdeep : public CreatureScript
 {
 public:
-    npc_murkdeep() : CreatureScript("npc_murkdeep") { }
+    npc_murkdeep() : CreatureScript("npc_murkdeep") {}
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -63,14 +63,14 @@ public:
     {
         npc_murkdeepAI(Creature* c) : ScriptedAI(c) {}
 
-        uint8 phase;
-        uint32 spawnTimer;
+        uint8    phase;
+        uint32   spawnTimer;
         EventMap events;
 
         void Reset() override
         {
             spawnTimer = 0;
-            phase = 0;
+            phase      = 0;
             me->SetVisible(false);
             me->SetReactState(REACT_PASSIVE);
         }
@@ -90,48 +90,48 @@ public:
                 spawnTimer = 0;
                 switch (phase)
                 {
-                    case 0:
-                        if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
-                        {
-                            Player* player = me->SelectNearestPlayer(100.0f);
-                            if (!player)
-                                return;
+                case 0:
+                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
+                    {
+                        Player* player = me->SelectNearestPlayer(100.0f);
+                        if (!player)
+                            return;
 
-                            phase++;
-                            for (int i = 0; i < 3; ++i)
-                                if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                                    cr->AI()->AttackStart(player);
-                        }
-                        return;
-                    case 1:
-                        if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
-                        {
-                            Player* player = me->SelectNearestPlayer(100.0f);
-                            if (!player)
-                                return;
-
-                            phase++;
-                            for (int i = 0; i < 2; ++i)
-                                if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                                    cr->AI()->AttackStart(player);
-                        }
-                        return;
-                    case 2:
-                        if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
-                        {
-                            Player* player = me->SelectNearestPlayer(100.0f);
-                            if (!player)
-                                return;
-
-                            phase++;
-                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                        phase++;
+                        for (int i = 0; i < 3; ++i)
+                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                                 cr->AI()->AttackStart(player);
+                    }
+                    return;
+                case 1:
+                    if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
+                    {
+                        Player* player = me->SelectNearestPlayer(100.0f);
+                        if (!player)
+                            return;
 
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            me->SetVisible(true);
-                            AttackStart(player);
-                        }
-                        return;
+                        phase++;
+                        for (int i = 0; i < 2; ++i)
+                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                                cr->AI()->AttackStart(player);
+                    }
+                    return;
+                case 2:
+                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
+                    {
+                        Player* player = me->SelectNearestPlayer(100.0f);
+                        if (!player)
+                            return;
+
+                        phase++;
+                        if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            cr->AI()->AttackStart(player);
+
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->SetVisible(true);
+                        AttackStart(player);
+                    }
+                    return;
                 }
             }
 
@@ -144,14 +144,14 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_SUNDER_ARMOR:
-                    me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
-                    events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 15000);
-                    break;
-                case EVENT_SPELL_NET:
-                    me->CastSpell(me->GetVictim(), SPELL_NET, false);
-                    events.ScheduleEvent(EVENT_SPELL_NET, 25000);
-                    break;
+            case EVENT_SPELL_SUNDER_ARMOR:
+                me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
+                events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 15000);
+                break;
+            case EVENT_SPELL_NET:
+                me->CastSpell(me->GetVictim(), SPELL_NET, false);
+                events.ScheduleEvent(EVENT_SPELL_NET, 25000);
+                break;
             }
 
             DoMeleeAttackIfReady();
@@ -183,11 +183,11 @@ enum Kerlonian
 class npc_kerlonian : public CreatureScript
 {
 public:
-    npc_kerlonian() : CreatureScript("npc_kerlonian") { }
+    npc_kerlonian() : CreatureScript("npc_kerlonian") {}
 
     struct npc_kerlonianAI : public FollowerAI
     {
-        npc_kerlonianAI(Creature* creature) : FollowerAI(creature) { }
+        npc_kerlonianAI(Creature* creature) : FollowerAI(creature) {}
 
         uint32 FallAsleepTimer;
 
@@ -321,13 +321,13 @@ enum Remtravel
 class npc_prospector_remtravel : public CreatureScript
 {
 public:
-    npc_prospector_remtravel() : CreatureScript("npc_prospector_remtravel") { }
+    npc_prospector_remtravel() : CreatureScript("npc_prospector_remtravel") {}
 
     struct npc_prospector_remtravelAI : public npc_escortAI
     {
-        npc_prospector_remtravelAI(Creature* creature) : npc_escortAI(creature) { }
+        npc_prospector_remtravelAI(Creature* creature) : npc_escortAI(creature) {}
 
-        void Reset() override { }
+        void Reset() override {}
 
         void EnterCombat(Unit* who) override
         {
@@ -337,8 +337,8 @@ public:
 
         void JustSummoned(Creature* /*pSummoned*/) override
         {
-            //unsure if it should be any
-            //pSummoned->AI()->AttackStart(me);
+            // unsure if it should be any
+            // pSummoned->AI()->AttackStart(me);
         }
 
         void WaypointReached(uint32 waypointId) override
@@ -347,57 +347,57 @@ public:
             {
                 switch (waypointId)
                 {
-                    case 0:
-                        Talk(SAY_REM_START, player);
-                        break;
-                    case 5:
-                        Talk(SAY_REM_RAMP1_1, player);
-                        break;
-                    case 6:
-                        DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        break;
-                    case 9:
-                        Talk(SAY_REM_RAMP1_2, player);
-                        break;
-                    case 14:
-                        //depend quest rewarded?
-                        Talk(SAY_REM_BOOK, player);
-                        break;
-                    case 15:
-                        Talk(SAY_REM_TENT1_1, player);
-                        break;
-                    case 16:
-                        DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        break;
-                    case 17:
-                        Talk(SAY_REM_TENT1_2, player);
-                        break;
-                    case 26:
-                        Talk(SAY_REM_MOSS, player);
-                        break;
-                    case 27:
-                        Talk(EMOTE_REM_MOSS, player);
-                        break;
-                    case 28:
-                        Talk(SAY_REM_MOSS_PROGRESS, player);
-                        break;
-                    case 29:
-                        DoSpawnCreature(NPC_GRAVEL_SCOUT, -15.0f, 3.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        DoSpawnCreature(NPC_GRAVEL_BONE, -15.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        DoSpawnCreature(NPC_GRAVEL_GEO, -15.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        break;
-                    case 31:
-                        Talk(SAY_REM_PROGRESS, player);
-                        break;
-                    case 41:
-                        Talk(SAY_REM_REMEMBER, player);
-                        break;
-                    case 42:
-                        Talk(EMOTE_REM_END, player);
-                        player->GroupEventHappens(QUEST_ABSENT_MINDED_PT2, me);
-                        break;
+                case 0:
+                    Talk(SAY_REM_START, player);
+                    break;
+                case 5:
+                    Talk(SAY_REM_RAMP1_1, player);
+                    break;
+                case 6:
+                    DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    break;
+                case 9:
+                    Talk(SAY_REM_RAMP1_2, player);
+                    break;
+                case 14:
+                    // depend quest rewarded?
+                    Talk(SAY_REM_BOOK, player);
+                    break;
+                case 15:
+                    Talk(SAY_REM_TENT1_1, player);
+                    break;
+                case 16:
+                    DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    break;
+                case 17:
+                    Talk(SAY_REM_TENT1_2, player);
+                    break;
+                case 26:
+                    Talk(SAY_REM_MOSS, player);
+                    break;
+                case 27:
+                    Talk(EMOTE_REM_MOSS, player);
+                    break;
+                case 28:
+                    Talk(SAY_REM_MOSS_PROGRESS, player);
+                    break;
+                case 29:
+                    DoSpawnCreature(NPC_GRAVEL_SCOUT, -15.0f, 3.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    DoSpawnCreature(NPC_GRAVEL_BONE, -15.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    DoSpawnCreature(NPC_GRAVEL_GEO, -15.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    break;
+                case 31:
+                    Talk(SAY_REM_PROGRESS, player);
+                    break;
+                case 41:
+                    Talk(SAY_REM_REMEMBER, player);
+                    break;
+                case 42:
+                    Talk(EMOTE_REM_END, player);
+                    player->GroupEventHappens(QUEST_ABSENT_MINDED_PT2, me);
+                    break;
                 }
             }
         }

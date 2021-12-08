@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LootMgr.h"
 #include "Containers.h"
 #include "Group.h"
 #include "Log.h"
-#include "LootMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -51,6 +51,7 @@ LootStore LootTemplates_Prospecting("prospecting_loot_template",     "item entry
 LootStore LootTemplates_Reference("reference_loot_template",         "reference id",                    false);
 LootStore LootTemplates_Skinning("skinning_loot_template",           "creature skinning id",            true);
 LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (random item creating)", false);
+LootStore LootTemplates_Player("player_loot_template",               "team id",                         true);
 
 // Selects invalid loot items to be removed from group possible entries (before rolling)
 struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, bool>
@@ -483,7 +484,6 @@ void LootItem::AddAllowedLooter(Player const* player)
 // --------- Loot ---------
 //
 
-// Inserts the item into the loot (called by LootTemplate processors)
 // Inserts the item into the loot (called by LootTemplate processors)
 void Loot::AddItem(LootStoreItem const& item)
 {
@@ -2250,6 +2250,27 @@ void LoadLootTemplates_Spell()
         LOG_INFO("server.loading", ">> Loaded %u spell loot templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     else
         LOG_ERROR("sql.sql", ">> Loaded 0 spell loot templates. DB table `spell_loot_template` is empty");
+    LOG_INFO("server.loading", " ");
+}
+
+void LoadLootTemplates_Player()
+{
+    LOG_INFO("server.loading", "Loading player loot templates...");
+
+    uint32 oldMSTime = getMSTime();
+
+    LootIdSet lootIdSet;
+    uint32 count = LootTemplates_Player.LoadAndCollectLootIds(lootIdSet);
+
+    if (count)
+    {
+        LOG_INFO("server.loading", ">> Loaded %u player loot templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    }
+    else
+    {
+        LOG_ERROR("sql.sql", ">> Loaded 0 player loot templates. DB table `player_loot_template` is empty");
+    }
+
     LOG_INFO("server.loading", " ");
 }
 

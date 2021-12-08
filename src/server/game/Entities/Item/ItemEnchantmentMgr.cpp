@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "ItemEnchantmentMgr.h"
+#include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Util.h"

@@ -21,8 +21,8 @@
 #include <iostream>
 #include <list>
 #include <map>
-#include <vector>
 #include <sys/stat.h>
+#include <vector>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -33,19 +33,13 @@
 #undef min
 #undef max
 
-//#pragma warning(disable : 4505)
-//#pragma comment(lib, "Winmm.lib")
-
-#include <map>
-
 //From Extractor
-#include "adtfile.h"
-#include "wdtfile.h"
-#include "dbcfile.h"
-#include "wmo.h"
-#include "mpq_libmpq04.h"
-
 #include "vmapexport.h"
+#include "adtfile.h"
+#include "dbcfile.h"
+#include "mpq_libmpq04.h"
+#include "wdtfile.h"
+#include "wmo.h"
 
 //------------------------------------------------------------------------------
 // Defines

@@ -18,9 +18,9 @@
 #ifndef DEF_CRUSADER_H
 #define DEF_CRUSADER_H
 
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 #include "SpellAuraEffects.h"
-#include "CreatureAIImpl.h"
 
 #define TrialOfTheCrusaderScriptName "instance_trial_of_the_crusader"
 

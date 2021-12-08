@@ -22,3 +22,4 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvpstats-
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-queue-list-cache.git modules/mod-queue-list-cache
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-server-auto-shutdown.git modules/mod-server-auto-shutdown
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-transmog.git modules/mod-transmog
+git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-progression-system modules/mod-progression-system

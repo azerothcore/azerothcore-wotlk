@@ -18,7 +18,10 @@
 #ifndef DEF_MOLTEN_CORE_H
 #define DEF_MOLTEN_CORE_H
 
-#define MCScriptName "instance_molten_core"
+#include "CreatureAIImpl.h"
+#include "Object.h"
+
+constexpr auto MCScriptName = "instance_molten_core";
 
 constexpr uint32 MAX_ENCOUNTER = 10;
 
@@ -44,7 +47,7 @@ enum MCActions
 {
     ACTION_START_RAGNAROS_INTRO         = -1,
     ACTION_FINISH_RAGNAROS_INTRO        = -2,
-    ACTION_RESET_MAGMADAR_ENCOUNTER     = -3,   // Used when ragers are pulled far away
+    ACTION_RESET_GOLEMAGG_ENCOUNTER     = -3,   // Used when ragers are pulled far away
     ACTION_PREPARE_MAJORDOMO_RAGNA      = -4,
 };
 

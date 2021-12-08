@@ -15,9 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class PlayerCommand
+#ifndef _PLAYER_COMMAND_H
+#define _PLAYER_COMMAND_H
+
+#include "Chat.h"
+#include "Common.h"
+
+class Player;
+class SpellInfo;
+
+namespace Acore::PlayerCommand
 {
-public:
-    static bool Learn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
-    static bool UnLearn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
+    bool HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
+    bool HandleUnlearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
 };
+
+#endif // _PLAYER_COMMAND_H

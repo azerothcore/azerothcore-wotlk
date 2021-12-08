@@ -50,6 +50,11 @@ protected:
 
     NetworkThread<WorldSocket>* CreateThreads() const override;
 
+    static void OnSocketAccept(tcp::socket&& sock, uint32 threadIndex)
+    {
+        Instance().OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
+    }
+
 private:
     int32 _socketSystemSendBufferSize;
     int32 _socketApplicationSendBufferSize;

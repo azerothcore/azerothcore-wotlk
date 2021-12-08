@@ -36,6 +36,7 @@ Copied events should probably have a new owner
 #include "ArenaTeamMgr.h"
 #include "CalendarMgr.h"
 #include "DatabaseEnv.h"
+#include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
@@ -44,8 +45,8 @@ Copied events should probably have a new owner
 #include "Opcodes.h"
 #include "Player.h"
 #include "SocialMgr.h"
-#include "utf8.h"
 #include "WorldSession.h"
+#include "utf8.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
@@ -155,6 +156,11 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     for (uint32 entry : sGameEventMgr->modifiedHolidays)
     {
         HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(entry);
+
+        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, sGameEventMgr->GetHolidayEventId(holiday->Id), nullptr))
+        {
+            continue;
+        }
 
         data << uint32(holiday->Id);                        // m_ID
         data << uint32(holiday->Region);                    // m_region, might be looping
@@ -543,13 +549,13 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     else
     {
         // xinef: Get Data From global storage
-        if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
+        if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name))
         {
-            if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
+            if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid))
             {
                 inviteeGuid = guid;
-                inviteeTeamId = Player::TeamIdForRace(playerData->race);
-                inviteeGuildId = playerData->guildId;
+                inviteeTeamId = Player::TeamIdForRace(playerData->Race);
+                inviteeGuildId = playerData->GuildId;
             }
         }
     }
@@ -566,7 +572,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
         return;
     }
 
-    // xinef: zomg! sync query
+    // xinef: sync query
     if (QueryResult result = CharacterDatabase.PQuery("SELECT flags FROM character_social WHERE guid = %u AND friend = %u", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
     {
         Field* fields = result->Fetch();

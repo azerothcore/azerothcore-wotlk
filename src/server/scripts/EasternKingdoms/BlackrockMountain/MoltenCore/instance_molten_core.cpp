@@ -15,12 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "InstanceScript.h"
 #include "TemporarySummon.h"
 #include "molten_core.h"
 
@@ -53,6 +51,8 @@ MCBossObject const linkedBossObjData[MAX_MC_LINKED_BOSS_OBJ]=
     { DATA_GOLEMAGG,    GO_RUNE_THERI,      GO_CIRCLE_GOLEMAGG  },
     { DATA_SULFURON,    GO_RUNE_KORO,       GO_CIRCLE_SULFURON  },
 };
+
+constexpr uint8 SAY_SPAWN = 1;
 
 class instance_molten_core : public InstanceMapScript
 {
@@ -324,7 +324,7 @@ public:
 
         void DoAction(int32 action) override
         {
-            if (action == ACTION_RESET_MAGMADAR_ENCOUNTER)
+            if (action == ACTION_RESET_GOLEMAGG_ENCOUNTER)
             {
                 if (Creature* golemagg = instance->GetCreature(_golemaggGUID))
                 {
@@ -351,7 +351,17 @@ public:
                 return;
             }
 
-            instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE ? MajordomoSummonPos : MajordomoRagnaros);
+            if (GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
+            {
+                if (Creature* creature = instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, MajordomoSummonPos))
+                {
+                    creature->AI()->Talk(SAY_SPAWN);
+                }
+            }
+            else
+            {
+                instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, MajordomoRagnaros);
+            }
         }
 
         bool CheckMajordomoExecutus() const

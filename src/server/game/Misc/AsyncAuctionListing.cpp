@@ -16,12 +16,12 @@
  */
 
 #include "AsyncAuctionListing.h"
-#include "AuctionHouseMgr.h"
 #include "Creature.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "WorldSession.h"
 
 uint32 AsyncAuctionListingMgr::auctionListingDiff = 0;
 bool AsyncAuctionListingMgr::auctionListingAllowed = false;
@@ -64,7 +64,7 @@ bool AuctionListItemsDelayEvent::Execute()
     bool result = auctionHouse->BuildListAuctionItems(data, plr,
                   wsearchedname, _listfrom, _levelmin, _levelmax, _usable,
                   _auctionSlotID, _auctionMainCategory, _auctionSubCategory, _quality,
-                  count, totalcount, _getAll);
+                  count, totalcount, _getAll, _sortOrder);
 
     if (!result)
         return false;

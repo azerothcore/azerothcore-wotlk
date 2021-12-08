@@ -777,12 +777,6 @@ public:
 
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
-    [[nodiscard]] ObjectGuid GetPlayerGUIDByName(std::string const& name) const;
-    bool GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const;
-    [[nodiscard]] TeamId GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
-
     uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId);
     void GetTaxiPath(uint32 source, uint32 destination, uint32& path, uint32& cost);
     uint32 GetTaxiMountDisplayId(uint32 id, TeamId teamId, bool allowed_alt_team = false);
@@ -1156,6 +1150,7 @@ public:
             return &itr->second;
         return nullptr;
     }
+    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
@@ -1172,6 +1167,7 @@ public:
         return itr->second;
     }
 
+    GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
