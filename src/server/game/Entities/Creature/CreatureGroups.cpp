@@ -237,31 +237,23 @@ void CreatureGroup::MemberEvaded(Creature* member)
     for (auto const& itr : m_members)
     {
         Creature* pMember = itr.first;
-
-        //Skip one check
-        if (pMember == member)
+        // This should never happen
+        if (!pMember)
         {
             continue;
         }
 
-        if (!pMember->IsAlive())
+        if (pMember == member || pMember->isDead() || pMember->IsInEvadeMode() || !pMember->IsInCombat() ||
+                !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
         {
             continue;
         }
 
-        if (pMember->IsInEvadeMode())
+        if (pMember->IsAIEnabled)
         {
-            continue;
-        }
-
-        if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
-        {
-            if (pMember->IsAIEnabled)
+            if (CreatureAI* pMemberAI = pMember->AI())
             {
-                if (CreatureAI* pMemberAI = pMember->AI())
-                {
-                    pMemberAI->EnterEvadeMode();
-                }
+                pMemberAI->EnterEvadeMode();
             }
         }
     }

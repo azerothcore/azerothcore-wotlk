@@ -158,7 +158,7 @@ public:
                 return;
 
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_ESSENCE_OF_SUFFERING, 5000); // ZOMG! 15000);
+            events.ScheduleEvent(EVENT_ESSENCE_OF_SUFFERING, 5000); // 15000);
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 

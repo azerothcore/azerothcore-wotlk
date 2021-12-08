@@ -369,7 +369,7 @@ public:
                             Player* target = myList.front();
                             if (me->GetVictim()->GetGUID() != _tankGUID || target->GetGUID() != _offtankGUID)
                             {
-                                // remove manually from previous, single target flag has nothing to do with this shit as caster is in every case different... tc retards
+                                // remove manually from previous, single target flag has nothing to do with this as caster is in every case different.
                                 if (_tankGUID)
                                     if (Player* prevTank = ObjectAccessor::GetPlayer(*me, _tankGUID))
                                     {
