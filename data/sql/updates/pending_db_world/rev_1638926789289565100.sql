@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638926789289565100');
 
 /* Remove Remove Oil of Immolation, Restorative Potion, Lesser Stoneshield Potion, Elixir of Detect Undead, 
-Elixir of Greater Intellect, Iron Ore and Eternium Ore from loot tables where they do not belong.
+Elixir of Greater Intellect, Iron Ore and Eternium Ore from creature loot tables where they do not belong.
 */
 
 DELETE FROM `creature_loot_template` WHERE (`Item` IN (8956, 9030, 4623, 9144, 9154, 9179, 23427, 2772));
