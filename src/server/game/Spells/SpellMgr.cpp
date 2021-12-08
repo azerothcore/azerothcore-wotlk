@@ -7517,6 +7517,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Green Beam
     ApplySpellFix({31628, 31630, 31631}, [](SpellEntry* spellInfo)
     {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
         spellInfo->MaxAffectedTargets = 1;
     });
 
