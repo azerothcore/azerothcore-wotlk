@@ -7,4 +7,3 @@ UPDATE `quest_template` SET `QuestCompletionLog`='Return to Mound of Dirt in The
 UPDATE `quest_template` SET `QuestCompletionLog`='Return to Talvash del Kissel at the Mystic Ward in Ironforge.' WHERE  `ID`=2199;
 UPDATE `quest_template` SET `QuestCompletionLog`='Return to Talvash del Kissel at the Mystic Ward in Ironforge.' WHERE  `ID`=2204;
 UPDATE `quest_template` SET `QuestCompletionLog`='Return to Talvash del Kissel at the Mystic Ward in Ironforge.' WHERE  `ID`=8355;
-
