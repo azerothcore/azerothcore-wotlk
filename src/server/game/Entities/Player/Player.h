@@ -1805,7 +1805,7 @@ public:
     void UpdatePvP(bool state, bool _override = false);
     void UpdateZone(uint32 newZone, uint32 newArea);
     void UpdateArea(uint32 newArea);
-    void SetNeedsZoneUpdate(bool needsUpdate) {m_needsZoneUpdate = needsUpdate;}
+    void SetNeedZoneUpdate(bool needUpdate) { m_needsZoneUpdate = needsUpdate; }
 
     void UpdateZoneDependentAuras(uint32 zone_id);    // zones
     void UpdateAreaDependentAuras(uint32 area_id);    // subzones
