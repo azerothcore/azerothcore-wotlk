@@ -209,9 +209,9 @@ public:
 
         if (!groupTarget)
         {
-            if (uint32 groupGUID = Player::GetGroupIdFromStorage(target->GetGUID().GetCounter()))
+            if (ObjectGuid groupGUID = sCharacterCache->GetCharacterGroupGuidByGuid(target->GetGUID()))
             {
-                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
+                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID.GetCounter());
             }
         }
 
@@ -256,12 +256,6 @@ public:
             {
                 flags = "None";
             }
-
-            /*Player* p = ObjectAccessor::FindConnectedPlayer((*itr).guid);
-            const char* onlineState = p ? "online" : "offline";
-
-            handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
-                slot.guid.GetCounter(), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
         }
 
         return true;
