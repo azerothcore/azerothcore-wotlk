@@ -76,10 +76,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 /*********************************************************/
 /***                    STORAGE SYSTEM                 ***/
 /*********************************************************/
@@ -2340,13 +2336,6 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
     }
 
-    InventoryResult result = EQUIP_ERR_OK;
-
-    if (!sScriptMgr->CanUseItem(const_cast<Player*>(this), proto, result))
-    {
-        return result;
-    }
-
     if (getLevel() < proto->RequiredLevel)
     {
         return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
@@ -2358,13 +2347,12 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_CANT_DO_RIGHT_NOW;
     }
 
-#ifdef ELUNA
-    InventoryResult eres = sEluna->OnCanUseItem(this, proto->ItemId);
-    if (eres != EQUIP_ERR_OK)
+    InventoryResult result = EQUIP_ERR_OK;
+
+    if (!sScriptMgr->CanUseItem(const_cast<Player*>(this), proto, result))
     {
-        return eres;
+        return result;
     }
-#endif
 
     return EQUIP_ERR_OK;
 }
@@ -2851,19 +2839,13 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         pItem2->SetState(ITEM_CHANGED, this);
 
         ApplyEquipCooldown(pItem2);
-#ifdef ELUNA
-        sEluna->OnEquip(this, pItem2, bag, slot);
-#endif
+        sScriptMgr->OnEquip(this, pItem2, bag, slot, update);
         return pItem2;
     }
 
     // only for full equip instead adding to stack
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
-
-#ifdef ELUNA
-    sEluna->OnEquip(this, pItem, bag, slot);
-#endif
 
     sScriptMgr->OnEquip(this, pItem, bag, slot, update);
     UpdateForQuestWorldObjects();
@@ -2889,9 +2871,7 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
-#ifdef ELUNA
-        sEluna->OnEquip(this, pItem, (pos >> 8), slot);
-#endif
+        sScriptMgr->OnEquip(this, pItem, (pos >> 8), slot, true);
     }
 }
 
