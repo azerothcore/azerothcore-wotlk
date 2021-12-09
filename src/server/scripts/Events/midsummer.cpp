@@ -511,8 +511,8 @@ void AddSC_event_midsummer_scripts()
 {
     // NPCs
     new go_midsummer_bonfire();
-    RegisterCreatureScript(npc_midsummer_bonfire);
-    RegisterCreatureScript(npc_midsummer_torch_target);
+    RegisterCreatureAI(npc_midsummer_bonfire);
+    RegisterCreatureAI(npc_midsummer_torch_target);
 
     // Spells
     RegisterSpellScript(spell_gen_crab_disguise);
