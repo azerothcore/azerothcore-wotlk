@@ -83,9 +83,9 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 -- Bird Reference loot for level 1 to 5
 SET @REFBIRD := @REF + 5;
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(@REFBIRD,1476,0,40,0,1,1,1,1, 'Bird 1-5 - Plucked Feathers'),
-(@REFBIRD,7100,0,30,0,1,1,1,1, 'Bird 1-5 - Cracked Egg Shells'),
-(@REFBIRD,7101,0,30,0,1,1,1,1, 'Bird 1-5 - Leg Meat');
+(@REFBIRD,7096,0,40,0,1,1,1,1, 'Bird 1-5 - Plucked Feather'),
+(@REFBIRD,4757,0,30,0,1,1,1,1, 'Bird 1-5 - Cracked Egg Shells'),
+(@REFBIRD,7097,0,30,0,1,1,1,1, 'Bird 1-5 - Leg Meat');
 
 -- Scorpid Reference loot for level 1 to 5
 SET @REFSCORPID := @REF + 6;
