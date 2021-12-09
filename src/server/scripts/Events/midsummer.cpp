@@ -47,7 +47,7 @@ public:
 
 struct npc_midsummer_bonfire : public ScriptedAI
 {
-    npc_midsummer_bonfireAI(Creature* creature) : ScriptedAI(creature)
+    npc_midsummer_bonfire(Creature* creature) : ScriptedAI(creature)
     {
         me->IsAIEnabled = true;
         goGUID.Clear();
