@@ -326,14 +326,17 @@ public:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
                             {
                                 me->AttackerStateUpdate(target);
+                                me->SetTarget(target->GetGUID());
+                                events.RepeatEvent(500);
                             }
                             else
                             {
-                                events.RescheduleEvent(EVENT_MAGMA_BLAST, 4000, PHASE_EMERGED, PHASE_EMERGED);
+                                events.ScheduleEvent(EVENT_MAGMA_BLAST, 4000, PHASE_EMERGED, PHASE_EMERGED);
                             }
                         }
                         else
                         {
+                            me->AttackerStateUpdate(me->GetVictim());
                             _hasYelledMagmaBurst = false;
                             events.RepeatEvent(500);
                         }
