@@ -5404,6 +5404,11 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     if (!pet)
     {
         player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET);
+        if (pet = player->GetPet())
+        {
+            pet->SetHealth(pet->CountPctFromMaxHealth(damage));
+        }
+
         return;
     }
 
