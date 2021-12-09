@@ -35,7 +35,6 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "ScriptMgrMacros.h"
 
 struct TSpellSummary
 {

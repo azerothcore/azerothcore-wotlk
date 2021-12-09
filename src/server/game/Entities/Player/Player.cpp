@@ -12421,7 +12421,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 WorldObject* Player::GetViewpoint() const
 {
     if (ObjectGuid guid = GetGuidValue(PLAYER_FARSIGHT))
-        return (WorldObject*)ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER);
+        return static_cast<WorldObject*>(ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER));
     return nullptr;
 }
 

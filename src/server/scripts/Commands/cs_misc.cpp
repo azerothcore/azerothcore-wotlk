@@ -94,7 +94,6 @@ public:
             { "dismount",          HandleDismountCommand,          SEC_PLAYER,             Console::No  },
             { "guid",              HandleGUIDCommand,              SEC_GAMEMASTER,         Console::No  },
             { "help",              HandleHelpCommand,              SEC_PLAYER,             Console::Yes },
-            { "itemmove",          HandleItemMoveCommand,          SEC_GAMEMASTER,         Console::No  },
             { "cooldown",          HandleCooldownCommand,          SEC_GAMEMASTER,         Console::No  },
             { "distance",          HandleGetDistanceCommand,       SEC_ADMINISTRATOR,      Console::No  },
             { "recall",            HandleRecallCommand,            SEC_GAMEMASTER,         Console::No  },
@@ -1158,32 +1157,6 @@ public:
         {
             Acore::ChatCommands::SendCommandHelpFor(*handler, "help");
         }
-
-        return true;
-    }
-
-    // move item to other slot
-    static bool HandleItemMoveCommand(ChatHandler* handler, uint8 srcSlot, uint8 dstSlot)
-    {
-        if (srcSlot == dstSlot)
-        {
-            return true;
-        }
-
-        if (!handler->GetSession()->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0, srcSlot, true))
-        {
-            return false;
-        }
-
-        if (!handler->GetSession()->GetPlayer()->IsValidPos(INVENTORY_SLOT_BAG_0, dstSlot, false))
-        {
-            return false;
-        }
-
-        uint16 src = ((INVENTORY_SLOT_BAG_0 == 8) | srcSlot);
-        uint16 dst = ((INVENTORY_SLOT_BAG_0 << 8) | dstSlot);
-
-        handler->GetSession()->GetPlayer()->SwapItem(src, dst);
 
         return true;
     }
