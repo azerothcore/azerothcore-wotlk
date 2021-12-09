@@ -1116,7 +1116,7 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
         return false;
 
     // Update player zone if needed
-    if (m_needsZoneUpdate)
+    if (m_needZoneUpdate)
     {
         uint32 newZone, newArea;
         GetZoneAndAreaId(newZone, newArea);
