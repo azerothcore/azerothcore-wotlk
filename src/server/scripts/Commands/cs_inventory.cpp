@@ -21,17 +21,33 @@
 #include "Player.h"
 #include "WorldSession.h"
 
-constexpr std::array<std::string, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsToString =
+static std::array<std::string, MAX_ITEM_QUALITY> itemQualityToString =
 {
-    "normal",
-    "soul",
-    "herb",
-    "enchanting",
-    "engineering",
-    "gem",
-    "mining",
-    "leatherworking",
-    "inscription"
+    {
+        "poor",
+        "normal",
+        "uncommon",
+        "rare",
+        "epic",
+        "legendary",
+        "artifact",
+        "all"
+    }
+};
+
+static std::array<std::string, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsToString =
+{
+    {
+        "normal",
+        "soul",
+        "herb",
+        "enchanting",
+        "engineering",
+        "gem",
+        "mining",
+        "leatherworking",
+        "inscription"
+    }
 };
 
 constexpr uint32 bagSpecsColors[MAX_ITEM_SUBCLASS_CONTAINER] =
@@ -47,17 +63,19 @@ constexpr uint32 bagSpecsColors[MAX_ITEM_SUBCLASS_CONTAINER] =
     0xff54504f      // DARK GREY - Inscription
 };
 
-constexpr std::array<std::string, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsColorToString =
+static std::array<std::string, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsColorToString =
 {
-    "normal",
-    "soul",
-    "herb",
-    "enchanting",
-    "engineering",
-    "gem",
-    "mining",
-    "leatherworking",
-    "inscription"
+    {
+        "normal",
+        "soul",
+        "herb",
+        "enchanting",
+        "engineering",
+        "gem",
+        "mining",
+        "leatherworking",
+        "inscription"
+    }
 };
 
 using namespace Acore::ChatCommands;
