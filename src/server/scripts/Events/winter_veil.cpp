@@ -34,7 +34,7 @@ enum Mistletoe
 };
 
 // 26218 - Mistletoe
-class spell_winter_veil_mistletoe_ : public SpellScript
+class spell_winter_veil_mistletoe : public SpellScript
 {
     PrepareSpellScript(spell_winter_veil_mistletoe);
 
