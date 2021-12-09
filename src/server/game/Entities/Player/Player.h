@@ -2869,7 +2869,7 @@ public:
 
     uint8 m_grantableLevels;
 
-    bool m_needsZoneUpdate;
+    bool m_needZoneUpdate;
 
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
