@@ -482,7 +482,7 @@ bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest) 
 
 struct npc_soh_fire_trigger : public NullCreatureAI
 {
-    npc_soh_fire_triggerAI(Creature* creature) : NullCreatureAI(creature) { }
+    npc_soh_fire_trigger(Creature* creature) : NullCreatureAI(creature) { }
 
     void Reset() override
     {
