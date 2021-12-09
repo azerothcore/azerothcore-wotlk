@@ -336,11 +336,6 @@ public:
                         }
                         else
                         {
-                            if (me->GetVictim())
-                            {
-                                me->AttackerStateUpdate(me->GetVictim());
-                            }
-
                             _hasYelledMagmaBurst = false;
                             events.RepeatEvent(500);
                         }
