@@ -21,20 +21,18 @@
 #include "ScriptMgr.h"
 
 template<typename ScriptName, typename TCallBack>
-inline bool GetReturnBoolScripts(bool ret, TCallBack&& callback)
+inline Optional<bool> IsValidBoolScript(TCallBack&& callback)
 {
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
-        return ret;
-
-    bool needReturn = !ret;
+        return {};
 
     for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
     {
         if (callback(script))
-            return needReturn;
+            return true;
     }
 
-    return ret;
+    return false;
 }
 
 template<class ScriptName, class T, typename TCallBack>
