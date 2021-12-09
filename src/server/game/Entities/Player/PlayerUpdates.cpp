@@ -1121,7 +1121,7 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
         uint32 newZone, newArea;
         GetZoneAndAreaId(newZone, newArea);
         UpdateZone(newZone, newArea);
-        m_needsZoneUpdate = false;
+        m_needZoneUpdate = false;
     }
 
     if (GetGroup())
