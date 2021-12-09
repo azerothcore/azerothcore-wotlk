@@ -6,7 +6,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638942051959578400');
 UPDATE `quest_poi` SET `WorldMapAreaId`=23 WHERE `QuestID`=6164 AND `id`=0;
 UPDATE `quest_poi` SET `WorldMapAreaId`=23 WHERE `QuestID`=6164 AND `id`=1;
 
-/* Set quests 894, 900, 901, 902, 890, 892, 896, 888, 887, 3924 to The Barrens
+/* Set quests 894, 900, 901, 902, 890, 892, 896, 888, 887 to The Barrens
 */
 
 UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=890 AND `id`=0;
@@ -28,6 +28,10 @@ UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=900 AND `id`=3;
 UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=901 AND `id`=0;
 UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=901 AND `id`=1;
 UPDATE `quest_poi` SET `WorldMapAreaId`=11 WHERE `QuestID`=902 AND `id`=0;
+
+/* Set quest 3924 completion to Orgrimmar
+*/
+
 UPDATE `quest_poi` SET `WorldMapAreaId`=321 WHERE `QuestID`=3924 AND `id`=3;
 
 /* Set quests 1125 and 1126 to Silithus
