@@ -61,7 +61,7 @@ struct npc_pet_shaman_earth_elemental : public ScriptedAI
             if (!me->IsInCombat())
                 if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     if (Unit* target = owner->GetSelectedUnit())
-                        if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
+                        if (me->CanCreatureAttack(target))
                             AttackStart(target);
             _initAttack = false;
         }
@@ -109,7 +109,7 @@ struct npc_pet_shaman_fire_elemental : public ScriptedAI
             if (!me->IsInCombat())
                 if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     if (Unit* target = owner->GetSelectedUnit())
-                        if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
+                        if (me->CanCreatureAttack(target))
                             AttackStart(target);
             _initAttack = false;
         }
