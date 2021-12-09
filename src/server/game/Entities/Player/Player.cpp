@@ -92,10 +92,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
@@ -2297,19 +2293,27 @@ void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool re
     GetSession()->SendPacket(&data);
 }
 
-void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
+void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
 {
     if (xp < 1)
+    {
         return;
+    }
 
-    if (!IsAlive() && !GetBattlegroundId())
+    if (!IsAlive() && !GetBattlegroundId() && !isLFGReward)
+    {
         return;
+    }
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN))
+    {
         return;
+    }
 
     if (victim && victim->GetTypeId() == TYPEID_UNIT && !victim->ToCreature()->hasLootRecipient())
+    {
         return;
+    }
 
     uint8 level = getLevel();
 
@@ -4350,12 +4354,12 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // update visibility
     UpdateObjectVisibility();
 
-#ifdef ELUNA
-    sEluna->OnResurrect(this);
-#endif
+    sScriptMgr->OnPlayerResurrect(this, restore_percent, applySickness);
 
-    if(!applySickness)
+    if (!applySickness)
+    {
         return;
+    }
 
     //Characters from level 1-10 are not affected by resurrection sickness.
     //Characters from level 11-19 will suffer from one minute of sickness
@@ -4512,6 +4516,8 @@ void Player::RemoveCorpse()
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     Corpse::DeleteFromDB(GetGUID(), trans);
     CharacterDatabase.CommitTransaction(trans);
+
+    _corpseLocation.WorldRelocate();
 }
 
 void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
@@ -8768,11 +8774,12 @@ void Player::StopCastingCharm()
 void Player::Say(std::string_view text, Language language, WorldObject const* /*= nullptr*/)
 {
     std::string _text(text);
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
-#ifdef ELUNA
-    if (!sEluna->OnChat(this, CHAT_MSG_SAY, language, _text))
+    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_SAY, language, _text))
+    {
         return;
-#endif
+    }
+
+    sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
@@ -8787,11 +8794,13 @@ void Player::Say(uint32 textId, WorldObject const* target /*= nullptr*/)
 void Player::Yell(std::string_view text, Language language, WorldObject const* /*= nullptr*/)
 {
     std::string _text(text);
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
-#ifdef ELUNA
-    if (!sEluna->OnChat(this, CHAT_MSG_YELL, language, _text))
+
+    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_YELL, language, _text))
+    {
         return;
-#endif
+    }
+
+    sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
@@ -8806,11 +8815,13 @@ void Player::Yell(uint32 textId, WorldObject const* target /*= nullptr*/)
 void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, bool /*= false*/)
 {
     std::string _text(text);
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
-#ifdef ELUNA
-    if (!sEluna->OnChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
+
+    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
+    {
         return;
-#endif
+    }
+
+    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
@@ -8832,13 +8843,13 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
     std::string _text(text);
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
-#ifdef ELUNA
-    if (!sEluna->OnChat(this, CHAT_MSG_WHISPER, language, _text, target))
+
+    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text, target))
     {
         return;
     }
-#endif
+
+    sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
@@ -12412,7 +12423,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 WorldObject* Player::GetViewpoint() const
 {
     if (ObjectGuid guid = GetGuidValue(PLAYER_FARSIGHT))
-        return (WorldObject*)ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER);
+        return static_cast<WorldObject*>(ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER));
     return nullptr;
 }
 
@@ -12797,9 +12808,6 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         if (loot->containerGUID)
             sLootItemStorage->RemoveStoredLootItem(loot->containerGUID, item->itemid, item->count, loot, item->itemIndex);
 
-#ifdef ELUNA
-        sEluna->OnLootItem(this, newitem, item->count, this->GetLootGUID());
-#endif
         sScriptMgr->OnLootItem(this, newitem, item->count, this->GetLootGUID());
     }
     else
@@ -13229,9 +13237,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     m_usedTalentCount += talentPointsChange;
     SetFreeTalentPoints(CurTalentPoints - talentPointsChange);
 
-#ifdef ELUNA
-    sEluna->OnLearnTalents(this, talentId, talentRank, spellId);
-#endif
+    sScriptMgr->OnPlayerLearnTalents(this, talentId, talentRank, spellId);
 }
 
 void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank)
@@ -15011,8 +15017,12 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
 
 bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
 {
-    if (!packetOnly && !Unit::SetHover(apply))
-        return false;
+    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
+    if (!packetOnly /* && !Unit::SetHover(apply)*/)
+    {
+        Unit::SetHover(apply);
+        // return false;
+    }
 
     WorldPacket data(apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
     data << GetPackGUID();
@@ -15028,8 +15038,12 @@ bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
 
 bool Player::SetWaterWalking(bool apply, bool packetOnly /*= false*/)
 {
-    if (!packetOnly && !Unit::SetWaterWalking(apply))
-        return false;
+    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
+    if (!packetOnly /* && !Unit::SetWaterWalking(apply)*/)
+    {
+        Unit::SetWaterWalking(apply);
+        // return false;
+    }
 
     WorldPacket data(apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
     data << GetPackGUID();

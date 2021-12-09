@@ -70,11 +70,6 @@
 #include "WorldSession.h"
 #include <math.h>
 
-#ifdef ELUNA
-#include "ElunaEventMgr.h"
-#include "LuaEngine.h"
-#endif
-
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
     2.5f,                  // MOVE_WALK
@@ -387,9 +382,8 @@ Unit::~Unit()
 
 void Unit::Update(uint32 p_time)
 {
-#ifdef ELUNA
-    elunaEvents->Update(p_time);
-#endif
+    sScriptMgr->OnUnitUpdate(this, p_time);
+
     // WARNING! Order of execution here is important, do not change.
     // Spells must be processed with event system BEFORE they go to _UpdateSpells.
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
@@ -4078,6 +4072,14 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
         if (effMask & 1 << i && (!aurApp->GetRemoveMode()))
             aurApp->_HandleEffect(i, true);
     }
+
+    if (Player* player = ToPlayer())
+    {
+        if (sConditionMgr->IsSpellUsedInSpellClickConditions(aurApp->GetBase()->GetId()))
+        {
+            player->UpdateVisibleGameobjectsOrSpellClicks();
+        }
+    }
 }
 
 // removes aura application from lists and unapplies effects
@@ -4155,6 +4157,14 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMo
         ModifyAuraState(auraState, false);
 
     aura->HandleAuraSpecificMods(aurApp, caster, false, false);
+
+        if (Player* player = ToPlayer())
+        {
+            if (sConditionMgr->IsSpellUsedInSpellClickConditions(aurApp->GetBase()->GetId()))
+            {
+                player->UpdateVisibleGameobjectsOrSpellClicks();
+            }
+        }
 
     // only way correctly remove all auras from list
     //if (removedAuras != m_removedAurasCount) new aura may be added
@@ -12991,10 +13001,11 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
         controlled->SetInCombatState(PvP, enemy, duration);
     }
-#ifdef ELUNA
+
     if (Player* player = this->ToPlayer())
-        sEluna->OnPlayerEnterCombat(player, enemy);
-#endif
+    {
+        sScriptMgr->OnPlayerEnterCombat(player, enemy);
+    }
 }
 
 void Unit::ClearInCombat()
@@ -13025,10 +13036,11 @@ void Unit::ClearInCombat()
             for (uint8 i = 0; i < MAX_RUNES; ++i)
                 player->SetGracePeriod(i, 0);
     }
-#ifdef ELUNA
+
     if (Player* player = this->ToPlayer())
-        sEluna->OnPlayerLeaveCombat(player);
-#endif
+    {
+        sScriptMgr->OnPlayerLeaveCombat(player);
+    }
 }
 
 void Unit::ClearInPetCombat()

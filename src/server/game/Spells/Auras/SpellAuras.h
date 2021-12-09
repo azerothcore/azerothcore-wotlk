@@ -105,7 +105,11 @@ public:
     ObjectGuid GetCasterGUID() const { return m_casterGuid; }
     Unit* GetCaster() const;
     WorldObject* GetOwner() const { return m_owner; }
-    Unit* GetUnitOwner() const { ASSERT(GetType() == UNIT_AURA_TYPE); return (Unit*)m_owner; }
+    Unit* GetUnitOwner() const
+    {
+        ASSERT(GetType() == UNIT_AURA_TYPE);
+        return (Unit*) m_owner->ToUnit();
+    }
     DynamicObject* GetDynobjOwner() const { ASSERT(GetType() == DYNOBJ_AURA_TYPE); return (DynamicObject*)m_owner; }
 
     AuraObjectType GetType() const;
@@ -115,7 +119,7 @@ public:
     void _Remove(AuraRemoveMode removeMode);
     virtual void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) = 0;
 
-    virtual void FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster) = 0;
+    virtual void FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* caster) = 0;
     void UpdateTargetMap(Unit* caster, bool apply = true);
 
     void _RegisterForTargets() {Unit* caster = GetCaster(); UpdateTargetMap(caster, false);}
@@ -284,7 +288,7 @@ public:
 
     void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) override;
 
-    void FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster) override;
+    void FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* caster) override;
 
     // Allow Apply Aura Handler to modify and access m_AuraDRGroup
     void SetDiminishGroup(DiminishingGroup group) { m_AuraDRGroup = group; }
@@ -304,6 +308,6 @@ protected:
 public:
     void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) override;
 
-    void FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster) override;
+    void FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* caster) override;
 };
 #endif

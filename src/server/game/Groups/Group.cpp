@@ -298,7 +298,7 @@ void Group::ConvertToRaid()
     // update quest related GO states (quest activity dependent from raid membership)
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
         if (Player* player = ObjectAccessor::FindPlayer(citr->guid))
-            player->UpdateForQuestWorldObjects();
+            player->UpdateVisibleGameobjectsOrSpellClicks();
 
     // pussywizard: client automatically clears df "eye" near minimap, so remove from raid browser
     if (sLFGMgr->GetState(GetLeaderGUID()) == lfg::LFG_STATE_RAIDBROWSER)
@@ -475,7 +475,7 @@ bool Group::AddMember(Player* player)
 
         // quest related GO state dependent from raid membership
         if (isRaidGroup())
-            player->UpdateForQuestWorldObjects();
+            player->UpdateVisibleGameobjectsOrSpellClicks();
 
         {
             // Broadcast new player group member fields to rest of the group
@@ -560,7 +560,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
                     player->SetGroup(nullptr);
 
                 // quest related GO state dependent from raid membership
-                player->UpdateForQuestWorldObjects();
+                player->UpdateVisibleGameobjectsOrSpellClicks();
             }
 
             WorldPacket data;
@@ -774,7 +774,7 @@ void Group::Disband(bool hideDestroy /* = false */)
 
         // quest related GO state dependent from raid membership
         if (isRaidGroup())
-            player->UpdateForQuestWorldObjects();
+            player->UpdateVisibleGameobjectsOrSpellClicks();
 
         WorldPacket data;
         if (!hideDestroy)
@@ -1510,8 +1510,28 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                         roll->getLoot()->unlootedCount--;
                         ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(roll->itemid);
-                        player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, 13262); // Disenchant
+
+                        ItemPosCountVec dest;
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+
+                        if(msg == EQUIP_ERR_OK)
+                        {
+                            player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
+                        }
+                        else
+                        {
+                            Loot loot;
+                            loot.FillLoot(pProto->DisenchantID, LootTemplates_Disenchant, player, true);
+
+                            uint32 max_slot = loot.GetMaxSlotInLootFor(player);
+                            for(uint32 i = 0; i < max_slot; i++)
+                            {
+                                LootItem* lootItem = loot.LootItemInSlot(i, player);
+                                player->SendEquipError(msg, nullptr, nullptr, lootItem->itemid);
+                                player->SendItemRetrievalMail(lootItem->itemid, lootItem->count);
+                            }
+                        }
                     }
                 }
             }
