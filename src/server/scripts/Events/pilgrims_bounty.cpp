@@ -524,6 +524,7 @@ class spell_pilgrims_bounty_turkey_tracker : public SpellScript
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         if (Player* target = GetHitPlayer())
+        {
             if (AuraEffect* aurEff = target->GetAuraEffectDummy(SPELL_TURKEY_TRACKER))
             {
                 uint32 stackAmount = aurEff->GetBase()->GetStackAmount();
@@ -545,6 +546,7 @@ class spell_pilgrims_bounty_turkey_tracker : public SpellScript
                         break;
                 }
             }
+        }
     }
 
     void Register() override
@@ -594,7 +596,6 @@ class spell_pilgrims_bounty_food_aura : public AuraScript
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pilgrims_bounty_food_aura::RecalculateHook, EFFECT_0, SPELL_AURA_MOD_REGEN);
     }
 };
-
 
 class spell_pilgrims_bounty_food : public SpellScript
 {
