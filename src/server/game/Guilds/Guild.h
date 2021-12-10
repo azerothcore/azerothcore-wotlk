@@ -668,7 +668,7 @@ private:
     };
 
 public:
-    static void SendCommandResult(WorldSession* session, GuildCommandType type, GuildCommandError errCode, std::string_view param = "");
+    static void SendCommandResult(WorldSession* session, GuildCommandType type, GuildCommandError errCode, std::string_view param = {});
     static void SendSaveEmblemResult(WorldSession* session, GuildEmblemError errCode);
 
     Guild();
@@ -743,8 +743,8 @@ public:
     template<class Do>
     void BroadcastWorker(Do& _do, Player* except = nullptr)
     {
-        for (auto itr = m_members.begin(); itr != m_members.end(); ++itr)
-            if (Player* player = itr->second.FindPlayer())
+        for (auto const& m_member : m_members)
+            if (Player* player = m_member.second.FindPlayer())
                 if (player != except)
                     _do(player);
     }

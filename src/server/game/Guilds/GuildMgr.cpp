@@ -65,7 +65,7 @@ Guild* GuildMgr::GetGuildById(uint32 guildId) const
 
 Guild* GuildMgr::GetGuildByName(std::string_view guildName) const
 {
-    for (auto [id, guild] : GuildStore)
+    for (auto const& [id, guild] : GuildStore)
         if (StringEqualI(guild->GetName(), guildName))
             return guild;
 

@@ -2330,8 +2330,8 @@ void Guild::_CreateNewBankTab()
     trans->Append(stmt);
 
     ++tabId;
-    for (auto itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
-        (*itr).CreateMissingTabsIfNeeded(tabId, trans, false);
+    for (auto & m_rank : m_ranks)
+        m_rank.CreateMissingTabsIfNeeded(tabId, trans, false);
 
     CharacterDatabase.CommitTransaction(trans);
 }
