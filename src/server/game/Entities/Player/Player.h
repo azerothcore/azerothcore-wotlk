@@ -1473,7 +1473,7 @@ public:
     [[nodiscard]] bool HasQuestForItem(uint32 itemId, uint32 excludeQuestId = 0, bool turnIn = false, bool* showInLoot = nullptr) const;
     [[nodiscard]] bool HasQuestForGO(int32 GOId) const;
     [[nodiscard]] bool HasQuest(uint32 questId) const;
-    void UpdateVisibleGameobjectsOrSpellClicks();
+    void UpdateForQuestWorldObjects();
     [[nodiscard]] bool CanShareQuest(uint32 quest_id) const;
 
     void SendQuestComplete(uint32 quest_id);
