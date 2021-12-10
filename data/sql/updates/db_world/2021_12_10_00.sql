@@ -1,3 +1,19 @@
+-- DB update 2021_12_09_05 -> 2021_12_10_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_09_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_09_05 2021_12_10_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638661444140849200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638661444140849200');
 
 /* Nathanos Blightcaller Combat Script
@@ -48,3 +64,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (11878, 1, 3, "Is that the best you can do?", 12, 0, 100, 0, 0, 0, 7237, 0, "Nathanos Blightcaller"),
 (11878, 1, 4, "You weren't worth the energy expenditure. <Nathanos spits.>", 12, 0, 100, 0, 0, 0, 7238, 0, "Nathanos Blightcaller"),
 (11878, 1, 5, "Next time, bring friends.", 12, 0, 100, 0, 0, 0, 7239, 0, "Nathanos Blightcaller");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_10_00' WHERE sql_rev = '1638661444140849200';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
