@@ -53,15 +53,6 @@
 //  there is probably some underlying problem with imports which should properly addressed
 #include "GridNotifiersImpl.h"
 
-TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
-{
-    TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
-    if (itr != spellList.end())
-        return &itr->second;
-
-    return nullptr;
-}
-
 bool VendorItemData::RemoveItem(uint32 item_id)
 {
     bool found = false;
