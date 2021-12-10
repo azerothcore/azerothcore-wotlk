@@ -2663,7 +2663,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         procEx |= createProcExtendMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_DAMAGE;
 
-        caster->DealSpellDamage(&damageInfo, true);
+        caster->DealSpellDamage(&damageInfo, true, this);
 
         // do procs after damage, eg healing effects
         // no need to check if target is alive, done in procdamageandspell
