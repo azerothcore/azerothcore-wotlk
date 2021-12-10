@@ -694,9 +694,13 @@ public:
 
     static bool HandleReloadNpcTrainerCommand(ChatHandler* handler)
     {
-        LOG_INFO("server.loading", "Re-Loading `npc_trainer` Table!");
-        sObjectMgr->LoadTrainerSpell();
-        handler->SendGlobalGMSysMessage("DB table `npc_trainer` reloaded.");
+        LOG_INFO("server.loading", "Re-Loading `trainer` Table!");
+        sObjectMgr->LoadTrainers();
+        sObjectMgr->LoadCreatureDefaultTrainers();
+        handler->SendGlobalGMSysMessage("DB table `trainer` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `trainer_locale` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `trainer_spell` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `creature_default_trainer` reloaded.");
         return true;
     }
 

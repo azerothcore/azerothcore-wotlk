@@ -80,6 +80,7 @@
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "TicketMgr.h"
+#include "Trainer.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -2742,6 +2743,53 @@ void Player::SendInitialSpells()
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendUnlearnSpells()
+{
+    WorldPacket data(SMSG_SEND_UNLEARN_SPELLS, 4 + 4 * m_spells.size());
+
+    uint32 spellCount = 0;
+    size_t countPos   = data.wpos();
+    data << uint32(spellCount); // spell count placeholder
+
+    for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
+    {
+        if (itr->second->state == PLAYERSPELL_REMOVED)
+            continue;
+
+        if (itr->second->active || itr->second->disabled)
+            continue;
+
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(itr->first);
+        if (skillLineAbilities.first == skillLineAbilities.second)
+            continue;
+
+        bool hasSupercededSpellInfoInClient = false;
+        for (auto boundsItr = skillLineAbilities.first; boundsItr != skillLineAbilities.second; ++boundsItr)
+        {
+            if (boundsItr->second->forward_spellid)
+            {
+                hasSupercededSpellInfoInClient = true;
+                break;
+            }
+        }
+
+        if (hasSupercededSpellInfoInClient)
+            continue;
+
+        uint32 nextRank = sSpellMgr->GetNextSpellInChain(itr->first);
+        if (!nextRank || !HasSpell(nextRank))
+            continue;
+
+        data << uint32(itr->first);
+
+        ++spellCount;
+    }
+
+    data.put<uint32>(countPos, spellCount); // write real count value
+
+    SendDirectMessage(&data);
+}
+
 void Player::RemoveMail(uint32 id)
 {
     for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
@@ -2938,6 +2986,31 @@ void Player::SendLearnPacket(uint32 spellId, bool learn)
     }
 }
 
+static bool IsUnlearnSpellsPacketNeededForSpell(uint32 spellId)
+{
+    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(spellId);
+    if (spellInfo->IsRanked() && !spellInfo->IsStackableWithRanks())
+    {
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+        if (skillLineAbilities.first != skillLineAbilities.second)
+        {
+            bool hasSupercededSpellInfoInClient = false;
+            for (auto boundsItr = skillLineAbilities.first; boundsItr != skillLineAbilities.second; ++boundsItr)
+            {
+                if (boundsItr->second->forward_spellid)
+                {
+                    hasSupercededSpellInfoInClient = true;
+                    break;
+                }
+            }
+
+            return !hasSupercededSpellInfoInClient;
+        }
+    }
+
+    return false;
+}
+
 bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary /*= false*/, bool learnFromSkill /*= false*/)
 {
     if (!_addSpell(spellId, addSpecMask, temporary, learnFromSkill))
@@ -2963,10 +3036,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                     itr->second->Active = false;
                     if (IsInWorld())
                     {
-                        WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
-                        data << uint32(nextSpellInfo->Id);
-                        data << uint32(spellInfo->Id);
-                        GetSession()->SendPacket(&data);
+                        SendSupercededSpell(nextSpellInfo->Id, spellInfo->Id);
                     }
                     return false;
                 }
@@ -3777,74 +3847,6 @@ bool Player::HasActiveSpell(uint32 spell) const
 {
     PlayerSpellMap::const_iterator itr = m_spells.find(spell);
     return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->Active && itr->second->IsInSpec(m_activeSpec));
-}
-
-TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell) const
-{
-    if (!trainer_spell)
-        return TRAINER_SPELL_RED;
-
-    bool hasSpell = true;
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-
-        if (!HasSpell(trainer_spell->learnedSpell[i]))
-        {
-            hasSpell = false;
-            break;
-        }
-    }
-    // known spell
-    if (hasSpell)
-        return TRAINER_SPELL_GRAY;
-
-    // check skill requirement
-    if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
-        return TRAINER_SPELL_RED;
-
-    // check level requirement
-    if (getLevel() < trainer_spell->reqLevel)
-        return TRAINER_SPELL_RED;
-
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-
-        // check race/class requirement
-        if (!IsSpellFitByClassAndRace(trainer_spell->learnedSpell[i]))
-            return TRAINER_SPELL_RED;
-
-        if (uint32 prevSpell = sSpellMgr->GetPrevSpellInChain(trainer_spell->learnedSpell[i]))
-        {
-            // check prev.rank requirement
-            if (prevSpell && !HasSpell(prevSpell))
-                return TRAINER_SPELL_RED;
-        }
-
-        SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(trainer_spell->learnedSpell[i]);
-        for (SpellsRequiringSpellMap::const_iterator itr = spellsRequired.first; itr != spellsRequired.second; ++itr)
-        {
-            // check additional spell requirement
-            if (!HasSpell(itr->second))
-                return TRAINER_SPELL_RED;
-        }
-    }
-
-    // check primary prof. limit
-    // first rank of primary profession spell when there are no proffesions avalible is disabled
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-        SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(trainer_spell->learnedSpell[i]);
-        if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && (GetFreePrimaryProfessionPoints() == 0))
-            return TRAINER_SPELL_GREEN_DISABLED;
-    }
-
-    return TRAINER_SPELL_GREEN;
 }
 
 /**
@@ -5500,7 +5502,7 @@ void Player::SaveRecallPosition()
 }
 
 // pussywizard!
-void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr)
+void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr) const
 {
     if (self)
         GetSession()->SendPacket(data);
@@ -5513,7 +5515,7 @@ void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, b
 }
 
 // pussywizard!
-void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self)
+void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self) const
 {
     if (self)
         GetSession()->SendPacket(data);

@@ -21,6 +21,7 @@
 // For static or at-server-startup loaded spell data
 
 #include "Common.h"
+#include "IteratorPair.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "Unit.h"
@@ -644,7 +645,7 @@ public:
 
     // Spell Required table
     [[nodiscard]] SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
-    [[nodiscard]] SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
+    [[nodiscard]] Acore::IteratorPair<SpellRequiredMap::const_iterator> GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
     [[nodiscard]] bool IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const;
 
     // Spell learning

@@ -35,6 +35,7 @@
 #include "ObjectDefines.h"
 #include "QuestDef.h"
 #include "TemporarySummon.h"
+#include "Trainer.h"
 #include "VehicleDefines.h"
 #include <functional>
 #include <limits>
@@ -645,7 +646,6 @@ typedef std::vector<QuestPOI> QuestPOIVector;
 typedef std::unordered_map<uint32, QuestPOIVector> QuestPOIContainer;
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
-typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 
 enum SkillRangeType
 {
@@ -1054,8 +1054,8 @@ public:
     void LoadGossipMenuItems();
 
     void LoadVendors();
-    void LoadTrainerSpell();
-    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
+    void LoadTrainers();
+    void LoadCreatureDefaultTrainers();
 
     std::string GeneratePetName(uint32 entry);
     uint32 GetBaseXP(uint8 level);
@@ -1288,14 +1288,7 @@ public:
     bool AddGameTele(GameTele& data);
     bool DeleteGameTele(std::string_view name);
 
-    [[nodiscard]] TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
-    {
-        CacheTrainerSpellContainer::const_iterator  iter = _cacheTrainerSpellStore.find(entry);
-        if (iter == _cacheTrainerSpellStore.end())
-            return nullptr;
-
-        return &iter->second;
-    }
+    Trainer::Trainer const* GetTrainer(uint32 creatureId) const;
 
     [[nodiscard]] VendorItemData const* GetNpcVendorItemList(uint32 entry) const
     {
@@ -1519,7 +1512,8 @@ private:
     PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
 
     CacheVendorItemContainer _cacheVendorItemStore;
-    CacheTrainerSpellContainer _cacheTrainerSpellStore;
+    std::unordered_map<uint32, Trainer::Trainer> _trainers;
+    std::unordered_map<uint32, uint32> _creatureDefaultTrainers;
 
     std::set<uint32> _difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures, used in CheckCreatureTemplate
     std::set<uint32> _hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1 values, used in CheckCreatureTemplate

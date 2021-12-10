@@ -1087,11 +1087,13 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
     return true;
 }
 
-bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
+bool Creature::CanResetTalents(Player* player) const
 {
-    return player->getLevel() >= 10
-           && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
-           && player->getClass() == GetCreatureTemplate()->trainer_class;
+    Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(GetEntry());
+    if (!trainer)
+        return false;
+
+    return player->getLevel() >= 10 && trainer->IsTrainerValidForPlayer(player);
 }
 
 bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= nullptr*/) const
@@ -2838,11 +2840,6 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
     vCount->count = vCount->count > used_count ? vCount->count - used_count : 0;
     vCount->lastIncrementTime = ptime;
     return vCount->count;
-}
-
-TrainerSpellData const* Creature::GetTrainerSpells() const
-{
-    return sObjectMgr->GetNpcTrainerSpells(GetEntry());
 }
 
 // overwrite WorldObject function for proper name localization
