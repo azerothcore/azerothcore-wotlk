@@ -2848,7 +2848,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
     sScriptMgr->OnEquip(this, pItem, bag, slot, update);
-    UpdateVisibleGameobjectsOrSpellClicks();
+    UpdateForQuestWorldObjects();
     return pItem;
 }
 
