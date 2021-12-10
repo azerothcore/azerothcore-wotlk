@@ -22,7 +22,10 @@
 #include "Errors.h"
 #include <list>
 #include <map>
+#include <unordered_set>
+#include <vector>
 
+class Creature;
 class Player;
 class Unit;
 class WorldObject;
@@ -254,9 +257,9 @@ public:
     ConditionList GetConditionReferences(uint32 refId);
 
     uint32 GetSearcherTypeMaskForConditionList(ConditionList const& conditions);
-    bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
-    bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
-    bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions) const;
+    bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions) const;
+    bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) const;
     [[nodiscard]] bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
     [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
     ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
@@ -264,6 +267,7 @@ public:
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+    bool IsSpellUsedInSpellClickConditions(uint32 spellId) const;
 
 private:
     bool isSourceTypeValid(Condition* cond);
@@ -271,7 +275,7 @@ private:
     bool addToGossipMenus(Condition* cond);
     bool addToGossipMenuItems(Condition* cond);
     bool addToSpellImplicitTargetConditions(Condition* cond);
-    bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) const;
 
     void Clean(); // free up resources
     std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
@@ -282,6 +286,8 @@ private:
     CreatureSpellConditionContainer   SpellClickEventConditionStore;
     NpcVendorConditionContainer       NpcVendorConditionContainerStore;
     SmartEventConditionContainer      SmartEventConditionStore;
+
+    std::unordered_set<uint32> SpellsUsedInSpellClickConditions;
 };
 
 #define sConditionMgr ConditionMgr::instance()
