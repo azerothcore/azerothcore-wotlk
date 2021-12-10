@@ -1548,7 +1548,7 @@ void Player::SendQuestUpdate(uint32 questId)
             RemoveAurasDueToSpell(oldSpellId);
     }
 
-    UpdateVisibleGameobjectsOrSpellClicks();
+    UpdateForQuestWorldObjects();
 }
 
 QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
@@ -1809,7 +1809,7 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
             }
         }
     }
-    UpdateVisibleGameobjectsOrSpellClicks();
+    UpdateForQuestWorldObjects();
 }
 
 void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
@@ -1850,7 +1850,7 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
             }
         }
     }
-    UpdateVisibleGameobjectsOrSpellClicks();
+    UpdateForQuestWorldObjects();
 }
 
 void Player::KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid)

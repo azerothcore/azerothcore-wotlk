@@ -165,29 +165,6 @@ namespace Acore
 
     // WorldObject searchers & workers
 
-    // Generic base class to insert elements into arbitrary containers using push_back
-    template <typename Type> class ContainerInserter
-    {
-        using InserterType = void (*)(void*, Type&&);
-
-        void*        ref;
-        InserterType inserter;
-
-        // MSVC workaround
-        template <typename T> static void InserterOf(void* ref, Type&& type)
-        {
-            static_cast<T*>(ref)->push_back(std::move(type));
-        }
-
-    protected:
-        template <typename T> ContainerInserter(T& ref_) : ref(&ref_), inserter(&InserterOf<T>) {}
-
-        void Insert(Type type)
-        {
-            inserter(ref, std::move(type));
-        }
-    };
-
     template<class Check>
     struct WorldObjectSearcher
     {
@@ -229,15 +206,15 @@ namespace Acore
     };
 
     template<class Check>
-    struct WorldObjectListSearcher : ContainerInserter<WorldObject*>
+    struct WorldObjectListSearcher
     {
         uint32 i_mapTypeMask;
         uint32 i_phaseMask;
+        std::list<WorldObject*>& i_objects;
         Check& i_check;
 
-        template <typename Container> WorldObjectListSearcher(WorldObject const* searcher, Container& container, Check& check, uint32 mapTypeMask = GRID_MAP_TYPE_MASK_ALL)
-            : ContainerInserter<WorldObject*>(container),
-            i_mapTypeMask(mapTypeMask), i_phaseMask(searcher->GetPhaseMask()), i_check(check) {}
+        WorldObjectListSearcher(WorldObject const* searcher, std::list<WorldObject*>& objects, Check& check, uint32 mapTypeMask = GRID_MAP_TYPE_MASK_ALL)
+            : i_mapTypeMask(mapTypeMask), i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
@@ -339,14 +316,14 @@ namespace Acore
     };
 
     template<class Check>
-    struct GameObjectListSearcher : ContainerInserter<GameObject*>
+    struct GameObjectListSearcher
     {
         uint32 i_phaseMask;
+        std::list<GameObject*>& i_objects;
         Check& i_check;
 
-        template <typename Container> GameObjectListSearcher(WorldObject const* searcher, Container& container, Check& check)
-            : ContainerInserter<GameObject*>(container),
-            i_phaseMask(searcher->GetPhaseMask()), i_check(check) {}
+        GameObjectListSearcher(WorldObject const* searcher, std::list<GameObject*>& objects, Check& check)
+            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(GameObjectMapType& m);
 
@@ -411,14 +388,14 @@ namespace Acore
 
     // All accepted by Check units if any
     template<class Check>
-    struct UnitListSearcher : ContainerInserter<Unit*>
+    struct UnitListSearcher
     {
         uint32 i_phaseMask;
+        std::list<Unit*>& i_objects;
         Check& i_check;
 
-        template <typename Container> UnitListSearcher(WorldObject const* searcher, Container& container, Check& check)
-            : ContainerInserter<Unit*>(container),
-            i_phaseMask(searcher->GetPhaseMask()), i_check(check) {}
+        UnitListSearcher(WorldObject const* searcher, std::list<Unit*>& objects, Check& check)
+            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
@@ -460,14 +437,14 @@ namespace Acore
     };
 
     template<class Check>
-    struct CreatureListSearcher  : ContainerInserter<Creature*>
+    struct CreatureListSearcher
     {
         uint32 i_phaseMask;
+        std::list<Creature*>& i_objects;
         Check& i_check;
 
-        template <typename Container> CreatureListSearcher(WorldObject const* searcher, Container& container, Check& check)
-            : ContainerInserter<Creature*>(container),
-            i_phaseMask(searcher->GetPhaseMask()), i_check(check) {}
+        CreatureListSearcher(WorldObject const* searcher, std::list<Creature*>& objects, Check& check)
+            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(CreatureMapType& m);
 
@@ -511,14 +488,14 @@ namespace Acore
     };
 
     template<class Check>
-    struct PlayerListSearcher : ContainerInserter<Player*>
+    struct PlayerListSearcher
     {
         uint32 i_phaseMask;
+        std::list<Player*>& i_objects;
         Check& i_check;
 
-        template <typename Container> PlayerListSearcher(WorldObject const* searcher, Container& container, Check& check)
-            : ContainerInserter<Player*>(container),
-            i_phaseMask(searcher->GetPhaseMask()), i_check(check) {}
+        PlayerListSearcher(WorldObject const* searcher, std::list<Player*>& objects, Check& check)
+            : i_phaseMask(searcher->GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(PlayerMapType& m);
 
@@ -826,23 +803,20 @@ namespace Acore
     {
     public:
         AnyUnfriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range) : i_obj(obj), i_funit(funit), i_range(range) {}
-
-        bool operator()(Unit* u) const
+        bool operator()(Unit* u)
         {
             if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u) &&
-                (i_funit->GetTypeId() != TYPEID_UNIT || !i_funit->ToCreature()->IsAvoidingAOE())) // pussywizard)
-            {
+                    (i_funit->GetTypeId() != TYPEID_UNIT || !i_funit->ToCreature()->IsAvoidingAOE())) // pussywizard
                 return true;
-            }
-
-            return false;
+            else
+                return false;
         }
-
     private:
         WorldObject const* i_obj;
         Unit const* i_funit;
         float i_range;
     };
+
     class AnyUnfriendlyNoTotemUnitInObjectRangeCheck
     {
     public:
@@ -929,19 +903,9 @@ namespace Acore
     class AnyGroupedUnitInObjectRangeCheck
     {
     public:
-        AnyGroupedUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool raid, bool playerOnly = false) : _source(obj), _refUnit(funit), _range(range), _raid(raid), _playerOnly(playerOnly) {}
+        AnyGroupedUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool raid) : _source(obj), _refUnit(funit), _range(range), _raid(raid) {}
         bool operator()(Unit* u)
         {
-            if (G3D::fuzzyEq(_range, 0.0f))
-            {
-                return false;
-            }
-
-            if (_playerOnly && u->GetTypeId() != TYPEID_PLAYER)
-            {
-                return false;
-            }
-
             if (_raid)
             {
                 if (!_refUnit->IsInRaidWith(u))
@@ -958,7 +922,6 @@ namespace Acore
         Unit const* _refUnit;
         float _range;
         bool _raid;
-        bool               _playerOnly;
     };
 
     class AnyUnitInObjectRangeCheck
@@ -1005,35 +968,27 @@ namespace Acore
     class AnyAoETargetUnitInObjectRangeCheck
     {
     public:
-        AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, SpellInfo const* spellInfo = nullptr)
-            : i_obj(obj), i_funit(funit), _spellInfo(spellInfo), i_range(range)
+        AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
+            : i_obj(obj), i_funit(funit), _spellInfo(nullptr), i_range(range)
         {
             Unit const* check = i_funit;
             Unit const* owner = i_funit->GetOwner();
             if (owner)
                 check = owner;
             i_targetForPlayer = (check->GetTypeId() == TYPEID_PLAYER);
-
-            if (!_spellInfo)
-            {
-                if (DynamicObject const* dynObj = i_obj->ToDynObject())
-                {
-                    _spellInfo = sSpellMgr->GetSpellInfo(dynObj->GetSpellId());
-                }
-            }
+            if (i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT)
+                _spellInfo = sSpellMgr->GetSpellInfo(((DynamicObject*)i_obj)->GetSpellId());
         }
         bool operator()(Unit* u)
         {
             // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
-            if (u->GetTypeId() == TYPEID_UNIT && ((Creature*) u)->IsTotem())
-            {
+            if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
                 return false;
-            }
-            if (_spellInfo && _spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER) && u->GetTypeId() != TYPEID_PLAYER)
-            {
-                return false;
-            }
-            return i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range);
+
+            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range))
+                return true;
+
+            return false;
         }
     private:
         bool i_targetForPlayer;
