@@ -483,12 +483,16 @@ void Pet::Update(uint32 diff)
                                 GetMotionMaster()->Clear(false);
                                 GetMotionMaster()->MoveIdle();
 
+                                bool oldCmdAttack = GetCharmInfo()->IsCommandAttack();
+
                                 GetCharmInfo()->SetIsCommandAttack(false);
                                 GetCharmInfo()->SetIsAtStay(true);
                                 GetCharmInfo()->SetIsCommandFollow(false);
                                 GetCharmInfo()->SetIsFollowing(false);
                                 GetCharmInfo()->SetIsReturning(false);
                                 GetCharmInfo()->SaveStayPosition(true);
+
+                                GetCharmInfo()->SetIsCommandAttack(oldCmdAttack);
 
                                 CastSpell(tempspellTarget, tempspell, false);
                                 m_tempspell = 0;
