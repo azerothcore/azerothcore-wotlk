@@ -1473,7 +1473,7 @@ public:
     [[nodiscard]] bool HasQuestForItem(uint32 itemId, uint32 excludeQuestId = 0, bool turnIn = false, bool* showInLoot = nullptr) const;
     [[nodiscard]] bool HasQuestForGO(int32 GOId) const;
     [[nodiscard]] bool HasQuest(uint32 questId) const;
-    void UpdateForQuestWorldObjects();
+    void UpdateVisibleGameobjectsOrSpellClicks();
     [[nodiscard]] bool CanShareQuest(uint32 quest_id) const;
 
     void SendQuestComplete(uint32 quest_id);
@@ -1806,6 +1806,7 @@ public:
     void UpdatePvP(bool state, bool _override = false);
     void UpdateZone(uint32 newZone, uint32 newArea);
     void UpdateArea(uint32 newArea);
+    void SetNeedZoneUpdate(bool needUpdate) { m_needZoneUpdate = needUpdate; }
 
     void UpdateZoneDependentAuras(uint32 zone_id);    // zones
     void UpdateAreaDependentAuras(uint32 area_id);    // subzones
@@ -2868,6 +2869,8 @@ public:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
     uint8 m_grantableLevels;
+
+    bool m_needZoneUpdate;
 
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
