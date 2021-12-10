@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Object.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
@@ -28,7 +29,6 @@
 #include "Log.h"
 #include "MapMgr.h"
 #include "MovementPacketBuilder.h"
-#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -55,10 +55,15 @@
 //  there is probably some underlying problem with imports which should properly addressed
 #include "GridNotifiersImpl.h"
 
-#ifdef ELUNA
-#include "ElunaEventMgr.h"
-#include "LuaEngine.h"
-#endif
+constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max)] =
+{
+    DEFAULT_VISIBILITY_DISTANCE,
+    VISIBILITY_DISTANCE_TINY,
+    VISIBILITY_DISTANCE_SMALL,
+    VISIBILITY_DISTANCE_LARGE,
+    VISIBILITY_DISTANCE_GIGANTIC,
+    MAX_VISIBILITY_DISTANCE
+};
 
 Object::Object() : m_PackGUID(sizeof(uint64) + 1)
 {
@@ -77,10 +82,7 @@ Object::Object() : m_PackGUID(sizeof(uint64) + 1)
 
 WorldObject::~WorldObject()
 {
-#ifdef ELUNA
-    delete elunaEvents;
-    elunaEvents = nullptr;
-#endif
+    sScriptMgr->OnWorldObjectDestroy(this);
 
     // this may happen because there are many !create/delete
     if (IsWorldObject() && m_currMap)
@@ -1096,23 +1098,20 @@ void MovementInfo::OutDebug()
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
-#ifdef ELUNA
-    elunaEvents(nullptr),
-#endif
-    LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
+    LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
     m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+
+    sScriptMgr->OnWorldObjectCreate(this);
 }
 
-#ifdef ELUNA
 void WorldObject::Update(uint32 time_diff)
 {
-    elunaEvents->Update(time_diff);
+    sScriptMgr->OnWorldObjectUpdate(this, time_diff);
 }
-#endif
 
 void WorldObject::SetWorldObject(bool on)
 {
@@ -1170,12 +1169,15 @@ void WorldObject::setActive(bool on)
     }
 }
 
-void WorldObject::SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride)
+void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)
 {
+    ASSERT(type < VisibilityDistanceType::Max);
     if (GetTypeId() == TYPEID_PLAYER)
+    {
         return;
+    }
 
-    m_isVisibilityDistanceOverride = isVisibilityDistanceOverride;
+    m_visibilityDistanceOverride = VisibilityDistances[AsUnderlyingType(type)];
 }
 
 void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
@@ -1814,15 +1816,25 @@ float WorldObject::GetGridActivationRange() const
 float WorldObject::GetVisibilityRange() const
 {
     if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
+    {
         return MAX_VISIBILITY_DISTANCE;
+    }
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
     {
-        if (IsInWintergrasp())
-            return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
-        else if (IsVisibilityOverridden())
-            return MAX_VISIBILITY_DISTANCE;
-        else
-            return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
+        {
+            if (IsInWintergrasp())
+            {
+                return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
+            }
+            else if (IsVisibilityOverridden())
+            {
+                return MAX_VISIBILITY_DISTANCE;
+            }
+            else
+            {
+                return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
+            }
+        }
     }
     else
         return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
@@ -2204,22 +2216,23 @@ void WorldObject::SetMap(Map* map)
 {
     ASSERT(map);
     ASSERT(!IsInWorld());
+
     if (m_currMap == map) // command add npc: first create, than loadfromdb
+    {
         return;
+    }
+
     if (m_currMap)
     {
         LOG_FATAL("entities.object", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
+
     m_currMap = map;
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
 
-#ifdef ELUNA
-    delete elunaEvents;
-    // On multithread replace this with a pointer to map's Eluna pointer stored in a map
-    elunaEvents = new ElunaEventProcessor(&Eluna::GEluna, this);
-#endif
+    sScriptMgr->OnWorldObjectSetMap(this, map);
 
     if (IsWorldObject())
         m_currMap->AddWorldObject(this);
@@ -2229,13 +2242,13 @@ void WorldObject::ResetMap()
 {
     ASSERT(m_currMap);
     ASSERT(!IsInWorld());
-    if (IsWorldObject())
-        m_currMap->RemoveWorldObject(this);
 
-#ifdef ELUNA
-    delete elunaEvents;
-    elunaEvents = nullptr;
-#endif
+    if (IsWorldObject())
+    {
+        m_currMap->RemoveWorldObject(this);
+    }
+
+    sScriptMgr->OnWorldObjectResetMap(this);
 
     m_currMap = nullptr;
     //maybe not for corpse
@@ -2533,10 +2546,10 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
     return creature;
 }
 
-GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
+GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range, bool onlySpawned /*= false*/) const
 {
     GameObject* go = nullptr;
-    Acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
+    Acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range, onlySpawned);
     Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
     Cell::VisitGridObjects(this, searcher, range);
     return go;
@@ -2845,7 +2858,8 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
-    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
+    // Exclude gameobjects from LoS calculations
+    if (fabs(this->GetPositionZ() - z) > 3.0f || (GetTypeId() != TYPEID_GAMEOBJECT && !IsWithinLOS(x, y, z)))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();

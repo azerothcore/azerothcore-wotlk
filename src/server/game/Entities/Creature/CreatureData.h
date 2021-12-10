@@ -18,9 +18,9 @@
 #ifndef AZEROTHCORE_CREATUREDATA_H
 #define AZEROTHCORE_CREATUREDATA_H
 
-#include "DBCEnums.h"
 #include "Cell.h"
 #include "Common.h"
+#include "DBCEnums.h"
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
@@ -38,7 +38,7 @@
 #define MAX_CREATURE_QUEST_ITEMS 6
 
 #define MAX_EQUIPMENT_ITEMS 3
-
+enum class VisibilityDistanceType : uint8;
 // TODO: Implement missing flags from TC in places that custom flags from xinef&pussywizzard use flag values.
 // EnumUtils: DESCRIBE THIS
 enum CreatureFlagsExtra : uint32
@@ -342,6 +342,7 @@ struct CreatureAddon
     uint32 emote;
     bool isLarge;
     std::vector<uint32> auras;
+    VisibilityDistanceType visibilityDistanceType;
 };
 
 typedef std::unordered_map<uint32, CreatureAddon> CreatureAddonContainer;

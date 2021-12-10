@@ -25,6 +25,7 @@
 #include "GridNotifiers.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 enum RogueSpells
@@ -146,7 +147,7 @@ class spell_rog_cheat_death : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_ROGUE_CHEAT_DEATH_COOLDOWN });
+        return ValidateSpellInfo({ SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, SPELL_ROGUE_CHEATING_DEATH });
     }
 
     bool Load() override
@@ -286,6 +287,11 @@ public:
     class spell_rog_killing_spree_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_rog_killing_spree_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_ROGUE_KILLING_SPREE });
+        }
 
         SpellCastResult CheckCast()
         {

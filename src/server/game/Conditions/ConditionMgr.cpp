@@ -640,6 +640,11 @@ ConditionMgr::~ConditionMgr()
     Clean();
 }
 
+bool ConditionMgr::IsSpellUsedInSpellClickConditions(uint32 spellId) const
+{
+    return SpellsUsedInSpellClickConditions.find(spellId) != SpellsUsedInSpellClickConditions.end();
+}
+
 ConditionMgr* ConditionMgr::instance()
 {
     static ConditionMgr instance;
@@ -694,7 +699,7 @@ uint32 ConditionMgr::GetSearcherTypeMaskForConditionList(ConditionList const& co
     return mask;
 }
 
-bool ConditionMgr::IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions)
+bool ConditionMgr::IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) const
 {
     //     groupId, groupCheckPassed
     std::map<uint32, bool> ElseGroupStore;
@@ -738,19 +743,19 @@ bool ConditionMgr::IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, 
     return false;
 }
 
-bool ConditionMgr::IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions)
+bool ConditionMgr::IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions) const
 {
     ConditionSourceInfo srcInfo = ConditionSourceInfo(object);
     return IsObjectMeetToConditions(srcInfo, conditions);
 }
 
-bool ConditionMgr::IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions)
+bool ConditionMgr::IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions) const
 {
     ConditionSourceInfo srcInfo = ConditionSourceInfo(object1, object2);
     return IsObjectMeetToConditions(srcInfo, conditions);
 }
 
-bool ConditionMgr::IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions)
+bool ConditionMgr::IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) const
 {
     if (conditions.empty())
         return true;
@@ -763,7 +768,7 @@ bool ConditionMgr::CanHaveSourceGroupSet(ConditionSourceType sourceType) const
 {
     return (sourceType == CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_DISENCHANT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_FISHING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GAMEOBJECT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_ITEM_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MAIL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MILLING_LOOT_TEMPLATE ||
             sourceType == CONDITION_SOURCE_TYPE_PICKPOCKETING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_PROSPECTING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_REFERENCE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SKINNING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SPELL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION || sourceType == CONDITION_SOURCE_TYPE_VEHICLE_SPELL ||
-            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR);
+            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR || sourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE);
 }
 
 bool ConditionMgr::CanHaveSourceIdSet(ConditionSourceType sourceType) const
@@ -876,6 +881,7 @@ void ConditionMgr::LoadConditions(bool isReload)
         LootTemplates_Disenchant.ResetConditions();
         LootTemplates_Prospecting.ResetConditions();
         LootTemplates_Spell.ResetConditions();
+        LootTemplates_Player.ResetConditions();
 
         LOG_INFO("server.loading", "Re-Loading `gossip_menu` Table for Conditions!");
         sObjectMgr->LoadGossipMenu();
@@ -1003,7 +1009,7 @@ void ConditionMgr::LoadConditions(bool isReload)
             cond->ErrorTextId = 0;
         }
 
-        if (cond->SourceGroup)
+        if (cond->SourceGroup || cond->SourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE)
         {
             bool valid = false;
             // handle grouped conditions
@@ -1054,6 +1060,10 @@ void ConditionMgr::LoadConditions(bool isReload)
             case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
             {
                 SpellClickEventConditionStore[cond->SourceGroup][cond->SourceEntry].push_back(cond);
+                if (cond->ConditionType == CONDITION_AURA)
+                {
+                    SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
+                }
                 valid = true;
                 ++count;
                 continue; // do not add to m_AllocatedMemory to avoid double deleting
@@ -1083,6 +1093,11 @@ void ConditionMgr::LoadConditions(bool isReload)
                 valid = true;
                 ++count;
                 continue;
+            }
+            case CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE:
+            {
+                valid = addToLootTemplate(cond, LootTemplates_Player.GetLootForConditionFill(cond->SourceGroup));
+                break;
             }
             default:
                 break;
@@ -1117,6 +1132,10 @@ void ConditionMgr::LoadConditions(bool isReload)
         }
 
         // add new Condition to storage based on Type/Entry
+        if (cond->SourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT && cond->ConditionType == CONDITION_AURA)
+        {
+            SpellsUsedInSpellClickConditions.insert(cond->ConditionValue1);
+        }
         ConditionStore[cond->SourceType][cond->SourceEntry].push_back(cond);
         ++count;
     } while (result->NextRow());
@@ -1611,6 +1630,23 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
         if (!itemTemplate)
         {
             LOG_ERROR("condition", "SourceEntry %u in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceEntry);
+            return false;
+        }
+        break;
+    }
+    case CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE:
+    {
+        if (!LootTemplates_Player.HaveLootFor(cond->SourceGroup))
+        {
+            LOG_ERROR("sql.sql", "SourceGroup %u in `condition` table, does not exist in `player_loot_template`, ignoring.", cond->SourceGroup);
+            return false;
+        }
+
+        LootTemplate* loot = LootTemplates_Player.GetLootForConditionFill(cond->SourceGroup);
+        ItemTemplate const* pItemProto = sObjectMgr->GetItemTemplate(cond->SourceEntry);
+        if (!pItemProto && !loot->isReference(cond->SourceEntry))
+        {
+            LOG_ERROR("sql.sql", "SourceType %u, SourceEntry %u in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceType, cond->SourceEntry);
             return false;
         }
         break;
@@ -2291,7 +2327,7 @@ void ConditionMgr::Clean()
         itr->second.clear();
     }
 
-    SpellClickEventConditionStore.clear();
+    SpellsUsedInSpellClickConditions.clear();
 
     for (NpcVendorConditionContainer::iterator itr = NpcVendorConditionContainerStore.begin(); itr != NpcVendorConditionContainerStore.end(); ++itr)
     {

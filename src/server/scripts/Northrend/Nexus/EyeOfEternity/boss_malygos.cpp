@@ -16,17 +16,17 @@
  */
 
 #include "CombatAI.h"
-#include "eye_of_eternity.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
+#include "eye_of_eternity.h"
 
 enum MovementInformPoints
 {

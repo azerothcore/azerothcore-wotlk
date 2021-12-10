@@ -240,21 +240,6 @@ namespace DisableMgr
                     }
                     case DISABLE_TYPE_GAME_EVENT:
                     {
-                        GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
-
-                        if (entry < 1 || entry >= events.size())
-                        {
-                            LOG_ERROR("disable", "Event entry %u from `disables` does not exist, skipped.", entry);
-                            continue;
-                        }
-
-                        GameEventData const& eventData = events[entry];
-                        if (!eventData.isValid())
-                        {
-                            LOG_ERROR("disable", "Event entry %u from `disables` does not exist, skipped.", entry);
-                            continue;
-                        }
-
                         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
                         if (activeEvents.find(entry) != activeEvents.end())
                         {

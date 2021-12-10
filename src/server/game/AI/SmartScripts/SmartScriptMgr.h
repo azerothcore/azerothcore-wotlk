@@ -21,9 +21,9 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "DBCStores.h"
 #include "Spell.h"
-//#include "SmartAI.h"
-//#include "SmartScript.h"
+#include "SpellMgr.h"
 #include "Unit.h"
 
 struct WayPoint
@@ -1459,6 +1459,13 @@ struct SmartTarget
             uint32 dist;
             uint32 dead;
         } closest;
+
+        struct
+        {
+            uint32 entry;
+            uint32 dist;
+            uint32 onlySpawned;
+        } closestGameobject;
 
         struct
         {

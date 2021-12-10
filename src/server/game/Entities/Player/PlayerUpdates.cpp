@@ -33,6 +33,7 @@
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
 #include "WeatherMgr.h"
@@ -797,8 +798,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 {
     LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid %d", spellid);
 
-    SkillLineAbilityMapBounds bounds =
-        sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
+    SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first;
          _spell_idx != bounds.second; ++_spell_idx)
@@ -1114,6 +1114,15 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
 {
     if (!Unit::UpdatePosition(x, y, z, orientation, teleport))
         return false;
+
+    // Update player zone if needed
+    if (m_needZoneUpdate)
+    {
+        uint32 newZone, newArea;
+        GetZoneAndAreaId(newZone, newArea);
+        UpdateZone(newZone, newArea);
+        m_needZoneUpdate = false;
+    }
 
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
@@ -1820,7 +1829,7 @@ void Player::UpdateTriggerVisibility()
     GetSession()->SendPacket(&packet);
 }
 
-void Player::UpdateForQuestWorldObjects()
+void Player::UpdateVisibleGameobjectsOrSpellClicks()
 {
     if (m_clientGUIDs.empty())
         return;
@@ -1847,19 +1856,9 @@ void Player::UpdateForQuestWorldObjects()
             SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
             for (SpellClickInfoContainer::const_iterator _itr = clickPair.first; _itr != clickPair.second; ++_itr)
             {
-                //! This code doesn't look right, but it was logically converted to condition system to do the exact
-                //! same thing it did before. It definitely needs to be overlooked for intended functionality.
                 ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
-                bool buildUpdateBlock = false;
-                for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
-                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
-                        buildUpdateBlock = true;
-
-                if (buildUpdateBlock)
-                {
-                    obj->BuildValuesUpdateBlockForPlayer(&udata, this);
-                    break;
-                }
+                obj->BuildValuesUpdateBlockForPlayer(&udata, this);
+                break;
             }
         }
     }

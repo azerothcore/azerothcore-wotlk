@@ -15,20 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PointMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Errors.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "ObjectAccessor.h"
 #include "Player.h"
-#include "PointMovementGenerator.h"
 #include "World.h"
 
 //----- Point Movement Generator
 template<class T>
 void PointMovementGenerator<T>::DoInitialize(T* unit)
 {
-    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
     {
         // the next line is to ensure that a new spline is created in DoUpdate() once the unit is no longer rooted/stunned
         // todo: rename this flag to something more appropriate since it is set to true even without speed change now.
@@ -98,9 +99,9 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
     if (!unit)
         return false;
 
-    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
     {
-        unit->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        unit->StopMoving();
         return true;
     }
 

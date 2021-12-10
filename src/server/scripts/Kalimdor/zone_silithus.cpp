@@ -29,15 +29,16 @@ EndContentData */
 
 #include "AccountMgr.h"
 #include "BanMgr.h"
-#include "Group.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "Spell.h"
-#include "SpellInfo.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "Group.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "Spell.h"
+#include "SpellInfo.h"
+#include "WorldSession.h"
 
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
@@ -1009,6 +1010,11 @@ public:
     {
         go_wind_stoneAI(GameObject* go) : GameObjectAI(go) {}
 
+        void InitializeAI() override
+        {
+            me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        }
+
         bool GossipHello(Player* player, bool reportUse) override
         {
             if (reportUse)
@@ -1047,10 +1053,13 @@ public:
 
         bool GossipSelect(Player* player, uint32 sender, uint32 action) override
         {
+            Seconds respawnTimer = 0s;
             player->PlayerTalkClass->SendCloseGossip();
 
             if (sender == GOSSIPID_LESSER_WS)
             {
+                respawnTimer = 300s; // Lesser Windstone respawn in 5 minutes
+
                 switch (action)
                 {
                 case 0:
@@ -1074,6 +1083,8 @@ public:
             }
             else if (sender == GOSSIPID_WS)
             {
+                respawnTimer = 900s; // Windstone respawn in 15 minutes
+
                 switch (action)
                 {
                 case 0:
@@ -1097,6 +1108,8 @@ public:
             }
             else if (sender == GOSSIPID_GREATER_WS)
             {
+                respawnTimer = 10800s; // Greater Windstone respawn in 3 hours
+
                 switch (action)
                 {
                 case 0:
@@ -1118,6 +1131,10 @@ public:
                     break;
                 }
             }
+
+            me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
+            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            CloseGossipMenuFor(player);
             return false;
         }
 

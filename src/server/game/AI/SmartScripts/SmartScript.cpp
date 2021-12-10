@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SmartScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "ChatTextBuilder.h"
@@ -33,7 +34,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
-#include "SmartScript.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
@@ -790,12 +790,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsGameObject(*itr))
                     {
+                        GameObject* go = (*itr)->ToGameObject();
+
                         // Activate
-                        // xinef: wtf is this shit?
-                        (*itr)->ToGameObject()->SetLootState(GO_READY);
-                        (*itr)->ToGameObject()->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
-                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject %s activated",
-                                       (*itr)->GetGUID().ToString().c_str());
+                        if (go->GetGoType() != GAMEOBJECT_TYPE_DOOR)
+                        {
+                            go->SetLootState(GO_READY);
+                        }
+
+                        go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
+                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject %s activated", go->GetGUID().ToString().c_str());
                     }
                 }
 
@@ -1271,15 +1275,17 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                {
                     if (IsCreature(*itr))
                     {
-                        (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range);
+                        (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range, e.GetEventType() == SMART_EVENT_AGGRO ? unit : nullptr);
                         if (e.action.callHelp.withEmote)
                         {
                             Acore::BroadcastTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
                             sCreatureTextMgr->SendChatPacket(*itr, builder, CHAT_MSG_MONSTER_EMOTE);
                         }
                     }
+                }
 
                 delete targets;
                 break;
@@ -1510,7 +1516,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         o += e.target.o;
                         if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, x, y, z, o, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration))
                         {
-                            if (e.action.summonCreature.attackInvoker == 2) // pussywizard: proper attackInvoker implementation, but not spoiling tc shitness
+                            if (e.action.summonCreature.attackInvoker == 2) // pussywizard: proper attackInvoker implementation
                                 summon->AI()->AttackStart(unit);
                             else if (e.action.summonCreature.attackInvoker)
                                 summon->AI()->AttackStart((*itr)->ToUnit());
@@ -3681,7 +3687,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             }
         case SMART_TARGET_CLOSEST_GAMEOBJECT:
             {
-                GameObject* target = GetClosestGameObjectWithEntry(GetBaseObject(), e.target.closest.entry, (float)(e.target.closest.dist ? e.target.closest.dist : 100));
+                GameObject* target = GetClosestGameObjectWithEntry(GetBaseObject(), e.target.closestGameobject.entry, (float)(e.target.closestGameobject.dist ? e.target.closestGameobject.dist : 100), e.target.closestGameobject.onlySpawned);
                 if (target)
                     l->push_back(target);
                 break;
@@ -4474,7 +4480,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
             break;
         case SMART_EVENT_OOC_LOS:
         case SMART_EVENT_IC_LOS:
-        // Xinef: wtf is this bullshit? cooldown should be processed AFTER action is done, not before...
+        // Xinef: cooldown should be processed AFTER action is done, not before...
         //RecalcTimer(e, e.event.los.cooldownMin, e.event.los.cooldownMax);
         //break;
         case SMART_EVENT_DISTANCE_CREATURE:

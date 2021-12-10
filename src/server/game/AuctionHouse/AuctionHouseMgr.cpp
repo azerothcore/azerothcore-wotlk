@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AuctionHouseMgr.h"
 #include "AccountMgr.h"
 #include "AsyncAuctionListing.h"
-#include "AuctionHouseMgr.h"
 #include "AvgDiffTracker.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Item.h"
 #include "Logging/Log.h"
 #include "ObjectMgr.h"
@@ -33,6 +33,186 @@
 #include <vector>
 
 constexpr auto AH_MINIMUM_DEPOSIT = 100;
+
+// Proof of concept, we should shift the info we're obtaining in here into AuctionEntry probably
+static bool SortAuction(AuctionEntry* left, AuctionEntry* right, AuctionSortOrderVector& sortOrder, Player* player, bool checkMinBidBuyout)
+{
+    for (auto thisOrder : sortOrder)
+    {
+        switch (thisOrder.sortOrder)
+        {
+            case AUCTION_SORT_BID:
+            {
+                if (left->bid == right->bid)
+                {
+                    if (checkMinBidBuyout)
+                    {
+                        if (left->buyout == right->buyout)
+                        {
+                            if (left->startbid == right->startbid)
+                            {
+                                continue;
+                            }
+
+                            return thisOrder.isDesc ? left->startbid > right->startbid : left->startbid < right->startbid;
+                        }
+
+                        return thisOrder.isDesc ? left->buyout > right->buyout : left->buyout < right->buyout;
+                    }
+
+                    continue;
+                }
+
+                return thisOrder.isDesc ? left->bid > right->bid : left->bid < right->bid;
+            }
+            case AUCTION_SORT_BUYOUT:
+            case AUCTION_SORT_BUYOUT_2:
+            {
+                if (left->buyout == right->buyout)
+                {
+                    continue;
+                }
+
+                return thisOrder.isDesc ? left->buyout > right->buyout : left->buyout < right->buyout;
+            }
+            case AUCTION_SORT_ITEM:
+            {
+                ItemTemplate const* protoLeft = sObjectMgr->GetItemTemplate(left->item_template);
+                ItemTemplate const* protoRight = sObjectMgr->GetItemTemplate(right->item_template);
+                if (!protoLeft || !protoRight)
+                {
+                    continue;
+                }
+
+                std::string leftName = protoLeft->Name1;
+                std::string rightName = protoRight->Name1;
+                if (leftName.empty() || rightName.empty())
+                {
+                    continue;
+                }
+
+                LocaleConstant locale = LOCALE_enUS;
+                if (player && player->GetSession())
+                {
+                    locale = player->GetSession()->GetSessionDbLocaleIndex();
+                }
+
+                if (locale > LOCALE_enUS)
+                {
+                    if (ItemLocale const* leftIl = sObjectMgr->GetItemLocale(protoLeft->ItemId))
+                    {
+                        ObjectMgr::GetLocaleString(leftIl->Name, locale, leftName);
+                    }
+
+                    if (ItemLocale const* rightIl = sObjectMgr->GetItemLocale(protoRight->ItemId))
+                    {
+                        ObjectMgr::GetLocaleString(rightIl->Name, locale, rightName);
+                    }
+                }
+
+                int result = leftName.compare(rightName);
+                if (result == 0)
+                {
+                    continue;
+                }
+
+                return thisOrder.isDesc ? result > 0 : result < 0;
+            }
+            case AUCTION_SORT_MINLEVEL:
+            {
+                ItemTemplate const* protoLeft  = sObjectMgr->GetItemTemplate(left->item_template);
+                ItemTemplate const* protoRight = sObjectMgr->GetItemTemplate(right->item_template);
+                if (!protoLeft || !protoRight)
+                {
+                    continue;
+                }
+
+                if (protoLeft->RequiredLevel == protoRight->RequiredLevel)
+                {
+                    continue;
+                }
+
+                return thisOrder.isDesc ? protoLeft->RequiredLevel > protoRight->RequiredLevel : protoLeft->RequiredLevel < protoRight->RequiredLevel;
+            }
+            case AUCTION_SORT_OWNER:
+            {
+                std::string leftName;
+                sCharacterCache->GetCharacterNameByGuid(left->owner, leftName);
+
+                std::string rightName;
+                sCharacterCache->GetCharacterNameByGuid(right->owner, rightName);
+
+                int result = leftName.compare(rightName);
+                if (result == 0)
+                {
+                    continue;
+                }
+
+                return thisOrder.isDesc ? result > 0 : result < 0;
+            }
+            case AUCTION_SORT_RARITY:
+            {
+                ItemTemplate const* protoLeft  = sObjectMgr->GetItemTemplate(left->item_template);
+                ItemTemplate const*  protoRight = sObjectMgr->GetItemTemplate(right->item_template);
+                if (!protoLeft || !protoRight)
+                {
+                    continue;
+                }
+
+                if (protoLeft->Quality == protoRight->Quality)
+                {
+                    continue;
+                }
+
+                return thisOrder.isDesc ? protoLeft->Quality > protoRight->Quality : protoLeft->Quality < protoRight->Quality;
+            }
+            case AUCTION_SORT_STACK:
+            {
+                if (left->itemCount == right->itemCount)
+                {
+                    continue;
+                }
+
+                if (!thisOrder.isDesc)
+                {
+                    return (left->itemCount < right->itemCount);
+                }
+
+                return (left->itemCount > right->itemCount);
+            }
+            case AUCTION_SORT_TIMELEFT:
+            {
+                if (left->expire_time == right->expire_time)
+                {
+                    continue;
+                }
+
+                return thisOrder.isDesc ? left->expire_time > right->expire_time : left->expire_time < right->expire_time;
+            }
+            case AUCTION_SORT_MINBIDBUY:
+            {
+                if (left->buyout == right->buyout)
+                {
+                    if (left->startbid == right->startbid)
+                    {
+                        continue;
+                    }
+
+                    return thisOrder.isDesc ? left->startbid > right->startbid : left->startbid < right->startbid;
+                }
+
+                return thisOrder.isDesc ? left->buyout > right->buyout : left->buyout < right->buyout;
+            }
+            case AUCTION_SORT_MAX:
+                // Such sad travis appeasement
+            case AUCTION_SORT_UNK4:
+            default:
+                break;
+        }
+    }
+
+    return false;
+}
 
 AuctionHouseMgr::AuctionHouseMgr()
 {
@@ -117,9 +297,13 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
     uint32 bidder_accId = 0;
     Player* bidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
     if (bidder)
+    {
         bidder_accId = bidder->GetSession()->GetAccountId();
+    }
     else
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+    {
+        bidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
+    }
 
     // receiver exist
     if (bidder || bidder_accId)
@@ -153,7 +337,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
     // owner exist (online or offline)
     if (owner || owner_accId)
     {
@@ -175,7 +359,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, Characte
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
     // owner exist
     if (owner || owner_accId)
     {
@@ -200,18 +384,18 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY), 0, false, true, auction->Id);
 
         if (auction->bid >= 500 * GOLD)
-            if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(auction->bidder.GetCounter()))
+            if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(auction->bidder))
             {
                 Player* bidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
                 std::string owner_name = "";
                 uint8 owner_level = 0;
-                if (const GlobalPlayerData* gpd_owner = sWorld->GetGlobalPlayerData(auction->owner.GetCounter()))
+                if (CharacterCacheEntry const* gpd_owner = sCharacterCache->GetCharacterCacheByGuid(auction->owner))
                 {
-                    owner_name = gpd_owner->name;
-                    owner_level = gpd_owner->level;
+                    owner_name = gpd_owner->Name;
+                    owner_level = gpd_owner->Level;
                 }
                 CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<AH> profit: %ug, bidder: %s %u lvl (guid: %u), seller: %s %u lvl (guid: %u), item %u (%u)\", NOW())",
-                    gpd->accountId, auction->bidder.GetCounter(), gpd->name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", owner_accId, owner_name.c_str(), auction->bid, (profit / GOLD), gpd->name.c_str(), gpd->level, auction->bidder.GetCounter(), owner_name.c_str(), owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount);
+                    gpd->AccountId, auction->bidder.GetCounter(), gpd->Name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", owner_accId, owner_name.c_str(), auction->bid, (profit / GOLD), gpd->Name.c_str(), gpd->Level, auction->bidder.GetCounter(), owner_name.c_str(), owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount);
             }
     }
 }
@@ -225,7 +409,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
         return;
 
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
+    uint32 owner_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->owner);
 
     // owner exist
     if (owner || owner_accId)
@@ -251,7 +435,7 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 
     uint32 oldBidder_accId = 0;
     if (!oldBidder)
-        oldBidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+        oldBidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
 
     // old bidder exist
     if (oldBidder || oldBidder_accId)
@@ -275,7 +459,9 @@ void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, Ch
 
     uint32 bidder_accId = 0;
     if (!bidder)
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->bidder.GetCounter());
+    {
+        bidder_accId = sCharacterCache->GetCharacterAccountIdByGuid(auction->bidder);
+    }
 
     // bidder exist
     if (bidder || bidder_accId)
@@ -541,139 +727,192 @@ void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, 
 bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player,
         std::wstring const& wsearchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
         uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-        uint32& count, uint32& totalcount, uint8  /*getAll*/)
+        uint32& count, uint32& totalcount, uint8 /*getAll*/, AuctionSortOrderVector const& sortOrder)
 {
     uint32 itrcounter = 0;
+
+    std::vector<AuctionEntry*> auctionShortlist;
 
     // pussywizard: optimization, this is a simplified case
     if (itemClass == 0xffffffff && itemSubClass == 0xffffffff && inventoryType == 0xffffffff && quality == 0xffffffff && levelmin == 0x00 && levelmax == 0x00 && usable == 0x00 && wsearchedname.empty())
     {
-        totalcount = Getcount();
-        if (listfrom < totalcount)
+        auto itr = GetAuctionsBegin();
+        for (; itr != GetAuctionsEnd(); ++itr)
         {
-            AuctionEntryMap::iterator itr = AuctionsMap.begin();
-            std::advance(itr, listfrom);
-            for (; itr != AuctionsMap.end(); ++itr)
-            {
-                itr->second->BuildAuctionInfo(data);
-                if ((++count) >= 50)
-                    break;
-            }
+            auctionShortlist.push_back(itr->second);
         }
-        return true;
+    }
+    else
+    {
+        time_t curTime = sWorld->GetGameTime();
+
+        int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+        int locdbc_idx = player->GetSession()->GetSessionDbcLocale();
+
+        for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
+        {
+            if (!AsyncAuctionListingMgr::IsAuctionListingAllowed())                                                    // pussywizard: World::Update is waiting for us...
+            {
+                if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
+                {
+                    if (avgDiffTracker.getAverage() >= 30 || getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            AuctionEntry* Aentry = itr->second;
+            // Skip expired auctions
+            if (Aentry->expire_time < curTime)
+            {
+                continue;
+            }
+
+            Item* item = sAuctionMgr->GetAItem(Aentry->item_guid);
+            if (!item)
+            {
+                continue;
+            }
+
+            ItemTemplate const* proto = item->GetTemplate();
+            if (itemClass != 0xffffffff && proto->Class != itemClass)
+            {
+                continue;
+            }
+
+            if (itemSubClass != 0xffffffff && proto->SubClass != itemSubClass)
+            {
+                continue;
+            }
+
+            if (inventoryType != 0xffffffff && proto->InventoryType != inventoryType)
+            {
+                // xinef: exception, robes are counted as chests
+                if (inventoryType != INVTYPE_CHEST || proto->InventoryType != INVTYPE_ROBE)
+                {
+                    continue;
+                }
+            }
+
+            if (quality != 0xffffffff && proto->Quality < quality)
+            {
+                continue;
+            }
+
+            if (levelmin != 0x00 && (proto->RequiredLevel < levelmin || (levelmax != 0x00 && proto->RequiredLevel > levelmax)))
+            {
+                continue;
+            }
+
+            if (usable != 0x00)
+            {
+                if (player->CanUseItem(item) != EQUIP_ERR_OK)
+                {
+                    continue;
+                }
+
+                // xinef: check already learded recipes and pets
+                if (proto->Spells[1].SpellTrigger == ITEM_SPELLTRIGGER_LEARN_SPELL_ID && player->HasSpell(proto->Spells[1].SpellId))
+                {
+                    continue;
+                }
+            }
+
+            // Allow search by suffix (ie: of the Monkey) or partial name (ie: Monkey)
+            // No need to do any of this if no search term was entered
+            if (!wsearchedname.empty())
+            {
+                std::string name = proto->Name1;
+                if (name.empty())
+                {
+                    continue;
+                }
+
+                // local name
+                if (loc_idx >= 0)
+                    if (ItemLocale const* il = sObjectMgr->GetItemLocale(proto->ItemId))
+                        ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+
+                // DO NOT use GetItemEnchantMod(proto->RandomProperty) as it may return a result
+                //  that matches the search but it may not equal item->GetItemRandomPropertyId()
+                //  used in BuildAuctionInfo() which then causes wrong items to be listed
+                int32 propRefID = item->GetItemRandomPropertyId();
+
+                if (propRefID)
+                {
+                    // Append the suffix to the name (ie: of the Monkey) if one exists
+                    // These are found in ItemRandomSuffix.dbc and ItemRandomProperties.dbc
+                    // even though the DBC name seems misleading
+                    std::array<char const*, 16> const* suffix = nullptr;
+
+                    if (propRefID < 0)
+                    {
+                        const ItemRandomSuffixEntry* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
+                        if (itemRandEntry)
+                            suffix = &itemRandEntry->Name;
+                    }
+                    else
+                    {
+                        const ItemRandomPropertiesEntry* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
+                        if (itemRandEntry)
+                            suffix = &itemRandEntry->Name;
+                    }
+
+                    // dbc local name
+                    if (suffix)
+                    {
+                        // Append the suffix (ie: of the Monkey) to the name using localization
+                        // or default enUS if localization is invalid
+                        name += ' ';
+                        name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
+                    }
+                }
+
+                // Perform the search (with or without suffix)
+                if (!Utf8FitTo(name, wsearchedname))
+                {
+                    continue;
+                }
+            }
+
+            auctionShortlist.push_back(Aentry);
+        }
     }
 
-    time_t curTime = sWorld->GetGameTime();
-
-    int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-    int locdbc_idx = player->GetSession()->GetSessionDbcLocale();
-
-    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
+    // Check if sort enabled, and first sort column is valid, if not don't sort
+    if (sortOrder.size() > 0)
     {
-        if (!AsyncAuctionListingMgr::IsAuctionListingAllowed()) // pussywizard: World::Update is waiting for us...
-            if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
-                if (avgDiffTracker.getAverage() >= 30 || getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
-                    return false;
-
-        AuctionEntry* Aentry = itr->second;
-        // Skip expired auctions
-        if (Aentry->expire_time < curTime)
-            continue;
-
-        Item* item = sAuctionMgr->GetAItem(Aentry->item_guid);
-        if (!item)
-            continue;
-
-        ItemTemplate const* proto = item->GetTemplate();
-
-        if (itemClass != 0xffffffff && proto->Class != itemClass)
-            continue;
-
-        if (itemSubClass != 0xffffffff && proto->SubClass != itemSubClass)
-            continue;
-
-        if (inventoryType != 0xffffffff && proto->InventoryType != inventoryType)
+        AuctionSortInfo const& sortInfo = *sortOrder.begin();
+        if (sortInfo.sortOrder >= AUCTION_SORT_MINLEVEL && sortInfo.sortOrder < AUCTION_SORT_MAX && sortInfo.sortOrder != AUCTION_SORT_UNK4)
         {
-            // xinef: exception, robes are counted as chests
-            if (inventoryType != INVTYPE_CHEST || proto->InventoryType != INVTYPE_ROBE)
-                continue;
-        }
-
-        if (quality != 0xffffffff && proto->Quality < quality)
-            continue;
-
-        if (levelmin != 0x00 && (proto->RequiredLevel < levelmin || (levelmax != 0x00 && proto->RequiredLevel > levelmax)))
-            continue;
-
-        if (usable != 0x00)
-        {
-            if (player->CanUseItem(item) != EQUIP_ERR_OK)
-                continue;
-
-            // xinef: check already learded recipes and pets
-            if (proto->Spells[1].SpellTrigger == ITEM_SPELLTRIGGER_LEARN_SPELL_ID && player->HasSpell(proto->Spells[1].SpellId))
-                continue;
-        }
-
-        // Allow search by suffix (ie: of the Monkey) or partial name (ie: Monkey)
-        // No need to do any of this if no search term was entered
-        if (!wsearchedname.empty())
-        {
-            std::string name = proto->Name1;
-            if (name.empty())
-                continue;
-
-            // local name
-            if (loc_idx >= 0)
-                if (ItemLocale const* il = sObjectMgr->GetItemLocale(proto->ItemId))
-                    ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
-
-            // DO NOT use GetItemEnchantMod(proto->RandomProperty) as it may return a result
-            //  that matches the search but it may not equal item->GetItemRandomPropertyId()
-            //  used in BuildAuctionInfo() which then causes wrong items to be listed
-            int32 propRefID = item->GetItemRandomPropertyId();
-
-            if (propRefID)
+            // Partial sort to improve performance a bit, but the last pages will burn
+            if (listfrom + 50 <= auctionShortlist.size())
             {
-                // Append the suffix to the name (ie: of the Monkey) if one exists
-                // These are found in ItemRandomSuffix.dbc and ItemRandomProperties.dbc
-                //  even though the DBC name seems misleading
-
-                std::array<char const*, 16> const* suffix = nullptr;
-
-                if (propRefID < 0)
-                {
-                    const ItemRandomSuffixEntry* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
-                    if (itemRandEntry)
-                        suffix = &itemRandEntry->Name;
-                }
-                else
-                {
-                    const ItemRandomPropertiesEntry* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
-                    if (itemRandEntry)
-                        suffix = &itemRandEntry->Name;
-                }
-
-                // dbc local name
-                if (suffix)
-                {
-                    // Append the suffix (ie: of the Monkey) to the name using localization
-                    // or default enUS if localization is invalid
-                    name += ' ';
-                    name += (*suffix)[locdbc_idx >= 0 ? locdbc_idx : LOCALE_enUS];
-                }
+                std::partial_sort(auctionShortlist.begin(), auctionShortlist.begin() + listfrom + 50, auctionShortlist.end(),
+                    std::bind(SortAuction, std::placeholders::_1, std::placeholders::_2, sortOrder, player, sortInfo.sortOrder == AUCTION_SORT_BID));
             }
-
-            // Perform the search (with or without suffix)
-            if (!Utf8FitTo(name, wsearchedname))
-                continue;
+            else
+            {
+                std::sort(auctionShortlist.begin(), auctionShortlist.end(), std::bind(SortAuction, std::placeholders::_1, std::placeholders::_2, sortOrder,
+                    player, sortInfo.sortOrder == AUCTION_SORT_BID));
+            }
         }
+    }
 
+    for (auto auction : auctionShortlist)
+    {
         // Add the item if no search term or if entered search term was found
         if (count < 50 && totalcount >= listfrom)
         {
+            Item* item = sAuctionMgr->GetAItem(auction->item_guid);
+            if (!item)
+            {
+                continue;
+            }
+
             ++count;
-            Aentry->BuildAuctionInfo(data);
+            auction->BuildAuctionInfo(data);
         }
         ++totalcount;
     }

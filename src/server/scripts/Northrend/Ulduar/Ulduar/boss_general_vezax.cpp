@@ -19,11 +19,11 @@
 #include "BanMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "WorldSession.h"
+#include "ulduar.h"
 
 enum VezaxSpellData
 {

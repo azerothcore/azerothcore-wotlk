@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "halls_of_reflection.h"
 #include "MapMgr.h"
 #include "Transport.h"
+#include "halls_of_reflection.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {

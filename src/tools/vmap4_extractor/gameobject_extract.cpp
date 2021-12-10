@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "model.h"
-#include "dbcfile.h"
 #include "adtfile.h"
+#include "dbcfile.h"
+#include "model.h"
 #include "vmapexport.h"
 #include <algorithm>
 #include <cstdio>

@@ -24,8 +24,8 @@ TCComment: Can't test LOS until mmaps.
 TCCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "zulgurub.h"
 

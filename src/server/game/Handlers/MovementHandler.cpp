@@ -24,8 +24,8 @@
 #include "GameGraveyard.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
-#include "MathUtil.h"
 #include "MapMgr.h"
+#include "MathUtil.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -33,10 +33,10 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "Transport.h"
+#include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Vehicle.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
@@ -193,7 +193,7 @@ void WorldSession::HandleMoveWorldportAck()
     {
         if (mEntry->IsDungeon())
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->SpawnCorpseBones();
         }
     }
@@ -203,7 +203,7 @@ void WorldSession::HandleMoveWorldportAck()
         // resurrect character upon entering instance when the corpse is not available anymore
         if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->RemoveCorpse();
         }
     }
@@ -1003,6 +1003,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     else
     {
         movementInfo.time = (uint32)movementTime;
+    }
+
+    if (G3D::fuzzyEq(movementInfo.fallTime, 0.f))
+    {
+        movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FALLING);
     }
 
     movementInfo.guid = mover->GetGUID();

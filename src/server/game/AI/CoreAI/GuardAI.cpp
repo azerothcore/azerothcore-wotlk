@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureAIImpl.h"
 #include "GuardAI.h"
+#include "CreatureAIImpl.h"
 #include "Player.h"
 
 int GuardAI::Permissible(Creature const* creature)

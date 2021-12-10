@@ -30,8 +30,8 @@ EndContentData */
 #include "PassiveAI.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 

@@ -29,8 +29,8 @@ EndScriptData */
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
@@ -38,11 +38,11 @@ EndScriptData */
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
+#include "StringConvert.h"
 #include "TicketMgr.h"
+#include "Tokenize.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMgr.h"
-#include "StringConvert.h"
-#include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
 
@@ -156,6 +156,7 @@ public:
             { "spell_target_position",         HandleReloadSpellTargetPositionCommand,        SEC_ADMINISTRATOR, Console::Yes },
             { "spell_threats",                 HandleReloadSpellThreatsCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "spell_group_stack_rules",       HandleReloadSpellGroupStackRulesCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "player_loot_template",          HandleReloadLootTemplatesPlayerCommand,        SEC_ADMINISTRATOR, Console::Yes },
             { "acore_string",                  HandleReloadAcoreStringCommand,                SEC_ADMINISTRATOR, Console::Yes },
             { "warden_action",                 HandleReloadWardenactionCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "waypoint_scripts",              HandleReloadWpScriptsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
@@ -654,6 +655,16 @@ public:
         LoadLootTemplates_Spell();
         LootTemplates_Spell.CheckLootRefs();
         handler->SendGlobalGMSysMessage("DB table `spell_loot_template` reloaded.");
+        sConditionMgr->LoadConditions(true);
+        return true;
+    }
+
+    static bool HandleReloadLootTemplatesPlayerCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Loot Tables... (`player_loot_template`)");
+        LoadLootTemplates_Player();
+        LootTemplates_Player.CheckLootRefs();
+        handler->SendGlobalGMSysMessage("DB table `player_loot_template` reloaded.");
         sConditionMgr->LoadConditions(true);
         return true;
     }

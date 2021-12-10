@@ -21,11 +21,13 @@
 #include "Corpse.h"
 #include "CreatureAI.h"
 #include "GridNotifiers.h"
+#include "Object.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
+#include "WorldSession.h"
 
 template<class T>
 inline void Acore::VisibleNotifier::Visit(GridRefMgr<T>& m)
@@ -251,7 +253,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(PlayerMapType& m)
 
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -262,7 +264,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(CreatureMapType& m)
 
     for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -273,7 +275,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(CorpseMapType& m)
 
     for (CorpseMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -284,7 +286,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(GameObjectMapType& m)
 
     for (GameObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -295,7 +297,7 @@ void Acore::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType& m)
 
     for (DynamicObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
-            i_objects.push_back(itr->GetSource());
+            Insert(itr->GetSource());
 }
 
 // Gameobject searchers
@@ -339,7 +341,7 @@ void Acore::GameObjectListSearcher<Check>::Visit(GameObjectMapType& m)
     for (GameObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 // Unit searchers
@@ -416,7 +418,7 @@ void Acore::UnitListSearcher<Check>::Visit(PlayerMapType& m)
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -425,7 +427,7 @@ void Acore::UnitListSearcher<Check>::Visit(CreatureMapType& m)
     for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 // Creature searchers
@@ -469,7 +471,7 @@ void Acore::CreatureListSearcher<Check>::Visit(CreatureMapType& m)
     for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 template<class Check>
@@ -478,7 +480,7 @@ void Acore::PlayerListSearcher<Check>::Visit(PlayerMapType& m)
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (itr->GetSource()->InSamePhase(i_phaseMask))
             if (i_check(itr->GetSource()))
-                i_objects.push_back(itr->GetSource());
+                Insert(itr->GetSource());
 }
 
 template<class Check>

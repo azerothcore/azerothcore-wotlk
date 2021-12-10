@@ -17,8 +17,8 @@
 
 #ifndef MODEL_H
 #define MODEL_H
-#include <vector>
 #include "Utils.h"
+#include <vector>
 
 class Model
 {
