@@ -84,7 +84,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
 
 struct npc_midsummer_torch_target : public ScriptedAI
 {
-    npc_midsummer_torch_targetAI(Creature* creature) : ScriptedAI(creature)
+    npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
     {
         teleTimer = 0;
         startTimer = 1;
@@ -308,7 +308,7 @@ class spell_midsummer_torch_quest : public AuraScript
         if (Creature* cr = ar->SummonCreature(25535, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
         {
             torchGUID = cr->GetGUID();
-            CAST_AI(npc_midsummer_torch_target::npc_midsummer_torch_targetAI, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == 45716 ? 8 : 20));
+            CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == 45716 ? 8 : 20));
         }
     }
 
