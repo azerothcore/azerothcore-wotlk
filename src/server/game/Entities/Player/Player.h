@@ -1165,7 +1165,7 @@ public:
 
     [[nodiscard]] Pet* GetPet() const;
     bool IsPetDismissed();
-    void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType);
+    void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType, int32 healthPct = 0);
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
