@@ -1364,7 +1364,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         RemoveAurasByType(SPELL_AURA_MOD_FEAR);
         RemoveAurasByType(SPELL_AURA_MOD_CONFUSE);
         RemoveAurasByType(SPELL_AURA_MOD_ROOT);
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
     }
 
     if (m_transport)
@@ -1497,7 +1497,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                     InterruptNonMeleeSpells(true);
 
             //remove auras before removing from map...
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
 
             if (!GetSession()->PlayerLogout())
             {
