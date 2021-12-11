@@ -1,3 +1,19 @@
+-- DB update 2021_12_11_05 -> 2021_12_11_06
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_11_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_11_05 2021_12_11_06 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638753088438372219'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638753088438372219');
 
 -- Fix Sangrias Stillblade for quest 9678 "The First Trial"
@@ -19,3 +35,13 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 DELETE FROM `creature_text` WHERE `CreatureID`=17716;
 INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
 (17716,0,0, 'Defend yourself, youngling! We''ll see if there''s a Blood Knight in you, yet.',14,0,100,0,0,0,14365,0, 'Sangrias Stillblade say on attack');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_11_06' WHERE sql_rev = '1638753088438372219';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
