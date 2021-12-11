@@ -420,7 +420,7 @@ struct npc_costumed_orphan_matron : public ScriptedAI
     }
 };
 
-bool OnGossipHello(Player* player, Creature* creature) override
+bool OnGossipHello(Player* player, Creature* creature)
 {
     QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
     QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
@@ -472,7 +472,7 @@ bool OnGossipHello(Player* player, Creature* creature) override
     return true;
 }
 
-bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest) override
+bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest)
 {
     if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !creature->AI()->GetData(DATA_ALLOW_START))
         creature->AI()->DoAction(ACTION_START_EVENT);
