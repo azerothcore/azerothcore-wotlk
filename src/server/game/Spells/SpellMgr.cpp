@@ -7514,6 +7514,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Effect[EFFECT_1] = 0;
     });
 
+    // Green Beam
+    ApplySpellFix({31628, 31630, 31631}, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
