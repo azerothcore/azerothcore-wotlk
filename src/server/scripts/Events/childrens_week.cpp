@@ -969,5 +969,5 @@ void AddSC_event_childrens_week()
     new at_bring_your_orphan_to();
     new npc_grizzlemaw_cw_trigger();
     new npc_cw_area_trigger();
-    new npc_alexstraza_the_lifebinder();
+    RegisterCreatureAI(npc_alexstraza_the_lifebinder);
 }
