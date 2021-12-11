@@ -89,6 +89,12 @@ time_t LocalTimeToUTCTime(time_t time)
 {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
     return time + _timezone;
+#elif defined(__FreeBSD__)
+    struct tm tm;
+
+    gmtime_r(&time, &tm);
+    tm.tm_isdst = -1;
+    return mktime(&tm);
 #else
     return time + timezone;
 #endif
