@@ -75,7 +75,7 @@ public:
         stmt->setUInt32(0, restoreId);
         PreparedQueryResult fields = CharacterDatabase.Query(stmt);
 
-        if (!fields || !(*fields)[1].GetUInt32())
+        if (!fields || !(*fields)[1].GetUInt32() || (*fields)[3].GetUInt32() != player.GetGUID().GetCounter())
         {
             handler->SendSysMessage(LANG_ITEM_RESTORE_MISSING);
             handler->SetSentErrorMessage(true);
