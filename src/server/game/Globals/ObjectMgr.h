@@ -1266,13 +1266,13 @@ public:
 
     // reserved names
     void LoadReservedPlayersNames();
-    [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
-    static uint8 CheckPlayerName(std::string const& name, bool create = false);
-    static PetNameInvalidReason CheckPetName(std::string const& name);
-    static bool IsValidCharterName(std::string const& name);
+    static uint8 CheckPlayerName(std::string_view name, bool create = false);
+    static PetNameInvalidReason CheckPetName(std::string_view name);
+    static bool IsValidCharterName(std::string_view name);
     static bool IsValidChannelName(std::string const& name);
 
     static bool CheckDeclinedNames(std::wstring w_ownname, DeclinedName const& names);
