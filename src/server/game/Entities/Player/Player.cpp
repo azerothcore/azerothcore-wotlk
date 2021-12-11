@@ -1359,7 +1359,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     // remove auras that should be removed whenever being teleported
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
-    
+
     // Xinef: Remove all movement imparing effects auras, skip small teleport like blink
     if (mapid != GetMapId() || GetDistance2d(x, y) > 100)
     {
