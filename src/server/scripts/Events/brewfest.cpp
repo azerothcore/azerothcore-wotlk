@@ -111,7 +111,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
         }
     }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction) override
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction)
     {
         switch (uiAction)
         {
@@ -125,7 +125,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    bool OnGossipHello(Player* player, Creature* creature)
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
