@@ -1362,6 +1362,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         RemoveAurasByType(SPELL_AURA_MOD_FEAR);
         RemoveAurasByType(SPELL_AURA_MOD_CONFUSE);
         RemoveAurasByType(SPELL_AURA_MOD_ROOT);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
     }
 
     if (m_transport)
@@ -1416,9 +1417,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         if (!(options & TELE_TO_NOT_LEAVE_COMBAT))
             CombatStop();
-
-        //remove auras before teleporting...
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
 
         // this will be used instead of the current location in SaveToDB
         teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
