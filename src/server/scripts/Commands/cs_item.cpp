@@ -132,7 +132,8 @@ public:
             return false;
         }
 
-        do {
+        do
+        {
             Field* fields    = disposedItems->Fetch();
             uint32 id        = fields[0].GetUInt32();
             uint32 itemId    = fields[1].GetUInt32();
@@ -153,7 +154,6 @@ public:
     // TODO - move item to other slot
     static bool HandleItemMoveCommand(ChatHandler* handler, uint8 srcSlot, uint8 dstSlot)
     {
-
         if (srcSlot == dstSlot)
             return true;
 
@@ -173,7 +173,7 @@ public:
 
     static bool HasItemDeletionConfig()
     {
-      return sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD) || sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR);
+        return sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD) || sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR);
     }
 };
 
