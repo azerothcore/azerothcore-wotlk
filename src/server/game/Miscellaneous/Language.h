@@ -228,7 +228,10 @@ enum AcoreStrings
     LANG_CMD_AMBIGUOUS                  = 194,
     LANG_CMD_HELP_GENERIC               = 195,
     LANG_CMD_NO_HELP_AVAILABLE          = 196,
-    // Room for more level 1                197-199 not used
+
+    LANG_ITEM_RESTORE_LIST              = 197,
+    LANG_ITEM_RESTORE_LIST_EMPTY        = 198,
+    LANG_ITEM_RESTORE_MISSING           = 199,
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -1229,12 +1232,14 @@ enum AcoreStrings
     LANG_COMMAND_QUEST_ADD              = 5067,
     LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG = 5068,
     LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
-
-    LANG_CMD_AUTOBROADCAST_LVL_ERROR    = 5070,
-    LANG_CMD_SETTINGS_ANNOUNCER_ON      = 5071,
-    LANG_CMD_SETTINGS_ANNOUNCER_OFF     = 5072,
-
-    // Room for more strings    5073-9999
+  
+    LANG_COMMAND_DISABLED               = 5070,
+  
+    LANG_CMD_AUTOBROADCAST_LVL_ERROR    = 5071,
+    LANG_CMD_SETTINGS_ANNOUNCER_ON      = 5072,
+    LANG_CMD_SETTINGS_ANNOUNCER_OFF     = 5073,
+  
+    // Room for more strings    5074-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

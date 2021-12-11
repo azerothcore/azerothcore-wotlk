@@ -190,6 +190,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_areaUpdateId = 0;
     m_team = TEAM_NEUTRAL;
 
+    m_needZoneUpdate = false;
+
     m_nextSave = SavingSystemMgr::IncreaseSavingMaxValue(1);
     m_additionalSaveTimer = 0;
     m_additionalSaveMask = 0;
@@ -4518,6 +4520,8 @@ void Player::RemoveCorpse()
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     Corpse::DeleteFromDB(GetGUID(), trans);
     CharacterDatabase.CommitTransaction(trans);
+
+    _corpseLocation.WorldRelocate();
 }
 
 void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
@@ -5524,7 +5528,7 @@ void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool
     Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-void Player::SendDirectMessage(WorldPacket* data)
+void Player::SendDirectMessage(WorldPacket const* data) const
 {
     m_session->SendPacket(data);
 }
@@ -12423,7 +12427,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 WorldObject* Player::GetViewpoint() const
 {
     if (ObjectGuid guid = GetGuidValue(PLAYER_FARSIGHT))
-        return (WorldObject*)ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER);
+        return static_cast<WorldObject*>(ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER));
     return nullptr;
 }
 
@@ -15017,8 +15021,12 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
 
 bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
 {
-    if (!packetOnly && !Unit::SetHover(apply))
-        return false;
+    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
+    if (!packetOnly /* && !Unit::SetHover(apply)*/)
+    {
+        Unit::SetHover(apply);
+        // return false;
+    }
 
     WorldPacket data(apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
     data << GetPackGUID();
@@ -15034,8 +15042,12 @@ bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
 
 bool Player::SetWaterWalking(bool apply, bool packetOnly /*= false*/)
 {
-    if (!packetOnly && !Unit::SetWaterWalking(apply))
-        return false;
+    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
+    if (!packetOnly /* && !Unit::SetWaterWalking(apply)*/)
+    {
+        Unit::SetWaterWalking(apply);
+        // return false;
+    }
 
     WorldPacket data(apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
     data << GetPackGUID();
