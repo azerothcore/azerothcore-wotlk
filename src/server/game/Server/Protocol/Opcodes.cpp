@@ -20,7 +20,7 @@
 #include "WorldSession.h"
 #include <iomanip>
 #include <sstream>
-//#include "Packets/AllPackets.h"
+#include "Packets/AllPackets.h"
 
 template<class PacketClass, void(WorldSession::* HandlerFunction)(PacketClass&)>
 class PacketHandler : public ClientOpcodeHandler
