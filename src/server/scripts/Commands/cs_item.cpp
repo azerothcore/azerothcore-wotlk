@@ -121,6 +121,13 @@ public:
 
     static bool HandleItemRestoreListCommand(ChatHandler* handler, PlayerIdentifier player)
     {
+        if (!HasItemDeletionConfig())
+        {
+            handler->SendSysMessage(LANG_COMMAND_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LIST);
         stmt->setUInt32(0, player.GetGUID().GetCounter());
         PreparedQueryResult disposedItems = CharacterDatabase.Query(stmt);
