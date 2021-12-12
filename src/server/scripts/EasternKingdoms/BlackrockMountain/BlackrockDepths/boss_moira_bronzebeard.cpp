@@ -44,9 +44,9 @@ struct boss_moira_bronzebeardAI : public BossAI
     void EnterCombat(Unit* /*who*/) override
     {
         _EnterCombat();
-        events.ScheduleEvent(SPELL_MINDBLAST, 0.5 * TIMER_MINDBLAST);
-        events.ScheduleEvent(SPELL_HEAL, 0.5 * TIMER_HEAL);
-        events.ScheduleEvent(SPELL_RENEW, 0.5 * TIMER_RENEW);
+        events.ScheduleEvent(SPELL_MINDBLAST, 0.5 * (int) TIMER_MINDBLAST);
+        events.ScheduleEvent(SPELL_HEAL, 0.5 * (int) TIMER_HEAL);
+        events.ScheduleEvent(SPELL_RENEW, 0.5 * (int) TIMER_RENEW);
     }
 
     void UpdateAI(uint32 diff) override
@@ -107,10 +107,10 @@ struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
     {
         _EnterCombat();
         Talk(0);
-        events.ScheduleEvent(SPELL_WORDPAIN, 0.5 * TIMER_WORDPAIN);
-        events.ScheduleEvent(SPELL_HEAL, 0.5 * TIMER_HEAL);
-        events.ScheduleEvent(SPELL_RENEW, 0.5 * TIMER_RENEW);
-        events.ScheduleEvent(SPELL_SHADOWBOLT, 0.5 * TIMER_SHADOWBOLT);
+        events.ScheduleEvent(SPELL_WORDPAIN, 0.5 * (int)TIMER_WORDPAIN);
+        events.ScheduleEvent(SPELL_HEAL, 0.5 * (int) TIMER_HEAL);
+        events.ScheduleEvent(SPELL_RENEW, 0.5 * (int) TIMER_RENEW);
+        events.ScheduleEvent(SPELL_SHADOWBOLT, 0.5 * (int) TIMER_SHADOWBOLT);
     }
 
         void UpdateAI(uint32 diff) override
