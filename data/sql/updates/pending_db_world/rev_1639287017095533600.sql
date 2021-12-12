@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES 
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1639287017095533600');
 
 /* Eskhandar Ghost Effect
 */
