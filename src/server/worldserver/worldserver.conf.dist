@@ -3887,3 +3887,41 @@ Metric.OverallStatusInterval = 1
 
 #
 ###################################################################################################
+
+###################################################################################################
+# POOL SETTINGS
+#
+# Control the appearance of pools by using directives to apply to their Max_Limits
+#
+#    Pool.GameObject
+#        Description: Change appearance of GameObjects, does not affect Quest or Creature pools
+#        Default:     "" - (Disabled)
+#                     "needle,rate,pool_id;" - (Enabled)
+#
+#        Needle:      Can be used to identify a pertictular GameObject i.e Silverleaf
+#                     This string is matched in the 'pool_gameobject' table 'description' field
+#                     * indicates wildcard for match anything, case matters!!
+#
+#        Rate:        The multiplier for scaling up or down the max_limit for the pool(s)
+#
+#        Pool_id:     You can match the directive to an exact pool id
+#
+#        Format:      Pool.GameObject = Needle {string} Description, rate {float}, pool_id {int} [optional]
+#
+#        Examples:
+#                     Pool.GameObject = "Sungrass,1.45;"
+#                     Adjust all Sungrass pool(s) to 45% more
+#
+#                     Pool.GameObject = "Tin,0.2,50002;"
+#                     Adjust all tin in Jangolode Mine {50002} of westfall to 20% // Orginally 15 now 3 mines max appear
+#
+#                     Pool.GameObject = "*,0.0;"
+#                     Disables all GameObject pools, good for debugging objects not associated to any pool
+#                     * is wildcard includes anything, including empty description
+#
+#                     Pool.GameObject = "Copper,0.1;Peacebloom,0.01,920;Silver Vein,0.0;Briarthorn,0.2;Dark Iron,0.2;Colbalt,0.2;"
+#                     Example of a chain of directives, first directive matched will be the one applied to a pool
+#
+#        Logging:     Use Logger.spells.objects to see information about a perticular object when you gather it {i.e. unlock it}
+
+Pool.GameObject = ""
