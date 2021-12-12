@@ -3913,7 +3913,7 @@ Metric.OverallStatusInterval = 1
 #                     Adjust all Sungrass pool(s) to 45% more
 #
 #                     Pool.GameObject = "Tin,0.2,50002;"
-#                     Adjust all tin in Jangolode Mine {50002} of westfall to 20% // Orginally 15 now 3 mines max appear
+#                     Adjust all tin in Jangolode Mine {50002} of westfall to 20% // Originally 15 now 3 mines max appear
 #
 #                     Pool.GameObject = "*,0.0;"
 #                     Disables all GameObject pools, good for debugging objects not associated to any pool
