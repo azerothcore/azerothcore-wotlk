@@ -279,7 +279,7 @@ public:
     void setRate(Rates rate, float value) { rate_values[rate] = value; }
     /// Get a server rate (see #Rates)
     float getRate(Rates rate) const { return rate_values[rate]; }
-    // Config to control active gameobjects spawns 
+    // Config to control active gameobjects spawns
     std::string getGameObjectConfig() { return m_GameObjectConfig; }
 
     /// Set a server configuration element (see #WorldConfigs)

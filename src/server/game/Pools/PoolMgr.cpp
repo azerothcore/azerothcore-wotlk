@@ -749,7 +749,7 @@ void PoolMgr::LoadFromDB()
                 {
                     std::vector<std::string> directives = explode(sWorld->getGameObjectConfig(), ';');
                     std::string configDescription;
-                    
+
                     uint32 target_pool_id;
 
                     bool found = false;
@@ -779,7 +779,7 @@ void PoolMgr::LoadFromDB()
                         // check if correct pool, target_pool_id=0 means no pool specified, its global
                         if (target_pool_id != 0 && target_pool_id != pool_id)
                             continue;
-                        
+
                         std::string description = fields[3].GetString();
 
                         // check if correct description or empty (which means global, any description matches)
