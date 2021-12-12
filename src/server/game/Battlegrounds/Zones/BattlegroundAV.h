@@ -1621,7 +1621,7 @@ private:
     void DefendNode(BG_AV_Nodes node, TeamId teamId);
 
     void PopulateNode(BG_AV_Nodes node);
-    void DePopulateNode(BG_AV_Nodes node);
+    void DePopulateNode(BG_AV_Nodes node, bool ignoreSpiritGuid = false);
 
     BG_AV_Nodes GetNodeThroughObject(uint32 object);
     uint32 GetObjectThroughNode(BG_AV_Nodes node);
