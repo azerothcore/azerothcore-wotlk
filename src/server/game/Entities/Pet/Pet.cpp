@@ -490,6 +490,8 @@ void Pet::Update(uint32 diff)
                                 GetCharmInfo()->SetIsReturning(false);
                                 GetCharmInfo()->SaveStayPosition(true);
 
+                                AddSpellCooldown(tempspell, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
+
                                 CastSpell(tempspellTarget, tempspell, false);
                                 m_tempspell = 0;
                                 m_tempspellTarget = nullptr;
