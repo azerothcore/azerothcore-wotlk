@@ -613,7 +613,7 @@ void PoolMgr::LoadFromDB()
             uint32 pool_id = fields[0].GetUInt32();
 
             PoolTemplateData& pPoolTemplate = mPoolTemplate[pool_id];
-            pPoolTemplate.MaxLimit  = fields[1].GetUInt32();
+            pPoolTemplate.MaxLimit = fields[1].GetUInt32();
 
             ++count;
         } while (result->NextRow());
