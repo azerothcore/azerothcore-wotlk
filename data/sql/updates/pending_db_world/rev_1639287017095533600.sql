@@ -14,4 +14,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 */
 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 14306);
-INSERT INTO `creature_template_addon` (`entry`, `visibilityDistanceType`, `auras`) VALUES ('14306', '0', '22650');
+INSERT INTO `creature_template_addon` (`entry`, `visibilityDistanceType`, `auras`) VALUES 
+(14306, 0, 22650);
