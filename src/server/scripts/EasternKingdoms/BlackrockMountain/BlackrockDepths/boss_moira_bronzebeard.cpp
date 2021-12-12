@@ -21,16 +21,20 @@
 
 enum Spells
 {
-    SPELL_HEAL                                             = 15586,
-    SPELL_RENEW                                            = 8362,
-    SPELL_MINDBLAST                                        = 15587
+    SPELL_HEAL              = 15586,
+    SPELL_RENEW             = 8362,
+    SPELL_MINDBLAST         = 15587,
+    SPELL_SHADOWBOLT        = 15537,
+    SPELL_WORDPAIN          = 15654,
 };
 
 enum SpellTimers
 {
-    TIMER_HEAL        = 12000,
-    TIMER_MINDBLAST   = 16000,
-    TIMER_RENEW       = 12000
+    TIMER_HEAL          = 12000,
+    TIMER_MINDBLAST     = 16000,
+    TIMER_RENEW         = 12000,
+    TIMER_SHADOWBOLT    = 16000,
+    TIMER_WORDPAIN      = 12000,
 };
 
 struct boss_moira_bronzebeardAI : public BossAI
@@ -40,9 +44,9 @@ struct boss_moira_bronzebeardAI : public BossAI
     void EnterCombat(Unit* /*who*/) override
     {
         _EnterCombat();
-        events.ScheduleEvent(SPELL_MINDBLAST, urand(17000, 20000));
-        events.ScheduleEvent(SPELL_HEAL, urand(2000, 5000));
-        events.ScheduleEvent(SPELL_RENEW, urand(TIMER_RENEW, TIMER_RENEW));
+        events.ScheduleEvent(SPELL_MINDBLAST, 0.5 * TIMER_MINDBLAST);
+        events.ScheduleEvent(SPELL_HEAL, 0.5 * TIMER_HEAL);
+        events.ScheduleEvent(SPELL_RENEW, 0.5 * TIMER_RENEW);
     }
 
     void UpdateAI(uint32 diff) override
@@ -93,7 +97,7 @@ struct boss_moira_bronzebeardAI : public BossAI
     }
 };
 
-// high priestess should be identical to Moira except that she talks on combat start.
+// high priestess should be fairly identical to Moira.
 // Running away when emperor dies is handled through GUID from emperor, therefore not relevant here.
 struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
 {
@@ -101,8 +105,49 @@ struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
 
     void EnterCombat(Unit* /*who*/) override
     {
-        boss_moira_bronzebeardAI::EnterCombat(nullptr);
+        _EnterCombat();
         Talk(0);
+        events.ScheduleEvent(SPELL_WORDPAIN, 0.5 * TIMER_WORDPAIN);
+        events.ScheduleEvent(SPELL_HEAL, 0.5 * TIMER_HEAL);
+        events.ScheduleEvent(SPELL_RENEW, 0.5 * TIMER_RENEW);
+        events.ScheduleEvent(SPELL_SHADOWBOLT, 0.5 * TIMER_SHADOWBOLT);
+    }
+
+        void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            return;
+        }
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case SPELL_WORDPAIN:
+                DoCastVictim(SPELL_WORDPAIN);
+                events.ScheduleEvent(SPELL_WORDPAIN, urand(TIMER_WORDPAIN - 2000, TIMER_WORDPAIN + 2000));
+                break;
+            case SPELL_HEAL:
+                CastOnEmperorIfPossible(SPELL_HEAL, TIMER_HEAL);
+                break;
+            case SPELL_RENEW:
+                CastOnEmperorIfPossible(SPELL_RENEW, TIMER_RENEW);
+                break;
+            case SPELL_SHADOWBOLT:
+                DoCastVictim(SPELL_SHADOWBOLT);
+                events.ScheduleEvent(SPELL_SHADOWBOLT, urand(TIMER_SHADOWBOLT - 2000, TIMER_SHADOWBOLT + 2000));
+                break;
+            default:
+                break;
+            }
+        }
+        DoMeleeAttackIfReady();
     }
 };
 
