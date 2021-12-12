@@ -242,7 +242,7 @@ class spell_pri_glyph_of_prayer_of_healing : public AuraScript
         PreventDefaultAction();
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
-        if (!healInfo || healInfo->GetHeal())
+        if (!healInfo || !healInfo->GetHeal())
         {
             return;
         }
