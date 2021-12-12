@@ -303,7 +303,7 @@ enum darkIronAttack
     NPC_MOLE_MACHINE_TRIGGER            = 23894,
     NPC_DARK_IRON_GUZZLER               = 23709,
     NPC_NORMAL_DROHN                    = 24492,
-    NPC_NORMAL_VOODOO                   = 21349,
+    NPC_NORMAL_VOODOO                   = 24493,
     NPC_NORMAL_BARLEYBREW               = 23683,
     NPC_NORMAL_THUNDERBREW              = 23684,
     NPC_NORMAL_GORDOK                   = 23685,
@@ -1331,8 +1331,8 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                float z = caster->GetMapHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), caster->GetPositionZ());
-                WorldLocation pPosition = WorldLocation(caster->GetMapId(), caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), z, caster->GetOrientation());
+                WorldLocation pPosition = WorldLocation(*caster);
+                caster->MovePositionToFirstCollision(pPosition, 14.f, 0.f);
                 SetExplTargetDest(pPosition);
             }
 
