@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES
 /* Eskhandar Ghost Effect
 */
 
-DELETE FROM `creature_template_addon` WHERE (`entry` = 14306);
+DELETE FROM `creature_template_addon` WHERE `entry`=14306;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (14306, 0, 0, 0, 0, 0, 0, '22650');
 
