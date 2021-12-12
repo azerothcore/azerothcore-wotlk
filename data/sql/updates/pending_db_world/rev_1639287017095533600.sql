@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES 
 
-/* Eskhandar Ghostly Aura
+/* Eskhandar Ghost Effect
 */
 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 14306);
