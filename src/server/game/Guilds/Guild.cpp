@@ -1630,9 +1630,8 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
 
     if (m_bankMoney > GUILD_BANK_MONEY_LIMIT - amount)
     {
-    SendCommandResult(session, GUILD_COMMAND_MOVE_ITEM, ERR_GUILD_BANK_FULL);
-    return;
-
+        SendCommandResult(session, GUILD_COMMAND_MOVE_ITEM, ERR_GUILD_BANK_FULL);
+        return;
     }
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
