@@ -169,6 +169,9 @@ public:
     static void HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 asynchLoadType, uint8 loadResult);
     uint8 GetAsynchLoadType() const { return asynchLoadType; }
     void SetAsynchLoadType(uint8 type) { asynchLoadType = type; }
+
+    [[nodiscard]] bool HasTempSpell() const { return m_tempspell != 0; }
+
 protected:
     Player* m_owner;
     int32   m_happinessTimer;
