@@ -1426,6 +1426,9 @@ void World::LoadConfigSettings(bool reload)
     // Realm Availability
     m_bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", true);
 
+    // GameObject pool nodes allowed scale
+    m_GameObjectConfig = sConfigMgr->GetOption<std::string>("Pool.GameObject", "");
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }

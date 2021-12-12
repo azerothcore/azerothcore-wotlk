@@ -279,6 +279,8 @@ public:
     void setRate(Rates rate, float value) { rate_values[rate] = value; }
     /// Get a server rate (see #Rates)
     float getRate(Rates rate) const { return rate_values[rate]; }
+    // Config to control active gameobjects spawns 
+    std::string getGameObjectConfig() { return m_GameObjectConfig; }
 
     /// Set a server configuration element (see #WorldConfigs)
     void setBoolConfig(WorldBoolConfigs index, bool value)
@@ -429,6 +431,7 @@ private:
     void DetectDBCLang();
     bool m_allowMovement;
     std::string m_dataPath;
+    std::string m_GameObjectConfig;
 
     // for max speed access
     static float m_MaxVisibleDistanceOnContinents;
