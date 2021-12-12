@@ -686,8 +686,7 @@ void PoolMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                 1        2         3
-        QueryResult result = WorldDatabase.Query("SELECT guid, pool_entry, chance FROM pool_gameobject");
+        QueryResult result = WorldDatabase.Query("SELECT guid, pool_entry, chance, description FROM pool_gameobject");
 
         if (!result)
         {
@@ -738,6 +737,62 @@ void PoolMgr::LoadFromDB()
                 PoolObject plObject = PoolObject(guid, chance);
                 PoolGroup<GameObject>& gogroup = mPoolGameobjectGroups[pool_id];
                 gogroup.SetPoolId(pool_id);
+
+                // scale for MaxLimit of objects of a pool. Dont confuse this with spawn chance.
+                // scalePoolObjects = 1 => no change
+                // scalePoolObjects > 1 => more objects allowed in the world
+                // scalePoolObjects < 1 => decrease the objects, i.e. 0.5 is 50% less spawns
+                float ratePoolObjects = 1.0f;
+
+                // Apply directives to the total objects pool spawns, ignore if none defined in config
+                if (!sWorld->getGameObjectConfig().empty())
+                {
+                    std::vector<std::string> directives = explode(sWorld->getGameObjectConfig(), ';');
+                    std::string configDescription;
+                    
+                    uint32 target_pool_id;
+
+                    bool found = false;
+
+                    // Loop through the Pool.GameObject config string, see if any match
+                    for (std::string directive : directives)
+                    {
+
+                        std::vector<std::string> args = explode(directive, ',');
+                        if(args.size() == 0)
+                            continue;
+                        else if(args.size() > 3 || args.size() < 1)
+                        {
+                            LOG_ERROR("pool", "Error pasrsing GameObjectPool, check your config syntax for %s", directive.c_str());
+                            continue;
+                        }
+                        configDescription = "";
+                        target_pool_id = 0;
+
+                        if(!args[0].empty())
+                            configDescription = args[0];
+                        if(args.size() >= 2 && !args[1].empty())
+                            ratePoolObjects = stof(args[1]);
+                        if(args.size() >= 3 && !args[2].empty())
+                            target_pool_id = static_cast<uint32>(stoi(args[2]));
+
+                        // check if correct pool, target_pool_id=0 means no pool specified, its global
+                        if (target_pool_id != 0 && target_pool_id != pool_id)
+                            continue;
+                        
+                        std::string description = fields[3].GetString();
+
+                        // check if correct description or empty (which means global, any description matches)
+                        if(!configDescription.empty() && configDescription.find('*') != std::string::npos || description.find(configDescription) != std::string::npos)
+                        {
+                            LOG_DEBUG("pool", "Found a match for directive: '%s',  pool_id: %u ratePoolObjects: %f", directive.c_str(), pool_id, ratePoolObjects);
+                            break; // last check, if it got this far we have a match
+                        }
+                        else scalePoolObjects = 1.0f; // not a match, reset rate in case this is last item
+                    }
+                }
+                pPoolTemplate->MaxLimit = static_cast<uint32>(pPoolTemplate->MaxLimit * ratePoolObjects);
+
                 gogroup.AddEntry(plObject, pPoolTemplate->MaxLimit);
                 SearchPair p(guid, pool_id);
                 mGameobjectSearchMap.insert(p);
