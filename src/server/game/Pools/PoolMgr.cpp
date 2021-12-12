@@ -571,6 +571,25 @@ void PoolMgr::Initialize()
     mCreatureSearchMap.clear();
 }
 
+std::vector<std::string> PoolMgr::explode(const std::string& str, const char& ch) {
+    std::string next;
+    std::vector<std::string> result;
+
+    for (std::string::const_iterator it = str.begin(); it != str.end(); it++) {
+        if (*it == ch) {
+            if (!next.empty()) {
+                result.push_back(next);
+                next.clear();
+            }
+        } else {
+            next += *it;
+        }
+    }
+    if (!next.empty())
+         result.push_back(next);
+    return result;
+}
+
 void PoolMgr::LoadFromDB()
 {
     // Pool templates

@@ -131,6 +131,8 @@ public:
     void ChangeDailyQuests();
     void ChangeWeeklyQuests();
 
+    std::vector<std::string> explode(const std::string& str, const char& ch);
+
     PooledQuestRelation mQuestCreatureRelation;
     PooledQuestRelation mQuestGORelation;
 
