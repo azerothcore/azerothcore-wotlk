@@ -494,11 +494,15 @@ void Aura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication* auraApp)
     m_applications[target->GetGUID()] = auraApp;
 
     // set infinity cooldown state for spells
-    if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
     {
-        if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid)
+        if (caster->IsPlayer())
         {
             caster->ToPlayer()->AddSpellAndCategoryCooldowns(m_spellInfo, 0, nullptr, true);
+        }
+        else
+        {
+            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, infinityCooldownDelay);
         }
     }
 }
@@ -526,6 +530,30 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
     m_removedApplications.push_back(auraApp);
 
     // reset cooldown state for spells
+    if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
+    {
+        if (caster->IsPlayer())
+        {
+            // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
+            caster->ToPlayer()->SendCooldownEvent(GetSpellInfo());
+        }
+        else
+        {
+            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+
+            if (Unit* owner = caster->GetCharmerOrOwner())
+            {
+                if (Player* playerOwner = owner->ToPlayer())
+                {
+                    WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
+                    data << uint32(m_spellInfo->Id);
+                    data << caster->GetGUID();
+                    playerOwner->SendDirectMessage(&data);
+                }
+            }
+        }
+    }
+
     if (caster && caster->GetTypeId() == TYPEID_PLAYER)
     {
         if (GetSpellInfo()->IsCooldownStartedOnEvent() && !m_castItemGuid)

@@ -70,11 +70,6 @@
 #include "WorldSession.h"
 #include <math.h>
 
-#ifdef ELUNA
-#include "ElunaEventMgr.h"
-#include "LuaEngine.h"
-#endif
-
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
     2.5f,                  // MOVE_WALK
@@ -387,9 +382,8 @@ Unit::~Unit()
 
 void Unit::Update(uint32 p_time)
 {
-#ifdef ELUNA
-    elunaEvents->Update(p_time);
-#endif
+    sScriptMgr->OnUnitUpdate(this, p_time);
+
     // WARNING! Order of execution here is important, do not change.
     // Spells must be processed with event system BEFORE they go to _UpdateSpells.
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
@@ -771,7 +765,7 @@ void Unit::DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb)
     }
 }
 
-uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool  /*allowGM*/)
+uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool /*allowGM*/, Spell const* damageSpell /*= nullptr*/)
 {
     // Xinef: initialize damage done for rage calculations
     // Xinef: its rare to modify damage in hooks, however training dummy's sets damage to 0
@@ -1032,24 +1026,33 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         {
             if (victim != attacker && victim->GetTypeId() == TYPEID_PLAYER) // does not support creature push_back
             {
-                if (damagetype != DOT)
+                if (damagetype != DOT && !(damageSpell && damageSpell->m_targets.HasDstChannel()))
+                {
                     if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
+                    {
                         if (spell->getState() == SPELL_STATE_PREPARING)
                         {
                             uint32 interruptFlags = spell->m_spellInfo->InterruptFlags;
                             if (interruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
+                            {
                                 victim->InterruptNonMeleeSpells(false);
+                            }
                             else if (interruptFlags & SPELL_INTERRUPT_FLAG_PUSH_BACK)
+                            {
                                 spell->Delayed();
+                            }
                         }
-
-                if (Spell* spell = victim->m_currentSpells[CURRENT_CHANNELED_SPELL])
-                    if (spell->getState() == SPELL_STATE_CASTING)
-                    {
-                        uint32 channelInterruptFlags = spell->m_spellInfo->ChannelInterruptFlags;
-                        if (((channelInterruptFlags & CHANNEL_FLAG_DELAY) != 0) && (damagetype != DOT))
-                            spell->DelayedChannel();
                     }
+
+                    if (Spell* spell = victim->m_currentSpells[CURRENT_CHANNELED_SPELL])
+                        if (spell->getState() == SPELL_STATE_CASTING)
+                        {
+                            if ((spell->m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_DELAY) != 0)
+                            {
+                                spell->DelayedChannel();
+                            }
+                        }
+                }
             }
         }
 
@@ -1344,7 +1347,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         damageInfo->damage = 0;
 }
 
-void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss)
+void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell /*= nullptr*/)
 {
     if (damageInfo == 0)
         return;
@@ -1366,7 +1369,7 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss)
 
     // Call default DealDamage
     CleanDamage cleanDamage(damageInfo->cleanDamage, damageInfo->absorb, BASE_ATTACK, MELEE_HIT_NORMAL);
-    Unit::DealDamage(this, victim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SpellSchoolMask(damageInfo->schoolMask), spellProto, durabilityLoss);
+    Unit::DealDamage(this, victim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SpellSchoolMask(damageInfo->schoolMask), spellProto, durabilityLoss, false, spell);
 }
 
 // TODO for melee need create structure as in
@@ -12991,10 +12994,11 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
         controlled->SetInCombatState(PvP, enemy, duration);
     }
-#ifdef ELUNA
+
     if (Player* player = this->ToPlayer())
-        sEluna->OnPlayerEnterCombat(player, enemy);
-#endif
+    {
+        sScriptMgr->OnPlayerEnterCombat(player, enemy);
+    }
 }
 
 void Unit::ClearInCombat()
@@ -13025,10 +13029,11 @@ void Unit::ClearInCombat()
             for (uint8 i = 0; i < MAX_RUNES; ++i)
                 player->SetGracePeriod(i, 0);
     }
-#ifdef ELUNA
+
     if (Player* player = this->ToPlayer())
-        sEluna->OnPlayerLeaveCombat(player);
-#endif
+    {
+        sScriptMgr->OnPlayerLeaveCombat(player);
+    }
 }
 
 void Unit::ClearInPetCombat()
@@ -17111,9 +17116,16 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (!creature->IsPet() && creature->GetLootMode() > 0)
         {
             creature->DeleteThreatList();
-            CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
-            if (cInfo && (cInfo->lootid || cInfo->maxgold > 0))
+
+            // must be after setDeathState which resets dynamic flags
+            if (!creature->loot.empty())
+            {
                 creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            }
+            else
+            {
+                creature->AllLootRemovedFromCorpse();
+            }
         }
 
         // Call KilledUnit for creatures, this needs to be called after the lootable flag is set

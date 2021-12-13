@@ -38,6 +38,7 @@
 #include "IoContext.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "ModulesScriptLoader.h"
 #include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
@@ -61,9 +62,7 @@
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+#include "ModuleMgr.h"
 
 #ifdef _WIN32
 #include "ServiceWin32.h"
@@ -196,13 +195,10 @@ int main(int argc, char** argv)
     }
 
     // Add file and args in config
-    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc), CONFIG_FILE_LIST);
+    sConfigMgr->Configure(configFile, { argv, argv + argc }, CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
-
-    // Loading modules configs
-    sConfigMgr->LoadModulesConfigs();
 
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
@@ -278,7 +274,12 @@ int main(int argc, char** argv)
     // Set process priority according to configuration settings
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
+    // Loading modules configs before scripts
+    sConfigMgr->LoadModulesConfigs();
+
     sScriptMgr->SetScriptLoader(AddScripts);
+    sScriptMgr->SetModulesLoader(AddModulesScripts);
+
     std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
     {
         sScriptMgr->Unload();
@@ -315,8 +316,7 @@ int main(int argc, char** argv)
         sMetric->Unload();
     });
 
-    // Loading modules configs
-    sConfigMgr->PrintLoadedModulesConfigs();
+    Acore::Module::SetEnableModulesList(AC_MODULES_LIST);
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -329,10 +329,6 @@ int main(int argc, char** argv)
 
         sOutdoorPvPMgr->Die();                     // unload it before MapMgr
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
-
-#ifdef ELUNA
-        Eluna::Uninitialize();
-#endif
     });
 
     // Start the Remote Access port (acceptor) if enabled
@@ -448,7 +444,7 @@ bool StartDB()
     MySQL::Library_Init();
 
     // Load databases
-    DatabaseLoader loader("server.worldserver");
+    DatabaseLoader loader("server.worldserver", DatabaseLoader::DATABASE_NONE, AC_MODULES_LIST);
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")
@@ -458,7 +454,7 @@ bool StartDB()
         return false;
 
     ///- Get the realm Id from the configuration file
-    realm.Id.Realm = sConfigMgr->GetIntDefault("RealmID", 0);
+    realm.Id.Realm = sConfigMgr->GetOption<uint32>("RealmID", 0);
     if (!realm.Id.Realm)
     {
         LOG_ERROR("server.worldserver", "Realm ID not defined in configuration file");
