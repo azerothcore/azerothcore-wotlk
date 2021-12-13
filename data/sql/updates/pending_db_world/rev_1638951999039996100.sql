@@ -16,6 +16,7 @@ INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, 
 */
 
 UPDATE `quest_template` SET `QuestCompletionLog`='Return to Bragor Bloodfist at the Royal Quarter in the Undercity.' WHERE `ID`=14352;
+UPDATE `quest_poi` SET `WorldMapAreaId`=382 WHERE `QuestID`=14352 AND `id`=0;
 UPDATE `quest_poi` SET `WorldMapAreaId`=382 WHERE `QuestID`=14352 AND `id`=1;
 UPDATE `quest_poi` SET `WorldMapAreaId`=382 WHERE `QuestID`=14353 AND `id`=0;
 
