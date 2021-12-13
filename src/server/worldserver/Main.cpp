@@ -195,13 +195,10 @@ int main(int argc, char** argv)
     }
 
     // Add file and args in config
-    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc), CONFIG_FILE_LIST);
+    sConfigMgr->Configure(configFile, { argv, argv + argc }, CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
-
-    // Loading modules configs
-    sConfigMgr->LoadModulesConfigs();
 
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
@@ -277,6 +274,9 @@ int main(int argc, char** argv)
     // Set process priority according to configuration settings
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
+    // Loading modules configs before scripts
+    sConfigMgr->LoadModulesConfigs();
+
     sScriptMgr->SetScriptLoader(AddScripts);
     sScriptMgr->SetModulesLoader(AddModulesScripts);
 
@@ -317,9 +317,6 @@ int main(int argc, char** argv)
     });
 
     Acore::Module::SetEnableModulesList(AC_MODULES_LIST);
-
-    // Loading modules configs
-    sConfigMgr->PrintLoadedModulesConfigs();
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -457,7 +454,7 @@ bool StartDB()
         return false;
 
     ///- Get the realm Id from the configuration file
-    realm.Id.Realm = sConfigMgr->GetIntDefault("RealmID", 0);
+    realm.Id.Realm = sConfigMgr->GetOption<uint32>("RealmID", 0);
     if (!realm.Id.Realm)
     {
         LOG_ERROR("server.worldserver", "Realm ID not defined in configuration file");
