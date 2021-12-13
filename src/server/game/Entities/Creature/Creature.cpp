@@ -53,10 +53,6 @@
 //  there is probably some underlying problem with imports which should properly addressed
 #include "GridNotifiersImpl.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
@@ -242,12 +238,8 @@ void Creature::AddToWorld()
         {
             GetZoneScript()->OnCreatureCreate(this);
         }
-#ifdef ELUNA
-        sEluna->OnAddToWorld(this);
 
-    if (IsGuardian() && ToTempSummon() && ToTempSummon()->GetSummonerGUID().IsPlayer())
-        sEluna->OnPetAddedToWorld(ToTempSummon()->GetSummonerUnit()->ToPlayer(), this);
-#endif
+        sScriptMgr->OnCreatureAddWorld(this);
     }
 }
 
@@ -255,9 +247,8 @@ void Creature::RemoveFromWorld()
 {
     if (IsInWorld())
     {
-#ifdef ELUNA
-        sEluna->OnRemoveFromWorld(this);
-#endif
+        sScriptMgr->OnCreatureRemoveWorld(this);
+
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
 
@@ -1802,11 +1793,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
         setActive(false);
 
-        if (!IsPet() && GetCreatureTemplate()->SkinLootId)
-            if (LootTemplates_Skinning.HaveLootFor(GetCreatureTemplate()->SkinLootId))
-                if (hasLootRecipient())
-                    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-
         if (HasSearchedAssistance())
         {
             SetNoSearchAssistance(false);
@@ -1878,6 +1864,7 @@ void Creature::Respawn(bool force)
         LOG_DEBUG("entities.unit", "Respawning creature %s (SpawnId: %u, %s)", GetName().c_str(), GetSpawnId(), GetGUID().ToString().c_str());
         m_respawnTime = 0;
         ResetPickPocketLootTime();
+        loot.clear();
 
         if (m_originalEntry != GetEntry())
             UpdateEntry(m_originalEntry);
@@ -2719,25 +2706,33 @@ void Creature::GetRespawnPosition(float& x, float& y, float& z, float* ori, floa
 
 void Creature::AllLootRemovedFromCorpse()
 {
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
+    if (loot.loot_type != LOOT_SKINNING && !IsPet() && GetCreatureTemplate()->SkinLootId && hasLootRecipient())
     {
-        time_t now = time(nullptr);
-        if (m_corpseRemoveTime <= now)
-            return;
+        if (LootTemplates_Skinning.HaveLootFor(GetCreatureTemplate()->SkinLootId))
+        {
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+        }
+    }
 
-        float decayRate;
-        CreatureTemplate const* cinfo = GetCreatureTemplate();
+    time_t now = time(nullptr);
+    if (m_corpseRemoveTime <= now)
+    {
+        return;
+    }
 
-        decayRate = sWorld->getRate(RATE_CORPSE_DECAY_LOOTED);
-        uint32 diff = uint32((m_corpseRemoveTime - now) * decayRate);
+    float decayRate = sWorld->getRate(RATE_CORPSE_DECAY_LOOTED);
+    uint32 diff = uint32((m_corpseRemoveTime - now) * decayRate);
 
-        m_respawnTime -= diff;
+    m_respawnTime -= diff;
 
-        // corpse skinnable, but without skinning flag, and then skinned, corpse will despawn next update
-        if (cinfo && cinfo->SkinLootId)
-            m_corpseRemoveTime = time(nullptr);
-        else
-            m_corpseRemoveTime -= diff;
+    // corpse skinnable, but without skinning flag, and then skinned, corpse will despawn next update
+    if (loot.loot_type == LOOT_SKINNING)
+    {
+        m_corpseRemoveTime = time(nullptr);
+    }
+    else
+    {
+        m_corpseRemoveTime -= diff;
     }
 }
 
