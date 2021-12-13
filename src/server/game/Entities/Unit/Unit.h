@@ -1603,7 +1603,7 @@ public:
     void SetFaction(uint32 faction);
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
 
-    ReputationRank GetReactionTo(Unit const* target) const;
+    ReputationRank GetReactionTo(Unit const* target, bool checkOriginalFaction = false) const;
     ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, Unit const* target) const;
 
     bool IsHostileTo(Unit const* unit) const;
