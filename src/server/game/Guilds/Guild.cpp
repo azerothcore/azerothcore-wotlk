@@ -2268,6 +2268,17 @@ bool Guild::ChangeMemberRank(ObjectGuid guid, uint8 newRank)
         if (Member* member = GetMember(guid))
         {
             member->ChangeRank(newRank);
+
+            if (newRank == GR_GUILDMASTER)
+            {
+                m_leaderGuid = guid;
+
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEADER);
+                stmt->setUInt32(0, m_leaderGuid.GetCounter());
+                stmt->setUInt32(1, m_id);
+                CharacterDatabase.Execute(stmt);
+            }
+
             return true;
         }
     return false;
