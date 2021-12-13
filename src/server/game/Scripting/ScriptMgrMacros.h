@@ -20,67 +20,48 @@
 
 #include "ScriptMgr.h"
 
-template<typename ScriptName, typename TCallBack>
-inline Optional<bool> IsValidBoolScript(TCallBack&& callback)
+template<typename ScriptName>
+inline Optional<bool> IsValidBoolScript(std::function<bool(ScriptName*)> executeHook)
 {
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
         return {};
 
     for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
     {
-        if (callback(script))
+        if (executeHook(script))
             return true;
     }
 
     return false;
 }
 
-template<class ScriptName, class T, typename TCallBack>
-inline void GetReturnIndexScripts([[maybe_unused]] T* ret, TCallBack&& callback)
+template<typename ScriptName, class T>
+inline T* GetReturnAIScript(std::function<T*(ScriptName*)> executeHook)
+{
+    if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
+        return nullptr;
+
+    for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
+    {
+        if (T* scriptAI = executeHook(script))
+        {
+            return scriptAI;
+        }
+    }
+
+    return nullptr;
+}
+
+template<typename ScriptName>
+inline void ExecuteScript(std::function<void(ScriptName*)> executeHook)
 {
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
         return;
 
     for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
     {
-        if (T* scriptAI = callback(script))
-        {
-            ret = scriptAI;
-            break;
-        }
+        executeHook(script);
     }
 }
-
-// Utility macros to refer to the script registry.
-#define SCR_REG_MAP(T) ScriptRegistry<T>::ScriptMap
-#define SCR_REG_ITR(T) ScriptRegistry<T>::ScriptMapIterator
-#define SCR_REG_LST(T) ScriptRegistry<T>::ScriptPointerList
-
-// Utility macros for looping over scripts.
-#define FOR_SCRIPTS(T, C, E) \
-    if (!SCR_REG_LST(T).empty()) \
-        for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
-            C != SCR_REG_LST(T).end(); ++C)
-
-#define FOR_SCRIPTS_RET(T, C, E, R) \
-    if (SCR_REG_LST(T).empty()) \
-        return R; \
-    for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
-        C != SCR_REG_LST(T).end(); ++C)
-
-#define FOREACH_SCRIPT(T) \
-    FOR_SCRIPTS(T, itr, end) \
-    itr->second
-
-// Utility macros for finding specific scripts.
-#define GET_SCRIPT(T, I, V) \
-    T* V = ScriptRegistry<T>::GetScriptById(I); \
-    if (!V) \
-        return;
-
-#define GET_SCRIPT_RET(T, I, V, R) \
-    T* V = ScriptRegistry<T>::GetScriptById(I); \
-    if (!V) \
-        return R;
 
 #endif // _SCRIPT_MGR_MACRO_H_
