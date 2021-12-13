@@ -796,12 +796,15 @@ public:
 };
 
 /*######
-## go_gilded_brazier (Paladin First Trail quest (9678))
+## go_gilded_brazier (Paladin quest 9678 "The First Trial")
 ######*/
 
 enum GildedBrazier
 {
-    NPC_STILLBLADE  = 17716,
+    EVENT_STILLBLADE_SPAWN = 1,
+    EVENT_RESET_BRAZIER    = 2,
+    NPC_STILLBLADE         = 17716,
+    QUEST_THE_FIRST_TRIAL  = 9678
 };
 
 class go_gilded_brazier : public GameObjectScript
@@ -809,17 +812,73 @@ class go_gilded_brazier : public GameObjectScript
 public:
     go_gilded_brazier() : GameObjectScript("go_gilded_brazier") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_gilded_brazierAI : public GameObjectAI
     {
-        if (go->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
+        go_gilded_brazierAI(GameObject* go) : GameObjectAI(go)
         {
-            if (player->GetQuestStatus(9678) == QUEST_STATUS_INCOMPLETE)
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _playerGUID.Clear();
+        }
+
+        bool GossipHello(Player* player, bool reportUse) override
+        {
+            if (reportUse)
+                return false;
+
+            if (me->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
             {
-                if (Creature* Stillblade = player->SummonCreature(NPC_STILLBLADE, 8106.11f, -7542.06f, 151.775f, 3.02598f, TEMPSUMMON_DEAD_DESPAWN, 60000))
-                    Stillblade->AI()->AttackStart(player);
+                if (player->GetQuestStatus(QUEST_THE_FIRST_TRIAL) == QUEST_STATUS_INCOMPLETE)
+                {
+                    _playerGUID = player->GetGUID();
+                    me->SetFlag(GAMEOBJECT_FLAGS, 1);
+                    me->RemoveByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
+                    _events.ScheduleEvent(EVENT_STILLBLADE_SPAWN, 1000);
+                }
+            }
+            return true;
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_STILLBLADE_SPAWN:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                    {
+                        player->SummonCreature(NPC_STILLBLADE, 8032.587f, -7524.518f, 149.68073f, 6.161012172698974609f, TEMPSUMMON_DEAD_DESPAWN, 60000);
+                        _events.ScheduleEvent(EVENT_RESET_BRAZIER, 4000);
+                    }
+                    break;
+                }
+                case EVENT_RESET_BRAZIER:
+                {
+                    me->RemoveFlag(GAMEOBJECT_FLAGS, 1);
+                    me->SetByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
+                    break;
+                }
+                default:
+                    break;
+                }
             }
         }
-        return true;
+
+    private:
+        EventMap _events;
+        ObjectGuid _playerGUID;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_gilded_brazierAI(go);
     }
 };
 
