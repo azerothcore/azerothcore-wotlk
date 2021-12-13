@@ -26,9 +26,9 @@
     // Needed for _findfirst
 #   include <io.h>
 #  ifdef __MINGW32__
-#    define stat64 stat
+#    define stat stat
 #  else
-#    define stat64 _stat64
+#    define stat _stat
 #  endif
 #else
 #   include <dirent.h>
@@ -580,8 +580,8 @@ bool FileSystem::_isNewer(const std::string& _src, const std::string& _dst) {
 int64 FileSystem::_size(const std::string& _filename) {
     const std::string& filename = FilePath::canonicalize(FilePath::expandEnvironmentVariables(_filename));
 
-    struct stat64 st;
-    int result = stat64(filename.c_str(), &st);
+    struct stat st;
+    int result = stat(filename.c_str(), &st);
     
     if (result == -1) {
 #if _HAVE_ZIP /* G3DFIX: Use ZIP-library only if defined */
