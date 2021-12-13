@@ -490,6 +490,8 @@ void Pet::Update(uint32 diff)
                                 GetCharmInfo()->SetIsReturning(false);
                                 GetCharmInfo()->SaveStayPosition(true);
 
+                                AddSpellCooldown(tempspell, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
+
                                 CastSpell(tempspellTarget, tempspell, false);
                                 m_tempspell = 0;
                                 m_tempspellTarget = nullptr;
@@ -509,13 +511,18 @@ void Pet::Update(uint32 diff)
                                     }
                                     else
                                     {
-                                        GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-                                        GetCharmInfo()->SetIsCommandAttack(false);
-                                        GetCharmInfo()->SetIsAtStay(false);
-                                        GetCharmInfo()->SetIsReturning(true);
-                                        GetCharmInfo()->SetIsCommandFollow(true);
-                                        GetCharmInfo()->SetIsFollowing(false);
-                                        GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                                        if (IsAIEnabled)
+                                            AI()->PetStopAttack();
+                                        else
+                                        {
+                                            GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                                            GetCharmInfo()->SetIsCommandAttack(false);
+                                            GetCharmInfo()->SetIsAtStay(false);
+                                            GetCharmInfo()->SetIsReturning(true);
+                                            GetCharmInfo()->SetIsCommandFollow(true);
+                                            GetCharmInfo()->SetIsFollowing(false);
+                                            GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                                        }
                                     }
 
                                     m_tempoldTarget = nullptr;
