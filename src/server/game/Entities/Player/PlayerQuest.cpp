@@ -1401,18 +1401,26 @@ QuestStatus Player::GetQuestStatus(uint32 quest_id) const
     if (quest_id)
     {
         QuestStatusMap::const_iterator itr = m_QuestStatus.find(quest_id);
+
         if (itr != m_QuestStatus.end())
+        {
             return itr->second.Status;
+        }
 
         if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id))
         {
             if (qInfo->IsSeasonal())
+            {
                 return SatisfyQuestSeasonal(qInfo, false) ? QUEST_STATUS_NONE : QUEST_STATUS_REWARDED;
+            }
 
             if (!qInfo->IsRepeatable() && IsQuestRewarded(quest_id))
+            {
                 return QUEST_STATUS_REWARDED;
+            }
         }
     }
+
     return QUEST_STATUS_NONE;
 }
 
@@ -1603,20 +1611,9 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         QuestStatus status = GetQuestStatus(questId);
         if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
         {
-            if (quest->IsRepeatable() && quest->IsDailyOrWeekly())
+            if (quest->IsRepeatable() || quest->IsDailyOrWeekly())
             {
-                if (quest->IsAutoComplete())
-                {
-                    result2 = DIALOG_STATUS_AVAILABLE_REP;
-                }
-                else
-                {
-                    result2 = DIALOG_STATUS_REWARD_REP;
-                }
-            }
-            else if (quest->IsAutoComplete())
-            {
-                result2 = DIALOG_STATUS_AVAILABLE;
+                 result2 = DIALOG_STATUS_REWARD_REP;
             }
             else
             {
