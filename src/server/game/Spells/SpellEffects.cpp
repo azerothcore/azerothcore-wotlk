@@ -3167,7 +3167,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         m_caster->ToPlayer()->PetSpellInitialize();
     }
 }
@@ -3245,19 +3245,45 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
         }
 
         if (owner->GetTypeId() == TYPEID_PLAYER)
-            owner->ToPlayer()->RemovePet(OldSummon, (OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT), false);
+            owner->ToPlayer()->RemovePet(OldSummon, PET_SAVE_NOT_IN_SLOT, false);
         else
             return;
     }
 
     float x, y, z;
     owner->GetClosePoint(x, y, z, owner->GetObjectSize());
-    owner->SummonPet(petentry, x, y, z, owner->GetOrientation(), SUMMON_PET, 0, m_spellInfo->Id, m_caster->GetGUID(), PET_LOAD_SUMMON_PET);
-    //if (!pet)
-    //    return;
+    Pet* pet = owner->SummonPet(petentry, x, y, z, owner->GetOrientation(), SUMMON_PET);
+    if (!pet)
+        return;
 
-    // xinef: cant execute this... :( hope nothing relevant gets bugged
-    //ExecuteLogEffectSummonObject(effIndex, pet);
+    if (m_caster->GetTypeId() == TYPEID_UNIT)
+    {
+        if (m_caster->ToCreature()->IsTotem())
+            pet->SetReactState(REACT_AGGRESSIVE);
+        else
+            pet->SetReactState(REACT_DEFENSIVE);
+    }
+
+    pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
+
+    // Reset cooldowns
+    if (owner->getClass() != CLASS_HUNTER)
+    {
+        pet->m_CreatureSpellCooldowns.clear();
+        owner->PetSpellInitialize();
+    }
+
+    // Set health to max if new pet is summoned
+    // in this function old pet is saved with current health eg. 20% and new one is loaded from db with same amount
+    // pet should have full health
+    pet->SetHealth(pet->GetMaxHealth());
+
+    // generate new name for summon pet
+    std::string new_name = sObjectMgr->GeneratePetName(petentry);
+    if (!new_name.empty())
+        pet->SetName(new_name);
+
+    // ExecuteLogEffectSummonObject(effectInfo->EffectIndex, pet);
 }
 
 void Spell::EffectLearnPetSpell(SpellEffIndex effIndex)
@@ -3282,7 +3308,7 @@ void Spell::EffectLearnPetSpell(SpellEffIndex effIndex)
         return;
 
     pet->learnSpell(learn_spellproto->Id);
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
     pet->GetOwner()->PetSpellInitialize();
 }
 
@@ -5403,7 +5429,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     player->GetPosition(x, y, z);
     if (!pet)
     {
-        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET);
+        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET);
         return;
     }
 
@@ -5422,7 +5448,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
         pet->GetCharmInfo()->SetIsFollowing(false);
     }
 
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
 void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
@@ -6041,7 +6067,7 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
     {
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         unitTarget->ToPlayer()->PetSpellInitialize();
     }
 }

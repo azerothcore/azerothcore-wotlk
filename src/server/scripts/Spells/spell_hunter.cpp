@@ -947,7 +947,20 @@ class spell_hun_tame_beast : public SpellScript
                 return SPELL_FAILED_DONT_REPORT;
             }
 
-            if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->IsPetDismissed() || player->GetCharmGUID())
+            PetStable const* petStable = player->GetPetStable();
+            if (petStable)
+            {
+                if (petStable->CurrentPet)
+                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+
+                if (petStable->GetUnslottedHunterPet())
+                {
+                    caster->SendTameFailure(PET_TAME_TOO_MANY);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+            }
+
+            if (player->GetCharmGUID())
             {
                 player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                 return SPELL_FAILED_DONT_REPORT;

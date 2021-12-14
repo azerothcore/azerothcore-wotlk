@@ -5922,21 +5922,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_RESURRECT_PET:
                 {
-                    if (Creature* pet = m_caster->GetGuardianPet())
-                    {
-                        if (pet->IsAlive())
-                        {
-                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-                        }
-                    }
-                    else if (Player* player = m_caster->ToPlayer())
-                    {
-                        SpellCastResult loadResult = Pet::TryLoadFromDB(player, false, MAX_PET_TYPE, true);
-                        if (loadResult != SPELL_CAST_OK)
-                        {
-                            return loadResult;
-                        }
-                    }
+                    Unit* unitCaster = m_caster->ToUnit();
+                    if (!unitCaster)
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    Creature* pet = unitCaster->GetGuardianPet();
+                    if (pet && pet->IsAlive())
+                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
                     break;
                 }
@@ -5972,6 +5964,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_SUMMON_PET:
                 {
+                    Unit* unitCaster = m_caster->ToUnit();
+                    if (!unitCaster)
+                        return SPELL_FAILED_BAD_TARGETS;
+
                     if (!m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET_FIRST))
                     {
                         if (m_caster->GetPetGUID())
@@ -5983,6 +5979,40 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK && strict)
                         if (Pet* pet = m_caster->ToPlayer()->GetPet())
                             pet->CastSpell(pet, 32752, true, nullptr, nullptr, pet->GetGUID()); //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
+
+                    Player* playerCaster = unitCaster->ToPlayer();
+                    if (playerCaster && playerCaster->GetPetStable())
+                    {
+                        std::pair<PetStable::PetInfo const*, PetSaveMode> info = Pet::GetLoadPetInfo(*playerCaster->GetPetStable(), m_spellInfo->Effects[i].MiscValue, 0, false);
+                        if (info.first)
+                        {
+                            if (info.first->Type == HUNTER_PET)
+                            {
+                                if (!info.first->Health)
+                                {
+                                    playerCaster->SendTameFailure(PET_TAME_DEAD);
+                                    return SPELL_FAILED_DONT_REPORT;
+                                }
+
+                                CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(info.first->CreatureId);
+                                if (!creatureInfo || !creatureInfo->IsTameable(playerCaster->CanTameExoticPets()))
+                                {
+                                    // if problem in exotic pet
+                                    if (creatureInfo && creatureInfo->IsTameable(true))
+                                        playerCaster->SendTameFailure(PET_TAME_CANT_CONTROL_EXOTIC);
+                                    else
+                                        playerCaster->SendTameFailure(PET_TAME_NOPET_AVAILABLE);
+
+                                    return SPELL_FAILED_DONT_REPORT;
+                                }
+                            }
+                        }
+                        else if (!m_spellInfo->Effects[i].MiscValue) // when miscvalue is present it is allowed to create new pets
+                        {
+                            playerCaster->SendTameFailure(PET_TAME_NOPET_AVAILABLE);
+                            return SPELL_FAILED_DONT_REPORT;
+                        }
+                    }
                     break;
                 }
             case SPELL_EFFECT_SUMMON_PLAYER:
