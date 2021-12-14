@@ -136,9 +136,9 @@ enum Entries
     SPELL_HEALING_POTION         = 17534
 };
 
-struct npc_Apothecary_Hanes : public npc_escortAI
+struct npc_apothecary_hanes : public npc_escortAI
 {
-    npc_Apothecary_Hanes(Creature* creature) : npc_escortAI(creature) { }
+    npc_apothecary_hanes(Creature* creature) : npc_escortAI(creature) { }
     uint32 PotTimer;
 
     void Reset() override
