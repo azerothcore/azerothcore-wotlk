@@ -39,6 +39,8 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
 
         return true;
     }
+
+    return false;
 }
 
 bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action)
@@ -60,6 +62,8 @@ bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, ui
 
         return true;
     }
+
+    return false;
 }
 
 bool ScriptMgr::OnGossipSelectCode(Player* player, GameObject* go, uint32 sender, uint32 action, const char* code)
@@ -82,6 +86,8 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, GameObject* go, uint32 sender
 
         return true;
     }
+
+    return false;
 }
 
 bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest)
@@ -105,6 +111,8 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
 
         return true;
     }
+
+    return false;
 }
 
 bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest, uint32 opt)
@@ -129,6 +137,8 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
 
         return true;
     }
+
+    return false;
 }
 
 uint32 ScriptMgr::GetDialogStatus(Player* player, GameObject* go)
