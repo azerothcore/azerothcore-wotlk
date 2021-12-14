@@ -679,6 +679,14 @@ struct SmartAction
 
         struct
         {
+            uint32 groupId;
+            uint32 minDelay;
+            uint32 maxDelay;
+            uint32 spawnflags;
+        } groupSpawn;
+
+        struct
+        {
             uint32 sound;
             uint32 onlySelf;
             uint32 type;
@@ -1287,6 +1295,14 @@ struct SmartAction
             uint32 param6;
         } raw;
     };
+};
+
+enum SMARTAI_SPAWN_FLAGS
+{
+    SMARTAI_SPAWN_FLAG_NONE = 0x00,
+    SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN = 0x01,
+    SMARTAI_SPAWN_FLAG_FORCE_SPAWN = 0x02,
+    SMARTAI_SPAWN_FLAG_NOSAVE_RESPAWN = 0x04,
 };
 
 enum SMARTAI_TEMPLATE

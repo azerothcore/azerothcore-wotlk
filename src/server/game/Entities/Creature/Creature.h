@@ -67,6 +67,7 @@ public:
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
+    bool IsSpawnedOnTransport() const { return m_creatureData && m_creatureData->spawnPoint.GetMapId() != GetMapId(); }
 
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
     [[nodiscard]] uint32 GetCorpseDelay() const { return m_corpseDelay; }
@@ -201,8 +202,8 @@ public:
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 
-    bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, true, allowDuplicate); }
-    bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool gridLoad = false, bool allowDuplicate = false);
+    bool LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool allowDuplicate);
+
     void SaveToDB();
     // overriden in Pet
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
@@ -275,7 +276,7 @@ public:
     [[nodiscard]] time_t GetRespawnTimeEx() const;
     void SetRespawnTime(uint32 respawn) { m_respawnTime = respawn ? time(nullptr) + respawn : 0; }
     void Respawn(bool force = false);
-    void SaveRespawnTime() override;
+    void SaveRespawnTime(uint32 forceDelay = 0, bool savetodb = true) override;
 
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelay; }
     void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
@@ -349,6 +350,10 @@ public:
     [[nodiscard]] uint32 GetOriginalEntry() const { return m_originalEntry; }
     void SetOriginalEntry(uint32 entry) { m_originalEntry = entry; }
 
+    // There's many places not ready for dynamic spawns. This allows them to live on for now.
+    void SetRespawnCompatibilityMode(bool mode = true) { m_respawnCompatibilityMode = mode; }
+    bool GetRespawnCompatibilityMode() { return m_respawnCompatibilityMode; }
+
     static float _GetDamageMod(int32 Rank);
 
     float m_SightDistance, m_CombatDistance;
@@ -366,6 +371,8 @@ public:
     [[nodiscard]] std::shared_ptr<time_t> const& GetLastDamagedTimePtr() const;
     void SetLastDamagedTime(time_t val);
     void SetLastDamagedTimePtr(std::shared_ptr<time_t> const& val);
+
+    bool IsEscortNPC(bool onlyIfActive = true);
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -450,6 +457,7 @@ private:
     //Formation var
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
+    bool m_respawnCompatibilityMode;
 
     mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 

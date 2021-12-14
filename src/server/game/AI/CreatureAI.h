@@ -126,6 +126,10 @@ public:
     virtual void AttackedBy(Unit* /*attacker*/) {}
     virtual bool IsEscorted() { return false; }
 
+    // Should return true if the NPC is target of an escort quest
+    // If onlyIfActive is set, should return true only if the escort quest is currently active
+    virtual bool IsEscortNPC(bool /*onlyIfActive*/) const { return false; }
+
     // Called when creature is spawned or respawned (for reseting variables)
     virtual void JustRespawned() { Reset(); }
 

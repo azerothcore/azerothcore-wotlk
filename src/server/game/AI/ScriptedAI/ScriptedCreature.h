@@ -445,6 +445,8 @@ public:
     void EnterCombat(Unit* /*who*/) override { _EnterCombat(); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
     void JustReachedHome() override { _JustReachedHome(); }
+    void _DespawnAtEvade(Seconds delayToRespawn, Creature* who = nullptr);
+    void _DespawnAtEvade(uint32 delayToRespawn = 30, Creature* who = nullptr) { _DespawnAtEvade(Seconds(delayToRespawn), who); }
 
 protected:
     void _Reset();

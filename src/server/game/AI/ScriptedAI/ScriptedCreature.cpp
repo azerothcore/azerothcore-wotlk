@@ -542,8 +542,35 @@ void BossAI::_Reset()
     me->ResetLootMode();
     events.Reset();
     summons.DespawnAll();
-    if (instance)
+    if (instance && instance->GetBossState(_bossId) != DONE)
+    {
         instance->SetBossState(_bossId, NOT_STARTED);
+    }
+}
+
+void BossAI::_DespawnAtEvade(Seconds delayToRespawn, Creature* who)
+{
+    if (delayToRespawn < Seconds(2))
+    {
+        LOG_ERROR("scripts", "_DespawnAtEvade called with delay of %ld seconds, defaulting to 2.", delayToRespawn.count());
+        delayToRespawn = Seconds(2);
+    }
+
+    if (!who) { who = me; }
+
+    if (TempSummon* whoSummon = who->ToTempSummon())
+    {
+        LOG_ERROR("scripts", "_DespawnAtEvade called on a temporary summon.");
+        whoSummon->UnSummon();
+        return;
+    }
+
+    who->DespawnOrUnsummon(Milliseconds(0), Seconds(delayToRespawn));
+
+    if (instance && who == me)
+    {
+        instance->SetBossState(_bossId, FAIL);
+    }
 }
 
 void BossAI::_JustDied()

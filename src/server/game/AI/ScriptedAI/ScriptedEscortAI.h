@@ -105,7 +105,8 @@ public:
     void SetDespawnAtFar(bool despawn) { DespawnAtFar = despawn; }
     bool GetAttack() { return m_bIsActiveAttacker; }//used in EnterEvadeMode override
     void SetCanAttack(bool attack) { m_bIsActiveAttacker = attack; }
-    ObjectGuid GetEventStarterGUID() { return m_uiPlayerGUID; }
+    ObjectGuid GetEventStarterGUID() const { return m_uiPlayerGUID; }
+    virtual bool IsEscortNPC(bool isEscorting) const override;
 
     void AddEscortState(uint32 escortState) { m_uiEscortState |= escortState; }
     void RemoveEscortState(uint32 escortState) { m_uiEscortState &= ~escortState; }
