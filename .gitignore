@@ -7,6 +7,9 @@
 /modules/*
 !/modules/*.md
 !/modules/*.sh
+!/modules/CMakeLists.txt
+!/modules/*.h
+!/modules/*.cmake
 /build*/
 /var/*
 !/var/build/.gitkeep

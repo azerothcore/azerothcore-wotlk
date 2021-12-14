@@ -281,9 +281,13 @@ void BattlegroundAB::NodeDeoccupied(uint8 node)
     --_controlledPoints[_capturePointInfo[node]._ownerTeamId];
 
     _capturePointInfo[node]._ownerTeamId = TEAM_NEUTRAL;
-    RelocateDeadPlayers(BgCreatures[node]);
 
-    DelCreature(node); // Delete spirit healer
+    _reviveEvents.AddEventAtOffset([this, node]()
+    {
+        RelocateDeadPlayers(BgCreatures[node]);
+        DelCreature(node); // Delete spirit healer
+    }, 500ms);
+
     DelCreature(BG_AB_ALL_NODES_COUNT + node); // Delete aura trigger
 }
 
