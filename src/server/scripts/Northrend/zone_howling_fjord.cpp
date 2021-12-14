@@ -35,119 +35,95 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
-// Ours
-class npc_attracted_reef_bull : public CreatureScript
+struct npc_attracted_reef_bull : public NullCreatureAI
 {
-public:
-    npc_attracted_reef_bull() : CreatureScript("npc_attracted_reef_bull") { }
-
-    struct npc_attracted_reef_bullAI : public NullCreatureAI
+    npc_attracted_reef_bull(Creature* creature) : NullCreatureAI(creature)
     {
-        npc_attracted_reef_bullAI(Creature* creature) : NullCreatureAI(creature)
+        me->SetDisableGravity(true);
+        if (me->IsSummon())
+            if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
+                me->GetMotionMaster()->MovePoint(0, *owner);
+    }
+
+    void MovementInform(uint32  /*type*/, uint32  /*id*/) override
+    {
+        if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
         {
-            me->SetDisableGravity(true);
+            me->CastSpell(me, 44460, true);
+            me->DespawnOrUnsummon(10000);
+            cow->CastSpell(cow, 44460, true);
+            cow->DespawnOrUnsummon(10000);
             if (me->IsSummon())
                 if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
-                    me->GetMotionMaster()->MovePoint(0, *owner);
+                    owner->CastSpell(owner, 44463, true);
         }
+    }
 
-        void MovementInform(uint32  /*type*/, uint32  /*id*/) override
-        {
-            if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
-            {
-                me->CastSpell(me, 44460, true);
-                me->DespawnOrUnsummon(10000);
-                cow->CastSpell(cow, 44460, true);
-                cow->DespawnOrUnsummon(10000);
-                if (me->IsSummon())
-                    if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
-                        owner->CastSpell(owner, 44463, true);
-            }
-        }
-
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
-        {
-            if (caster && spellInfo->Id == 44454)
-                me->GetMotionMaster()->MovePoint(0, *caster);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
     {
-        return new npc_attracted_reef_bullAI(creature);
+        if (caster && spellInfo->Id == 44454)
+            me->GetMotionMaster()->MovePoint(0, *caster);
     }
 };
 
-class npc_your_inner_turmoil : public CreatureScript
+struct npc_your_inner_turmoil : public ScriptedAI
 {
-public:
-    npc_your_inner_turmoil() : CreatureScript("npc_your_inner_turmoil") { }
+    npc_your_inner_turmoil(Creature* creature) : ScriptedAI(creature) {}
 
-    struct npc_your_inner_turmoilAI : public ScriptedAI
+    uint32 timer;
+    short phase;
+
+    void Reset() override
     {
-        npc_your_inner_turmoilAI(Creature* creature) : ScriptedAI(creature) {}
+        timer = 0;
+        phase = 0;
+    }
 
-        uint32 timer;
-        short phase;
-
-        void Reset() override
+    void UpdateAI(uint32 diff) override
+    {
+        if (timer >= 6000 && phase < 4)
         {
+            phase++;
+            setphase(phase);
             timer = 0;
-            phase = 0;
         }
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (timer >= 6000 && phase < 4)
-            {
-                phase++;
-                setphase(phase);
-                timer = 0;
-            }
+        timer += diff;
 
-            timer += diff;
+        DoMeleeAttackIfReady();
+    }
 
-            DoMeleeAttackIfReady();
-        }
-
-        void setphase(short newPhase)
-        {
-            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
-            if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            switch (newPhase)
-            {
-                case 1:
-                    me->Whisper("You think that you can get rid of me through meditation?", LANG_UNIVERSAL, summoner->ToPlayer());
-                    return;
-                case 2:
-                    me->Whisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", LANG_UNIVERSAL, summoner->ToPlayer());
-                    return;
-                case 3:
-                    me->Whisper("You cannot defeat me. I'm an inseparable part of you!", LANG_UNIVERSAL, summoner->ToPlayer());
-                    return;
-                case 4:
-                    me->Whisper("NOOOOOOOoooooooooo!", LANG_UNIVERSAL, summoner->ToPlayer());
-                    me->SetLevel(summoner->getLevel());
-                    me->SetFaction(FACTION_MONSTER);
-                    if (me->GetExactDist(summoner) < 50.0f)
-                    {
-                        me->UpdatePosition(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), 0.0f, true);
-                        summoner->CastSpell(me, 50218, true); // clone caster
-                        AttackStart(summoner);
-                    }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void setphase(short newPhase)
     {
-        return new npc_your_inner_turmoilAI(creature);
+        Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
+        if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        switch (newPhase)
+        {
+            case 1:
+                me->Whisper("You think that you can get rid of me through meditation?", LANG_UNIVERSAL, summoner->ToPlayer());
+                return;
+            case 2:
+                me->Whisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", LANG_UNIVERSAL, summoner->ToPlayer());
+                return;
+            case 3:
+                me->Whisper("You cannot defeat me. I'm an inseparable part of you!", LANG_UNIVERSAL, summoner->ToPlayer());
+                return;
+            case 4:
+                me->Whisper("NOOOOOOOoooooooooo!", LANG_UNIVERSAL, summoner->ToPlayer());
+                me->SetLevel(summoner->getLevel());
+                me->SetFaction(FACTION_MONSTER);
+                if (me->GetExactDist(summoner) < 50.0f)
+                {
+                    me->UpdatePosition(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), 0.0f, true);
+                    summoner->CastSpell(me, 50218, true); // clone caster
+                    AttackStart(summoner);
+                }
+        }
     }
 };
 
-// Theirs
 /*######
 ## npc_apothecary_hanes
 ######*/
@@ -160,10 +136,22 @@ enum Entries
     SPELL_HEALING_POTION         = 17534
 };
 
-class npc_apothecary_hanes : public CreatureScript
+struct npc_Apothecary_Hanes : public npc_escortAI
 {
-public:
-    npc_apothecary_hanes() : CreatureScript("npc_apothecary_hanes") { }
+    npc_Apothecary_Hanes(Creature* creature) : npc_escortAI(creature) { }
+    uint32 PotTimer;
+
+    void Reset() override
+    {
+        SetDespawnAtFar(false);
+        PotTimer = 10000; //10 sec cooldown on potion
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Player* player = GetPlayerForEscort())
+            player->FailQuest(QUEST_TRAIL_OF_FIRE);
+    }
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
@@ -175,91 +163,68 @@ public:
         return true;
     }
 
-    struct npc_Apothecary_HanesAI : public npc_escortAI
+    void UpdateEscortAI(uint32 diff) override
     {
-        npc_Apothecary_HanesAI(Creature* creature) : npc_escortAI(creature) { }
-        uint32 PotTimer;
-
-        void Reset() override
+        if (HealthBelowPct(75))
         {
-            SetDespawnAtFar(false);
-            PotTimer = 10000; //10 sec cooldown on potion
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_TRAIL_OF_FIRE);
-        }
-
-        void UpdateEscortAI(uint32 diff) override
-        {
-            if (HealthBelowPct(75))
+            if (PotTimer <= diff)
             {
-                if (PotTimer <= diff)
-                {
-                    DoCast(me, SPELL_HEALING_POTION, true);
-                    PotTimer = 10000;
-                }
-                else PotTimer -= diff;
+                DoCast(me, SPELL_HEALING_POTION, true);
+                PotTimer = 10000;
             }
-            if (GetAttack() && UpdateVictim())
-                DoMeleeAttackIfReady();
+            else PotTimer -= diff;
         }
+        if (GetAttack() && UpdateVictim())
+            DoMeleeAttackIfReady();
+    }
 
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 1:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    SetRun(true);
-                    break;
-                case 23:
-                    player->GroupEventHappens(QUEST_TRAIL_OF_FIRE, me);
-                    me->DespawnOrUnsummon();
-                    break;
-                case 5:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(false);
-                    break;
-                case 6:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(true);
-                    break;
-                case 8:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(false);
-                    break;
-                case 9:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    break;
-                case 10:
-                    SetRun(true);
-                    break;
-                case 13:
-                    SetRun(false);
-                    break;
-                case 14:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(true);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void WaypointReached(uint32 waypointId) override
     {
-        return new npc_Apothecary_HanesAI(creature);
+        Player* player = GetPlayerForEscort();
+        if (!player)
+            return;
+
+        switch (waypointId)
+        {
+            case 1:
+                me->SetReactState(REACT_AGGRESSIVE);
+                SetRun(true);
+                break;
+            case 23:
+                player->GroupEventHappens(QUEST_TRAIL_OF_FIRE, me);
+                me->DespawnOrUnsummon();
+                break;
+            case 5:
+                if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
+                    Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
+                SetRun(false);
+                break;
+            case 6:
+                if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
+                    Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
+                SetRun(true);
+                break;
+            case 8:
+                if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
+                    Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
+                SetRun(false);
+                break;
+            case 9:
+                if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
+                    Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
+                break;
+            case 10:
+                SetRun(true);
+                break;
+            case 13:
+                SetRun(false);
+                break;
+            case 14:
+                if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
+                    Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
+                SetRun(true);
+                break;
+        }
     }
 };
 
@@ -267,42 +232,31 @@ public:
 ## npc_plaguehound_tracker
 ######*/
 
-class npc_plaguehound_tracker : public CreatureScript
+struct npc_plaguehound_tracker : public npc_escortAI
 {
-public:
-    npc_plaguehound_tracker() : CreatureScript("npc_plaguehound_tracker") { }
+    npc_plaguehound_tracker(Creature* creature) : npc_escortAI(creature) { }
 
-    struct npc_plaguehound_trackerAI : public npc_escortAI
+    void Reset() override
     {
-        npc_plaguehound_trackerAI(Creature* creature) : npc_escortAI(creature) { }
+        ObjectGuid summonerGUID;
+        if (me->IsSummon())
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                if (summoner->GetTypeId() == TYPEID_PLAYER)
+                    summonerGUID = summoner->GetGUID();
 
-        void Reset() override
-        {
-            ObjectGuid summonerGUID;
-            if (me->IsSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                    if (summoner->GetTypeId() == TYPEID_PLAYER)
-                        summonerGUID = summoner->GetGUID();
+        if (!summonerGUID)
+            return;
 
-            if (!summonerGUID)
-                return;
+        me->SetWalk(true);
+        Start(false, false, summonerGUID);
+    }
 
-            me->SetWalk(true);
-            Start(false, false, summonerGUID);
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            if (waypointId != 26)
-                return;
-
-            me->DespawnOrUnsummon();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void WaypointReached(uint32 waypointId) override
     {
-        return new npc_plaguehound_trackerAI(creature);
+        if (waypointId != 26)
+            return;
+
+        me->DespawnOrUnsummon();
     }
 };
 
@@ -324,10 +278,9 @@ enum Razael
     GOSSIP_TEXTID_LYANA2 = 11588
 };
 
-class npc_razael_and_lyana : public CreatureScript
+struct npc_razael_and_lyana : public ScriptedAI
 {
-public:
-    npc_razael_and_lyana() : CreatureScript("npc_razael_and_lyana") { }
+    npc_razael_and_lyana(Creature* creature) : ScriptedAI(creature) { }
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -378,12 +331,9 @@ public:
 
 void AddSC_howling_fjord()
 {
-    // Ours
-    new npc_attracted_reef_bull();
-    new npc_your_inner_turmoil();
-
-    // Theirs
-    new npc_apothecary_hanes();
-    new npc_plaguehound_tracker();
-    new npc_razael_and_lyana();
+    RegisterCreatureAI(npc_attracted_reef_bull);
+    RegisterCreatureAI(npc_your_inner_turmoil);
+    RegisterCreatureAI(npc_apothecary_hanes);
+    RegisterCreatureAI(npc_plaguehound_tracker);
+    RegisterCreatureAI(npc_razael_and_lyana);
 }
