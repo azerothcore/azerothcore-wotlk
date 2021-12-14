@@ -5667,6 +5667,9 @@ bool Player::isAllowedToLoot(const Creature* creature)
     if (!loot->hasItemForAll() && !loot->hasItemFor(this)) // no loot in creature for this player
         return false;
 
+    if (loot->loot_type == LOOT_SKINNING)
+        return creature->GetLootRecipientGUID() == GetGUID();
+
     Group* thisGroup = GetGroup();
     if (!thisGroup)
         return this == creature->GetLootRecipient();
