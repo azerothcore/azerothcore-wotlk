@@ -153,7 +153,7 @@ struct npc_apothecary_hanes : public npc_escortAI
             player->FailQuest(QUEST_TRAIL_OF_FIRE);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
