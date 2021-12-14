@@ -2099,7 +2099,6 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
            && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
 }
 
-// pussywizard!
 void GameObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
 {
     dist += GetObjectSize();
