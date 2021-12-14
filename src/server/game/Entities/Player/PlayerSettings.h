@@ -20,10 +20,7 @@
 
 class Player;
 
-enum PlayerSettingSources : uint8
-{
-    SETTING_SOURCE_AC = 0
-};
+const std::string AzerothcorePSSource = "ac_default";
 
 enum CharacterSettingIndexes : uint8
 {
@@ -49,6 +46,6 @@ struct PlayerSetting
 };
 
 typedef std::vector<PlayerSetting> PlayerSettingVector;
-typedef std::map<uint32, PlayerSettingVector> PlayerSettingMap;
+typedef std::map<std::string, PlayerSettingVector> PlayerSettingMap;
 
 #endif

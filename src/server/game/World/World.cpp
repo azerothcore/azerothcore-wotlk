@@ -2589,7 +2589,7 @@ void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
 
         if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
         {
-            if (itr.second->GetPlayer()->GetPlayerSetting(SETTING_SOURCE_AC, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
             {
                 continue;
             }

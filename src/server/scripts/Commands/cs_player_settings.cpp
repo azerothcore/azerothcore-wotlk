@@ -45,17 +45,17 @@ public:
         Player* player = handler->GetPlayer();
 
         PlayerSetting setting;
-        setting = player->GetPlayerSetting(SETTING_SOURCE_AC, SETTING_ANNOUNCER_FLAGS);
+        setting = player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS);
 
         if (type == "bg")
         {
             on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_BG_QUEUE) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_BG_QUEUE);
-            player->UpdatePlayerSetting(SETTING_SOURCE_AC, SETTING_ANNOUNCER_FLAGS, setting.value);
+            player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
         }
         else if (type == "arena")
         {
             on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE);
-            player->UpdatePlayerSetting(SETTING_SOURCE_AC, SETTING_ANNOUNCER_FLAGS, setting.value);
+            player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
         }
         else if (type == "autobroadcast")
         {
@@ -66,7 +66,7 @@ public:
             }
 
             on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST);
-            player->UpdatePlayerSetting(SETTING_SOURCE_AC, SETTING_ANNOUNCER_FLAGS, setting.value);
+            player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
         }
 
         handler->SetSentErrorMessage(false);

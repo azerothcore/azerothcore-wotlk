@@ -38,7 +38,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
 
-            uint32 source = fields[0].GetUInt32();
+            std::string source = fields[0].GetString();;
             std::string data = fields[1].GetString();
 
             std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', true);
@@ -61,7 +61,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
     }
 }
 
-PlayerSetting Player::GetPlayerSetting(uint32 source, uint8 index)
+PlayerSetting Player::GetPlayerSetting(std::string source, uint8 index)
 {
     auto itr = m_charSettingsMap.find(source);
 
@@ -93,13 +93,13 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_SETTINGS);
         stmt->setUInt32(0, GetGUID().GetCounter());
-        stmt->setUInt32(1, itr.first);
+        stmt->setString(1, itr.first);
         stmt->setString(2, data.str());
         trans->Append(stmt);
     }
 }
 
-void Player::UpdatePlayerSetting(uint32 source, uint8 index, uint32 value)
+void Player::UpdatePlayerSetting(std::string source, uint8 index, uint32 value)
 {
     auto itr = m_charSettingsMap.find(source);
 

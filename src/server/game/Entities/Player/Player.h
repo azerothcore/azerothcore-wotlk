@@ -2601,8 +2601,8 @@ public:
     std::string GetPlayerName();
 
     // Settings
-    [[nodiscard]] PlayerSetting GetPlayerSetting(uint32 source, uint8 index);
-    void UpdatePlayerSetting(uint32 source, uint8 index, uint32 value);
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
+    void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
 
  protected:
     // Gamemaster whisper whitelist
