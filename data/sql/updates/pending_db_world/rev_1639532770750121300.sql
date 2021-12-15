@@ -157,6 +157,4 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (14, 3692, 3214, 0, 1, 47, 0, 994, 64, 0, 1, 0, 0, '', 'When player has not finished quest \'Escape Through Force\''),
 (14, 3692, 3214, 0, 1, 47, 0, 995, 64, 0, 1, 0, 0, '', 'When player has not finished quest \'Escape Through Stealth\'');
 
-UPDATE `quest_template` SET `Flags`= 65536 WHERE `ID` IN (993);
-
 UPDATE `creature_template` SET `npcflag`= 2 WHERE `entry`= 3694;
