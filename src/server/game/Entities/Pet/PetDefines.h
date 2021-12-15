@@ -81,15 +81,6 @@ enum PetTalk
     PET_TALK_ATTACK         = 1
 };
 
-//enum PetLoadStage
-//{
-//    PET_LOAD_DEFAULT                            = 0,
-//    PET_LOAD_HANDLE_UNSTABLE_CALLBACK           = 1, // used also in HandleStableSwapPetCallback, uses same error / ok messages
-//    PET_LOAD_BG_RESURRECT                       = 2,
-//    PET_LOAD_SUMMON_PET                         = 3,
-//    PET_LOAD_SUMMON_DEAD_PET                    = 4
-//};
-
 enum PetLoadState
 {
     PET_LOAD_OK                                 = 0,
