@@ -29,6 +29,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum DeathKnightSpells
 {
@@ -301,10 +302,35 @@ public:
     }
 };
 
+class spell_pet_dk_gargoyle_strike : public SpellScript
+{
+    PrepareSpellScript(spell_pet_dk_gargoyle_strike);
+
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+    {
+        int32 damage = 60;
+        if (Unit* caster = GetCaster())
+        {
+            if (caster->getLevel() >= 60)
+            {
+                damage += (caster->getLevel() - 60) * 4;
+            }
+        }
+
+        SetHitDamage(damage);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_deathknight_pet_scripts()
 {
     new npc_pet_dk_ebon_gargoyle();
     new npc_pet_dk_ghoul();
     new npc_pet_dk_army_of_the_dead();
     new npc_pet_dk_dancing_rune_weapon();
+    RegisterSpellScript(spell_pet_dk_gargoyle_strike);
 }
