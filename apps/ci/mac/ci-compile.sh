@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export OPENSSL_ROOT_DIR=$(brew --prefix openssl@1.1)
+
 export CCACHE_CPP2=true
 export CCACHE_MAXSIZE='500M'
 export CCACHE_COMPRESS=1
@@ -17,9 +19,9 @@ time cmake ../../../ \
 -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib \
 -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
 -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib \
--DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include \
--DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl/lib/libssl.dylib \
--DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl/lib/libcrypto.dylib \
+-DOPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include" \
+-DOPENSSL_SSL_LIBRARIES="$OPENSSL_ROOT_DIR/lib/libssl.dylib" \
+-DOPENSSL_CRYPTO_LIBRARIES="$OPENSSL_ROOT_DIR/lib/libcrypto.dylib" \
 -DWITH_WARNINGS=1 \
 -DCMAKE_C_FLAGS="-Werror" \
 -DCMAKE_CXX_FLAGS="-Werror" \
