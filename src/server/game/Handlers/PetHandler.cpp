@@ -94,7 +94,7 @@ bool LoadPetFromDBQueryHolder::Initialize()
     return res;
 }
 
-uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType)
+uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType, AsynchPetSummon* info)
 {
     if (!result)
         return PET_LOAD_NO_RESULT;
@@ -300,15 +300,15 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
 
     pet->SetAsynchLoadType(asynchLoadType);
 
-    AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this](SQLQueryHolderBase const& holder)
+    AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this, info](SQLQueryHolderBase const& holder)
     {
-        HandleLoadPetFromDBSecondCallback(static_cast<LoadPetFromDBQueryHolder const&>(holder));
+        HandleLoadPetFromDBSecondCallback(static_cast<LoadPetFromDBQueryHolder const&>(holder), info);
     });
 
     return PET_LOAD_OK;
 }
 
-void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder)
+void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder, AsynchPetSummon* info)
 {
     if (!GetPlayer())
         return;
@@ -377,6 +377,11 @@ void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder co
     }
 
     pet->HandleAsynchLoadSucceed();
+
+    if (info && info->m_healthPct)
+    {
+        pet->SetHealth(pet->CountPctFromMaxHealth(info->m_healthPct));
+    }
 }
 
 void WorldSession::HandleDismissCritter(WorldPacket& recvData)
@@ -750,7 +755,10 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 if (result == SPELL_CAST_OK)
                 {
-                    pet->ToCreature()->AddSpellCooldown(spellid, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
+                    if (!spellInfo->IsCooldownStartedOnEvent())
+                    {
+                        pet->ToCreature()->AddSpellCooldown(spellid, 0, 0);
+                    }
 
                     unit_target = spell->m_targets.GetUnitTarget();
 
@@ -890,7 +898,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             charmInfo->SetIsCommandFollow(false);
                             charmInfo->SetIsReturning(false);
 
-                            pet->GetMotionMaster()->MoveChase(unit_target);
+                            pet->GetMotionMaster()->MoveFollow(unit_target, PET_FOLLOW_DIST, rand_norm() * 2 * M_PI);
 
                             if (pet->IsPet() && ((Pet*)pet)->getPetType() == SUMMON_PET && pet != unit_target && urand(0, 100) < 10)
                                 pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);

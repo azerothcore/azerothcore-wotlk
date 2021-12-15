@@ -63,17 +63,12 @@ Guild* GuildMgr::GetGuildById(uint32 guildId) const
     return nullptr;
 }
 
-Guild* GuildMgr::GetGuildByName(const std::string& guildName) const
+Guild* GuildMgr::GetGuildByName(std::string_view guildName) const
 {
-    std::string search = guildName;
-    std::transform(search.begin(), search.end(), search.begin(), ::toupper);
-    for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
-    {
-        std::string gname = itr->second->GetName();
-        std::transform(gname.begin(), gname.end(), gname.begin(), ::toupper);
-        if (search == gname)
-            return itr->second;
-    }
+    for (auto const& [id, guild] : GuildStore)
+        if (StringEqualI(guild->GetName(), guildName))
+            return guild;
+
     return nullptr;
 }
 
