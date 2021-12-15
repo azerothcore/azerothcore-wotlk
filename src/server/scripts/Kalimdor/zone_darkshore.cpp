@@ -490,14 +490,14 @@ public:
                 _events.Update(diff);
                 switch (_events.ExecuteEvent())
                 {
-                case EVENT_CHECK_FOLLOWING:
-                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
-                    if (!player || me->GetDistance2d(player) > 100.0f || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE || player->GetQuestStatus(QUEST_PLAGUED_LANDS) == QUEST_STATUS_NONE)
-                    {
-                        me->DespawnOrUnsummon();
-                    }
-                    _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1000);
-                    break;
+                    case EVENT_CHECK_FOLLOWING:
+                        Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                        if (!player || me->GetDistance2d(player) > 100.0f || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE || player->GetQuestStatus(QUEST_PLAGUED_LANDS) == QUEST_STATUS_NONE)
+                        {
+                            me->DespawnOrUnsummon();
+                        }
+                        _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1000);
+                        break;
                 }
             }
 
