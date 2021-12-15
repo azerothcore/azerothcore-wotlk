@@ -41,6 +41,7 @@
 constexpr Milliseconds PET_FOCUS_REGEN_INTERVAL = 4s;
 
 enum class VisibilityDistanceType : uint8;
+
 // TODO: Implement missing flags from TC in places that custom flags from xinef&pussywizzard use flag values.
 // EnumUtils: DESCRIBE THIS
 enum CreatureFlagsExtra : uint32
