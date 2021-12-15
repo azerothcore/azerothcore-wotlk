@@ -134,7 +134,7 @@ public:
         MAX
     };
 
-    PetLoadQueryHolder(ObjectGuid::LowType ownerGuid, uint32 petNumber)
+    PetLoadQueryHolder([[maybe_unused]] ObjectGuid::LowType ownerGuid, uint32 petNumber)
     {
         SetSize(MAX);
 
