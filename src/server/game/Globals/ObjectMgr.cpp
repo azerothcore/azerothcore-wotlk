@@ -3607,6 +3607,63 @@ void ObjectMgr::LoadPlayerInfo()
         }
     }
 
+    // Load playercreate cast spell
+    LOG_INFO("server.loading", "Loading Player Create Cast Spell Data...");
+    {
+        uint32 oldMSTime = getMSTime();
+
+        QueryResult result = WorldDatabase.PQuery("SELECT raceMask, classMask, spell FROM playercreateinfo_cast_spell");
+
+        if (!result)
+        {
+            LOG_ERROR("server.loading", ">> Loaded 0 player create cast spells. DB table `playercreateinfo_cast_spell` is empty.");
+        }
+        else
+        {
+            uint32 count = 0;
+
+            do
+            {
+                Field* fields    = result->Fetch();
+                uint32 raceMask  = fields[0].GetUInt32();
+                uint32 classMask = fields[1].GetUInt32();
+                uint32 spellId   = fields[2].GetUInt32();
+
+                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                {
+                    LOG_ERROR("sql.sql", "Wrong race mask %u in `playercreateinfo_cast_spell` table, ignoring.", raceMask);
+                    continue;
+                }
+
+                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                {
+                    LOG_ERROR("sql.sql", "Wrong class mask %u in `playercreateinfo_cast_spell` table, ignoring.", classMask);
+                    continue;
+                }
+
+                for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
+                {
+                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    {
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        {
+                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            {
+                                if (PlayerInfo* info = _playerInfo[raceIndex][classIndex])
+                                {
+                                    info->castSpells.push_back(spellId);
+                                    ++count;
+                                }
+                            }
+                        }
+                    }
+                }
+            } while (result->NextRow());
+
+            LOG_INFO("server.loading", ">> Loaded %u player create cast spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        }
+    }
+
     // Load playercreate actions
     LOG_INFO("server.loading", "Loading Player Create Action Data...");
     {
@@ -7592,7 +7649,7 @@ void ObjectMgr::LoadReservedPlayersNames()
     LOG_INFO("server.loading", " ");
 }
 
-bool ObjectMgr::IsReservedName(const std::string& name) const
+bool ObjectMgr::IsReservedName(std::string_view name) const
 {
     // pussywizard
     if (name.size() >= 2 && (name[name.size() - 2] == 'G' || name[name.size() - 2] == 'g') && (name[name.size() - 1] == 'M' || name[name.size() - 1] == 'm'))
@@ -7700,7 +7757,7 @@ bool isValidString(std::wstring wstr, uint32 strictMask, bool numericOrSpace, bo
     return false;
 }
 
-uint8 ObjectMgr::CheckPlayerName(const std::string& name, bool create)
+uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -7725,7 +7782,7 @@ uint8 ObjectMgr::CheckPlayerName(const std::string& name, bool create)
     return CHAR_NAME_SUCCESS;
 }
 
-bool ObjectMgr::IsValidCharterName(const std::string& name)
+bool ObjectMgr::IsValidCharterName(std::string_view name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -7757,7 +7814,7 @@ bool ObjectMgr::IsValidChannelName(const std::string& name)
     return isValidString(wname, strictMask, true);
 }
 
-PetNameInvalidReason ObjectMgr::CheckPetName(const std::string& name)
+PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -8842,7 +8899,7 @@ void ObjectMgr::LoadBroadcastTexts()
         _broadcastTextStore[bct.Id] = bct;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded " SZFMTD " broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded " SZFMTD " Broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadBroadcastTextLocales()
