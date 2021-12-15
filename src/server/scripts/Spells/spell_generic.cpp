@@ -1703,7 +1703,6 @@ class spell_gen_pet_summoned : public SpellScript
             else
                 delete newPet;
         }
-            // Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
     }
 
     void Register() override
