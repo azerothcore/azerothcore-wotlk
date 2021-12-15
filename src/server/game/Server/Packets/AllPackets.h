@@ -19,5 +19,6 @@
 #define AllPackets_h__
 
 #include "CharacterPackets.h"
+#include "GuildPackets.h"
 
 #endif // AllPackets_h__

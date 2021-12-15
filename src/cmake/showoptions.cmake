@@ -188,4 +188,12 @@ if (USE_CPP_20)
   message(" *** Please note that this is an experimental feature!")
 endif()
 
+if (CONFIG_ABORT_INCORRECT_OPTIONS)
+  message("")
+  message(" WARNING !")
+  message(" Enabled abort if core found incorrect option in config files")
+
+  add_definitions(-DCONFIG_ABORT_INCORRECT_OPTIONS)
+endif()
+
 message("")
