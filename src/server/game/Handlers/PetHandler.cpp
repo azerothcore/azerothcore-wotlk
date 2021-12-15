@@ -94,7 +94,7 @@ bool LoadPetFromDBQueryHolder::Initialize()
     return res;
 }
 
-uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType)
+uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType, AsynchPetSummon* info)
 {
     if (!result)
         return PET_LOAD_NO_RESULT;
@@ -300,15 +300,15 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
 
     pet->SetAsynchLoadType(asynchLoadType);
 
-    AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this](SQLQueryHolderBase const& holder)
+    AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this, info](SQLQueryHolderBase const& holder)
     {
-        HandleLoadPetFromDBSecondCallback(static_cast<LoadPetFromDBQueryHolder const&>(holder));
+        HandleLoadPetFromDBSecondCallback(static_cast<LoadPetFromDBQueryHolder const&>(holder), info);
     });
 
     return PET_LOAD_OK;
 }
 
-void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder)
+void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder, AsynchPetSummon* info)
 {
     if (!GetPlayer())
         return;
@@ -377,6 +377,11 @@ void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder co
     }
 
     pet->HandleAsynchLoadSucceed();
+
+    if (info && info->m_healthPct)
+    {
+        pet->SetHealth(pet->CountPctFromMaxHealth(info->m_healthPct));
+    }
 }
 
 void WorldSession::HandleDismissCritter(WorldPacket& recvData)
