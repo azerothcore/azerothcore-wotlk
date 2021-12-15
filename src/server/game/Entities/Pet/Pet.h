@@ -35,15 +35,15 @@ struct PetSpell
 class AsynchPetSummon
 {
 public:
-    AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID) :
-        m_entry(entry), pos(position), m_petType(petType),
-        m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID) { }
+    AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID, int32 healthPct = 0) :
+        m_entry(entry), pos(position), m_petType(petType), m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID), m_healthPct(healthPct) { }
 
     uint32 m_entry;
     Position pos;
     PetType m_petType;
     uint32 m_duration, m_createdBySpell;
     ObjectGuid m_casterGUID;
+    int32 m_healthPct;
 };
 
 typedef std::unordered_map<uint32, PetSpell> PetSpellMap;
