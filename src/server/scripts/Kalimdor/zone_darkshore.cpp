@@ -580,28 +580,28 @@ public:
                 _events.Update(diff);
                 switch (_events.ExecuteEvent())
                 {
-                case EVENT_POST_QUEST_ONE:
-                    if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
-                    {
-                        Talk(SAY_BE_CLEANSED);
-                        me->CastSpell(bear, SPELL_THARNARIUMS_HEAL);
-                    }
-                    _events.ScheduleEvent(EVENT_POST_QUEST_TWO, 4000);
-                    break;
-                case EVENT_POST_QUEST_TWO:
-                    if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
-                    {
-                        bear->SetUInt32Value(UNIT_FIELD_BYTES_1, 7);
-                    }
-                    _events.ScheduleEvent(EVENT_POST_QUEST_THREE, 1000);
-                    break;
-                case EVENT_POST_QUEST_THREE:
-                    if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
-                    {
-                        bear->DespawnOrUnsummon();
-                        _scriptRunning = false;
-                    }
-                    break;
+                    case EVENT_POST_QUEST_ONE:
+                        if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
+                        {
+                            Talk(SAY_BE_CLEANSED);
+                            me->CastSpell(bear, SPELL_THARNARIUMS_HEAL);
+                        }
+                        _events.ScheduleEvent(EVENT_POST_QUEST_TWO, 4000);
+                        break;
+                    case EVENT_POST_QUEST_TWO:
+                        if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
+                        {
+                            bear->SetUInt32Value(UNIT_FIELD_BYTES_1, 7);
+                        }
+                        _events.ScheduleEvent(EVENT_POST_QUEST_THREE, 1000);
+                        break;
+                    case EVENT_POST_QUEST_THREE:
+                        if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
+                        {
+                            bear->DespawnOrUnsummon();
+                            _scriptRunning = false;
+                        }
+                        break;
                 }
             }
 
