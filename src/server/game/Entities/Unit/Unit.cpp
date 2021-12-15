@@ -17149,7 +17149,8 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             creature->DeleteThreatList();
 
             // must be after setDeathState which resets dynamic flags
-            if (!creature->loot.empty())
+            CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
+            if (cInfo && (cInfo->lootid || cInfo->maxgold > 0))
             {
                 creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
