@@ -28,9 +28,13 @@ void AddSC_boss_draganthaurissan();
 void AddSC_boss_general_angerforge();
 void AddSC_boss_gorosh_the_dervish();
 void AddSC_boss_grizzle();
+void AddSC_boss_eviscerator();
+void AddSC_boss_okthor();
+void AddSC_boss_hedrum();
 void AddSC_boss_high_interrogator_gerstahn();
 void AddSC_boss_magmus();
 void AddSC_boss_moira_bronzebeard();
+void AddSC_boss_high_priestess_thaurissan();
 void AddSC_boss_tomb_of_seven();
 void AddSC_instance_blackrock_depths();
 void AddSC_boss_drakkisath();                //Blackrock Spire
@@ -172,9 +176,13 @@ void AddEasternKingdomsScripts()
     AddSC_boss_general_angerforge();
     AddSC_boss_gorosh_the_dervish();
     AddSC_boss_grizzle();
+    AddSC_boss_okthor();
+    AddSC_boss_eviscerator();
+    AddSC_boss_hedrum();
     AddSC_boss_high_interrogator_gerstahn();
     AddSC_boss_magmus();
     AddSC_boss_moira_bronzebeard();
+    AddSC_boss_high_priestess_thaurissan();
     AddSC_boss_tomb_of_seven();
     AddSC_instance_blackrock_depths();
     AddSC_boss_drakkisath();                //Blackrock Spire
