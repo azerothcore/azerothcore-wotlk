@@ -1,3 +1,19 @@
+-- DB update 2021_12_16_03 -> 2021_12_16_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_12_16_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_12_16_03 2021_12_16_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1638823987349287400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638823987349287400');
 
 UPDATE `creature_template` SET `gossip_menu_id`=10244 WHERE `entry`=19169; -- Blood Elf
@@ -252,3 +268,13 @@ UPDATE `npc_text` SET `text0_0`="The celebration of the natural processes of the
 DELETE FROM `npc_text` WHERE `ID` IN (9680);
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `lang0`, `Probability0`, `BroadcastTextID0`, `text1_0`, `text1_1`, `lang1`, `Probability1`, `BroadcastTextID1`, `text2_0`, `text2_1`, `lang2`, `Probability2`, `BroadcastTextID2`, `text3_0`, `text3_1`, `lang3`, `Probability3`, `BroadcastTextID3`, `text4_0`, `text4_1`, `lang4`, `Probability4`, `BroadcastTextID4`) VALUES
 (9680, "Enjoying the Midsummer Fire Festival, $c?", "Enjoying the Midsummer Fire Festival, $c?", 0, 1, 49959, "Festive Midsummer, $c!", "Festive Midsummer, $c!", 0, 1, 49960, "Midsummer Fire Festival is a great time to adventure, but it's also a great time to shop!", "Midsummer Fire Festival is a great time to adventure, but it's also a great time to shop!", 0, 1, 49961, "Midsummer Fire Festival is a great time to celebrate the summer!", "Midsummer Fire Festival is a great time to celebrate the summer!", 0, 1, 24535, "I love the firework show at the end of Midsummer Firefestival.", "I love the firework show at the end of Midsummer Firefestival.", 0, 1, 24536);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_12_16_04' WHERE sql_rev = '1638823987349287400';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
