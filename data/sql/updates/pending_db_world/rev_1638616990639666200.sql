@@ -1,3 +1,0 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1638616990639666200');
-
-ALTER TABLE `npc_trainer` ADD COLUMN `ReqSpell` INT UNSIGNED DEFAULT 0 NOT NULL AFTER `ReqLevel`; 
