@@ -62,10 +62,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
     &Spell::EffectNULL,                                     //  0
@@ -228,7 +224,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectCreateItem2,                              //157 SPELL_EFFECT_CREATE_ITEM_2            create item or create item template and replace by some randon spell loot item
     &Spell::EffectMilling,                                  //158 SPELL_EFFECT_MILLING                  milling
     &Spell::EffectRenamePet,                                //159 SPELL_EFFECT_ALLOW_RENAME_PET         allow rename pet once again
-    &Spell::EffectNULL,                                     //160 SPELL_EFFECT_160                      1 spell - 45534
+    &Spell::EffectForceCast,                                //160 SPELL_EFFECT_FORCE_CAST_2
     &Spell::EffectSpecCount,                                //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
     &Spell::EffectNULL,                                     //163 unused
@@ -621,17 +617,17 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (Player* caster = m_caster->ToPlayer())
                         {
                             // Add Ammo and Weapon damage plus RAP * 0.1
-                            if (Item* item = caster->GetWeaponForAttack(RANGED_ATTACK))
+                            float dmg_min = caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE);
+                            float dmg_max = caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE);
+                            if (dmg_max == 0.0f && dmg_min > dmg_max)
                             {
-                                ItemTemplate const* weaponTemplate = item->GetTemplate();
-                                float dmg_min = weaponTemplate->Damage[0].DamageMin;
-                                float dmg_max = weaponTemplate->Damage[0].DamageMax;
-                                if (dmg_max == 0.0f && dmg_min > dmg_max)
-                                    damage += int32(dmg_min);
-                                else
-                                    damage += irand(int32(dmg_min), int32(dmg_max));
-                                damage += int32(caster->GetAmmoDPS() * weaponTemplate->Delay * 0.001f);
+                                damage += int32(dmg_min);
                             }
+                            else
+                            {
+                                damage += irand(int32(dmg_min), int32(dmg_max));
+                            }
+                            damage += int32(caster->GetAmmoDPS() * caster->GetAttackTime(RANGED_ATTACK) * 0.001f);
                         }
                     }
                     break;
@@ -788,14 +784,19 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     // normal DB scripted effect
     LOG_DEBUG("spells.aura", "Spell ScriptStart spellid %u in EffectDummy(%u)", m_spellInfo->Id, effIndex);
     m_caster->GetMap()->ScriptsStart(sSpellScripts, uint32(m_spellInfo->Id | (effIndex << 24)), m_caster, unitTarget);
-#ifdef ELUNA
+
     if (gameObjTarget)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
+    {
+        sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
+    }
     else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
+    {
+        sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
+    }
     else if (itemTarget)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
-#endif
+    {
+        sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
+    }
 }
 
 void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
@@ -3235,7 +3236,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
             for (Unit::AuraApplicationMap::iterator i = myAuras.begin(); i != myAuras.end();)
             {
                 Aura const* aura = i->second->GetBase();
-                if (!aura->IsPassive() && aura->CanBeSentToClient())
+                if (!aura->IsPassive() && !OldSummon->IsPetAura(aura) && aura->CanBeSentToClient())
                     OldSummon->RemoveAura(i);
                 else
                     ++i;
@@ -3612,7 +3613,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 break;
         }
 
-        if (m_spellInfo->SchoolMask & SPELL_SCHOOL_MASK_NORMAL)
+        if (m_spellSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
         {
             float weapon_total_pct = m_caster->GetModifierValue(unitMod, TOTAL_PCT);
             fixed_bonus = int32(fixed_bonus * weapon_total_pct);
@@ -3627,8 +3628,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         if (Unit* owner = m_caster->GetOwner())
             weaponDamage = owner->CalculateDamage(m_attackType, normalized, true);
     }
+    else if (m_spellInfo->Id == 5019) // Wands
+    {
+        weaponDamage = m_caster->CalculateDamage(m_attackType, true, false);
+    }
     else
+    {
         weaponDamage = m_caster->CalculateDamage(m_attackType, normalized, true);
+    }
 
     // Sequence is important
     for (int j = 0; j < MAX_SPELL_EFFECTS; ++j)
@@ -4408,21 +4415,9 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     target->GetSession()->SendPacket(&data);
 
     // create duel-info
-    DuelInfo* duel   = new DuelInfo;
-    duel->initiator  = caster;
-    duel->opponent   = target;
-    duel->startTime  = 0;
-    duel->startTimer = 0;
-    duel->isMounted  = (GetSpellInfo()->Id == 62875); // Mounted Duel
-    caster->duel     = duel;
-
-    DuelInfo* duel2   = new DuelInfo;
-    duel2->initiator  = caster;
-    duel2->opponent   = caster;
-    duel2->startTime  = 0;
-    duel2->startTimer = 0;
-    duel2->isMounted  = (GetSpellInfo()->Id == 62875); // Mounted Duel
-    target->duel      = duel2;
+    bool isMounted = (GetSpellInfo()->Id == 62875);
+    caster->duel = std::make_unique<DuelInfo>(target, caster, isMounted);
+    target->duel = std::make_unique<DuelInfo>(caster, caster, isMounted);
 
     caster->SetGuidValue(PLAYER_DUEL_ARBITER, pGameObj->GetGUID());
     target->SetGuidValue(PLAYER_DUEL_ARBITER, pGameObj->GetGUID());
@@ -5408,7 +5403,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     player->GetPosition(x, y, z);
     if (!pet)
     {
-        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET);
+        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET, damage);
         return;
     }
 

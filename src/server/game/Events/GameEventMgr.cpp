@@ -34,10 +34,6 @@
 #include "WorldPacket.h"
 #include <time.h>
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 GameEventMgr* GameEventMgr::instance()
 {
     static GameEventMgr instance;

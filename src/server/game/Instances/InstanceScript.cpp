@@ -156,7 +156,7 @@ void InstanceScript::LoadObjectData(ObjectData const* creatureData, ObjectData c
         LoadObjectData(gameObjectData, _gameObjectInfo);
     }
 
-    LOG_ERROR("scripts", "InstanceScript::LoadObjectData: " SZFMTD " objects loaded.", _creatureInfo.size() + _gameObjectInfo.size());
+    LOG_DEBUG("scripts", "InstanceScript::LoadObjectData: " SZFMTD " objects loaded.", _creatureInfo.size() + _gameObjectInfo.size());
 }
 
 void InstanceScript::LoadObjectData(ObjectData const* data, ObjectInfoMap& objectInfo)
@@ -181,8 +181,10 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
         case IN_PROGRESS:
             if (!minion->IsAlive())
                 minion->Respawn();
-            else if (!minion->GetVictim())
+            else
+            {
                 minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+            }
             break;
         default:
             break;
