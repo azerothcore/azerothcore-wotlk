@@ -817,6 +817,25 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         else
             victim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TAKE_DAMAGE, 0);
 
+        // interrupt spells with SPELL_INTERRUPT_FLAG_ABORT_ON_DMG on absorbed damage (no dots)
+        if (!damage && damagetype != DOT && cleanDamage && cleanDamage->absorbed_damage)
+        {
+            if (victim != attacker && victim->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
+                {
+                    if (spell->getState() == SPELL_STATE_PREPARING)
+                    {
+                        uint32 interruptFlags = spell->m_spellInfo->InterruptFlags;
+                        if (interruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
+                        {
+                            victim->InterruptNonMeleeSpells(false);
+                        }
+                    }
+                }
+            }
+        }
+
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
         AuraEffectList vCopyDamageCopy(victim->GetAuraEffectsByType(SPELL_AURA_SHARE_DAMAGE_PCT));
@@ -5118,7 +5137,7 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
     if (dispelMask & (1 << DISPEL_DISEASE) && HasAura(50536))
         dispelMask &= ~(1 << DISPEL_DISEASE);
 
-    ReputationRank rank = GetReactionTo(caster);
+    ReputationRank rank = GetReactionTo(caster, IsCharmed());
     bool positive = rank >= REP_FRIENDLY;
 
     // Neutral unit not at war with caster should be treated as a friendly unit
@@ -9519,7 +9538,7 @@ void Unit::SetFaction(uint32 faction)
 }
 
 // function based on function Unit::UnitReaction from 13850 client
-ReputationRank Unit::GetReactionTo(Unit const* target) const
+ReputationRank Unit::GetReactionTo(Unit const* target, bool checkOriginalFaction /*= false*/) const
 {
     // always friendly to self
     if (this == target)
@@ -9601,11 +9620,42 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
     }
 
     ReputationRank repRank = REP_HATED;
-
     if (!sScriptMgr->IfNormalReaction(this, target, repRank))
+    {
         return ReputationRank(repRank);
+    }
+
+    FactionTemplateEntry const* factionTemplateEntry = nullptr;
+    if (checkOriginalFaction)
+    {
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(getRace()))
+            {
+                factionTemplateEntry = sFactionTemplateStore.LookupEntry(rEntry->FactionID);
+            }
+        }
+        else
+        {
+            Unit* owner = GetOwner();
+            if (HasUnitTypeMask(UNIT_MASK_MINION) && owner)
+            {
+                factionTemplateEntry = sFactionTemplateStore.LookupEntry(owner->GetFaction());
+            }
+            else if (CreatureTemplate const* cinfo = ToCreature()->GetCreatureTemplate())
+            {
+                factionTemplateEntry = sFactionTemplateStore.LookupEntry(cinfo->faction);
+            }
+        }
+    }
+
+    if (!factionTemplateEntry)
+    {
+        factionTemplateEntry = GetFactionTemplateEntry();
+    }
+
     // do checks dependant only on our faction
-    return GetFactionReactionTo(GetFactionTemplateEntry(), target);
+    return GetFactionReactionTo(factionTemplateEntry, target);
 }
 
 ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, Unit const* target) const
