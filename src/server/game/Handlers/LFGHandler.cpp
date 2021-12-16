@@ -47,21 +47,14 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& l
 
 void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
 {
-    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER | lfg::LFG_OPTION_ENABLE_SEASONAL_BOSSES))
-    {
+    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER) ||
+        (GetPlayer()->GetGroup() && GetPlayer()->GetGroup()->GetLeaderGUID() != GetPlayer()->GetGUID() &&
+         (GetPlayer()->GetGroup()->GetMembersCount() == MAXGROUPSIZE || !GetPlayer()->GetGroup()->isLFGGroup())))
         return;
-    }
-
-    // pussywizard:
-    if (Group* g = GetPlayer()->GetGroup())
-        if (g->isLFGGroup() && g->GetLeaderGUID() != GetPlayer()->GetGUID())
-        {
-            return;
-        }
 
     if (packet.Slots.empty())
     {
-        LOG_DEBUG("network", "CMSG_LFG_JOIN [%s] no dungeons selected", GetPlayer()->GetGUID().ToString().c_str());
+        LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s no dungeons selected", GetPlayerInfo().c_str());
         return;
     }
 
@@ -74,7 +67,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
     }
 
     LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s roles: %u, Dungeons: " SZFMTD ", Comment: %s",
-              GetPlayerInfo().c_str(), packet.Roles, newDungeons.size(), packet.Comment.c_str());
+                 GetPlayerInfo().c_str(), packet.Roles, newDungeons.size(), packet.Comment.c_str());
 
     sLFGMgr->JoinLfg(GetPlayer(), uint8(packet.Roles), newDungeons, packet.Comment);
 }
