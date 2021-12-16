@@ -31,6 +31,7 @@
 #include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "MapMgr.h"
 #include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
