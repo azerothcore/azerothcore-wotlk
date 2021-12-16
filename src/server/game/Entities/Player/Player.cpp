@@ -237,7 +237,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_MirrorTimerFlags = UNDERWATER_NONE;
     m_MirrorTimerFlagsLast = UNDERWATER_NONE;
-    m_isInWater = false;
     m_drunkTimer = 0;
     m_deathTimer = 0;
     m_deathExpireTime = 0;
@@ -2091,24 +2090,6 @@ bool Player::IsFalling() const
 {
     // Xinef: Added !IsInFlight check
     return GetPositionZ() < m_lastFallZ && !IsInFlight();
-}
-
-void Player::SetInWater(bool apply)
-{
-    if (m_isInWater == apply)
-        return;
-
-    //define player in water by opcodes
-    //move player's guid into HateOfflineList of those mobs
-    //which can't swim and move guid back into ThreatList when
-    //on surface.
-    //TODO: exist also swimming mobs, and function must be symmetric to enter/leave water
-    m_isInWater = apply;
-
-    // remove auras that need water/land
-    RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
-
-    getHostileRefMgr().updateThreatTables();
 }
 
 bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
