@@ -1151,12 +1151,6 @@ public:
             delete spell;
             if (result != SPELL_CAST_OK)
             {
-                if (result == SPELL_FAILED_REAGENTS)
-                {
-                    std::string accountName;
-                    AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-                    sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "Server");
-                }
                 return;
             }
             player->CastSpell(player, spellInfoTrigger->Id, false);
