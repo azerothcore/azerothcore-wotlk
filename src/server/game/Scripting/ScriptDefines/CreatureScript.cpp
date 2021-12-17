@@ -134,7 +134,7 @@ bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* q
 
     if (ret && *ret)
     {
-        return true;
+        return false;
     }
 
     auto tempScript = ScriptRegistry<CreatureScript>::GetScriptById(creature->GetScriptId());
