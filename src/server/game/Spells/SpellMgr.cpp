@@ -3403,6 +3403,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 switch(spellInfo->Effects[j].ApplyAuraName)
                 {
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
                         if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
                         {
@@ -7512,6 +7513,13 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 67118, 67150, 67188 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[EFFECT_1] = 0;
+    });
+
+    // Green Beam
+    ApplySpellFix({31628, 31630, 31631}, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->MaxAffectedTargets = 1;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

@@ -667,6 +667,9 @@ protected:
 
     // pussywizard:
     uint32 m_UpdateTimer;
+
+    EventProcessor _reviveEvents;
+
 private:
     // Battleground
     BattlegroundTypeId m_RealTypeID;

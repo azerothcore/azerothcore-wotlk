@@ -71,18 +71,3 @@ function(IsDynamicLinkingModulesRequired variable)
   endforeach()
   set(${variable} ${IS_REQUIRED} PARENT_SCOPE)
 endfunction()
-
-# Get list all modules
-function(GetModuleList)
-  file(GLOB LOCALE_MODULE_LIST RELATIVE
-    ${CMAKE_SOURCE_DIR}/modules
-    ${CMAKE_SOURCE_DIR}/modules/*)
-
-  foreach(MODULE_DIR ${LOCALE_MODULE_LIST})
-    if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/modules/${MODULE_DIR}")
-      set(MODULE_LIST__ ${MODULE_LIST__}${MODULE_DIR},)
-    endif()
-  endforeach()
-
-  add_definitions(-DAC_MODULES_LIST=$<1:"${MODULE_LIST__}">)
-endfunction()
