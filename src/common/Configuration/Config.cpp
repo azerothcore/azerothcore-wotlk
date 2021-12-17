@@ -360,7 +360,7 @@ std::string const ConfigMgr::GetConfigPath()
 #endif
 }
 
-void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::string> args, std::string const& modulesConfigList /*= ""*/)
+void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::string> args, std::string_view modulesConfigList /*= {}*/)
 {
     _filename = initFileName;
     _args = std::move(args);
