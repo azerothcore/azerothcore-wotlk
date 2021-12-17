@@ -8,6 +8,7 @@ UPDATE `creature` SET `position_x`=7172.997,`position_y`=-6615.694,`position_z`=
 
 -- Bad spawn
 DELETE FROM `creature` WHERE `guid` IN (82767);
+DELETE FROM `creature_addon` WHERE `guid` IN (82767);
 
 -- Condition for source Spell implicit target condition type Object entry guid
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=28731 AND `SourceId`=0;
