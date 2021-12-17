@@ -785,6 +785,13 @@ void ObjectMgr::LoadCreatureTemplateAddons()
                 LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong spell %u defined in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
                 continue;
             }
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
+                continue;
+            }
+
             creatureAddon.auras[i++] = uint32(atol(*itr));
         }
 
@@ -1232,6 +1239,13 @@ void ObjectMgr::LoadCreatureAddons()
                 LOG_ERROR("sql.sql", "Creature (GUID: %u) has wrong spell %u defined in `auras` field in `creature_addon`.", guid, uint32(atol(*itr)));
                 continue;
             }
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, uint32(atol(*itr)));
+                continue;
+            }
+
             creatureAddon.auras[i++] = uint32(atol(*itr));
         }
 
