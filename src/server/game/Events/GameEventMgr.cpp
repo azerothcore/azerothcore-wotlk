@@ -394,9 +394,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                       1                2
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, game_event_creature.eventEntry FROM creature"
-                             " JOIN game_event_creature ON creature.guid = game_event_creature.guid");
+        //                                                 0        1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_creature");
 
         if (!result)
         {
@@ -412,6 +411,13 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 int16 event_id = fields[1].GetInt8();
+
+                CreatureData const* data = sObjectMgr->GetCreatureData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_creature` contains creature (GUID: %u) not found in `creature` table.", guid);
+                    continue;
+                }
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
@@ -436,9 +442,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                      0                1
-        QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, game_event_gameobject.eventEntry FROM gameobject"
-                             " JOIN game_event_gameobject ON gameobject.guid=game_event_gameobject.guid");
+        //                                                0         1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_gameobject");
 
         if (!result)
         {
@@ -456,6 +461,13 @@ void GameEventMgr::LoadFromDB()
                 int16 event_id = fields[1].GetInt8();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
+
+                GameObjectData const* data = sObjectMgr->GetGOData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: %u) not found in `gameobject` table.", guid);
+                    continue;
+                }
 
                 if (internal_event_id < 0 || internal_event_id >= int32(mGameEventGameobjectGuids.size()))
                 {
