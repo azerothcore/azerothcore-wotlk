@@ -33,10 +33,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets)
 {
     // some spell cast packet including more data (for projectiles?)
@@ -558,16 +554,6 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
     }
 
     pet->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
-
-    if (spellInfo->IsCooldownStartedOnEvent())
-    {
-        pet->AddSpellCooldown(spellId, 0, 0);
-
-        WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
-        data << uint32(spellInfo->Id);
-        data << pet->GetGUID();
-        _player->SendDirectMessage(&data);
-    }
 }
 
 void WorldSession::HandleCancelGrowthAuraOpcode(WorldPacket& /*recvPacket*/)

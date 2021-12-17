@@ -60,6 +60,11 @@ bool PetAI::_needToStop()
     return !me->CanCreatureAttack(me->GetVictim());
 }
 
+void PetAI::PetStopAttack()
+{
+    _stopAttack();
+}
+
 void PetAI::_stopAttack()
 {
     if (!me->IsAlive())
@@ -174,7 +179,7 @@ void PetAI::UpdateAI(uint32 diff)
         else
             _doMeleeAttack();
     }
-    else if (!me->GetCharmInfo() || (!me->GetCharmInfo()->GetForcedSpell() && !me->HasUnitState(UNIT_STATE_CASTING)))
+    else if (!me->GetCharmInfo() || (!me->GetCharmInfo()->GetForcedSpell() && !(me->IsPet() && me->ToPet()->HasTempSpell()) && !me->HasUnitState(UNIT_STATE_CASTING)))
     {
         if (me->HasReactState(REACT_AGGRESSIVE) || me->GetCharmInfo()->IsAtStay())
         {
