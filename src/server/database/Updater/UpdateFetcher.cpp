@@ -369,7 +369,7 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
         {
             case MODE_APPLY:
                 speed = Apply(filePath);
-            /* fallthrough */
+                [[fallthrough]];
             case MODE_REHASH:
                 UpdateEntry(file, speed);
                 break;
