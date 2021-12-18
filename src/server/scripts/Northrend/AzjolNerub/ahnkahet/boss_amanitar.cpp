@@ -123,7 +123,7 @@ struct boss_amanitar : public BossAI
         events.ScheduleEvent(EVENT_RESPAWN, 40000, 60000);
     }
 
-    void JustDied(Unit* /*Killer*/) override
+    void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
