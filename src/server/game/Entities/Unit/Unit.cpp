@@ -1871,10 +1871,6 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
             victimResistance += float(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
     }
 
-    // Chaos Bolt exception, ignore all target resistances (unknown attribute?)
-    if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && spellInfo->SpellIconID == 3178)
-        victimResistance = 0;
-
     victimResistance = std::max(victimResistance, 0.0f);
     if (owner)
         victimResistance += std::max((float(victim->getLevel()) - float(owner->getLevel())) * 5.0f, 0.0f);
