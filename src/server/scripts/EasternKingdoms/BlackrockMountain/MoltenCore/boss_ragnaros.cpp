@@ -39,7 +39,7 @@ enum Spells
 {
     SPELL_HAND_OF_RAGNAROS                  = 19780,
     SPELL_WRATH_OF_RAGNAROS                 = 20566,
-    SPELL_LAVA_BURST                        = 21908,    // Randomly trigger one of server side spells (21886, 21900 - 21907) which summons Go 178088 (TODO)
+    SPELL_LAVA_BURST                        = 21908,    // Randomly trigger one of server side spells (21886, 21900 - 21907) which summons Go 178088
     SPELL_MAGMA_BLAST                       = 20565,    // Ranged attack
     SPELL_SONS_OF_FLAME_DUMMY               = 21108,    // Server side effect
     SPELL_RAGSUBMERGE                       = 21107,    // Stealth aura
@@ -49,7 +49,7 @@ enum Spells
     SPELL_ELEMENTAL_FIRE_KILL               = 19773,    // Spell is used only on Majordomo
     SPELL_MIGHT_OF_RAGNAROS                 = 21154,
     SPELL_INTENSE_HEAT                      = 21155,
-    SPELL_SUMMON_SONS_FLAME                 = 21108,    // Trigger the eight spells summoning the Son of Flame adds (TODO)
+    SPELL_SUMMON_SONS_FLAME                 = 21108,    // Trigger the eight spells summoning the Son of Flame adds
 
     SPELL_LAVA_BURST_A                      = 21886,
     SPELL_LAVA_BURST_B                      = 21900,
@@ -59,7 +59,16 @@ enum Spells
     SPELL_LAVA_BURST_F                      = 21905,
     SPELL_LAVA_BURST_G                      = 21906,
     SPELL_LAVA_BURST_H                      = 21907,
-    SPELL_LAVA_BURST_TRAP                   = 21158
+    SPELL_LAVA_BURST_TRAP                   = 21158,
+
+    SPELL_SUMMON_SON_OF_FLAME_A             = 21117,
+    SPELL_SUMMON_SON_OF_FLAME_B             = 21110,
+    SPELL_SUMMON_SON_OF_FLAME_C             = 21111,
+    SPELL_SUMMON_SON_OF_FLAME_D             = 21112,
+    SPELL_SUMMON_SON_OF_FLAME_E             = 21113,
+    SPELL_SUMMON_SON_OF_FLAME_F             = 21114,
+    SPELL_SUMMON_SON_OF_FLAME_G             = 21115,
+    SPELL_SUMMON_SON_OF_FLAME_H             = 21116
 };
 
 enum Events
@@ -155,6 +164,10 @@ public:
             if (summon->GetEntry() == NPC_FLAME_OF_RAGNAROS)
             {
                 summon->CastSpell((Unit*)nullptr, SPELL_INTENSE_HEAT, true, nullptr, nullptr, me->GetGUID());
+            }
+            else if (summon->GetEntry() == NPC_SON_OF_FLAME)
+            {
+                DoZoneInCombat(summon);
             }
         }
 
@@ -390,16 +403,7 @@ public:
 
                         Talk(_hasSubmergedOnce ? SAY_REINFORCEMENTS2 : SAY_REINFORCEMENTS1);
 
-                        for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
-                        {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            {
-                                if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPosition(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
-                                {
-                                    summoned->AI()->AttackStart(target);
-                                }
-                            }
-                        }
+                        DoCastAOE(SPELL_SUMMON_SONS_FLAME);
 
                         if (!_hasSubmergedOnce)
                         {
@@ -479,7 +483,7 @@ public:
 
 constexpr std::array<uint32, 8> RagnarosLavaBurstSpells = { SPELL_LAVA_BURST_A, SPELL_LAVA_BURST_B, SPELL_LAVA_BURST_C, SPELL_LAVA_BURST_D, SPELL_LAVA_BURST_E, SPELL_LAVA_BURST_F, SPELL_LAVA_BURST_G, SPELL_LAVA_BURST_H };
 
-// 21908 - Lava Burst Randomizer
+// 21908 - Lava Burst Randomizer (server side)
 class spell_ragnaros_lava_burst_randomizer : public SpellScript
 {
     PrepareSpellScript(spell_ragnaros_lava_burst_randomizer);
@@ -508,8 +512,38 @@ class spell_ragnaros_lava_burst_randomizer : public SpellScript
     }
 };
 
+constexpr std::array<uint32, 8> RagnarosSoFSpells = { SPELL_SUMMON_SON_OF_FLAME_A, SPELL_SUMMON_SON_OF_FLAME_B, SPELL_SUMMON_SON_OF_FLAME_C, SPELL_SUMMON_SON_OF_FLAME_D, SPELL_SUMMON_SON_OF_FLAME_E, SPELL_SUMMON_SON_OF_FLAME_F, SPELL_SUMMON_SON_OF_FLAME_G, SPELL_SUMMON_SON_OF_FLAME_H };
+
+// 21108 - Summon Sons of Flame (server side)
+class spell_ragnaros_summon_sons_of_flame : public SpellScript
+{
+    PrepareSpellScript(spell_ragnaros_summon_sons_of_flame);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(RagnarosSoFSpells);
+    }
+
+    void HandleScript()
+    {
+        if (Unit* caster = GetCaster())
+        {
+            for (uint32 spell : RagnarosSoFSpells)
+            {
+                caster->CastSpell(caster, spell, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_ragnaros_summon_sons_of_flame::HandleScript);
+    }
+};
+
 void AddSC_boss_ragnaros()
 {
     new boss_ragnaros();
     RegisterSpellScript(spell_ragnaros_lava_burst_randomizer);
+    RegisterSpellScript(spell_ragnaros_summon_sons_of_flame);
 }
