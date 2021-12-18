@@ -570,7 +570,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION && me->GetInstanceScript())
             {

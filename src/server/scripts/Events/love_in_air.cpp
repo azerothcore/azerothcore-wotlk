@@ -330,7 +330,7 @@ struct npc_love_in_air_hummel : public ScriptedAI
             speachTimer = 1;
     }
 
-    void JustDied(Unit* ) override
+    void JustDied(Unit* /*killer*/) override
     {
         me->AI()->Talk(SAY_HUMMEL_5);
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -465,7 +465,7 @@ struct npc_love_in_air_hummel_helper : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* ) override
+    void JustDied(Unit* /*killer*/) override
     {
         me->AI()->Talk(SAY_HUMMEL_HELPER_SAY_5);
     }

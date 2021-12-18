@@ -17189,8 +17189,10 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             killer->ToCreature()->AI()->KilledUnit(victim);
 
         // Call creature just died function
-        if (creature->IsAIEnabled)
-            creature->AI()->JustDied(killer ? killer : victim);
+        if (CreatureAI* ai = creature->AI())
+        {
+            ai->JustDied(killer);
+        }
 
         if (TempSummon* summon = creature->ToTempSummon())
             if (Unit* summoner = summon->GetSummonerUnit())

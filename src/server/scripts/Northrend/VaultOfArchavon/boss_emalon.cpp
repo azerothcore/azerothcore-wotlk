@@ -149,7 +149,7 @@ public:
                 pInstance->SetData(EVENT_EMALON, IN_PROGRESS);
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             events.Reset();

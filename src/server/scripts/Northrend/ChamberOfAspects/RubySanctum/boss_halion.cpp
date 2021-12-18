@@ -494,7 +494,7 @@ public:
                 if (me->IsDamageEnoughForLootingAndReward())
                     halion->LowerPlayerDamageReq(halion->GetMaxHealth());
 
-                if (halion->IsAlive())
+                if (killer && halion->IsAlive())
                     Unit::Kill(killer, halion);
             }
 
