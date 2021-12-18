@@ -7705,6 +7705,8 @@ void Spell::HandleLaunchPhase()
             usesAmmo = false;
     }
 
+    PrepareTargetProcessing();
+
     bool firstTarget = true;
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
@@ -7742,6 +7744,8 @@ void Spell::HandleLaunchPhase()
         DoAllEffectOnLaunchTarget(target, multiplier, firstTarget);
         firstTarget = false;
     }
+
+    FinishTargetProcessing();
 }
 
 void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier, bool firstTarget)

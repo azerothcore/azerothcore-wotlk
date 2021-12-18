@@ -921,11 +921,6 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                     }
                     return;
                 }
-            // Spell Lock, handled in interrupt effect
-            // launch is handled before hit triggers, thus silence removes current casted spell
-            // and interrupt is unable to detect any cast and doesnt work
-            case 24259:
-                return;
         }
     }
 
@@ -3716,7 +3711,7 @@ void Spell::EffectHealMaxHealth(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectInterruptCast(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
 
     if (!unitTarget || !unitTarget->IsAlive())
@@ -3747,10 +3742,6 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
             }
         }
     }
-
-    // Spell Lock
-    if (m_spellInfo->Id == 19647)
-        m_caster->CastSpell(unitTarget, m_spellInfo->Effects[EFFECT_1].TriggerSpell, true);
 }
 
 void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
