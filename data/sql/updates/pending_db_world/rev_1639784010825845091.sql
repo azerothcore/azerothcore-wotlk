@@ -34,6 +34,7 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMa
 
 -- Respawn Stonewing Slayer
 DELETE FROM `creature` WHERE `id`=16324;
+DELETE FROM `creature` WHERE `guid`=82336;
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
 (82484, 16324, 530, 0, 0, 1, 1, 0, 0, 7286.3057, -6011.4873, 18.123753, 0.757922708988189697, 300, 10, 0, 1, 0, 1, 0, 0, 0, '', 0),
 (82373, 16324, 530, 0, 0, 1, 1, 0, 0, 7317.652, -5985.4385, 15.159128, 0.907571196556091308, 300, 10, 0, 1, 0, 1, 0, 0, 0, '', 0),
