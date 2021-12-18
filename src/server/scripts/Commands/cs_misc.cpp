@@ -168,7 +168,7 @@ public:
             { "showarea",           SEC_GAMEMASTER,         false, &HandleShowAreaCommand,              "" },
             { "hidearea",           SEC_ADMINISTRATOR,      false, &HandleHideAreaCommand,              "" },
             { "additem",            SEC_GAMEMASTER,         false, &HandleAddItemCommand,               "" },
-            { "additemset",         SEC_GAMEMASTER,         false, &HandleAddItemSetCommand,            "" },
+            { "additem set",        SEC_GAMEMASTER,         false, &HandleAddItemSetCommand,            "" },
             { "wchange",            SEC_ADMINISTRATOR,      false, &HandleChangeWeather,                "" },
             { "maxskill",           SEC_GAMEMASTER,         false, &HandleMaxSkillCommand,              "" },
             { "setskill",           SEC_GAMEMASTER,         false, &HandleSetSkillCommand,              "" },
