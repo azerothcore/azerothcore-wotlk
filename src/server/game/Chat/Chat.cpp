@@ -35,10 +35,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 Player* ChatHandler::GetPlayer() const
 {
     return m_session ? m_session->GetPlayer() : nullptr;

@@ -21,11 +21,13 @@
 #include "Corpse.h"
 #include "CreatureAI.h"
 #include "GridNotifiers.h"
+#include "Object.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
+#include "WorldSession.h"
 
 template<class T>
 inline void Acore::VisibleNotifier::Visit(GridRefMgr<T>& m)

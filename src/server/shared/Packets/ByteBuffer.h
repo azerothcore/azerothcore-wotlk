@@ -18,12 +18,12 @@
 #ifndef _BYTEBUFFER_H
 #define _BYTEBUFFER_H
 
-#include "Define.h"
 #include "ByteConverter.h"
+#include "Define.h"
 #include <array>
+#include <cstring>
 #include <string>
 #include <vector>
-#include <cstring>
 
 class MessageBuffer;
 

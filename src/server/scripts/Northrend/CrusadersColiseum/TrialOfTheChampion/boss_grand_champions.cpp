@@ -17,12 +17,12 @@
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "trial_of_the_champion.h"
 #include "Vehicle.h"
+#include "trial_of_the_champion.h"
 
 enum MountSpells
 {

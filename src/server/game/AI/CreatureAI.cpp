@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Creature.h"
 #include "CreatureAI.h"
+#include "Creature.h"
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
@@ -314,14 +314,13 @@ bool CreatureAI::_EnterEvadeMode()
     me->SetLastDamagedTime(0);
     me->SetCannotReachTarget(false);
 
-    if (CreatureGroup* formation = me->GetFormation())
-    {
-        formation->MemberEvaded(me);
-    }
-
     if (me->IsInEvadeMode())
     {
         return false;
+    }
+    else if (CreatureGroup* formation = me->GetFormation())
+    {
+        formation->MemberEvaded(me);
     }
 
     return true;

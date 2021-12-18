@@ -21,9 +21,9 @@
 #include "IoContext.h"
 #include "IpAddress.h"
 #include "Log.h"
+#include <atomic>
 #include <boost/asio/ip/tcp.hpp>
 #include <functional>
-#include <atomic>
 
 using boost::asio::ip::tcp;
 

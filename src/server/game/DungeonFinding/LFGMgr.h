@@ -89,7 +89,7 @@ namespace lfg
         LFG_TELEPORTERROR_IN_VEHICLE                 = 3,
         LFG_TELEPORTERROR_FATIGUE                    = 4,
         LFG_TELEPORTERROR_INVALID_LOCATION           = 6,
-        LFG_TELEPORTERROR_CHARMING                   = 8       // FIXME - It can be 7 or 8 (Need proper data)
+        LFG_TELEPORTERROR_COMBAT                     = 8       // FIXME - It can be 7 or 8 (Need proper data)
     };
 
     /// Queue join results

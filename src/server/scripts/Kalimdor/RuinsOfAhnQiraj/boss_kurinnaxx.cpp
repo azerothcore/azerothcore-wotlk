@@ -16,9 +16,9 @@
  */
 
 #include "CreatureTextMgr.h"
-#include "ruins_of_ahnqiraj.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Spells
 {

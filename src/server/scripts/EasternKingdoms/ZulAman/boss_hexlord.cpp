@@ -22,8 +22,8 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "zulaman.h"

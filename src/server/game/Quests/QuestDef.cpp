@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "QuestDef.h"
 #include "Formulas.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "QuestDef.h"
 #include "World.h"
 
 Quest::Quest(Field* questRecord)
@@ -184,38 +184,47 @@ void Quest::LoadQuestTemplateAddon(Field* fields)
         Flags |= QUEST_FLAGS_AUTO_ACCEPT;
 }
 
-uint32 Quest::XPValue(Player* player) const
+uint32 Quest::XPValue(uint8 playerLevel) const
 {
-    if (player)
+    int32 quest_level = (Level == -1 ? playerLevel : Level);
+    const QuestXPEntry* xpentry = sQuestXPStore.LookupEntry(quest_level);
+    if (!xpentry)
     {
-        int32 quest_level = (Level == -1 ? player->getLevel() : Level);
-        const QuestXPEntry* xpentry = sQuestXPStore.LookupEntry(quest_level);
-        if (!xpentry)
-            return 0;
-
-        int32 diffFactor = 2 * (quest_level - player->getLevel()) + 20;
-        if (diffFactor < 1)
-            diffFactor = 1;
-        else if (diffFactor > 10)
-            diffFactor = 10;
-
-        uint32 xp = diffFactor * xpentry->Exp[RewardXPDifficulty] / 10;
-        if (xp <= 100)
-            xp = 5 * ((xp + 2) / 5);
-        else if (xp <= 500)
-            xp = 10 * ((xp + 5) / 10);
-        else if (xp <= 1000)
-            xp = 25 * ((xp + 12) / 25);
-        else
-            xp = 50 * ((xp + 25) / 50);
-
-        return xp;
+        return 0;
     }
 
-    return 0;
+    int32 diffFactor = 2 * (quest_level - playerLevel) + 20;
+    if (diffFactor < 1)
+    {
+        diffFactor = 1;
+    }
+    else if (diffFactor > 10)
+    {
+        diffFactor = 10;
+    }
+
+    uint32 xp = diffFactor * xpentry->Exp[RewardXPDifficulty] / 10;
+    if (xp <= 100)
+    {
+        xp = 5 * ((xp + 2) / 5);
+    }
+    else if (xp <= 500)
+    {
+        xp = 10 * ((xp + 5) / 10);
+    }
+    else if (xp <= 1000)
+    {
+        xp = 25 * ((xp + 12) / 25);
+    }
+    else
+    {
+        xp = 50 * ((xp + 25) / 50);
+    }
+
+    return xp;
 }
 
-int32 Quest::GetRewOrReqMoney(Player* player /*= nullptr*/) const
+int32 Quest::GetRewOrReqMoney(uint8 playerLevel) const
 {
     int32 rewardedMoney = RewardMoney;
     if (rewardedMoney < 0)
@@ -223,9 +232,9 @@ int32 Quest::GetRewOrReqMoney(Player* player /*= nullptr*/) const
         return rewardedMoney;
     }
 
-    if (player && RewardMoneyDifficulty)
+    if (playerLevel && RewardMoneyDifficulty)
     {
-        if (uint32 questRewardedMoney = sObjectMgr->GetQuestMoneyReward(player->getLevel(), RewardMoneyDifficulty))
+        if (uint32 questRewardedMoney = sObjectMgr->GetQuestMoneyReward(playerLevel, RewardMoneyDifficulty))
         {
             rewardedMoney = questRewardedMoney;
         }

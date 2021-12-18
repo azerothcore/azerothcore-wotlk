@@ -20,8 +20,8 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "WorldPacket.h"
 #include "ObjectGuid.h"
+#include "WorldPacket.h"
 #include <unordered_map>
 
 enum CalendarMailAnswers

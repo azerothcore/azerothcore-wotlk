@@ -16,11 +16,11 @@
  */
 
 #include "GridNotifiers.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -237,7 +237,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -589,7 +589,7 @@ public:
 
                 // AIR PHASE EVENTS BELOW:
                 case EVENT_AIR_PHASE:
-                    // pussywizard: unroot may be scheduled after this event cos of events shitness (time must be unique)
+                    // pussywizard: unroot may be scheduled after this event cos of events (time must be unique)
                     if (me->HasUnitState(UNIT_STATE_ROOT))
                     {
                         events.CancelEvent(EVENT_UNROOT);

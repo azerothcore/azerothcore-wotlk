@@ -70,7 +70,7 @@ enum ArenaTeamEvents
 };
 
 // PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
-enum ArenaTeamInfoType
+enum ArenaTeamInfoType : uint8
 {
     ARENA_TEAM_ID                = 0,
     ARENA_TEAM_TYPE              = 1,                       // new in 3.2 - team type?

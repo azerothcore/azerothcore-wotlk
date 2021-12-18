@@ -18,9 +18,9 @@
 #include "GameObjectAI.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
-#include "scholomance.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "scholomance.h"
 
 enum Spells
 {

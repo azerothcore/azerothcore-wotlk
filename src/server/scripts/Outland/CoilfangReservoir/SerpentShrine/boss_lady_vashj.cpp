@@ -16,11 +16,11 @@
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "serpent_shrine.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "WorldSession.h"
+#include "serpent_shrine.h"
 
 enum Says
 {

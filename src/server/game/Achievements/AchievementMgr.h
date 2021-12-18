@@ -18,15 +18,14 @@
 #ifndef __ACORE_ACHIEVEMENTMGR_H
 #define __ACORE_ACHIEVEMENTMGR_H
 
-#include <map>
-#include <string>
-#include <chrono>
-
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include <chrono>
+#include <map>
+#include <string>
 
 typedef std::list<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
 typedef std::list<AchievementEntry const*>         AchievementEntryList;

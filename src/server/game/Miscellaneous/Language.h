@@ -228,7 +228,10 @@ enum AcoreStrings
     LANG_CMD_AMBIGUOUS                  = 194,
     LANG_CMD_HELP_GENERIC               = 195,
     LANG_CMD_NO_HELP_AVAILABLE          = 196,
-    // Room for more level 1                197-199 not used
+
+    LANG_ITEM_RESTORE_LIST              = 197,
+    LANG_ITEM_RESTORE_LIST_EMPTY        = 198,
+    LANG_ITEM_RESTORE_MISSING           = 199,
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -1114,7 +1117,8 @@ enum AcoreStrings
     LANG_CMDPARSER_ITEM_NO_EXIST          = 1513,
     LANG_CMDPARSER_SPELL_NO_EXIST         = 1514,
     LANG_CMDPARSER_EXACT_SEQ_MISMATCH     = 1515,
-    // FREE IDS                             1516-1499
+    LANG_CMDPARSER_QUEST_NO_EXIST         = 1516,
+    // FREE IDS                             1517-1499
 
     // Ticket Strings 2000-2030
     LANG_COMMAND_TICKETNEW              = 2000,
@@ -1225,7 +1229,12 @@ enum AcoreStrings
     LANG_COMMAND_CACHE_REFRESH          = 5065,
     LANG_COMMAND_CACHE_NOT_FOUND        = 5066,
 
-    // Room for more strings    5063-9999
+    LANG_COMMAND_QUEST_ADD              = 5067,
+    LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG = 5068,
+    LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
+
+    // Room for more strings    5070-9999
+    LANG_COMMAND_DISABLED               = 5070,
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

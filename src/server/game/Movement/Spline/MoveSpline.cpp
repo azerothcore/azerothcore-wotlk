@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MoveSpline.h"
 #include "Creature.h"
 #include "Log.h"
-#include "MoveSpline.h"
 #include <sstream>
 
 namespace Movement

@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvPMgr.h"
 #include "DisableMgr.h"
 #include "ObjectMgr.h"
-#include "OutdoorPvPMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 
