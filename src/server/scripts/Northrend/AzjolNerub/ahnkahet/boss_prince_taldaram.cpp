@@ -164,7 +164,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
                 }
 
                 float angle = me->GetAngle(&victimPos) + angleOffset;
-                float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
+                float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * std::cos(angle);
                 float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * sin(angle);
                 me->GetMotionMaster()->MovePoint(POINT_ORB, x, y, me->GetPositionZ());
 

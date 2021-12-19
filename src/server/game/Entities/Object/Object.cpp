@@ -1519,8 +1519,8 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
 
 void Position::RelocateOffset(const Position& offset)
 {
-    m_positionX = GetPositionX() + (offset.GetPositionX() * cos(GetOrientation()) + offset.GetPositionY() * sin(GetOrientation() + M_PI));
-    m_positionY = GetPositionY() + (offset.GetPositionY() * cos(GetOrientation()) + offset.GetPositionX() * sin(GetOrientation()));
+    m_positionX = GetPositionX() + (offset.GetPositionX() * std::cos(GetOrientation()) + offset.GetPositionY() * sin(GetOrientation() + M_PI));
+    m_positionY = GetPositionY() + (offset.GetPositionY() * std::cos(GetOrientation()) + offset.GetPositionX() * sin(GetOrientation()));
     m_positionZ = GetPositionZ() + offset.GetPositionZ();
     m_orientation = GetOrientation() + offset.GetOrientation();
 }
@@ -1530,8 +1530,8 @@ void Position::GetPositionOffsetTo(const Position& endPos, Position& retOffset) 
     float dx = endPos.GetPositionX() - GetPositionX();
     float dy = endPos.GetPositionY() - GetPositionY();
 
-    retOffset.m_positionX = dx * cos(GetOrientation()) + dy * sin(GetOrientation());
-    retOffset.m_positionY = dy * cos(GetOrientation()) - dx * sin(GetOrientation());
+    retOffset.m_positionX = dx * std::cos(GetOrientation()) + dy * sin(GetOrientation());
+    retOffset.m_positionY = dy * std::cos(GetOrientation()) - dx * sin(GetOrientation());
     retOffset.m_positionZ = endPos.GetPositionZ() - GetPositionZ();
     retOffset.m_orientation = endPos.GetOrientation() - GetOrientation();
 }
@@ -1558,7 +1558,7 @@ void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos)
     if (fabs(dx) < 0.001f && fabs(dy) < 0.001f)
     {
         float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
-        vcos = cos(angle);
+        vcos = std::cos(angle);
         vsin = sin(angle);
     }
     else
@@ -1677,7 +1677,7 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
     float new_dist = (float)rand_norm() * static_cast<float>(distance);
 
-    rand_x = pos.m_positionX + new_dist * cos(angle);
+    rand_x = pos.m_positionX + new_dist * std::cos(angle);
     rand_y = pos.m_positionY + new_dist * sin(angle);
     rand_z = pos.m_positionZ;
 
@@ -2862,7 +2862,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
 {
     angle += m_orientation;
     float destx, desty, destz, ground, floor;
-    destx = pos.m_positionX + dist * cos(angle);
+    destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * sin(angle);
 
     // Prevent invalid coordinates here, position is unchanged
@@ -2883,7 +2883,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         // do not allow too big z changes
         if (fabs(pos.m_positionZ - destz) > 6.0f)
         {
-            destx -= step * cos(angle);
+            destx -= step * std::cos(angle);
             desty -= step * sin(angle);
             ground = GetMapHeight(destx, desty, MAX_HEIGHT);
             floor = GetMapHeight(destx, desty, pos.m_positionZ);
@@ -2944,7 +2944,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 {
     angle += GetOrientation();
     float destx, desty, destz;
-    destx = pos.m_positionX + dist * cos(angle);
+    destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
 

@@ -338,7 +338,7 @@ public:
                         me->m_positionZ = 42.5f;
                         me->DisableSpline();
                         me->CastSpell(me, SPELL_COLDFLAME_SUMMON, true);
-                        float nx = me->GetPositionX() + 5.0f * cos(me->GetOrientation());
+                        float nx = me->GetPositionX() + 5.0f * std::cos(me->GetOrientation());
                         float ny = me->GetPositionY() + 5.0f * sin(me->GetOrientation());
                         if (!me->IsWithinLOS(nx, ny, 42.5f))
                         {
@@ -494,12 +494,12 @@ public:
             float angle = caster->GetAngle(GetHitUnit());
             float dist = caster->GetObjectSize() / 2.0f;
             float z = caster->GetPositionZ() + 2.5f;
-            float nx = caster->GetPositionX() + dist * cos(angle);
+            float nx = caster->GetPositionX() + dist * std::cos(angle);
             float ny = caster->GetPositionY() + dist * sin(angle);
 
             if (!caster->IsWithinLOS(nx, ny, z))
             {
-                nx = caster->GetPositionX() + 0.5f * cos(angle);
+                nx = caster->GetPositionX() + 0.5f * std::cos(angle);
                 ny = caster->GetPositionY() + 0.5f * sin(angle);
             }
 
@@ -598,7 +598,7 @@ public:
             float z = caster->GetPositionZ() + 2.5f;
             for (uint8 i = 0; i < 4; ++i)
             {
-                float nx = x + 2.5f * cos((M_PI / 4) + (i * (M_PI / 2)));
+                float nx = x + 2.5f * std::cos((M_PI / 4) + (i * (M_PI / 2)));
                 float ny = y + 2.5f * sin((M_PI / 4) + (i * (M_PI / 2)));
                 if (caster->IsWithinLOS(nx, ny, z))
                 {

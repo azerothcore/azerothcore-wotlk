@@ -162,7 +162,7 @@ class spell_q12014_steady_as_a_rock : public SpellScript
 
         if (caster->ToPlayer()->GetQuestStatus(12014 /*QUEST_STEADY_AS_A_ROCK*/) == QUEST_STATUS_INCOMPLETE)
         {
-            float x = caster->GetPositionX() + 3.0f * cos(caster->GetOrientation());
+            float x = caster->GetPositionX() + 3.0f * std::cos(caster->GetOrientation());
             float y = caster->GetPositionY() + 3.0f * sin(caster->GetOrientation());
             float o = caster->GetOrientation() < M_PI ? caster->GetOrientation() + M_PI : caster->GetOrientation() - M_PI;
             caster->SummonGameObject(188367, x, y, caster->GetPositionZ(), o, 0.0f, 0.0f, 0.0f, 0.0f, 60000);
@@ -472,7 +472,7 @@ class spell_quest_dragonmaw_race_generic : public SpellScript
         Unit* caster = GetCaster();
         float o = Position::NormalizeOrientation(caster->GetOrientation() + frand(0.0f, 2 * M_PI));
         float dist = frand(5.0f, 30.0f);
-        _x = caster->GetPositionX() + dist * cos(o);
+        _x = caster->GetPositionX() + dist * std::cos(o);
         _y = caster->GetPositionY() + dist * sin(o);
         _z = caster->GetPositionZ() + frand(-10.0f, 15.0f);
         GetSpell()->m_targets.SetDst(_x, _y, _z, 0.0f, caster->GetMapId());

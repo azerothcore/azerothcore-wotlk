@@ -18680,7 +18680,7 @@ void Unit::JumpTo(float speedXY, float speedZ, bool forward)
         GetMotionMaster()->MoveJumpTo(angle, speedXY, speedZ);
     else
     {
-        float vcos = cos(angle + GetOrientation());
+        float vcos = std::cos(angle + GetOrientation());
         float vsin = sin(angle + GetOrientation());
 
         WorldPacket data(SMSG_MOVE_KNOCK_BACK, (8 + 4 + 4 + 4 + 4 + 4));
@@ -18946,7 +18946,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         pos.Relocate(2802.18f, 7054.91f, -0.6f, 4.67f);
     else if (vehicle->GetVehicleInfo()->m_ID == 349) // AT Mounts, dismount to the right
     {
-        float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
+        float x = pos.GetPositionX() + 2.0f * std::cos(pos.GetOrientation() - M_PI / 2.0f);
         float y = pos.GetPositionY() + 2.0f * sin(pos.GetOrientation() - M_PI / 2.0f);
         float z = GetMapHeight(x, y, pos.GetPositionZ());
         if (z > INVALID_HEIGHT)
@@ -18982,7 +18982,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     {
         float o = pos.GetAngle(this);
         Movement::MoveSplineInit init(this);
-        init.MoveTo(pos.GetPositionX() + 8 * cos(o), pos.GetPositionY() + 8 * sin(o), pos.GetPositionZ() + 16.0f);
+        init.MoveTo(pos.GetPositionX() + 8 * std::cos(o), pos.GetPositionY() + 8 * sin(o), pos.GetPositionZ() + 16.0f);
         init.SetFacing(GetOrientation());
         init.SetTransportExit();
         init.Launch();

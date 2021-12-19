@@ -643,7 +643,7 @@ G3D::Vector3 TranslateLocation(G3D::Vector4 const* DBCPosition, G3D::Vector3 con
     }
 
     work.x = DBCPosition->x + (distance * sin(angle));
-    work.y = DBCPosition->y + (distance * cos(angle));
+    work.y = DBCPosition->y + (distance * std::cos(angle));
     work.z = DBCPosition->z + z;
     return work;
 }

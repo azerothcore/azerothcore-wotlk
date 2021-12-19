@@ -1515,7 +1515,7 @@ void GameObject::Use(Unit* user)
                     // the distance between this slot and the center of the go - imagine a 1D space
                     float relativeDistance = (info->size * itr->first) - (info->size * (info->chair.slots - 1) / 2.0f);
 
-                    float x_i = GetPositionX() + relativeDistance * cos(orthogonalOrientation);
+                    float x_i = GetPositionX() + relativeDistance * std::cos(orthogonalOrientation);
                     float y_i = GetPositionY() + relativeDistance * sin(orthogonalOrientation);
 
                     if (itr->second)
@@ -2085,7 +2085,7 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
         return IsWithinDist3d(x, y, z, radius);
 
     float sinA = sin(GetOrientation());
-    float cosA = cos(GetOrientation());
+    float cosA = std::cos(GetOrientation());
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
     float dz = z - GetPositionZ();

@@ -164,7 +164,7 @@ class spell_winter_veil_racer_rocket_slam : public SpellScript
         else
         {
             Position pos;
-            float x = caster->GetPositionX() + 30 * cos(caster->GetOrientation());
+            float x = caster->GetPositionX() + 30 * std::cos(caster->GetOrientation());
             float y = caster->GetPositionY() + 30 * sin(caster->GetOrientation());
             pos.Relocate(x, y, caster->GetMap()->GetHeight(x, y, MAX_HEIGHT) + 0.5f);
             //caster->GetFirstCollisionPosition(pos, 30.0f, caster->GetOrientation());

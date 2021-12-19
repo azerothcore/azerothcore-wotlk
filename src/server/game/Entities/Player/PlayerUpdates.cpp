@@ -1562,7 +1562,7 @@ void Player::UpdateCinematicLocation(uint32 /*diff*/)
 
     // Modify result based on camera direction (Humans for example, have the
     // camera point behind)
-    workDiff += static_cast<int32>(float(CINEMATIC_LOOKAHEAD) * cos(angle));
+    workDiff += static_cast<int32>(float(CINEMATIC_LOOKAHEAD) * std::cos(angle));
 
     // Get an iterator to the last entry in the cameras, to make sure we don't
     // go beyond the end
