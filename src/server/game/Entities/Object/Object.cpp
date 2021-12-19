@@ -1563,7 +1563,7 @@ void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos)
     }
     else
     {
-        float dist = sqrt((dx * dx) + (dy * dy));
+        float dist = std::sqrt((dx * dx) + (dy * dy));
         vcos = dx / dist;
         vsin = dy / dist;
     }
@@ -1625,7 +1625,7 @@ bool Position::HasInArc(float arc, const Position* obj, float targetRadius) cons
         // pussywizard: at least a part of target's model is in every direction
         if (distSq < targetRadius * targetRadius)
             return true;
-        float angularRadius = 2.0f * atan(targetRadius / (2.0f * sqrt(distSq)));
+        float angularRadius = 2.0f * atan(targetRadius / (2.0f * std::sqrt(distSq)));
         lborder -= angularRadius;
         rborder += angularRadius;
     }
@@ -1651,7 +1651,7 @@ bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, 
     float A = (obj2->GetPositionY() - obj1->GetPositionY()) / (obj2->GetPositionX() - obj1->GetPositionX());
     float B = -1;
     float C = obj1->GetPositionY() - A * obj1->GetPositionX();
-    float dist = fabs(A * GetPositionX() + B * GetPositionY() + C) / sqrt(A * A + B * B);
+    float dist = fabs(A * GetPositionX() + B * GetPositionY() + C) / std::sqrt(A * A + B * B);
     return dist <= size;
 }
 
