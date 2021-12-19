@@ -309,7 +309,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->Yell(TEXT_DEATH, LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_DEATH);
