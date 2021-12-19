@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1639932916698986865');
 -- Windrunner Spire
 
 -- Fallen Ranger
-UPDATE `creature` SET `wander_distance`=3 WHERE `guid` IN (82535,82533);
+UPDATE `creature` SET `wander_distance`=3, `MovementType`=1 WHERE `guid` IN (82535,82533);
 DELETE FROM `creature` WHERE `guid` IN (82508,82526,82525,82543,82541,82542,82532,82524,82546,82507,82509,82523,82530,82534,82721);
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
 (82508, 16314, 530, 0, 0, 1, 1, 0, 0, 6983.7007, -5851.492, 44.219906, 2.168352842330932617, 300, 6, 0, 1, 0, 1, 0, 0, 0, '', 0),
@@ -23,7 +23,7 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMa
 (82721, 16314, 530, 0, 0, 1, 1, 0, 0, 7001.0156, -5658.835, 80.86369, 4.616763114929199218, 300, 4, 0, 1, 0, 1, 0, 0, 0, '', 0);
 
 -- Deatholme Acolyte
-UPDATE `creature` SET `wander_distance`=3 WHERE `guid`=82539;
+UPDATE `creature` SET `wander_distance`=3, `MovementType`=1 WHERE `guid`=82539;
 DELETE FROM `creature` WHERE `guid` IN (82545,82537,82538,82514,82529,82536,82540,82528,82547,82531,82544,82527,82522,82722);
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
 (82545, 16315, 530, 0, 0, 1, 1, 0, 0, 7019.394, -5656.379, 80.86369, 5.50263214111328125, 300, 0, 0, 1, 0, 2, 0, 0, 0, '', 0),
