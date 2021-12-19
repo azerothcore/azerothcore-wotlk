@@ -471,11 +471,11 @@ public:
                                 Player* player = pg[index];
                                 float angle = rand_norm() * 2 * M_PI;
                                 float z = 364.35f;
-                                if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + sin(angle) * 5.0f, z))
+                                if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z))
                                 {
                                     angle = player->GetAngle(2744.65f, 2569.46f);
                                 }
-                                me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
+                                me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
                                 pg.erase(pg.begin() + index);
                             }
 
@@ -789,7 +789,7 @@ public:
 
                         float angle = VX001->GetOrientation();
                         float v_x = me->GetPositionX() + cos(angle) * 10.0f;
-                        float v_y = me->GetPositionY() + sin(angle) * 10.0f;
+                        float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
                         me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
 
                         if( pInstance )
@@ -1454,7 +1454,7 @@ public:
                                         trigger->CastSpell(trigger, SPELL_ROCKET_STRIKE_AURA, true);
                                     Position exitPos = r->GetPosition();
                                     exitPos.m_positionX += cos(me->GetOrientation()) * 2.35f;
-                                    exitPos.m_positionY += sin(me->GetOrientation()) * 2.35f;
+                                    exitPos.m_positionY += std::sin(me->GetOrientation()) * 2.35f;
                                     exitPos.m_positionZ += 2.0f * Phase;
                                     r->_ExitVehicle(&exitPos);
                                     me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, r->GetGUID());
@@ -1760,7 +1760,7 @@ public:
                         float angle = victim->GetAngle(me->GetPositionX(), me->GetPositionY());
                         me->SetOrientation( me->GetAngle(victim->GetPositionX(), victim->GetPositionY()) );
                         float x = victim->GetPositionX() + 15.0f * cos(angle);
-                        float y = victim->GetPositionY() + 15.0f * sin(angle);
+                        float y = victim->GetPositionY() + 15.0f * std::sin(angle);
 
                         // check if there's magnetic core in line of movement
                         Creature* mc = nullptr;
@@ -2377,7 +2377,7 @@ public:
                             if (target && prevdist >= 4.0f) // no need to spread when player is standing in fire, check distance
                             {
                                 float angle = last->GetAngle(target->GetPositionX(), target->GetPositionY()) - M_PI / 8 + rand_norm() * 2 * M_PI / 8;
-                                SpreadFlame(last->GetPositionX() + 7.0f * cos(angle), last->GetPositionY() + 7.0f * sin(angle));
+                                SpreadFlame(last->GetPositionX() + 7.0f * cos(angle), last->GetPositionY() + 7.0f * std::sin(angle));
                             }
                         }
 

@@ -182,7 +182,7 @@ public:
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist = rand_norm() * 40.0f;
-                if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
+                if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + std::sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
                 {
                     c->SetFaction(FACTION_PREY);
                     c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -652,7 +652,7 @@ public:
                     o -= M_PI;
                 else
                     o += M_PI;
-                me->NearTeleportTo(target->GetPositionX() + cos(o) * 5.0f, target->GetPositionY() + sin(o) * 5.0f, target->GetPositionZ() + 0.6f, target->GetOrientation());
+                me->NearTeleportTo(target->GetPositionX() + cos(o) * 5.0f, target->GetPositionY() + std::sin(o) * 5.0f, target->GetPositionZ() + 0.6f, target->GetOrientation());
                 AttackStart(target);
                 me->GetMotionMaster()->MoveChase(target);
                 events.DelayEvents(3000);

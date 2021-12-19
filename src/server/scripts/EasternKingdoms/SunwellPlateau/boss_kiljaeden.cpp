@@ -585,7 +585,7 @@ public:
                     for (uint8 i = 1; i < phase; ++i)
                     {
                         float x = me->GetPositionX() + 18.0f * cos((i * 2.0f - 1.0f) * M_PI / 3.0f);
-                        float y = me->GetPositionY() + 18.0f * sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
+                        float y = me->GetPositionY() + 18.0f * std::sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
                         if (Creature* orb = me->SummonCreature(NPC_SHIELD_ORB, x, y, 40.0f, 0, TEMPSUMMON_CORPSE_DESPAWN))
                         {
                             Movement::PointsArray movementArray;
@@ -595,7 +595,7 @@ public:
                             for (uint8 j = 1; j < 20; ++j)
                             {
                                 x = me->GetPositionX() + 18.0f * cos(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
-                                y = me->GetPositionY() + 18.0f * sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
+                                y = me->GetPositionY() + 18.0f * std::sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
                                 movementArray.push_back(G3D::Vector3(x, y, 40.0f));
                             }
 
@@ -866,8 +866,8 @@ public:
                     events.ScheduleEvent(eventId + 1, 6000);
                     break;
                 case EVENT_SCENE_03:
-                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1727.08f + cos(5.14f), 656.82f + sin(5.14f), 28.37f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1738.84f + cos(2.0f), 627.32f + sin(2.0f), 28.26f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1727.08f + cos(5.14f), 656.82f + std::sin(5.14f), 28.37f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1738.84f + cos(2.0f), 627.32f + std::sin(2.0f), 28.26f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
                     events.ScheduleEvent(eventId + 1, 11000);
                     break;
                 case EVENT_SCENE_04:
@@ -880,7 +880,7 @@ public:
                         first->m_Events.AddEvent(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), first->m_Events.CalculateTime(5000));
                         first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(12000));
                         for (uint8 i = 0; i < 9; ++i)
-                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
+                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                                 follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
                     }
                     events.ScheduleEvent(eventId + 1, 10000);
@@ -891,7 +891,7 @@ public:
                         first->m_Events.AddEvent(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), first->m_Events.CalculateTime(5000));
                         first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(14500));
                         for (uint8 i = 0; i < 9; ++i)
-                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
+                            if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                                 follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
                     }
                     events.ScheduleEvent(eventId + 1, 12000);

@@ -877,7 +877,7 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         // reminder: WorldRotation only influences model rotation, not the path
         float sign = GetFloatValue(GAMEOBJECT_PARENTROTATION + 2) >= 0.0f ? 1.0f : -1.0f;
         float pathRotAngle = sign * 2.0f * acos(GetFloatValue(GAMEOBJECT_PARENTROTATION + 3));
-        float cs = cos(pathRotAngle), sn = sin(pathRotAngle);
+        float cs = cos(pathRotAngle), sn = std::sin(pathRotAngle);
         float nx = pos.x * cs - pos.y * sn;
         float ny = pos.x * sn + pos.y * cs;
         pos.x = nx;

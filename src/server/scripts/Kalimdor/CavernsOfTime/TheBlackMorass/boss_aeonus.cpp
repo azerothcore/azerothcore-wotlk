@@ -78,7 +78,7 @@ public:
 
             if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
             {
-                me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
+                me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * std::sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
                 me->GetMotionMaster()->MoveTargetedHome();
             }
         }

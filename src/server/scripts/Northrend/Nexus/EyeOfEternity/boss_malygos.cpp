@@ -260,7 +260,7 @@ public:
                         {
                             float angle = me->GetOrientation();
                             float dist = 75.0f;
-                            if (Creature* c = me->SummonCreature(NPC_PORTAL, me->GetPositionX() + cos(angle) * dist, me->GetPositionY() + sin(angle) * dist, me->GetPositionZ(), FourSidesPos[id].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 13000))
+                            if (Creature* c = me->SummonCreature(NPC_PORTAL, me->GetPositionX() + cos(angle) * dist, me->GetPositionY() + std::sin(angle) * dist, me->GetPositionZ(), FourSidesPos[id].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 13000))
                                 me->CastSpell(c, SPELL_PORTAL_BEAM, false);
                             timer2 = INTRO_MOVEMENT_INTERVAL - 10000;
                         }
@@ -399,7 +399,7 @@ public:
                         me->RemoveAllAuras();
                         float angle = CenterPos.GetAngle(me);
                         float x = CenterPos.GetPositionX() + cos(angle) * 35.0f;
-                        float y = CenterPos.GetPositionY() + sin(angle) * 35.0f;
+                        float y = CenterPos.GetPositionY() + std::sin(angle) * 35.0f;
                         float z = FourSidesPos[0].GetPositionZ();
                         me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_CENTER_AIR, x, y, z);
@@ -485,7 +485,7 @@ public:
                         Position pos;
                         float angle = (me->GetOrientation() >= M_PI / 4 ? me->GetOrientation() - M_PI / 4 : 7 * M_PI / 4 + me->GetOrientation());
                         pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
-                        pos.m_positionY = CenterPos.GetPositionY() + sin(angle) * 40.0f;
+                        pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
                         pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
                         pos.m_orientation = pos.GetAngle(&CenterPos);
 
@@ -504,7 +504,7 @@ public:
                                         Position plrpos;
                                         float playerAngle = CenterPos.GetAngle(pPlayer);
                                         plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
-                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(playerAngle) * 5.0f;
+                                        plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
                                         plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
                                         plrpos.m_orientation = plrpos.GetAngle(&CenterPos);
 
@@ -599,7 +599,7 @@ public:
                     {
                         float dist = 22.0f;
                         float angle = M_PI / 2 + ((float)i / MAX_NEXUS_LORDS) * 2 * M_PI;
-                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + std::sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             if (Creature* c = me->SummonCreature(NPC_NEXUS_LORD, *disk, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             {
                                 c->EnterVehicle(disk, 0);
@@ -610,7 +610,7 @@ public:
                     {
                         float dist = 30.0f;
                         float angle = 0.0f + ((float)i / MAX_SCIONS_OF_ETERNITY) * 2 * M_PI;
-                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                        if (Creature* disk = me->SummonCreature(NPC_HOVER_DISK, CenterPos.GetPositionX() + cos(angle) * dist, CenterPos.GetPositionY() + std::sin(angle) * dist, CenterPos.GetPositionZ() + 30.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             if (Creature* c = me->SummonCreature(NPC_SCION_OF_ETERNITY, *disk, TEMPSUMMON_MANUAL_DESPAWN, 0))
                             {
                                 c->EnterVehicle(disk, 0);
@@ -626,7 +626,7 @@ public:
                         float dist = urand(5, 30);
                         float angle = rand_norm() * 2 * M_PI;
                         float posx = CenterPos.GetPositionX() + cos(angle) * dist;
-                        float posy = CenterPos.GetPositionY() + sin(angle) * dist;
+                        float posy = CenterPos.GetPositionY() + std::sin(angle) * dist;
                         me->SetFacingTo(me->GetAngle(posx, posy));
                         me->CastSpell(posx, posy, CenterPos.GetPositionZ() + 1.5f, SPELL_ARCANE_OVERLOAD, true);
                         events.RepeatEvent(15000);
@@ -639,7 +639,7 @@ public:
                         float dist = Phase2NorthPos.GetExactDist2d(&CenterPos);
                         float newangle = angle + 0.5f;
                         if (newangle >= 2 * M_PI) newangle -= 2 * M_PI;
-                        me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, CenterPos.GetPositionX() + cos(newangle)*dist, CenterPos.GetPositionY() + sin(newangle)*dist, Phase2NorthPos.GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(MI_POINT_CIRCLE_OUTSIDE_PH_2, CenterPos.GetPositionX() + cos(newangle)*dist, CenterPos.GetPositionY() + std::sin(newangle)*dist, Phase2NorthPos.GetPositionZ());
                     }
                     break;
                 case EVENT_MOVE_TO_SURGE_OF_POWER:
@@ -648,7 +648,7 @@ public:
                         float angle = CenterPos.GetAngle(me);
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->GetMotionMaster()->MovePoint(MI_POINT_SURGE_OF_POWER_CENTER, CenterPos.GetPositionX() + cos(angle) * 10.0f, CenterPos.GetPositionY() + sin(angle) * 10.0f, Phase2NorthPos.GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(MI_POINT_SURGE_OF_POWER_CENTER, CenterPos.GetPositionX() + cos(angle) * 10.0f, CenterPos.GetPositionY() + std::sin(angle) * 10.0f, Phase2NorthPos.GetPositionZ());
                         events.CancelEventGroup(1); // everything beside berserk
                     }
                     break;
@@ -878,7 +878,7 @@ public:
             float angle = CenterPos.GetAngle(me);
             Position pos;
             pos.m_positionX = CenterPos.GetPositionX() + VORTEX_RADIUS * cos(angle);
-            pos.m_positionY = CenterPos.GetPositionY() + VORTEX_RADIUS * sin(angle);
+            pos.m_positionY = CenterPos.GetPositionY() + VORTEX_RADIUS * std::sin(angle);
             pos.m_positionZ = CenterPos.GetPositionZ() + h;
             pos.m_orientation = pos.GetAngle(&CenterPos);
             me->SetPosition(pos);
@@ -934,7 +934,7 @@ public:
                 if (newangle >= 2 * M_PI)
                     newangle -= 2 * M_PI;
                 float newx = CenterPos.GetPositionX() + VORTEX_RADIUS * cos(newangle);
-                float newy = CenterPos.GetPositionY() + VORTEX_RADIUS * sin(newangle);
+                float newy = CenterPos.GetPositionY() + VORTEX_RADIUS * std::sin(newangle);
                 float arcangle = me->GetAngle(newx, newy);
                 float dist = 2 * me->GetDistance2d(newx, newy);
                 if (me->GetVehicleKit()) if (Unit* pass = me->GetVehicleKit()->GetPassenger(0)) if (Player* plr = pass->ToPlayer())
@@ -949,7 +949,7 @@ public:
                                 sScriptMgr->AnticheatSetUnderACKmount(plr);
                             }
 
-                            plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
+                            plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * std::sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
                             me->Relocate(newx, newy);
                         }
 
@@ -1333,7 +1333,7 @@ public:
                                         if (newangle < 0.0f) newangle += 2 * M_PI;
                                         float newz = me->GetPositionZ() - 4.0f;
                                         if (newz < CenterPos.GetPositionZ()) newz = CenterPos.GetPositionZ();
-                                        me->GetMotionMaster()->MovePoint(MI_POINT_NEXUS_LORD, CenterPos.GetPositionX() + cos(newangle) * 22.0f, CenterPos.GetPositionY() + sin(newangle) * 22.0f, newz);
+                                        me->GetMotionMaster()->MovePoint(MI_POINT_NEXUS_LORD, CenterPos.GetPositionX() + cos(newangle) * 22.0f, CenterPos.GetPositionY() + std::sin(newangle) * 22.0f, newz);
                                     }
                                     break;
                                 case NPC_SCION_OF_ETERNITY:
@@ -1343,7 +1343,7 @@ public:
                                         if (newangle < 0.0f) newangle += 2 * M_PI;
                                         float newz = me->GetPositionZ() - 2.0f;
                                         if (newz < CenterPos.GetPositionZ() + 20.0f) newz = CenterPos.GetPositionZ() + 20.0f;
-                                        me->GetMotionMaster()->MovePoint(MI_POINT_SCION, CenterPos.GetPositionX() + cos(newangle) * 30.0f, CenterPos.GetPositionY() + sin(newangle) * 30.0f, newz);
+                                        me->GetMotionMaster()->MovePoint(MI_POINT_SCION, CenterPos.GetPositionX() + cos(newangle) * 30.0f, CenterPos.GetPositionY() + std::sin(newangle) * 30.0f, newz);
                                     }
                                     break;
                             }

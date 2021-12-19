@@ -198,7 +198,7 @@ public:
                                 c->SendMovementFlagUpdate();
                                 float dist = rand_norm() * 2.0f;
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
+                                c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * std::sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
                             }
                     }
 
@@ -280,7 +280,7 @@ public:
                                 c->SetSpeed(MOVE_RUN, 0.8f);
                                 c->SetInCombatWithZone();
                                 c->GetMotionMaster()->MoveChase(me, dist, angle);
-                                c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * sin(angle), me->GetPositionZ(), 0.0f);
+                                c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0.0f);
                             }
                     }
 
@@ -541,7 +541,7 @@ public:
                             {
                                 float angle = c->GetAngle(me);
                                 float x = c->GetPositionX() + cos(angle) * 12.0f;
-                                float y = c->GetPositionY() + sin(angle) * 12.0f;
+                                float y = c->GetPositionY() + std::sin(angle) * 12.0f;
                                 me->GetMotionMaster()->MovePoint(2, x, y, c->GetPositionZ());
                             }
 
@@ -685,7 +685,7 @@ public:
                     me->SetFacingTo(PTSTyrannusWaitPos2.GetOrientation());
                     break;
                 case 5:
-                    me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
+                    me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * std::sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
                     break;
                 case 6:
                     me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, false);
@@ -979,7 +979,7 @@ public:
                         c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CHEER);
                         float ang = frand(1.92f, 2.36f);
                         float dist = urand(50, 85);
-                        c->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX() + cos(ang)*dist, TSSpawnPos.GetPositionY() + sin(ang)*dist, 628.2f);
+                        c->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX() + cos(ang)*dist, TSSpawnPos.GetPositionY() + std::sin(ang)*dist, 628.2f);
                     }
             }
             else if (p == 3)
@@ -1187,7 +1187,7 @@ public:
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist = urand(1, 4);
-                target->ToPlayer()->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation());
+                target->ToPlayer()->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation());
             }
         }
 

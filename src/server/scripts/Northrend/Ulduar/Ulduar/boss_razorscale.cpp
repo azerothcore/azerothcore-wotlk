@@ -412,7 +412,7 @@ public:
                         for( int j = 0; j < 4; ++j )
                         {
                             float x = cords[i][0] + 4.0f * cos(j * M_PI / 2);
-                            float y = cords[i][1] + 4.0f * sin(j * M_PI / 2);
+                            float y = cords[i][1] + 4.0f * std::sin(j * M_PI / 2);
 
                             uint32 npc_entry = 0;
                             switch( opt )
@@ -878,7 +878,7 @@ public:
                                     if (!fs->AI()->GetData(2))
                                     {
                                         float a = rand_norm() * M_PI;
-                                        me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * sin(a), fs->GetPositionZ());
+                                        me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * std::sin(a), fs->GetPositionZ());
                                         fixingGUID = fs->GetGUID();
                                         return;
                                     }

@@ -617,7 +617,7 @@ public:
                 if ((cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0, 2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
                     cr->GetMotionMaster()->MoveJump(
                         Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
-                        Middle.GetPositionY() + urand(19, 24) * sin(Middle.GetAngle(cr)),
+                        Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
                         Middle.GetPositionZ(), 20, 20);
             }
         }
