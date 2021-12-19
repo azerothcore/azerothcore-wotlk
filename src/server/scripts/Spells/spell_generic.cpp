@@ -2271,56 +2271,6 @@ class spell_gen_lifeblood : public AuraScript
     }
 };
 
-enum MagicRoosterSpells
-{
-    SPELL_MAGIC_ROOSTER_NORMAL          = 66122,
-    SPELL_MAGIC_ROOSTER_DRAENEI_MALE    = 66123,
-    SPELL_MAGIC_ROOSTER_TAUREN_MALE     = 66124
-};
-
-// 65917 - Magic Rooster
-class spell_gen_magic_rooster : public SpellScript
-{
-    PrepareSpellScript(spell_gen_magic_rooster);
-
-    void HandleScript(SpellEffIndex effIndex)
-    {
-        PreventHitDefaultEffect(effIndex);
-        if (Player* target = GetHitPlayer())
-        {
-            uint32 petNumber = target->GetTemporaryUnsummonedPetNumber();
-            target->SetTemporaryUnsummonedPetNumber(0);
-
-            // prevent client crashes from stacking mounts
-            target->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-            uint32 spellId = SPELL_MAGIC_ROOSTER_NORMAL;
-            switch (target->getRace())
-            {
-                case RACE_DRAENEI:
-                    if (target->getGender() == GENDER_MALE)
-                        spellId = SPELL_MAGIC_ROOSTER_DRAENEI_MALE;
-                    break;
-                case RACE_TAUREN:
-                    if (target->getGender() == GENDER_MALE)
-                        spellId = SPELL_MAGIC_ROOSTER_TAUREN_MALE;
-                    break;
-                default:
-                    break;
-            }
-
-            target->CastSpell(target, spellId, true);
-            if (petNumber)
-                target->SetTemporaryUnsummonedPetNumber(petNumber);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_gen_magic_rooster::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
 /* 4073 - Mechanical Dragonling
    12749 - Mithril Mechanical Dragonling
    13166 - Battle Chicken
@@ -4436,7 +4386,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_seaforium_blast);
     RegisterSpellScript(spell_gen_turkey_marker);
     RegisterSpellScript(spell_gen_lifeblood);
-    RegisterSpellScript(spell_gen_magic_rooster);
     RegisterSpellScript(spell_gen_allow_cast_from_item_only);
     RegisterSpellAndAuraScriptPair(spell_gen_vehicle_scaling, spell_gen_vehicle_scaling_aura);
     RegisterSpellScript(spell_gen_oracle_wolvar_reputation);
