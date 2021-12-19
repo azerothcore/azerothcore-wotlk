@@ -217,7 +217,7 @@ public:
                     {
                         // instance difficulty check is already done in db (achievement_criteria_data)
                         // int() for Visual Studio, compile errors with abs(time_t)
-                        return (abs(int(ArchavonDeath - EmalonDeath)) < MINUTE && \
+                        return (std::abs(int(ArchavonDeath - EmalonDeath)) < MINUTE && \
                                 abs(int(EmalonDeath - KoralonDeath)) < MINUTE && \
                                 abs(int(KoralonDeath - ArchavonDeath)) < MINUTE);
                     }

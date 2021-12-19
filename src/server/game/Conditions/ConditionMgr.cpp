@@ -931,7 +931,7 @@ void ConditionMgr::LoadConditions(bool isReload)
                 delete cond;
                 continue;
             }
-            cond->ReferenceId = uint32(abs(iConditionTypeOrReference));
+            cond->ReferenceId = uint32(std::abs(iConditionTypeOrReference));
 
             const char* rowType = "reference template";
             if (iSourceTypeOrReferenceId >= 0)
