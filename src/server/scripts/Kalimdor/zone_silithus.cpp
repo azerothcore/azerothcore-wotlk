@@ -28,7 +28,6 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "AccountMgr.h"
-#include "BanMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Group.h"
@@ -38,7 +37,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "SpellInfo.h"
-#include "WorldSession.h"
 
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
