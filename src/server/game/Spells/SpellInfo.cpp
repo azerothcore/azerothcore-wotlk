@@ -16,7 +16,6 @@
  */
 
 #include "SpellInfo.h"
-#include "Battleground.h"
 #include "Chat.h"
 #include "ConditionMgr.h"
 #include "DBCStores.h"

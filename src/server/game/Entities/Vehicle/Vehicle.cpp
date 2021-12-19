@@ -17,7 +17,6 @@
 
 #include "Vehicle.h"
 #include "BattlefieldWG.h"
-#include "Common.h"
 #include "CreatureAI.h"
 #include "Log.h"
 #include "MoveSplineInit.h"
@@ -28,7 +27,6 @@
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
-#include "WorldPacket.h"
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE)
