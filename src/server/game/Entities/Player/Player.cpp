@@ -2075,6 +2075,12 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTy
     {
         if (go->GetGoType() == type)
         {
+            // Players cannot interact with gameobjects that use the "Point" icon
+            if (go->GetGOInfo()->IconName == "Point")
+            {
+                return nullptr;
+            }
+
             if (go->IsWithinDistInMap(this))
             {
                 return go;
