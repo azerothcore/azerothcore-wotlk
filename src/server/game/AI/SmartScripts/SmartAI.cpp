@@ -46,6 +46,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     // spawn in run mode
     // Xinef: spawn in run mode and set mRun to run... this overrides SetWalk EVERYWHERE
     mRun = true;
+    mEvadeDisabled = false;
 
     mCanAutoAttack = true;
     mCanCombatMove = true;
@@ -623,6 +624,12 @@ void SmartAI::EnterEvadeMode()
     if (!me->IsAlive() || me->IsInEvadeMode())
         return;
 
+    if (mEvadeDisabled)
+    {
+        GetScript()->ProcessEventsFor(SMART_EVENT_EVADE);
+        return;
+    }
+
     if (me->GetCharmerGUID().IsPlayer() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
     {
         me->AttackStop();
@@ -933,6 +940,11 @@ void SmartAI::SetFly(bool fly)
 void SmartAI::SetSwim(bool swim)
 {
     me->SetSwim(swim);
+}
+
+void SmartAI::SetEvadeDisabled(bool disable)
+{
+    mEvadeDisabled = disable;
 }
 
 void SmartAI::sGossipHello(Player* player)
