@@ -10,34 +10,18 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-CollectSourceFiles(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE_SOURCES)
+file(GLOB sources *.h)
+
+add_library(httplib INTERFACE ${sources})
 
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(shared
-  ${PRIVATE_SOURCES})
+target_include_directories(httplib
+        INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR})
 
-CollectIncludeDirectories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  PUBLIC_INCLUDES)
-
-target_include_directories(shared
-  PUBLIC
-    ${PUBLIC_INCLUDES}
-  PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR})
-
-target_link_libraries(shared
-  PRIVATE
-    acore-core-interface
-  PUBLIC
-    database
-    httplib)
-
-set_target_properties(shared
-  PROPERTIES
-    FOLDER
-      "server")
+set_target_properties(httplib
+        PROPERTIES
+        FOLDER
+        "deps")

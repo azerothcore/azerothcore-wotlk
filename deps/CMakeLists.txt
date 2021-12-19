@@ -37,6 +37,7 @@ if(SERVERS)
   add_subdirectory(readline)
   add_subdirectory(gsoap)
   add_subdirectory(gperftools)
+  add_subdirectory(httplib)
 endif()
 
 if(TOOLS)

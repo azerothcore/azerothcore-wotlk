@@ -66,6 +66,18 @@ namespace Acore::Impl
             return true;
         }
 
+        T* Peek()
+        {
+            Node* tail = _tail.load(std::memory_order_relaxed);
+            Node* next = tail->Next.load(std::memory_order_acquire);
+            if (!next)
+            {
+                return nullptr;
+            }
+
+            return next->Data;
+        }
+
     private:
         struct Node
         {

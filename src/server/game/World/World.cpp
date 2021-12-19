@@ -50,6 +50,7 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
+#include "HttpManager.h"
 #include "IPLocation.h"
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
@@ -2454,6 +2455,11 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update saving system"));
         SavingSystemMgr::Update(diff);
+    }
+
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update HTTP manager"));
+        HttpManager::GetInstance()->HandleHttpResponses();
     }
 
     {
