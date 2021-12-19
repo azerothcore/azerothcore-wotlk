@@ -2533,7 +2533,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             //float x, y, z;
             //m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE);
             // xinef: vehicles summoned in air, eg. Cold Hearted quest
-            if (fabs(m_caster->GetPositionZ() - destTarget->GetPositionZ()) > 6.0f)
+            if (std::fabs(m_caster->GetPositionZ() - destTarget->GetPositionZ()) > 6.0f)
                 destTarget->m_positionZ = m_caster->GetPositionZ();
 
             summon = m_originalCaster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, m_caster, m_spellInfo->Id);

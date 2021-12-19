@@ -1635,7 +1635,7 @@ public:
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;
                         else destZ = me->GetPositionZ() + 25.0f;
                         me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), destZ, me->GetSpeed(MOVE_RUN));
-                        float moveTime = fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
+                        float moveTime = std::fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                         _events.ScheduleEvent(EVENT_ICY_BLAST, uint32(moveTime) + urand(60000, 70000));
                         _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, uint32(moveTime) + 250);
                         break;
