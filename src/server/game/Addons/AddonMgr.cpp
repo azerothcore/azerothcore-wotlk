@@ -113,11 +113,12 @@ namespace AddonMgr
 
     SavedAddon const* GetAddonInfo(const std::string& name)
     {
-        for (auto it = m_knownAddons.begin(); it != m_knownAddons.end(); ++it)
+        for (auto const& addon : m_knownAddons)
         {
-            SavedAddon const& addon = (*it);
             if (addon.Name == name)
+            {
                 return &addon;
+            }
         }
 
         return nullptr;
