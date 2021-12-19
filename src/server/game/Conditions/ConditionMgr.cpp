@@ -960,7 +960,7 @@ void ConditionMgr::LoadConditions(bool isReload)
 
         if (iSourceTypeOrReferenceId < 0) // it is a reference template
         {
-            uint32 uRefId = abs(iSourceTypeOrReferenceId);
+            uint32 uRefId = std::abs(iSourceTypeOrReferenceId);
             if (ConditionReferenceStore.find(uRefId) == ConditionReferenceStore.end()) // make sure we have a list for our conditions, based on reference id
             {
                 ConditionList mCondList;

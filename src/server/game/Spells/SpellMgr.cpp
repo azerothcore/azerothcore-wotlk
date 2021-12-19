@@ -2264,13 +2264,13 @@ void SpellMgr::LoadSpellLinked()
         SpellInfo const* spellInfo = GetSpellInfo(std::abs(trigger));
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", abs(trigger));
+            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", std::abs(trigger));
             continue;
         }
         spellInfo = GetSpellInfo(std::abs(effect));
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", abs(effect));
+            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", std::abs(effect));
             continue;
         }
 
@@ -2579,13 +2579,13 @@ void SpellMgr::LoadSpellAreas()
             SpellInfo const* spellInfo = GetSpellInfo(std::abs(spellArea.auraSpell));
             if (!spellInfo)
             {
-                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have wrong aura spell (%u) requirement", spell, abs(spellArea.auraSpell));
+                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have wrong aura spell (%u) requirement", spell, std::abs(spellArea.auraSpell));
                 continue;
             }
 
             if (uint32(std::abs(spellArea.auraSpell)) == spellArea.spellId)
             {
-                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have aura spell (%u) requirement for itself", spell, abs(spellArea.auraSpell));
+                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have aura spell (%u) requirement for itself", spell, std::abs(spellArea.auraSpell));
                 continue;
             }
 
