@@ -47,7 +47,7 @@ namespace Movement
             if (splineflags.final_angle)
                 c.orientation = facing.angle;
             else if (splineflags.final_point)
-                c.orientation = atan2(facing.f.y - c.y, facing.f.x - c.x);
+                c.orientation = std::atan2(facing.f.y - c.y, facing.f.x - c.x);
             //nothing to do for MoveSplineFlag::Final_Target flag
         }
         else
@@ -56,7 +56,7 @@ namespace Movement
             {
                 Vector3 hermite;
                 spline.evaluate_derivative(point_Idx, u, hermite);
-                c.orientation = atan2(hermite.y, hermite.x);
+                c.orientation = std::atan2(hermite.y, hermite.x);
             }
 
             if (splineflags.orientationInversed)
