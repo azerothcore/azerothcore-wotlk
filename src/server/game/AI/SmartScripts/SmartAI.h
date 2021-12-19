@@ -172,7 +172,7 @@ public:
     void SetFly(bool fly = true);
 
     void SetSwim(bool swim = true);
-    
+
     void SetEvadeDisabled(bool disable = true);
 
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
