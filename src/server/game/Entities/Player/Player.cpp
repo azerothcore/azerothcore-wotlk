@@ -5946,7 +5946,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             else
                 victim_guid.Clear();                        // Don't show HK: <rank> message, only log.
 
-            honor_f = ceil(Acore::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
+            honor_f = std::ceil(Acore::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
 
             // count the number of playerkills in one day
             ApplyModUInt32Value(PLAYER_FIELD_KILLS, 1, true);
@@ -12138,7 +12138,7 @@ uint32 Player::GetCorpseReclaimDelay(bool pvp) const
 
     time_t now = time(nullptr);
     // 0..2 full period
-    // should be ceil(x)-1 but not floor(x)
+    // should be std::ceil(x)-1 but not floor(x)
     uint64 count = (now < m_deathExpireTime - 1) ? (m_deathExpireTime - 1 - now) / DEATH_EXPIRE_STEP : 0;
     return copseReclaimDelay[count];
 }
