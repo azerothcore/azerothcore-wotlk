@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1639932916698986865');
 -- Windrunner Spire
 
 -- Fallen Ranger
-UPDATE `creature` SET `wander_distance`=3 WHERE `guid` IN (82535,82535);
+UPDATE `creature` SET `wander_distance`=3 WHERE `guid` IN (82535,82533);
 DELETE FROM `creature` WHERE `guid` IN (82508,82526,82525,82543,82541,82542,82532,82524,82546,82507,82509,82523,82530,82534,82721);
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
 (82508, 16314, 530, 0, 0, 1, 1, 0, 0, 6983.7007, -5851.492, 44.219906, 2.168352842330932617, 300, 6, 0, 1, 0, 1, 0, 0, 0, '', 0),
