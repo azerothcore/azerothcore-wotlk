@@ -68,7 +68,6 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "Realm.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "SkillDiscovery.h"
@@ -2449,11 +2448,6 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update world scripts"));
         sScriptMgr->OnWorldUpdate(diff);
-    }
-
-    {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update saving system"));
-        SavingSystemMgr::Update(diff);
     }
 
     {

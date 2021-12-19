@@ -71,7 +71,6 @@
 #include "QueryHolder.h"
 #include "ReputationMgr.h"
 #include "Realm.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SocialMgr.h"
@@ -192,7 +191,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_needZoneUpdate = false;
 
-    m_nextSave = SavingSystemMgr::IncreaseSavingMaxValue(1);
     m_additionalSaveTimer = 0;
     m_additionalSaveMask = 0;
     m_hostileReferenceCheckTimer = 15000;
