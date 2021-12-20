@@ -10,18 +10,30 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-file(GLOB sources *.h)
+add_library(httplib INTERFACE)
 
-add_library(httplib INTERFACE ${sources})
+CollectIncludeDirectories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  PUBLIC_INCLUDES)
+
+target_include_directories(httplib
+  PUBLIC
+    ${PUBLIC_INCLUDES}
+  PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR})
 
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-target_include_directories(httplib
-        INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(httplib
+  PRIVATE
+    acore-dependency-interface)
+    
+target_compile_definitions(httplib
+  INTERFACE
+    -DCPPHTTPLIB_OPENSSL_SUPPORT)
 
 set_target_properties(httplib
-        PROPERTIES
-        FOLDER
-        "deps")
+  PROPERTIES
+    FOLDER
+      "deps")
