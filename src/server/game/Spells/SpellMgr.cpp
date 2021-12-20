@@ -6180,6 +6180,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 69768 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
     });
 
     ApplySpellFix({ 69767 }, [](SpellEntry* spellInfo)
