@@ -143,7 +143,126 @@ public:
     }
 };
 
+/*######
+## npc_sentinel_leader
+######*/
+
+enum SentinelLeader
+{
+    EVENT_QUESTION        = 1,
+    EVENT_TALK            = 2,
+    EVENT_SINISTER_STRIKE = 3,
+    EVENT_BACKSTAB        = 4,
+    NPC_SENTINEL_SPY      = 16330,
+    SPELL_SINISTER_STRIKE = 14873,
+    SPELL_BACKSTAB        = 7159
+};
+
+struct npc_sentinel_leader : public ScriptedAI
+{
+    npc_sentinel_leader(Creature* creature) : ScriptedAI(creature) {}
+
+    void Reset() override
+    {
+        _helpCalled = false;
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == WAYPOINT_MOTION_TYPE)
+        {
+            switch (id)
+            {
+            case 1:
+            case 4:
+            case 7:
+            case 8:
+            case 13:
+            case 14:
+            case 17:
+                Creature* SentinelSpy = me->FindNearestCreature(NPC_SENTINEL_SPY, 2.0f, true);
+                if (SentinelSpy)
+                {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    SentinelSpy->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    _events.ScheduleEvent(EVENT_QUESTION, 5000);
+                }
+                break;
+            }
+        }
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _events.ScheduleEvent(EVENT_SINISTER_STRIKE, urand(5000, 9000));
+        _events.ScheduleEvent(EVENT_BACKSTAB, urand(3000, 5000));
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        if (!UpdateVictim())
+        {
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_QUESTION:
+                {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                    _events.ScheduleEvent(EVENT_TALK, 1000);
+                    break;
+                }
+                case EVENT_TALK:
+                {
+                    Creature* SentinelSpy = me->FindNearestCreature(NPC_SENTINEL_SPY, 2.0f, true);
+                    if (SentinelSpy)
+                    {
+                        SentinelSpy->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+            return;
+        }
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_SINISTER_STRIKE:
+                DoCastVictim(SPELL_SINISTER_STRIKE, true);
+                _events.ScheduleEvent(EVENT_SINISTER_STRIKE, urand(5000, 9000));
+                break;
+            case EVENT_BACKSTAB:
+                DoCastVictim(SPELL_BACKSTAB, true);
+                _events.ScheduleEvent(EVENT_BACKSTAB, urand(7000, 11000));
+                break;
+            default:
+                break;
+            }
+        }
+
+        if (me->HealthBelowPct(15) && !_helpCalled)
+        {
+            _helpCalled = true;
+            me->CallForHelp(20.0f);
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    EventMap _events;
+    bool     _helpCalled;
+};
+
 void AddSC_ghostlands()
 {
     new npc_ranger_lilatha();
+    RegisterCreatureAI(npc_sentinel_leader);
 }

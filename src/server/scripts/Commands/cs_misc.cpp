@@ -23,7 +23,6 @@
 #include "Chat.h"
 #include "GameGraveyard.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GuildMgr.h"
 #include "IPLocation.h"
@@ -42,6 +41,12 @@
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
 #include "Tokenize.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 constexpr auto SPELL_STUCK = 7355;
 constexpr auto SPELL_FREEZE = 9454;

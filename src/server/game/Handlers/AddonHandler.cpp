@@ -16,7 +16,6 @@
  */
 
 #include "AddonHandler.h"
-#include "DatabaseEnv.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "zlib.h"
