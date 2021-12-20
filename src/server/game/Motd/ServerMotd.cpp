@@ -16,7 +16,6 @@
  */
 
 #include "ServerMotd.h"
-#include "Common.h"
 #include "Opcodes.h"
 #include "ScriptMgr.h"
 #include "Util.h"

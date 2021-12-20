@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
 
 InstanceScript* ScriptMgr::CreateInstanceScript(InstanceMap* map)
 {

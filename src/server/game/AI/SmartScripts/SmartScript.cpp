@@ -3267,6 +3267,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 break;
             }
+        case SMART_ACTION_DISABLE_EVADE:
+            {
+                if (!IsSmart())
+                    break;
+
+                CAST_AI(SmartAI, me->AI())->SetEvadeDisabled(e.action.disableEvade.disable != 0);
+                break;
+            }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry %d SourceType %u, Event %u, Unhandled Action type %u", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
