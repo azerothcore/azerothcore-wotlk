@@ -1055,7 +1055,7 @@ public:
             Seconds respawnTimer = 0s;
             player->PlayerTalkClass->SendCloseGossip();
 
-            if (Creature* summon = ObjectAccessor::GetCreature(*me, _creatureGuid))
+            if (ObjectAccessor::GetCreature(*me, _creatureGuid))
             {
                 // We already summoned something recently, return.
                 CloseGossipMenuFor(player);
