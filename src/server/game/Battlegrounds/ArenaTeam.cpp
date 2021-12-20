@@ -664,7 +664,7 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
             points = 344;
     }
     else
-        points = 1511.26f / (1.0f + 1639.28f * (std::exp(-0.00412f * (float)rating));
+        points = 1511.26f / (1.0f + 1639.28f * std::exp(-0.00412f * (float)rating));
 
     // Type penalties for teams < 5v5
     if (Type == ARENA_TEAM_2v2)
