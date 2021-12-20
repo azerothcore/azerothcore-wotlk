@@ -16,9 +16,7 @@
  */
 
 #include "SmartScriptMgr.h"
-#include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
 #include "GameEventMgr.h"
 #include "GridDefines.h"
