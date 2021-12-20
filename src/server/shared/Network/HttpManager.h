@@ -42,8 +42,6 @@ public:
     httplib::Headers headers;
     HttpCallback callback;
 };
-
-
 class HttpManager
 {
 public:
