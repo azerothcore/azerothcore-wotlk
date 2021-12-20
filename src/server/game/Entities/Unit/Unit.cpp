@@ -17419,11 +17419,11 @@ void Unit::SetRooted(bool apply)
 
         if (IsFalling())
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
         }
         else
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
 
          // Creature specific
