@@ -1,5 +1,5 @@
 #include <thread>
-#include <Logging/Log.h>
+#include "Log.h"
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "HttpManager.h"
