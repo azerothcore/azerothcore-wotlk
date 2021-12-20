@@ -47,18 +47,18 @@ constexpr std::array<uint32, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsColors =
     0xff54504f      // DARK GREY - Inscription
 };
 
-constexpr std::array<const char*, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsColorToString =
-{
-    "normal",
-    "soul",
-    "herb",
-    "enchanting",
-    "engineering",
-    "gem",
-    "mining",
-    "leatherworking",
-    "inscription"
-};
+//constexpr std::array<const char*, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsColorToString =
+//{
+//    "normal",
+//    "soul",
+//    "herb",
+//    "enchanting",
+//    "engineering",
+//    "gem",
+//    "mining",
+//    "leatherworking",
+//    "inscription"
+//};
 
 using namespace Acore::ChatCommands;
 
