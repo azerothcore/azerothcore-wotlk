@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
 #include "Vehicle.h"
 
 void ScriptMgr::OnInstall(Vehicle* veh)
