@@ -527,6 +527,21 @@ public:
     SpellCastTargets m_targets;
     SpellCustomErrors m_customError;
 
+    void AddComboPointGain(Unit* target, int8 amount)
+    {
+        if (target != m_comboTarget)
+        {
+            m_comboTarget = target;
+            m_comboPointGain = amount;
+        }
+        else
+        {
+            m_comboPointGain += amount;
+        }
+    }
+    Unit* m_comboTarget;
+    int8 m_comboPointGain;
+
     UsedSpellMods m_appliedMods;
 
     PathGenerator* m_pathFinder; // pussywizard: for precomputing path for charge

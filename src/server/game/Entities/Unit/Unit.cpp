@@ -207,7 +207,8 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
     m_HostileRefMgr(this),
-    m_comboTarget(nullptr)
+    m_comboTarget(nullptr),
+    m_comboPoints(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -9094,9 +9095,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     Unit* cptarget = nullptr;
                     if (trigger_spell_id == 51699)
                     {
-                        cptarget = ObjectAccessor::GetUnit(*target, pTarget->GetComboTarget());
+                        cptarget = pTarget->GetComboTarget();
                         if (!cptarget)
+                        {
                             cptarget = pTarget->GetSelectedUnit();
+                        }
                     }
                     else
                         cptarget = target;
@@ -14078,7 +14081,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellInfo const* spellProto
 
 int32 Unit::CalcSpellDuration(SpellInfo const* spellProto)
 {
-    uint8 comboPoints = m_movedByPlayer ? m_movedByPlayer->ToPlayer()->GetComboPoints() : 0;
+    uint8 comboPoints = GetComboPoints();
 
     int32 minduration = spellProto->GetDuration();
     int32 maxduration = spellProto->GetMaxDuration();
@@ -14947,6 +14950,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 
     m_Events.KillAllEvents(false);                      // non-delatable (currently casted spells) will not deleted now but it will deleted at call in Map::RemoveAllObjectsInRemoveList
     CombatStop();
+    ClearComboPoints();
     ClearComboPointHolders();
     DeleteThreatList();
     getHostileRefMgr().deleteReferences();
@@ -15565,7 +15569,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 {
                     if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_WARRIOR)
                     {
-                        ToPlayer()->AddComboPoints(target, 1);
+                        AddComboPoints(target, 1);
                         StartReactiveTimer(REACTIVE_OVERPOWER);
                     }
                 }
@@ -16192,17 +16196,96 @@ void Unit::RestoreDisplayId()
         SetDisplayId(GetNativeDisplayId());
 }
 
+void Unit::AddComboPoints(Unit* target, int8 count)
+{
+    if (!count)
+    {
+        return;
+    }
+
+    // remove Premed-like effects
+    // (NB: this Aura removes the already-added CP when it expires from duration - now that we've added CP, this shouldn't happen anymore)
+    RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
+
+    if (target && target != m_comboTarget)
+    {
+        if (m_comboTarget)
+        {
+            m_comboTarget->RemoveComboPointHolder(this);
+        }
+
+        m_comboTarget = target;
+        m_comboPoints = count;
+        target->AddComboPointHolder(this);
+    }
+    else
+    {
+        m_comboPoints = std::max<int8>(std::min<int8>(m_comboPoints + count, 5), 0);
+    }
+
+    SendComboPoints();
+}
+
+void Unit::ClearComboPoints()
+{
+    if (!m_comboTarget)
+    {
+        return;
+    }
+
+    // remove Premed-like effects
+    // (NB: this Aura retains the CP while it's active - now that CP have reset, it shouldn't be there anymore)
+    RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
+
+    m_comboPoints = 0;
+    SendComboPoints();
+    m_comboTarget->RemoveComboPointHolder(this);
+    m_comboTarget = nullptr;
+}
+
+void Unit::SendComboPoints()
+{
+    if (m_cleanupDone)
+    {
+        return;
+    }
+
+    PackedGuid const packGUID = m_comboTarget ? m_comboTarget->GetPackGUID() : PackedGuid();
+    if (Player* playerMe = ToPlayer())
+    {
+        WorldPacket data(SMSG_UPDATE_COMBO_POINTS, packGUID.size() + 1);
+        data << packGUID;
+        data << uint8(m_comboPoints);
+        playerMe->SendDirectMessage(&data);
+    }
+
+    ObjectGuid ownerGuid = GetCharmerOrOwnerGUID();
+    Player* owner = nullptr;
+    if (ownerGuid.IsPlayer())
+    {
+        owner = ObjectAccessor::GetPlayer(*this, ownerGuid);
+    }
+
+    if (m_movedByPlayer || owner)
+    {
+        WorldPacket data(SMSG_PET_UPDATE_COMBO_POINTS, GetPackGUID().size() + packGUID.size() + 1);
+        data << GetPackGUID();
+        data << packGUID;
+        data << uint8(m_comboPoints);
+
+        if (m_movedByPlayer)
+            m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        if (owner && owner != m_movedByPlayer)
+            owner->SendDirectMessage(&data);
+    }
+}
+
 void Unit::ClearComboPointHolders()
 {
     while (!m_ComboPointHolders.empty())
     {
-        ObjectGuid guid = *m_ComboPointHolders.begin();
-
-        Player* player = ObjectAccessor::GetPlayer(*this, guid);
-        if (player && player->GetComboTarget() == GetGUID())         // recheck for safe
-            player->ClearComboPoints();                        // remove also guid from m_ComboPointHolders;
-        else
-            m_ComboPointHolders.erase(guid);             // or remove manually
+        (*m_ComboPointHolders.begin())->ClearComboPoints(); // this also removes it from m_comboPointHolders
     }
 }
 
@@ -16216,7 +16299,7 @@ void Unit::ClearAllReactives()
     if (getClass() == CLASS_HUNTER && HasAuraState(AURA_STATE_HUNTER_PARRY))
         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
     if (getClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
-        ToPlayer()->ClearComboPoints();
+        ClearComboPoints();
 }
 
 void Unit::UpdateReactives(uint32 p_time)
@@ -16244,7 +16327,7 @@ void Unit::UpdateReactives(uint32 p_time)
                     break;
                 case REACTIVE_OVERPOWER:
                     if (getClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
-                        ToPlayer()->ClearComboPoints();
+                        ClearComboPoints();
                     break;
                 default:
                     break;
