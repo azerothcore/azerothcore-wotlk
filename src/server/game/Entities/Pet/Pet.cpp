@@ -222,7 +222,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
         {
             // process only if player is in world (teleport crashes?)
             // otherwise wait with result till he logs in
-            uint8 loadResult = mySess->HandleLoadPetFromDBFirstCallback(result, asynchLoadType);
+            uint8 loadResult = mySess->HandleLoadPetFromDBFirstCallback(result, asynchLoadType, info);
 
             if (loadResult != PET_LOAD_OK)
                 Pet::HandleAsynchLoadFailed(info, owner, asynchLoadType, loadResult);
@@ -511,13 +511,18 @@ void Pet::Update(uint32 diff)
                                     }
                                     else
                                     {
-                                        GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-                                        GetCharmInfo()->SetIsCommandAttack(false);
-                                        GetCharmInfo()->SetIsAtStay(false);
-                                        GetCharmInfo()->SetIsReturning(true);
-                                        GetCharmInfo()->SetIsCommandFollow(true);
-                                        GetCharmInfo()->SetIsFollowing(false);
-                                        GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                                        if (IsAIEnabled)
+                                            AI()->PetStopAttack();
+                                        else
+                                        {
+                                            GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                                            GetCharmInfo()->SetIsCommandAttack(false);
+                                            GetCharmInfo()->SetIsAtStay(false);
+                                            GetCharmInfo()->SetIsReturning(true);
+                                            GetCharmInfo()->SetIsCommandFollow(true);
+                                            GetCharmInfo()->SetIsFollowing(false);
+                                            GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                                        }
                                     }
 
                                     m_tempoldTarget = nullptr;
@@ -2322,6 +2327,11 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
             //AIM_Initialize();
             //owner->PetSpellInitialize();
             pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+        }
+
+        if (info->m_healthPct)
+        {
+            pet->SetHealth(pet->CountPctFromMaxHealth(info->m_healthPct));
         }
     }
 }

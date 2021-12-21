@@ -751,8 +751,8 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -761,7 +761,14 @@ void ObjectMgr::LoadCreatureTemplateAddons()
                 LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong spell %u defined in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
                 continue;
             }
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
+                continue;
+            }
+
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)
@@ -1181,8 +1188,8 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -1191,7 +1198,14 @@ void ObjectMgr::LoadCreatureAddons()
                 LOG_ERROR("sql.sql", "Creature (GUID: %u) has wrong spell %u defined in `auras` field in `creature_addon`.", guid, uint32(atol(*itr)));
                 continue;
             }
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, uint32(atol(*itr)));
+                continue;
+            }
+
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)
@@ -8295,7 +8309,7 @@ void ObjectMgr::LoadMailLevelRewards()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel)
+void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell)
 {
     if (entry >= ACORE_TRAINER_START_REF)
         return;
@@ -8332,6 +8346,12 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
         return;
     }
 
+    if (reqSpell && !sSpellMgr->GetSpellInfo(reqSpell))
+    {
+        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry (Entry: %u) for a non-existing reqSpell (Spell: %u), ignoring", entry, reqSpell);
+        return;
+    }
+
     TrainerSpellData& data = _cacheTrainerSpellStore[entry];
 
     TrainerSpell& trainerSpell = data.spellList[spell];
@@ -8340,6 +8360,7 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
     trainerSpell.reqSkill      = reqSkill;
     trainerSpell.reqSkillValue = reqSkillValue;
     trainerSpell.reqLevel      = reqLevel;
+    trainerSpell.reqSpell      = reqSpell;
 
     if (!trainerSpell.reqLevel)
         trainerSpell.reqLevel = spellinfo->SpellLevel;
@@ -8380,7 +8401,7 @@ void ObjectMgr::LoadTrainerSpell()
     // For reload case
     _cacheTrainerSpellStore.clear();
 
-    QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqLevel FROM npc_trainer AS a "
+    QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqLevel, a.ReqSpell FROM npc_trainer AS a "
                          "INNER JOIN npc_trainer AS b ON a.ID = -(b.SpellID) "
                          "UNION SELECT * FROM npc_trainer WHERE SpellID > 0");
 
@@ -8403,8 +8424,9 @@ void ObjectMgr::LoadTrainerSpell()
         uint32 reqSkill      = fields[3].GetUInt16();
         uint32 reqSkillValue = fields[4].GetUInt16();
         uint32 reqLevel      = fields[5].GetUInt8();
+        uint32 reqSpell      = fields[6].GetUInt32();
 
-        AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
+        AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel, reqSpell);
 
         ++count;
     } while (result->NextRow());
