@@ -16,7 +16,6 @@
  */
 
 #include "BattlefieldMgr.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "Zones/BattlefieldWG.h"
 

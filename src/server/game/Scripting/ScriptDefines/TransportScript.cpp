@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
 #include "Transport.h"
 
 void ScriptMgr::OnAddPassenger(Transport* transport, Player* player)
