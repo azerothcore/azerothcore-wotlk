@@ -21,7 +21,6 @@
 #include "DatabaseEnv.h"
 #include "GameGraveyard.h"
 #include "Language.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
