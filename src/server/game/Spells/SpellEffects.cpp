@@ -5388,26 +5388,39 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
+    if (damage < 0)
+        return;
+
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
 
-    Pet* pet = player->GetPet();
-    if (pet && pet->IsAlive())
-        return;
+    // Maybe player dismissed dead pet or pet despawned?
+    bool hadPet = true;
 
-    if (damage < 0)
-        return;
-
-    float x, y, z;
-    player->GetPosition(x, y, z);
-    if (!pet)
+    if (!player->GetPet())
     {
-        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET);
-        return;
+        // Position passed to SummonPet is irrelevant with current implementation,
+        // pet will be relocated without using these coords in Pet::LoadPetFromDB
+        player->SummonPet(0, 0.0f, 0.0f, 0.0f, 0.0f, SUMMON_PET);
+        hadPet = false;
     }
 
-    pet->SetPosition(x, y, z, player->GetOrientation());
+    // TODO: Better to fail Hunter's "Revive Pet" at cast instead of here when casting ends
+    Pet* pet = player->GetPet(); // Attempt to get current pet
+    if (!pet || pet->IsAlive())
+        return;
+
+    // If player did have a pet before reviving, teleport it
+    if (hadPet)
+    {
+        // Reposition the pet's corpse before reviving so as not to grab aggro
+        // We can use a different, more accurate version of GetClosePoint() since we have a pet
+        float x, y, z; // Will be used later to reposition the pet if we have one
+        player->GetClosePoint(x, y, z, pet->GetCombatReach(), PET_FOLLOW_DIST, pet->GetFollowAngle());
+        pet->NearTeleportTo(x, y, z, player->GetOrientation());
+        pet->Relocate(x, y, z, player->GetOrientation()); // This is needed so SaveStayPosition() will get the proper coords.
+    }
 
     pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
     pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
@@ -5416,10 +5429,10 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     pet->SetHealth(pet->CountPctFromMaxHealth(damage));
 
     // xinef: restore movement
-    if (pet->GetCharmInfo())
+    if (auto ci = pet->GetCharmInfo())
     {
-        pet->GetCharmInfo()->SetIsAtStay(false);
-        pet->GetCharmInfo()->SetIsFollowing(false);
+        ci->SetIsAtStay(false);
+        ci->SetIsFollowing(false);
     }
 
     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
