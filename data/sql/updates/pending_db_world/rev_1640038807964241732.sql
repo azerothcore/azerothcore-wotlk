@@ -109,12 +109,14 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMa
 (82937, 16317, 530, 0, 0, 1, 1, 0, 0, 6448.702, -6383.246, 41.319817, 2.792526721954345703, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82915, 16317, 530, 0, 0, 1, 1, 0, 0, 6470.639, -6380.8696, 27.286062, 1.919862151145935058, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82879, 16317, 530, 0, 0, 1, 1, 0, 0, 6477.12, -6363.0093, 27.286095, 3.787364482879638671, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
+
 (82824, 16317, 530, 0, 0, 1, 1, 0, 0, 6297.0513, -6472.9165, 83.28334, 0.750491559505462646, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82863, 16317, 530, 0, 0, 1, 1, 0, 0, 6296.8594, -6455.6494, 83.28348, 5.585053443908691406, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82871, 16317, 530, 0, 0, 1, 1, 0, 0, 6313.0225, -6474.518, 83.283554, 2.251474618911743164, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82874, 16317, 530, 0, 0, 1, 1, 0, 0, 6301.094, -6257.4937, 77.823, 0.715584993362426757, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82886, 16317, 530, 0, 0, 1, 1, 0, 0, 6300.626, -6239.95, 77.82277, 5.567600250244140625, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82903, 16317, 530, 0, 0, 1, 1, 0, 0, 6318.4634, -6239.1562, 77.82291, 4.084070205688476562, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
+
 (82927, 16317, 530, 0, 0, 1, 1, 0, 0, 6479.73, -6289.819, 48.917976, 3.141592741012573242, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (82826, 16317, 530, 0, 0, 1, 1, 0, 0, 6463.9507, -6441.8706, 52.459564, 3.525565147399902343, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
 
@@ -374,41 +376,35 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-82824,-82863,-82871,-82874,-82886,-82903,-82927,-82826) AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (1631700) AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(-82824,0,0,0,1,0,100,0,1000,1000,300000,300000,0,11,29066,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Summon Dreadbone Skeleton'''),
+(-82824,0,0,0,1,0,100,1,1000,1000,0,0,0,11,28729,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Ribbon of Souls'''),
 (-82824,0,1,0,0,0,100,0,0,0,3400,4800,0,11,9613,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Deatholme Necromancer - In Combat CMC - Cast ''Shadow Bolt'''),
 (-82824,0,2,0,2,0,100,0,0,20,8000,12000,0,11,29067,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-20% Health - Cast ''Slave Drain'''),
 (-82824,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-15% Health - Flee For Assist (No Repeat)'),
-(-82824,0,4,0,1,0,100,0,10000,40000,50000,55000,0,80,1631700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Run Script'),
 
-(-82863,0,0,0,1,0,100,0,1000,1000,300000,300000,0,11,29066,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Summon Dreadbone Skeleton'''),
+(-82863,0,0,0,1,0,100,1,1000,1000,0,0,0,11,28729,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Ribbon of Souls'''),
 (-82863,0,1,0,0,0,100,0,0,0,3400,4800,0,11,9613,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Deatholme Necromancer - In Combat CMC - Cast ''Shadow Bolt'''),
 (-82863,0,2,0,2,0,100,0,0,20,8000,12000,0,11,29067,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-20% Health - Cast ''Slave Drain'''),
 (-82863,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-15% Health - Flee For Assist (No Repeat)'),
-(-82863,0,4,0,1,0,100,0,10000,40000,50000,55000,0,80,1631700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Run Script'),
 
-(-82871,0,0,0,1,0,100,0,1000,1000,300000,300000,0,11,29066,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Summon Dreadbone Skeleton'''),
+(-82871,0,0,0,1,0,100,1,1000,1000,0,0,0,11,28729,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Ribbon of Souls'''),
 (-82871,0,1,0,0,0,100,0,0,0,3400,4800,0,11,9613,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Deatholme Necromancer - In Combat CMC - Cast ''Shadow Bolt'''),
 (-82871,0,2,0,2,0,100,0,0,20,8000,12000,0,11,29067,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-20% Health - Cast ''Slave Drain'''),
 (-82871,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-15% Health - Flee For Assist (No Repeat)'),
-(-82871,0,4,0,1,0,100,0,10000,40000,50000,55000,0,80,1631700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Run Script'),
 
-(-82874,0,0,0,1,0,100,0,1000,1000,300000,300000,0,11,29066,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Summon Dreadbone Skeleton'''),
+(-82874,0,0,0,1,0,100,1,1000,1000,0,0,0,11,28729,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Ribbon of Souls'''),
 (-82874,0,1,0,0,0,100,0,0,0,3400,4800,0,11,9613,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Deatholme Necromancer - In Combat CMC - Cast ''Shadow Bolt'''),
 (-82874,0,2,0,2,0,100,0,0,20,8000,12000,0,11,29067,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-20% Health - Cast ''Slave Drain'''),
 (-82874,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-15% Health - Flee For Assist (No Repeat)'),
-(-82874,0,4,0,1,0,100,0,10000,40000,50000,55000,0,80,1631700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Run Script'),
 
-(-82886,0,0,0,1,0,100,0,1000,1000,300000,300000,0,11,29066,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Summon Dreadbone Skeleton'''),
+(-82886,0,0,0,1,0,100,1,1000,1000,0,0,0,11,28729,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Ribbon of Souls'''),
 (-82886,0,1,0,0,0,100,0,0,0,3400,4800,0,11,9613,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Deatholme Necromancer - In Combat CMC - Cast ''Shadow Bolt'''),
 (-82886,0,2,0,2,0,100,0,0,20,8000,12000,0,11,29067,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-20% Health - Cast ''Slave Drain'''),
 (-82886,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-15% Health - Flee For Assist (No Repeat)'),
-(-82886,0,4,0,1,0,100,0,10000,40000,50000,55000,0,80,1631700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Run Script'),
 
-(-82903,0,0,0,1,0,100,0,1000,1000,300000,300000,0,11,29066,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Summon Dreadbone Skeleton'''),
+(-82903,0,0,0,1,0,100,1,1000,1000,0,0,0,11,28729,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Ribbon of Souls'''),
 (-82903,0,1,0,0,0,100,0,0,0,3400,4800,0,11,9613,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Deatholme Necromancer - In Combat CMC - Cast ''Shadow Bolt'''),
 (-82903,0,2,0,2,0,100,0,0,20,8000,12000,0,11,29067,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-20% Health - Cast ''Slave Drain'''),
 (-82903,0,3,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Between 0-15% Health - Flee For Assist (No Repeat)'),
-(-82903,0,4,0,1,0,100,0,10000,40000,50000,55000,0,80,1631700,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Run Script'),
 
 (-82927,0,0,0,1,0,100,0,1000,1000,300000,300000,0,11,29066,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Deatholme Necromancer - Out of Combat - Cast ''Summon Dreadbone Skeleton'''),
 (-82927,0,1,0,0,0,100,0,0,0,3400,4800,0,11,9613,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Deatholme Necromancer - In Combat CMC - Cast ''Shadow Bolt'''),
