@@ -71,12 +71,11 @@ namespace lfg
 
 namespace WorldPackets
 {
-
     namespace Totem
     {
         class TotemDestroyed;
     }
-  
+
     namespace Guild
     {
         class QueryGuildInfo;
