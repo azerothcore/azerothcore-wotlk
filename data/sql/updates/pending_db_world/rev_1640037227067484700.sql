@@ -1,8 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640037227067484700');
 
--- Removing duplicated un-used quest
-DELETE FROM `quest_template` WHERE (`ID` = 960);
-
 -- Turning quest 'Onu is Meditating' to auto-complete
 UPDATE `quest_template` SET `Flags` = `Flags`| 65536 WHERE (`ID` = 961);
 
