@@ -2955,6 +2955,8 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    bool _wasOutdoor;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
