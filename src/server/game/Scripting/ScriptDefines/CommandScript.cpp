@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
 #include "Chat.h"
 
 Acore::ChatCommands::ChatCommandTable ScriptMgr::GetChatCommands()

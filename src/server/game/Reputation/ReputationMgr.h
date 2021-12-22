@@ -115,9 +115,9 @@ public:                                                 // modifiers
     {
         return SetReputation(factionEntry, standing, false);
     }
-    bool ModifyReputation(FactionEntry const* factionEntry, float standing, Optional<ReputationRank> repMaxCap = { })
+    bool ModifyReputation(FactionEntry const* factionEntry, float standing, bool noSpillOver = false, Optional<ReputationRank> repMaxCap = {})
     {
-        return SetReputation(factionEntry, standing, true, repMaxCap);
+        return SetReputation(factionEntry, standing, true, noSpillOver, repMaxCap);
     }
 
     void SetVisible(FactionTemplateEntry const* factionTemplateEntry);
@@ -139,7 +139,7 @@ public:                                                 // senders
 private:                                                // internal helper functions
     void Initialize();
     uint32 GetDefaultStateFlags(FactionEntry const* factionEntry) const;
-    bool SetReputation(FactionEntry const* factionEntry, float standing, bool incremental, Optional<ReputationRank> repMaxCap = { });
+    bool SetReputation(FactionEntry const* factionEntry, float standing, bool incremental, bool noSpillOver = false, Optional<ReputationRank> repMaxCap = { });
     void SetVisible(FactionState* faction);
     void SetAtWar(FactionState* faction, bool atWar) const;
     void SetInactive(FactionState* faction, bool inactive) const;
