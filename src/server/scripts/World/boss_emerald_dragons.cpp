@@ -16,7 +16,6 @@
  */
 
 #include "GridNotifiers.h"
-#include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
