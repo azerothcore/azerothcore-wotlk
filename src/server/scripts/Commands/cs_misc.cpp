@@ -1621,7 +1621,7 @@ public:
             return false;
         }
 
-        uint32 itemId = 0;
+        uint32 itemId = itemTemplate->ItemId;
         int32 count = 1;
 
         if (_count)
