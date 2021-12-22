@@ -3791,7 +3791,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     }
 
     // In water or jumping in water
-    if (IsInWater() || (GetLiquidData().Status == LIQUID_MAP_ABOVE_WATER && (IsFalling() || ToPlayer() && ToPlayer()->IsFalling())))
+    if (IsInWater() || (GetLiquidData().Status == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
     {
         return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
     }
