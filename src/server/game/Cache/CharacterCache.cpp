@@ -22,7 +22,6 @@
 #include "Player.h"
 #include "Timer.h"
 #include "World.h"
-#include "WorldPacket.h"
 #include <unordered_map>
 
 namespace
@@ -214,7 +213,6 @@ void CharacterCache::UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 sl
         return;
     }
 
-    ASSERT(slot < 3);
     itr->second.ArenaTeamId[slot] = arenaTeamId;
 }
 

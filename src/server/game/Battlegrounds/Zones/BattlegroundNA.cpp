@@ -17,11 +17,9 @@
 
 #include "BattlegroundNA.h"
 #include "Language.h"
-#include "Object.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 BattlegroundNA::BattlegroundNA()
 {
