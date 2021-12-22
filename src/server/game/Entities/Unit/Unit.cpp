@@ -20296,3 +20296,33 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
 }
+
+bool Unit::CanRestoreMana(SpellInfo const* spellInfo)
+{
+    // Aura of Despair
+    if (HasAuraType(SPELL_AURA_PREVENT_REGENERATE_POWER))
+    {
+        // Exceptions
+        switch (spellInfo->Id)
+        {
+            case 30824: // Shamanistic Rage
+            case 31786: // Spiritual Attunement
+            case 31930: // Judgements of the Wise
+            case 34075: // Aspect of the Viper
+            case 34720: // Thrill of the hunt
+            case 47755: // Rapture
+            case 63337: // Saronite Vapors (regenerate mana)
+            case 63375: // Improved stormstrike
+            case 64372: // Lifebloom
+                return true;
+            case 54428: // Divine Plea - only with talent Guarded by the Light
+                return HasSpell(53583);
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    return true;
+}

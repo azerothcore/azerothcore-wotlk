@@ -1382,6 +1382,11 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
     if (!unitTarget || !unitTarget->IsAlive() || unitTarget->getPowerType() != PowerType || damage < 0)
         return;
 
+    if (PowerType == POWER_MANA && !unitTarget->CanRestoreMana(GetSpellInfo()))
+    {
+        return;
+    }
+
     // add spell damage bonus
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
@@ -1913,6 +1918,11 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
     if (unitTarget->GetMaxPower(power) == 0)
         return;
 
+    if (power == POWER_MANA && !unitTarget->CanRestoreMana(GetSpellInfo()))
+    {
+        return;
+    }
+
     // Some level depends spells
     int level_multiplier = 0;
     int level_diff = 0;
@@ -2024,6 +2034,11 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
     uint32 maxPower = unitTarget->GetMaxPower(power);
     if (maxPower == 0)
         return;
+
+    if (power == POWER_MANA && !unitTarget->CanRestoreMana(GetSpellInfo()))
+    {
+        return;
+    }
 
     uint32 gain = CalculatePct(maxPower, damage);
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, gain, power);

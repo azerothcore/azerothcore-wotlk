@@ -6745,6 +6745,11 @@ void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
     if (GetBase()->IsPermanent() && target->GetPower(PowerType) == target->GetMaxPower(PowerType))
         return;
 
+    if (PowerType == POWER_MANA && !target->CanRestoreMana(GetSpellInfo()))
+    {
+        return;
+    }
+
     // ignore negative values (can be result apply spellmods to aura damage
     uint32 amount = std::max(m_amount, 0) * target->GetMaxPower(PowerType) / 100;
     LOG_DEBUG("spells.aura.effect", "PeriodicTick: %s energize %s for %u dmg inflicted by %u",
@@ -6777,6 +6782,11 @@ void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) cons
     // don't regen when permanent aura target has full power
     if (GetBase()->IsPermanent() && target->GetPower(PowerType) == target->GetMaxPower(PowerType))
         return;
+
+    if (PowerType == POWER_MANA && !target->CanRestoreMana(GetSpellInfo()))
+    {
+        return;
+    }
 
     // ignore negative values (can be result apply spellmods to aura damage
     int32 amount = std::max(m_amount, 0);
