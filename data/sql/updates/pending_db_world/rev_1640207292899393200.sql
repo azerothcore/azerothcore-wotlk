@@ -57,6 +57,7 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 11664) AND (`Item` IN (
 ));
 
 -- Flamewalker Elite - Add items missing accordingly to tbc.wowhead
+DELETE FROM `creature_loot_template` WHERE `Entry` = 11664 AND `Item` IN (22390, 3465);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (11664, 22390, 0, 0.1, 0, 1, 0, 1, 1, 'Flamewaker Elite - Plans: Persuader'),
 (11664, 3475, 0, 0.1, 0, 1, 0, 1, 1, 'Flamewaker Elite - Cloak of Flames');
