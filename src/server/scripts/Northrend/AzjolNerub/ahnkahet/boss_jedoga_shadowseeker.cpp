@@ -336,7 +336,7 @@ struct boss_jedoga_shadowseeker : public BossAI
         Talk(SAY_SLAY);
     }
 
-    void JustDied(Unit* /*Killer*/) override
+    void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         DespawnOOCSummons();

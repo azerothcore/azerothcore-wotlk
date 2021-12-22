@@ -28,7 +28,6 @@
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
-#include "ChannelMgr.h"
 #include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
@@ -42,10 +41,8 @@
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GameObjectAI.h"
-#include "GitRevision.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Guild.h"
@@ -56,7 +53,6 @@
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
-#include "MapInstanced.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -66,14 +62,12 @@
 #include "Pet.h"
 #include "PetitionMgr.h"
 #include "Player.h"
-#include "PoolMgr.h"
 #include "QuestDef.h"
 #include "QueryHolder.h"
 #include "ReputationMgr.h"
 #include "Realm.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
-#include "SkillDiscovery.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -91,6 +85,12 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 enum CharacterFlags
 {
@@ -1364,6 +1364,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         RemoveAurasByType(SPELL_AURA_MOD_FEAR);
         RemoveAurasByType(SPELL_AURA_MOD_CONFUSE);
         RemoveAurasByType(SPELL_AURA_MOD_ROOT);
+        // remove auras that should be removed when being teleported
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
     }
 
     if (m_transport)
@@ -5846,7 +5848,7 @@ void Player::RewardReputation(Quest const* quest)
         }
 
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
-            GetReputationMgr().ModifyReputation(factionEntry, rep);
+            GetReputationMgr().ModifyReputation(factionEntry, rep, false, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
     }
 }
 
@@ -15134,13 +15136,13 @@ Guild* Player::GetGuild() const
     return guildId ? sGuildMgr->GetGuildById(guildId) : nullptr;
 }
 
-void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType)
+void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType, int32 healthPct /*= 0*/)
 {
     Position pos = {x, y, z, ang};
     if (!pos.IsPositionValid())
         return;
 
-    AsynchPetSummon* asynchPetInfo = new AsynchPetSummon(entry, pos, petType, duration, createdBySpell, casterGUID);
+    AsynchPetSummon* asynchPetInfo = new AsynchPetSummon(entry, pos, petType, duration, createdBySpell, casterGUID, healthPct);
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
 }
 
@@ -15377,9 +15379,9 @@ uint16 Player::GetMaxSkillValueForLevel() const
     return result;
 }
 
-float Player::GetQuestRate()
+float Player::GetQuestRate(bool isDFQuest)
 {
-    float result = sWorld->getRate(RATE_XP_QUEST);
+    float result = isDFQuest ? sWorld->getRate(RATE_XP_QUEST_DF) : sWorld->getRate(RATE_XP_QUEST);
 
     sScriptMgr->OnGetQuestRate(this, result);
 
