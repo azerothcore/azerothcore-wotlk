@@ -10,7 +10,6 @@ INSERT INTO `spell_proc_event` (`entry`,`SchoolMask`,`SpellFamilyName`,`procPhas
 (16166,0,0,1),
 (16188,8,11,1),
 (16246,0,0,1),
-(16886,0,0,1),
 (17116,8,7,1),
 (4341,0,0,1),
 (28200,0,0,1),
