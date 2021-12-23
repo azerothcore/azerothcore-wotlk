@@ -60,7 +60,12 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+
+ // TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
@@ -337,37 +342,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                 ++count;
 
                         damage /= count;                    // divide to all targets
-                    }
-
-                    switch (m_spellInfo->Id)                     // better way to check unknown
-                    {
-                        // Consumption
-                        case 28865:
-                            damage = (m_caster->GetMap()->ToInstanceMap()->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250);
-                            break;
-                        // percent from health with min
-                        case 25599:                             // Thundercrash
-                            {
-                                damage = unitTarget->GetHealth() / 2;
-                                if (damage < 200)
-                                    damage = 200;
-                                break;
-                            }
-                        // arcane charge. must only affect demons (also undead?)
-                        case 45072:
-                            {
-                                if (unitTarget->GetCreatureType() != CREATURE_TYPE_DEMON
-                                        && unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
-                                    return;
-                                break;
-                            }
-                        // Gargoyle Strike
-                        case 51963:
-                            {
-                                // about +4 base spell dmg per level
-                                damage = (m_caster->getLevel() - 60) * 4 + 60;
-                                break;
-                            }
                     }
                     break;
                 }
