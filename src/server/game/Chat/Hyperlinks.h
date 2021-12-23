@@ -38,7 +38,6 @@ struct TalentEntry;
 
 namespace Acore::Hyperlinks
 {
-
     struct AchievementLinkData
     {
         AchievementEntry const* Achievement;
@@ -90,7 +89,8 @@ namespace Acore::Hyperlinks
         std::string KnownRecipes;
     };
 
-    namespace LinkTags {
+    namespace LinkTags
+    {
 
         /************************** LINK TAGS ***************************************************\
         |* Link tags must abide by the following:                                               *|
@@ -247,9 +247,9 @@ namespace Acore::Hyperlinks
         std::string_view const data;
         std::string_view const text;
     };
+
     HyperlinkInfo AC_GAME_API ParseSingleHyperlink(std::string_view str);
     bool AC_GAME_API CheckAllLinks(std::string_view str);
-
 }
 
 #endif
