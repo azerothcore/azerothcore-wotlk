@@ -2711,7 +2711,7 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
     m_ExitCode = exitcode;
 
     auto const& playersOnline = GetActiveSessionCount();
-    
+
     if (time < 5 && playersOnline)
     {
         // Set time to 5s for save all players
