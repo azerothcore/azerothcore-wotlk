@@ -17,7 +17,6 @@
 
 #include "SpellMgr.h"
 #include "BattlefieldMgr.h"
-#include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"

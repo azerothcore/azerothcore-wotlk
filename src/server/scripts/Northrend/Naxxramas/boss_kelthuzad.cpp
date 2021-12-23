@@ -156,7 +156,7 @@ public:
 
         float NormalizeOrientation(float o)
         {
-            return fmod(o, 2.0f * static_cast<float>(M_PI)); // Only positive values will be passed
+            return std::fmod(o, 2.0f * static_cast<float>(M_PI)); // Only positive values will be passed
         }
 
         void SpawnHelpers()
