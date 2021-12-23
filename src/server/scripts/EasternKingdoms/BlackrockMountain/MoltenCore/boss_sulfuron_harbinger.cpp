@@ -22,28 +22,28 @@
 enum Spells
 {
     // Sulfuron Harbringer
-    SPELL_DARK_STRIKE           = 19777,
     SPELL_DEMORALIZING_SHOUT    = 19778,
     SPELL_INSPIRE               = 19779,
     SPELL_KNOCKDOWN             = 19780,
     SPELL_FLAMESPEAR            = 19781,
 
     // Adds
-    SPELL_HEAL                  = 19775,
-    SPELL_SHADOWWORDPAIN        = 19776,
+    SPELL_DARK_MENDING          = 19775,
+    SPELL_SHADOW_WORD_PAIN      = 19776,
+    SPELL_DARK_STRIKE           = 19777,
     SPELL_IMMOLATE              = 20294,
 };
 
 enum Events
 {
-    EVENT_DARK_STRIKE           = 1,
-    EVENT_DEMORALIZING_SHOUT,
+    EVENT_DEMORALIZING_SHOUT    = 1,
     EVENT_INSPIRE,
     EVENT_KNOCKDOWN,
     EVENT_FLAMESPEAR,
 
-    EVENT_HEAL,
+    EVENT_DARK_MENDING,
     EVENT_SHADOW_WORD_PAIN,
+    EVENT_DARK_STRIKE,
     EVENT_IMMOLATE,
 };
 
@@ -59,7 +59,6 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_DARK_STRIKE, urand(4000, 7000));
             events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, urand(6000, 20000));
             events.ScheduleEvent(EVENT_INSPIRE, urand(7000, 10000));
             events.ScheduleEvent(EVENT_KNOCKDOWN, 6000);
@@ -70,12 +69,6 @@ public:
         {
             switch (eventId)
             {
-                case EVENT_DARK_STRIKE:
-                {
-                    DoCastSelf(SPELL_DARK_STRIKE);
-                    events.RepeatEvent(urand(4000, 7000));
-                    break;
-                }
                 case EVENT_DEMORALIZING_SHOUT:
                 {
                     DoCastVictim(SPELL_DEMORALIZING_SHOUT);
@@ -102,10 +95,7 @@ public:
                 }
                 case EVENT_FLAMESPEAR:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                    {
-                        DoCast(target, SPELL_FLAMESPEAR);
-                    }
+                    DoCastRandomTarget(SPELL_FLAMESPEAR);
                     events.RepeatEvent(urand(12000, 16000));
                     break;
                 }
@@ -140,7 +130,8 @@ public:
 
         void EnterCombat(Unit* /*victim*/) override
         {
-            events.ScheduleEvent(EVENT_HEAL, urand(15000, 30000));
+            events.ScheduleEvent(EVENT_DARK_STRIKE, urand(4000, 7000));
+            events.ScheduleEvent(EVENT_DARK_MENDING, urand(15000, 30000));
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(2000, 4000));
             events.ScheduleEvent(EVENT_IMMOLATE, urand(3500, 6000));
         }
@@ -163,20 +154,29 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_HEAL:
+                    case EVENT_DARK_STRIKE:
+                    {
+                        DoCastVictim(SPELL_DARK_STRIKE);
+                        events.RepeatEvent(urand(4000, 7000));
+                        break;
+                    }
+                    case EVENT_DARK_MENDING:
                     {
                         if (Unit* target = DoSelectLowestHpFriendly(60.0f, 1))
                         {
-                            DoCast(target, SPELL_HEAL);
+                            if (target->GetGUID() != me->GetGUID())
+                            {
+                                DoCast(target, SPELL_DARK_MENDING);
+                            }
                         }
                         events.RepeatEvent(urand(15000, 20000));
                         break;
                     }
                     case EVENT_SHADOW_WORD_PAIN:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHADOWWORDPAIN))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHADOW_WORD_PAIN))
                         {
-                            DoCast(target, SPELL_SHADOWWORDPAIN);
+                            DoCast(target, SPELL_SHADOW_WORD_PAIN);
                         }
                         events.RepeatEvent(urand(2500, 5000));
                         break;

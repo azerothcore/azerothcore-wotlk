@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Totem.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -22,7 +23,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "Totem.h"
 #include "WorldPacket.h"
 
 Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false)

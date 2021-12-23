@@ -17,9 +17,9 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "molten_core.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "molten_core.h"
 
 enum Emotes
 {

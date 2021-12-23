@@ -17,13 +17,13 @@
 
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "WaypointMgr.h"
+#include "ulduar.h"
 
 #define SPELL_FLAMEBUFFET_10                64016
 #define SPELL_FLAMEBUFFET_25                64023

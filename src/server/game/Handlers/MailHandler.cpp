@@ -17,8 +17,8 @@
 
 #include "AccountMgr.h"
 #include "CharacterCache.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Item.h"
 #include "Language.h"
 #include "Log.h"

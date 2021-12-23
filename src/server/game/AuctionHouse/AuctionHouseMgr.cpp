@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AuctionHouseMgr.h"
 #include "AccountMgr.h"
 #include "AsyncAuctionListing.h"
-#include "AuctionHouseMgr.h"
 #include "AvgDiffTracker.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Item.h"
 #include "Logging/Log.h"
 #include "ObjectMgr.h"
@@ -29,7 +29,6 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include <vector>
 
 constexpr auto AH_MINIMUM_DEPOSIT = 100;

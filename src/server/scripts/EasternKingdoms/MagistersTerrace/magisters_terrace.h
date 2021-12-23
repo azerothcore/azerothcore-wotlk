@@ -19,9 +19,9 @@
 #define DEF_MAGISTERS_TERRACE_H
 
 #include "CreatureAI.h"
+#include "CreatureAIImpl.h"
 #include "Player.h"
 #include "SpellScript.h"
-#include "CreatureAIImpl.h"
 
 #define MTScriptName "instance_magisters_terrace"
 

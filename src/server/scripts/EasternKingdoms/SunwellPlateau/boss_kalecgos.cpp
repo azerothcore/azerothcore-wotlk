@@ -16,10 +16,10 @@
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "sunwell_plateau.h"
+#include "ScriptedCreature.h"
 #include "WorldSession.h"
+#include "sunwell_plateau.h"
 
 enum Yells
 {
@@ -196,9 +196,9 @@ public:
             }
         }
 
-        void JustDied(Unit* who) override
+        void JustDied(Unit* killer) override
         {
-            BossAI::JustDied(who);
+            BossAI::JustDied(killer);
         }
 
         void EnterCombat(Unit* who) override

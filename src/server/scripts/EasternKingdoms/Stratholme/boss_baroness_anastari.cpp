@@ -20,8 +20,8 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "stratholme.h"
 #include "TaskScheduler.h"
+#include "stratholme.h"
 
 enum Spells
 {

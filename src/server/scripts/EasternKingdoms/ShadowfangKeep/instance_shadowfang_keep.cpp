@@ -17,8 +17,8 @@
 
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
-#include "shadowfang_keep.h"
 #include "TemporarySummon.h"
+#include "shadowfang_keep.h"
 
 //enum Creatures
 //{

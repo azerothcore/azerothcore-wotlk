@@ -23,8 +23,8 @@ SDCategory: Duskwood
 EndScriptData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum TwilightCorrupter
 {

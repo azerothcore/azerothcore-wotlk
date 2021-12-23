@@ -22,9 +22,9 @@ Comment: All bf related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "BattlefieldMgr.h"
 #include "Chat.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 

@@ -18,9 +18,9 @@
 #ifndef AZEROTHCORE_CREATUREDATA_H
 #define AZEROTHCORE_CREATUREDATA_H
 
-#include "DBCEnums.h"
 #include "Cell.h"
 #include "Common.h"
+#include "DBCEnums.h"
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
@@ -416,6 +416,7 @@ struct TrainerSpell
     uint32 reqSkillValue{0};
     uint32 reqLevel{0};
     uint32 learnedSpell[3];
+    uint32 reqSpell{0};
 
     // helpers
     [[nodiscard]] bool IsCastable() const { return learnedSpell[0] != spell; }

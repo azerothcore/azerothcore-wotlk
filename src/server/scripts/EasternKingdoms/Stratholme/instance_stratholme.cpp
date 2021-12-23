@@ -17,8 +17,8 @@
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "stratholme.h"
 
 const Position BlackGuardPos[10] =

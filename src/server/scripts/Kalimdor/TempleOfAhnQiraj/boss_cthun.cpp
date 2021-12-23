@@ -23,8 +23,8 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
 /*

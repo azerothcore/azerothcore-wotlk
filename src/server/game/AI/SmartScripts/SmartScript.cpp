@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SmartScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "ChatTextBuilder.h"
@@ -33,7 +34,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
-#include "SmartScript.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
@@ -1516,7 +1516,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         o += e.target.o;
                         if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, x, y, z, o, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration))
                         {
-                            if (e.action.summonCreature.attackInvoker == 2) // pussywizard: proper attackInvoker implementation, but not spoiling tc shitness
+                            if (e.action.summonCreature.attackInvoker == 2) // pussywizard: proper attackInvoker implementation
                                 summon->AI()->AttackStart(unit);
                             else if (e.action.summonCreature.attackInvoker)
                                 summon->AI()->AttackStart((*itr)->ToUnit());
@@ -3267,6 +3267,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 break;
             }
+        case SMART_ACTION_DISABLE_EVADE:
+            {
+                if (!IsSmart())
+                    break;
+
+                CAST_AI(SmartAI, me->AI())->SetEvadeDisabled(e.action.disableEvade.disable != 0);
+                break;
+            }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry %d SourceType %u, Event %u, Unhandled Action type %u", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -4480,7 +4488,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
             break;
         case SMART_EVENT_OOC_LOS:
         case SMART_EVENT_IC_LOS:
-        // Xinef: wtf is this bullshit? cooldown should be processed AFTER action is done, not before...
+        // Xinef: cooldown should be processed AFTER action is done, not before...
         //RecalcTimer(e, e.event.los.cooldownMin, e.event.los.cooldownMax);
         //break;
         case SMART_EVENT_DISTANCE_CREATURE:

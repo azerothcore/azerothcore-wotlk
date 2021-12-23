@@ -19,6 +19,8 @@
 #define ACORE_MAIL_H
 
 #include "Common.h"
+#include "DatabaseEnvFwd.h"
+#include "ObjectGuid.h"
 #include <map>
 #include <utility>
 

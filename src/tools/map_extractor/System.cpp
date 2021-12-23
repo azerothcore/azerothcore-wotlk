@@ -20,8 +20,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <deque>
-#include <set>
 #include <filesystem>
+#include <set>
 
 #ifdef _WIN32
 #include "direct.h"
@@ -37,7 +37,6 @@
 #include "adt.h"
 #include "wdt.h"
 
-#include "G3D/Plane.h"
 #include <fcntl.h>
 
 #if defined( __GNUC__ )

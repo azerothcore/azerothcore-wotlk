@@ -27,6 +27,7 @@
 #include "Config.h"
 #include "GitRevision.h"
 #include "Language.h"
+#include "ModuleMgr.h"
 #include "MySQLThreading.h"
 #include "Player.h"
 #include "Realm.h"
@@ -35,11 +36,11 @@
 #include "StringConvert.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
-#include <filesystem>
 #include <boost/version.hpp>
+#include <filesystem>
+#include <numeric>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
-#include <numeric>
 
 using namespace Acore::ChatCommands;
 
@@ -219,6 +220,14 @@ public:
         handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+
+        handler->SendSysMessage("> List enable modules:");
+
+        for (auto const& modName : Acore::Module::GetEnableModulesList())
+        {
+            handler->SendSysMessage(Acore::StringFormatFmt("- {}", modName));
+        }
+
         return true;
     }
 

@@ -39,12 +39,11 @@ EndContentData */
 
 #include "Group.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
 
 // Ours
 class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader

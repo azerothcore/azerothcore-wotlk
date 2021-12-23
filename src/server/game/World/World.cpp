@@ -92,10 +92,6 @@
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -444,15 +440,6 @@ void World::LoadConfigSettings(bool reload)
     // Set realm id and enable db logging
     sLog->SetRealmId(realm.Id.Realm);
 
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    if (!reload)
-    {
-        LOG_INFO("eluna", "Initialize Eluna Lua Engine...");
-        Eluna::Initialize();
-    }
-#endif
-
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     ///- Read the player limit and the Message of the day from the config file
@@ -519,6 +506,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_KILL]                     = sConfigMgr->GetOption<float>("Rate.XP.Kill", 1.0f);
     rate_values[RATE_XP_BG_KILL]                  = sConfigMgr->GetOption<float>("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]                    = sConfigMgr->GetOption<float>("Rate.XP.Quest", 1.0f);
+    rate_values[RATE_XP_QUEST_DF]                 = sConfigMgr->GetOption<float>("Rate.XP.Quest.DF", 1.0f);
     rate_values[RATE_XP_EXPLORE]                  = sConfigMgr->GetOption<float>("Rate.XP.Explore", 1.0f);
     rate_values[RATE_XP_PET]                      = sConfigMgr->GetOption<float>("Rate.XP.Pet", 1.0f);
     rate_values[RATE_XP_PET_NEXT_LEVEL]           = sConfigMgr->GetOption<float>("Rate.Pet.LevelXP", 0.05f);
@@ -2081,12 +2069,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
 
-#ifdef ELUNA
-    ///- Run eluna scripts.
-    // in multithread foreach: run scripts
-    sEluna->RunScripts();
-    sEluna->OnConfigLoad(false, false); // Must be done after Eluna is initialized and scripts have run.
-#endif
+    sScriptMgr->OnBeforeWorldInitialized();
 
     if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
     {
@@ -2119,6 +2102,7 @@ void World::SetInitialWorldSettings()
 
     if (sConfigMgr->isDryRun())
     {
+        sMapMgr->UnloadAll();
         LOG_INFO("server.loading", "AzerothCore dry run completed, terminating.");
         exit(0);
     }

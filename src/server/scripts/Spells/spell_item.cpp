@@ -23,11 +23,12 @@
 
 #include "Battleground.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "WorldSession.h"
 
 class spell_item_massive_seaforium_charge : public SpellScript
 {

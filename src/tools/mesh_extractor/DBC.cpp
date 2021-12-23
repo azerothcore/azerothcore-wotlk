@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdio>
 #include "DBC.h"
 #include "Define.h"
+#include <cstdio>
 
 DBC::DBC( FILE* stream ) : StringBlock(nullptr), StringBlockSize(0), IsFaulty(true)
 {

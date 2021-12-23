@@ -19,8 +19,8 @@
 #define _WHO_LISTCACHE_H_
 
 #include "Common.h"
-#include "SharedDefines.h"
 #include "ObjectGuid.h"
+#include "SharedDefines.h"
 
 class WhoListPlayerInfo
 {

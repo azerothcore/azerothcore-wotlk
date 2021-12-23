@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LFGMgr.h"
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DBCStores.h"
@@ -22,12 +23,12 @@
 #include "GameEventMgr.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "Language.h"
+#include "InstanceSaveMgr.h"
 #include "LFGGroupData.h"
-#include "LFGMgr.h"
 #include "LFGPlayerData.h"
 #include "LFGQueue.h"
 #include "LFGScripts.h"
+#include "Language.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -38,7 +39,6 @@
 
 namespace lfg
 {
-
     LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
     {
         new LFGPlayerScript();
@@ -1696,7 +1696,7 @@ namespace lfg
         {
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
-                if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
+                if (player->GetGroup() != grp) // pussywizard: could not add because group was full
                     continue;
 
                 // Add the cooldown spell if queued for a random dungeon
@@ -2104,15 +2104,25 @@ namespace lfg
         LfgTeleportError error = LFG_TELEPORTERROR_OK;
 
         if (!player->IsAlive())
+        {
             error = LFG_TELEPORTERROR_PLAYER_DEAD;
+        }
         else if (player->IsFalling() || player->HasUnitState(UNIT_STATE_JUMPING))
+        {
             error = LFG_TELEPORTERROR_FALLING;
+        }
         else if (player->IsMirrorTimerActive(FATIGUE_TIMER))
+        {
             error = LFG_TELEPORTERROR_FATIGUE;
+        }
         else if (player->GetVehicle())
+        {
             error = LFG_TELEPORTERROR_IN_VEHICLE;
-        else if (player->GetCharmGUID())
-            error = LFG_TELEPORTERROR_CHARMING;
+        }
+        else if (player->GetCharmGUID() || player->IsInCombat())
+        {
+            error = LFG_TELEPORTERROR_COMBAT;
+        }
         else
         {
             uint32 mapid = dungeon->map;
@@ -2233,7 +2243,7 @@ namespace lfg
 
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             else
             {
                 done = true;
@@ -2241,7 +2251,7 @@ namespace lfg
                 if (!quest)
                     continue;
                 // we give reward without informing client (retail does this)
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             }
 
             // Give rewards
