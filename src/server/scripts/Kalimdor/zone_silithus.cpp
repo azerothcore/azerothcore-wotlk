@@ -28,17 +28,16 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "AccountMgr.h"
-#include "BanMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Group.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "SpellInfo.h"
-#include "WorldSession.h"
 
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
@@ -1056,6 +1055,17 @@ public:
             Seconds respawnTimer = 0s;
             player->PlayerTalkClass->SendCloseGossip();
 
+            if (ObjectAccessor::GetCreature(*me, _creatureGuid))
+            {
+                // We already summoned something recently, return.
+                CloseGossipMenuFor(player);
+                return true;
+            }
+            else
+            {
+                _creatureGuid.Clear();
+            }
+
             if (sender == GOSSIPID_LESSER_WS)
             {
                 respawnTimer = 300s; // Lesser Windstone respawn in 5 minutes
@@ -1151,22 +1161,22 @@ public:
             delete spell;
             if (result != SPELL_CAST_OK)
             {
-                if (result == SPELL_FAILED_REAGENTS)
-                {
-                    std::string accountName;
-                    AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-                    sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "Server");
-                }
                 return;
             }
             player->CastSpell(player, spellInfoTrigger->Id, false);
-            TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000);
-            summons->CastSpell(summons, SPELL_SPAWN_IN, false);
-            summons->AI()->Talk(SAY_ON_SPAWN_IN);
-            summons->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            summons->SendMeleeAttackStart(player);
-            summons->CombatStart(player);
+            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000))
+            {
+                summons->CastSpell(summons, SPELL_SPAWN_IN, false);
+                summons->AI()->Talk(SAY_ON_SPAWN_IN);
+                summons->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                summons->SendMeleeAttackStart(player);
+                summons->CombatStart(player);
+                _creatureGuid = summons->GetGUID();
+            }
         }
+
+        private:
+            ObjectGuid _creatureGuid;
     };
 
     GameObjectAI* GetAI(GameObject* go) const
