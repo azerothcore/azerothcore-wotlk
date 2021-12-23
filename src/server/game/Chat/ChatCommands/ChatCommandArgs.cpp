@@ -17,7 +17,6 @@
 
 #include "ChatCommandArgs.h"
 #include "AchievementMgr.h"
-#include "ChatCommand.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Util.h"
