@@ -133,16 +133,16 @@ public:
         MAX
     };
 
-    PetLoadQueryHolder([[maybe_unused]] ObjectGuid::LowType ownerGuid, uint32 petNumber)
+    PetLoadQueryHolder(ObjectGuid::LowType ownerGuid, uint32 petNumber)
     {
         SetSize(MAX);
 
         CharacterDatabasePreparedStatement* stmt = nullptr;
 
-        /*stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_DECLINED_NAME);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_DECLINED_NAME);
         stmt->setUInt32(0, ownerGuid);
         stmt->setUInt32(1, petNumber);
-        SetPreparedQuery(DECLINED_NAMES, stmt);*/
+        SetPreparedQuery(DECLINED_NAMES, stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURA);
         stmt->setUInt32(0, petNumber);
@@ -471,13 +471,13 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
         if (getPetType() == HUNTER_PET)
         {
-            /*if (PreparedQueryResult result = holder.GetPreparedResult(PetLoadQueryHolder::DECLINED_NAMES))
+            if (PreparedQueryResult result = holder.GetPreparedResult(PetLoadQueryHolder::DECLINED_NAMES))
             {
                 m_declinedname = std::make_unique<DeclinedName>();
                 Field* fields = result->Fetch();
                 for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
                     m_declinedname->name[i] = fields[i].GetString();
-            }*/
+            }
         }
 
         // must be after SetMinion (owner guid check)
