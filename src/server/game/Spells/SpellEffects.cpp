@@ -5427,6 +5427,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     pet->setDeathState(ALIVE);
     pet->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_POSSESSED))); // xinef: just in case
     pet->SetHealth(pet->CountPctFromMaxHealth(damage));
+    pet->SetDisplayId(pet->GetNativeDisplayId());
 
     // xinef: restore movement
     if (auto ci = pet->GetCharmInfo())
