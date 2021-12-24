@@ -751,8 +751,8 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -765,10 +765,10 @@ void ObjectMgr::LoadCreatureTemplateAddons()
             if (AdditionalSpellInfo->GetDuration() > 0)
             {
                 LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
-                continue;
+                // continue;
             }
 
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)
@@ -1188,8 +1188,8 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -1202,10 +1202,10 @@ void ObjectMgr::LoadCreatureAddons()
             if (AdditionalSpellInfo->GetDuration() > 0)
             {
                 LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, uint32(atol(*itr)));
-                continue;
+                // continue;
             }
 
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)

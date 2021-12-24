@@ -37,7 +37,6 @@
 #include "adt.h"
 #include "wdt.h"
 
-#include "G3D/Plane.h"
 #include <fcntl.h>
 
 #if defined( __GNUC__ )
