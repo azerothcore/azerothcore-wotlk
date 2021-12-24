@@ -363,7 +363,7 @@ struct Loot
         loot_type = LOOT_NONE;
     }
 
-    [[nodiscard]] bool empty() const { return items.empty() && quest_items.empty() && gold == 0; }
+    [[nodiscard]] bool empty() const { return items.empty() && gold == 0; }
     [[nodiscard]] bool isLooted() const { return gold == 0 && unlootedCount == 0; }
 
     void NotifyItemRemoved(uint8 lootIndex);
