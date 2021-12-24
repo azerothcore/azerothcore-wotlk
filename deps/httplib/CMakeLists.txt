@@ -17,10 +17,8 @@ CollectIncludeDirectories(
   PUBLIC_INCLUDES)
 
 target_include_directories(httplib
-  PUBLIC
-    ${PUBLIC_INCLUDES}
-  PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR})
+  INTERFACE
+    ${PUBLIC_INCLUDES}})
 
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
