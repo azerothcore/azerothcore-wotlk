@@ -58,7 +58,6 @@
 #include "QueryHolder.h"
 #include "QuestDef.h"
 #include "ReputationMgr.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
@@ -7173,16 +7172,6 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-
-    // our: saving system
-    if (!create && !logout)
-    {
-        // pussywizard: if it was not yet our time to save, be we are saved (additional save after important changes)
-        // pussywizard: then free our original ticket in saving queue, so saving is fluent with no gaps
-        SavingSystemMgr::InsertToSavingSkipListIfNeeded(m_nextSave);
-
-        m_nextSave = SavingSystemMgr::IncreaseSavingMaxValue(1);
-    }
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state
