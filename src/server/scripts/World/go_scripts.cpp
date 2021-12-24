@@ -1942,7 +1942,7 @@ class go_duskwither_spire_power_source : public GameObjectScript
 public:
     go_duskwither_spire_power_source() : GameObjectScript("go_duskwither_spire_power_source") {}
 
-    bool OnGossipHello(Player* /*player*/ player, GameObject* go) override
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
         if (Creature* bunny = go->FindNearestCreature(NPC_POWER_SOURCE_INVISIBLE_BUNNY, 1.0f))
         {
