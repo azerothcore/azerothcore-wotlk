@@ -48,6 +48,7 @@ public:
         {
             { "restore",   HandleItemRestoreCommandTable },
             { "move",      HandleItemMoveCommand,               SEC_GAMEMASTER,    Console::Yes },
+            { "refund",    HandleItemRefundCommand,             SEC_ADMINISTRATOR, Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -139,7 +140,8 @@ public:
             return false;
         }
 
-        do {
+        do
+        {
             Field* fields    = disposedItems->Fetch();
             uint32 id        = fields[0].GetUInt32();
             uint32 itemId    = fields[1].GetUInt32();
@@ -160,7 +162,6 @@ public:
     // TODO - move item to other slot
     static bool HandleItemMoveCommand(ChatHandler* handler, uint8 srcSlot, uint8 dstSlot)
     {
-
         if (srcSlot == dstSlot)
             return true;
 
@@ -180,7 +181,201 @@ public:
 
     static bool HasItemDeletionConfig()
     {
-      return sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD) || sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR);
+        return sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD) || sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR);
+    }
+
+    static bool HandleItemRefundCommand(ChatHandler* handler, PlayerIdentifier player, uint32 itemId, uint32 extendedCost)
+    {
+        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCost);
+        if (!iece)
+        {
+            handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_BAD_EXTENDED_COST);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId);
+
+        if (!item)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (Player* target = player.GetConnectedPlayer())
+        {
+            if (!target->HasItemCount(itemId, 1, true))
+            {
+                handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_NOT_FOUND, itemId);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            if (iece->reqhonorpoints)
+            {
+                uint32 honor = target->GetHonorPoints() + iece->reqhonorpoints;
+                if (honor > sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS))
+                {
+                    handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_HONOR, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS), target->GetHonorPoints(), iece->reqhonorpoints);
+                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_CMD_ITEM_REFUND_HONOR_FAILED, item->Name1);
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+
+                target->SetHonorPoints(honor);
+                ChatHandler(target->GetSession()).PSendSysMessage(LANG_CMD_ITEM_REFUNDED_HONOR, item->Name1, item->ItemId, iece->reqhonorpoints);
+                handler->PSendSysMessage(LANG_CMD_ITEM_REFUNDED_HONOR, item->Name1, item->ItemId, iece->reqhonorpoints);
+            }
+
+            if (iece->reqarenapoints)
+            {
+                uint32 arenapoints = target->GetArenaPoints() + iece->reqarenapoints;
+                if (arenapoints > sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS))
+                {
+                    handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_AP, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS), target->GetArenaPoints(), iece->reqarenapoints);
+                    ChatHandler(target->GetSession()).PSendSysMessage(LANG_CMD_ITEM_REFUND_AP_FAILED, item->Name1);
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+
+                target->SetArenaPoints(arenapoints);
+                ChatHandler(target->GetSession()).PSendSysMessage(LANG_CMD_ITEM_REFUNDED_AP, item->Name1, item->ItemId, iece->reqarenapoints);
+                handler->PSendSysMessage(LANG_CMD_ITEM_REFUNDED_AP, item->Name1, item->ItemId, iece->reqarenapoints);
+            }
+
+            uint8 count = 0;
+            for (uint32 const& reqItem : iece->reqitem)
+            {
+                if (reqItem)
+                {
+                    target->AddItem(reqItem, iece->reqitemcount[count]);
+                }
+
+                ++count;
+            }
+
+            target->DestroyItemCount(itemId, 1, true);
+        }
+        else
+        {
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabasePreparedStatement* stmt;
+
+            ObjectGuid::LowType guid = player.GetGUID().GetCounter();
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
+            stmt->setUInt32(0, itemId);
+            stmt->setUInt32(1, guid);
+
+            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+            if (result)
+            {
+                if (iece->reqhonorpoints)
+                {
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HONORPOINTS);
+                    stmt->setUInt32(0, guid);
+
+                    PreparedQueryResult queryResult = CharacterDatabase.Query(stmt);
+
+                    if (queryResult)
+                    {
+                        Field* fields = queryResult->Fetch();
+                        if ((fields[0].GetUInt32() + iece->reqhonorpoints) > sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS))
+                        {
+                            handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_HONOR, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS), fields[0].GetUInt32(), iece->reqhonorpoints);
+                            handler->SetSentErrorMessage(true);
+                            return false;
+                        }
+                    }
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE);
+                    stmt->setUInt32(0, iece->reqhonorpoints);
+                    stmt->setUInt32(1, guid);
+                    trans->Append(stmt);
+                    handler->PSendSysMessage(LANG_CMD_ITEM_REFUNDED_HONOR, item->Name1, item->ItemId, iece->reqhonorpoints);
+                }
+
+                if (iece->reqarenapoints)
+                {
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENAPOINTS);
+                    stmt->setUInt32(0, guid);
+
+                    PreparedQueryResult queryResult = CharacterDatabase.Query(stmt);
+
+                    if (queryResult)
+                    {
+                        Field* fields = queryResult->Fetch();
+                        if ((fields[0].GetUInt32() + iece->reqhonorpoints) > sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS))
+                        {
+                            handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_AP, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS), fields[0].GetUInt32(), iece->reqarenapoints);
+                            handler->SetSentErrorMessage(true);
+                            return false;
+                        }
+                    }
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS_ACCUMULATIVE);
+                    stmt->setUInt32(0, iece->reqarenapoints);
+                    stmt->setUInt32(1, guid);
+                    trans->Append(stmt);
+                    handler->PSendSysMessage(LANG_CMD_ITEM_REFUNDED_AP, item->Name1, item->ItemId, iece->reqarenapoints);
+                }
+
+                MailSender sender(MAIL_NORMAL, guid, MAIL_STATIONERY_GM);
+                // fill mail
+                std::string msg = "Your item " + item->Name1 + " has been removed and the used currency restored. This mail contains any items used as currency.";
+                MailDraft   draft("Item Refund", msg);
+
+                uint8 count      = 0;
+                bool  foundItems = false;
+                for (uint32 const& reqItem : iece->reqitem)
+                {
+                    if (reqItem)
+                    {
+                        // Skip invalid items.
+                        if (!sObjectMgr->GetItemTemplate(reqItem))
+                        {
+                            continue;
+                        }
+
+                        if (Item* item = Item::CreateItem(reqItem, iece->reqitemcount[count]))
+                        {
+                            item->SaveToDB(trans);
+                            draft.AddItem(item);
+                            foundItems = true;
+                        }
+                    }
+
+                    ++count;
+                }
+
+                if (foundItems)
+                {
+                    draft.SendMailTo(trans, MailReceiver(nullptr, guid), sender);
+                }
+
+                Field* fields = result->Fetch();
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+                stmt->setUInt32(0, fields[0].GetUInt32());
+                trans->Append(stmt);
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                stmt->setUInt32(0, fields[0].GetUInt32());
+                trans->Append(stmt);
+
+                CharacterDatabase.CommitTransaction(trans);
+            }
+            else
+            {
+                handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_NOT_FOUND, itemId);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+        }
+
+        return true;
     }
 };
 

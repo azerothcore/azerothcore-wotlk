@@ -334,6 +334,14 @@ public:
                     }
                     case EVENT_MAGMA_BLAST_MELEE_CHECK:
                     {
+                        if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetTarget()))
+                        {
+                            if (!target->IsAlive())
+                            {
+                                me->SetTarget(ObjectGuid::Empty);
+                            }
+                        }
+
                         if (!IsVictimWithinMeleeRange())
                         {
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
