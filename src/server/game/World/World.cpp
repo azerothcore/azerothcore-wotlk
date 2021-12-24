@@ -68,7 +68,6 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "Realm.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "SkillDiscovery.h"
@@ -89,12 +88,14 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "TaskScheduler.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+namespace
+{
+    TaskScheduler playersSaveScheduler;
+}
 
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -444,15 +445,6 @@ void World::LoadConfigSettings(bool reload)
     // Set realm id and enable db logging
     sLog->SetRealmId(realm.Id.Realm);
 
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    if (!reload)
-    {
-        LOG_INFO("eluna", "Initialize Eluna Lua Engine...");
-        Eluna::Initialize();
-    }
-#endif
-
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     ///- Read the player limit and the Message of the day from the config file
@@ -519,6 +511,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_KILL]                     = sConfigMgr->GetOption<float>("Rate.XP.Kill", 1.0f);
     rate_values[RATE_XP_BG_KILL]                  = sConfigMgr->GetOption<float>("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]                    = sConfigMgr->GetOption<float>("Rate.XP.Quest", 1.0f);
+    rate_values[RATE_XP_QUEST_DF]                 = sConfigMgr->GetOption<float>("Rate.XP.Quest.DF", 1.0f);
     rate_values[RATE_XP_EXPLORE]                  = sConfigMgr->GetOption<float>("Rate.XP.Explore", 1.0f);
     rate_values[RATE_XP_PET]                      = sConfigMgr->GetOption<float>("Rate.XP.Pet", 1.0f);
     rate_values[RATE_XP_PET_NEXT_LEVEL]           = sConfigMgr->GetOption<float>("Rate.Pet.LevelXP", 0.05f);
@@ -2081,12 +2074,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
 
-#ifdef ELUNA
-    ///- Run eluna scripts.
-    // in multithread foreach: run scripts
-    sEluna->RunScripts();
-    sEluna->OnConfigLoad(false, false); // Must be done after Eluna is initialized and scripts have run.
-#endif
+    sScriptMgr->OnBeforeWorldInitialized();
 
     if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
     {
@@ -2470,8 +2458,8 @@ void World::Update(uint32 diff)
     }
 
     {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update saving system"));
-        SavingSystemMgr::Update(diff);
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
+        playersSaveScheduler.Update(diff);
     }
 
     {
@@ -2721,6 +2709,33 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     m_ShutdownMask = options;
     m_ExitCode = exitcode;
+
+    auto const& playersOnline = GetActiveSessionCount();
+
+    if (time < 5 && playersOnline)
+    {
+        // Set time to 5s for save all players
+        time = 5;
+    }
+
+    playersSaveScheduler.CancelAll();
+
+    if (time >= 5)
+    {
+        playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
+        {
+            if (!GetActiveSessionCount())
+            {
+                LOG_INFO("server", "> No players online. Skip save before shutdown");
+                return;
+            }
+
+            LOG_INFO("server", "> Save players before shutdown server");
+            ObjectAccessor::SaveAllPlayers();
+        });
+    }
+
+    FMT_LOG_WARN("server", "Time left until shutdown/restart: {}", time);
 
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
     if (time == 0)

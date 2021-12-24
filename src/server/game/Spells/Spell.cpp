@@ -15,11 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef ELUNA
-#include "ElunaUtility.h"
-#include "LuaEngine.h"
-#endif
-
 #include "Spell.h"
 #include "ArenaSpectator.h"
 #include "BattlefieldMgr.h"
@@ -2668,7 +2663,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         procEx |= createProcExtendMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_DAMAGE;
 
-        caster->DealSpellDamage(&damageInfo, true);
+        caster->DealSpellDamage(&damageInfo, true, this);
 
         // do procs after damage, eg healing effects
         // no need to check if target is alive, done in procdamageandspell
@@ -2884,10 +2879,15 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         uint32 flagsExtra = unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetCreatureTemplate()->flags_extra : 0;
 
         // Increase Diminishing on unit, current informations for actually casts will use values above
-        if ((type == DRTYPE_PLAYER && (
-                    unit->GetCharmerOrOwnerPlayerOrPlayerItself() || flagsExtra & CREATURE_FLAG_EXTRA_ALL_DIMINISH || (m_diminishGroup == DIMINISHING_TAUNT && (flagsExtra & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS))
-                )) || type == DRTYPE_ALL)
-            unit->IncrDiminishing(m_diminishGroup);
+        if ((type == DRTYPE_PLAYER && (unit->IsCharmedOwnedByPlayerOrPlayer() || flagsExtra & CREATURE_FLAG_EXTRA_ALL_DIMINISH ||
+            (m_diminishGroup == DIMINISHING_TAUNT && (flagsExtra & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS)))) || type == DRTYPE_ALL)
+        {
+            // Do not apply diminish return if caster is NPC
+            if (m_caster->IsCharmedOwnedByPlayerOrPlayer())
+            {
+                unit->IncrDiminishing(m_diminishGroup);
+            }
+        }
     }
 
     if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && !m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH))
@@ -3586,9 +3586,7 @@ void Spell::_cast(bool skipCheck)
     {
         // now that we've done the basic check, now run the scripts
         // should be done before the spell is actually executed
-#ifdef ELUNA
-        sEluna->OnSpellCast(playerCaster, this, skipCheck);
-#endif
+        sScriptMgr->OnPlayerSpellCast(playerCaster, this, skipCheck);
 
         // As of 3.0.2 pets begin attacking their owner's target immediately
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
@@ -5631,7 +5629,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     // Xinef: fix for duels
                     Player* player = m_caster->ToPlayer();
-                    if (!player || !player->duel || target != player->duel->opponent)
+                    if (!player || !player->duel || target != player->duel->Opponent)
                         return SPELL_FAILED_NOTHING_TO_DISPEL;
                 }
             }
@@ -5872,9 +5870,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // We must also ensure the gameobject we are opening is still closed by the time the spell finishes.
                     if (GameObject* go = m_targets.GetGOTarget())
                     {
-                        if (go->GetGoState() != GO_STATE_READY)
+                        if (go->GetGoType() == GAMEOBJECT_TYPE_DOOR && go->GetGoState() != GO_STATE_READY)
                         {
-                            return SPELL_FAILED_BAD_TARGETS;
+                            return SPELL_FAILED_ALREADY_OPEN;
                         }
                     }
                     if (m_spellInfo->Id != 1842 || (m_targets.GetGOTarget() &&
@@ -8351,7 +8349,12 @@ void Spell::TriggerGlobalCooldown()
             m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_GLOBAL_COOLDOWN, gcd, this);
 
         // Apply haste rating
-        gcd = int32(float(gcd) * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+        if (m_spellInfo->StartRecoveryCategory == 133 && m_spellInfo->StartRecoveryTime == 1500 && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
+            m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_RANGED && !m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && !m_spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY))
+        {
+            gcd = int32(float(gcd) * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+        }
+
         if (gcd < MIN_GCD)
             gcd = MIN_GCD;
         else if (gcd > MAX_GCD)

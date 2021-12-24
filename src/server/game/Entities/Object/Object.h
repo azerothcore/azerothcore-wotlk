@@ -33,9 +33,7 @@
 #include <sstream>
 #include <string>
 
-#ifdef ELUNA
 class ElunaEventProcessor;
-#endif
 
 enum TempSummonType
 {
@@ -448,11 +446,11 @@ struct Position
         if (o < 0)
         {
             float mod = o * -1;
-            mod = fmod(mod, 2.0f * static_cast<float>(M_PI));
+            mod = std::fmod(mod, 2.0f * static_cast<float>(M_PI));
             mod = -mod + 2.0f * static_cast<float>(M_PI);
             return mod;
         }
-        return fmod(o, 2.0f * static_cast<float>(M_PI));
+        return std::fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 };
 
@@ -673,19 +671,12 @@ protected:
 public:
     ~WorldObject() override;
 
-#ifdef ELUNA
     virtual void Update(uint32 /*time_diff*/);
-#else
-    virtual void Update(uint32 /*time_diff*/) { };
-#endif
+
     void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
-
-#ifdef ELUNA
-    ElunaEventProcessor* elunaEvents;
-#endif
 
     void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
     void GetNearPoint2D(float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
@@ -898,6 +889,8 @@ public:
     void SetAllowedLooters(GuidUnorderedSet const looters);
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
+
+    ElunaEventProcessor* elunaEvents;
 
 protected:
     std::string m_name;
