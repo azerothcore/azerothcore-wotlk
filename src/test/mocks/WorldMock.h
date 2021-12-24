@@ -106,7 +106,6 @@ public:
     MOCK_METHOD(bool, IsFFAPvPRealm, (), (const));
     MOCK_METHOD(void, KickAll, ());
     MOCK_METHOD(void, KickAllLess, (AccountTypes sec), ());
-    MOCK_METHOD(uint32, GetNextWhoListUpdateDelaySecs, ());
     MOCK_METHOD(void, ProcessCliCommands, ());
     MOCK_METHOD(void, QueueCliCommand, (CliCommandHolder* commandHolder), ());
     MOCK_METHOD(void, ForceGameEventUpdate, ());

@@ -1979,9 +1979,6 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_PINGDB].SetInterval(getIntConfig(CONFIG_DB_PING_INTERVAL)*MINUTE * IN_MILLISECONDS);  // Mysql ping time in minutes
 
-    // our speed up
-    m_timers[WUPDATE_5_SECS].SetInterval(5 * IN_MILLISECONDS);
-
     m_timers[WUPDATE_WHO_LIST].SetInterval(5 * IN_MILLISECONDS); // update who list cache every 5 seconds
 
     mail_expire_check_timer = time(nullptr) + 6 * 3600;
@@ -2217,16 +2214,6 @@ void World::Update(uint32 diff)
             m_timers[i].Update(diff);
         else
             m_timers[i].SetCurrent(0);
-    }
-
-    // pussywizard: our speed up and functionality
-    if (m_timers[WUPDATE_5_SECS].Passed())
-    {
-        m_timers[WUPDATE_5_SECS].Reset();
-
-        // moved here from HandleCharEnumOpcode
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
-        CharacterDatabase.Execute(stmt);
     }
 
     ///- Update the game time and check for shutdown time
@@ -3367,17 +3354,6 @@ bool World::IsPvPRealm() const
 bool World::IsFFAPvPRealm() const
 {
     return getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP;
-}
-
-uint32 World::GetNextWhoListUpdateDelaySecs()
-{
-    if (m_timers[WUPDATE_5_SECS].Passed())
-        return 1;
-
-    uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
-    t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
-
-    return uint32(ceil(t / 1000.0f));
 }
 
 void World::FinalizePlayerWorldSession(WorldSession* session)

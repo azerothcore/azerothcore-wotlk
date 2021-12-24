@@ -68,7 +68,6 @@ enum WorldTimers
     WUPDATE_AUTOBROADCAST,
     WUPDATE_MAILBOXQUEUE,
     WUPDATE_PINGDB,
-    WUPDATE_5_SECS,
     WUPDATE_WHO_LIST,
     WUPDATE_COUNT
 };
@@ -334,9 +333,6 @@ public:
     static float GetMaxVisibleDistanceOnContinents()    { return m_MaxVisibleDistanceOnContinents; }
     static float GetMaxVisibleDistanceInInstances()     { return m_MaxVisibleDistanceInInstances;  }
     static float GetMaxVisibleDistanceInBGArenas()      { return m_MaxVisibleDistanceInBGArenas;   }
-
-    // our: needed for arena spectator subscriptions
-    uint32 GetNextWhoListUpdateDelaySecs();
 
     void ProcessCliCommands();
     void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }

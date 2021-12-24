@@ -566,7 +566,6 @@ public:
     virtual bool IsFFAPvPRealm() const = 0;
     virtual void KickAll() = 0;
     virtual void KickAllLess(AccountTypes sec) = 0;
-    virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
     virtual void ProcessCliCommands() = 0;
     virtual void QueueCliCommand(CliCommandHolder* commandHolder) = 0;
     virtual void ForceGameEventUpdate() = 0;
