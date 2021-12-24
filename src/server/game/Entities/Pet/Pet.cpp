@@ -223,18 +223,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     if (petStable->CurrentPet && owner->GetPet() && petStable->CurrentPet.value().PetNumber == petInfo->PetNumber)
         return false;
 
+    // we are loading pet at that moment
+    if (owner->IsSpectator() || owner->GetPet() || !owner->IsInWorld() || !owner->FindMap())
+        return false;
+
     bool forceLoadFromDB = false;
     sScriptMgr->OnBeforeLoadPetFromDB(owner, petEntry, petnumber, current, forceLoadFromDB);
 
     if (!forceLoadFromDB && (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())) // DK Pet exception
-        return false;
-
-    // we are loading pet at that moment
-    // if (owner->IsSpectator() || owner->GetPet() || !owner->IsInWorld() || !owner->FindMap())
-    //     return false;
-
-    // Don't try to reload the current pet
-    if (petStable->CurrentPet && owner->GetPet() && petStable->CurrentPet.value().PetNumber == petInfo->PetNumber)
         return false;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(petInfo->CreatedBySpellId);

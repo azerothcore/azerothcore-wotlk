@@ -15330,6 +15330,12 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     if (duration > 0s)
         pet->SetDuration(duration);
 
+    if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
+    {
+        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", (uint32)pet->GetHealthPct());
+        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", pet->GetCreatureTemplate()->family);
+    }
+
     return pet;
 }
 
