@@ -68,7 +68,6 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "Realm.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "SkillDiscovery.h"
@@ -89,8 +88,14 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "TaskScheduler.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
+
+namespace
+{
+    TaskScheduler playersSaveScheduler;
+}
 
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -2453,8 +2458,8 @@ void World::Update(uint32 diff)
     }
 
     {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update saving system"));
-        SavingSystemMgr::Update(diff);
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
+        playersSaveScheduler.Update(diff);
     }
 
     {
@@ -2704,6 +2709,33 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     m_ShutdownMask = options;
     m_ExitCode = exitcode;
+
+    auto const& playersOnline = GetActiveSessionCount();
+
+    if (time < 5 && playersOnline)
+    {
+        // Set time to 5s for save all players
+        time = 5;
+    }
+
+    playersSaveScheduler.CancelAll();
+
+    if (time >= 5)
+    {
+        playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
+        {
+            if (!GetActiveSessionCount())
+            {
+                LOG_INFO("server", "> No players online. Skip save before shutdown");
+                return;
+            }
+
+            LOG_INFO("server", "> Save players before shutdown server");
+            ObjectAccessor::SaveAllPlayers();
+        });
+    }
+
+    FMT_LOG_WARN("server", "Time left until shutdown/restart: {}", time);
 
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
     if (time == 0)
