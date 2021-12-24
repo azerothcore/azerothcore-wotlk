@@ -3711,32 +3711,24 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 break;
             }
         case SMART_TARGET_OWNER_OR_SUMMONER:
+            /*
+             * Owners/Summoners should be WorldObjects. This allows to have other objects
+             * such as gameobjects to execute SmartScripts using this type of target.
+             * Otherwise, only Units like creatures can summon other creatures.
+             */
             {
                 if (me)
                 {
-                    if (Unit* owner = ObjectAccessor::GetUnit(*me, me->GetCharmerOrOwnerGUID()))
+                    if (WorldObject* owner = ObjectAccessor::GetWorldObject(*me, me->GetCharmerOrOwnerGUID()))
                     {
                         l->push_back(owner);
-                    }
-                    // Xinef: dont add same unit twice
-                    else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit())
-                    {
-                        l->push_back(me->ToTempSummon()->GetSummonerUnit());
-                    }
-                    else if (WorldObject* wo_summoner = me->ToTempSummon()->GetSummoner())
-                    {
-                        l->push_back(wo_summoner);
                     }
                 }
                 else if (go)
                 {
-                    if (Unit* owner = ObjectAccessor::GetUnit(*go, go->GetOwnerGUID()))
+                    if (WorldObject* owner = ObjectAccessor::GetWorldObject(*go, go->GetOwnerGUID()))
                     {
                         l->push_back(owner);
-                    }
-                    else if (WorldObject* wo_summoner = me->ToTempSummon()->GetSummoner())
-                    {
-                        l->push_back(wo_summoner);
                     }
                 }
 
