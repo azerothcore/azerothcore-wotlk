@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WardenCheckMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Util.h"
 #include "Warden.h"
-#include "WardenCheckMgr.h"
 #include "WorldSession.h"
 
 WardenCheckMgr::WardenCheckMgr()

@@ -18,9 +18,9 @@
 #ifndef WMODEL_HNDL_H
 #define WMODEL_HNDL_H
 #include "Define.h"
+#include "ObjectDataHandler.h"
 #include "Utils.h"
 #include "WorldModelRoot.h"
-#include "ObjectDataHandler.h"
 
 #include <set>
 #include <vector>

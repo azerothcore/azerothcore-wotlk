@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "BattlegroundMgr.h"
 #include "GameEventMgr.h"
+#include "BattlegroundMgr.h"
+#include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "Language.h"
@@ -32,10 +33,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include <time.h>
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 
 GameEventMgr* GameEventMgr::instance()
 {
@@ -136,6 +133,11 @@ void GameEventMgr::StartInternalEvent(uint16 event_id)
 
 bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
 {
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, event_id, nullptr) && !overwrite)
+    {
+        return false;
+    }
+
     GameEventData& data = mGameEvent[event_id];
     if (data.state == GAMEEVENT_NORMAL || data.state == GAMEEVENT_INTERNAL)
     {
@@ -251,6 +253,7 @@ void GameEventMgr::LoadFromDB()
             }
 
             GameEventData& pGameEvent = mGameEvent[event_id];
+            pGameEvent.eventId      = fields[0].GetUInt32();
             uint64 starttime        = fields[1].GetUInt64();
             pGameEvent.start        = time_t(starttime);
             uint64 endtime          = fields[2].GetUInt64();
@@ -391,9 +394,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                       1                2
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, game_event_creature.eventEntry FROM creature"
-                             " JOIN game_event_creature ON creature.guid = game_event_creature.guid");
+        //                                                 0        1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_creature");
 
         if (!result)
         {
@@ -409,6 +411,13 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 int16 event_id = fields[1].GetInt8();
+
+                CreatureData const* data = sObjectMgr->GetCreatureData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_creature` contains creature (GUID: %u) not found in `creature` table.", guid);
+                    continue;
+                }
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
@@ -433,9 +442,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                      0                1
-        QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, game_event_gameobject.eventEntry FROM gameobject"
-                             " JOIN game_event_gameobject ON gameobject.guid=game_event_gameobject.guid");
+        //                                                0         1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_gameobject");
 
         if (!result)
         {
@@ -453,6 +461,13 @@ void GameEventMgr::LoadFromDB()
                 int16 event_id = fields[1].GetInt8();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
+
+                GameObjectData const* data = sObjectMgr->GetGOData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: %u) not found in `gameobject` table.", guid);
+                    continue;
+                }
 
                 if (internal_event_id < 0 || internal_event_id >= int32(mGameEventGameobjectGuids.size()))
                 {
@@ -1850,6 +1865,21 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
             // if none is found we don't modify start date and use the one in game_event
         }
     }
+}
+
+uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
+{
+    auto const events = sGameEventMgr->GetEventMap();
+
+    for (auto const& eventEntry : events)
+    {
+        if (eventEntry.holiday_id == holidayId)
+        {
+            return eventEntry.eventId;
+        }
+    }
+
+    return 0;
 }
 
 bool IsHolidayActive(HolidayIds id)

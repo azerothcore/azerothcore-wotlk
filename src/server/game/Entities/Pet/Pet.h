@@ -35,15 +35,15 @@ struct PetSpell
 class AsynchPetSummon
 {
 public:
-    AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID) :
-        m_entry(entry), pos(position), m_petType(petType),
-        m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID) { }
+    AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID, int32 healthPct = 0) :
+        m_entry(entry), pos(position), m_petType(petType), m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID), m_healthPct(healthPct) { }
 
     uint32 m_entry;
     Position pos;
     PetType m_petType;
     uint32 m_duration, m_createdBySpell;
     ObjectGuid m_casterGUID;
+    int32 m_healthPct;
 };
 
 typedef std::unordered_map<uint32, PetSpell> PetSpellMap;
@@ -169,6 +169,9 @@ public:
     static void HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 asynchLoadType, uint8 loadResult);
     uint8 GetAsynchLoadType() const { return asynchLoadType; }
     void SetAsynchLoadType(uint8 type) { asynchLoadType = type; }
+
+    [[nodiscard]] bool HasTempSpell() const { return m_tempspell != 0; }
+
 protected:
     Player* m_owner;
     int32   m_happinessTimer;

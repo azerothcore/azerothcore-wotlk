@@ -80,6 +80,8 @@ CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=${CSCRIPTPCH:-ON}
 CCOREPCH=${CCOREPCH:-ON}
+# compile with C++20
+CUSE_CPP_20=${CUSE_CPP_20:-OFF}
 
 # Skip specific modules from compilation (cmake reconfigure needed)
 # use semicolon ; to separate modules

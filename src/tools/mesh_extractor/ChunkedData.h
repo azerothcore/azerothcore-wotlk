@@ -18,8 +18,8 @@
 #ifndef CHNK_H
 #define CHNK_H
 
-#include <vector>
 #include "Chunk.h"
+#include <vector>
 
 class ChunkedData
 {

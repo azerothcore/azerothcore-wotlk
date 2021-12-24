@@ -21,25 +21,29 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "DBCStores.h"
 #include "Spell.h"
-//#include "SmartAI.h"
-//#include "SmartScript.h"
+#include "SpellMgr.h"
 #include "Unit.h"
 
 struct WayPoint
 {
-    WayPoint(uint32 _id, float _x, float _y, float _z)
+    WayPoint(uint32 _id, float _x, float _y, float _z, float _o, uint32 _delay)
     {
         id = _id;
         x = _x;
         y = _y;
         z = _z;
+        o = _o;
+        delay = _delay;
     }
 
     uint32 id;
     float x;
     float y;
     float z;
+    float  o;
+    uint32 delay;
 };
 
 enum SMART_EVENT_PHASE
@@ -581,7 +585,7 @@ enum SMART_ACTION
     SMART_ACTION_RISE_UP                            = 114,    // distance
     SMART_ACTION_RANDOM_SOUND                       = 115,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf
     SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // TODO: NOT SUPPORTED YET
-    SMART_ACTION_DISABLE_EVADE                      = 117,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_DISABLE_EVADE                      = 117,    // 0/1 (1 = disabled, 0 = enabled)
     SMART_ACTION_GO_SET_GO_STATE                    = 118,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_SET_CAN_FLY                        = 119,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_REMOVE_AURAS_BY_TYPE               = 120,    // TODO: NOT SUPPORTED YET
@@ -1270,6 +1274,11 @@ struct SmartAction
             uint32 isNegative;
             uint32 instanceTarget;
         } doAction;
+
+        struct
+        {
+            uint32 disable;
+        } disableEvade;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1455,6 +1464,13 @@ struct SmartTarget
             uint32 dist;
             uint32 dead;
         } closest;
+
+        struct
+        {
+            uint32 entry;
+            uint32 dist;
+            uint32 onlySpawned;
+        } closestGameobject;
 
         struct
         {

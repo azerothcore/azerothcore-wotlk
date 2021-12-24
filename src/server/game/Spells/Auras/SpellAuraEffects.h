@@ -28,6 +28,13 @@ class SpellInfo;
 
 typedef void(AuraEffect::*pAuraEffectHandler)(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
+enum BrewfestEntries
+{
+    BREWFEST_KODO = 30507,
+    GREAT_BREWFEST_KODO = 27707,
+    FRESH_BREWFEST_HOPS = 66052
+};
+
 class AuraEffect
 {
     friend void Aura::_InitEffects(uint8 effMask, Unit* caster, int32* baseAmount);

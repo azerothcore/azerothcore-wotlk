@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -99,15 +99,18 @@ enum Misc
     EVENT_KILL_TALK                     = 100
 };
 
-struct HammerOfJusticeSelector : public Acore::unary_function<Unit*, bool>
+struct HammerOfJusticeSelector
 {
-    Unit const* _me;
+public:
     HammerOfJusticeSelector(Unit* me) : _me(me) { }
 
     bool operator()(Unit const* target) const
     {
         return target && target->GetTypeId() == TYPEID_PLAYER && _me->IsInRange(target, 10.0f, 40.0f, true);
     }
+
+private:
+    Unit const* _me;
 };
 
 class VerasEnvenom : public BasicEvent

@@ -25,10 +25,16 @@
 #include "SharedDefines.h"
 #include <map>
 
-static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
+constexpr std::array<uint32, MAX_REPUTATION_RANK> ReputationRankStrIndex =
 {
-    LANG_REP_HATED,    LANG_REP_HOSTILE, LANG_REP_UNFRIENDLY, LANG_REP_NEUTRAL,
-    LANG_REP_FRIENDLY, LANG_REP_HONORED, LANG_REP_REVERED,    LANG_REP_EXALTED
+    LANG_REP_HATED,
+    LANG_REP_HOSTILE,
+    LANG_REP_UNFRIENDLY,
+    LANG_REP_NEUTRAL,
+    LANG_REP_FRIENDLY,
+    LANG_REP_HONORED,
+    LANG_REP_REVERED,
+    LANG_REP_EXALTED
 };
 
 typedef uint32 RepListID;
@@ -104,11 +110,11 @@ public:                                                 // accessors
 public:                                                 // modifiers
     bool SetReputation(FactionEntry const* factionEntry, int32 standing)
     {
-        return SetReputation(factionEntry, standing, false, false);
+        return SetReputation(factionEntry, standing, false, false, false);
     }
-    bool ModifyReputation(FactionEntry const* factionEntry, int32 standing, bool spillOverOnly = false)
+    bool ModifyReputation(FactionEntry const* factionEntry, int32 standing, bool spillOverOnly = false, bool noSpillOver = false)
     {
-        return SetReputation(factionEntry, standing, true, spillOverOnly);
+        return SetReputation(factionEntry, standing, true, spillOverOnly, noSpillOver);
     }
 
     void SetVisible(FactionTemplateEntry const* factionTemplateEntry);
@@ -130,7 +136,7 @@ public:                                                 // senders
 private:                                                // internal helper functions
     void Initialize();
     uint32 GetDefaultStateFlags(FactionEntry const* factionEntry) const;
-    bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool spillOverOnly);
+    bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool spillOverOnly, bool noSpillOver = false);
     void SetVisible(FactionState* faction);
     void SetAtWar(FactionState* faction, bool atWar) const;
     void SetInactive(FactionState* faction, bool inactive) const;

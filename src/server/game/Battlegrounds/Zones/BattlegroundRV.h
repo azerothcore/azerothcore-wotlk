@@ -77,10 +77,6 @@ enum BattlegroundRVData
     BG_RV_STATE_SWITCH_PILLARS,
     BG_RV_STATE_CLOSE_FIRE,
 
-    BG_RV_PILLAR_SWITCH_TIMER                    = 25000,
-    BG_RV_FIRE_TO_PILLAR_TIMER                   = 20000,
-    BG_RV_CLOSE_FIRE_TIMER                       =  5000,
-    BG_RV_FIRST_TIMER                            = 20500, // elevators rise in 20133ms
     BG_RV_WORLD_STATE_A                          = 0xe11,
     BG_RV_WORLD_STATE_H                          = 0xe10,
     BG_RV_WORLD_STATE                            = 0xe1a,
@@ -108,15 +104,15 @@ public:
     GameObject* GetPillarAtPosition(Position* p);
 
 private:
-    uint32 Timer;
+    Milliseconds Timer;
     uint32 State;
     uint16 CheckPlayersTimer;
 
     void PostUpdateImpl(uint32 diff) override;
 
 protected:
-    uint32 getTimer() { return Timer; }
-    void setTimer(uint32 timer) { Timer = timer; }
+    Milliseconds GetTimer() { return Timer; }
+    void SetTimer(Milliseconds timer) { Timer = timer; }
     uint32 getState() { return State; };
     void setState(uint32 state) { State = state; }
 

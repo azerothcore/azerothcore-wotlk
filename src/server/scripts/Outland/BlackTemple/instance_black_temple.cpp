@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "black_temple.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "black_temple.h"
 
 DoorData const doorData[] =
 {

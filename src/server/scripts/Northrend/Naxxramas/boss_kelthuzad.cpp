@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "naxxramas.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "naxxramas.h"
 
 enum Yells
 {
@@ -156,7 +156,7 @@ public:
 
         float NormalizeOrientation(float o)
         {
-            return fmod(o, 2.0f * static_cast<float>(M_PI)); // Only positive values will be passed
+            return std::fmod(o, 2.0f * static_cast<float>(M_PI)); // Only positive values will be passed
         }
 
         void SpawnHelpers()

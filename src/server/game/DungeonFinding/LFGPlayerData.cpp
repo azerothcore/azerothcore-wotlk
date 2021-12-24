@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "LFGMgr.h"
 #include "LFGPlayerData.h"
+#include "LFGMgr.h"
 
 namespace lfg
 {

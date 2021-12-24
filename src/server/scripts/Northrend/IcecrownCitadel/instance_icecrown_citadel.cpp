@@ -18,16 +18,16 @@
 #include "AccountMgr.h"
 #include "CreatureTextMgr.h"
 #include "Group.h"
-#include "icecrown_citadel.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "icecrown_citadel.h"
 
 enum EventIds
 {

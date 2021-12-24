@@ -17,12 +17,12 @@
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum KologarnSays
 {
@@ -648,7 +648,7 @@ public:
 };
 
 // predicate function to select non main tank target
-class StoneGripTargetSelector : public Acore::unary_function<Unit*, bool>
+class StoneGripTargetSelector
 {
 public:
     StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
@@ -664,6 +664,7 @@ public:
         return false;
     }
 
+private:
     Creature* _me;
     Unit const* _victim;
 };

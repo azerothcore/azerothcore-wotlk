@@ -18,8 +18,8 @@
 #ifndef DEF_RAZORFEN_DOWNS_H
 #define DEF_RAZORFEN_DOWNS_H
 
-#include "PassiveAI.h"
 #include "CreatureAIImpl.h"
+#include "PassiveAI.h"
 
 #define RazorfenDownsScriptName "instance_razorfen_downs"
 

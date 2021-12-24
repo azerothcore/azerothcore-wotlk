@@ -18,9 +18,7 @@
 #include "ArenaSpectator.h"
 #include "CellImpl.h"
 #include "Common.h"
-#include "DynamicObject.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -35,6 +33,12 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 // update aura target map every 500 ms instead of every update - reduce amount of grid searcher calls
 static constexpr int32 UPDATE_TARGET_MAP_INTERVAL = 500;
@@ -494,11 +498,15 @@ void Aura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication* auraApp)
     m_applications[target->GetGUID()] = auraApp;
 
     // set infinity cooldown state for spells
-    if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
     {
-        if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid)
+        if (caster->IsPlayer())
         {
             caster->ToPlayer()->AddSpellAndCategoryCooldowns(m_spellInfo, 0, nullptr, true);
+        }
+        else
+        {
+            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, infinityCooldownDelay);
         }
     }
 }
@@ -526,6 +534,30 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
     m_removedApplications.push_back(auraApp);
 
     // reset cooldown state for spells
+    if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
+    {
+        if (caster->IsPlayer())
+        {
+            // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
+            caster->ToPlayer()->SendCooldownEvent(GetSpellInfo());
+        }
+        else
+        {
+            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+
+            if (Unit* owner = caster->GetCharmerOrOwner())
+            {
+                if (Player* playerOwner = owner->ToPlayer())
+                {
+                    WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
+                    data << uint32(m_spellInfo->Id);
+                    data << caster->GetGUID();
+                    playerOwner->SendDirectMessage(&data);
+                }
+            }
+        }
+    }
+
     if (caster && caster->GetTypeId() == TYPEID_PLAYER)
     {
         if (GetSpellInfo()->IsCooldownStartedOnEvent() && !m_castItemGuid)
@@ -894,11 +926,18 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
     Unit* caster = GetCaster();
 
     if (!caster)
+    {
         return;
+    }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
         if (AuraEffect* aurEff = m_effects[i])
+        {
             aurEff->CalculatePeriodic(caster, periodicReset, false);
+            aurEff->CalculatePeriodicData();
+        }
+    }
 }
 
 void Aura::SetCharges(uint8 charges)
@@ -1048,49 +1087,40 @@ bool Aura::IsRemovedOnShapeLost(Unit* target) const
 
 bool Aura::CanBeSaved() const
 {
-    if (IsPassive() || (GetSpellInfo()->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && GetSpellInfo()->Stances))
+    SpellInfo const* spellInfo = GetSpellInfo();
+
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_FORCE_AURA_SAVING))
+    {
+        return true;
+    }
+
+    if (spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED))
+    {
         return false;
+    }
+
+    if (IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
+    {
+        return false;
+    }
 
     // Xinef: do not save channel auras
     if (GetSpellInfo()->IsChanneled())
+    {
         return false;
+    }
 
     // Xinef: Check if aura is single target, not only spell info
-    if (GetCasterGUID() != GetOwner()->GetGUID())
-        if (GetSpellInfo()->IsSingleTarget() || IsSingleTarget())
-            return false;
-
-    // Xinef: Dont save control vehicle auras - caster may not exist
-    if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
+    if (GetCasterGUID() != GetOwner()->GetGUID() && (GetSpellInfo()->IsSingleTarget() || IsSingleTarget()))
+    {
         return false;
-
-    // Can't be saved - aura handler relies on calculated amount and changes it
-    if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
-        return false;
-
-    // No point in saving this, since the stable dialog can't be open on aura load anyway.
-    if (HasEffectType(SPELL_AURA_OPEN_STABLE))
-        return false;
-
-    // xinef: do not save bind sight auras!
-    if (HasEffectType(SPELL_AURA_BIND_SIGHT))
-        return false;
-
-    // xinef: no charming auras (taking direct control)
-    if (HasEffectType(SPELL_AURA_MOD_POSSESS) || HasEffectType(SPELL_AURA_MOD_POSSESS_PET))
-        return false;
-
-    // xinef: no charming auras can be saved
-    if (HasEffectType(SPELL_AURA_MOD_CHARM) || HasEffectType(SPELL_AURA_AOE_CHARM))
-        return false;
-
-    // Xinef: Raise Ally control aura
-    if (GetId() == 46619)
-        return false;
+    }
 
     // don't save auras removed by proc system
     if (IsUsingCharges() && !GetCharges())
+    {
         return false;
+    }
 
     return true;
 }

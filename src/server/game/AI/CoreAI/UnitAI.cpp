@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "UnitAI.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
 #include "Player.h"
@@ -23,7 +24,6 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "UnitAI.h"
 
 void UnitAI::AttackStart(Unit* victim)
 {
@@ -203,6 +203,19 @@ void UnitAI::DoCastAOE(uint32 spellId, bool triggered)
         return;
 
     me->CastSpell((Unit*)nullptr, spellId, triggered);
+}
+
+void UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered)
+{
+    if (!triggered && me->HasUnitState(UNIT_STATE_CASTING))
+    {
+        return;
+    }
+
+    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, threatTablePosition, dist, playerOnly))
+    {
+        me->CastSpell(target, spellId, triggered);
+    }
 }
 
 #define UPDATE_TARGET(a) {if (AIInfo->target<a) AIInfo->target=a;}

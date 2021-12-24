@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "auchenai_crypts.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "ScriptMgr.h"
+#include "auchenai_crypts.h"
 
 class instance_auchenai_crypts : public InstanceMapScript
 {

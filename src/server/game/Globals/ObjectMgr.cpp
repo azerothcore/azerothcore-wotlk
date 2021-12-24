@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectMgr.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaTeamMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -26,11 +28,10 @@
 #include "GossipDef.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
-#include "ObjectMgr.h"
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
@@ -717,8 +718,8 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6         7
-    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_template_addon");
+    //                                                0       1       2      3       4       5              6               7
+    QueryResult result = WorldDatabase.Query("SELECT entry, path_id, mount, bytes1, bytes2, emote, visibilityDistanceType, auras FROM creature_template_addon");
 
     if (!result)
     {
@@ -747,11 +748,11 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
-        creatureAddon.isLarge = fields[6].GetBool();
+        creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -760,7 +761,14 @@ void ObjectMgr::LoadCreatureTemplateAddons()
                 LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong spell %u defined in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
                 continue;
             }
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
+                // continue;
+            }
+
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)
@@ -778,6 +786,11 @@ void ObjectMgr::LoadCreatureTemplateAddons()
             creatureAddon.emote = 0;
         }
 
+        if (creatureAddon.visibilityDistanceType >= VisibilityDistanceType::Max)
+        {
+            LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid visibilityDistanceType (%u) defined in `creature_template_addon`.", entry, AsUnderlyingType(creatureAddon.visibilityDistanceType));
+            creatureAddon.visibilityDistanceType = VisibilityDistanceType::Normal;
+        }
         ++count;
     } while (result->NextRow());
 
@@ -1135,8 +1148,8 @@ void ObjectMgr::LoadCreatureAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                0       1       2      3       4       5      6        7
-    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, isLarge, auras FROM creature_addon");
+    //                                                0       1       2      3       4       5             6                7
+    QueryResult result = WorldDatabase.Query("SELECT guid, path_id, mount, bytes1, bytes2, emote, visibilityDistanceType, auras FROM creature_addon");
 
     if (!result)
     {
@@ -1172,11 +1185,11 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
-        creatureAddon.isLarge = fields[6].GetBool();
+        creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
         Tokenizer tokens(fields[7].GetString(), ' ');
-        uint8 i = 0;
-        creatureAddon.auras.resize(tokens.size());
+
+        creatureAddon.auras.reserve(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
@@ -1185,7 +1198,14 @@ void ObjectMgr::LoadCreatureAddons()
                 LOG_ERROR("sql.sql", "Creature (GUID: %u) has wrong spell %u defined in `auras` field in `creature_addon`.", guid, uint32(atol(*itr)));
                 continue;
             }
-            creatureAddon.auras[i++] = uint32(atol(*itr));
+
+            if (AdditionalSpellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, uint32(atol(*itr)));
+                // continue;
+            }
+
+            creatureAddon.auras.push_back(atol(*itr));
         }
 
         if (creatureAddon.mount)
@@ -1201,6 +1221,12 @@ void ObjectMgr::LoadCreatureAddons()
         {
             LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid emote (%u) defined in `creature_addon`.", guid, creatureAddon.emote);
             creatureAddon.emote = 0;
+        }
+
+        if (creatureAddon.visibilityDistanceType >= VisibilityDistanceType::Max)
+        {
+            LOG_ERROR("sql.sql", "Creature (GUID: %u) has invalid visibilityDistanceType (%u) defined in `creature_addon`.", guid, AsUnderlyingType(creatureAddon.visibilityDistanceType));
+            creatureAddon.visibilityDistanceType = VisibilityDistanceType::Normal;
         }
 
         ++count;
@@ -2331,56 +2357,6 @@ void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectDat
             cell_guids.gameobjects.erase(guid);
         }
     }
-}
-
-ObjectGuid ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
-{
-    // Get data from global storage
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
-        return guid;
-
-    // No player found
-    return ObjectGuid::Empty;
-}
-
-bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const
-{
-    // Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(lowGuid))
-    {
-        name = playerData->name;
-        return true;
-    }
-
-    return false;
-}
-
-TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return Player::TeamIdForRace(playerData->race);
-
-    return TEAM_NEUTRAL;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const
-{
-    // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
-        return playerData->accountId;
-
-    return 0;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
-{
-    // Get data from global storage
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
-            return playerData->accountId;
-
-    return 0;
 }
 
 void ObjectMgr::LoadItemLocales()
@@ -3642,6 +3618,63 @@ void ObjectMgr::LoadPlayerInfo()
 
             LOG_INFO("server.loading", ">> Loaded %u custom player create spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
+        }
+    }
+
+    // Load playercreate cast spell
+    LOG_INFO("server.loading", "Loading Player Create Cast Spell Data...");
+    {
+        uint32 oldMSTime = getMSTime();
+
+        QueryResult result = WorldDatabase.PQuery("SELECT raceMask, classMask, spell FROM playercreateinfo_cast_spell");
+
+        if (!result)
+        {
+            LOG_ERROR("server.loading", ">> Loaded 0 player create cast spells. DB table `playercreateinfo_cast_spell` is empty.");
+        }
+        else
+        {
+            uint32 count = 0;
+
+            do
+            {
+                Field* fields    = result->Fetch();
+                uint32 raceMask  = fields[0].GetUInt32();
+                uint32 classMask = fields[1].GetUInt32();
+                uint32 spellId   = fields[2].GetUInt32();
+
+                if (raceMask != 0 && !(raceMask & RACEMASK_ALL_PLAYABLE))
+                {
+                    LOG_ERROR("sql.sql", "Wrong race mask %u in `playercreateinfo_cast_spell` table, ignoring.", raceMask);
+                    continue;
+                }
+
+                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                {
+                    LOG_ERROR("sql.sql", "Wrong class mask %u in `playercreateinfo_cast_spell` table, ignoring.", classMask);
+                    continue;
+                }
+
+                for (uint32 raceIndex = RACE_HUMAN; raceIndex < MAX_RACES; ++raceIndex)
+                {
+                    if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
+                    {
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        {
+                            if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
+                            {
+                                if (PlayerInfo* info = _playerInfo[raceIndex][classIndex])
+                                {
+                                    info->castSpells.push_back(spellId);
+                                    ++count;
+                                }
+                            }
+                        }
+                    }
+                }
+            } while (result->NextRow());
+
+            LOG_INFO("server.loading", ">> Loaded %u player create cast spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 
@@ -5809,8 +5842,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 }
 
                 // xinef: update global data
-                sWorld->UpdateGlobalPlayerMails(m->sender, 1);
-                sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+                sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->sender));
+                sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
 
                 delete m;
                 ++returnedCount;
@@ -5818,8 +5851,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             }
         }
 
-        // xinef: update global data
-        sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+        sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
         stmt->setUInt32(0, m->messageID);
@@ -6042,12 +6074,10 @@ uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, ui
         uint32 submask = 1 << ((i - 1) % 32);
 
         // skip not taxi network nodes
-#ifndef ELUNA
-        if ((sTaxiNodesMask[field] & submask) == 0)
-#else
         if (field >= TaxiMaskSize || (sTaxiNodesMask[field] & submask) == 0)
-#endif
+        {
             continue;
+        }
 
         float dist2 = (node->x - x) * (node->x - x) + (node->y - y) * (node->y - y) + (node->z - z) * (node->z - z);
         if (found)
@@ -7633,7 +7663,7 @@ void ObjectMgr::LoadReservedPlayersNames()
     LOG_INFO("server.loading", " ");
 }
 
-bool ObjectMgr::IsReservedName(const std::string& name) const
+bool ObjectMgr::IsReservedName(std::string_view name) const
 {
     // pussywizard
     if (name.size() >= 2 && (name[name.size() - 2] == 'G' || name[name.size() - 2] == 'g') && (name[name.size() - 1] == 'M' || name[name.size() - 1] == 'm'))
@@ -7741,7 +7771,7 @@ bool isValidString(std::wstring wstr, uint32 strictMask, bool numericOrSpace, bo
     return false;
 }
 
-uint8 ObjectMgr::CheckPlayerName(const std::string& name, bool create)
+uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -7766,7 +7796,7 @@ uint8 ObjectMgr::CheckPlayerName(const std::string& name, bool create)
     return CHAR_NAME_SUCCESS;
 }
 
-bool ObjectMgr::IsValidCharterName(const std::string& name)
+bool ObjectMgr::IsValidCharterName(std::string_view name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -7798,7 +7828,7 @@ bool ObjectMgr::IsValidChannelName(const std::string& name)
     return isValidString(wname, strictMask, true);
 }
 
-PetNameInvalidReason ObjectMgr::CheckPetName(const std::string& name)
+PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -8279,7 +8309,7 @@ void ObjectMgr::LoadMailLevelRewards()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel)
+void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell)
 {
     if (entry >= ACORE_TRAINER_START_REF)
         return;
@@ -8316,6 +8346,12 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
         return;
     }
 
+    if (reqSpell && !sSpellMgr->GetSpellInfo(reqSpell))
+    {
+        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry (Entry: %u) for a non-existing reqSpell (Spell: %u), ignoring", entry, reqSpell);
+        return;
+    }
+
     TrainerSpellData& data = _cacheTrainerSpellStore[entry];
 
     TrainerSpell& trainerSpell = data.spellList[spell];
@@ -8324,6 +8360,7 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
     trainerSpell.reqSkill      = reqSkill;
     trainerSpell.reqSkillValue = reqSkillValue;
     trainerSpell.reqLevel      = reqLevel;
+    trainerSpell.reqSpell      = reqSpell;
 
     if (!trainerSpell.reqLevel)
         trainerSpell.reqLevel = spellinfo->SpellLevel;
@@ -8364,7 +8401,7 @@ void ObjectMgr::LoadTrainerSpell()
     // For reload case
     _cacheTrainerSpellStore.clear();
 
-    QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqLevel FROM npc_trainer AS a "
+    QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqLevel, a.ReqSpell FROM npc_trainer AS a "
                          "INNER JOIN npc_trainer AS b ON a.ID = -(b.SpellID) "
                          "UNION SELECT * FROM npc_trainer WHERE SpellID > 0");
 
@@ -8387,8 +8424,9 @@ void ObjectMgr::LoadTrainerSpell()
         uint32 reqSkill      = fields[3].GetUInt16();
         uint32 reqSkillValue = fields[4].GetUInt16();
         uint32 reqLevel      = fields[5].GetUInt8();
+        uint32 reqSpell      = fields[6].GetUInt32();
 
-        AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
+        AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel, reqSpell);
 
         ++count;
     } while (result->NextRow());
@@ -8875,7 +8913,7 @@ void ObjectMgr::LoadBroadcastTexts()
         _broadcastTextStore[bct.Id] = bct;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded " SZFMTD " broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded " SZFMTD " Broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadBroadcastTextLocales()
