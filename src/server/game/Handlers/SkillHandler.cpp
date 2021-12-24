@@ -16,7 +16,6 @@
  */
 
 #include "Log.h"
-#include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
