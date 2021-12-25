@@ -1386,7 +1386,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_PACKET_SPOOF_BANDURATION] = sConfigMgr->GetOption<int32>("PacketSpoof.BanDuration", 86400);
 
     // Accountpassword Secruity
-    m_int_configs[CONFIG_ACC_PASSCHANGESEC] = sConfigMgr->GetIntDefault("Account.PasswordChangeSecurity", 0);
+    m_int_configs[CONFIG_ACC_PASSCHANGESEC] = sConfigMgr->GetOption<int32>("Account.PasswordChangeSecurity", 0);
 
     // Random Battleground Rewards
     m_int_configs[CONFIG_BG_REWARD_WINNER_HONOR_FIRST] = sConfigMgr->GetOption<int32>("Battleground.RewardWinnerHonorFirst", 30);
