@@ -28,7 +28,6 @@
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
 #include "DisableMgr.h"
@@ -50,7 +49,6 @@
 #include "Pet.h"
 #include "PetAI.h"
 #include "Player.h"
-#include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -67,7 +65,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include <math.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -17174,7 +17171,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             creature->DeleteThreatList();
 
             // must be after setDeathState which resets dynamic flags
-            if (!creature->loot.empty())
+            if (!creature->loot.isLooted())
             {
                 creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
@@ -17419,11 +17416,11 @@ void Unit::SetRooted(bool apply)
 
         if (IsFalling())
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
         }
         else
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
 
          // Creature specific
