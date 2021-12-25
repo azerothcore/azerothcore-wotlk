@@ -1233,8 +1233,18 @@ enum AcoreStrings
     LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG = 5068,
     LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
 
-    // Room for more strings    5070-9999
     LANG_COMMAND_DISABLED               = 5070,
+
+    LANG_CMD_ITEM_REFUND_BAD_EXTENDED_COST = 5071,
+    LANG_CMD_ITEM_REFUND_MAX_HONOR         = 5072,
+    LANG_CMD_ITEM_REFUND_HONOR_FAILED      = 5073,
+    LANG_CMD_ITEM_REFUNDED_HONOR           = 5074,
+    LANG_CMD_ITEM_REFUND_MAX_AP            = 5075,
+    LANG_CMD_ITEM_REFUND_AP_FAILED         = 5076,
+    LANG_CMD_ITEM_REFUNDED_AP              = 5077,
+    LANG_CMD_ITEM_REFUND_NOT_FOUND         = 5078,
+
+    // Room for more strings    5078-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
