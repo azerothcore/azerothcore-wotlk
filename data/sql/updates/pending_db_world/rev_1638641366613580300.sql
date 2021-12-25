@@ -8,5 +8,5 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 DELETE FROM `acore_string` WHERE `entry` IN (5079, 5080, 5081);
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (5079, 'You must be at least level %u to disable autobroadcast messages.'),
-(5080, 'You are now receiving global messages from %s.'),
-(5081, 'You will no longer receive global messages from %s');
+(5080, 'You are now receiving global %s messages.'),
+(5081, 'You will no longer receive global %s messages.');
