@@ -431,6 +431,66 @@ public:
     }
 };
 
+enum eBearTrap
+{
+    EVENT_CHECK                     = 1,
+    NPC_RABID_THISTLE_BEAR          = 2164,
+    SPELL_BEAR_CAPTURED_IN_TRAP     = 9439
+};
+
+class go_bear_trap : public GameObjectScript
+{
+public:
+    go_bear_trap() : GameObjectScript("go_bear_trap") {}
+
+    struct go_bear_trapAI : public GameObjectAI
+    {
+        go_bear_trapAI(GameObject* gameObject) : GameObjectAI(gameObject)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _events.ScheduleEvent(EVENT_CHECK, 1000);
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK:
+                    {
+                        if (Creature* bear = me->FindNearestCreature(NPC_RABID_THISTLE_BEAR, 1.0f))
+                        {
+                            bear->CastSpell(bear, SPELL_BEAR_CAPTURED_IN_TRAP);
+                            me->RemoveFromWorld();
+                        }
+                        else
+                        {
+                            _events.ScheduleEvent(EVENT_CHECK, 1000);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_bear_trapAI(go);
+    }
+};
+
 // Theirs
 /*####
 ## go_brewfest_music
@@ -1882,6 +1942,7 @@ void AddSC_go_scripts()
     new go_tadpole_cage();
     new go_flames();
     new go_heat();
+    new go_bear_trap();
 
     // Theirs
     new go_brewfest_music();
@@ -1912,3 +1973,4 @@ void AddSC_go_scripts()
     new go_veil_skith_cage();
     new go_bells();
 }
+

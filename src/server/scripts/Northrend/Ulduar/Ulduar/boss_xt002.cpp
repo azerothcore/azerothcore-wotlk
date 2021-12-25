@@ -236,7 +236,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->Yell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL);
             me->PlayDirectSound(XT_SOUND_DEATH);
@@ -533,7 +533,7 @@ public:
                 }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetVisible(false);
             if (me->GetInstanceScript())
@@ -591,7 +591,7 @@ public:
         void JustDied(Unit* killer) override
         {
             // Nerf Scrapbots achievement
-            if (killer->GetEntry() == NPC_XE321_BOOMBOT)
+            if (killer && killer->GetEntry() == NPC_XE321_BOOMBOT)
                 if (me->GetInstanceScript())
                 {
                     me->GetInstanceScript()->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, 65037);
