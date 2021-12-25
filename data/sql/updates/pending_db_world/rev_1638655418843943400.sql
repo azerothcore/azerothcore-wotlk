@@ -8,7 +8,7 @@ UPDATE `creature_addon` SET `auras`= 53274 WHERE `guid` = 130896;
 /* Lich King text + voice during phase 3 of DK questline
 */
 
-DELETE FROM `creature_text` WHERE (`CreatureID` = 29110) AND (`GroupID` IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16));
+DELETE FROM `creature_text` WHERE (`CreatureID` = 29110) AND (`GroupID` = 0);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
 (29110, 0, 0, 'Bow before your king!', 14, 0, 100, 0, 0, 14796, 29511, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
 (29110, 0, 1, 'Come to me, Crusaders. I will remake you!', 14, 0, 100, 0, 0, 14799, 29514, 0, 'Lich King - Ebon Hold - Phase 3 Voice Lines'),
