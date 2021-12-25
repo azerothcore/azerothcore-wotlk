@@ -123,6 +123,11 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
     if (mountDisplayId)
         GetPlayer()->Mount(mountDisplayId);
 
+    if (Creature* critter = ObjectAccessor::GetCreature(*GetPlayer(), GetPlayer()->GetCritterGUID()))
+    {
+        critter->DespawnOrUnsummon();
+    }
+
     GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
 
     sScriptMgr->AnticheatSetSkipOnePacketForASH(GetPlayer(), true);

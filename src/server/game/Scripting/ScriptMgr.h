@@ -1842,7 +1842,7 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+    virtual void OnHandleDevCommand(Player* /*player*/, bool& /*enable*/) { }
 
     /**
      * @brief This hook runs execute chat command
@@ -2464,7 +2464,7 @@ public: /* MiscScript */
 
 public: /* CommandSC */
 
-    void OnHandleDevCommand(Player* player, std::string& argstr);
+    void OnHandleDevCommand(Player* player, bool& enable);
     bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
 
 public: /* DatabaseScript */
@@ -2567,14 +2567,24 @@ class FactoryCreatureScript : public CreatureScript
 };
 #define RegisterCreatureAIWithFactory(ai_name, factory_fn) new FactoryCreatureScript<ai_name, &factory_fn>(#ai_name)
 
+// Cannot be used due gob scripts not working like this
 template <class AI>
 class GenericGameObjectScript : public GameObjectScript
 {
     public:
         GenericGameObjectScript(char const* name) : GameObjectScript(name) { }
-        GameObjectAI* GetAI(GameObject* go) const override { return new AI(go); }
+        GameObjectAI* GetAI(GameObject* me) const override { return new AI(me); }
 };
 #define RegisterGameObjectAI(ai_name) new GenericGameObjectScript<ai_name>(#ai_name)
+
+// Cannot be used due gob scripts not working like this
+template <class AI, AI* (*AIFactory)(GameObject*)> class FactoryGameObjectScript : public GameObjectScript
+{
+    public:
+        FactoryGameObjectScript(char const* name) : GameObjectScript(name) {}
+        GameObjectAI* GetAI(GameObject* me) const override { return AIFactory(me); }
+};
+#define RegisterGameObjectAIWithFactory(ai_name, factory_fn) new FactoryGameObjectScript<ai_name, &factory_fn>(#ai_name)
 
 #define sScriptMgr ScriptMgr::instance()
 

@@ -23,7 +23,6 @@
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "SpellMgr.h"
 #include "Vehicle.h"
 
 class PhasedRespawn : public BasicEvent
