@@ -18,11 +18,11 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
+void ScriptMgr::OnHandleDevCommand(Player* player, bool& enable)
 {
     ExecuteScript<CommandSC>([&](CommandSC* script)
     {
-        script->OnHandleDevCommand(player, argstr);
+        script->OnHandleDevCommand(player, enable);
     });
 }
 
