@@ -20,9 +20,7 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Common.h"
-#include "Formulas.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -40,9 +38,11 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 class Aura;
 //
@@ -108,7 +108,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleAuraTrackResources,                        // 45 SPELL_AURA_TRACK_RESOURCES
     &AuraEffect::HandleNULL,                                      // 46 SPELL_AURA_46 (used in test spells 54054 and 54058, and spell 48050) (3.0.8a)
     &AuraEffect::HandleAuraModParryPercent,                       // 47 SPELL_AURA_MOD_PARRY_PERCENT
-    &AuraEffect::HandleNULL,                                      // 48 SPELL_AURA_48 spell Napalm (area damage spell with additional delayed damage effect)
+    &AuraEffect::HandleNoImmediateEffect,                         // 48 SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT
     &AuraEffect::HandleAuraModDodgePercent,                       // 49 SPELL_AURA_MOD_DODGE_PERCENT
     &AuraEffect::HandleNoImmediateEffect,                         // 50 SPELL_AURA_MOD_CRITICAL_HEALING_AMOUNT implemented in Unit::SpellCriticalHealingBonus
     &AuraEffect::HandleAuraModBlockPercent,                       // 51 SPELL_AURA_MOD_BLOCK_PERCENT
@@ -599,6 +599,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
         case SPELL_AURA_PERIODIC_HEAL:
         case SPELL_AURA_OBS_MOD_HEALTH:
         case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+        case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
         case SPELL_AURA_PERIODIC_ENERGIZE:
         case SPELL_AURA_PERIODIC_LEECH:
         case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
@@ -1099,6 +1100,9 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
             break;
         case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
             HandlePeriodicTriggerSpellAuraTick(target, caster);
+            break;
+        case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
+            // Don't actually do anything - client will trigger casts of these spells by itself
             break;
         case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
             HandlePeriodicTriggerSpellWithValueAuraTick(target, caster);
@@ -2619,7 +2623,7 @@ void AuraEffect::HandleAuraModPacify(AuraApplication const* aurApp, uint8 mode, 
     if (apply)
     {
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-        //target->AttackStop(); // pussywizard: wtf? why having this flag prevents from being in combat? it should just prevent melee attack
+        //target->AttackStop(); // pussywizard: why having this flag prevents from being in combat? it should just prevent melee attack
     }
     else
     {
@@ -2813,6 +2817,8 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
     if (apply)
     {
         uint32 creatureEntry = GetMiscValue();
+        uint32 displayId = 0;
+        uint32 vehicleId = 0;
 
         // Festive Holiday Mount
         if (target->HasAura(62061))
@@ -2836,23 +2842,31 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
             }
         }
 
-        CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(creatureEntry);
-        if (!ci)
+        if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
         {
-            LOG_ERROR("sql.sql", "AuraMounted: `creature_template`='%u' not found in database (only need its modelid)", GetMiscValue());
-            return;
+            if (GetMiscValueB() > 0) // Choose proper modelid
+            {
+                displayId = GetMiscValueB() == 2 && creatureInfo->Modelid2 > 0 ? creatureInfo->Modelid2 : creatureInfo->Modelid1;
+            }
+            else // Should we choose random modelid in this case?
+            {
+                displayId = ObjectMgr::ChooseDisplayId(creatureInfo);
+            }
+            sObjectMgr->GetCreatureModelRandomGender(&displayId);
+
+            vehicleId = creatureInfo->VehicleId;
+
+            //some spell has one aura of mount and one of vehicle
+            for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (GetSpellInfo()->Effects[i].Effect == SPELL_EFFECT_SUMMON && GetSpellInfo()->Effects[i].MiscValue == GetMiscValue())
+                {
+                    displayId = 0;
+                }
+            }
+
         }
-
-        uint32 displayID = ObjectMgr::ChooseDisplayId(ci);
-        sObjectMgr->GetCreatureModelRandomGender(&displayID);
-
-        //some spell has one aura of mount and one of vehicle
-        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            if (GetSpellInfo()->Effects[i].Effect == SPELL_EFFECT_SUMMON
-                    && GetSpellInfo()->Effects[i].MiscValue == GetMiscValue())
-                displayID = 0;
-
-        target->Mount(displayID, ci->VehicleId, GetMiscValue());
+        target->Mount(displayId, vehicleId, GetMiscValue());
     }
     else
     {
@@ -4185,7 +4199,6 @@ void AuraEffect::HandleModTotalPercentStat(AuraApplication const* aurApp, uint8 
     }
 
     // recalculate current HP/MP after applying aura modifications (only for spells with SPELL_ATTR0_UNK4 0x00000010 flag)
-    // this check is total bullshit i think
     if (GetMiscValue() == STAT_STAMINA && m_spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY))
         target->SetHealth(std::max<uint32>(uint32(healthPct * target->GetMaxHealth() * 0.01f), (alive ? 1 : 0)));
 }
@@ -6222,11 +6235,12 @@ void AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick(Unit* target, Unit*
     }
     else
     {
-#ifdef ELUNA
         Creature* c = target->ToCreature();
         if (c && caster)
-            sEluna->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature());
-#endif
+        {
+            sScriptMgr->OnDummyEffect(caster, GetId(), SpellEffIndex(GetEffIndex()), target->ToCreature());
+        }
+
         LOG_DEBUG("spells.aura", "AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick: Spell %u has non-existent spell %u in EffectTriggered[%d] and is therefor not triggered.", GetId(), triggerSpellId, GetEffIndex());
     }
 }

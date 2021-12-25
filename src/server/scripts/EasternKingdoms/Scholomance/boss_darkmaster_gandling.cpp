@@ -296,7 +296,7 @@ public:
         void SpellHitTarget(Unit* target, const SpellInfo* spellinfo) override
         {
             uint32 room = 0;
-            if (spellinfo && spellinfo->Id == SPELL_SHADOW_PORTAL)
+            if (spellinfo && spellinfo->Id == SPELL_SHADOW_PORTAL && target && me->GetVictim())
             {
                 room = GetData(GANDLING_ROOM_TO_USE);
                 SetGate(room, CLOSED);

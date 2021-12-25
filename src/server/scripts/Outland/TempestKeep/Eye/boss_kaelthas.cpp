@@ -556,7 +556,7 @@ public:
                     //me->CastSpell(me, SPELL_KEAL_STUNNED, true);
                     break;
                 case EVENT_SCENE_9:
-                    me->CastSpell(me, 52241, true); // WRONG VISUAL, ZOMG!
+                    me->CastSpell(me, 52241, true); // WRONG VISUAL
                     me->CastSpell(me, 34807, true);
                     me->SummonCreature(NPC_WORLD_TRIGGER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
                     if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX() + 5, me->GetPositionY(), me->GetPositionZ() + 15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -601,7 +601,7 @@ public:
                     break;
                 case EVENT_SCENE_16:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveAurasDueToSpell(52241); // WRONG VISUAL, ZOMG!
+                    me->RemoveAurasDueToSpell(52241); // WRONG VISUAL
                     me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
                     break;
             }

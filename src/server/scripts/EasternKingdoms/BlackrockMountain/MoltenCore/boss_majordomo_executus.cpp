@@ -75,7 +75,6 @@ enum Events
 {
     EVENT_MAGIC_REFLECTION                  = 1,
     EVENT_DAMAGE_REFLECTION,
-    EVENT_BLAST_WAVE,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -129,7 +128,7 @@ public:
 
     struct boss_majordomoAI : public BossAI
     {
-        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
+        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS) {}
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -167,8 +166,6 @@ public:
                         }
                     }
                 }
-
-                spawnInTextTimer = 10000;
             }
             else
             {
@@ -219,13 +216,11 @@ public:
 
             _EnterCombat();
             DoCastAOE(SPELL_SEPARATION_ANXIETY);
-            spawnInTextTimer = 0;
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
             events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
 
@@ -292,18 +287,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (spawnInTextTimer)
-            {
-                if (spawnInTextTimer <= diff)
-                {
-                    spawnInTextTimer = 0;
-                    Talk(SAY_SPAWN);
-                }
-                else
-                {
-                    spawnInTextTimer -= diff;
-                }
-            }
 
             switch (events.GetPhaseMask())
             {
@@ -335,12 +318,6 @@ public:
                             {
                                 DoCastSelf(SPELL_DAMAGE_REFLECTION);
                                 events.RepeatEvent(30000);
-                                break;
-                            }
-                            case EVENT_BLAST_WAVE:
-                            {
-                                DoCastVictim(SPELL_BLAST_WAVE);
-                                events.RepeatEvent(10000);
                                 break;
                             }
                             case EVENT_TELEPORT_RANDOM:
@@ -518,7 +495,6 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
-        uint32 spawnInTextTimer;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override

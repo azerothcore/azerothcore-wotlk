@@ -935,7 +935,7 @@ public:
                     Talk(SAY_LK_REMORSELESS_WINTER);
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_1, false);
-                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, bullshit, 15mins on movies
+                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15mins on movies
                     events.ScheduleEvent(EVENT_QUAKE, 62500);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8000, EVENT_GROUP_ABILITIES);
@@ -947,7 +947,7 @@ public:
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_2, false);
                     summons.DespawnEntry(NPC_VALKYR_SHADOWGUARD);
-                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, bullshit, 15 mins on movies
+                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15 mins on movies
                     events.ScheduleEvent(EVENT_QUAKE_2, 62500);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8000, EVENT_GROUP_ABILITIES);
