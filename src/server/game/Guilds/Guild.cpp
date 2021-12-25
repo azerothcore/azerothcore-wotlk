@@ -1628,6 +1628,12 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
     // Call script after validation and before money transfer.
     sScriptMgr->OnGuildMemberDepositMoney(this, player, amount);
 
+    if (m_bankMoney > GUILD_BANK_MONEY_LIMIT - amount)
+    {
+        SendCommandResult(session, GUILD_COMMAND_MOVE_ITEM, ERR_GUILD_BANK_FULL);
+        return;
+    }
+
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     _ModifyBankMoney(trans, amount, true);
 
@@ -2268,6 +2274,17 @@ bool Guild::ChangeMemberRank(ObjectGuid guid, uint8 newRank)
         if (Member* member = GetMember(guid))
         {
             member->ChangeRank(newRank);
+
+            if (newRank == GR_GUILDMASTER)
+            {
+                m_leaderGuid = guid;
+
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_LEADER);
+                stmt->setUInt32(0, m_leaderGuid.GetCounter());
+                stmt->setUInt32(1, m_id);
+                CharacterDatabase.Execute(stmt);
+            }
+
             return true;
         }
     return false;

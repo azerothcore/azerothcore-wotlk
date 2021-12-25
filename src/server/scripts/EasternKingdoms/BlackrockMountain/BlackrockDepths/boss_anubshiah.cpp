@@ -21,11 +21,20 @@
 
 enum Spells
 {
-    SPELL_SHADOWBOLT                                       = 17228,
-    SPELL_CURSEOFTONGUES                                   = 15470,
-    SPELL_CURSEOFWEAKNESS                                  = 17227,
-    SPELL_DEMONARMOR                                       = 11735,
-    SPELL_ENVELOPINGWEB                                    = 15471
+    SPELL_SHADOWBOLT         = 15472,
+    SPELL_CURSE_TONGUES      = 15470,
+    SPELL_CURSE_WEAKNESS     = 12493,
+    SPELL_DEMON_ARMOR        = 13787,
+    SPELL_ENVELOPING_WEB     = 15471
+};
+
+enum Timers
+{
+    TIMER_SHADOWBOLT = 7000,
+    TIMER_CURSE_TONGUES = 24000,
+    TIMER_CURSE_WEAKNESS = 12000,
+    TIMER_DEMON_ARMOR = 3000, // virtually only cast once
+    TIMER_ENVELOPING_WEB = 16000
 };
 
 class boss_anubshiah : public CreatureScript
@@ -38,75 +47,68 @@ public:
         return GetBlackrockDepthsAI<boss_anubshiahAI>(creature);
     }
 
-    struct boss_anubshiahAI : public ScriptedAI
+    struct boss_anubshiahAI : public BossAI
     {
-        boss_anubshiahAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_anubshiahAI(Creature* creature) :  BossAI(creature, DATA_ANUBSHIAH) { }
 
-        uint32 ShadowBolt_Timer;
-        uint32 CurseOfTongues_Timer;
-        uint32 CurseOfWeakness_Timer;
-        uint32 DemonArmor_Timer;
-        uint32 EnvelopingWeb_Timer;
-
-        void Reset() override
+        void EnterCombat(Unit* /*who*/) override
         {
-            ShadowBolt_Timer = 7000;
-            CurseOfTongues_Timer = 24000;
-            CurseOfWeakness_Timer = 12000;
-            DemonArmor_Timer = 3000;
-            EnvelopingWeb_Timer = 16000;
+            _EnterCombat();
+            events.ScheduleEvent(SPELL_SHADOWBOLT, 0.2 * (int)TIMER_SHADOWBOLT);
+            events.ScheduleEvent(SPELL_CURSE_TONGUES, 0.2 * (int)TIMER_CURSE_TONGUES);
+            events.ScheduleEvent(SPELL_CURSE_WEAKNESS, 0.2 * (int)TIMER_CURSE_WEAKNESS);
+            events.ScheduleEvent(SPELL_DEMON_ARMOR, 0.2 * (int)TIMER_DEMON_ARMOR);
+            events.ScheduleEvent(SPELL_ENVELOPING_WEB, 0.2 * (int)TIMER_ENVELOPING_WEB);
         }
-
-        void EnterCombat(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
-
-            //ShadowBolt_Timer
-            if (ShadowBolt_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SHADOWBOLT);
-                ShadowBolt_Timer = 7000;
             }
-            else ShadowBolt_Timer -= diff;
+            events.Update(diff);
 
-            //CurseOfTongues_Timer
-            if (CurseOfTongues_Timer <= diff)
+            if (me->HasUnitState(UNIT_STATE_CASTING))
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_CURSEOFTONGUES);
-                CurseOfTongues_Timer = 18000;
+                return;
             }
-            else CurseOfTongues_Timer -= diff;
-
-            //CurseOfWeakness_Timer
-            if (CurseOfWeakness_Timer <= diff)
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                DoCastVictim(SPELL_CURSEOFWEAKNESS);
-                CurseOfWeakness_Timer = 45000;
+                switch (eventId)
+                {
+                case SPELL_SHADOWBOLT:
+                    DoCastVictim(SPELL_SHADOWBOLT);
+                    events.ScheduleEvent(SPELL_SHADOWBOLT, urand(TIMER_SHADOWBOLT - 2000, TIMER_SHADOWBOLT + 2000));
+                    break;
+                case SPELL_CURSE_TONGUES:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    {
+                        DoCast(target, SPELL_CURSE_TONGUES);
+                    }
+                    events.ScheduleEvent(SPELL_CURSE_TONGUES, urand(TIMER_CURSE_TONGUES - 2000, TIMER_CURSE_TONGUES + 2000));
+                    break;
+                case SPELL_CURSE_WEAKNESS:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    {
+                        DoCast(target, SPELL_CURSE_WEAKNESS);
+                    }
+                    events.ScheduleEvent(SPELL_CURSE_WEAKNESS, urand(TIMER_CURSE_WEAKNESS - 2000, TIMER_CURSE_WEAKNESS + 2000));
+                    break;
+                case SPELL_DEMON_ARMOR:
+                    DoCast(me, SPELL_DEMON_ARMOR);
+                    events.ScheduleEvent(SPELL_DEMON_ARMOR, TIMER_DEMON_ARMOR);
+                    break;
+                case SPELL_ENVELOPING_WEB:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        DoCast(target, SPELL_ENVELOPING_WEB);
+                    events.ScheduleEvent(SPELL_ENVELOPING_WEB, urand(TIMER_ENVELOPING_WEB - 2000, TIMER_ENVELOPING_WEB + 2000));
+                    break;
+                default:
+                    break;
+                }
             }
-            else CurseOfWeakness_Timer -= diff;
-
-            //DemonArmor_Timer
-            if (DemonArmor_Timer <= diff)
-            {
-                DoCast(me, SPELL_DEMONARMOR);
-                DemonArmor_Timer = 300000;
-            }
-            else DemonArmor_Timer -= diff;
-
-            //EnvelopingWeb_Timer
-            if (EnvelopingWeb_Timer <= diff)
-            {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_ENVELOPINGWEB);
-                EnvelopingWeb_Timer = 12000;
-            }
-            else EnvelopingWeb_Timer -= diff;
-
             DoMeleeAttackIfReady();
         }
     };
