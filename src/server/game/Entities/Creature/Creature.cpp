@@ -549,6 +549,10 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetDetectionDistance(cInfo->detection_range);
 
     LoadSpellTemplateImmunity();
+
+    // We must update last scriptId or it looks like we reloaded a script, breaking some things such as gossip temporarily
+    LastUsedScriptID = GetScriptId();
+
     return true;
 }
 
