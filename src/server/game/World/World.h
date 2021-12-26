@@ -262,6 +262,8 @@ public:
     void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr);
 
+    void SendWorldTextOptional(uint32 string_id, uint32 flag, ...);
+
     /// Are we in the middle of a shutdown?
     bool IsShuttingDown() const { return m_ShutdownTimer > 0; }
     uint32 GetShutDownTimeLeft() const { return m_ShutdownTimer; }
