@@ -205,6 +205,10 @@ bool LoginQueryHolder::Initialize()
     stmt->setUInt64(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION, stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_SETTINGS);
+    stmt->setUInt64(0, lowGuid);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS, stmt);
+
     return res;
 }
 
@@ -982,9 +986,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);
     if (firstLogin)
     {
-
-        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
-
         PlayerInfo const* info = sObjectMgr->GetPlayerInfo(pCurrChar->getRace(), pCurrChar->getClass());
         for (uint32 spellId : info->castSpells)
         {

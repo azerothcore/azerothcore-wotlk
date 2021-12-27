@@ -39,7 +39,6 @@
 #include "Pet.h"
 #include "Player.h"
 #include "QueryHolder.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Transport.h"
@@ -632,7 +631,6 @@ void WorldSession::LogoutPlayer(bool save)
 
         ///- empty buyback items and save the player in the database
         // some save parts only correctly work in case player present in map/player_lists (pets, etc)
-        SavingSystemMgr::InsertToSavingSkipListIfNeeded(_player->GetNextSave()); // pussywizard
         if (save)
         {
             uint32 eslot;

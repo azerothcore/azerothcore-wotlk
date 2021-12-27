@@ -21,7 +21,6 @@
 #include "ChannelMgr.h"
 #include "Formulas.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Guild.h"
 #include "InstanceScript.h"
@@ -29,7 +28,6 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
@@ -37,6 +35,12 @@
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
 #include "WeatherMgr.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 // Zone Interval should be 1 second
 constexpr auto ZONE_UPDATE_INTERVAL = 1000;
@@ -311,35 +315,18 @@ void Player::Update(uint32 p_time)
     if (m_deathState == JUST_DIED)
         KillPlayer();
 
-    if (m_nextSave <= SavingSystemMgr::GetSavingCurrentValue() &&
-        !GetSession()->isLogingOut())
-        SaveToDB(false, false);
-    else if (m_additionalSaveTimer && !GetSession()->isLogingOut()) // pussywizard:
+    if (m_nextSave)
     {
-        if (m_additionalSaveTimer <= p_time)
+        if (p_time >= m_nextSave)
         {
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-            if (m_additionalSaveMask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
-                SaveInventoryAndGoldToDB(trans);
-            if (m_additionalSaveMask & ADDITIONAL_SAVING_QUEST_STATUS)
-            {
-                _SaveQuestStatus(trans);
-
-                // xinef: if nothing changed, nothing will happen
-                _SaveDailyQuestStatus(trans);
-                _SaveWeeklyQuestStatus(trans);
-                _SaveSeasonalQuestStatus(trans);
-                _SaveMonthlyQuestStatus(trans);
-            }
-
-            CharacterDatabase.CommitTransaction(trans);
-
-            m_additionalSaveTimer = 0;
-            m_additionalSaveMask  = 0;
+            // m_nextSave reset in SaveToDB call
+            SaveToDB(false, false);
+            FMT_LOG_DEBUG("entities.player", "Player::Update: Player '{}' ({}) saved", GetName(), GetGUID().ToString());
         }
         else
-            m_additionalSaveTimer -= p_time;
+        {
+            m_nextSave -= p_time;
+        }
     }
 
     // Handle Water/drowning
@@ -1829,7 +1816,7 @@ void Player::UpdateTriggerVisibility()
     GetSession()->SendPacket(&packet);
 }
 
-void Player::UpdateVisibleGameobjectsOrSpellClicks()
+void Player::UpdateForQuestWorldObjects()
 {
     if (m_clientGUIDs.empty())
         return;
@@ -1856,9 +1843,19 @@ void Player::UpdateVisibleGameobjectsOrSpellClicks()
             SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
             for (SpellClickInfoContainer::const_iterator _itr = clickPair.first; _itr != clickPair.second; ++_itr)
             {
+                //! This code doesn't look right, but it was logically converted to condition system to do the exact
+                //! same thing it did before. It definitely needs to be overlooked for intended functionality.
                 ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
-                obj->BuildValuesUpdateBlockForPlayer(&udata, this);
-                break;
+                bool buildUpdateBlock = false;
+                for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
+                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
+                        buildUpdateBlock = true;
+
+                if (buildUpdateBlock)
+                {
+                    obj->BuildValuesUpdateBlockForPlayer(&udata, this);
+                    break;
+                }
             }
         }
     }

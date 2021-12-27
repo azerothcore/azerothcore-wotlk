@@ -1846,7 +1846,7 @@ public:
 
     bool IsDatabaseBound() const { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+    virtual void OnHandleDevCommand(Player* /*player*/, bool& /*enable*/) { }
 
     /**
      * @brief This hook runs execute chat command
@@ -2472,7 +2472,7 @@ public: /* MiscScript */
 
 public: /* CommandSC */
 
-    void OnHandleDevCommand(Player* player, std::string& argstr);
+    void OnHandleDevCommand(Player* player, bool& enable);
     bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
 
 public: /* DatabaseScript */
