@@ -100,7 +100,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
                 {
                     if (Aura* aur = player->GetAura(SPELL_RAM_AURA))
                     {
-                        int32 diff = aur->GetApplyTime() - (time(nullptr) - (HOUR * 18) + spellCooldown);
+                        int32 diff = aur->GetApplyTime() - (GameTime::GetGameTime().count() - (HOUR * 18) + spellCooldown);
                         if (diff > 10) // aura applied later
                             return;
 
@@ -533,7 +533,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
     bool AllowStart()
     {
-        time_t curtime = time(nullptr);
+        time_t curtime = GameTime::GetGameTime().count();
         tm strDate;
         localtime_r(&curtime, &strDate);
 

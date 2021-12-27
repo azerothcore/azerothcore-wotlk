@@ -462,7 +462,7 @@ public:
                         {
                             TempSummonGrimstone->RemoveFromWorld();
                             TempSummonGrimstone = nullptr;
-                            timeRingFail = time(nullptr);
+                            timeRingFail = GameTime::GetGameTime().count();
                         }
                         SetData(TYPE_RING_OF_LAW, NOT_STARTED);
                         break;

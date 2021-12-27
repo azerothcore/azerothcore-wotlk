@@ -643,7 +643,7 @@ public:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
                 stmt->setUInt32(0, guid);
                 stmt->setUInt32(1, entry);
-                stmt->setUInt64(2, time(nullptr));
+                stmt->setUInt64(2, GameTime::GetGameTime().count());
                 trans->Append(stmt);
             }
             else if (quest->IsWeekly())

@@ -205,7 +205,7 @@ void Guild::EventLogEntry::WritePacket(WorldPackets::Guild::GuildEventLogQueryRe
     eventEntry.PlayerGUID = playerGUID;
     eventEntry.OtherGUID = otherGUID;
     eventEntry.TransactionType = uint8(m_eventType);
-    eventEntry.TransactionDate = uint32(::time(nullptr) - m_timestamp);
+    eventEntry.TransactionDate = uint32(GameTime::GetGameTime().count() - m_timestamp);
     eventEntry.RankID = uint8(m_newRank);
     packet.Entry.push_back(eventEntry);
 }
@@ -239,7 +239,7 @@ void Guild::BankEventLogEntry::WritePacket(WorldPackets::Guild::GuildBankLogQuer
 {
     WorldPackets::Guild::GuildBankLogEntry bankLogEntry;
     bankLogEntry.PlayerGUID = ObjectGuid::Create<HighGuid::Player>(m_playerGuid.GetCounter());
-    bankLogEntry.TimeOffset = int32(::time(nullptr) - m_timestamp);
+    bankLogEntry.TimeOffset = int32(GameTime::GetGameTime().count() - m_timestamp);
     bankLogEntry.EntryType = int8(m_eventType);
 
     switch(m_eventType)
@@ -1207,7 +1207,7 @@ void Guild::HandleRoster(WorldSession* session)
         memberData.Guid = member.GetGUID();
         memberData.RankID = int32(member.GetRankId());
         memberData.AreaID = int32(member.GetZoneId());
-        memberData.LastSave = float(float(::time(nullptr) - member.GetLogoutTime()) / DAY);
+        memberData.LastSave = float(float(GameTime::GetGameTime().count() - member.GetLogoutTime()) / DAY);
 
         memberData.Status = member.GetFlags();
         memberData.Level = member.GetLevel();
