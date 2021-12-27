@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "Optional.h"
 #include "PetDefines.h"
+#include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
@@ -875,6 +876,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
+    PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS      = 36,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1412,7 +1414,7 @@ public:
     void RemoveRewardedQuest(uint32 questId, bool update = true);
     void SendQuestUpdate(uint32 questId);
     QuestGiverStatus GetQuestDialogStatus(Object* questGiver);
-    float GetQuestRate();
+    float GetQuestRate(bool isDFQuest = false);
     void SetDailyQuestStatus(uint32 quest_id);
     bool IsDailyQuestDone(uint32 quest_id);
     void SetWeeklyQuestStatus(uint32 quest_id);
@@ -2598,6 +2600,10 @@ public:
 
     std::string GetPlayerName();
 
+    // Settings
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
+    void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
+
  protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
@@ -2680,6 +2686,7 @@ public:
     void _LoadTalents(PreparedQueryResult result);
     void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
     void _LoadBrewOfTheMonth(PreparedQueryResult result);
+    void _LoadCharacterSettings(PreparedQueryResult result);
 
     /*********************************************************/
     /***                   SAVE SYSTEM                     ***/
@@ -2703,6 +2710,7 @@ public:
     void _SaveStats(CharacterDatabaseTransaction trans);
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
+    void _SavePlayerSettings(CharacterDatabaseTransaction trans);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -2955,6 +2963,8 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    PlayerSettingMap m_charSettingsMap;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
