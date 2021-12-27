@@ -7581,6 +7581,13 @@ void SpellMgr::LoadDbcDataCorrections()
                 if (spellInfo->SpellIconID == 2721 && spellInfo->SpellFamilyFlags[0] & 0x2)
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
                 break;
+            case SPELLFAMILY_HUNTER:
+                // Multi-Shot not affected by category cooldown modifiers
+                if (spellInfo->SpellFamilyFlags[0] & 0x00001000)
+                {
+                    spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
+                }
+                break;
         }
 
         // Recklessness/Shield Wall/Retaliation
