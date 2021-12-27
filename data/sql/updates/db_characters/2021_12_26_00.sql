@@ -15,7 +15,7 @@ SELECT sql_rev INTO OK FROM version_db_characters WHERE sql_rev = '1638643807174
 --
 
 INSERT INTO `version_db_characters` (`sql_rev`) VALUES ('1638643807174948000');
-
+-- placeholder
 --
 -- END UPDATING QUERIES
 --
