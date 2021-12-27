@@ -66,7 +66,6 @@
 #include "QueryHolder.h"
 #include "ReputationMgr.h"
 #include "Realm.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
@@ -192,7 +191,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_needZoneUpdate = false;
 
-    m_nextSave = SavingSystemMgr::IncreaseSavingMaxValue(1);
     m_additionalSaveTimer = 0;
     m_additionalSaveMask = 0;
     m_hostileReferenceCheckTimer = 15000;
@@ -4167,6 +4165,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SKILLS);
+                stmt->setUInt32(0, lowGuid);
+                trans->Append(stmt);
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SETTINGS);
                 stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 

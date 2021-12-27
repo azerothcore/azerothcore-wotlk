@@ -17171,7 +17171,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             creature->DeleteThreatList();
 
             // must be after setDeathState which resets dynamic flags
-            if (!creature->loot.empty())
+            if (!creature->loot.isLooted())
             {
                 creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
@@ -17416,11 +17416,11 @@ void Unit::SetRooted(bool apply)
 
         if (IsFalling())
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
         }
         else
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
 
          // Creature specific

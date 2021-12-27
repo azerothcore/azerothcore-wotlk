@@ -1055,7 +1055,8 @@ public:
             Seconds respawnTimer = 0s;
             player->PlayerTalkClass->SendCloseGossip();
 
-            if (ObjectAccessor::GetCreature(*me, _creatureGuid))
+            Creature* lastSpawn = ObjectAccessor::GetCreature(*me, _creatureGuid);
+            if (lastSpawn && lastSpawn->IsAlive())
             {
                 // We already summoned something recently, return.
                 CloseGossipMenuFor(player);
@@ -1167,10 +1168,9 @@ public:
             if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000))
             {
                 summons->CastSpell(summons, SPELL_SPAWN_IN, false);
-                summons->AI()->Talk(SAY_ON_SPAWN_IN);
-                summons->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                summons->SendMeleeAttackStart(player);
-                summons->CombatStart(player);
+                summons->SetTarget(player->GetGUID());
+                summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
+                summons->AI()->AttackStart(player);
                 _creatureGuid = summons->GetGUID();
             }
         }
