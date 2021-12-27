@@ -60,7 +60,12 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+
+ // TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
@@ -224,7 +229,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectCreateItem2,                              //157 SPELL_EFFECT_CREATE_ITEM_2            create item or create item template and replace by some randon spell loot item
     &Spell::EffectMilling,                                  //158 SPELL_EFFECT_MILLING                  milling
     &Spell::EffectRenamePet,                                //159 SPELL_EFFECT_ALLOW_RENAME_PET         allow rename pet once again
-    &Spell::EffectNULL,                                     //160 SPELL_EFFECT_160                      1 spell - 45534
+    &Spell::EffectForceCast,                                //160 SPELL_EFFECT_FORCE_CAST_2
     &Spell::EffectSpecCount,                                //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
     &Spell::EffectNULL,                                     //163 unused
@@ -337,37 +342,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                 ++count;
 
                         damage /= count;                    // divide to all targets
-                    }
-
-                    switch (m_spellInfo->Id)                     // better way to check unknown
-                    {
-                        // Consumption
-                        case 28865:
-                            damage = (m_caster->GetMap()->ToInstanceMap()->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250);
-                            break;
-                        // percent from health with min
-                        case 25599:                             // Thundercrash
-                            {
-                                damage = unitTarget->GetHealth() / 2;
-                                if (damage < 200)
-                                    damage = 200;
-                                break;
-                            }
-                        // arcane charge. must only affect demons (also undead?)
-                        case 45072:
-                            {
-                                if (unitTarget->GetCreatureType() != CREATURE_TYPE_DEMON
-                                        && unitTarget->GetCreatureType() != CREATURE_TYPE_UNDEAD)
-                                    return;
-                                break;
-                            }
-                        // Gargoyle Strike
-                        case 51963:
-                            {
-                                // about +4 base spell dmg per level
-                                damage = (m_caster->getLevel() - 60) * 4 + 60;
-                                break;
-                            }
                     }
                     break;
                 }
@@ -5403,7 +5377,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     player->GetPosition(x, y, z);
     if (!pet)
     {
-        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET);
+        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET, damage);
         return;
     }
 

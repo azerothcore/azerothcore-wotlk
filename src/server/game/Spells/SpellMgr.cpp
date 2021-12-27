@@ -17,7 +17,6 @@
 
 #include "SpellMgr.h"
 #include "BattlefieldMgr.h"
-#include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
@@ -3403,6 +3402,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 switch(spellInfo->Effects[j].ApplyAuraName)
                 {
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
                         if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
                         {
