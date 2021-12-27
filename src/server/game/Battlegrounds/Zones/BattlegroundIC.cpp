@@ -567,78 +567,89 @@ void BattlegroundIC::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     // All the node points are iterated to find the clicked one
     for (uint8 i = 0; i < MAX_NODE_TYPES; ++i)
     {
-        if (nodePoint[i].gameobject_entry == gameObject->GetEntry())
+        ICNodePoint& point = nodePoint[i];
+        if (point.gameobject_entry == gameObject->GetEntry())
         {
             // THIS SHOULD NEEVEER HAPPEN
-            if (nodePoint[i].faction == player->GetTeamId())
+            if (point.faction == player->GetTeamId())
+            {
                 return;
+            }
 
             // Prevent capturing of keep if none of gates was destroyed
-            if (nodePoint[i].gameobject_entry == GO_ALLIANCE_BANNER)
+            if (point.gameobject_entry == GO_ALLIANCE_BANNER)
             {
-                if (GateStatus[BG_IC_A_FRONT] != BG_IC_GATE_DESTROYED &&
-                        GateStatus[BG_IC_A_WEST] != BG_IC_GATE_DESTROYED &&
-                        GateStatus[BG_IC_A_EAST] != BG_IC_GATE_DESTROYED)
+                if (GateStatus[BG_IC_A_FRONT] != BG_IC_GATE_DESTROYED && GateStatus[BG_IC_A_WEST] != BG_IC_GATE_DESTROYED && GateStatus[BG_IC_A_EAST] != BG_IC_GATE_DESTROYED)
+                {
                     return;
+                }
             }
-            else if (nodePoint[i].gameobject_entry == GO_HORDE_BANNER)
+            else if (point.gameobject_entry == GO_HORDE_BANNER)
             {
-                if (GateStatus[BG_IC_H_FRONT] != BG_IC_GATE_DESTROYED &&
-                        GateStatus[BG_IC_H_WEST] != BG_IC_GATE_DESTROYED &&
-                        GateStatus[BG_IC_H_EAST] != BG_IC_GATE_DESTROYED)
+                if (GateStatus[BG_IC_H_FRONT] != BG_IC_GATE_DESTROYED && GateStatus[BG_IC_H_WEST] != BG_IC_GATE_DESTROYED && GateStatus[BG_IC_H_EAST] != BG_IC_GATE_DESTROYED)
+                {
                     return;
+                }
             }
 
-            uint32 nextBanner = GetNextBanner(&nodePoint[i], player->GetTeamId(), false);
+            uint32 nextBanner = GetNextBanner(&point, player->GetTeamId(), false);
 
             // we set the new settings of the nodePoint
-            nodePoint[i].faction = player->GetTeamId();
-            nodePoint[i].last_entry = nodePoint[i].gameobject_entry;
-            nodePoint[i].gameobject_entry = nextBanner;
+            point.faction = player->GetTeamId();
+            point.last_entry = point.gameobject_entry;
+            point.gameobject_entry = nextBanner;
 
             // this is just needed if the next banner is grey
-            if (nodePoint[i].banners[BANNER_A_CONTESTED] == nextBanner || nodePoint[i].banners[BANNER_H_CONTESTED] == nextBanner)
+            if (point.banners[BANNER_A_CONTESTED] == nextBanner || point.banners[BANNER_H_CONTESTED] == nextBanner)
             {
-                nodePoint[i].timer = BANNER_STATE_CHANGE_TIME; // 1 minute for last change (real faction banner)
-                nodePoint[i].needChange = true;
+                point.timer = BANNER_STATE_CHANGE_TIME; // 1 minute for last change (real faction banner)
+                point.needChange = true;
 
-                RelocateDeadPlayers(BgCreatures[static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + nodePoint[i].nodeType - 2]);
+                _reviveEvents.AddEventAtOffset([this, point]()
+                {
+                    RelocateDeadPlayers(BgCreatures[static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + point.nodeType - 2]);
 
-                // if we are here means that the point has been lost, or it is the first capture
-
-                if (nodePoint[i].nodeType != NODE_TYPE_REFINERY && nodePoint[i].nodeType != NODE_TYPE_QUARRY)
-                    if (BgCreatures[static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + (nodePoint[i].nodeType) - 2])
-                        DelCreature(static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + (nodePoint[i].nodeType) - 2);
+                    // if we are here means that the point has been lost, or it is the first capture
+                    if (point.nodeType != NODE_TYPE_REFINERY && point.nodeType != NODE_TYPE_QUARRY)
+                    {
+                        if (BgCreatures[static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + (point.nodeType) - 2])
+                        {
+                            DelCreature(static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + (point.nodeType) - 2);
+                        }
+                    }
+                }, 500ms);
 
                 UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
 
-                SendMessage2ToAll(LANG_BG_IC_TEAM_ASSAULTED_NODE_1, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, nodePoint[i].string);
-                SendMessage2ToAll(LANG_BG_IC_TEAM_ASSAULTED_NODE_2, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, nodePoint[i].string, (player->GetTeamId() == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE));
-                HandleContestedNodes(&nodePoint[i]);
+                SendMessage2ToAll(LANG_BG_IC_TEAM_ASSAULTED_NODE_1, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, point.string);
+                SendMessage2ToAll(LANG_BG_IC_TEAM_ASSAULTED_NODE_2, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, point.string, (player->GetTeamId() == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE));
+                HandleContestedNodes(&point);
             }
-            else if (nextBanner == nodePoint[i].banners[BANNER_A_CONTROLLED] || nextBanner == nodePoint[i].banners[BANNER_H_CONTROLLED])
+            else if (nextBanner == point.banners[BANNER_A_CONTROLLED] || nextBanner == point.banners[BANNER_H_CONTROLLED])
                 // if we are going to spawn the definitve faction banner, we dont need the timer anymore
             {
-                nodePoint[i].timer = BANNER_STATE_CHANGE_TIME;
-                nodePoint[i].needChange = false;
-                SendMessage2ToAll(LANG_BG_IC_TEAM_DEFENDED_NODE, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, nodePoint[i].string);
-                HandleCapturedNodes(&nodePoint[i], true);
+                point.timer = BANNER_STATE_CHANGE_TIME;
+                point.needChange = false;
+                SendMessage2ToAll(LANG_BG_IC_TEAM_DEFENDED_NODE, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, point.string);
+                HandleCapturedNodes(&point, true);
                 UpdatePlayerScore(player, SCORE_BASES_DEFENDED, 1);
             }
 
-            GameObject* banner = GetBGObject(nodePoint[i].gameobject_type);
+            GameObject* banner = GetBGObject(point.gameobject_type);
 
             if (!banner) // this should never happen
+            {
                 return;
+            }
 
             float cords[4] = {banner->GetPositionX(), banner->GetPositionY(), banner->GetPositionZ(), banner->GetOrientation() };
 
-            DelObject(nodePoint[i].gameobject_type);
-            AddObject(nodePoint[i].gameobject_type, nodePoint[i].gameobject_entry, cords[0], cords[1], cords[2], cords[3], 0, 0, 0, 0, RESPAWN_ONE_DAY);
+            DelObject(point.gameobject_type);
+            AddObject(point.gameobject_type, point.gameobject_entry, cords[0], cords[1], cords[2], cords[3], 0, 0, 0, 0, RESPAWN_ONE_DAY);
 
-            GetBGObject(nodePoint[i].gameobject_type)->SetUInt32Value(GAMEOBJECT_FACTION, nodePoint[i].faction == TEAM_ALLIANCE ? BG_IC_Factions[1] : BG_IC_Factions[0]);
+            GetBGObject(point.gameobject_type)->SetUInt32Value(GAMEOBJECT_FACTION, point.faction == TEAM_ALLIANCE ? BG_IC_Factions[1] : BG_IC_Factions[0]);
 
-            UpdateNodeWorldState(&nodePoint[i]);
+            UpdateNodeWorldState(&point);
             // we dont need iterating if we are here
             // If the needChange bool was set true, we will handle the rest in the Update Map function.
             return;

@@ -38,7 +38,6 @@
 #include "GameGraveyard.h"
 #include "GameTime.h"
 #include "Map.h"
-#include "MapInstanced.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -46,7 +45,6 @@
 #include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include <random>
 #include <unordered_map>
 
 /*********************************************************/

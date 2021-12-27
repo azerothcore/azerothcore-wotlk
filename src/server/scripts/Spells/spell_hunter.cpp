@@ -34,6 +34,7 @@
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 enum HunterSpells
@@ -1217,7 +1218,27 @@ class spell_hun_lock_and_load : public AuraScript
 
         AfterProc += AuraProcFn(spell_hun_lock_and_load::ApplyMarker);
     }
+};
 
+// 19577 - Intimidation
+class spell_hun_intimidation : public AuraScript
+{
+    PrepareAuraScript(spell_hun_intimidation);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            return !spellInfo->IsPositive();
+        }
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_intimidation::CheckProc);
+    }
 };
 
 void AddSC_hunter_spell_scripts()
@@ -1248,4 +1269,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_viper_attack_speed);
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);
+    RegisterSpellScript(spell_hun_intimidation);
 }

@@ -17,9 +17,7 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "Common.h"
 #include "GameTime.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"

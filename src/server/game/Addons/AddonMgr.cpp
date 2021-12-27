@@ -75,7 +75,7 @@ namespace AddonMgr
             {
                 Field* fields = result->Fetch();
 
-                BannedAddon addon;
+                BannedAddon addon{};
                 addon.Id = fields[0].GetUInt32() + offset;
                 addon.Timestamp = uint32(fields[3].GetUInt64());
 
@@ -111,11 +111,12 @@ namespace AddonMgr
 
     SavedAddon const* GetAddonInfo(const std::string& name)
     {
-        for (SavedAddonsList::const_iterator it = m_knownAddons.begin(); it != m_knownAddons.end(); ++it)
+        for (auto const& addon : m_knownAddons)
         {
-            SavedAddon const& addon = (*it);
             if (addon.Name == name)
+            {
                 return &addon;
+            }
         }
 
         return nullptr;
