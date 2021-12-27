@@ -1483,11 +1483,11 @@ void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& 
     });
 }
 
-bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
+bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover, MovementInfo const& movementInfo)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
     {
-        return !script->AnticheatHandleDoubleJump(player, mover);
+        return !script->AnticheatHandleDoubleJump(player, mover, movementInfo);
     });
 
     if (ret && *ret)
@@ -1498,11 +1498,11 @@ bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
     return true;
 }
 
-bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, uint16 opcode)
 {
     auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
     {
-        return !script->AnticheatCheckMovementInfo(player, movementInfo, mover, jump);
+        return !script->AnticheatCheckMovementInfo(player, movementInfo, mover, opcode);
     });
 
     if (ret && *ret)
@@ -1511,4 +1511,43 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
     }
 
     return true;
+}
+
+void ScriptMgr::AnticheatResetFallingData(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->AnticheatResetFallingData(player);
+    });
+}
+
+bool ScriptMgr::AnticheatNoFallingDamage(Player* player, uint16 opcode)
+{
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        return !script->AnticheatNoFallingDamage(player, opcode);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void ScriptMgr::AnticheatHandleNoFallingDamage(Player* player, uint16 opcode)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->AnticheatHandleNoFallingDamage(player, opcode);
+    });
+}
+
+void ScriptMgr::AnticheatSetSuccessfullyLanded(Player* player)
+{
+    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    {
+        script->AnticheatSetSuccessfullyLanded(player);
+    });
 }
