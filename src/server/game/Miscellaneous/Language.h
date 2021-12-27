@@ -1244,7 +1244,11 @@ enum AcoreStrings
     LANG_CMD_ITEM_REFUNDED_AP              = 5077,
     LANG_CMD_ITEM_REFUND_NOT_FOUND         = 5078,
 
-    // Room for more strings    5078-9999
+    LANG_CMD_AUTOBROADCAST_LVL_ERROR    = 5079,
+    LANG_CMD_SETTINGS_ANNOUNCER_ON      = 5080,
+    LANG_CMD_SETTINGS_ANNOUNCER_OFF     = 5081,
+
+    // Room for more strings    5082-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
