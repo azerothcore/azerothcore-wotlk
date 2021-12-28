@@ -35,7 +35,6 @@
 #include "DatabaseLoader.h"
 #include "DeadlineTimer.h"
 #include "GitRevision.h"
-#include "HttpManager.h"
 #include "IoContext.h"
 #include "MapMgr.h"
 #include "Metric.h"
@@ -274,8 +273,6 @@ int main(int argc, char** argv)
 
     // Set process priority according to configuration settings
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
-
-    HttpManager httpManager;
 
     // Loading modules configs before scripts
     sConfigMgr->LoadModulesConfigs();

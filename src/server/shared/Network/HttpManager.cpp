@@ -21,8 +21,6 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "HttpManager.h"
 
-HttpManager* HttpManager::instance;
-
 HttpWorkItem::HttpWorkItem(HttpMethod method, const std::string& url, const std::string& body, const std::string& contentType, const httplib::Headers& headers, HttpCallback cb)
     : method(method),
     url(url),
@@ -48,7 +46,6 @@ HttpManager::HttpManager()
     condVarMutex(),
     parseUrlRegex("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?")
 {
-    HttpManager::instance = this;
     StartHttpWorker();
 }
 
@@ -135,7 +132,8 @@ void HttpManager::StopHttpWorker()
 
 HttpManager* HttpManager::GetInstance()
 {
-    return HttpManager::instance;
+    static HttpManager instance;
+    return &instance;
 }
 
 void HttpManager::HttpWorkerThread()

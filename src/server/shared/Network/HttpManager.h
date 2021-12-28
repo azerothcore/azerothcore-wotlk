@@ -63,9 +63,6 @@ public:
 class HttpManager
 {
 public:
-    HttpManager();
-    ~HttpManager();
-
     void HttpRequest(HttpMethod method, const std::string& url, HttpCallback cb);
     void HttpRequest(HttpMethod method, const std::string& url, const httplib::Headers& headers, HttpCallback cb);
     void HttpRequest(HttpMethod method, const std::string& url, const std::string& body, const std::string& contentType, HttpCallback cb);
@@ -75,6 +72,9 @@ public:
     static HttpManager* GetInstance();
 
 private:
+    HttpManager();
+    ~HttpManager();
+
     void StartHttpWorker();
     void StopHttpWorker();
     void PushRequest(HttpWorkItem* item);
@@ -92,8 +92,6 @@ private:
     std::condition_variable condVar;
     std::mutex condVarMutex;
     std::regex parseUrlRegex;
-
-    static HttpManager* instance;
 };
 
 #endif // #ifndef __HTTP_MANAGER_H
