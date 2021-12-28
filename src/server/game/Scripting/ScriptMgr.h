@@ -82,6 +82,7 @@ struct GroupQueueInfo;
 struct ItemTemplate;
 struct OutdoorPvPData;
 struct TargetInfo;
+struct SpellModifier;
 
 namespace Acore::ChatCommands
 {
@@ -1517,6 +1518,9 @@ public:
 
     // Called before the phase for a WorldObject is set
     virtual void OnBeforeWorldObjectSetPhaseMask(WorldObject const* /*worldObject*/, uint32& /*oldPhaseMask*/, uint32& /*newPhaseMask*/, bool& /*useCombinedPhases*/, bool& /*update*/) { }
+
+    // Called when checking if a spell is affected by a mod
+    virtual bool OnIsAffectedBySpellModCheck(SpellInfo const* /*affectedSpell*/, SpellModifier const* /*mod*/) { return true; };
 };
 
 class BGScript : public ScriptObject
@@ -2333,6 +2337,7 @@ public: /* GlobalScript */
     void OnAfterInitializeLockedDungeons(Player* player);
     void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
     void OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update);
+    bool OnIsAffectedBySpellModCheck(SpellInfo const* affectedSpell, SpellModifier const* mod);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
