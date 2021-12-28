@@ -1007,7 +1007,6 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-        // summons->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
         {
             _summon->AI()->AttackStart(player);
