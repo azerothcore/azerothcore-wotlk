@@ -1286,7 +1286,7 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
         return false;
     }
 
-    if (!sScriptMgr->OnIsAffectedBySpellModCheck(affectSpell, mod))
+    if (!sScriptMgr->OnIsAffectedBySpellModCheck(affectSpell, this, mod))
     {
         return false;
     }
