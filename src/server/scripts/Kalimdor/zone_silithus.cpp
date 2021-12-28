@@ -1080,8 +1080,6 @@ public:
             {
                 // We already summoned something recently, return.
                 CloseGossipMenuFor(player);
-                LOG_ERROR("sql.sql", "closing menu bro");
-
                 return true;
             }
             else
