@@ -1288,7 +1288,7 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 
     if (!sScriptMgr->OnIsAffectedBySpellModCheck(affectSpell, this, mod))
     {
-        return false;
+        return true;
     }
 
     // False if affect_spell == nullptr or spellFamily not equal
