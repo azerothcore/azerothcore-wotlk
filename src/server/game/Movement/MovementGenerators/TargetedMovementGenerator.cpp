@@ -209,6 +209,7 @@ void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 {
     i_path = nullptr;
     _lastTargetPosition.reset();
+    owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
@@ -218,6 +219,7 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     owner->SetWalk(false);
+    owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
