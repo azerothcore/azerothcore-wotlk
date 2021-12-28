@@ -18,15 +18,15 @@ CollectIncludeDirectories(
 
 target_include_directories(httplib
   INTERFACE
-    ${PUBLIC_INCLUDES}})
+    ${PUBLIC_INCLUDES})
 
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(httplib
-  PRIVATE
+  INTERFACE
     acore-dependency-interface)
-    
+
 target_compile_definitions(httplib
   INTERFACE
     -DCPPHTTPLIB_OPENSSL_SUPPORT)
