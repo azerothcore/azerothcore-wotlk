@@ -28,7 +28,6 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
@@ -316,35 +315,18 @@ void Player::Update(uint32 p_time)
     if (m_deathState == JUST_DIED)
         KillPlayer();
 
-    if (m_nextSave <= SavingSystemMgr::GetSavingCurrentValue() &&
-        !GetSession()->isLogingOut())
-        SaveToDB(false, false);
-    else if (m_additionalSaveTimer && !GetSession()->isLogingOut()) // pussywizard:
+    if (m_nextSave)
     {
-        if (m_additionalSaveTimer <= p_time)
+        if (p_time >= m_nextSave)
         {
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-            if (m_additionalSaveMask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
-                SaveInventoryAndGoldToDB(trans);
-            if (m_additionalSaveMask & ADDITIONAL_SAVING_QUEST_STATUS)
-            {
-                _SaveQuestStatus(trans);
-
-                // xinef: if nothing changed, nothing will happen
-                _SaveDailyQuestStatus(trans);
-                _SaveWeeklyQuestStatus(trans);
-                _SaveSeasonalQuestStatus(trans);
-                _SaveMonthlyQuestStatus(trans);
-            }
-
-            CharacterDatabase.CommitTransaction(trans);
-
-            m_additionalSaveTimer = 0;
-            m_additionalSaveMask  = 0;
+            // m_nextSave reset in SaveToDB call
+            SaveToDB(false, false);
+            FMT_LOG_DEBUG("entities.player", "Player::Update: Player '{}' ({}) saved", GetName(), GetGUID().ToString());
         }
         else
-            m_additionalSaveTimer -= p_time;
+        {
+            m_nextSave -= p_time;
+        }
     }
 
     // Handle Water/drowning
