@@ -416,6 +416,7 @@ struct TrainerSpell
     uint32 reqSkillValue{0};
     uint32 reqLevel{0};
     uint32 learnedSpell[3];
+    uint32 reqSpell{0};
 
     // helpers
     [[nodiscard]] bool IsCastable() const { return learnedSpell[0] != spell; }

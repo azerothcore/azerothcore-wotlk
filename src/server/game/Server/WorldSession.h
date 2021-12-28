@@ -691,8 +691,8 @@ public:                                                 // opcodes handlers
     void HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result);
     void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
     void HandleCharacterAuraFrozen(PreparedQueryResult result);
-    uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType);
-    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder);
+    uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType, AsynchPetSummon* info);
+    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder, AsynchPetSummon* info);
 
     void HandleDuelAcceptedOpcode(WorldPacket& recvPacket);
     void HandleDuelCancelledOpcode(WorldPacket& recvPacket);
