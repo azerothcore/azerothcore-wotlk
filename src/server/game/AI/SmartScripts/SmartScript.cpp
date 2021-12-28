@@ -1323,7 +1323,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     }
                     else if (GameObject* go = (*itr)->ToGameObject())
                     {
-                        go->Delete();
+                        go->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
                     }
                 }
 
