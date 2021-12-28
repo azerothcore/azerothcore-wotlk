@@ -124,11 +124,11 @@ void ScriptMgr::OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, 
     });
 }
 
-bool ScriptMgr::OnIsAffectedBySpellModCheck(SpellInfo const* affectedSpell, SpellModifier const* mod)
+bool ScriptMgr::OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellModifier const* mod)
 {
     auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
     {
-        return !script->OnIsAffectedBySpellModCheck(affectedSpell, mod);
+        return !script->OnIsAffectedBySpellModCheck(affectSpell, mod);
     });
 
     if (ret && *ret)

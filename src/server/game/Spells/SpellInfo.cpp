@@ -1281,13 +1281,18 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 
     SpellInfo const* affectSpell = sSpellMgr->GetSpellInfo(mod->spellId);
 
+    if (!affectSpell)
+    {
+        return false;
+    }
+
     if (!sScriptMgr->OnIsAffectedBySpellModCheck(affectSpell, mod))
     {
         return false;
     }
 
     // False if affect_spell == nullptr or spellFamily not equal
-    if (!affectSpell || affectSpell->SpellFamilyName != SpellFamilyName)
+    if (affectSpell->SpellFamilyName != SpellFamilyName)
         return false;
 
     // true
