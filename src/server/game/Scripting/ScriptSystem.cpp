@@ -18,7 +18,6 @@
 #include "ScriptSystem.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 
 ScriptPointVector const SystemMgr::_empty;
 
