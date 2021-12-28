@@ -1000,10 +1000,10 @@ enum WindStone
     SAY_ON_SPAWN_IN      = 0
 };
 
-class DelayedSummonEvent : public BasicEvent
+class DelayedWindstoneSummonEvent : public BasicEvent
 {
 public:
-    DelayedSummonEvent(TempSummon* summon, ObjectGuid playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
+    DelayedWindstoneSummonEvent(TempSummon* summon, ObjectGuid playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -1194,7 +1194,7 @@ public:
                 summons->SetLootRecipient(player);
                 summons->CastSpell(summons, SPELL_SPAWN_IN, false);
                 summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
-                summons->m_Events.AddEvent(new DelayedSummonEvent(summons,  player->GetGUID()), summons->m_Events.CalculateTime(5200));
+                summons->m_Events.AddEvent(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), summons->m_Events.CalculateTime(5200));
                 _creatureGuid = summons->GetGUID();
             }
         }
