@@ -95,19 +95,6 @@ void HostileRefMgr::setOnlineOfflineState(bool isOnline)
 }
 
 //=================================================
-// The online / offline status is calculated and set
-
-void HostileRefMgr::updateThreatTables()
-{
-    HostileReference* ref = getFirst();
-    while (ref)
-    {
-        ref->updateOnlineStatus();
-        ref = ref->next();
-    }
-}
-
-//=================================================
 // The references are not needed anymore
 // tell the source to remove them from the list and free the mem
 
