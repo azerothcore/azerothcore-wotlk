@@ -50,7 +50,8 @@ enum DataTypes
     DATA_HALL_RUNE_5                = 20,
     DATA_HALL_RUNE_6                = 21,
     DATA_HALL_RUNE_7                = 22,
-    DATA_SOLAKAR_FLAMEWREATH        = 23
+    DATA_SOLAKAR_FLAMEWREATH        = 23,
+    DATA_MOR_GRAYHOOF               = 24
 };
 
 enum CreaturesIds
@@ -144,5 +145,7 @@ inline AI* GetBlackrockSpireAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, BRSScriptName);
 }
+
+#define RegisterBlackrockSpireCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackrockSpireAI)
 
 #endif

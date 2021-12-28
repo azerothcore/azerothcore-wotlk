@@ -22,12 +22,12 @@ SDComment: Oz, Hood, and RAJ event implemented. RAJ event requires more testing.
 SDCategory: Karazhan
 EndScriptData */
 
-#include "karazhan.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "karazhan.h"
 
 /***********************************/
 /*** OPERA WIZARD OF OZ EVENT *****/
@@ -778,8 +778,7 @@ public:
 
             if (MoveTimer <= diff)
             {
-                Position pos;
-                me->GetRandomNearPosition(pos, 10);
+                Position pos = me->GetRandomNearPosition(10);
                 me->GetMotionMaster()->MovePoint(0, pos);
                 MoveTimer = urand(3000, 5000);
             }

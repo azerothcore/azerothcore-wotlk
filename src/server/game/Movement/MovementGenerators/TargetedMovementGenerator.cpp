@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TargetedMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "MoveSplineInit.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Spell.h"
-#include "TargetedMovementGenerator.h"
 #include "Transport.h"
 
 static bool IsMutualChase(Unit* owner, Unit* target)
@@ -209,6 +209,7 @@ void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 {
     i_path = nullptr;
     _lastTargetPosition.reset();
+    owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
@@ -218,6 +219,7 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     owner->SetWalk(false);
+    owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 

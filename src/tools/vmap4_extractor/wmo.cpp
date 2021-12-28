@@ -15,14 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "adtfile.h"
 #include "wmo.h"
+#include "adtfile.h"
 #include "vec3d.h"
 #include "vmapexport.h"
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
-#include <fstream>
 #include <map>
 #include <utility>
 #undef min

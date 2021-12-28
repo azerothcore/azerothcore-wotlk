@@ -23,11 +23,11 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "Item.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
-#include "temple_of_ahnqiraj.h"
 #include "WorldPacket.h"
+#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -289,7 +289,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (!who || me->GetVictim())
             return;
 
-        if (me->_CanDetectFeignDeathOf(who) && me->CanCreatureAttack(who))
+        if (me->CanCreatureAttack(who))
         {
             if (me->IsWithinDistInMap(who, PULL_RANGE, true, false) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
             {

@@ -17,17 +17,17 @@
 
 #ifndef _PLAYER_COMMAND_H
 #define _PLAYER_COMMAND_H
-#include "Chat.h"
-#include "Player.h"
 
-namespace Acore
+#include "Chat.h"
+#include "Common.h"
+
+class Player;
+class SpellInfo;
+
+namespace Acore::PlayerCommand
 {
-    // Used in player/character commands
-    namespace PlayerCommand
-    {
-        bool HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
-        bool HandleUnlearnSpellCommand(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all);
-    };
+    bool HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
+    bool HandleUnlearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
 };
 
 #endif // _PLAYER_COMMAND_H

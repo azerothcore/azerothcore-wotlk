@@ -26,13 +26,15 @@
 #include "GridNotifiers.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
-#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 enum HunterSpells
@@ -449,7 +451,7 @@ class spell_hun_chimera_shot : public SpellScript
 
                         // Amount of one aura tick
                         basePoint = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), aurEff->GetAmount()));
-                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; // TODO: WTF? caster uses unitTarget?
+                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; // TODO: Caster uses unitTarget?
                         if (basePoint > casterBasePoint)
                             basePoint = casterBasePoint;
                         ApplyPct(basePoint, TickCount * 60);
@@ -706,12 +708,17 @@ class spell_hun_sniper_training : public AuraScript
         PreventDefaultAction();
         if (aurEff->GetAmount() <= 0)
         {
-            Unit* caster = GetCaster();
-            uint32 spellId = SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_HUNTER_SNIPER_TRAINING_R1;
-            if (Unit* target = GetTarget())
+            if (!GetCaster() || !GetTarget())
             {
-                SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId);
-                Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(GetSpellInfo()) ? caster : target;
+                return;
+            }
+
+            Unit* target = GetTarget();
+
+            uint32 spellId = SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_HUNTER_SNIPER_TRAINING_R1;
+            if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId))
+            {
+                Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(GetSpellInfo()) ? GetCaster() : target;
                 triggerCaster->CastSpell(target, triggeredSpellInfo, true, 0, aurEff);
             }
         }
@@ -946,6 +953,12 @@ class spell_hun_tame_beast : public SpellScript
                 player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                 return SPELL_FAILED_DONT_REPORT;
             }
+
+            if (target->GetOwnerGUID())
+            {
+                player->SendTameFailure(PET_TAME_CREATURE_ALREADY_OWNED);
+                return SPELL_FAILED_DONT_REPORT;
+            }
         }
         else
         {
@@ -1113,7 +1126,7 @@ class spell_hun_lock_and_load : public AuraScript
     bool CheckTrapProc(ProcEventInfo& eventInfo)
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo)
+        if (!spellInfo || !eventInfo.GetActor())
         {
             return false;
         }
@@ -1205,7 +1218,27 @@ class spell_hun_lock_and_load : public AuraScript
 
         AfterProc += AuraProcFn(spell_hun_lock_and_load::ApplyMarker);
     }
+};
 
+// 19577 - Intimidation
+class spell_hun_intimidation : public AuraScript
+{
+    PrepareAuraScript(spell_hun_intimidation);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            return !spellInfo->IsPositive();
+        }
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_intimidation::CheckProc);
+    }
 };
 
 void AddSC_hunter_spell_scripts()
@@ -1236,4 +1269,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_viper_attack_speed);
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);
+    RegisterSpellScript(spell_hun_intimidation);
 }

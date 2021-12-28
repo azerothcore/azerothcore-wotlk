@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Creature.h"
 #include "CreatureAI.h"
+#include "Creature.h"
 #include "CreatureAIImpl.h"
+#include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "SpellMgr.h"
 #include "Vehicle.h"
 
 class PhasedRespawn : public BasicEvent
@@ -185,6 +185,9 @@ void CreatureAI::TriggerAlert(Unit const* who) const
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
         return;
+    // Only alert if target is within line of sight
+    if (!me->IsWithinLOSInMap(who))
+        return;
     // Send alert sound (if any) for this creature
     me->SendAIReaction(AI_REACTION_ALERT);
     // Face the unit (stealthed player) and set distracted state for 5 seconds
@@ -292,7 +295,9 @@ bool CreatureAI::UpdateVictim()
 bool CreatureAI::_EnterEvadeMode()
 {
     if (!me->IsAlive())
+    {
         return false;
+    }
 
     // don't remove vehicle auras, passengers aren't supposed to drop off the vehicle
     // don't remove clone caster on evade (to be verified)
@@ -309,7 +314,13 @@ bool CreatureAI::_EnterEvadeMode()
     me->SetCannotReachTarget(false);
 
     if (me->IsInEvadeMode())
+    {
         return false;
+    }
+    else if (CreatureGroup* formation = me->GetFormation())
+    {
+        formation->MemberEvaded(me);
+    }
 
     return true;
 }
@@ -355,15 +366,13 @@ Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawn
 
 Creature* CreatureAI::DoSummon(uint32 entry, WorldObject* obj, float radius, uint32 despawnTime, TempSummonType summonType)
 {
-    Position pos;
-    obj->GetRandomNearPosition(pos, radius);
+    Position pos = obj->GetRandomNearPosition(radius);
     return me->SummonCreature(entry, pos, summonType, despawnTime);
 }
 
 Creature* CreatureAI::DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius, uint32 despawnTime, TempSummonType summonType)
 {
-    Position pos;
-    obj->GetRandomNearPosition(pos, radius);
+    Position pos = obj->GetRandomNearPosition(radius);
     pos.m_positionZ += flightZ;
     return me->SummonCreature(entry, pos, summonType, despawnTime);
 }

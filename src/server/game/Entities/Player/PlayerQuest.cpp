@@ -18,18 +18,17 @@
 #include "CreatureAI.h"
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
+#include "GitRevision.h"
+#include "GossipDef.h"
 #include "Group.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
-#include "GitRevision.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+#include "SpellMgr.h"
+#include "WorldSession.h"
 
 /*********************************************************/
 /***                    QUEST SYSTEM                   ***/
@@ -428,10 +427,7 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
     switch (questGiver->GetTypeId())
     {
         case TYPEID_UNIT:
-#ifdef ELUNA
-            sEluna->OnQuestAccept(this, questGiver->ToCreature(), quest);
-#endif
-            sScriptMgr->OnQuestAccept(this, (questGiver->ToCreature()), quest);
+            sScriptMgr->OnQuestAccept(this, questGiver->ToCreature(), quest);
             questGiver->ToCreature()->AI()->sQuestAccept(this, quest);
             break;
         case TYPEID_ITEM:
@@ -457,9 +453,6 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
             break;
         }
         case TYPEID_GAMEOBJECT:
-#ifdef ELUNA
-            sEluna->OnQuestAccept(this, questGiver->ToGameObject(), quest);
-#endif
             sScriptMgr->OnQuestAccept(this, questGiver->ToGameObject(), quest);
             questGiver->ToGameObject()->AI()->QuestAccept(this, quest);
             break;
@@ -654,7 +647,7 @@ void Player::IncompleteQuest(uint32 quest_id)
     }
 }
 
-void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce)
+void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce, bool isLFGReward)
 {
     //this THING should be here to protect code from quest, which cast on player far teleport as a reward
     //should work fine, cause far teleport will be executed in Player::Update()
@@ -735,7 +728,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     bool rewarded = IsQuestRewarded(quest_id) && !quest->IsDFQuest();
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this) * GetQuestRate());
+    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(getLevel()) * GetQuestRate(quest->IsDFQuest()));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
@@ -749,11 +742,11 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
     else
     {
-        GiveXP(XP, nullptr);
+        GiveXP(XP, nullptr, isLFGReward);
     }
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
-    if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(this))
+    if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(getLevel()))
     {
         moneyRew += rewOrReqMoney;
     }
@@ -1408,18 +1401,26 @@ QuestStatus Player::GetQuestStatus(uint32 quest_id) const
     if (quest_id)
     {
         QuestStatusMap::const_iterator itr = m_QuestStatus.find(quest_id);
+
         if (itr != m_QuestStatus.end())
+        {
             return itr->second.Status;
+        }
 
         if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id))
         {
             if (qInfo->IsSeasonal())
+            {
                 return SatisfyQuestSeasonal(qInfo, false) ? QUEST_STATUS_NONE : QUEST_STATUS_REWARDED;
+            }
 
             if (!qInfo->IsRepeatable() && IsQuestRewarded(quest_id))
+            {
                 return QUEST_STATUS_REWARDED;
+            }
         }
     }
+
     return QUEST_STATUS_NONE;
 }
 
@@ -1446,10 +1447,14 @@ bool Player::CanShareQuest(uint32 quest_id) const
 
 void Player::SetQuestStatus(uint32 questId, QuestStatus status, bool update /*= true*/)
 {
-    if (sObjectMgr->GetQuestTemplate(questId))
+    if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         m_QuestStatus[questId].Status = status;
-        m_QuestStatusSave[questId] = true;
+
+        if (quest->GetQuestMethod() && !quest->IsAutoComplete())
+        {
+            m_QuestStatusSave[questId] = true;
+        }
     }
 
     if (update)
@@ -1490,7 +1495,7 @@ void Player::RemoveRewardedQuest(uint32 questId, bool update /*= true*/)
 void Player::SendQuestUpdate(uint32 questId)
 {
     uint32 zone = 0, area = 0;
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 oldSpellId = 0;
 
     SpellAreaForQuestMapBounds saBounds = sSpellMgr->GetSpellAreaForQuestMapBounds(questId);
@@ -1514,7 +1519,7 @@ void Player::SendQuestUpdate(uint32 questId)
 
     saBounds = sSpellMgr->GetSpellAreaForQuestEndMapBounds(questId);
 
-    // xinef: shittness fixup
+    // xinef: fixup
     uint32 skipSpellId = 0;
     oldSpellId = 0;
     if (saBounds.first != saBounds.second)
@@ -1561,13 +1566,12 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
     QuestRelationBounds qr;
     QuestRelationBounds qir;
 
+    sScriptMgr->GetDialogStatus(this, questgiver);
+
     switch (questgiver->GetTypeId())
     {
         case TYPEID_GAMEOBJECT:
         {
-#ifdef ELUNA
-            sEluna->GetDialogStatus(this, questgiver->ToGameObject());
-#endif
             QuestGiverStatus questStatus = QuestGiverStatus(sScriptMgr->GetDialogStatus(this, questgiver->ToGameObject()));
             if (questStatus != DIALOG_STATUS_SCRIPTED_NO_STATUS)
                 return questStatus;
@@ -1577,9 +1581,6 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         }
         case TYPEID_UNIT:
         {
-#ifdef ELUNA
-            sEluna->GetDialogStatus(this, questgiver->ToCreature());
-#endif
             QuestGiverStatus questStatus = QuestGiverStatus(sScriptMgr->GetDialogStatus(this, questgiver->ToCreature()));
             if (questStatus != DIALOG_STATUS_SCRIPTED_NO_STATUS)
                 return questStatus;
@@ -1614,7 +1615,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         {
             if (quest->GetQuestLevel() == -1)
             {
-                result2 = DIALOG_STATUS_AVAILABLE;
+                 result2 = DIALOG_STATUS_REWARD_REP;
             }
             else
             {
@@ -1655,7 +1656,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             {
                 if (SatisfyQuestLevel(quest, false))
                 {
-                    bool isLowLevel = (getLevel() > (GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)));
+                    bool isNotLowLevelQuest = getLevel() <= (GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF));
 
                     // If quest is auto complete by method type
                     if (!quest->GetQuestMethod())
@@ -1681,7 +1682,9 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
                     }
                 }
                 else
+                {
                     result2 = DIALOG_STATUS_UNAVAILABLE;
+                }
             }
         }
 
@@ -2286,12 +2289,12 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         data << uint32(XP);
-        data << uint32(quest->GetRewOrReqMoney(this));
+        data << uint32(quest->GetRewOrReqMoney(getLevel()));
     }
     else
     {
         data << uint32(0);
-        data << uint32(quest->GetRewOrReqMoney(this) + quest->GetRewMoneyMaxLevel());
+        data << uint32(quest->GetRewOrReqMoney(getLevel()) + quest->GetRewMoneyMaxLevel());
     }
 
     data << uint32(10 * quest->CalculateHonorGain(GetQuestLevel(quest)));

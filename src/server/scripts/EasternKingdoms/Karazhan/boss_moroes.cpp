@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "karazhan.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "karazhan.h"
 
 enum Yells
 {
@@ -272,8 +272,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             if (Unit* target = GetHitUnit())
             {
-                Position pos;
-                target->GetFirstCollisionPosition(pos, 5.0f, M_PI);
+                Position pos = target->GetFirstCollisionPosition(5.0f, M_PI);
                 GetCaster()->CastSpell(target, SPELL_GARROTE_DUMMY, true);
                 GetCaster()->RemoveAurasDueToSpell(SPELL_VANISH);
                 GetCaster()->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), target->GetOrientation());

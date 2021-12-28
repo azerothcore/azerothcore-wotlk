@@ -45,9 +45,9 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "Spell.h"
 #include "WorldSession.h"
 
@@ -431,6 +431,66 @@ public:
     }
 };
 
+enum eBearTrap
+{
+    EVENT_CHECK                     = 1,
+    NPC_RABID_THISTLE_BEAR          = 2164,
+    SPELL_BEAR_CAPTURED_IN_TRAP     = 9439
+};
+
+class go_bear_trap : public GameObjectScript
+{
+public:
+    go_bear_trap() : GameObjectScript("go_bear_trap") {}
+
+    struct go_bear_trapAI : public GameObjectAI
+    {
+        go_bear_trapAI(GameObject* gameObject) : GameObjectAI(gameObject)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _events.ScheduleEvent(EVENT_CHECK, 1000);
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK:
+                    {
+                        if (Creature* bear = me->FindNearestCreature(NPC_RABID_THISTLE_BEAR, 1.0f))
+                        {
+                            bear->CastSpell(bear, SPELL_BEAR_CAPTURED_IN_TRAP);
+                            me->RemoveFromWorld();
+                        }
+                        else
+                        {
+                            _events.ScheduleEvent(EVENT_CHECK, 1000);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_bear_trapAI(go);
+    }
+};
+
 // Theirs
 /*####
 ## go_brewfest_music
@@ -796,12 +856,15 @@ public:
 };
 
 /*######
-## go_gilded_brazier (Paladin First Trail quest (9678))
+## go_gilded_brazier (Paladin quest 9678 "The First Trial")
 ######*/
 
 enum GildedBrazier
 {
-    NPC_STILLBLADE  = 17716,
+    EVENT_STILLBLADE_SPAWN = 1,
+    EVENT_RESET_BRAZIER    = 2,
+    NPC_STILLBLADE         = 17716,
+    QUEST_THE_FIRST_TRIAL  = 9678
 };
 
 class go_gilded_brazier : public GameObjectScript
@@ -809,17 +872,73 @@ class go_gilded_brazier : public GameObjectScript
 public:
     go_gilded_brazier() : GameObjectScript("go_gilded_brazier") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_gilded_brazierAI : public GameObjectAI
     {
-        if (go->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
+        go_gilded_brazierAI(GameObject* go) : GameObjectAI(go)
         {
-            if (player->GetQuestStatus(9678) == QUEST_STATUS_INCOMPLETE)
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _playerGUID.Clear();
+        }
+
+        bool GossipHello(Player* player, bool reportUse) override
+        {
+            if (reportUse)
+                return false;
+
+            if (me->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
             {
-                if (Creature* Stillblade = player->SummonCreature(NPC_STILLBLADE, 8106.11f, -7542.06f, 151.775f, 3.02598f, TEMPSUMMON_DEAD_DESPAWN, 60000))
-                    Stillblade->AI()->AttackStart(player);
+                if (player->GetQuestStatus(QUEST_THE_FIRST_TRIAL) == QUEST_STATUS_INCOMPLETE)
+                {
+                    _playerGUID = player->GetGUID();
+                    me->SetFlag(GAMEOBJECT_FLAGS, 1);
+                    me->RemoveByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
+                    _events.ScheduleEvent(EVENT_STILLBLADE_SPAWN, 1000);
+                }
+            }
+            return true;
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_STILLBLADE_SPAWN:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                    {
+                        player->SummonCreature(NPC_STILLBLADE, 8032.587f, -7524.518f, 149.68073f, 6.161012172698974609f, TEMPSUMMON_DEAD_DESPAWN, 60000);
+                        _events.ScheduleEvent(EVENT_RESET_BRAZIER, 4000);
+                    }
+                    break;
+                }
+                case EVENT_RESET_BRAZIER:
+                {
+                    me->RemoveFlag(GAMEOBJECT_FLAGS, 1);
+                    me->SetByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
+                    break;
+                }
+                default:
+                    break;
+                }
             }
         }
-        return true;
+
+    private:
+        EventMap _events;
+        ObjectGuid _playerGUID;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_gilded_brazierAI(go);
     }
 };
 
@@ -1625,6 +1744,214 @@ public:
     }
 };
 
+/*####
+## go_bells
+####*/
+
+enum BellHourlySoundFX
+{
+    BELLTOLLHORDE      = 6595,
+    BELLTOLLTRIBAL     = 6675,
+    BELLTOLLALLIANCE   = 6594,
+    BELLTOLLNIGHTELF   = 6674,
+    BELLTOLLDWARFGNOME = 7234,
+    BELLTOLLKHARAZHAN  = 9154,
+    LIGHTHOUSEFOGHORN  = 7197
+};
+
+enum BellHourlySoundZones
+{
+    TIRISFAL_ZONE            = 85,
+    UNDERCITY_ZONE           = 1497,
+    DUN_MOROGH_ZONE          = 1,
+    IRONFORGE_ZONE           = 1537,
+    TELDRASSIL_ZONE          = 141,
+    DARNASSUS_ZONE           = 1657,
+    ASHENVALE_ZONE           = 331,
+    HILLSBRAD_FOOTHILLS_ZONE = 267,
+    DUSKWOOD_ZONE            = 10,
+    WESTFALL_ZONE            = 40,
+    DUSTWALLOW_MARSH_ZONE    = 15,
+    SHATTRATH_ZONE           = 3703
+};
+
+enum LightHouseAreas
+{
+    AREA_ALCAZ_ISLAND        = 2079,
+    AREA_WESTFALL_LIGHTHOUSE = 115
+};
+
+enum BellHourlyObjects
+{
+    GO_HORDE_BELL     = 175885,
+    GO_ALLIANCE_BELL  = 176573,
+    GO_KHARAZHAN_BELL = 182064
+};
+
+enum BellHourlyMisc
+{
+    GAME_EVENT_HOURLY_BELLS = 73,
+    EVENT_RING_BELL         = 1,
+    EVENT_TIME              = 2
+};
+
+class go_bells : public GameObjectScript
+{
+public:
+    go_bells() : GameObjectScript("go_bells") {}
+
+    struct go_bellsAI : public GameObjectAI
+    {
+        go_bellsAI(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+        {
+            uint32 zoneId = go->GetZoneId();
+
+            switch (go->GetEntry())
+            {
+            case GO_HORDE_BELL:
+            {
+                switch (zoneId)
+                {
+                case TIRISFAL_ZONE:
+                case UNDERCITY_ZONE:
+                case HILLSBRAD_FOOTHILLS_ZONE:
+                case DUSKWOOD_ZONE:
+                    _soundId = BELLTOLLHORDE;
+                    break;
+                default:
+                    _soundId = BELLTOLLTRIBAL;
+                    break;
+                }
+                break;
+            }
+            case GO_ALLIANCE_BELL:
+            {
+                switch (zoneId)
+                {
+                case IRONFORGE_ZONE:
+                case DUN_MOROGH_ZONE:
+                    _soundId = BELLTOLLDWARFGNOME;
+                    break;
+                case DARNASSUS_ZONE:
+                case TELDRASSIL_ZONE:
+                case ASHENVALE_ZONE:
+                case SHATTRATH_ZONE:
+                    _soundId = BELLTOLLNIGHTELF;
+                    break;
+                case WESTFALL_ZONE:
+                    if (go->GetAreaId() == AREA_WESTFALL_LIGHTHOUSE)
+                    {
+                        _soundId = LIGHTHOUSEFOGHORN;
+                    }
+                    else
+                    {
+                        _soundId = BELLTOLLALLIANCE;
+                    }
+                    break;
+                case DUSTWALLOW_MARSH_ZONE:
+                    if (go->GetAreaId() == AREA_ALCAZ_ISLAND)
+                    {
+                        _soundId = LIGHTHOUSEFOGHORN;
+                    }
+                    else
+                    {
+                        _soundId = BELLTOLLALLIANCE;
+                    }
+                    break;
+                default:
+                    _soundId = BELLTOLLALLIANCE;
+                    break;
+                }
+                break;
+            }
+            case GO_KHARAZHAN_BELL:
+            {
+                _soundId = BELLTOLLKHARAZHAN;
+                break;
+            }
+            break;
+            }
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            if (sGameEventMgr->IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once)
+            {
+                // Reset
+                once = false;
+                _events.ScheduleEvent(EVENT_TIME, 1000);
+            }
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TIME:
+                {
+                    // Get how many times it should ring
+                    time_t t = time(nullptr);
+                    tm local_tm;
+                    tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
+                    localtime_r(&t, &local_tm);
+                    uint8 _rings = (local_tm.tm_hour) % 12;
+                    _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
+
+                    // Schedule ring event
+                    for (auto i = 0; i < _rings; ++i)
+                    {
+                        _events.ScheduleEvent(EVENT_RING_BELL, (i * 4 + 1) * 1000);
+                    }
+                    break;
+                }
+                case EVENT_RING_BELL:
+                {
+                    me->PlayDirectSound(_soundId);
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+
+    private:
+        EventMap _events;
+        uint32   _soundId;
+        bool     once;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_bellsAI(go);
+    }
+};
+
+/*########
+#### go_duskwither_spire_power_source
+#####*/
+
+enum DuskwitherSpirePowersource
+{
+    NPC_POWER_SOURCE_INVISIBLE_BUNNY = 17984
+};
+
+class go_duskwither_spire_power_source : public GameObjectScript
+{
+public:
+    go_duskwither_spire_power_source() : GameObjectScript("go_duskwither_spire_power_source") {}
+
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    {
+        if (Creature* bunny = go->FindNearestCreature(NPC_POWER_SOURCE_INVISIBLE_BUNNY, 1.0f))
+        {
+            bunny->DespawnOrUnsummon(0ms, 10s);
+        }
+        return false;
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1639,6 +1966,8 @@ void AddSC_go_scripts()
     new go_tadpole_cage();
     new go_flames();
     new go_heat();
+    new go_bear_trap();
+    new go_duskwither_spire_power_source();
 
     // Theirs
     new go_brewfest_music();
@@ -1667,4 +1996,6 @@ void AddSC_go_scripts()
     new go_hive_pod();
     new go_massive_seaforium_charge();
     new go_veil_skith_cage();
+    new go_bells();
 }
+

@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 enum PriestSpells
@@ -241,7 +242,7 @@ class spell_pri_glyph_of_prayer_of_healing : public AuraScript
         PreventDefaultAction();
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
-        if (!healInfo || healInfo->GetHeal())
+        if (!healInfo || !healInfo->GetHeal())
         {
             return;
         }
@@ -792,7 +793,10 @@ class spell_pri_vampiric_touch : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), 57669, true, nullptr, aurEff);
+        if (Unit* actor = eventInfo.GetActor())
+        {
+            actor->CastSpell(actor, 57669, true, nullptr, aurEff);
+        }
     }
 
     void Register() override
@@ -800,6 +804,33 @@ class spell_pri_vampiric_touch : public AuraScript
         AfterDispel += AuraDispelFn(spell_pri_vampiric_touch::HandleDispel);
         DoCheckProc += AuraCheckProcFn(spell_pri_vampiric_touch::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_pri_vampiric_touch::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 605 - Mind Control
+class spell_pri_mind_control : public SpellScript
+{
+    PrepareSpellScript(spell_pri_mind_control);
+
+    void OnHit()
+    {
+        if (Aura const* aura = GetHitAura())
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    uint32 duration = static_cast<uint32>(aura->GetMaxDuration());
+                    caster->SetInCombatWith(target, duration);
+                    target->SetInCombatWith(caster, duration);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_pri_mind_control::OnHit);
     }
 };
 
@@ -824,4 +855,5 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_renew);
     RegisterSpellScript(spell_pri_shadow_word_death);
     RegisterSpellScript(spell_pri_vampiric_touch);
+    RegisterSpellScript(spell_pri_mind_control);
 }

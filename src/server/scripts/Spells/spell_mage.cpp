@@ -85,25 +85,6 @@ private:
     uint32 _triggerSpellId;
 };
 
-class spell_mage_deep_freeze : public SpellScript
-{
-    PrepareSpellScript(spell_mage_deep_freeze)
-
-    void HandleOnHit()
-    {
-        if (Unit* caster = GetCaster())
-            if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : nullptr))
-                if (Creature* cTarget = target->ToCreature())
-                    if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
-                        caster->CastSpell(cTarget, 71757, true);
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_mage_deep_freeze::HandleOnHit);
-    }
-};
-
 class spell_mage_burning_determination : public AuraScript
 {
     PrepareAuraScript(spell_mage_burning_determination);
@@ -155,6 +136,11 @@ class spell_mage_molten_armor : public AuraScript
         const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
             return true;
+
+        if (!eventInfo.GetActionTarget())
+        {
+            return false;
+        }
 
         // Xinef: Molten Shields talent
         if (AuraEffect* aurEff = eventInfo.GetActionTarget()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_MAGE, 16, EFFECT_0))
@@ -803,7 +789,7 @@ class spell_mage_master_of_elements : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         _spellInfo = eventInfo.GetSpellInfo();
-        if (!_spellInfo)
+        if (!_spellInfo || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
         {
             return false;
         }
@@ -949,7 +935,6 @@ class spell_mage_summon_water_elemental : public SpellScript
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_arcane_blast);
-    RegisterSpellScript(spell_mage_deep_freeze);
     RegisterSpellScript(spell_mage_burning_determination);
     RegisterSpellScript(spell_mage_molten_armor);
     RegisterSpellScript(spell_mage_mirror_image);

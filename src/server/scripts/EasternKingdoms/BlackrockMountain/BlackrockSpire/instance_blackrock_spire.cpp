@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_spire.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
@@ -23,8 +22,9 @@
 #include "InstanceScript.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_spire.h"
 
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
 
@@ -376,7 +376,7 @@ public:
                 case DATA_UROK_DOOMHOWL:
                     if (data == FAIL)
                     {
-                        if (!(GetBossState(DATA_UROK_DOOMHOWL) == NOT_STARTED))
+                        if (GetBossState(DATA_UROK_DOOMHOWL) != NOT_STARTED)
                         {
                             SetBossState(DATA_UROK_DOOMHOWL, NOT_STARTED);
                             if (GameObject* challenge = instance->GetGameObject(go_urokChallenge))
@@ -395,7 +395,7 @@ public:
                                     circle->Delete();
                                 }
                             }
-                            for (const auto& mobGUID: UrokMobs)
+                            for (const auto& mobGUID : UrokMobs)
                             {
                                 if (Creature* mob = instance->GetCreature(mobGUID))
                                 {
@@ -510,6 +510,10 @@ public:
                     return go_emberseerrunes[6];
                 case GO_PORTCULLIS_ACTIVE:
                     return go_portcullis_active;
+                case GO_UROK_PILE:
+                    return go_urokPile;
+                case GO_UROK_CHALLENGE:
+                    return go_urokChallenge;
                 default:
                     break;
             }

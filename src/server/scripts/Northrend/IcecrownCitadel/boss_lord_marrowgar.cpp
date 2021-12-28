@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "icecrown_citadel.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 #include <random>
 
 enum ScriptTexts
@@ -71,7 +71,7 @@ enum Events
 
 uint32 const boneSpikeSummonId[3] = {69062, 72669, 72670};
 
-struct BoneStormMoveTargetSelector : public Acore::unary_function<Unit*, bool>
+struct BoneStormMoveTargetSelector
 {
 public:
     BoneStormMoveTargetSelector(Creature* source) : _source(source) { }

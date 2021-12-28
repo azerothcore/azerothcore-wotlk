@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "icecrown_citadel.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedGossip.h"
 #include "Spell.h"
+#include "icecrown_citadel.h"
 
 #define GOSSIP_SENDER_ICC_PORT 631
 

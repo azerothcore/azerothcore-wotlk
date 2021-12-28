@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mechanar.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "mechanar.h"
 
 enum Spells
 {
@@ -79,7 +79,7 @@ public:
                 Talk(YELL_KILL);
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(YELL_DEATH);
@@ -118,8 +118,7 @@ public:
                     break;
                 case EVENT_SUMMON_NETHER_CHARGE:
                     {
-                        Position pos;
-                        me->GetRandomNearPosition(pos, 8.0f);
+                        Position pos = me->GetRandomNearPosition(8.0f);
                         me->SummonCreature(NPC_NETHER_CHARGE, pos, TEMPSUMMON_TIMED_DESPAWN, 18000);
                         events.ScheduleEvent(EVENT_SUMMON_NETHER_CHARGE, 5000);
                         break;

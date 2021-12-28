@@ -16,8 +16,9 @@
  */
 
 #include "AccountMgr.h"
-#include "DatabaseEnv.h"
+#include "CharacterCache.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Item.h"
 #include "Language.h"
 #include "Log.h"
@@ -26,7 +27,6 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -122,7 +122,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     ObjectGuid receiverGuid;
     if (normalizePlayerName(receiver))
-        receiverGuid = sObjectMgr->GetPlayerGUIDByName(receiver);
+    {
+        receiverGuid = sCharacterCache->GetCharacterGuidByName(receiver);
+    }
 
     if (!receiverGuid)
     {
@@ -178,10 +180,10 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     else
     {
         // xinef: get data from global storage
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(receiverGuid.GetCounter()))
+        if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(receiverGuid))
         {
-            rc_teamId = Player::TeamIdForRace(playerData->race);
-            mails_count = playerData->mailCount;
+            rc_teamId = Player::TeamIdForRace(playerData->Race);
+            mails_count = playerData->MailCount;
         }
     }
     //do not allow to have more than 100 mails in mailbox.. mails count is in opcode uint8!!! - so max can be 255..
@@ -207,7 +209,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         }
     }*/
 
-    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(receiverGuid.GetCounter());
+    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(receiverGuid);
 
     if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
@@ -380,8 +382,8 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
         }
 
         m->state = MAIL_STATE_DELETED;
-        // xinef: update global data
-        sWorld->UpdateGlobalPlayerMails(player->GetGUID().GetCounter(), -1);
+
+        sCharacterCache->DecreaseCharacterMailCount(player->GetGUID());
     }
     player->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
@@ -444,8 +446,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     delete m;                                               //we can deallocate old mail
     player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_OK);
 
-    // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(player->GetGUID().GetCounter(), -1);
+    sCharacterCache->DecreaseCharacterMailCount(player->GetGUID());
 }
 
 //called when player takes item attached in mail
@@ -506,9 +507,13 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
             uint32 sender_accId = 0;
             Player* sender = ObjectAccessor::FindPlayerByLowGUID(m->sender);
             if (sender)
+            {
                 sender_accId = sender->GetSession()->GetAccountId();
+            }
             else
-                sender_accId = sObjectMgr->GetPlayerAccountIdByGUID(m->sender);
+            {
+                sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, m->sender));
+            }
 
             // check player existence
             if (sender || sender_accId)
@@ -520,8 +525,10 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                 if( m->COD >= 10 * GOLD )
                 {
                     std::string senderName;
-                    if (!sObjectMgr->GetPlayerNameByGUID(m->sender, senderName))
+                    if (!sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, m->sender), senderName))
+                    {
                         senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
+                    }
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
                     CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())",

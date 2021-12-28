@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "halls_of_stone.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "halls_of_stone.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"

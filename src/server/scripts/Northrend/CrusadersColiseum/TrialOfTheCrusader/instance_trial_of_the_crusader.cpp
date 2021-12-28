@@ -17,8 +17,8 @@
 
 #include "Group.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000
