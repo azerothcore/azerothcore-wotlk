@@ -3058,7 +3058,14 @@ void SpellMgr::LoadSpellCustomAttr()
             case SPELLFAMILY_HUNTER:
                 // Aspects
                 if (spellInfo->GetCategory() == 47)
+                {
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                }
+                // Aimed Shot
+                if (spellInfo->SpellFamilyFlags[0] & 0x00020000)
+                {
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_FORCE_SEND_CATEGORY_COOLDOWNS;
+                }
                 break;
             default:
                 break;
@@ -7582,10 +7589,11 @@ void SpellMgr::LoadDbcDataCorrections()
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
                 break;
             case SPELLFAMILY_HUNTER:
-                // Multi-Shot not affected by category cooldown modifiers
-                if (spellInfo->SpellFamilyFlags[0] & 0x00001000)
+                // Aimed Shot not affected by category cooldown modifiers
+                if (spellInfo->SpellFamilyFlags[0] & 0x00020000)
                 {
                     spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
+                    spellInfo->RecoveryTime = 10 * IN_MILLISECONDS;
                 }
                 break;
         }
