@@ -1004,6 +1004,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     // Stop the npc if moving
     if (uint32 pause = vendor->GetMovementTemplate().GetInteractionPauseTimer())
         vendor->PauseMovement(pause);
+    vendor->SetHomePosition(vendor->GetPosition());
 
     SetCurrentVendor(vendorEntry);
 
