@@ -180,7 +180,6 @@ struct SpellModifier
     SpellModOp   op   : 8;
     SpellModType type : 8;
     int16 charges     : 16;
-    uint32 index;
     int32 value{0};
     flag96 mask;
     uint32 spellId{0};
