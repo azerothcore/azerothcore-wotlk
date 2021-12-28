@@ -971,7 +971,27 @@ public:
         void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
         {
             if (apply)
+            {
+                class DelayedTransportPositionOffsets : public BasicEvent
+                {
+                    public:
+                        DelayedTransportPositionOffsets(Unit* owner) : _owner(owner) { }
+
+                        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+                        {
+                            _owner->m_movementInfo.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
+                            return true;
+                        }
+
+                    private:
+                        Unit* _owner;
+                };
+
+                if (who->IsPlayer())
+                    who->m_Events.AddEvent(new DelayedTransportPositionOffsets(who), who->m_Events.CalculateTime(500));
+
                 return;
+            }
 
             if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
                 _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
