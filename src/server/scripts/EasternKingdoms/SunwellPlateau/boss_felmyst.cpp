@@ -307,7 +307,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_GAS_NOVA, 20000, 1);
                     break;
                 case EVENT_SPELL_ENCAPSULATE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_ENCAPSULATE_CHANNEL, false);
                     events.ScheduleEvent(EVENT_SPELL_ENCAPSULATE, 25000, 1);
                     break;
@@ -470,7 +470,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summon->SetInCombatWithZone();
-            summon->AI()->AttackStart(summon->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f));
+            summon->AI()->AttackStart(summon->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f));
         }
     };
 };

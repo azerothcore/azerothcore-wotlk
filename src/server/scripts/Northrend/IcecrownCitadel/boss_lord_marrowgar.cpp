@@ -216,10 +216,10 @@ public:
                         break;
                     }
                     events.RepeatEvent(5000);
-                    Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, BoneStormMoveTargetSelector(me));
+                    Unit* unit = SelectTarget(SelectTargetMethod::Random, 0, BoneStormMoveTargetSelector(me));
                     if (!unit)
                     {
-                        if ((unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true)))
+                        if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
                             if (unit->GetPositionX() > -337.0f)
                             {
                                 EnterEvadeMode();
@@ -479,9 +479,9 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.clear();
-            Unit* target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 1, -1.0f, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
+            Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true, -SPELL_IMPALED); // -1.0f as it takes into account object size
             if (!target)
-                target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true); // if only tank or noone outside of boss' model
+                target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true); // if only tank or noone outside of boss' model
             if (!target)
                 return;
 

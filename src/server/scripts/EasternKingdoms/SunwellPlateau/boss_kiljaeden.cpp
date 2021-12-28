@@ -570,7 +570,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SOUL_FLAY, urand(4000, 5000));
                     break;
                 case EVENT_SPELL_LEGION_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_LEGION_LIGHTNING, false);
                     events.ScheduleEvent(EVENT_SPELL_LEGION_LIGHTNING, phase == PHASE_SACRIFICE ? 15000 : 30000);
                     events.RescheduleEvent(EVENT_SPELL_SOUL_FLAY, 2000);
@@ -1038,7 +1038,7 @@ public:
         void HandlePeriodic(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
@@ -1258,7 +1258,7 @@ public:
         void HandlePeriodic(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
