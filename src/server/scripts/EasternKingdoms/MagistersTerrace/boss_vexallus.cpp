@@ -116,7 +116,7 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
             {
                 summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
                 summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
@@ -168,12 +168,12 @@ public:
                     events.ScheduleEvent(EVENT_HEALTH_CHECK, 0);
                     break;
                 case EVENT_SPELL_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_CHAIN_LIGHTNING_N, SPELL_CHAIN_LIGHTNING_H), false);
                     events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 8000);
                     break;
                 case EVENT_SPELL_ARCANE_SHOCK:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_ARCANE_SHOCK_N, SPELL_ARCANE_SHOCK_H), false);
                     events.ScheduleEvent(EVENT_SPELL_ARCANE_SHOCK, 8000);
                     break;
