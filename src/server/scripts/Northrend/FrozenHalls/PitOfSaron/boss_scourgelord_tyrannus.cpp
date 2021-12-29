@@ -173,18 +173,18 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, urand(40000, 48000));
                     break;
                 case EVENT_SPELL_OVERLORDS_BRAND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 95.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 95.0f, true))
                         me->CastSpell(target, SPELL_OVERLORDS_BRAND, false);
                     events.RepeatEvent(urand(11000, 12000));
                     break;
                 case EVENT_RIMEFANG_SPELL_ICY_BLAST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 190.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 190.0f, true))
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                             c->CastSpell(target, RIMEFANG_SPELL_ICY_BLAST, false);
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MARK_OF_RIMEFANG:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 190.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 190.0f, true))
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                         {
                             Talk(SAY_MARK);
