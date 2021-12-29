@@ -476,7 +476,7 @@ public:
                     events.RepeatEvent(4000);
                     break;
                 case 2: // Conversion Beam
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, 69578, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
