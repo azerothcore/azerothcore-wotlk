@@ -734,7 +734,7 @@ public:
             {
                 case EVENT_DRP_CHARGE:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
 
                         events.RepeatEvent(10000);

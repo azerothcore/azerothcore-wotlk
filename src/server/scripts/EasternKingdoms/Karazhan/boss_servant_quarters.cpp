@@ -133,7 +133,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_ACIDIC_FANG, urand(12000, 18000));
                     break;
                 case EVENT_SPELL_HYAKISS_WEB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                         me->CastSpell(target, SPELL_HYAKISS_WEB, false);
                     events.ScheduleEvent(EVENT_SPELL_HYAKISS_WEB, 15000);
                     break;
@@ -146,7 +146,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, urand(12000, 18000));
                     break;
                 case EVENT_SPELL_DIVE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, FarthestTargetSelector(me, 40.0f, false, true)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.0f, false, true)))
                         me->CastSpell(target, SPELL_DIVE, false);
                     events.ScheduleEvent(EVENT_SPELL_DIVE, 20000);
                     break;

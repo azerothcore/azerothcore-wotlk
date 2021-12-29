@@ -252,7 +252,7 @@ struct boss_volazj : public BossAI
                 }
                 case EVENT_HERALD_SHIVER:
                 {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         DoCast(pTarget, SPELL_SHIVER, false);
                     }
