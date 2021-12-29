@@ -358,7 +358,7 @@ public:
             GetCaster()->getThreatMgr().resetAllAggro();
 
             if (roll_chance_i(33))
-                if (Unit* target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                if (Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                     target->CastSpell(GetCaster(), SPELL_TAUNT, true);
         }
 

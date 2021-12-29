@@ -144,12 +144,12 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CURSE_OF_LIFE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_CURSE_OF_LIFE, false);
                     events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13000);
                     break;
                 case EVENT_SPELL_RAIN_OF_FIRE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_RAIN_OF_FIRE, false);
                     events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 16000);
                     break;
@@ -179,7 +179,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 6000);
                     break;
                 case EVENT_SPELL_EYE_BEAM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_EYE_BEAM, false);
                     break;
                 case EVENT_SPELL_LIGHTNING_BREATH:
@@ -187,7 +187,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 8000);
                     break;
                 case EVENT_SPELL_POISON_CLOUD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_POISON_CLOUD, false);
                     events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 10000);
                     break;
