@@ -17,7 +17,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164069415537041440
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640694155370414400');
 
 -- High Marshal Whirlaxis unit flags: UNK_6 & IMMUNE_TO_PC
-UPDATE `acore_world`.`creature_template` SET `unit_flags`='320' WHERE  `entry` = 15204;
+UPDATE `creature_template` SET `unit_flags`=320 WHERE  `entry` = 15204;
 
 --
 -- END UPDATING QUERIES

@@ -671,7 +671,7 @@ public:
                         events.ScheduleEvent(EVENT_THIRD_PHASE_CHECK, 5000);
                     break;
                 case EVENT_ICE_TOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, LastPhaseIceTombTargetSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, LastPhaseIceTombTargetSelector(me)))
                     {
                         Talk(EMOTE_WARN_FROZEN_ORB, target);
                         me->CastSpell(target, SPELL_ICE_TOMB_DUMMY, true);
@@ -1643,7 +1643,7 @@ public:
                 case EVENT_ICY_BLAST_CAST:
                     if (--_icyBlastCounter)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         {
                             me->SetFacingToObject(target);
                             me->CastSpell(target, SPELL_ICY_BLAST, false);
