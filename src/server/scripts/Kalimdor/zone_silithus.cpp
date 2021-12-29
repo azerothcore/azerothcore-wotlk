@@ -1185,7 +1185,8 @@ public:
                 return;
             }
             player->CastSpell(player, spellInfoTrigger->Id, false);
-            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 6000))
+            // @todo: this is not correct! should despawn 5-6 seconds when out of combat, but can't be handled by tempsummon timer alone apparently
+            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5 * 60 * 1000))
             {
                 summons->SetTarget(player->GetGUID());
                 summons->SetLootRecipient(player);
