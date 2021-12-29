@@ -175,7 +175,7 @@ public:
                     events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SPELL_BANISH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, false))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, false))
                         me->CastSpell(target, SPELL_BANISH, false);
                     events.RepeatEvent(16000);
                     break;
