@@ -106,7 +106,6 @@ void TempSummon::Update(uint32 diff)
             }
         case TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE:
             {
-                // if m_deathState is DEAD, CORPSE was skipped
                 if (!IsInCombat() && m_deathState != CORPSE)
                 {
                     if (m_timer <= diff)
