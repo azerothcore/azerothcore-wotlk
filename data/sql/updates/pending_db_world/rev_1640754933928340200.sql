@@ -229,6 +229,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (47328, 1989, 1, 0, 0, 1, 1, 0, 0, 10485.975, 1018.1689, 1325.7792, 1.832595705986022949, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0); -- .go xyz 10485.975 1018.1689 1325.7792
 
 -- Pathing for 47326 Grellkin in the northmost Grellkin camp in Shadowglen that has 2 point pathing for whatever reason Entry: 1989
+-- 0x2044A0002001F140000047000041F061 .go xyz 10507.13 1048.6158 1324.6445
 SET @NPC := 47326;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=10507.13,`position_y`=1048.6158,`position_z`=1324.6445 WHERE `guid`=@NPC;
@@ -238,8 +239,8 @@ DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
 (@PATH,1,10507.13,1048.6158,1324.6445,0,11000,0,0,100,0),
 (@PATH,2,10500.348,1053.144,1325.5411,0,31000,0,0,100,0);
--- 0x2044A0002001F140000047000041F061 .go xyz 10507.13 1048.6158 1324.6445
--- Pathing for 47339 Grellkin in the southmost Grellkin camp in Shadowglen that has 2 point pathing for whatever reason Entry: 1989 
+-- Pathing for 47339 Grellkin in the southmost Grellkin camp in Shadowglen that has 2 point pathing for whatever reason Entry: 1989
+-- 0x2056B4002001F1400000150000BD2881 .go xyz 10336.16 1032.9716 1339.371
 SET @NPC := 47339;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=10336.16,`position_y`=1032.9716,`position_z`=1339.371 WHERE `guid`=@NPC;
@@ -249,8 +250,8 @@ DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
 (@PATH,1,10336.16,1032.9716,1339.371,0,25000,0,0,100,0),
 (@PATH,2,10337.761,1025.8269,1338.2256,0,26000,0,0,100,0);
--- 0x2056B4002001F1400000150000BD2881 .go xyz 10336.16 1032.9716 1339.371
 -- Pathing for Grell in the only Grell camp in Shadowglen that has 2 point pathing for whatever reason  Entry: 1988
+-- 0x2056B4002001F10000001500003D394B .go xyz 10273.941 963.12164 1340.2665
 SET @NPC := 47289;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=10273.941,`position_y`=963.12164,`position_z`=1340.2665 WHERE `guid`=@NPC;
@@ -260,4 +261,3 @@ DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
 (@PATH,1,10273.941,963.12164,1340.2665,0,13000,0,0,100,0),
 (@PATH,2,10271.291,964.8906,1340.8572,0,25000,0,0,100,0);
--- 0x2056B4002001F10000001500003D394B .go xyz 10273.941 963.12164 1340.2665
