@@ -133,8 +133,8 @@ bool ScriptMgr::OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellI
 
     if (ret && *ret)
     {
-        return false;
+        return true;
     }
 
-    return true;
+    return false;
 }
