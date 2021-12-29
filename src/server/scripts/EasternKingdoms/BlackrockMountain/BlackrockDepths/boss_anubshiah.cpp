@@ -83,14 +83,14 @@ public:
                     events.ScheduleEvent(SPELL_SHADOWBOLT, urand(TIMER_SHADOWBOLT - 2000, TIMER_SHADOWBOLT + 2000));
                     break;
                 case SPELL_CURSE_TONGUES:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(target, SPELL_CURSE_TONGUES);
                     }
                     events.ScheduleEvent(SPELL_CURSE_TONGUES, urand(TIMER_CURSE_TONGUES - 2000, TIMER_CURSE_TONGUES + 2000));
                     break;
                 case SPELL_CURSE_WEAKNESS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(target, SPELL_CURSE_WEAKNESS);
                     }
@@ -101,7 +101,7 @@ public:
                     events.ScheduleEvent(SPELL_DEMON_ARMOR, TIMER_DEMON_ARMOR);
                     break;
                 case SPELL_ENVELOPING_WEB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         DoCast(target, SPELL_ENVELOPING_WEB);
                     events.ScheduleEvent(SPELL_ENVELOPING_WEB, urand(TIMER_ENVELOPING_WEB - 2000, TIMER_ENVELOPING_WEB + 2000));
                     break;
