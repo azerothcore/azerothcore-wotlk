@@ -582,12 +582,12 @@ void Creature::Update(uint32 diff)
 
                     if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
                     {
-                        // Creature should not respawn, reset respawn timer. Conditions will be checked again the new time it tries to respawn.
+                        // Creature should not respawn, reset respawn timer. Conditions will be checked again the next time it tries to respawn.
                         m_respawnTime = time(nullptr) + m_respawnDelay;
                         break;
                     }
 
-                    bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that object to us respawning
+                    bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that prevent us respawning
                     if (!allowed)                                               // Will be rechecked on next Update call
                         break;
 
