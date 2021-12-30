@@ -9,7 +9,7 @@ SET @DEATHSPELL := 18969;
 
 -- Questender
 DELETE FROM `creature_questender` WHERE `id`=@TIRION;
-INSERT INTO `creature_questender` VALUES
+INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (@TIRION, 5944);
 
 -- Creature Text
@@ -48,138 +48,138 @@ UPDATE `creature_template` SET `faction`=16, `AIName`='SmartAI', `ScriptName`=''
 
 DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @ISILLIEN AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(@ISILLIEN, 0, 0, 0, 37, 0, 100, 0, 0, 0, 0, 0, 80, 184000, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien  - On AI initialize - Self: Start timed action list id #184000 (update always (2))"),
-(@ISILLIEN, 0, 1, 0, 0, 0, 100, 0, 1000, 1000, 30000, 30000, 11, 11647, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien  - Every 30 seconds (1s initially)  - Self: Cast spell Power Word: Shield (11647) on Self"),
-(@ISILLIEN, 0, 2, 0, 0, 0, 100, 0, 3000, 3000, 8000, 9000, 11, 17287, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - Every 8 - 9 seconds (3 - 3s initially)  - Self: Cast spell Mind Blast (17287) on Victim"),
-(@ISILLIEN, 0, 3, 0, 0, 0, 100, 0, 20000, 20000, 20000, 20000, 11, 13639, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien  - Every 20 seconds  - Self: Cast spell Greater Health (13639) on Self"),
-(@ISILLIEN, 0, 4, 0, 0, 0, 100, 0, 7000, 8000, 15000, 15000, 11, 17314, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien  - Every 15 - 15 seconds (7 - 8s initially)  - Self: Cast spell Mind Flay (17314) on Victim");
+(@ISILLIEN, 0, 0, 0, 37, 0, 100, 0, 0, 0, 0, 0, 80, 184000, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien  - On AI initialize - Self: Start timed action list id #184000 (update always (2))'),
+(@ISILLIEN, 0, 1, 0, 0, 0, 100, 0, 1000, 1000, 30000, 30000, 11, 11647, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien  - Every 30 seconds (1s initially)  - Self: Cast spell Power Word: Shield (11647) on Self'),
+(@ISILLIEN, 0, 2, 0, 0, 0, 100, 0, 3000, 3000, 8000, 9000, 11, 17287, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - Every 8 - 9 seconds (3 - 3s initially)  - Self: Cast spell Mind Blast (17287) on Victim'),
+(@ISILLIEN, 0, 3, 0, 0, 0, 100, 0, 20000, 20000, 20000, 20000, 11, 13639, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien  - Every 20 seconds  - Self: Cast spell Greater Health (13639) on Self'),
+(@ISILLIEN, 0, 4, 0, 0, 0, 100, 0, 7000, 8000, 15000, 15000, 11, 17314, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien  - Every 15 - 15 seconds (7 - 8s initially)  - Self: Cast spell Mind Flay (17314) on Victim');
 
 -- Grand Inquisitor Isillien Actionlist 1
-DELETE FROM smart_scripts WHERE entryOrGuid = @ISILLIEN*100 AND source_type = 9;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
-(@ISILLIEN*100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Set UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC"),
-(@ISILLIEN*100, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 1 seconds - Self: Talk 0 to invoker"),
-(@ISILLIEN*100, 9, 2, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2677, -1917, 68, 2.1, "Grand Inquisitor Isillien - After 4 seconds - Self: Move to position (2677, -1917, 68, 2.1) (point id 0)"),
-(@ISILLIEN*100, 9, 3, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 8 seconds - Self: Talk 1 to invoker"),
-(@ISILLIEN*100, 9, 4, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 8 seconds - Self: Talk 2 to invoker"),
-(@ISILLIEN*100, 9, 5, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 8 seconds - Self: Talk 3 to invoker"),
-(@ISILLIEN*100, 9, 6, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 8 seconds - Self: Talk 4 to invoker"),
-(@ISILLIEN*100, 9, 7, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 5 seconds - Self: Talk 5 to invoker"),
-(@ISILLIEN*100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2674, -1920, 68.41, 1.8, "Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2674, -1920, 68.41, 1.8) as summon type timed despawn out of combat (4) with duration 40 seconds"),
-(@ISILLIEN*100, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2684, -1918, 69.52, 2.2, "Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2684, -1918, 69.52, 2.2) as summon type timed despawn out of combat (4) with duration 40 seconds"),
-(@ISILLIEN*100, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2694, -1875, 66.86, 3.8, "Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2694, -1875, 66.86, 3.8) as summon type timed despawn out of combat (4) with duration 40 seconds"),
-(@ISILLIEN*100, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2693, -1869, 66.87, 3.9, "Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2693, -1869, 66.87, 3.9) as summon type timed despawn out of combat (4) with duration 40 seconds"),
-(@ISILLIEN*100, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2697, -1879, 66.8, 3.8, "Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2697, -1879, 66.8, 3.8) as summon type timed despawn out of combat (4) with duration 40 seconds"),
-(@ISILLIEN*100, 9, 13, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 45, 1, 1, 0, 0, 0, 0, 11, 12128, 100, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 2 seconds - Creature Crimson Elite (12128) in 100 yd: Set creature data #1 to 1"),
-(@ISILLIEN*100, 9, 14, 0, 0, 0, 100, 0, 0, 0, 0, 0, 19, 776, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Remove UNIT_FLAGS to PVP_ATTACKABLE, IMMUNE_TO_PC, IMMUNE_TO_NPC"),
-(@ISILLIEN*100, 9, 15, 0, 0, 0, 100, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 1842, 30, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Attack Closest alive creature Highlord Taelan Fordring (1842) in 30 yards"),
-(@ISILLIEN*100, 9, 16, 0, 0, 0, 100, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Set invincibility to 1 HP"),
-(@ISILLIEN*100, 9, 17, 0, 0, 0, 100, 0, 45000, 45000, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 45 seconds - Self: Talk 6 to invoker"),
-(@ISILLIEN*100, 9, 18, 0, 0, 0, 100, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Set home position to current position"),
-(@ISILLIEN*100, 9, 19, 0, 0, 0, 100, 0, 0, 0, 0, 0, 11, 18969, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Cast spell Taelan Death (18969) on Self (flags: triggered)"),
-(@ISILLIEN*100, 9, 20, 0, 0, 0, 100, 0, 500, 500, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0.5 seconds - Self: Evade"),
-(@ISILLIEN*100, 9, 21, 0, 0, 0, 100, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Set UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC"),
-(@ISILLIEN*100, 9, 22, 0, 0, 0, 100, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Set invincibility to 0 HP"),
-(@ISILLIEN*100, 9, 23, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 6 seconds - Self: Talk 7 to invoker"),
-(@ISILLIEN*100, 9, 24, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 3 seconds - Self: Talk 8 to invoker"),
-(@ISILLIEN*100, 9, 25, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 5 seconds - Self: Remove UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC"),
-(@ISILLIEN*100, 9, 26, 0, 0, 0, 100, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 50, 0, 0, 0, 0, 0, 0, "Grand Inquisitor Isillien - After 0 seconds - Self: Attack Closest player in 50 yards"),
-(@ISILLIEN*100, 9, 27, 0, 0, 0, 100, 0, 25000, 25000, 0, 0, 12, 12126, 4, 180000, 0, 0, 0, 8, 0, 0, 0, 2642.8, -1913, 71.2, 0.4, "Grand Inquisitor Isillien - After 25 seconds - Self: Summon creature Lord Tirion Fordring (12126) at (2642.8, -1913, 71.2, 0.4) as summon type timed despawn out of combat (4) with duration 180 seconds");
+DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @ISILLIEN*100 AND `source_type` = 9;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(@ISILLIEN*100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Set UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC'),
+(@ISILLIEN*100, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 1 seconds - Self: Talk 0 to invoker'),
+(@ISILLIEN*100, 9, 2, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2677, -1917, 68, 2.1, 'Grand Inquisitor Isillien - After 4 seconds - Self: Move to position (2677, -1917, 68, 2.1) (point id 0)'),
+(@ISILLIEN*100, 9, 3, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 8 seconds - Self: Talk 1 to invoker'),
+(@ISILLIEN*100, 9, 4, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 8 seconds - Self: Talk 2 to invoker'),
+(@ISILLIEN*100, 9, 5, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 8 seconds - Self: Talk 3 to invoker'),
+(@ISILLIEN*100, 9, 6, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 8 seconds - Self: Talk 4 to invoker'),
+(@ISILLIEN*100, 9, 7, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 5 seconds - Self: Talk 5 to invoker'),
+(@ISILLIEN*100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2674, -1920, 68.41, 1.8, 'Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2674, -1920, 68.41, 1.8) as summon type timed despawn out of combat (4) with duration 40 seconds'),
+(@ISILLIEN*100, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2684, -1918, 69.52, 2.2, 'Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2684, -1918, 69.52, 2.2) as summon type timed despawn out of combat (4) with duration 40 seconds'),
+(@ISILLIEN*100, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2694, -1875, 66.86, 3.8, 'Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2694, -1875, 66.86, 3.8) as summon type timed despawn out of combat (4) with duration 40 seconds'),
+(@ISILLIEN*100, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2693, -1869, 66.87, 3.9, 'Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2693, -1869, 66.87, 3.9) as summon type timed despawn out of combat (4) with duration 40 seconds'),
+(@ISILLIEN*100, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 12, 12128, 4, 40000, 0, 0, 0, 8, 0, 0, 0, 2697, -1879, 66.8, 3.8, 'Grand Inquisitor Isillien - After 0 seconds - Self: Summon creature Crimson Elite (12128) at (2697, -1879, 66.8, 3.8) as summon type timed despawn out of combat (4) with duration 40 seconds'),
+(@ISILLIEN*100, 9, 13, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 45, 1, 1, 0, 0, 0, 0, 11, 12128, 100, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 2 seconds - Creature Crimson Elite (12128) in 100 yd: Set creature data #1 to 1'),
+(@ISILLIEN*100, 9, 14, 0, 0, 0, 100, 0, 0, 0, 0, 0, 19, 776, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Remove UNIT_FLAGS to PVP_ATTACKABLE, IMMUNE_TO_PC, IMMUNE_TO_NPC'),
+(@ISILLIEN*100, 9, 15, 0, 0, 0, 100, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 1842, 30, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Attack Closest alive creature Highlord Taelan Fordring (1842) in 30 yards'),
+(@ISILLIEN*100, 9, 16, 0, 0, 0, 100, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Set invincibility to 1 HP'),
+(@ISILLIEN*100, 9, 17, 0, 0, 0, 100, 0, 45000, 45000, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 45 seconds - Self: Talk 6 to invoker'),
+(@ISILLIEN*100, 9, 18, 0, 0, 0, 100, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Set home position to current position'),
+(@ISILLIEN*100, 9, 19, 0, 0, 0, 100, 0, 0, 0, 0, 0, 11, 18969, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Cast spell Taelan Death (18969) on Self (flags: triggered)'),
+(@ISILLIEN*100, 9, 20, 0, 0, 0, 100, 0, 500, 500, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0.5 seconds - Self: Evade'),
+(@ISILLIEN*100, 9, 21, 0, 0, 0, 100, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Set UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC'),
+(@ISILLIEN*100, 9, 22, 0, 0, 0, 100, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Set invincibility to 0 HP'),
+(@ISILLIEN*100, 9, 23, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 6 seconds - Self: Talk 7 to invoker'),
+(@ISILLIEN*100, 9, 24, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 3 seconds - Self: Talk 8 to invoker'),
+(@ISILLIEN*100, 9, 25, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 5 seconds - Self: Remove UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC'),
+(@ISILLIEN*100, 9, 26, 0, 0, 0, 100, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 50, 0, 0, 0, 0, 0, 0, 'Grand Inquisitor Isillien - After 0 seconds - Self: Attack Closest player in 50 yards'),
+(@ISILLIEN*100, 9, 27, 0, 0, 0, 100, 0, 25000, 25000, 0, 0, 12, 12126, 4, 180000, 0, 0, 0, 8, 0, 0, 0, 2642.8, -1913, 71.2, 0.4, 'Grand Inquisitor Isillien - After 25 seconds - Self: Summon creature Lord Tirion Fordring (12126) at (2642.8, -1913, 71.2, 0.4) as summon type timed despawn out of combat (4) with duration 180 seconds');
 
 -- Highlord Taelan Fordring
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `scale` = 1.18 WHERE `entry` = @TAELAN;
 
-DELETE FROM smart_scripts WHERE entryOrGuid = @TAELAN AND source_type = 0;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
-(@TAELAN, 0, 0, 0, 34, 0, 100, 0, 8, 16777215, 0, 0, 43, 0, 2402, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On movement of type POINT_MOTION_TYPE (8) inform, point 16777215 - Self: Mount to model 2402"),
-(@TAELAN, 0, 1, 2, 19, 0, 100, 0, 5944, 0, 0, 0, 1, 0, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On player accepted quest In Dreams (5944) - Self: Talk 0 to invoker"),
-(@TAELAN, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On link - Self: Set active"),
-(@TAELAN, 0, 3, 0, 52, 0, 100, 1, 0, 1842, 0, 0, 53, 0, 1842, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - When text 0 said by creature Highlord Taelan Fordring (1842) is over - Self: Start path #1842, run, do not repeat, Aggressive (2)"),
-(@TAELAN, 0, 4, 5, 11, 0, 100, 0, 0, 0, 0, 0, 2, 67, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On respawn  - Self: Set faction to Horde (67)"),
-(@TAELAN, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On link - Self: Remove UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC"),
-(@TAELAN, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On link - Self: Remove 7 bytes from UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0)"),
-(@TAELAN, 0, 7, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 17232, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On aggro - Self: Cast spell Devotion Aura (17232) on Self"),
-(@TAELAN, 0, 8, 0, 0, 0, 100, 0, 3000, 3000, 5000, 5000, 11, 17281, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - Every 5 seconds (3s initially)  - Self: Cast spell Crusader Strike (17281) on Victim"),
-(@TAELAN, 0, 9, 0, 2, 0, 100, 0, 0, 20, 120000, 120000, 11, 17233, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - When health between 0-20% (check every 120000 - 120000 ms) - Self: Cast spell Lay on Hands (17233) on Self"),
-(@TAELAN, 0, 10, 11, 40, 0, 100, 0, 1, 0, 0, 0, 1, 1, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On wapoint 1 of any path reached - Self: Talk 1 to invoker"),
-(@TAELAN, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 2, 42, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On link - Self: Set faction to Beast - Raptor (42)"),
-(@TAELAN, 0, 12, 0, 40, 0, 100, 0, 26, 0, 0, 0, 54, 7000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On wapoint 26 of any path reached - Self: Pause path for 7000 ms"),
-(@TAELAN, 0, 13, 14, 55, 0, 100, 0, 26, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On wapoint 26 of any path paused - Self: Talk 2 to invoker"),
-(@TAELAN, 0, 14, 0, 61, 0, 100, 0, 0, 0, 0, 0, 67, 1, 3000, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On link - Trigger timed event #1 in 3000 - 3000 ms // -meta_wait"),
-(@TAELAN, 0, 15, 16, 59, 0, 100, 0, 1, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On timed event 1 triggered - Self: Talk 3 to Self"),
-(@TAELAN, 0, 16, 0, 61, 0, 100, 0, 0, 0, 0, 0, 43, 0, 2402, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On link - Self: Mount to model 2402"),
-(@TAELAN, 0, 17, 0, 40, 0, 100, 0, 74, 0, 0, 0, 80, 184200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On wapoint 74 of any path reached - Self: Start timed action list id #184200 (update always (2))"),
-(@TAELAN, 0, 18, 0, 8, 0, 100, 0, 18969, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - On spell Taelan Death (18969) hit  - Self: Kill self (Self)");
+DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @TAELAN AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(@TAELAN, 0, 0, 0, 34, 0, 100, 0, 8, 16777215, 0, 0, 43, 0, 2402, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On movement of type POINT_MOTION_TYPE (8) inform, point 16777215 - Self: Mount to model 2402'),
+(@TAELAN, 0, 1, 2, 19, 0, 100, 0, 5944, 0, 0, 0, 1, 0, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On player accepted quest In Dreams (5944) - Self: Talk 0 to invoker'),
+(@TAELAN, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On link - Self: Set active'),
+(@TAELAN, 0, 3, 0, 52, 0, 100, 1, 0, 1842, 0, 0, 53, 0, 1842, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - When text 0 said by creature Highlord Taelan Fordring (1842) is over - Self: Start path #1842, run, do not repeat, Aggressive (2)'),
+(@TAELAN, 0, 4, 5, 11, 0, 100, 0, 0, 0, 0, 0, 2, 67, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On respawn  - Self: Set faction to Horde (67)'),
+(@TAELAN, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On link - Self: Remove UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC'),
+(@TAELAN, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 91, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On link - Self: Remove 7 bytes from UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0)'),
+(@TAELAN, 0, 7, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 17232, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On aggro - Self: Cast spell Devotion Aura (17232) on Self'),
+(@TAELAN, 0, 8, 0, 0, 0, 100, 0, 3000, 3000, 5000, 5000, 11, 17281, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - Every 5 seconds (3s initially)  - Self: Cast spell Crusader Strike (17281) on Victim'),
+(@TAELAN, 0, 9, 0, 2, 0, 100, 0, 0, 20, 120000, 120000, 11, 17233, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - When health between 0-20% (check every 120000 - 120000 ms) - Self: Cast spell Lay on Hands (17233) on Self'),
+(@TAELAN, 0, 10, 11, 40, 0, 100, 0, 1, 0, 0, 0, 1, 1, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On wapoint 1 of any path reached - Self: Talk 1 to invoker'),
+(@TAELAN, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 2, 42, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On link - Self: Set faction to Beast - Raptor (42)'),
+(@TAELAN, 0, 12, 0, 40, 0, 100, 0, 26, 0, 0, 0, 54, 7000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On wapoint 26 of any path reached - Self: Pause path for 7000 ms'),
+(@TAELAN, 0, 13, 14, 55, 0, 100, 0, 26, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On wapoint 26 of any path paused - Self: Talk 2 to invoker'),
+(@TAELAN, 0, 14, 0, 61, 0, 100, 0, 0, 0, 0, 0, 67, 1, 3000, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On link - Trigger timed event #1 in 3000 - 3000 ms // -meta_wait'),
+(@TAELAN, 0, 15, 16, 59, 0, 100, 0, 1, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On timed event 1 triggered - Self: Talk 3 to Self'),
+(@TAELAN, 0, 16, 0, 61, 0, 100, 0, 0, 0, 0, 0, 43, 0, 2402, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On link - Self: Mount to model 2402'),
+(@TAELAN, 0, 17, 0, 40, 0, 100, 0, 74, 0, 0, 0, 80, 184200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On wapoint 74 of any path reached - Self: Start timed action list id #184200 (update always (2))'),
+(@TAELAN, 0, 18, 0, 8, 0, 100, 0, 18969, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - On spell Taelan Death (18969) hit  - Self: Kill self (Self)');
 
 -- Highlord Taelan Actionlist 1
-DELETE FROM smart_scripts WHERE entryOrGuid = @TAELAN*100 AND source_type = 9;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
-(@TAELAN*100, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - After 1 seconds - Self: Talk 4 to invoker"),
-(@TAELAN*100, 9, 1, 0, 0, 0, 100, 0, 100, 100, 0, 0, 66, 0, 0, 0, 0, 0, 0, 21, 40, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - After 0.1 seconds - Self: Look at Closest player in 40 yards"),
-(@TAELAN*100, 9, 2, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 12, 1840, 4, 120000, 0, 0, 0, 8, 0, 0, 0, 2683.64, -1926.72, 72.14, 2, "Highlord Taelan Fordring - After 2 seconds - Self: Summon creature Grand Inquisitor Isillien (1840) at (2683.64, -1926.72, 72.14, 2) as summon type timed despawn out of combat (4) with duration 120 seconds"),
-(@TAELAN*100, 9, 3, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - After 4 seconds - Self: Talk 5 to invoker"),
-(@TAELAN*100, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 9, 1840, 0, 40, 0, 0, 0, 0, "Highlord Taelan Fordring - After 0 seconds - Self: Look at Creature Grand Inquisitor Isillien (1840) in 0 - 40 yards"),
-(@TAELAN*100, 9, 5, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - After 4 seconds - Self: Talk 6 to invoker"),
-(@TAELAN*100, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - After 0 seconds - Self: Dismount"),
-(@TAELAN*100, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - After 0 seconds - Self: Set home position to current position"),
-(@TAELAN*100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 19, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Highlord Taelan Fordring - After 0 seconds - Self: Remove UNIT_FLAGS to PVP_ATTACKABLE");
+DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @TAELAN*100 AND `source_type` = 9;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(@TAELAN*100, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 1 seconds - Self: Talk 4 to invoker'),
+(@TAELAN*100, 9, 1, 0, 0, 0, 100, 0, 100, 100, 0, 0, 66, 0, 0, 0, 0, 0, 0, 21, 40, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 0.1 seconds - Self: Look at Closest player in 40 yards'),
+(@TAELAN*100, 9, 2, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 12, 1840, 4, 120000, 0, 0, 0, 8, 0, 0, 0, 2683.64, -1926.72, 72.14, 2, 'Highlord Taelan Fordring - After 2 seconds - Self: Summon creature Grand Inquisitor Isillien (1840) at (2683.64, -1926.72, 72.14, 2) as summon type timed despawn out of combat (4) with duration 120 seconds'),
+(@TAELAN*100, 9, 3, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 4 seconds - Self: Talk 5 to invoker'),
+(@TAELAN*100, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 9, 1840, 0, 40, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 0 seconds - Self: Look at Creature Grand Inquisitor Isillien (1840) in 0 - 40 yards'),
+(@TAELAN*100, 9, 5, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 4 seconds - Self: Talk 6 to invoker'),
+(@TAELAN*100, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 0 seconds - Self: Dismount'),
+(@TAELAN*100, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 0 seconds - Self: Set home position to current position'),
+(@TAELAN*100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 19, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Highlord Taelan Fordring - After 0 seconds - Self: Remove UNIT_FLAGS to PVP_ATTACKABLE');
 
 -- Tirion Fordring
-UPDATE `creature_template` SET `unit_flags`=0, `faction`=35, `flags_extra`=2, `AIName`='SmartAI', `ScriptName`='' WHERE entry=@TIRION;
+UPDATE `creature_template` SET `unit_flags`=0, `faction`=35, `flags_extra`=2, `AIName`='SmartAI', `ScriptName`='' WHERE `entry`=@TIRION;
 
-DELETE FROM smart_scripts WHERE entryOrGuid = @TIRION AND source_type = 0;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
-(@TIRION, 0, 0, 1, 37, 0, 100, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - On AI initialize - Self: Set react state to Aggressive (2)"),
-(@TIRION, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 43, 0, 2325, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - On link - Self: Mount to model 2325"),
-(@TIRION, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - On link - Self: Set run"),
-(@TIRION, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - On link - Self: Set npc flags NONE"),
-(@TIRION, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 53, 1, 12126, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - On link - Self: Start path #12126, run, do not repeat, Passive (0)"),
-(@TIRION, 0, 5, 0, 40, 0, 100, 0, 1, 0, 0, 0, 80, 1212600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - On wapoint 1 of any path reached - Self: Start timed action list id #1212600 (update always (2))"),
-(@TIRION, 0, 6, 0, 7, 1, 100, 0, 0, 0, 0, 0, 80, 1212601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - On evade - Self: Start timed action list id #1212601 (update out of combat (0))"),
-(@TIRION, 0, 7, 0, 0, 0, 100, 0, 6000, 10000, 6000, 10000, 11, 18819, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - Every 6 - 10 seconds  - Self: Cast spell Holy Cleave (18819) on Victim");
+DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @TIRION AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(@TIRION, 0, 0, 1, 37, 0, 100, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - On AI initialize - Self: Set react state to Aggressive (2)'),
+(@TIRION, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 43, 0, 2325, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - On link - Self: Mount to model 2325'),
+(@TIRION, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - On link - Self: Set run'),
+(@TIRION, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - On link - Self: Set npc flags NONE'),
+(@TIRION, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 53, 1, 12126, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - On link - Self: Start path #12126, run, do not repeat, Passive (0)'),
+(@TIRION, 0, 5, 0, 40, 0, 100, 0, 1, 0, 0, 0, 80, 1212600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - On wapoint 1 of any path reached - Self: Start timed action list id #1212600 (update always (2))'),
+(@TIRION, 0, 6, 0, 7, 1, 100, 0, 0, 0, 0, 0, 80, 1212601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - On evade - Self: Start timed action list id #1212601 (update out of combat (0))'),
+(@TIRION, 0, 7, 0, 0, 0, 100, 0, 6000, 10000, 6000, 10000, 11, 18819, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - Every 6 - 10 seconds  - Self: Cast spell Holy Cleave (18819) on Victim');
 
 -- Tirion Fordring Actionlist 1 - Talk and fight
-DELETE FROM smart_scripts WHERE entryOrGuid = @TIRION*100 AND source_type = 9;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
-(@TIRION*100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Set home position to current position"),
-(@TIRION*100, 9, 1, 0, 0, 0, 100, 0, 500, 500, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0.5 seconds - Self: Dismount"),
-(@TIRION*100, 9, 2, 0, 0, 0, 100, 0, 500, 500, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0.5 seconds - Self: Set UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0) to 8"),
-(@TIRION*100, 9, 3, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 5 seconds - Self: Remove 8 bytes from UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0)"),
-(@TIRION*100, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Look at Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards"),
-(@TIRION*100, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Talk 1 to invoker"),
-(@TIRION*100, 9, 6, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 10, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, "Tirion Fordrin - After 4 seconds - Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards: Talk 10 to invoker"),
-(@TIRION*100, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Remove UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC"),
-(@TIRION*100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 2, 42, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Set faction to Beast - Raptor (42)"),
-(@TIRION*100, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Set react state to Aggressive (2)"),
-(@TIRION*100, 9, 10, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 9, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, "Tirion Fordrin - After 4 seconds - Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards: Talk 9 to invoker"),
-(@TIRION*100, 9, 11, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 5 seconds - Self: Talk 2 to invoker"),
-(@TIRION*100, 9, 12, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, "Tirion Fordrin - After 3 seconds - Self: Attack Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards"),
-(@TIRION*100, 9, 13, 0, 0, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Set event phase to 1");
+DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @TIRION*100 AND `source_type` = 9;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(@TIRION*100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Set home position to current position'),
+(@TIRION*100, 9, 1, 0, 0, 0, 100, 0, 500, 500, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0.5 seconds - Self: Dismount'),
+(@TIRION*100, 9, 2, 0, 0, 0, 100, 0, 500, 500, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0.5 seconds - Self: Set UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0) to 8'),
+(@TIRION*100, 9, 3, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 5 seconds - Self: Remove 8 bytes from UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0)'),
+(@TIRION*100, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Look at Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards'),
+(@TIRION*100, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Talk 1 to invoker'),
+(@TIRION*100, 9, 6, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 10, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 4 seconds - Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards: Talk 10 to invoker'),
+(@TIRION*100, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Remove UNIT_FLAGS to IMMUNE_TO_PC, IMMUNE_TO_NPC'),
+(@TIRION*100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 2, 42, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Set faction to Beast - Raptor (42)'),
+(@TIRION*100, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Set react state to Aggressive (2)'),
+(@TIRION*100, 9, 10, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 1, 9, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 4 seconds - Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards: Talk 9 to invoker'),
+(@TIRION*100, 9, 11, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 5 seconds - Self: Talk 2 to invoker'),
+(@TIRION*100, 9, 12, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 1840, 50, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 3 seconds - Self: Attack Closest alive creature Grand Inquisitor Isillien (1840) in 50 yards'),
+(@TIRION*100, 9, 13, 0, 0, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Set event phase to 1');
 
 -- Tirion Fordring Actionlist 2 - After fight talk and quest complete
-DELETE FROM smart_scripts WHERE entryOrGuid = @TIRION*100+1 AND source_type = 9;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
-(@TIRION*100+1, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 3 seconds - Self: Talk 3 to invoker"),
-(@TIRION*100+1, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Dismount"),
-(@TIRION*100+1, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 1842, 50, 1, 0, 0, 0, 0, "Tirion Fordrin - After 3 seconds - Self: Look at Closest dead creature Highlord Taelan Fordring (1842) in 50 yards"),
-(@TIRION*100+1, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Talk 4 to invoker"),
-(@TIRION*100+1, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Set UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0) to 8"),
-(@TIRION*100+1, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 3 seconds - Self: Talk 5 to invoker"),
-(@TIRION*100+1, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Remove 8 bytes from UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0)"),
-(@TIRION*100+1, 9, 7, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 8 seconds - Self: Talk 6 to invoker"),
-(@TIRION*100+1, 9, 8, 0, 0, 0, 100, 0, 9000, 9000, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 9 seconds - Self: Talk 7 to invoker"),
-(@TIRION*100+1, 9, 9, 0, 0, 0, 100, 0, 12000, 12000, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 12 seconds - Self: Talk 8 to invoker"),
-(@TIRION*100+1, 9, 10, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 15, 5944, 0, 0, 0, 0, 0, 18, 50, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 1 seconds - Players in 50 yards: Call quest In Dreams (5944) group event happened"),
-(@TIRION*100+1, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 81, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Tirion Fordrin - After 0 seconds - Self: Set npc flags QUESTGIVER");
+DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @TIRION*100+1 AND `source_type` = 9;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(@TIRION*100+1, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 3 seconds - Self: Talk 3 to invoker'),
+(@TIRION*100+1, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Dismount'),
+(@TIRION*100+1, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 1842, 50, 1, 0, 0, 0, 0, 'Tirion Fordrin - After 3 seconds - Self: Look at Closest dead creature Highlord Taelan Fordring (1842) in 50 yards'),
+(@TIRION*100+1, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Talk 4 to invoker'),
+(@TIRION*100+1, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Set UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0) to 8'),
+(@TIRION*100+1, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 3 seconds - Self: Talk 5 to invoker'),
+(@TIRION*100+1, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Remove 8 bytes from UNIT_FIELD_BYTES_1 with Type UNIT_BYTES_1_OFFSET_STAND_STATE (0)'),
+(@TIRION*100+1, 9, 7, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 8 seconds - Self: Talk 6 to invoker'),
+(@TIRION*100+1, 9, 8, 0, 0, 0, 100, 0, 9000, 9000, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 9 seconds - Self: Talk 7 to invoker'),
+(@TIRION*100+1, 9, 9, 0, 0, 0, 100, 0, 12000, 12000, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 12 seconds - Self: Talk 8 to invoker'),
+(@TIRION*100+1, 9, 10, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 15, 5944, 0, 0, 0, 0, 0, 18, 50, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 1 seconds - Players in 50 yards: Call quest In Dreams (5944) group event happened'),
+(@TIRION*100+1, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 81, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tirion Fordrin - After 0 seconds - Self: Set npc flags QUESTGIVER');
 
 -- Crimson Elite
 UPDATE `creature_template` SET `faction`=16, `AIName`='SmartAI', `ScriptName`='' WHERE `entry`=@CRIMSON;
 
-DELETE FROM smart_scripts WHERE entryOrGuid = @CRIMSON AND source_type = 0;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
-(@CRIMSON, 0, 0, 0, 0, 0, 100, 0, 3000, 5000, 9000, 10000, 11, 17143, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Crimson Elite - Every 9 - 10 seconds (3 - 5s initially)  - Self: Cast spell Holy Strike (17143) on Victim"),
-(@CRIMSON, 0, 1, 0, 0, 0, 100, 0, 8000, 9000, 20000, 22000, 11, 14518, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Crimson Elite - Every 20 - 22 seconds (8 - 9s initially)  - Self: Cast spell Crusader Strike (14518) on Victim"),
-(@CRIMSON, 0, 2, 0, 38, 0, 100, 0, 1, 1, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2674, -1906, 66.1, 5.3, "Crimson Elite - On data 1 set to 1 - Self: Move to position (2674, -1906, 66.1, 5.3) (point id 0)");
+DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @CRIMSON AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(@CRIMSON, 0, 0, 0, 0, 0, 100, 0, 3000, 5000, 9000, 10000, 11, 17143, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Crimson Elite - Every 9 - 10 seconds (3 - 5s initially)  - Self: Cast spell Holy Strike (17143) on Victim'),
+(@CRIMSON, 0, 1, 0, 0, 0, 100, 0, 8000, 9000, 20000, 22000, 11, 14518, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Crimson Elite - Every 20 - 22 seconds (8 - 9s initially)  - Self: Cast spell Crusader Strike (14518) on Victim'),
+(@CRIMSON, 0, 2, 0, 38, 0, 100, 0, 1, 1, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2674, -1906, 66.1, 5.3, 'Crimson Elite - On data 1 set to 1 - Self: Move to position (2674, -1906, 66.1, 5.3) (point id 0)');
 
 -- Waypoints
 DELETE FROM `waypoints` WHERE `entry`=@TIRION;
@@ -268,6 +268,6 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=@D
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, @DEATHSPELL, 0, 0, 31, 0, 3, @TAELAN, 0, 0, 0, 0, '', 'Taelan Death Spell - Target Taelan');
 
-DELETE FROM conditions WHERE SourceTypeOrReferenceId = 22 AND SourceEntry = @TAELAN AND SourceId = 0;
-INSERT INTO conditions (SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget, ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition, Comment) VALUES
-(22, 1, 1842, 0, 0, 23, 1, 203, 0, 0, 1, "Highlord Taelan Fordring - Object (1) is not in area Mardenholde Keep (203)");
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @TAELAN AND `SourceId` = 0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
+(22, 1, 1842, 0, 0, 23, 1, 203, 0, 0, 1, 'Highlord Taelan Fordring - Object (1) is not in area Mardenholde Keep (203)');
