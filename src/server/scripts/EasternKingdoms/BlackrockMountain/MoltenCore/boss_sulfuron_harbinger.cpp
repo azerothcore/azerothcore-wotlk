@@ -174,7 +174,7 @@ public:
                     }
                     case EVENT_SHADOW_WORD_PAIN:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHADOW_WORD_PAIN))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_SHADOW_WORD_PAIN))
                         {
                             DoCast(target, SPELL_SHADOW_WORD_PAIN);
                         }
@@ -183,7 +183,7 @@ public:
                     }
                     case EVENT_IMMOLATE:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_IMMOLATE))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_IMMOLATE))
                         {
                             DoCast(target, SPELL_IMMOLATE);
                         }

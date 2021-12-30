@@ -174,7 +174,7 @@ public:
                     events.ScheduleEvent(EVENT_ROAR, 40000);
                     break;
                 case EVENT_CHARGING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         me->CastSpell(target, SPELL_BERSERKER_C, false);
                     events.ScheduleEvent(EVENT_CHARGING, 35000);
                     break;
@@ -262,7 +262,7 @@ public:
                     events.ScheduleEvent(EVENT_ADD_ABILITY2, 30000);
                     break;
                 case EVENT_ADD_ABILITY3:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_DEATH_COIL, false);
                     events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
                     break;
@@ -327,12 +327,12 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ADD_ABILITY1:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         me->CastSpell(target, SPELL_GREATER_POLYMORPH, false);
                     events.ScheduleEvent(EVENT_ADD_ABILITY1, 20000);
                     break;
                 case EVENT_ADD_ABILITY2:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         me->CastSpell(target, SPELL_LIGHTNING_BOLT, false);
                     events.ScheduleEvent(EVENT_ADD_ABILITY2, 15000);
                     break;
