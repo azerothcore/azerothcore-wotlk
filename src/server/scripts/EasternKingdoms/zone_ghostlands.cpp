@@ -269,17 +269,16 @@ private:
 enum SentinelInfiltrator
 {
     EMOTE_FLEE               = 0,
-    EVENT_TALK               = 1,
-    EVENT_QUESTION           = 2,
+    EVENT_TALK2              = 1,
+    EVENT_QUESTION2          = 2,
     EVENT_EXCLAMATION        = 3,
     EVENT_SALUTE             = 4,
-    EVENT_GOUGE              = 5,
-    EVENT_BACKSTAB           = 6,
+    EVENT_GOUGE2             = 5,
+    EVENT_BACKSTAB2          = 6,
     NPC_SENTINEL_INFILTRATOR = 16333,
     PATH_ONE                 = 841030,
     PATH_TWO                 = 859400,
-    SPELL_GOUGE              = 12540,
-    SPELL_BACKSTAB           = 7159
+    SPELL_GOUGE              = 12540
 };
 
 struct npc_sentinel_infiltrator : public ScriptedAI
@@ -317,7 +316,7 @@ struct npc_sentinel_infiltrator : public ScriptedAI
                         {
                             me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                             SentinelInfiltrator->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                            _events.ScheduleEvent(EVENT_TALK, 2000);
+                            _events.ScheduleEvent(EVENT_TALK2, 2000);
                         }
                         break;
                 }
@@ -345,8 +344,8 @@ struct npc_sentinel_infiltrator : public ScriptedAI
 
     void EnterCombat(Unit* /*who*/) override
     {
-        _events.ScheduleEvent(EVENT_GOUGE, urand(9000, 15000));
-        _events.ScheduleEvent(EVENT_BACKSTAB, urand(3000, 5000));
+        _events.ScheduleEvent(EVENT_GOUGE2, urand(9000, 15000));
+        _events.ScheduleEvent(EVENT_BACKSTAB2, urand(3000, 5000));
     }
 
     void UpdateAI(uint32 diff) override
@@ -359,7 +358,7 @@ struct npc_sentinel_infiltrator : public ScriptedAI
             {
                 switch (eventId)
                 {
-                case EVENT_TALK:
+                case EVENT_TALK2:
                 {
                     Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
                     if (SentinelInfiltrator)
@@ -369,7 +368,7 @@ struct npc_sentinel_infiltrator : public ScriptedAI
                     _events.ScheduleEvent(EVENT_QUESTION, 2000);
                     break;
                 }
-                case EVENT_QUESTION:
+                case EVENT_QUESTION2:
                 {
                     me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                     _events.ScheduleEvent(EVENT_EXCLAMATION, 1000);
@@ -406,11 +405,11 @@ struct npc_sentinel_infiltrator : public ScriptedAI
         {
             switch (eventId)
             {
-            case EVENT_GOUGE:
+            case EVENT_GOUGE2:
                 DoCastVictim(SPELL_GOUGE, true);
-                _events.ScheduleEvent(EVENT_GOUGE, urand(9000, 15000));
+                _events.ScheduleEvent(EVENT_GOUGE2, urand(9000, 15000));
                 break;
-            case EVENT_BACKSTAB:
+            case EVENT_BACKSTAB2:
                 DoCastVictim(SPELL_BACKSTAB, true);
                 _events.ScheduleEvent(EVENT_BACKSTAB, urand(7000, 11000));
                 break;
