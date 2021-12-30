@@ -310,8 +310,10 @@ private:
     static std::array<StaticData, TOTAL_SPELL_EFFECTS> _data;
 };
 
-class SpellInfo
+class AC_GAME_API SpellInfo
 {
+friend class SpellMgr;
+
 public:
     uint32 Id;
     SpellCategoryEntry const* CategoryEntry;
