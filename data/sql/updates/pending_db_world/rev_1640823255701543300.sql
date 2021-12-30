@@ -25,4 +25,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (30992, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 3099200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Doctor Sabnok - Reached WP14 - Run Script');
 
 -- Update Doctor Sabnok final waypoint orientation to not look in wall
-UPDATE `waypoints` SET `orientation`='6.16' WHERE  `entry`=30992 AND `pointid`=14;
+UPDATE `waypoints` SET `orientation`='6.16' WHERE `entry`=30992 AND `pointid`=14;
