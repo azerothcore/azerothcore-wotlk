@@ -265,7 +265,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 -- Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=@DEATHSPELL;
-INSERT INTO `conditions` VALUES
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, @DEATHSPELL, 0, 0, 31, 0, 3, @TAELAN, 0, 0, 0, 0, '', 'Taelan Death Spell - Target Taelan');
 
 DELETE FROM conditions WHERE SourceTypeOrReferenceId = 22 AND SourceEntry = @TAELAN AND SourceId = 0;
