@@ -578,7 +578,7 @@ void Creature::Update(uint32 diff)
                 if (m_respawnTime <= now)
                 {
 
-                    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_SPAWN, GetEntry());
+                    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_RESPAWN, GetEntry());
 
                     if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
                     {

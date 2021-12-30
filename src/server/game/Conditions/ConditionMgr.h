@@ -148,7 +148,7 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_PHASE                          = 26, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE           = 28,
-    CONDITION_SOURCE_TYPE_CREATURE_SPAWN                 = 29,
+    CONDITION_SOURCE_TYPE_CREATURE_RESPAWN               = 29,
     CONDITION_SOURCE_TYPE_MAX                            = 30 // placeholder
 };
 
