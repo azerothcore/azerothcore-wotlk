@@ -24,8 +24,9 @@ EndScriptData */
 
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "ScriptedCreature.h"
+#include "GridNotifiersImpl.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulaman.h"
 
 enum Yells
@@ -407,7 +408,7 @@ public:
 
             if (FireBreathTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();

@@ -18,14 +18,14 @@
 #ifndef MPQ_H
 #define MPQ_H
 
-#include "libmpq/mpq.h"
 #include "Define.h"
 #include "Errors.h"
-#include <string>
+#include "libmpq/mpq.h"
 #include <ctype.h>
-#include <vector>
-#include <iostream>
 #include <deque>
+#include <iostream>
+#include <string>
+#include <vector>
 
 class MPQArchive
 {

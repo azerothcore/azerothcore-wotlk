@@ -73,6 +73,9 @@ public:
                 case NPC_ARLOKK:
                     _arlokkGUID = creature->GetGUID();
                     break;
+                case NPC_HAKKAR:
+                    _hakkarGUID = creature->GetGUID();
+                    break;
             }
         }
 
@@ -123,6 +126,8 @@ public:
                     return _arlokkGUID;
                 case GO_GONG_OF_BETHEKK:
                     return _goGongOfBethekkGUID;
+                case DATA_HAKKAR:
+                    return _hakkarGUID;
             }
 
             return ObjectGuid::Empty;
@@ -181,6 +186,7 @@ public:
         ObjectGuid _vilebranchSpeakerGUID;
         ObjectGuid _arlokkGUID;
         ObjectGuid _goGongOfBethekkGUID;
+        ObjectGuid _hakkarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

@@ -777,12 +777,6 @@ public:
 
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
-    [[nodiscard]] ObjectGuid GetPlayerGUIDByName(std::string const& name) const;
-    bool GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const;
-    [[nodiscard]] TeamId GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
-
     uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId);
     void GetTaxiPath(uint32 source, uint32 destination, uint32& path, uint32& cost);
     uint32 GetTaxiMountDisplayId(uint32 id, TeamId teamId, bool allowed_alt_team = false);
@@ -1061,7 +1055,7 @@ public:
 
     void LoadVendors();
     void LoadTrainerSpell();
-    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
+    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
     uint32 GetBaseXP(uint8 level);
@@ -1156,6 +1150,7 @@ public:
             return &itr->second;
         return nullptr;
     }
+    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
@@ -1172,6 +1167,7 @@ public:
         return itr->second;
     }
 
+    GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
@@ -1270,13 +1266,13 @@ public:
 
     // reserved names
     void LoadReservedPlayersNames();
-    [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
-    static uint8 CheckPlayerName(std::string const& name, bool create = false);
-    static PetNameInvalidReason CheckPetName(std::string const& name);
-    static bool IsValidCharterName(std::string const& name);
+    static uint8 CheckPlayerName(std::string_view name, bool create = false);
+    static PetNameInvalidReason CheckPetName(std::string_view name);
+    static bool IsValidCharterName(std::string_view name);
     static bool IsValidChannelName(std::string const& name);
 
     static bool CheckDeclinedNames(std::wstring w_ownname, DeclinedName const& names);
@@ -1317,7 +1313,7 @@ public:
     void LoadScriptNames();
     ScriptNameContainer& GetScriptNames() { return _scriptNamesStore; }
     [[nodiscard]] std::string const& GetScriptName(uint32 id) const;
-    uint32 GetScriptId(const char* name);
+    uint32 GetScriptId(std::string const& name);
 
     [[nodiscard]] SpellClickInfoMapBounds GetSpellClickInfoMapBounds(uint32 creature_id) const
     {

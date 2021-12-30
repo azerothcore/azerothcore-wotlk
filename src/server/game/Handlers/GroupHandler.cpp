@@ -328,8 +328,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
         return;
     }
 
-    // Xinef: name is properly filled in packets
-    sObjectMgr->GetPlayerNameByGUID(guid.GetCounter(), name);
+    sCharacterCache->GetCharacterNameByGuid(guid, name);
 
     PartyResult res = GetPlayer()->CanUninviteFromGroup(guid);
     if (res != ERR_PARTY_RESULT_OK)
@@ -340,7 +339,11 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
             {
                 if (Aura* dungeonCooldownAura = kickTarget->GetAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
                 {
-                    SendPartyResult(PARTY_OP_UNINVITE, name, res, dungeonCooldownAura->GetDuration() / 1000);
+                    int32 elapsedTime = dungeonCooldownAura->GetMaxDuration() - dungeonCooldownAura->GetDuration();
+                    if (static_cast<int32>(sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER)) > elapsedTime)
+                    {
+                        SendPartyResult(PARTY_OP_UNINVITE, name, res, (sWorld->getIntConfig(CONFIG_LFG_KICK_PREVENTION_TIMER) - elapsedTime) / 1000);
+                    }
                 }
             }
         } else
@@ -677,7 +680,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     else
     {
         CharacterDatabase.EscapeString(name);
-        guid = sObjectMgr->GetPlayerGUIDByName(name.c_str());
+        guid = sCharacterCache->GetCharacterGuidByName(name);
     }
 
     group->ChangeMembersGroup(guid, groupNr);
@@ -1181,7 +1184,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
         }
         else
         {
-            if (ObjectGuid guid = sObjectMgr->GetPlayerGUIDByName(playerName))
+            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(playerName))
             {
                 return guid;
             }

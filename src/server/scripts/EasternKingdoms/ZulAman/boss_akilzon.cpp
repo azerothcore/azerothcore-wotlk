@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -28,8 +28,8 @@ EndScriptData */
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Weather.h"
 #include "zulaman.h"
 
@@ -186,7 +186,7 @@ public:
                     y = 1380.0f + rand() % 60;
                     if (Unit* trigger = me->SummonTrigger(x, y, z, 0, 2000))
                     {
-                        trigger->setFaction(35);
+                        trigger->SetFaction(FACTION_FRIENDLY);
                         trigger->SetMaxHealth(100000);
                         trigger->SetHealth(100000);
                         trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -225,7 +225,7 @@ public:
                 {
                     case EVENT_STATIC_DISRUPTION:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -241,7 +241,7 @@ public:
                         }
                     case EVENT_GUST_OF_WIND:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -255,7 +255,7 @@ public:
                         break;
                     case EVENT_ELECTRICAL_STORM:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50, true);
+                            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true);
                             if (!target)
                             {
                                 EnterEvadeMode();
@@ -281,7 +281,7 @@ public:
                                 Cloud->SetDisableGravity(true);
                                 Cloud->StopMoving();
                                 Cloud->SetObjectScale(1.0f);
-                                Cloud->setFaction(35);
+                                Cloud->SetFaction(FACTION_FRIENDLY);
                                 Cloud->SetMaxHealth(9999999);
                                 Cloud->SetHealth(9999999);
                                 Cloud->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -324,7 +324,7 @@ public:
                             Unit* bird = ObjectAccessor::GetUnit(*me, BirdGUIDs[i]);
                             if (!bird) //they despawned on die
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                 {
                                     x = target->GetPositionX() + irand(-10, 10);
                                     y = target->GetPositionY() + irand(-10, 10);
@@ -420,7 +420,7 @@ public:
 
             if (arrived)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
                     float x, y, z;
                     if (EagleSwoop_Timer)

@@ -17,8 +17,8 @@
 
 #include "Group.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -318,7 +318,7 @@ public:
                         {
                             trigger->SetDisplayId(11686);
                             trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            trigger->setFaction(14);
+                            trigger->SetFaction(FACTION_MONSTER);
                             trigger->SetInCombatWithZone();
                         }
 
@@ -340,7 +340,7 @@ public:
                             {
                                 trigger->SetDisplayId(11686);
                                 trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                trigger->setFaction(14);
+                                trigger->SetFaction(FACTION_MONSTER);
                                 trigger->SetInCombatWithZone();
                             }
 

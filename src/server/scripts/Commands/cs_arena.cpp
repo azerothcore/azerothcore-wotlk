@@ -25,7 +25,6 @@ EndScriptData */
 #include "ArenaTeamMgr.h"
 #include "Chat.h"
 #include "Language.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 
@@ -126,7 +125,7 @@ public:
         ArenaTeam* arena = sArenaTeamMgr->GetArenaTeamByName(oldName);
         if (!arena)
         {
-            handler->PSendSysMessage(LANG_AREAN_ERROR_NAME_NOT_FOUND, oldName.c_str());
+            handler->PSendSysMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, oldName.c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -195,7 +194,7 @@ public:
         }
 
         std::string oldCaptainName;
-        sObjectMgr->GetPlayerNameByGUID(arena->GetCaptain().GetCounter(), oldCaptainName);
+        sCharacterCache->GetCharacterNameByGuid(arena->GetCaptain(), oldCaptainName);
         arena->SetCaptain(target->GetGUID());
 
         handler->PSendSysMessage(LANG_ARENA_CAPTAIN, arena->GetName().c_str(), arena->GetId(), oldCaptainName.c_str(), target->GetName().c_str());
@@ -241,7 +240,7 @@ public:
         }
 
         if (!found)
-            handler->PSendSysMessage(LANG_AREAN_ERROR_NAME_NOT_FOUND, std::string(needle).c_str());
+            handler->PSendSysMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, std::string(needle).c_str());
 
         return true;
     }

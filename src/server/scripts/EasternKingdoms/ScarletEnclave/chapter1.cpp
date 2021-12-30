@@ -20,10 +20,10 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
@@ -173,7 +173,6 @@ enum deathsChallenge
     SAY_DUEL                    = 0,
 
     QUEST_DEATH_CHALLENGE       = 12733,
-    FACTION_HOSTILE             = 2068,
 
     DATA_IN_PROGRESS            = 0,
 
@@ -337,7 +336,7 @@ public:
                     Talk(SAY_DUEL + 4, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+5:
-                    me->setFaction(FACTION_HOSTILE);
+                    me->SetFaction(FACTION_UNDEAD_SCOURGE_2);
                     if (Player* player = ObjectAccessor::GetPlayer(*me, _duelGUID))
                         AttackStart(player);
                     return;
@@ -639,8 +638,7 @@ public:
 
 enum UnworthyInitiate
 {
-    SPELL_SOUL_PRISON_CHAIN_SELF    = 54612,
-    SPELL_SOUL_PRISON_CHAIN         = 54613,
+    SPELL_SOUL_PRISON_CHAIN         = 54612,
     SPELL_DK_INITIATE_VISUAL        = 51519,
 
     SPELL_ICY_TOUCH                 = 52372,
@@ -723,7 +721,7 @@ public:
             anchorGUID.Clear();
             phase = PHASE_CHAINED;
             events.Reset();
-            me->setFaction(7);
+            me->SetFaction(FACTION_CREATURE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
@@ -761,7 +759,6 @@ public:
             phase = PHASE_TO_EQUIP;
 
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-            me->RemoveAurasDueToSpell(SPELL_SOUL_PRISON_CHAIN_SELF);
             me->RemoveAurasDueToSpell(SPELL_SOUL_PRISON_CHAIN);
 
             float z;
@@ -825,7 +822,7 @@ public:
                             wait_timer -= diff;
                         else
                         {
-                            me->setFaction(14);
+                            me->SetFaction(FACTION_MONSTER);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                             phase = PHASE_ATTACKING;
 
@@ -947,7 +944,7 @@ public:
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
 
@@ -970,7 +967,7 @@ public:
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
                 me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
             }
         }
 
@@ -1080,7 +1077,7 @@ public:
                         me->SetFacingToObject(car);
                         // xinef: add some flags
                         car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                        car->setFaction(35);
+                        car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);
                     SetRun(true);

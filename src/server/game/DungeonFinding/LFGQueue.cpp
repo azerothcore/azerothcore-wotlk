@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LFGQueue.h"
 #include "Containers.h"
 #include "DBCStores.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
-#include "LFGQueue.h"
 #include "Log.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
@@ -319,7 +319,7 @@ namespace lfg
                     {
                         if (itRoles->first == itPlayer->first)
                         {
-                            // pussywizard: LFG ZOMG! this means that this player was in two different LfgQueueData (in QueueDataStore), and at least one of them is a group guid, because we do checks so there aren't 2 same guids in current CHECK
+                            // pussywizard: LFG this means that this player was in two different LfgQueueData (in QueueDataStore), and at least one of them is a group guid, because we do checks so there aren't 2 same guids in current CHECK
                             //LOG_ERROR("lfg", "LFGQueue::CheckCompatibility: ERROR! Player multiple times in queue! [%s]", itRoles->first.ToString().c_str());
                             break;
                         }

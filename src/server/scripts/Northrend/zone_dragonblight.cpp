@@ -29,11 +29,12 @@ EndContentData */
 #include "Chat.h"
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
+#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
@@ -330,7 +331,7 @@ public:
                     {
                         futureGUID = cr->GetGUID();
                         summoner->CastSpell(cr, SPELL_CLONE_CASTER, true);
-                        cr->setFaction(summoner->getFaction());
+                        cr->SetFaction(summoner->GetFaction());
                         cr->SetReactState(REACT_AGGRESSIVE);
                     }
                 }
@@ -490,7 +491,7 @@ public:
         void Reset() override
         {
             if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
-                me->setFaction(me->ToTempSummon()->GetSummonerUnit()->getFaction());
+                me->SetFaction(me->ToTempSummon()->GetSummonerUnit()->GetFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -1768,9 +1769,7 @@ enum StrengthenAncientsMisc
     SPELL_CREATE_ITEM_BARK      = 47550,
     SPELL_CONFUSED              = 47044,
 
-    NPC_LOTHALOR                = 26321,
-
-    FACTION_WALKER_ENEMY        = 14,
+    NPC_LOTHALOR                = 26321
 };
 
 class spell_q12096_q12092_dummy : public SpellScriptLoader // Strengthen the Ancients: On Interact Dummy to Woodlands Walker
@@ -1803,7 +1802,7 @@ public:
             else if (roll == 0) // enemy version
             {
                 tree->AI()->Talk(SAY_WALKER_ENEMY, player);
-                tree->setFaction(FACTION_WALKER_ENEMY);
+                tree->SetFaction(FACTION_MONSTER);
                 tree->Attack(player, true);
             }
         }

@@ -355,7 +355,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
                                             BG_AV_CreaturePos[triggerSpawnID][2],
                                             BG_AV_CreaturePos[triggerSpawnID][3]))
         {
-            trigger->setFaction(newFaction);
+            trigger->SetFaction(newFaction);
             trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, false);
         }
     }
@@ -786,19 +786,26 @@ void BattlegroundAV::PopulateNode(BG_AV_Nodes node)
             DelCreature(node + 302);
             return;
         }
-        trigger->setFaction(ownerId == TEAM_ALLIANCE ? 84 : 83);
+        trigger->SetFaction(ownerId == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
         trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, false);
     }
 }
-void BattlegroundAV::DePopulateNode(BG_AV_Nodes node)
+void BattlegroundAV::DePopulateNode(BG_AV_Nodes node, bool ignoreSpiritGuide)
 {
     uint32 c_place = AV_CPLACE_DEFENSE_STORM_AID + (4 * node);
     for (uint8 i = 0; i < 4; i++)
+    {
         if (BgCreatures[c_place + i])
+        {
             DelCreature(c_place + i);
+        }
+    }
+
     //spiritguide
-    if (!IsTower(node) && BgCreatures[node])
+    if (!ignoreSpiritGuide && !IsTower(node))
+    {
         DelCreature(node);
+    }
 
     //remove bonus honor aura trigger creature when node is lost
     if (node < BG_AV_NODES_MAX)//fail safe
@@ -1031,6 +1038,8 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
             SpawnBGObject(object - 22, RESPAWN_IMMEDIATELY);
         else
             SpawnBGObject(object + 22, RESPAWN_IMMEDIATELY);
+
+        bool ignoreSpiritGuide = false;
         if (IsTower(node))
         {
             //spawning/despawning of bigflag+aura
@@ -1045,9 +1054,18 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
             SpawnBGObject(BG_AV_OBJECT_AURA_N_FIRSTAID_STATION + 3 * node, RESPAWN_IMMEDIATELY); //neutral aura spawn
             SpawnBGObject(static_cast<uint8>(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION) + prevOwnerId + 3 * node, RESPAWN_ONE_DAY); //teeamaura despawn
 
-            RelocateDeadPlayers(BgCreatures[node]);
+            ignoreSpiritGuide = true;
+
+            _reviveEvents.AddEventAtOffset([this, node]()
+            {
+                RelocateDeadPlayers(BgCreatures[node]);
+
+                if (!IsTower(node))
+                    DelCreature(node); // Delete spirit healer
+            }, 500ms);
         }
-        DePopulateNode(node);
+
+        DePopulateNode(node, ignoreSpiritGuide);
     }
 
     SpawnBGObject(object, RESPAWN_ONE_DAY); //delete old banner

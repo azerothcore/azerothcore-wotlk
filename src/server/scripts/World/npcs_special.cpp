@@ -36,7 +36,6 @@ npc_locksmith            75%    list of keys needs to be confirmed
 npc_firework            100%    NPC's summoned by rockets and rocket clusters, for making them cast visual
 EndContentData */
 
-#include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
@@ -44,19 +43,23 @@ EndContentData */
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
 #include "WaypointMgr.h"
 #include "World.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 enum elderClearwater
 {
@@ -650,9 +653,7 @@ enum ChickenCluck
     EMOTE_HELLO         = 0,
     EMOTE_CLUCK_TEXT    = 2,
 
-    QUEST_CLUCK         = 3861,
-    FACTION_FRIENDLY    = 35,
-    FACTION_CHICKEN     = 31
+    QUEST_CLUCK         = 3861
 };
 
 class npc_chicken_cluck : public CreatureScript
@@ -669,7 +670,7 @@ public:
         void Reset() override
         {
             ResetFlagTimer = 120000;
-            me->setFaction(FACTION_CHICKEN);
+            me->SetFaction(FACTION_PREY);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
@@ -701,7 +702,7 @@ public:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_NONE && rand() % 30 == 1)
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        me->setFaction(FACTION_FRIENDLY);
+                        me->SetFaction(FACTION_FRIENDLY);
                         Talk(EMOTE_HELLO);
                     }
                     break;
@@ -709,7 +710,7 @@ public:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_COMPLETE)
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        me->setFaction(FACTION_FRIENDLY);
+                        me->SetFaction(FACTION_FRIENDLY);
                         Talk(EMOTE_CLUCK_TEXT);
                     }
                     break;
@@ -1179,7 +1180,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                     patientEntry = HordeSoldierId[rand() % 3];
                     break;
                 default:
-                    LOG_ERROR("scripts", "TSCR: Invalid entry for Triage doctor. Please check your database");
+                    LOG_ERROR("scripts", "Invalid entry for Triage doctor. Please check your database");
                     return;
             }
 
@@ -2461,6 +2462,83 @@ public:
     }
 };
 
+enum VenomhideHatchlingMisc
+{
+    ITEM_VENOMHIDE_BABY_TOOTH = 47196,
+
+    MODEL_BABY_RAPTOR              = 29251,
+    MODEL_BABY_RAPTOR_REPTILE_EYES = 29809,
+    MODEL_ADOLESCENT_RAPTOR        = 29103,
+    MODEL_FULL_RAPTOR              = 5291,
+};
+
+enum VenomhideHatchlingTexts
+{
+    TALK_EMOTE_EAT = 0,
+};
+
+enum VenomhideHatchlingSpellEmotes
+{
+    SPELL_SILITHID_MEAT       = 65258,
+    SPELL_SILITHID_EGG        = 65265,
+    SPELL_FRESH_DINOSAUR_MEAT = 65200,
+};
+
+class npc_venomhide_hatchling : public CreatureScript
+{
+public:
+    npc_venomhide_hatchling() : CreatureScript("npc_venomhide_hatchling") {}
+
+    struct npc_venomhide_hatchlingAI : public ScriptedAI
+    {
+        npc_venomhide_hatchlingAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            {
+                return;
+            }
+
+            if (summoner->ToPlayer()->GetItemCount(ITEM_VENOMHIDE_BABY_TOOTH) >= 6)
+            {
+                me->SetDisplayId(MODEL_BABY_RAPTOR_REPTILE_EYES);
+            }
+            if (summoner->ToPlayer()->GetItemCount(ITEM_VENOMHIDE_BABY_TOOTH) >= 11)
+            {
+                me->SetDisplayId(MODEL_ADOLESCENT_RAPTOR);
+            }
+            if (summoner->ToPlayer()->GetItemCount(ITEM_VENOMHIDE_BABY_TOOTH) >= 16)
+            {
+                me->SetDisplayId(MODEL_FULL_RAPTOR);
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_SILITHID_EGG || spell->Id == SPELL_SILITHID_MEAT || spell->Id == SPELL_FRESH_DINOSAUR_MEAT)
+            {
+                Talk(TALK_EMOTE_EAT);
+            }
+        }
+    };
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (creature->GetOwnerGUID() && creature->GetOwnerGUID() == player->GetGUID())
+        {
+            return false;
+        }
+
+        return true;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_venomhide_hatchlingAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     // Ours
@@ -2468,6 +2546,7 @@ void AddSC_npcs_special()
     new npc_riggle_bassbait();
     new npc_target_dummy();
     new npc_training_dummy();
+    new npc_venomhide_hatchling();
 
     // Theirs
     new npc_air_force_bots();

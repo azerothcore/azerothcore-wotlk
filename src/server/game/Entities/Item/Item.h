@@ -35,6 +35,7 @@ struct ItemSetEffect
     SpellInfo const* spells[8];
 };
 
+// EnumUtils: DESCRIBE THIS
 enum InventoryResult
 {
     EQUIP_ERR_OK                                 = 0,
@@ -128,6 +129,7 @@ enum InventoryResult
     EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED  = 89
 };
 
+// EnumUtils: DESCRIBE THIS
 enum BuyResult
 {
     BUY_ERR_CANT_FIND_ITEM                      = 0,
@@ -141,6 +143,7 @@ enum BuyResult
     BUY_ERR_REPUTATION_REQUIRE                  = 12
 };
 
+// EnumUtils: DESCRIBE THIS
 enum SellResult
 {
     SELL_ERR_CANT_FIND_ITEM                      = 1,       // The item was not found.

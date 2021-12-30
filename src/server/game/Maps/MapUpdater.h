@@ -31,7 +31,7 @@ class MapUpdater
 {
 public:
     MapUpdater();
-    virtual ~MapUpdater();
+    ~MapUpdater() = default;
 
     void schedule_update(Map& map, uint32 diff, uint32 s_diff);
     void schedule_lfg_update(uint32 diff);

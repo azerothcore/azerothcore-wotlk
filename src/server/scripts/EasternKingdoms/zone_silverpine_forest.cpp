@@ -28,9 +28,9 @@ pyrewood_ambush
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 /*######
 ## npc_deathstalker_erland
@@ -240,7 +240,7 @@ public:
                 if (!target)
                     target = me;
 
-                summoned->setFaction(123);
+                summoned->SetFaction(FACTION_STORMWIND);
                 summoned->AddThreat(target, 32.0f);
                 summoned->AI()->AttackStart(target);
             }

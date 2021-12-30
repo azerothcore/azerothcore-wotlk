@@ -16,10 +16,10 @@
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "sunwell_plateau.h"
+#include "ScriptedCreature.h"
 #include "WorldSession.h"
+#include "sunwell_plateau.h"
 
 enum Yells
 {
@@ -196,9 +196,9 @@ public:
             }
         }
 
-        void JustDied(Unit* who) override
+        void JustDied(Unit* killer) override
         {
-            BossAI::JustDied(who);
+            BossAI::JustDied(killer);
         }
 
         void EnterCombat(Unit* who) override
@@ -241,7 +241,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->CombatStop();
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
                     break;
                 case EVENT_TALK_GOOD_2:

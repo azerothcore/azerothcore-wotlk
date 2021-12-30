@@ -170,6 +170,8 @@ enum WorldBoolConfigs
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     CONFIG_SET_BOP_ITEM_TRADEABLE,
     CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
+    CONFIG_REALM_LOGIN_ENABLED,
+    CONFIG_PLAYER_SETTINGS_ENABLED,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -333,6 +335,7 @@ enum WorldIntConfigs
     CONFIG_CHARDELETE_MIN_LEVEL,
     CONFIG_AUTOBROADCAST_CENTER,
     CONFIG_AUTOBROADCAST_INTERVAL,
+    CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE,
     CONFIG_MAX_RESULTS_LOOKUP_COMMANDS,
     CONFIG_DB_PING_INTERVAL,
     CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION,
@@ -390,6 +393,8 @@ enum WorldIntConfigs
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
     CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
+    CONFIG_LFG_MAX_KICK_COUNT,
+    CONFIG_LFG_KICK_PREVENTION_TIMER,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -436,6 +441,7 @@ enum Rates
     RATE_XP_KILL,
     RATE_XP_BG_KILL,
     RATE_XP_QUEST,
+    RATE_XP_QUEST_DF,
     RATE_XP_EXPLORE,
     RATE_XP_PET,
     RATE_XP_PET_NEXT_LEVEL,
@@ -480,22 +486,6 @@ enum Rates
     RATE_DURABILITY_LOSS_BLOCK,
     RATE_MOVESPEED,
     MAX_RATES
-};
-
-// xinef: global storage
-struct GlobalPlayerData
-{
-    ObjectGuid::LowType guidLow;
-    uint32 accountId;
-    std::string name;
-    uint8 race;
-    uint8 playerClass;
-    uint8 gender;
-    uint8 level;
-    uint16 mailCount;
-    uint32 guildId;
-    uint32 groupId;
-    std::map<uint8, uint32> arenaTeamId;
 };
 
 class IWorld
@@ -549,6 +539,7 @@ public:
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
     virtual void SendWorldText(uint32 string_id, ...) = 0;
+    virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
     virtual void SendGlobalText(const char* text, WorldSession* self) = 0;
     virtual void SendGMText(uint32 string_id, ...) = 0;
     virtual void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
@@ -558,9 +549,9 @@ public:
     virtual void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr) = 0;
     virtual bool IsShuttingDown() const = 0;
     virtual uint32 GetShutDownTimeLeft() const = 0;
-    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode) = 0;
+    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) = 0;
     virtual void ShutdownCancel() = 0;
-    virtual void ShutdownMsg(bool show = false, Player* player = nullptr) = 0;
+    virtual void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) = 0;
     virtual void Update(uint32 diff) = 0;
     virtual void UpdateSessions(uint32 diff) = 0;
     virtual void setRate(Rates rate, float value) = 0;
@@ -579,17 +570,6 @@ public:
     virtual void KickAll() = 0;
     virtual void KickAllLess(AccountTypes sec) = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
-    virtual void LoadGlobalPlayerDataStore() = 0;
-    virtual ObjectGuid GetGlobalPlayerGUID(std::string const& name) const = 0;
-    virtual GlobalPlayerData const* GetGlobalPlayerData(ObjectGuid::LowType guid) const = 0;
-    virtual void AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0) = 0;
-    virtual void UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add = true) = 0;
-    virtual void UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId) = 0;
-    virtual void UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId) = 0;
-    virtual void UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName) = 0;
-    virtual void DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name) = 0;
     virtual void ProcessCliCommands() = 0;
     virtual void QueueCliCommand(CliCommandHolder* commandHolder) = 0;
     virtual void ForceGameEventUpdate() = 0;

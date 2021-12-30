@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "TemporarySummon.h"
+#include "blackwing_lair.h"
 
 enum Events
 {
@@ -190,7 +190,7 @@ public:
                 me->SetVisible(true);
                 me->SetPhaseMask(1, true);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
-                me->setFaction(35);
+                me->SetFaction(FACTION_FRIENDLY);
                 me->SetStandState(UNIT_STAND_STATE_SIT_HIGH_CHAIR);
                 me->RemoveAura(SPELL_NEFARIANS_BARRIER);
             }
@@ -209,7 +209,7 @@ public:
 
             Talk(SAY_GAMESBEGIN_2);
 
-            me->setFaction(103);
+            me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
             me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
             DoCast(me, SPELL_NEFARIANS_BARRIER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -318,7 +318,7 @@ public:
                                     DoCastVictim(SPELL_SHADOWBOLT_VOLLEY);
                                     break;
                                 case 1:
-                                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                                         DoCast(target, SPELL_SHADOWBOLT);
                                     break;
                             }
@@ -326,12 +326,12 @@ public:
                             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
                             break;
                         case EVENT_FEAR:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                                 DoCast(target, SPELL_FEAR);
                             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
                             break;
                         case EVENT_MIND_CONTROL:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40, true))
                                 DoCast(target, SPELL_SHADOW_COMMAND);
                             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
                             break;
@@ -345,7 +345,7 @@ public:
                                     CreatureID = Entry[urand(0, 4)];
                                 if (Creature* dragon = me->SummonCreature(CreatureID, DrakeSpawnLoc[i]))
                                 {
-                                    dragon->setFaction(103);
+                                    dragon->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                                     dragon->AI()->AttackStart(me->GetVictim());
                                 }
 
@@ -521,7 +521,7 @@ public:
                         events.ScheduleEvent(EVENT_TAILLASH, 10000);
                         break;
                     case EVENT_CLASSCALL:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                             switch (target->getClass())
                         {
                             case CLASS_MAGE:

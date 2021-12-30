@@ -94,9 +94,7 @@ enum MiscIds
     SPELL_SHADOW_INFERNO_DAMAGE     = 39646,
     SPELL_CHAOTIC_CHARGE            = 41033,
     SPELL_DEMENTIA1                 = 41406,
-    SPELL_DEMENTIA2                 = 41409,
-
-    FACTION_ASHTONGUE               = 1820
+    SPELL_DEMENTIA2                 = 41409
 };
 
 template <class AI, class T>

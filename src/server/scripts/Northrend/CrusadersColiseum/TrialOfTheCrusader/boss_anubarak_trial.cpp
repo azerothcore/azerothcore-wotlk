@@ -17,8 +17,8 @@
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
 
@@ -184,7 +184,7 @@ public:
                 float dist = rand_norm() * 40.0f;
                 if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
                 {
-                    c->setFaction(31);
+                    c->SetFaction(FACTION_PREY);
                     c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     c->GetMotionMaster()->MoveRandom(15.0f);
                 }
@@ -452,12 +452,12 @@ public:
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
             determinationTimer = urand(10000, 50000);
             despawnTimer = 0;
-            if( me->getFaction() == 16 ) // hostile - it's phase 2
+            if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
                 if( Unit* target = me->SelectNearestTarget(250.0f) )
                 {
                     AttackStart(target);
                     DoZoneInCombat();
-                    if( Unit* t = SelectTarget(SELECT_TARGET_RANDOM, 0, 250.0f, true) )
+                    if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
                     {
                         me->AddThreat(t, 20000.0f);
                         AttackStart(t);
@@ -674,7 +674,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SHADOW_STRIKE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
                         me->CastSpell(target, SPELL_SHADOW_STRIKE, false);
                     events.RepeatEvent(urand(30000, 45000));
                     break;
@@ -768,7 +768,7 @@ public:
             }
             DoZoneInCombat();
             DoResetThreat();
-            if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250.0f, true) )
+            if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
             {
                 if (!next)
                 {

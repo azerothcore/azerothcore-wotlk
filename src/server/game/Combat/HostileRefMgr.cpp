@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureAI.h"
 #include "HostileRefMgr.h"
+#include "CreatureAI.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "ThreatMgr.h"
@@ -90,19 +90,6 @@ void HostileRefMgr::setOnlineOfflineState(bool isOnline)
     while (ref)
     {
         ref->setOnlineOfflineState(isOnline);
-        ref = ref->next();
-    }
-}
-
-//=================================================
-// The online / offline status is calculated and set
-
-void HostileRefMgr::updateThreatTables()
-{
-    HostileReference* ref = getFirst();
-    while (ref)
-    {
-        ref->updateOnlineStatus();
         ref = ref->next();
     }
 }

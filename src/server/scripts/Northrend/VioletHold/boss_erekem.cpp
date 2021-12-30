@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "violet_hold.h"
 
 enum eSpells
@@ -154,7 +154,7 @@ public:
                     events.RepeatEvent(urand(8000, 13000));
                     break;
                 case EVENT_SPELL_LIGHTNING_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_LIGHTNING_BOLT, false);
                     events.RepeatEvent(urand(15000, 25000));
                     break;

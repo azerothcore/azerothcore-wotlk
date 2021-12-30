@@ -21,7 +21,6 @@
 #include "DatabaseEnv.h"
 #include "GameGraveyard.h"
 #include "Language.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -182,8 +181,14 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
             if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank())
                 primary_prof_first_rank = true;
         }
+
         if (!valid)
             continue;
+
+        if (tSpell->reqSpell && !_player->HasSpell(tSpell->reqSpell))
+        {
+            continue;
+        }
 
         TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
 
@@ -263,6 +268,11 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     if (!trainer_spell)
         return;
 
+    if (trainer_spell->reqSpell && !_player->HasSpell(trainer_spell->reqSpell))
+    {
+        return;
+    }
+
     // can't be learn, cheat? Or double learn with lags...
     if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
         return;
@@ -314,7 +324,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
         return;
 
     // set faction visible if needed
-    if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
+    if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->GetFaction()))
         _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);

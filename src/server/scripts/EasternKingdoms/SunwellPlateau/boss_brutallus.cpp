@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "WorldSession.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -139,7 +140,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_STOMP, 30000);
                     break;
                 case EVENT_SPELL_BURN:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true, -SPELL_BURN_DAMAGE))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, -SPELL_BURN_DAMAGE))
                         me->CastSpell(target, SPELL_BURN, false);
                     events.ScheduleEvent(EVENT_SPELL_BURN, 60000);
                     break;
@@ -371,7 +372,7 @@ public:
                     break;
                 case EVENT_MAD_20:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
                     {
                         brutallus->AI()->Talk(YELL_INTRO_TAUNT);

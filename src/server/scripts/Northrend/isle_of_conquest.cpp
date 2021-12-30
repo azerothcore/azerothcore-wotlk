@@ -19,8 +19,8 @@
 #include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
@@ -45,7 +45,7 @@ public:
         {
             if (me->GetEntry() == NPC_KEEP_CANNON)
             {
-                faction = me->getFaction();
+                faction = me->GetFaction();
                 me->Respawn();
                 me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, nullptr, false);
                 me->RemoveVehicleKit();
@@ -59,7 +59,7 @@ public:
             {
                 me->UpdateEntry(NPC_KEEP_CANNON, nullptr, false);
                 if (faction)
-                    me->setFaction(faction);
+                    me->SetFaction(faction);
                 me->CreateVehicleKit(510, NPC_KEEP_CANNON);
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                 events.ScheduleEvent(EVENT_RESTORE_FLAG, 4000);
@@ -285,7 +285,7 @@ public:
                     events.RepeatEvent(22000);
                     break;
                 case EVENT_DAGGER_THROW:
-                    if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* tgt = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(tgt, SPELL_IOCBOSS_DAGGER_THROW, false);
 
                     events.RepeatEvent(10000);

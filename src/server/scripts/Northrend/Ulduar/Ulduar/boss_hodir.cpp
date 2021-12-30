@@ -17,8 +17,8 @@
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -347,7 +347,7 @@ public:
                     }
 
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     me->GetMotionMaster()->Clear();
                     me->AttackStop();
                     me->CombatStop();
@@ -477,7 +477,7 @@ public:
                     {
                         me->CastSpell(plr, SPELL_FREEZE, false);
                     }
-                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                     {
                         me->CastSpell(target, SPELL_FREEZE, false);
                     }
@@ -522,7 +522,7 @@ public:
 
                         if( Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].x, hhd[k][i].y, 432.69f, M_PI / 2) )
                         {
-                            h_p->setFaction(1665);
+                            h_p->SetFaction(1665);
                             if( cnt < 8 )
                                 Helpers[cnt++] = h_p->GetGUID();
 

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "utgarde_keep.h"
 
 enum eDisplayId
@@ -189,7 +189,7 @@ public:
             else if (s->GetEntry() == NPC_THROW)
             {
                 ThrowGUID = s->GetGUID();
-                if( Unit* t = SelectTarget(SELECT_TARGET_RANDOM, 0, 70.0f, true) )
+                if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true) )
                     s->GetMotionMaster()->MovePoint(0, t->GetPositionX(), t->GetPositionY(), t->GetPositionZ());
             }
         }

@@ -17,8 +17,8 @@
 
 #ifndef TILE_BUILD_H
 #define TILE_BUILD_H
-#include <string>
 #include "Recast.h"
+#include <string>
 
 #include "Geometry.h"
 #include "WorldModelRoot.h"

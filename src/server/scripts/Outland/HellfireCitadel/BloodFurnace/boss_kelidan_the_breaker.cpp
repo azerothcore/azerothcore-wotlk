@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blood_furnace.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "blood_furnace.h"
 
 enum eKelidan
 {
@@ -336,7 +336,7 @@ public:
                     events.RepeatEvent(urand(6000, 7500));
                     break;
                 case EVENT_SPELL_MARK:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_MARK_OF_SHADOW, false);
                     events.RepeatEvent(urand(16000, 17500));
                     break;

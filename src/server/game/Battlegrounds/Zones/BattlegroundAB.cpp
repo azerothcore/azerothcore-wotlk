@@ -271,7 +271,7 @@ void BattlegroundAB::NodeOccupied(uint8 node)
 
     if (trigger)
     {
-        trigger->setFaction(_capturePointInfo[node]._ownerTeamId == TEAM_ALLIANCE ? 84 : 83);
+        trigger->SetFaction(_capturePointInfo[node]._ownerTeamId == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
         trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, false);
     }
 }
@@ -281,9 +281,13 @@ void BattlegroundAB::NodeDeoccupied(uint8 node)
     --_controlledPoints[_capturePointInfo[node]._ownerTeamId];
 
     _capturePointInfo[node]._ownerTeamId = TEAM_NEUTRAL;
-    RelocateDeadPlayers(BgCreatures[node]);
 
-    DelCreature(node); // Delete spirit healer
+    _reviveEvents.AddEventAtOffset([this, node]()
+    {
+        RelocateDeadPlayers(BgCreatures[node]);
+        DelCreature(node); // Delete spirit healer
+    }, 500ms);
+
     DelCreature(BG_AB_ALL_NODES_COUNT + node); // Delete aura trigger
 }
 

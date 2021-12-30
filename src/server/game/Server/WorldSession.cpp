@@ -30,6 +30,7 @@
 #include "Hyperlinks.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -38,7 +39,6 @@
 #include "Pet.h"
 #include "Player.h"
 #include "QueryHolder.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Transport.h"
@@ -49,10 +49,6 @@
 #include "WorldPacket.h"
 #include "WorldSocket.h"
 #include <zlib.h>
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 
 namespace
 {
@@ -131,7 +127,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
-    timeWhoCommandAllowed(0),
     _calendarEventCreationCooldown(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
@@ -254,12 +249,10 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     }
 #endif                                                      // !ACORE_DEBUG
 
-    sScriptMgr->OnPacketSend(this, *packet);
-
-#ifdef ELUNA
-    if (!sEluna->OnPacketSend(this, *packet))
+    if (!sScriptMgr->CanPacketSend(this, *packet))
+    {
         return;
-#endif
+    }
 
     LOG_TRACE("network.opcode", "S->C: %s %s", GetPlayerInfo().c_str(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())).c_str());
     m_Socket->SendPacket(*packet);
@@ -319,6 +312,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
 
+        METRIC_DETAILED_TIMER("worldsession_update_opcode_time", METRIC_TAG("opcode", opHandle->Name));
+
         try
         {
             switch (opHandle->Status)
@@ -344,11 +339,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                 }
                 else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
                 {
-                    sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                    if (!sEluna->OnPacketReceive(this, *packet))
+                    if (!sScriptMgr->CanPacketReceive(this, *packet))
+                    {
                         break;
-#endif
+                    }
+
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
                 }
@@ -356,11 +351,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             case STATUS_TRANSFER:
                 if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
                 {
-                    sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                    if (!sEluna->OnPacketReceive(this, *packet))
+                    if (!sScriptMgr->CanPacketReceive(this, *packet))
+                    {
                         break;
-#endif
+                    }
+
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
                 }
@@ -371,11 +366,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                 if (AntiDOS.EvaluateOpcode(*packet, currentTime))
                 {
-                    sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                    if (!sEluna->OnPacketReceive(this, *packet))
+                    if (!sScriptMgr->CanPacketReceive(this, *packet))
+                    {
                         break;
-#endif
+                    }
+
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
                 }
@@ -440,6 +435,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     }
 
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
+
+    METRIC_VALUE("processed_packets", processedPackets);
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
@@ -634,7 +631,6 @@ void WorldSession::LogoutPlayer(bool save)
 
         ///- empty buyback items and save the player in the database
         // some save parts only correctly work in case player present in map/player_lists (pets, etc)
-        SavingSystemMgr::InsertToSavingSkipListIfNeeded(_player->GetNextSave()); // pussywizard
         if (save)
         {
             uint32 eslot;
@@ -670,6 +666,8 @@ void WorldSession::LogoutPlayer(bool save)
 
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);
+
+        METRIC_EVENT("player_events", "Logout", _player->GetName());
 
         LOG_INFO("entities.player", "Account: %d (IP: %s) Logout Character:[%s] (%s) Level: %d",
             GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), _player->getLevel());

@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "oculus.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "oculus.h"
 
 enum Spells
 {
@@ -335,7 +335,7 @@ public:
                     events.RepeatEvent(urand(7000, 11000));
                     break;
                 case EVENT_TIME_BOMB:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
                         DoCast(target, DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H));
                     events.RepeatEvent(urand(20000, 25000));
                     break;

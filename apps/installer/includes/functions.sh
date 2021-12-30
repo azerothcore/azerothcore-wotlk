@@ -47,7 +47,11 @@ function inst_configureOS() {
 
 function inst_updateRepo() {
     cd "$AC_PATH_ROOT"
-    git pull origin $(git rev-parse --abbrev-ref HEAD)
+    if [ ! -z $INSTALLER_PULL_FROM ]; then
+        git pull "$ORIGIN_REMOTE" "$INSTALLER_PULL_FROM"
+    else
+        git pull "$ORIGIN_REMOTE" $(git rev-parse --abbrev-ref HEAD)
+    fi
 }
 
 function inst_resetRepo() {

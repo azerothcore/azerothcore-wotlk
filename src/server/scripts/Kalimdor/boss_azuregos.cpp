@@ -22,8 +22,8 @@ SDComment: Teleport not included, spell reflect not effecting dots (Core problem
 SDCategory: Azshara
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum Say
 {
@@ -130,7 +130,7 @@ public:
             //ManaStormTimer
             if (ManaStormTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     DoCast(target, SPELL_MANASTORM);
                 ManaStormTimer = urand(7500, 12500);
             }

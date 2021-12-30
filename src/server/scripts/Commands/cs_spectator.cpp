@@ -23,10 +23,6 @@
 #include "ScriptMgr.h"
 #include "World.h"
 
-#if AC_COMPILER == AC_COMPILER_GNU
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 using namespace Acore::ChatCommands;
 
 class spectator_commandscript : public CommandScript
@@ -38,21 +34,21 @@ public:
     {
         static ChatCommandTable spectatorCommandTable =
         {
-            { "version",        SEC_PLAYER,        false, &HandleSpectatorVersionCommand,                  "" },
-            { "reset",          SEC_PLAYER,        false, &HandleSpectatorResetCommand,                    "" },
-            { "spectate",       SEC_PLAYER,        false, &HandleSpectatorSpectateCommand,                 "" },
-            { "watch",          SEC_PLAYER,        false, &HandleSpectatorWatchCommand,                    "" },
-            { "leave",          SEC_PLAYER,        false, &HandleSpectatorLeaveCommand,                    "" },
-            { "",               SEC_PLAYER,        false, &HandleSpectatorCommand,                         "" }
+            { "version",  HandleSpectatorVersionCommand,  SEC_PLAYER, Console::No },
+            { "reset",    HandleSpectatorResetCommand,    SEC_PLAYER, Console::No },
+            { "spectate", HandleSpectatorSpectateCommand, SEC_PLAYER, Console::No },
+            { "watch",    HandleSpectatorWatchCommand,    SEC_PLAYER, Console::No },
+            { "leave",    HandleSpectatorLeaveCommand,    SEC_PLAYER, Console::No },
+            { "",         HandleSpectatorCommand,         SEC_PLAYER, Console::No }
         };
         static ChatCommandTable commandTable =
         {
-            { "spect",          SEC_PLAYER,        false, nullptr,                                         "", spectatorCommandTable }
+            { "spect", spectatorCommandTable }
         };
         return commandTable;
     }
 
-    static bool HandleSpectatorCommand(ChatHandler* handler, char const*  /*args*/)
+    static bool HandleSpectatorCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage("Incorrect syntax.");
         handler->PSendSysMessage("Command has subcommands:");
@@ -61,14 +57,14 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorVersionCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorVersionCommand(ChatHandler* handler, uint16 version)
     {
-        if (atoi(args) < SPECTATOR_ADDON_VERSION)
+        if (version < SPECTATOR_ADDON_VERSION)
             ArenaSpectator::SendCommand(handler->GetSession()->GetPlayer(), "%sOUTDATED", SPECTATOR_ADDON_PREFIX);
         return true;
     }
 
-    static bool HandleSpectatorResetCommand(ChatHandler* handler, char const*  /*args*/)
+    static bool HandleSpectatorResetCommand(ChatHandler* handler)
     {
         Player* p = handler->GetSession()->GetPlayer();
         if (!p->IsSpectator())
@@ -77,7 +73,7 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorLeaveCommand(ChatHandler* handler, char const*  /*args*/)
+    static bool HandleSpectatorLeaveCommand(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player->IsSpectator() || !player->FindMap() || !player->FindMap()->IsBattleArena())
@@ -91,17 +87,17 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)
     {
-        if (!ArenaSpectator::HandleSpectatorSpectateCommand(handler, args))
+        if (!ArenaSpectator::HandleSpectatorSpectateCommand(handler, name))
             return false;
 
         return true;
     }
 
-    static bool HandleSpectatorWatchCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorWatchCommand(ChatHandler* handler, std::string const& name)
     {
-        if (!ArenaSpectator::HandleSpectatorWatchCommand(handler, args))
+        if (!ArenaSpectator::HandleSpectatorWatchCommand(handler, name))
             return false;
 
         return true;

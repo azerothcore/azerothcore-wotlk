@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "azjol_nerub.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "azjol_nerub.h"
 
 enum Spells
 {
@@ -172,7 +172,7 @@ class boss_anub_arak : public CreatureScript
                         events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
                         break;
                     case EVENT_POUND:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
                         {
                             me->CastSpell(me, SPELL_SELF_ROOT, true);
                             me->DisableRotate(true);

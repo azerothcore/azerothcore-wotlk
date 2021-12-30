@@ -23,6 +23,7 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "SharedDefines.h"
+#include "WorldSession.h"
 
 enum CreatureTextRange
 {

@@ -20,7 +20,6 @@
 #include "Creature.h"
 #include "GameGraveyard.h"
 #include "Language.h"
-#include "Object.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
@@ -505,7 +504,7 @@ void BattlegroundEY::EventTeamCapturedPoint(TeamId teamId, uint32 point)
 
     if (trigger)
     {
-        trigger->setFaction(teamId == TEAM_ALLIANCE ? 84 : 83);
+        trigger->SetFaction(teamId == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
         trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, true);
     }
 }

@@ -19,21 +19,21 @@
 /// @{
 /// \file
 
-#include "Common.h"
-#include "Errors.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "Config.h"
 #include "CliRunnable.h"
+#include "Common.h"
+#include "Config.h"
+#include "Errors.h"
 #include "Log.h"
+#include "ObjectMgr.h"
 #include "Util.h"
+#include "World.h"
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #include "Chat.h"
 #include "ChatCommand.h"
 #include <cstring>
-#include <readline/readline.h>
 #include <readline/history.h>
+#include <readline/readline.h>
 #endif
 
 static constexpr char CLI_PREFIX[] = "AC> ";
