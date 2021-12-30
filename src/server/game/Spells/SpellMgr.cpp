@@ -3484,7 +3484,7 @@ void SpellMgr::LoadDbcDataCorrections()
         63137  // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
         }, [](SpellInfo* spellInfo)
     {
-            spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DB);
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DB);
     });
 
     ApplySpellFix({
@@ -3536,7 +3536,7 @@ void SpellMgr::LoadDbcDataCorrections()
         42821   // Headless Horseman - Wisp Flight Missile
         }, [](SpellInfo* spellInfo)
     {
-            spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
     });
 
     // Spirit of Kirith
