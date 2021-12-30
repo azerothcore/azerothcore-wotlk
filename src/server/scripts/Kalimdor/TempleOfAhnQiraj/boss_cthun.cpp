@@ -220,7 +220,7 @@ public:
         void SpawnEyeTentacle(float x, float y)
         {
             if (Creature* Spawned = DoSpawnCreature(NPC_EYE_TENTACLE, x, y, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     if (Spawned->AI())
                         Spawned->AI()->AttackStart(target);
         }
@@ -260,7 +260,7 @@ public:
                     if (BeamTimer <= diff)
                     {
                         //SPELL_GREEN_BEAM
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             me->InterruptNonMeleeSpells(false);
                             DoCast(target, SPELL_GREEN_BEAM);
@@ -277,7 +277,7 @@ public:
                     //ClawTentacleTimer
                     if (ClawTentacleTimer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             //Spawn claw tentacle on the random target
                             Creature* spawned = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500);
@@ -306,7 +306,7 @@ public:
                         me->SetTarget();
 
                         //Select random target for dark beam to start on
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
                             //Face our target
                             DarkGlareAngle = me->GetAngle(target);
@@ -967,7 +967,7 @@ public:
             //MindflayTimer
             if (MindflayTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                 if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
                     DoCast(target, SPELL_MIND_FLAY);
 
@@ -1043,7 +1043,7 @@ public:
                     //Dissapear and reappear at new position
                     me->SetVisible(false);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (!target)
                     {
                         Unit::Kill(me, me);
@@ -1157,7 +1157,7 @@ public:
                     //Dissapear and reappear at new position
                     me->SetVisible(false);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                     if (!target)
                     {
                         Unit::Kill(me, me);
@@ -1265,7 +1265,7 @@ public:
             //BeamTimer
             if (BeamTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                 if (target && !target->HasAura(SPELL_DIGESTIVE_ACID))
                     DoCast(target, SPELL_GREEN_BEAM);
 

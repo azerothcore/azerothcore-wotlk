@@ -31,16 +31,12 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
 
     if (ret && *ret)
     {
-        if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
-        {
-            ClearGossipMenuFor(player);
-            return tempScript->OnGossipHello(player, go);
-        }
-
         return true;
     }
 
-    return false;
+    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    ClearGossipMenuFor(player);
+    return tempScript ? tempScript->OnGossipHello(player, go) : false;
 }
 
 bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action)
@@ -55,15 +51,11 @@ bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, ui
 
     if (ret && *ret)
     {
-        if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
-        {
-            return tempScript->OnGossipSelect(player, go, sender, action);
-        }
-
         return true;
     }
 
-    return false;
+    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    return tempScript ? tempScript->OnGossipSelect(player, go, sender, action) : false;
 }
 
 bool ScriptMgr::OnGossipSelectCode(Player* player, GameObject* go, uint32 sender, uint32 action, const char* code)
@@ -79,15 +71,11 @@ bool ScriptMgr::OnGossipSelectCode(Player* player, GameObject* go, uint32 sender
 
     if (ret && *ret)
     {
-        if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
-        {
-            return tempScript->OnGossipSelectCode(player, go, sender, action, code);
-        }
-
         return true;
     }
 
-    return false;
+    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    return tempScript ? tempScript->OnGossipSelectCode(player, go, sender, action, code) : false;
 }
 
 bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest)
@@ -103,16 +91,12 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
 
     if (ret && *ret)
     {
-        if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
-        {
-            ClearGossipMenuFor(player);
-            return tempScript->OnQuestAccept(player, go, quest);
-        }
-
         return true;
     }
 
-    return false;
+    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    ClearGossipMenuFor(player);
+    return tempScript ? tempScript->OnQuestAccept(player, go, quest) : false;
 }
 
 bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest, uint32 opt)
@@ -128,17 +112,12 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
 
     if (ret && *ret)
     {
-        ClearGossipMenuFor(player);
-
-        if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
-        {
-            return tempScript->OnQuestReward(player, go, quest, opt);
-        }
-
-        return true;
+        return false;
     }
 
-    return false;
+    auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
+    ClearGossipMenuFor(player);
+    return tempScript ? tempScript->OnQuestReward(player, go, quest, opt) : false;
 }
 
 uint32 ScriptMgr::GetDialogStatus(Player* player, GameObject* go)

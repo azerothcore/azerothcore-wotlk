@@ -640,7 +640,7 @@ public:
                     events.ScheduleEvent(EVENT_CAST_CLEAVE, urand(8000, 10000));
                     break;
                 case EVENT_CAST_STARFALL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         DoCast(target, SPELL_OMEN_STARFALL);
                     events.ScheduleEvent(EVENT_CAST_STARFALL, urand(14000, 16000));
                     break;

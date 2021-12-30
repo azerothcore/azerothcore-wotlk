@@ -2252,13 +2252,15 @@ Rate.Drop.Item.ReferencedAmount = 1
 #        Description: Experience rates (outside battleground)
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
+#                     1 - (Rate.XP.Quest.DF) - Dungeon Finder/LFG quests only.
 #                     1 - (Rate.XP.Explore)
 #                     1 - (Rate.XP.Pet)
 
-Rate.XP.Kill    = 1
-Rate.XP.Quest   = 1
-Rate.XP.Explore = 1
-Rate.XP.Pet     = 1
+Rate.XP.Kill      = 1
+Rate.XP.Quest     = 1
+Rate.XP.Quest.DF  = 1
+Rate.XP.Explore   = 1
+Rate.XP.Pet       = 1
 
 #
 #    Rate.XP.BattlegroundKill
@@ -2541,6 +2543,13 @@ AutoBroadcast.Center = 0
 #        Default:     60000 - (60 seconds)
 
 AutoBroadcast.Timer = 60000
+
+#
+#    AutoBroadcast.MinDisableLevel
+#        Description: Minimum level required to disable autobroadcast announcements if EnablePlayerSettings option is enabled.
+#        Default:     0 - (Not allowed to disable it)
+
+AutoBroadcast.MinDisableLevel = 0
 
 #
 ###################################################################################################
@@ -3596,6 +3605,14 @@ LFG.MaxKickCount = 2
 #                     0 - Disabled
 
 LFG.KickPreventionTimer = 900
+
+#
+#     EnablePlayerSettings
+#        Description: Enables the usage of character specific settings.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+
+EnablePlayerSettings = 0
 
 #
 ###################################################################################################
