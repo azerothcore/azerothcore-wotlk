@@ -587,6 +587,7 @@ void Creature::Update(uint32 diff)
                         break;
                     }
 
+                    bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that object to us respawning
                     if (!allowed)                                               // Will be rechecked on next Update call
                         break;
 
