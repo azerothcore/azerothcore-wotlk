@@ -2545,6 +2545,13 @@ AutoBroadcast.Center = 0
 AutoBroadcast.Timer = 60000
 
 #
+#    AutoBroadcast.MinDisableLevel
+#        Description: Minimum level required to disable autobroadcast announcements if EnablePlayerSettings option is enabled.
+#        Default:     0 - (Not allowed to disable it)
+
+AutoBroadcast.MinDisableLevel = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3598,6 +3605,14 @@ LFG.MaxKickCount = 2
 #                     0 - Disabled
 
 LFG.KickPreventionTimer = 900
+
+#
+#     EnablePlayerSettings
+#        Description: Enables the usage of character specific settings.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+
+EnablePlayerSettings = 0
 
 #
 ###################################################################################################
