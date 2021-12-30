@@ -3790,10 +3790,13 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
             return false;
     }
 
-    if (IsInWater())
+    // In water or jumping in water
+    if (IsInWater() || (GetLiquidData().Status == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
+    {
         return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
-    else
-        return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
+    }
+
+    return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
 }
 
 void Unit::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)

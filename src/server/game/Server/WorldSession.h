@@ -71,6 +71,14 @@ namespace lfg
 
 namespace WorldPackets
 {
+
+    namespace Bank
+    {
+        class AutoBankItem;
+        class AutoStoreBankItem;
+        class BuyBankSlot;
+    }
+
     namespace Guild
     {
         class QueryGuildInfo;
@@ -669,8 +677,6 @@ public:                                                 // opcodes handlers
     void SendActivateTaxiReply(ActivateTaxiReply reply);
 
     void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
-    void HandleBankerActivateOpcode(WorldPacket& recvPacket);
-    void HandleBuyBankSlotOpcode(WorldPacket& recvPacket);
     void HandleTrainerListOpcode(WorldPacket& recvPacket);
     void HandleTrainerBuySpellOpcode(WorldPacket& recvPacket);
     void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
@@ -713,6 +719,12 @@ public:                                                 // opcodes handlers
     void HandleAuctionPlaceBid(WorldPacket& recvData);
     void HandleAuctionListPendingSales(WorldPacket& recvData);
 
+    // Bank
+    void HandleBankerActivateOpcode(WorldPacket& recvData);
+    void HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& packet);
+    void HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBankItem& packet);
+    void HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot);
+
     void HandleGetMailList(WorldPacket& recvData);
     void HandleSendMail(WorldPacket& recvData);
     void HandleMailTakeMoney(WorldPacket& recvData);
@@ -739,8 +751,6 @@ public:                                                 // opcodes handlers
     void HandleAutoEquipItemSlotOpcode(WorldPacket& recvPacket);
     void HandleSwapItem(WorldPacket& recvPacket);
     void HandleBuybackItem(WorldPacket& recvPacket);
-    void HandleAutoBankItemOpcode(WorldPacket& recvPacket);
-    void HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket);
     void HandleWrapItemOpcode(WorldPacket& recvPacket);
 
     void HandleAttackSwingOpcode(WorldPacket& recvPacket);

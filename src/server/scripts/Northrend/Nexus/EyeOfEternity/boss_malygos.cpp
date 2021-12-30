@@ -756,7 +756,7 @@ public:
                     events.RepeatEvent(3000);
                     break;
                 case EVENT_SPELL_STATIC_FIELD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, false))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, false))
                     {
                         me->SetFacingToObject(target);
                         me->CastSpell(target, SPELL_STATIC_FIELD_MAIN, true);
@@ -1497,7 +1497,7 @@ public:
                 {
                     uint8 i = 0;
                     std::list<Unit*> drakes;
-                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SELECT_TARGET_RANDOM, 0.0f, false, 57403 /*only drakes have this aura*/);
+                    c->AI()->SelectTargetList(drakes, (c->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SelectTargetMethod::Random, 0.0f, false, 57403 /*only drakes have this aura*/);
                     for (std::list<Unit*>::iterator itr = drakes.begin(); itr != drakes.end() && i < 3; ++itr)
                     {
                         DrakeGUID[i++] = (*itr)->GetGUID();
