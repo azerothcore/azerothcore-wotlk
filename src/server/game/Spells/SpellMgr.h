@@ -25,6 +25,16 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 
+#include "Define.h"
+#include "Duration.h"
+#include "IteratorPair.h"
+
+#include <map>
+#include <set>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+
 class SpellInfo;
 class Player;
 class Unit;
