@@ -610,7 +610,7 @@ public:
                         break;
                     }
                 case EVENT_FREYA_SUNBEAM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_SUNBEAM, false);
                     events.RepeatEvent(15000 + urand(0, 5000));
                     break;
@@ -986,7 +986,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_IRONBRANCH_THORN_SWARM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_THORN_SWARM, false);
                     events.RepeatEvent(14000);
                     break;
@@ -1225,7 +1225,7 @@ public:
                     me->CastSpell(me, SPELL_TIDAL_WAVE_DAMAGE, false);
                     break;
                 case EVENT_STORM_LASHER_LIGHTNING_LASH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_LIGHTNING_LASH, false);
                     events.RepeatEvent(10000);
                     break;

@@ -849,7 +849,7 @@ struct boss_sartharion_dragonAI : public BossAI
 
         if (isCalledBySartharion)
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 500, true))
             {
                 AttackStart(target);
             }
@@ -1088,7 +1088,7 @@ public:
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
@@ -1272,7 +1272,7 @@ public:
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
@@ -1388,7 +1388,7 @@ public:
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }

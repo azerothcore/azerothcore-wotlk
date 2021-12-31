@@ -373,7 +373,7 @@ public:
                     // if phase == 1 target the tank, otherwise anyone but the tank
                     Unit* target = phase == 1
                             ? me->GetVictim()
-                            : SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                            : SelectTarget(SelectTargetMethod::Random, 1, 100, true);
 
                     if (target)
                     {
@@ -422,7 +422,7 @@ public:
             {
                 if (AmplifyDamageTimer <= diff)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
 
                     if (target)
                     {
@@ -492,7 +492,7 @@ public:
 
         void changetarget()
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
             {
                 if (me->GetVictim())
                 {

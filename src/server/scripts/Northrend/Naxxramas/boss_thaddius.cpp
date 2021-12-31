@@ -359,7 +359,7 @@ public:
             }
             else if (ballLightningEnabled)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
                 {
                     me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
                 }
@@ -582,7 +582,7 @@ public:
                                 me->RemoveAurasDueToSpell(me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN);
                                 cr->InterruptNonMeleeSpells(true);
                             }
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 1000.f, true))
                             {
                                 cr->CastStop(SPELL_TESLA_SHOCK);
                                 cr->CastSpell(target, SPELL_TESLA_SHOCK, true);

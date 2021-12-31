@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "Optional.h"
 #include "PetDefines.h"
+#include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
@@ -875,6 +876,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
+    PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS      = 36,
+    PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 37,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1083,9 +1086,6 @@ public:
 
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
-    void SetInWater(bool apply);
-
-    [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
     [[nodiscard]] bool IsFalling() const;
     bool IsInAreaTriggerRadius(const AreaTrigger* trigger) const;
 
@@ -1163,9 +1163,12 @@ public:
     void RemoveRestFlag(RestFlag restFlag);
     [[nodiscard]] uint32 GetInnTriggerId() const { return _innTriggerId; }
 
+    PetStable* GetPetStable() { return m_petStable.get(); }
+    PetStable& GetOrInitPetStable();
+    PetStable const* GetPetStable() const { return m_petStable.get(); }
+
     [[nodiscard]] Pet* GetPet() const;
-    bool IsPetDismissed();
-    void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType, int32 healthPct = 0);
+    Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0s);
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
@@ -1345,8 +1348,6 @@ public:
     void LoadPet();
 
     bool AddItem(uint32 itemId, uint32 count);
-
-    uint32 m_stableSlots;
 
     /*********************************************************/
     /***                    GOSSIP SYSTEM                  ***/
@@ -2598,6 +2599,10 @@ public:
 
     std::string GetPlayerName();
 
+    // Settings
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
+    void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
+
  protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
@@ -2680,6 +2685,8 @@ public:
     void _LoadTalents(PreparedQueryResult result);
     void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
     void _LoadBrewOfTheMonth(PreparedQueryResult result);
+    void _LoadCharacterSettings(PreparedQueryResult result);
+    void _LoadPetStable(uint8 petStableSlots, PreparedQueryResult result);
 
     /*********************************************************/
     /***                   SAVE SYSTEM                     ***/
@@ -2703,6 +2710,7 @@ public:
     void _SaveStats(CharacterDatabaseTransaction trans);
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
+    void _SavePlayerSettings(CharacterDatabaseTransaction trans);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -2907,7 +2915,6 @@ private:
     int32 m_MirrorTimer[MAX_TIMERS];
     uint8 m_MirrorTimerFlags;
     uint8 m_MirrorTimerFlagsLast;
-    bool m_isInWater;
 
     // Current teleport data
     WorldLocation teleportStore_dest;
@@ -2918,6 +2925,8 @@ private:
     uint32 m_DelayedOperations;
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
+
+    std::unique_ptr<PetStable> m_petStable;
 
     // Temporary removed pet cache
     uint32 m_temporaryUnsummonedPetNumber;
@@ -2955,6 +2964,8 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    PlayerSettingMap m_charSettingsMap;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
