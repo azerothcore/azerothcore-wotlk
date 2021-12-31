@@ -68,7 +68,6 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "Realm.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "SkillDiscovery.h"
@@ -89,8 +88,14 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "TaskScheduler.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
+
+namespace
+{
+    TaskScheduler playersSaveScheduler;
+}
 
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1238,6 +1243,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION] = sConfigMgr->GetOption<int32>("LootNeedBeforeGreedILvlRestriction", 70);
 
+    m_bool_configs[CONFIG_PLAYER_SETTINGS_ENABLED] = sConfigMgr->GetOption<bool>("EnablePlayerSettings", 0);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1319,6 +1326,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_AUTOBROADCAST]         = sConfigMgr->GetOption<bool>("AutoBroadcast.On", false);
     m_int_configs[CONFIG_AUTOBROADCAST_CENTER]   = sConfigMgr->GetOption<int32>("AutoBroadcast.Center", 0);
     m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL] = sConfigMgr->GetOption<int32>("AutoBroadcast.Timer", 60000);
+    m_int_configs[CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE] = sConfigMgr->GetOption<int32>("AutoBroadcast.MinDisableLevel", 0);
     if (reload)
     {
         m_timers[WUPDATE_AUTOBROADCAST].SetInterval(m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL]);
@@ -2453,8 +2461,8 @@ void World::Update(uint32 diff)
     }
 
     {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update saving system"));
-        SavingSystemMgr::Update(diff);
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
+        playersSaveScheduler.Update(diff);
     }
 
     {
@@ -2566,6 +2574,34 @@ void World::SendWorldText(uint32 string_id, ...)
             continue;
 
         wt_do(itr->second->GetPlayer());
+    }
+
+    va_end(ap);
+}
+
+void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
+{
+    va_list ap;
+    va_start(ap, flag);
+
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (auto const& itr : m_sessions)
+    {
+        if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
+        {
+            continue;
+        }
+
+        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+        {
+            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+            {
+                continue;
+            }
+        }
+
+        wt_do(itr.second->GetPlayer());
     }
 
     va_end(ap);
@@ -2704,6 +2740,33 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     m_ShutdownMask = options;
     m_ExitCode = exitcode;
+
+    auto const& playersOnline = GetActiveSessionCount();
+
+    if (time < 5 && playersOnline)
+    {
+        // Set time to 5s for save all players
+        time = 5;
+    }
+
+    playersSaveScheduler.CancelAll();
+
+    if (time >= 5)
+    {
+        playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
+        {
+            if (!GetActiveSessionCount())
+            {
+                LOG_INFO("server", "> No players online. Skip save before shutdown");
+                return;
+            }
+
+            LOG_INFO("server", "> Save players before shutdown server");
+            ObjectAccessor::SaveAllPlayers();
+        });
+    }
+
+    FMT_LOG_WARN("server", "Time left until shutdown/restart: {}", time);
 
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
     if (time == 0)
@@ -2921,7 +2984,9 @@ void World::SendAutoBroadcast()
     uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
 
     if (abcenter == 0)
-        sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+    {
+        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
+    }
 
     else if (abcenter == 1)
     {
@@ -2932,7 +2997,7 @@ void World::SendAutoBroadcast()
 
     else if (abcenter == 2)
     {
-        sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
 
         WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
         data << msg;
