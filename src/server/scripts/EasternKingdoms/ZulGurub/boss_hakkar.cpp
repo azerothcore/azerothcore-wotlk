@@ -128,12 +128,12 @@ public:
                         events.ScheduleEvent(EVENT_CORRUPTED_BLOOD, urand(30000, 45000));
                         break;
                     case EVENT_CAUSE_INSANITY:
-                        // DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), SPELL_CAUSE_INSANITY);
+                        // DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), SPELL_CAUSE_INSANITY);
                         // events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
                         break;
                     case EVENT_WILL_OF_HAKKAR:
                         // Xinef: Skip Tank
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true), SPELL_WILL_OF_HAKKAR);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 1, 100, true), SPELL_WILL_OF_HAKKAR);
                         events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, urand(25000, 35000));
                         break;
                     case EVENT_ENRAGE:

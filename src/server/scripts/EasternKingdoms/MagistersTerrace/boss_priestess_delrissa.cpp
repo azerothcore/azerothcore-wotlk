@@ -223,7 +223,7 @@ public:
                         switch (urand(0, 2))
                         {
                             case 0:
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true);
+                                target = SelectTarget(SelectTargetMethod::Random, 0, 30, true);
                                 break;
                             case 1:
                                 target = me;
@@ -248,7 +248,7 @@ public:
                         events.ScheduleEvent(EVENT_SPELL_IMMUNITY, 1000);
                     break;
                 case EVENT_SPELL_SW_PAIN:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_WORD_PAIN_N, SPELL_SHADOW_WORD_PAIN_H), false);
                     events.ScheduleEvent(EVENT_SPELL_SW_PAIN, 10000);
                     break;
@@ -463,7 +463,7 @@ public:
                 case EVENT_SPELL_VANISH:
                     me->CastSpell(me, SPELL_VANISH, false);
                     DoResetThreat();
-                    if (Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* unit = SelectTarget(SelectTargetMethod::Random, 0))
                         me->AddThreat(unit, 1000.0f);
 
                     events.ScheduleEvent(EVENT_SPELL_VANISH, 30000);
@@ -556,7 +556,7 @@ public:
             switch (actualEventId)
             {
                 case EVENT_SPELL_IMMOLATE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_IMMOLATE_N, SPELL_IMMOLATE_H), false);
                     events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 12000);
                     break;
@@ -565,17 +565,17 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 5000);
                     break;
                 case EVENT_SPELL_SEED_OF_CORRUPTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                         me->CastSpell(target, SPELL_SEED_OF_CORRUPTION, false);
                     events.ScheduleEvent(EVENT_SPELL_SEED_OF_CORRUPTION, 18000);
                     break;
                 case EVENT_SPELL_CURSE_OF_AGONY:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_CURSE_OF_AGONY_N, SPELL_CURSE_OF_AGONY_H), false);
                     events.ScheduleEvent(EVENT_SPELL_CURSE_OF_AGONY, 13000);
                     break;
                 case EVENT_SPELL_FEAR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 20.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f))
                         me->CastSpell(target, SPELL_FEAR, false);
                     events.ScheduleEvent(EVENT_SPELL_FEAR, 15000);
                     break;
@@ -709,7 +709,7 @@ public:
             switch (actualEventId)
             {
                 case EVENT_SPELL_POLYMORPH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_POLYMORPH, false);
                     events.ScheduleEvent(EVENT_SPELL_POLYMORPH, 20000);
                     break;
@@ -722,7 +722,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_ICE_BLOCK, 1000);
                     break;
                 case EVENT_SPELL_BLIZZARD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_BLIZZARD_N, SPELL_BLIZZARD_H), false);
                     events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 20000);
                     break;
@@ -1015,7 +1015,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WAR_STOMP, 120000);
                     break;
                 case EVENT_SPELL_PURGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
                         me->CastSpell(target, SPELL_PURGE, false);
                     events.ScheduleEvent(EVENT_SPELL_PURGE, 15000);
                     break;
@@ -1096,7 +1096,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_ROCKET_LAUNCH, 20000);
                     break;
                 case EVENT_SPELL_IRON_BOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 15.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 15.0f))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_FEL_IRON_BOMB_N, SPELL_FEL_IRON_BOMB_H), false);
                     events.ScheduleEvent(EVENT_SPELL_IRON_BOMB, 20000);
                     break;

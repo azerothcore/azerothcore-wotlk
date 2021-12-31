@@ -5375,12 +5375,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     uint32 extraflags = fields[36].GetUInt16();
 
-    m_stableSlots = fields[37].GetUInt8();
-    if (m_stableSlots > MAX_PET_STABLES)
-    {
-        LOG_ERROR("entities.player", "Player can have not more %u stable slots, but have in DB %u", MAX_PET_STABLES, uint32(m_stableSlots));
-        m_stableSlots = MAX_PET_STABLES;
-    }
+    _LoadPetStable(fields[37].GetUInt8(), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS));
 
     m_atLoginFlags = fields[38].GetUInt16();
 
@@ -5621,6 +5616,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     _LoadEquipmentSets(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
     _LoadBrewOfTheMonth(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH));
+
+    _LoadCharacterSettings(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS));
 
     // Players are immune to taunt
     ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
@@ -6291,9 +6288,11 @@ void Player::LoadPet()
 {
     //fixme: the pet should still be loaded if the player is not in world
     // just not added to the map
-    if (IsInWorld())
+    if (m_petStable && IsInWorld())
     {
-        Pet::LoadPetFromDB(this, PET_LOAD_SUMMON_PET, 0, 0, true);
+        Pet* pet = new Pet(this);
+        if (!pet->LoadPetFromDB(this, 0, 0, true))
+            delete pet;
     }
 }
 
@@ -7166,6 +7165,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     GetSession()->SaveTutorialsData(trans);                 // changed only while character in game
     _SaveGlyphs(trans);
     _SaveInstanceTimeRestrictions(trans);
+    _SavePlayerSettings(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
@@ -7174,7 +7174,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, logout);
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state
