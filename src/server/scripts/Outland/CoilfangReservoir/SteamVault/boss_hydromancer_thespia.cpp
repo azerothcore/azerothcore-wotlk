@@ -96,18 +96,18 @@ public:
             {
                 case EVENT_SPELL_LIGHTNING:
                     for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(target, SPELL_LIGHTNING_CLOUD, false);
                     events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_LUNG:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         DoCast(target, SPELL_LUNG_BURST);
                     events.RepeatEvent(urand(7000, 12000));
                     break;
                 case EVENT_SPELL_ENVELOPING:
                     for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(target, SPELL_ENVELOPING_WINDS, false);
                     events.RepeatEvent(urand(10000, 15000));
                     break;

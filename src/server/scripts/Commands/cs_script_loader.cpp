@@ -61,6 +61,7 @@ void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
 void AddSC_cache_commandscript();
 void AddSC_item_commandscript();
+void AddSC_player_settings_commandscript();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -111,4 +112,5 @@ void AddCommandsScripts()
     AddSC_wp_commandscript();
     AddSC_cache_commandscript();
     AddSC_item_commandscript();
+    AddSC_player_settings_commandscript();
 }

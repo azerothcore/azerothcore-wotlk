@@ -380,7 +380,7 @@ public:
 
             if (SacrificeTimer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true);
                 if (target && target->IsAlive())
                 {
                     DoCast(target, SPELL_SACRIFICE, true);
@@ -401,7 +401,7 @@ public:
 
             if (ShadowboltTimer <= diff)
             {
-                DoCast(SelectTarget(SELECT_TARGET_TOPAGGRO, 0), SPELL_SHADOW_BOLT);
+                DoCast(SelectTarget(SelectTargetMethod::MaxThreat, 0), SPELL_SHADOW_BOLT);
                 ShadowboltTimer = 10000;
             }
             else
