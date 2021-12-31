@@ -41,7 +41,7 @@ public:
         uint32 faction;
         EventMap events;
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_KEEP_CANNON)
             {
