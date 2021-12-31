@@ -38,6 +38,8 @@ jobs:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
         run: source ./apps/ci/ci-conf.sh
+      - name: Process pending sql
+        run: bash bin/acore-db-pendings
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
       - name: Build

@@ -154,7 +154,7 @@ public:
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
                 case EVENT_SPELL_CATACLYSMIC_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 50.0f, true)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 50.0f, true)))
                         me->CastSpell(target, SPELL_CATACLYSMIC_BOLT, false);
                     events.ScheduleEvent(EVENT_SPELL_CATACLYSMIC_BOLT, 6000);
                     break;

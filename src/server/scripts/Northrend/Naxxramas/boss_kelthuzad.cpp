@@ -410,14 +410,14 @@ public:
                     events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SHADOW_FISSURE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         me->CastSpell(target, SPELL_SHADOW_FISURE, false);
                     }
                     events.RepeatEvent(25000);
                     break;
                 case EVENT_FROST_BLAST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, RAID_MODE(1, 0), 0, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, RAID_MODE(1, 0), 0, true))
                     {
                         me->CastSpell(target, SPELL_FROST_BLAST, false);
                     }
@@ -427,7 +427,7 @@ public:
                 case EVENT_CHAINS:
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
                         {
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
                         }
@@ -570,7 +570,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION && me->GetInstanceScript())
             {

@@ -146,7 +146,7 @@ public:
                     events.ScheduleEvent(EVENT_ORMOROK_SPELL_REFLECTION, 30000);
                     break;
                 case EVENT_ORMOROK_SUMMON:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_SUMMON_CRYSTALLINE_TANGLER, true);
                     events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17000);
                     break;
