@@ -123,6 +123,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,35,9846.939,991.32574,1305.4417,0,0,0,0,100,0);
 /* Fix the Wildlife immediately surrounding Dolanaar */
 DELETE FROM `creature` WHERE `guid` IN (46465, 46439, 47917, 47932, 47927, 47916, 47931, 47913);
+DELETE FROM `creature_addon` WHERE `guid` IN (46465, 47927, 47932);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 /* Deer Entry 883 */
 /* Deer 46465 was extra and not re-added */
