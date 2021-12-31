@@ -19,8 +19,8 @@
 #define MODEL_H
 
 #include "loadlib/loadlib.h"
-#include "vec3d.h"
 #include "modelheaders.h"
+#include "vec3d.h"
 #include <vector>
 
 class MPQFile;

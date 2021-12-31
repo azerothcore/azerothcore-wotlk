@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptSystem.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptSystem.h"
 
 ScriptPointVector const SystemMgr::_empty;
 

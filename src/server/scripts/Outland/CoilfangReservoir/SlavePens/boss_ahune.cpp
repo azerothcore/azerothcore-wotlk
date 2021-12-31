@@ -19,9 +19,9 @@
 #include "LFGMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 #define GOSSIP_TEXT_ID          15864
@@ -217,7 +217,7 @@ public:
                     break;
 
                 case EVENT_SPELL_COLD_SLAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 5.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 5.0f, true))
                         if (target->GetPositionZ() < me->GetPositionZ() + 6.0f)
                         {
                             int32 dmg = urand(5500, 6000);

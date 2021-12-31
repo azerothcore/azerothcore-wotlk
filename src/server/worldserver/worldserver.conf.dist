@@ -9,6 +9,7 @@
 #    EXAMPLE CONFIG
 #    CONNECTIONS AND DIRECTORIES
 #    PERFORMANCE SETTINGS
+#    SERVER LOGGING
 #    SERVER SETTINGS
 #    CRYPTOGRAPHY
 #    WARDEN SETTINGS
@@ -597,6 +598,15 @@ GameType = 0
 #                     29 - (CN9           - basic-Latin at create, any at login)
 
 RealmZone = 1
+
+#
+#    World.RealmAvailability
+#        Description: If enabled, players will enter the realm normally.
+#                     Character creation will still be possible even when realm is disabled.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+World.RealmAvailability = 1
 
 #
 #    StrictPlayerNames
@@ -2242,13 +2252,15 @@ Rate.Drop.Item.ReferencedAmount = 1
 #        Description: Experience rates (outside battleground)
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
+#                     1 - (Rate.XP.Quest.DF) - Dungeon Finder/LFG quests only.
 #                     1 - (Rate.XP.Explore)
 #                     1 - (Rate.XP.Pet)
 
-Rate.XP.Kill    = 1
-Rate.XP.Quest   = 1
-Rate.XP.Explore = 1
-Rate.XP.Pet     = 1
+Rate.XP.Kill      = 1
+Rate.XP.Quest     = 1
+Rate.XP.Quest.DF  = 1
+Rate.XP.Explore   = 1
+Rate.XP.Pet       = 1
 
 #
 #    Rate.XP.BattlegroundKill
@@ -2531,6 +2543,13 @@ AutoBroadcast.Center = 0
 #        Default:     60000 - (60 seconds)
 
 AutoBroadcast.Timer = 60000
+
+#
+#    AutoBroadcast.MinDisableLevel
+#        Description: Minimum level required to disable autobroadcast announcements if EnablePlayerSettings option is enabled.
+#        Default:     0 - (Not allowed to disable it)
+
+AutoBroadcast.MinDisableLevel = 0
 
 #
 ###################################################################################################
@@ -3370,12 +3389,12 @@ StrictChannelNames = 0
 
 #
 # Instance.SharedNormalHeroicId
-#  Description:  No description
-#  Default:  0 - Disable
-#      1 - Enable
+#  Description:  Forces ICC and RS Normal and Heroic to share lockouts.  ToC is uneffected and Normal and Heroic will be separate.
+#  Default:  1 - Enable
+#      0 - Disable
 #
 
-Instance.SharedNormalHeroicId = 0
+Instance.SharedNormalHeroicId = 1
 
 #
 #     Instance.ResetTimeRelativeTimestamp
@@ -3588,13 +3607,12 @@ LFG.MaxKickCount = 2
 LFG.KickPreventionTimer = 900
 
 #
-#    World.RealmAvailability
-#        Description: If enabled, players will enter the realm normally.
-#                     Character creation will still be possible even when realm is disabled.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#     EnablePlayerSettings
+#        Description: Enables the usage of character specific settings.
+#        Default:     0 - Disabled
+#                     1 - Enabled
 
-World.RealmAvailability = 1
+EnablePlayerSettings = 0
 
 #
 ###################################################################################################

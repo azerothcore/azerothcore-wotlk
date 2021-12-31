@@ -16,10 +16,10 @@
  */
 
 #include "MoveSplineInit.h"
-#include "old_hillsbrad.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
+#include "old_hillsbrad.h"
 
 enum LieutenantDrake
 {
@@ -134,7 +134,7 @@ public:
                     events.ScheduleEvent(EVENT_WHIRLWIND, 25000);
                     break;
                 case EVENT_EXPLODING_SHOT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 40.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f))
                         me->CastSpell(target, SPELL_EXPLODING_SHOT, false);
                     events.ScheduleEvent(EVENT_EXPLODING_SHOT, 25000);
                     break;

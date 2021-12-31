@@ -16,8 +16,8 @@
  */
 
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "violet_hold.h"
 
 enum Yells
@@ -113,7 +113,7 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_VOID_SHIFT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                     {
                         me->CastSpell(target, SPELL_VOID_SHIFT, false);
                         me->Whisper("Gaze... into the void.", LANG_UNIVERSAL, target->ToPlayer());

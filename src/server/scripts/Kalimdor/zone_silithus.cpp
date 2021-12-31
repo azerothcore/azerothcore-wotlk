@@ -28,16 +28,16 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "AccountMgr.h"
-#include "BanMgr.h"
-#include "Group.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "Spell.h"
-#include "SpellInfo.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "Group.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "Spell.h"
+#include "SpellInfo.h"
 
 /*####
 # quest_a_pawn_on_the_eternal_board (Defines)
@@ -1000,6 +1000,26 @@ enum WindStone
     SAY_ON_SPAWN_IN      = 0
 };
 
+class DelayedWindstoneSummonEvent : public BasicEvent
+{
+public:
+    DelayedWindstoneSummonEvent(TempSummon* summon, ObjectGuid playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
+        {
+            _summon->AI()->AttackStart(player);
+        }
+
+        return true;
+    }
+
+private:
+    TempSummon* _summon;
+    ObjectGuid _playerGUID;
+};
+
 class go_wind_stone : public GameObjectScript
 {
 public:
@@ -1009,11 +1029,16 @@ public:
     {
         go_wind_stoneAI(GameObject* go) : GameObjectAI(go) {}
 
+        void InitializeAI() override
+        {
+            me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+        }
+
         bool GossipHello(Player* player, bool reportUse) override
         {
             if (reportUse)
             {
-                uint32 gossipId         = go->GetGOInfo()->GetGossipMenuId();
+                uint32 gossipId         = me->GetGOInfo()->GetGossipMenuId();
                 bool   _twilightSetAura = (player->HasAura(AURA_TWILIGHT_SET, player->GetGUID()) ? true : false);
                 bool   _medallionAura   = (player->HasAura(AURA_MEDALLION, player->GetGUID()) ? true : false);
                 bool   _ringAura        = (player->HasAura(AURA_RING, player->GetGUID()) ? true : false);
@@ -1023,19 +1048,19 @@ public:
                 case GOSSIPID_LESSER_WS:
                 {
                     if (!_twilightSetAura)
-                        go->CastSpell(player, SPELL_PUNISHMENT);
+                        me->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
                 case GOSSIPID_WS:
                 {
                     if (!_twilightSetAura || !_medallionAura)
-                        go->CastSpell(player, SPELL_PUNISHMENT);
+                        me->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
                 case GOSSIPID_GREATER_WS:
                 {
                     if (!_twilightSetAura || !_medallionAura || !_ringAura)
-                        go->CastSpell(player, SPELL_PUNISHMENT);
+                        me->CastSpell(player, SPELL_PUNISHMENT);
                     break;
                 }
                 default:
@@ -1047,26 +1072,41 @@ public:
 
         bool GossipSelect(Player* player, uint32 sender, uint32 action) override
         {
+            Seconds respawnTimer = 0s;
             player->PlayerTalkClass->SendCloseGossip();
+
+            Creature* lastSpawn = ObjectAccessor::GetCreature(*me, _creatureGuid);
+            if (lastSpawn && lastSpawn->IsAlive())
+            {
+                // We already summoned something recently, return.
+                CloseGossipMenuFor(player);
+                return true;
+            }
+            else
+            {
+                _creatureGuid.Clear();
+            }
 
             if (sender == GOSSIPID_LESSER_WS)
             {
+                respawnTimer = 300s; // Lesser Windstone respawn in 5 minutes
+
                 switch (action)
                 {
                 case 0:
-                    SummonNPC(go, player, RAND(NPC_TEMPLAR_WATER, NPC_TEMPLAR_FIRE, NPC_TEMPLAR_EARTH, NPC_TEMPLAR_AIR), SPELL_TEMPLAR_RANDOM);
+                    SummonNPC(me, player, RAND(NPC_TEMPLAR_WATER, NPC_TEMPLAR_FIRE, NPC_TEMPLAR_EARTH, NPC_TEMPLAR_AIR), SPELL_TEMPLAR_RANDOM);
                     break;
                 case 1:
-                    SummonNPC(go, player, NPC_TEMPLAR_FIRE, SPELL_TEMPLAR_FIRE);
+                    SummonNPC(me, player, NPC_TEMPLAR_FIRE, SPELL_TEMPLAR_FIRE);
                     break;
                 case 2:
-                    SummonNPC(go, player, NPC_TEMPLAR_WATER, SPELL_TEMPLAR_WATER);
+                    SummonNPC(me, player, NPC_TEMPLAR_WATER, SPELL_TEMPLAR_WATER);
                     break;
                 case 3:
-                    SummonNPC(go, player, NPC_TEMPLAR_EARTH, SPELL_TEMPLAR_EARTH);
+                    SummonNPC(me, player, NPC_TEMPLAR_EARTH, SPELL_TEMPLAR_EARTH);
                     break;
                 case 4:
-                    SummonNPC(go, player, NPC_TEMPLAR_AIR, SPELL_TEMPLAR_AIR);
+                    SummonNPC(me, player, NPC_TEMPLAR_AIR, SPELL_TEMPLAR_AIR);
                     break;
                 default:
                     break;
@@ -1074,22 +1114,24 @@ public:
             }
             else if (sender == GOSSIPID_WS)
             {
+                respawnTimer = 900s; // Windstone respawn in 15 minutes
+
                 switch (action)
                 {
                 case 0:
-                    SummonNPC(go, player, RAND(NPC_DUKE_WATER, NPC_DUKE_FIRE, NPC_DUKE_EARTH, NPC_DUKE_AIR), SPELL_DUKE_RANDOM);
+                    SummonNPC(me, player, RAND(NPC_DUKE_WATER, NPC_DUKE_FIRE, NPC_DUKE_EARTH, NPC_DUKE_AIR), SPELL_DUKE_RANDOM);
                     break;
                 case 1:
-                    SummonNPC(go, player, NPC_DUKE_FIRE, SPELL_DUKE_FIRE);
+                    SummonNPC(me, player, NPC_DUKE_FIRE, SPELL_DUKE_FIRE);
                     break;
                 case 2:
-                    SummonNPC(go, player, NPC_DUKE_WATER, SPELL_DUKE_WATER);
+                    SummonNPC(me, player, NPC_DUKE_WATER, SPELL_DUKE_WATER);
                     break;
                 case 3:
-                    SummonNPC(go, player, NPC_DUKE_EARTH, SPELL_DUKE_EARTH);
+                    SummonNPC(me, player, NPC_DUKE_EARTH, SPELL_DUKE_EARTH);
                     break;
                 case 4:
-                    SummonNPC(go, player, NPC_DUKE_AIR, SPELL_DUKE_AIR);
+                    SummonNPC(me, player, NPC_DUKE_AIR, SPELL_DUKE_AIR);
                     break;
                 default:
                     break;
@@ -1097,27 +1139,33 @@ public:
             }
             else if (sender == GOSSIPID_GREATER_WS)
             {
+                respawnTimer = 10800s; // Greater Windstone respawn in 3 hours
+
                 switch (action)
                 {
                 case 0:
-                    SummonNPC(go, player, RAND(NPC_ROYAL_WATER, NPC_ROYAL_FIRE, NPC_ROYAL_EARTH, NPC_ROYAL_AIR), SPELL_ROYAL_RANDOM);
+                    SummonNPC(me, player, RAND(NPC_ROYAL_WATER, NPC_ROYAL_FIRE, NPC_ROYAL_EARTH, NPC_ROYAL_AIR), SPELL_ROYAL_RANDOM);
                     break;
                 case 1:
-                    SummonNPC(go, player, NPC_ROYAL_FIRE, SPELL_ROYAL_FIRE);
+                    SummonNPC(me, player, NPC_ROYAL_FIRE, SPELL_ROYAL_FIRE);
                     break;
                 case 2:
-                    SummonNPC(go, player, NPC_ROYAL_WATER, SPELL_ROYAL_WATER);
+                    SummonNPC(me, player, NPC_ROYAL_WATER, SPELL_ROYAL_WATER);
                     break;
                 case 3:
-                    SummonNPC(go, player, NPC_ROYAL_EARTH, SPELL_ROYAL_EARTH);
+                    SummonNPC(me, player, NPC_ROYAL_EARTH, SPELL_ROYAL_EARTH);
                     break;
                 case 4:
-                    SummonNPC(go, player, NPC_ROYAL_AIR, SPELL_ROYAL_AIR);
+                    SummonNPC(me, player, NPC_ROYAL_AIR, SPELL_ROYAL_AIR);
                     break;
                 default:
                     break;
                 }
             }
+
+            me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
+            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            CloseGossipMenuFor(player);
             return false;
         }
 
@@ -1134,22 +1182,23 @@ public:
             delete spell;
             if (result != SPELL_CAST_OK)
             {
-                if (result == SPELL_FAILED_REAGENTS)
-                {
-                    std::string accountName;
-                    AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-                    sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "Server");
-                }
                 return;
             }
             player->CastSpell(player, spellInfoTrigger->Id, false);
-            TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000);
-            summons->CastSpell(summons, SPELL_SPAWN_IN, false);
-            summons->AI()->Talk(SAY_ON_SPAWN_IN);
-            summons->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            summons->SendMeleeAttackStart(player);
-            summons->CombatStart(player);
+            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE, 6000))
+            {
+                summons->SetCorpseDelay(5 * MINUTE);
+                summons->SetTarget(player->GetGUID());
+                summons->SetLootRecipient(player);
+                summons->CastSpell(summons, SPELL_SPAWN_IN, false);
+                summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
+                summons->m_Events.AddEvent(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), summons->m_Events.CalculateTime(5200));
+                _creatureGuid = summons->GetGUID();
+            }
         }
+
+        private:
+            ObjectGuid _creatureGuid;
     };
 
     GameObjectAI* GetAI(GameObject* go) const

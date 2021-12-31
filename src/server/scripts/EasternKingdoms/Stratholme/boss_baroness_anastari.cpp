@@ -20,8 +20,8 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "stratholme.h"
 #include "TaskScheduler.h"
+#include "stratholme.h"
 
 enum Spells
 {
@@ -86,7 +86,7 @@ public:
         void SchedulePossession()
         {
             _scheduler.Schedule(20s, 30s, [this](TaskContext context){
-                if (Unit* possessTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0, true, false))
+                if (Unit* possessTarget = SelectTarget(SelectTargetMethod::Random, 1, 0, true, false))
                 {
                     DoCast(possessTarget, SPELL_POSSESS, true);
                     DoCast(possessTarget, SPELL_POSSESSED, true);
@@ -147,4 +147,3 @@ void AddSC_boss_baroness_anastari()
 {
     new boss_baroness_anastari;
 }
-

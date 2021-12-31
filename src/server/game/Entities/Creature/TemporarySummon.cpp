@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TemporarySummon.h"
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "TemporarySummon.h"
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) :
     Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
@@ -104,7 +104,23 @@ void TempSummon::Update(uint32 diff)
 
                 break;
             }
+        case TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE:
+            {
+                if (!IsInCombat() && m_deathState != CORPSE)
+                {
+                    if (m_timer <= diff)
+                    {
+                        UnSummon();
+                        return;
+                    }
 
+                    m_timer -= diff;
+                }
+                else if (m_timer != m_lifetime)
+                    m_timer = m_lifetime;
+
+                break;
+            }
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
             {
                 if (m_deathState == CORPSE)
@@ -418,7 +434,7 @@ void Puppet::InitSummon()
         else
         {
             LOG_INFO("misc", "Puppet::InitSummon (B1)");
-            //ABORT(); // ZOMG!
+            //ABORT();
         }
     }
 }

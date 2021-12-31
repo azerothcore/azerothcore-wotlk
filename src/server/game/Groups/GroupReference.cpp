@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Group.h"
 #include "GroupReference.h"
+#include "Group.h"
 
 void GroupReference::targetObjectBuildLink()
 {

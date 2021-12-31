@@ -17,8 +17,8 @@
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -484,7 +484,7 @@ public:
                     {
                         me->CastSpell(plr, SPELL_FREEZE, false);
                     }
-                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                     {
                         me->CastSpell(target, SPELL_FREEZE, false);
                     }

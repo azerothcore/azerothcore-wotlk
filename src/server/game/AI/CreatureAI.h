@@ -137,7 +137,7 @@ public:
     // Called at reaching home after evade
     virtual void JustReachedHome() {}
 
-    void DoZoneInCombat(Creature* creature = nullptr, float maxRangeToNearestTarget = 50.0f);
+    void DoZoneInCombat(Creature* creature = nullptr, float maxRangeToNearestTarget = 250.0f);
 
     // Called at text emote receive from player
     virtual void ReceiveEmote(Player* /*player*/, uint32 /*emoteId*/) {}
@@ -176,6 +176,8 @@ public:
     virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }
 
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
+
+    virtual void PetStopAttack() { }
 
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);

@@ -17,10 +17,10 @@
 
 #include "old_hillsbrad.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 /*enum Erozion
 {
@@ -494,7 +494,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer == me)
+            if (killer && killer == me)
                 return;
 
             summons.DespawnAll();

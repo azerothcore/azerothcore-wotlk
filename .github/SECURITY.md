@@ -5,7 +5,9 @@
 We support the following versions of dependencies.
 
 :white_check_mark: = supported
+
 :red_circle: = NOT supported
+
 unspecified = might work but no guarantee
 
 Versions of AzerothCore:
@@ -28,40 +30,38 @@ Versions of MariaDB:
 | --------------- | ------------------ |
 | 10.6            | :white_check_mark: |
 | 10.5            | :white_check_mark: |
-| 10.4            | :white_check_mark: |
-| 10.3            | :white_check_mark: |
-| 10.2            | :white_check_mark: |
+| 10.4 and lower  | :red_circle:       |
 
 Versions of CLang:
 
-| CLang Version   | Supported          |
-| --------------- | ------------------ |
-| 12              | :white_check_mark: |
-| 11              | :white_check_mark: |
-| 10              | :white_check_mark: |
-| 9 and lower     | :red_circle:       |
+| CLang Version | Supported          |
+| ------------- | ------------------ |
+| 12            | :white_check_mark: |
+| 11            | :white_check_mark: |
+| 10            | :white_check_mark: |
+| 9 and lower   | :red_circle:       |
 
 Versions of GCC:
 
-| GCC Version     | Supported          |
-| --------------- | ------------------ |
-| 10              | :white_check_mark: |
-| 9               | :white_check_mark: |
-| 8               | :white_check_mark: |
-| 7 and lower     | :red_circle:       |
+| GCC Version | Supported          |
+| ----------- | ------------------ |
+| 10          | :white_check_mark: |
+| 9           | :white_check_mark: |
+| 8           | :white_check_mark: |
+| 7 and lower | :red_circle:       |
 
 Versions of Ubuntu:
 
-| Ubuntu version  | Supported          |
-| --------------- | ------------------ |
-| 20.04           | :white_check_mark: |
-| 18.04           | :white_check_mark: |
+| Ubuntu version | Supported          |
+| -------------- | ------------------ |
+| 20.04          | :white_check_mark: |
+| 18.04          | :white_check_mark: |
 
 Versions of macOS:
 
-| macOS Version   | Supported          |
-| --------------- | ------------------ |
-| 10.15           | :white_check_mark: |
+| macOS Version | Supported          |
+| ------------- | ------------------ |
+| 10.15         | :white_check_mark: |
 
 **Note**: We do NOT support any repacks that may or may not have been made based on AzerothCore. Nor do we support any of the releases that are made under AzerothCore.
 

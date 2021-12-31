@@ -19,6 +19,7 @@
 #define TRANSPORTMGR_H
 
 #include "DBCStores.h"
+#include "ObjectGuid.h"
 #include "Spline.h"
 #include <G3D/Quat.h>
 

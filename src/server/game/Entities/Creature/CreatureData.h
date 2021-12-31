@@ -18,9 +18,9 @@
 #ifndef AZEROTHCORE_CREATUREDATA_H
 #define AZEROTHCORE_CREATUREDATA_H
 
-#include "DBCEnums.h"
 #include "Cell.h"
 #include "Common.h"
+#include "DBCEnums.h"
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
@@ -33,11 +33,14 @@
 
 #define MAX_KILL_CREDIT 2
 #define CREATURE_REGEN_INTERVAL 2 * IN_MILLISECONDS
-#define PET_FOCUS_REGEN_INTERVAL 4 * IN_MILLISECONDS
 
 #define MAX_CREATURE_QUEST_ITEMS 6
 
 #define MAX_EQUIPMENT_ITEMS 3
+
+constexpr Milliseconds PET_FOCUS_REGEN_INTERVAL = 4s;
+
+enum class VisibilityDistanceType : uint8;
 
 // TODO: Implement missing flags from TC in places that custom flags from xinef&pussywizzard use flag values.
 // EnumUtils: DESCRIBE THIS
@@ -342,6 +345,7 @@ struct CreatureAddon
     uint32 emote;
     bool isLarge;
     std::vector<uint32> auras;
+    VisibilityDistanceType visibilityDistanceType;
 };
 
 typedef std::unordered_map<uint32, CreatureAddon> CreatureAddonContainer;
@@ -415,6 +419,7 @@ struct TrainerSpell
     uint32 reqSkillValue{0};
     uint32 reqLevel{0};
     uint32 learnedSpell[3];
+    uint32 reqSpell{0};
 
     // helpers
     [[nodiscard]] bool IsCastable() const { return learnedSpell[0] != spell; }

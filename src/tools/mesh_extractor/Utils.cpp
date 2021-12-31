@@ -16,11 +16,11 @@
  */
 
 #include "Utils.h"
-#include "WorldModelHandler.h"
 #include "Constants.h"
-#include <cstring>
 #include "G3D/Matrix4.h"
 #include "G3D/Quat.h"
+#include "WorldModelHandler.h"
+#include <cstring>
 
 #ifdef _WIN32
 #include "direct.h"

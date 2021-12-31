@@ -19,8 +19,8 @@
 #include "CombatAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
@@ -41,7 +41,7 @@ public:
         uint32 faction;
         EventMap events;
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_KEEP_CANNON)
             {
@@ -285,7 +285,7 @@ public:
                     events.RepeatEvent(22000);
                     break;
                 case EVENT_DAGGER_THROW:
-                    if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* tgt = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(tgt, SPELL_IOCBOSS_DAGGER_THROW, false);
 
                     events.RepeatEvent(10000);

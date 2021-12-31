@@ -18,12 +18,12 @@
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum XT002Spells
 {
@@ -236,7 +236,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->Yell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL);
             me->PlayDirectSound(XT_SOUND_DEATH);
@@ -533,7 +533,7 @@ public:
                 }
         }
 
-        void JustDied(Unit* /*victim*/) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetVisible(false);
             if (me->GetInstanceScript())
@@ -591,7 +591,7 @@ public:
         void JustDied(Unit* killer) override
         {
             // Nerf Scrapbots achievement
-            if (killer->GetEntry() == NPC_XE321_BOOMBOT)
+            if (killer && killer->GetEntry() == NPC_XE321_BOOMBOT)
                 if (me->GetInstanceScript())
                 {
                     me->GetInstanceScript()->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, 65037);
@@ -782,7 +782,7 @@ public:
             me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }

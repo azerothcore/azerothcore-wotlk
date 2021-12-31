@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "the_black_morass.h"
 #include "MoveSplineInit.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "the_black_morass.h"
 
 enum medivhSays
 {
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetRespawnTime(DAY);
             events.Reset();
@@ -323,8 +323,7 @@ public:
 
         void DoSummonAtRift(uint32 entry)
         {
-            Position pos;
-            me->GetNearPosition(pos, 10.0f, 2 * M_PI * rand_norm());
+            Position pos = me->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
             if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
                 if (instance)

@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "pit_of_saron.h"
 #include "CreatureGroups.h"
 #include "MapMgr.h"
 #include "PassiveAI.h"
-#include "pit_of_saron.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SmartAI.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
@@ -476,7 +476,7 @@ public:
                     events.RepeatEvent(4000);
                     break;
                 case 2: // Conversion Beam
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, 69578, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;

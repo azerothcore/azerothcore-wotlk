@@ -19,9 +19,9 @@
  * Interaction between core and LFGScripts
  */
 
+#include "LFGScripts.h"
 #include "Group.h"
 #include "LFGMgr.h"
-#include "LFGScripts.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -29,10 +29,7 @@
 
 namespace lfg
 {
-
-    LFGPlayerScript::LFGPlayerScript() : PlayerScript("LFGPlayerScript")
-    {
-    }
+    LFGPlayerScript::LFGPlayerScript() : PlayerScript("LFGPlayerScript") { }
 
     void LFGPlayerScript::OnLevelChanged(Player* player, uint8 /*oldLevel*/)
     {

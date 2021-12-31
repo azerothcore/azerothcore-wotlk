@@ -22,14 +22,14 @@ SDComment:
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
+#include "hyjalAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "hyjal_trash.h"
-#include "hyjalAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "hyjal_trash.h"
 
 enum Spawns
 {
@@ -854,7 +854,7 @@ void hyjalAI::UpdateAI(uint32 diff)
                         break;
 
                     case TARGETTYPE_RANDOM:
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                        target = SelectTarget(SelectTargetMethod::Random, 0);
                         break;
 
                     case TARGETTYPE_VICTIM:

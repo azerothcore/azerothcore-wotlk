@@ -17,11 +17,11 @@
 
 #include "CombatAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "utgarde_pinnacle.h"
 #include "Vehicle.h"
+#include "utgarde_pinnacle.h"
 
 enum Misc
 {
@@ -226,7 +226,7 @@ public:
                     }
                 case EVENT_SKADI_SPEAR:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_POISONED_SPEAR_H : SPELL_POISONED_SPEAR_N, false);
 
                         events.RepeatEvent(10000);

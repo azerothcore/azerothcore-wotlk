@@ -17,9 +17,9 @@
 
 #include "BattlegroundRL.h"
 #include "Language.h"
+#include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 BattlegroundRL::BattlegroundRL()
 {

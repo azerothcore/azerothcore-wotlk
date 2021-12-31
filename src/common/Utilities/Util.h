@@ -21,6 +21,7 @@
 #include "Containers.h"
 #include "Define.h"
 #include "Errors.h"
+#include "Optional.h"
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -28,9 +29,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <list>
-#include <map>
-#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -77,7 +75,7 @@ tm TimeBreakdown(time_t t);
 
 void stripLineInvisibleChars(std::string& src);
 
-int32 MoneyStringToMoney(const std::string& moneyString);
+AC_COMMON_API Optional<int32> MoneyStringToMoney(std::string_view moneyString);
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
 uint32 TimeStringToSecs(const std::string& timestring);

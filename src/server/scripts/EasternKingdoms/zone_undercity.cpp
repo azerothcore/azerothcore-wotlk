@@ -30,10 +30,10 @@ EndContentData */
 
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -2123,7 +2123,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_FIREBALL:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_FIREBALL);
                         _events.ScheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
                         break;
@@ -2194,7 +2194,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_INFEST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                             DoCast(target, SPELL_INGEST);
                         _events.ScheduleEvent(EVENT_INFEST, 20 * IN_MILLISECONDS);
                         break;
