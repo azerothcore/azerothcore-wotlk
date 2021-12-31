@@ -121,7 +121,7 @@ public:
                     }
                 case EVENT_PILLAR:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
 
                         events.RepeatEvent(12000 + rand() % 8000);
@@ -129,7 +129,7 @@ public:
                     }
                 case EVENT_PARTING:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
                             me->CastSpell(target, PARTING_SORROW, false);
 
                         events.RepeatEvent(6000 + rand() % 10000);

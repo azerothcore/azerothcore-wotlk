@@ -208,7 +208,7 @@ public:
                         break;
                     case EVENT_MARK_OF_ARLOKK:
                         {
-                            Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, urand(1, 3), 0.0f, false, -SPELL_MARK_OF_ARLOKK);
+                            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, urand(1, 3), 0.0f, false, -SPELL_MARK_OF_ARLOKK);
                             if (!target)
                                 target = me->GetVictim();
                             if (target)
@@ -253,7 +253,7 @@ public:
                     case EVENT_VISIBLE:
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             AttackStart(target);
                         me->RemoveAura(SPELL_SUPER_INVIS);
                         me->RemoveAura(SPELL_VANISH);
@@ -389,7 +389,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ATTACK:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0.0f, 100, false))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0.0f, 100, false))
                             me->Attack(target, true);
                         break;
                     default:

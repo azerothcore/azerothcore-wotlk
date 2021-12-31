@@ -113,7 +113,7 @@ public:
                 switch (eventId)
                 {
                 case SPELL_HANDOFTHAURISSAN:
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM), SPELL_HANDOFTHAURISSAN);
+                    DoCast(SelectTarget(SelectTargetMethod::Random), SPELL_HANDOFTHAURISSAN);
                     //DoCastVictim(SPELL_HANDOFTHAURISSAN);
                     events.ScheduleEvent(SPELL_HANDOFTHAURISSAN, urand(4000, 7000));
                     break;

@@ -149,7 +149,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_INCINERATE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         if (roll_chance_i(50))
                             Talk(SAY_INCINERATE);
@@ -171,7 +171,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_CRUSHING_SHADOWS, 15000);
                     break;
                 case EVENT_SPELL_SHADOW_OF_DEATH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, ShadowOfDeathSelector()))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, ShadowOfDeathSelector()))
                         me->CastSpell(target, SPELL_SHADOW_OF_DEATH, false);
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_OF_DEATH, 30000);
                     break;

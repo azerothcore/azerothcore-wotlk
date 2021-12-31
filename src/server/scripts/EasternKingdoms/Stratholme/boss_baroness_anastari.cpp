@@ -86,7 +86,7 @@ public:
         void SchedulePossession()
         {
             _scheduler.Schedule(20s, 30s, [this](TaskContext context){
-                if (Unit* possessTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0, true, false))
+                if (Unit* possessTarget = SelectTarget(SelectTargetMethod::Random, 1, 0, true, false))
                 {
                     DoCast(possessTarget, SPELL_POSSESS, true);
                     DoCast(possessTarget, SPELL_POSSESSED, true);

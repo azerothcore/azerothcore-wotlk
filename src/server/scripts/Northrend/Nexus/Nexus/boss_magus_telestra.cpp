@@ -198,7 +198,7 @@ public:
                     events.ScheduleEvent(EVENT_MAGUS_HEALTH2, 1000);
                     break;
                 case EVENT_MAGUS_FIREBOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_FIREBOMB, false);
                     events.ScheduleEvent(EVENT_MAGUS_FIREBOMB, 3000);
                     break;

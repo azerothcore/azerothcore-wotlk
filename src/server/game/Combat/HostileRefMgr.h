@@ -59,8 +59,6 @@ public:
 
     HostileReference* getFirst() { return ((HostileReference*) RefMgr<Unit, ThreatMgr>::getFirst()); }
 
-    void updateThreatTables();
-
     void setOnlineOfflineState(bool isOnline);
 
     // set state for one reference, defined by Unit
