@@ -4873,7 +4873,7 @@ void Spell::TakeCastItem()
                 // item has charges left
                 if (charges)
                 {
-                    (charges > 0) ? --charges : ++charges;  // abs(charges) less at 1 after use
+                    (charges > 0) ? --charges : ++charges;  // std::abs(charges) less at 1 after use
                     if (proto->Stackable == 1)
                         m_CastItem->SetSpellCharges(i, charges);
                     m_CastItem->SetState(ITEM_CHANGED, m_caster->ToPlayer());
@@ -5143,7 +5143,7 @@ void Spell::TakeReagents()
             {
                 // CastItem will be used up and does not count as reagent
                 int32 charges = m_CastItem->GetSpellCharges(s);
-                if (castItemTemplate->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                if (castItemTemplate->Spells[s].SpellCharges < 0 && std::abs(charges) < 2)
                 {
                     ++itemcount;
                     break;
@@ -5922,19 +5922,22 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_RESURRECT_PET:
                 {
-                    if (Creature* pet = m_caster->GetGuardianPet())
+                    Unit* unitCaster = m_caster->ToUnit();
+                    if (!unitCaster)
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    Creature* pet = unitCaster->GetGuardianPet();
+                    if (pet && pet->IsAlive())
+                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+
+                    Player* player = unitCaster->ToPlayer();
+                    if (player)
                     {
-                        if (pet->IsAlive())
+                        // Check pet before resurrect
+                        auto [petStable, petSlot] = Pet::GetLoadPetInfo(*player->GetPetStable(), 0, 0, false);
+                        if (!petStable)
                         {
-                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-                        }
-                    }
-                    else if (Player* player = m_caster->ToPlayer())
-                    {
-                        SpellCastResult loadResult = Pet::TryLoadFromDB(player, false, MAX_PET_TYPE, true);
-                        if (loadResult != SPELL_CAST_OK)
-                        {
-                            return loadResult;
+                            return SPELL_FAILED_NO_PET;
                         }
                     }
 
@@ -5972,6 +5975,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_SUMMON_PET:
                 {
+                    Unit* unitCaster = m_caster->ToUnit();
+                    if (!unitCaster)
+                        return SPELL_FAILED_BAD_TARGETS;
+
                     if (!m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET_FIRST))
                     {
                         if (m_caster->GetPetGUID())
@@ -5983,6 +5990,40 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK && strict)
                         if (Pet* pet = m_caster->ToPlayer()->GetPet())
                             pet->CastSpell(pet, 32752, true, nullptr, nullptr, pet->GetGUID()); //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
+
+                    Player* playerCaster = unitCaster->ToPlayer();
+                    if (playerCaster && playerCaster->GetPetStable())
+                    {
+                        std::pair<PetStable::PetInfo const*, PetSaveMode> info = Pet::GetLoadPetInfo(*playerCaster->GetPetStable(), m_spellInfo->Effects[i].MiscValue, 0, false);
+                        if (info.first)
+                        {
+                            if (info.first->Type == HUNTER_PET)
+                            {
+                                if (!info.first->Health)
+                                {
+                                    playerCaster->SendTameFailure(PET_TAME_DEAD);
+                                    return SPELL_FAILED_DONT_REPORT;
+                                }
+
+                                CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(info.first->CreatureId);
+                                if (!creatureInfo || !creatureInfo->IsTameable(playerCaster->CanTameExoticPets()))
+                                {
+                                    // if problem in exotic pet
+                                    if (creatureInfo && creatureInfo->IsTameable(true))
+                                        playerCaster->SendTameFailure(PET_TAME_CANT_CONTROL_EXOTIC);
+                                    else
+                                        playerCaster->SendTameFailure(PET_TAME_NOPET_AVAILABLE);
+
+                                    return SPELL_FAILED_DONT_REPORT;
+                                }
+                            }
+                        }
+                        else if (!m_spellInfo->Effects[i].MiscValue) // when miscvalue is present it is allowed to create new pets
+                        {
+                            playerCaster->SendTameFailure(PET_TAME_NOPET_AVAILABLE);
+                            return SPELL_FAILED_DONT_REPORT;
+                        }
+                    }
                     break;
                 }
             case SPELL_EFFECT_SUMMON_PLAYER:
@@ -6798,7 +6839,7 @@ SpellCastResult Spell::CheckItems()
                     {
                         // CastItem will be used up and does not count as reagent
                         int32 charges = m_CastItem->GetSpellCharges(s);
-                        if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                        if (proto->Spells[s].SpellCharges < 0 && std::abs(charges) < 2)
                         {
                             ++itemcount;
                             break;

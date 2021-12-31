@@ -25,6 +25,7 @@
 #include "SpellMgr.h"
 #include "SpellInfo.h"
 #include "WorldSession.h"
+#include "ObjectMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -79,42 +80,28 @@ public:
         }
 
         // Everything looks OK, create new pet
-        Pet* pet = new Pet(player, HUNTER_PET);
-        if (!pet->CreateBaseAtCreature(creatureTarget))
-        {
-            delete pet;
-            handler->PSendSysMessage("Error 1");
-            return false;
-        }
+        Pet* pet = player->CreateTamedPetFrom(creatureTarget);
 
-        creatureTarget->setDeathState(JUST_DIED);
-        creatureTarget->RemoveCorpse();
-        creatureTarget->SetHealth(0); // just for nice GM-mode view
+        // "kill" original creature
+        creatureTarget->DespawnOrUnsummon();
 
-        pet->SetGuidValue(UNIT_FIELD_CREATEDBY, player->GetGUID());
-        pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->GetFaction());
-
-        if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
-        {
-            LOG_ERROR("misc", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
-            handler->PSendSysMessage("Error 2");
-            delete pet;
-            return false;
-        }
+        uint8 level = (creatureTarget->getLevel() < (player->getLevel() - 5)) ? (player->getLevel() - 5) : player->getLevel();
 
         // prepare visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel() - 1);
-        pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
+        pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
 
-        // this enables pet details window (Shift+P)
-        pet->InitPetCreateSpells();
-        pet->SetFullHealth();
+        // add to world
         pet->GetMap()->AddToMap(pet->ToCreature());
 
         // visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel());
+        pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
+
+        // caster have pet now
         player->SetMinion(pet, true);
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+
+        pet->InitTalentForLevel();
+
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         player->PetSpellInitialize();
 
         return true;

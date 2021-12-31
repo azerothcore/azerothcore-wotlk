@@ -191,9 +191,9 @@ void SmartAIMgr::LoadSmartAIFromDB()
         }
         else
         {
-            if (!sObjectMgr->GetCreatureData(uint32(abs(temp.entryOrGuid))))
+            if (!sObjectMgr->GetCreatureData(uint32(std::abs(temp.entryOrGuid))))
             {
-                LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid (%u) does not exist, skipped loading.", uint32(abs(temp.entryOrGuid)));
+                LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid (%u) does not exist, skipped loading.", uint32(std::abs(temp.entryOrGuid)));
                 continue;
             }
         }
@@ -1280,7 +1280,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
     if (e.entryOrGuid >= 0)
         entry = uint32(e.entryOrGuid);
     else {
-        entry = uint32(abs(e.entryOrGuid));
+        entry = uint32(std::abs(e.entryOrGuid));
         CreatureData const* data = sObjectMgr->GetCreatureData(entry);
         if (!data)
         {

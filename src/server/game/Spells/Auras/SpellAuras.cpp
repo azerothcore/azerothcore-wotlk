@@ -189,7 +189,7 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
         {
             AuraApplication* strongestApp = apply ? this : nullptr;
             AuraEffect* strongestEff = apply ? aurEff : nullptr;
-            int32 amount = apply ? abs(aurEff->GetAmount()) : 0;
+            int32 amount = apply ? std::abs(aurEff->GetAmount()) : 0;
             Unit* target = GetTarget();
             Unit::AuraEffectList const& auraList = target->GetAuraEffectsByType(aurEff->GetAuraType());
             for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
@@ -207,7 +207,7 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
                 if (!aurApp)
                     continue;
 
-                if (amount < abs((*iter)->GetForcedAmount()))
+                if (amount < std::abs((*iter)->GetForcedAmount()))
                 {
                     // xinef: if we have strongest aura and it is active, turn it off
                     // xinef: otherwise just save new aura;
@@ -220,7 +220,7 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
                     }
                     strongestApp = aurApp;
                     strongestEff = (*iter);
-                    amount = abs((*iter)->GetAmount());
+                    amount = std::abs((*iter)->GetAmount());
                 }
                 // xinef: itered aura is weaker, deactivate if active
                 else if (aurApp->IsActive((*iter)->GetEffIndex()))
@@ -1930,11 +1930,11 @@ bool Aura::IsAuraStronger(Aura const* newAura) const
                 continue;
 
             // xinef: assume that all spells are either positive or negative, otherwise they should not be in one group
-            int32 curValue = abs(thisEffect->GetAmount());
-            if (curValue < abs(newEffect->GetAmount()))
+            int32 curValue = std::abs(thisEffect->GetAmount());
+            if (curValue < std::abs(newEffect->GetAmount()))
                 return true;
 
-            if (curValue == abs(newEffect->GetAmount()))
+            if (curValue == std::abs(newEffect->GetAmount()))
                 if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
                     return true;
         }
