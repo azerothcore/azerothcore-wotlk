@@ -1169,7 +1169,7 @@ public:
 
         uint32 timer;
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_MR_BIGGLESWORTH && me->GetInstanceScript())
             {
