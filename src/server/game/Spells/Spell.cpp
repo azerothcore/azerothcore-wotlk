@@ -1695,8 +1695,8 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
         const float size = std::max((*itr)->GetObjectSize() * 0.7f, 1.0f); // 1/sqrt(3)
         // TODO: all calculation should be based on src instead of m_caster
-        const float objDist2d = fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
-        const float dz = fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
+        const float objDist2d = std::fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
+        const float dz = std::fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
 
         LOG_ERROR("spells", "Spell::SelectTrajTargets: check %u, dist between %f %f, height between %f %f.",
             (*itr)->GetEntry(), objDist2d - size, objDist2d + size, dz - size, dz + size);
@@ -1726,7 +1726,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         // RP-GG only, search in straight line, as item have no trajectory
         if (m_CastItem)
         {
-            if (dist < bestDist && fabs(dz) < 6.0f) // closes target, also check Z difference)
+            if (dist < bestDist && std::fabs(dz) < 6.0f) // closes target, also check Z difference)
             {
                 bestDist = dist;
                 break;

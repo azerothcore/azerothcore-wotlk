@@ -216,9 +216,9 @@ namespace lfg
         bool PlayerSameAs(RBInternalInfo const& i) const
         {
             return isGroupLeader == i.isGroupLeader && groupGuid == i.groupGuid && roles == i.roles && (isGroupLeader || (comment == i.comment && encounterMask == i.encounterMask && instanceGuid == i.instanceGuid))
-                   && _online == i._online && _level == i._level && _class == i._class && _race == i._race && fabs(_avgItemLevel - i._avgItemLevel) < 0.01f
+                   && _online == i._online && _level == i._level && _class == i._class && _race == i._race && std::fabs(_avgItemLevel - i._avgItemLevel) < 0.01f
                    && _talents0 == i._talents0 && _talents1 == i._talents1 && _talents2 == i._talents2 && _area == i._area && _armor == i._armor && _spellDamage == i._spellDamage && _spellHeal == i._spellHeal
-                   && _critRatingMelee == i._critRatingMelee && _critRatingRanged == i._critRatingRanged && _critRatingSpell == i._critRatingSpell && fabs(_mp5 - i._mp5) < 0.01f && fabs(_mp5combat - i._mp5combat) < 0.01f
+                   && _critRatingMelee == i._critRatingMelee && _critRatingRanged == i._critRatingRanged && _critRatingSpell == i._critRatingSpell && std::fabs(_mp5 - i._mp5) < 0.01f && std::fabs(_mp5combat - i._mp5combat) < 0.01f
                    && _attackPower == i._attackPower && _agility == i._agility && _health == i._health && _mana == i._mana && _defenseSkill == i._defenseSkill
                    && _dodgeRating == i._dodgeRating && _blockRating == i._blockRating && _parryRating == i._parryRating && _hasteRating == i._hasteRating && _expertiseRating == i._expertiseRating;
         }
