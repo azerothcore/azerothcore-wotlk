@@ -583,9 +583,9 @@ public:
         {
             summons.Summon(summon);
 
-            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, -10.0f, true);
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -10.0f, true);
             if (!target)
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
             if (target)
             {
                 if (summon->GetEntry() == NPC_BALL_OF_INFERNO_FLAME)
@@ -1015,7 +1015,7 @@ public:
                     Talk(SAY_VALANAR_BERSERK);
                     break;
                 case EVENT_KINETIC_BOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         me->CastSpell(target, SPELL_KINETIC_BOMB_TARGET, false);
                         Talk(SAY_VALANAR_SPECIAL);
@@ -1031,7 +1031,7 @@ public:
                     }
                     else
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                             me->CastSpell(target, SPELL_SHOCK_VORTEX, false);
                         events.ScheduleEvent(EVENT_SHOCK_VORTEX, urand(18000, 23000));
                     }

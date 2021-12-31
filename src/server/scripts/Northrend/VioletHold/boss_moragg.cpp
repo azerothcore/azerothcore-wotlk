@@ -99,7 +99,7 @@ public:
                     events.RepeatEvent(urand(8000, 10000));
                     break;
                 case EVENT_SPELL_OPTIC_LINK:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 40.0f, true))
                     {
                         me->CastSpell(target, SPELL_OPTIC_LINK, false);
                         events.RepeatEvent(urand(18000, 21000));

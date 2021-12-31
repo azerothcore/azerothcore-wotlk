@@ -18,6 +18,7 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
+#include "BankPackets.h"
 #include "GuildPackets.h"
 
 #endif // AllPackets_h__

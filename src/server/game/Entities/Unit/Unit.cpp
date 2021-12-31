@@ -3790,10 +3790,13 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
             return false;
     }
 
-    if (IsInWater())
+    // In water or jumping in water
+    if (IsInWater() || (GetLiquidData().Status == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
+    {
         return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
-    else
-        return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
+    }
+
+    return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
 }
 
 void Unit::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
@@ -16606,11 +16609,10 @@ bool Unit::IsPetAura(Aura const* aura)
         return false;
 
     // if the owner has that pet aura, return true
-    for (PetAuraSet::const_iterator itr = owner->m_petAuras.begin(); itr != owner->m_petAuras.end(); ++itr)
-    {
-        if ((*itr)->GetAura(GetEntry()) == aura->GetId())
+    for (PetAura const* petAura : owner->m_petAuras)
+        if (petAura->GetAura(GetEntry()) == aura->GetId())
             return true;
-    }
+
     return false;
 }
 
@@ -16629,7 +16631,11 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget, uint32 spell_id)
 
     uint8 level = creatureTarget->getLevel() + 5 < getLevel() ? (getLevel() - 5) : creatureTarget->getLevel();
 
-    InitTamedPet(pet, level, spell_id);
+    if (!InitTamedPet(pet, level, spell_id))
+    {
+        delete pet;
+        return nullptr;
+    }
 
     return pet;
 }
@@ -16656,6 +16662,11 @@ Pet* Unit::CreateTamedPetFrom(uint32 creatureEntry, uint32 spell_id)
 
 bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
 {
+    Player* player = ToPlayer();
+    PetStable& petStable = player->GetOrInitPetStable();
+    if (petStable.CurrentPet || petStable.GetUnslottedHunterPet())
+        return false;
+
     pet->SetCreatorGUID(GetGUID());
     pet->SetFaction(GetFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell_id);
@@ -16673,6 +16684,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     // this enables pet details window (Shift+P)
     pet->InitPetCreateSpells();
     pet->SetFullHealth();
+    pet->FillPetInfo(&petStable.CurrentPet.emplace());
     return true;
 }
 
@@ -17171,7 +17183,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             creature->DeleteThreatList();
 
             // must be after setDeathState which resets dynamic flags
-            if (!creature->loot.empty())
+            if (!creature->loot.isLooted())
             {
                 creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
@@ -17416,11 +17428,11 @@ void Unit::SetRooted(bool apply)
 
         if (IsFalling())
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
         }
         else
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
 
          // Creature specific
