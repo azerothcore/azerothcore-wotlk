@@ -4873,7 +4873,7 @@ void Spell::TakeCastItem()
                 // item has charges left
                 if (charges)
                 {
-                    (charges > 0) ? --charges : ++charges;  // abs(charges) less at 1 after use
+                    (charges > 0) ? --charges : ++charges;  // std::abs(charges) less at 1 after use
                     if (proto->Stackable == 1)
                         m_CastItem->SetSpellCharges(i, charges);
                     m_CastItem->SetState(ITEM_CHANGED, m_caster->ToPlayer());
@@ -5143,7 +5143,7 @@ void Spell::TakeReagents()
             {
                 // CastItem will be used up and does not count as reagent
                 int32 charges = m_CastItem->GetSpellCharges(s);
-                if (castItemTemplate->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                if (castItemTemplate->Spells[s].SpellCharges < 0 && std::abs(charges) < 2)
                 {
                     ++itemcount;
                     break;
@@ -6839,7 +6839,7 @@ SpellCastResult Spell::CheckItems()
                     {
                         // CastItem will be used up and does not count as reagent
                         int32 charges = m_CastItem->GetSpellCharges(s);
-                        if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                        if (proto->Spells[s].SpellCharges < 0 && std::abs(charges) < 2)
                         {
                             ++itemcount;
                             break;
