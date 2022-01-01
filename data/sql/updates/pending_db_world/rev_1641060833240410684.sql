@@ -14,16 +14,6 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 -- item 11753 Eye of Kajal is a quest item for quest 4482 which is a retrieval quest not a % loot quest
 (11103, 11753, 0, 100, 1, 1, 0, 1, 1, 'Dark Coffer - Eye of Kajal');
 
--- Adds items to the questitem objective with gameobject
--- Added deletes for re-runability, but they are not in the table
-DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0 AND `ItemId`=11751;
-DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0 AND `ItemId`=11752;
-DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0 AND `ItemId`=11753;
-INSERT INTO `gameobject_questitem` (`GameObjectEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES 
-(11103, 0, 11751, 0),
-(11103, 0, 11752, 0),
-(11103, 0, 11753, 0);
-
 -- Conditions to ensure it only drops only durning quests
 DELETE FROM `conditions` WHERE `SourceGroup`=11103 AND `SourceEntry`=11751 AND `ConditionValue1`=4483 AND `ConditionTypeOrReference`=9;
 INSERT INTO `conditions` SET 
