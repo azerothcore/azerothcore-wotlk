@@ -16,9 +16,9 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 
 -- Adds items to the questitem objective with gameobject
 -- Added deletes for re-runability, but they are not in the table
-DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0;
-DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0;
-DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0;
+DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0 AND `ItemId`=11751;
+DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0 AND `ItemId`=11752;
+DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry`=11103 AND `Idx`=0 AND `ItemId`=11753;
 INSERT INTO `gameobject_questitem` (`GameObjectEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES 
 (11103, 0, 11751, 0),
 (11103, 0, 11752, 0),
