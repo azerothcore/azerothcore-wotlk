@@ -235,12 +235,12 @@ public:
                     {
                         std::list<Unit*> targets;
                         uint32 minTargets = RAID_MODE<uint32>(3, 8, 3, 8);
-                        SelectTargetList(targets, minTargets, SELECT_TARGET_RANDOM, -5.0f, true);
+                        SelectTargetList(targets, minTargets, SelectTargetMethod::Random, -5.0f, true);
                         float minDist = 0.0f;
                         if (targets.size() >= minTargets)
                             minDist = -5.0f;
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, minDist, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, minDist, true))
                             me->CastSpell(target, SPELL_VILE_GAS, false);
                         events.ScheduleEvent(EVENT_VILE_GAS, urand(28000, 35000), 1);
                         break;
@@ -250,7 +250,7 @@ public:
                     events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(15000, 17500));
                     break;
                 case EVENT_FESTERGUT_GOO:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankTargetSelector(me)))
                         if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                             professor->CastSpell(target, SPELL_MALLABLE_GOO_H, true);
                     events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(15000, 20000));

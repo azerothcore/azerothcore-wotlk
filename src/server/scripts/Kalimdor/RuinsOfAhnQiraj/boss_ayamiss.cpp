@@ -100,7 +100,7 @@ public:
                     who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
                     break;
                 case NPC_HORNET:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         who->AI()->AttackStart(target);
                     break;
             }
@@ -187,7 +187,7 @@ public:
                         events.ScheduleEvent(EVENT_POISON_STINGER, urand(2000, 3000));
                         break;
                     case EVENT_PARALYZE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                         {
                             DoCast(target, SPELL_PARALYZE);
                             instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
@@ -199,7 +199,7 @@ public:
                     case EVENT_SWARMER_ATTACK:
                         for (ObjectGuid const& guid : _swarmers)
                             if (Creature* swarmer = me->GetMap()->GetCreature(guid))
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                                     swarmer->AI()->AttackStart(target);
 
                         _swarmers.clear();
