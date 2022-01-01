@@ -1887,7 +1887,7 @@ void Player::Regenerate(Powers power)
         return;
 
     addvalue += m_powerFraction[power];
-    uint32 integerValue = uint32(fabs(addvalue));
+    uint32 integerValue = uint32(std::fabs(addvalue));
 
     if (addvalue < 0.0f)
     {
@@ -5799,7 +5799,7 @@ void Player::RewardReputation(Quest const* quest)
             uint32 row = ((quest->RewardFactionValueId[i] < 0) ? 1 : 0) + 1;
             if (QuestFactionRewEntry const* questFactionRewEntry = sQuestFactionRewardStore.LookupEntry(row))
             {
-                uint32 field = abs(quest->RewardFactionValueId[i]);
+                uint32 field = std::abs(quest->RewardFactionValueId[i]);
                 rep = questFactionRewEntry->QuestRewFactionValue[field];
             }
         }

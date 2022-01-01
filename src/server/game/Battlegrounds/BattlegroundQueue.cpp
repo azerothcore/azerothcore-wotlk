@@ -89,7 +89,7 @@ bool BattlegroundQueue::SelectionPool::KickGroup(const uint32 size)
     for (auto itr = groupToKick; itr != SelectedGroups.end(); ++itr)
     {
         // if proper size - overwrite to kick last one
-        if (abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
+        if (std::abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
         {
             groupToKick = itr;
             foundProper = true;
@@ -421,7 +421,7 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
     }
 
     // balance the teams based on the difference allowed
-    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (std::abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -504,7 +504,7 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
     }
 
     // if free space differs too much, ballance
-    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (std::abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -610,7 +610,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
             return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
         case BG_QUEUE_INVITATION_TYPE_BALANCED: // check difference between selection pools - if = 1 or less start.
-            return abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+            return std::abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
         case BG_QUEUE_INVITATION_TYPE_EVEN: // if both counts are same then it's an even match
             return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() == m_SelectionPools[TEAM_HORDE].GetPlayerCount()) && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
