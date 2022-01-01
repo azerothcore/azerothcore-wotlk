@@ -5,7 +5,7 @@ DELETE FROM `gameobject_loot_template` WHERE (`Entry` = 11103) AND (`Item` IN (1
 
 -- These items are Quest Required
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
--- item 4483 burning essense is a quest item for quest 4483 which is a retrieval quest not a % loot quest
+-- item 11751 burning essense is a quest item for quest 4483 which is a retrieval quest not a % loot quest
 (11103, 11751, 0, 100, 1, 1, 0, 1, 1, 'Dark Coffer - Burning Essence'),
 
 -- item 11752 Black Blood of the Tormentede is a quest item for quest 4463 which is a retrieval quest not a % loot quest
@@ -23,3 +23,55 @@ INSERT INTO `gameobject_questitem` (`GameObjectEntry`, `Idx`, `ItemId`, `Verifie
 (11103, 0, 11751, 0),
 (11103, 0, 11752, 0),
 (11103, 0, 11753, 0);
+
+-- Conditions to ensure it only drops only durning quests
+DELETE FROM `conditions` WHERE `SourceGroup`='11103' AND `SourceEntry`='11751' AND `ConditionValue1`='4483' AND `ConditionTypeOrReference`='9';
+INSERT INTO `conditions` SET 
+	`SourceTypeOrReferenceId`='4', -- gameobject loot template
+	`SourceGroup`='11103', -- gameobject
+	`SourceEntry`='11751', -- item id
+	`SourceId`='0',
+	`ElseGroup`='0',
+	`ConditionTypeOrReference`='9', -- CONDITION_QUESTTAKEN
+	`ConditionTarget`='0', -- player
+	`ConditionValue1`='4483', -- quest ID
+	`ConditionValue2`='0', -- always 0
+	`ConditionValue3`='0', -- always 0
+	`NegativeCondition`='0',
+	`ErrorTextId`='0',
+	`ScriptName`='',
+	`Comment`="Loot Dark Coffer - Burning Essence while quest 4483 is active";
+
+DELETE FROM `conditions` WHERE `SourceGroup`='11103' AND `SourceEntry`='11752' AND `ConditionValue1`='4463' AND `ConditionTypeOrReference`='9';
+INSERT INTO `conditions` SET 
+	`SourceTypeOrReferenceId`='4', -- gameobject loot template
+	`SourceGroup`='11103', -- gameobject
+	`SourceEntry`='11752', -- item id
+	`SourceId`='0',
+	`ElseGroup`='0',
+	`ConditionTypeOrReference`='9', -- CONDITION_QUESTTAKEN
+	`ConditionTarget`='0', -- player
+	`ConditionValue1`='4463', -- quest ID
+	`ConditionValue2`='0', -- always 0
+	`ConditionValue3`='0', -- always 0
+	`NegativeCondition`='0',
+	`ErrorTextId`='0',
+	`ScriptName`='',
+	`Comment`="Loot Dark Coffer - Black Blood of the Tormented while quest 4463 is active";
+
+DELETE FROM `conditions` WHERE `SourceGroup`='11103' AND `SourceEntry`='11753' AND `ConditionValue1`='4482' AND `ConditionTypeOrReference`='9';
+INSERT INTO `conditions` SET 
+	`SourceTypeOrReferenceId`='4', -- gameobject loot template
+	`SourceGroup`='11103', -- gameobject
+	`SourceEntry`='11753', -- item id
+	`SourceId`='0',
+	`ElseGroup`='0',
+	`ConditionTypeOrReference`='9', -- CONDITION_QUESTTAKEN
+	`ConditionTarget`='0', -- player
+	`ConditionValue1`='4482', -- quest ID
+	`ConditionValue2`='0', -- always 0
+	`ConditionValue3`='0', -- always 0
+	`NegativeCondition`='0',
+	`ErrorTextId`='0',
+	`ScriptName`='',
+	`Comment`="Loot Dark Coffer - Eye of Kajal while quest 4482 is active";
