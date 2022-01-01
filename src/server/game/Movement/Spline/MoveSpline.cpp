@@ -227,7 +227,7 @@ namespace Movement
             for (uint32 i = 1; i < path.size() - 1; ++i)
             {
                 offset = path[i] - middle;
-                if (fabs(offset.x) >= MAX_OFFSET || fabs(offset.y) >= MAX_OFFSET || fabs(offset.z) >= MAX_OFFSET)
+                if (std::fabs(offset.x) >= MAX_OFFSET || std::fabs(offset.y) >= MAX_OFFSET || std::fabs(offset.z) >= MAX_OFFSET)
                 {
                     LOG_ERROR("movement", "MoveSplineInitArgs::_checkPathBounds check failed");
                     return false;

@@ -163,7 +163,7 @@ struct boss_amanitar : public BossAI
             }
             case EVENT_ROOTS:
             {
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                 {
                     DoCast(pTarget, SPELL_ENTANGLING_ROOTS, false);
                 }
@@ -179,7 +179,7 @@ struct boss_amanitar : public BossAI
             }
             case EVENT_BOLT:
             {
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                 {
                     DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
                 }
@@ -204,7 +204,7 @@ struct boss_amanitar : public BossAI
                     }
                 }
 
-                if (SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_MINI))
+                if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_MINI))
                 {
                     DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
                     DoCastAOE(SPELL_MINI);

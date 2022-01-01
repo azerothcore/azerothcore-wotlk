@@ -131,7 +131,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_FREEZING_GROUND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_FREEZING_GROUND, false);
                     events.RepeatEvent(20000);
                     break;
