@@ -1,3 +1,19 @@
+-- DB update 2022_01_01_00 -> 2022_01_02_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_01_00 2022_01_02_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1639803872367552000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1639803872367552000');
 
 -- Source: 2.5.2.41446 Alliance Night Elf 03 Area in Shadowglen around Aldrasil includes correct paths for Shadowglen Sentinel creatures 46484 and 46499.pkt
@@ -130,3 +146,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,53,10429.064,787.15063,1337.2859,0,0,0,0,100,0),
 (@PATH,54,10433.855,790.94324,1340.4896,0,0,0,0,100,0),
 (@PATH,55,10437.52,794.17706,1343.1299,0,0,0,0,100,0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_02_00' WHERE sql_rev = '1639803872367552000';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
