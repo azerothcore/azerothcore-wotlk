@@ -216,10 +216,10 @@ public:
                     if (ArchavonDeath && EmalonDeath && KoralonDeath)
                     {
                         // instance difficulty check is already done in db (achievement_criteria_data)
-                        // int() for Visual Studio, compile errors with abs(time_t)
-                        return (abs(int(ArchavonDeath - EmalonDeath)) < MINUTE && \
-                                abs(int(EmalonDeath - KoralonDeath)) < MINUTE && \
-                                abs(int(KoralonDeath - ArchavonDeath)) < MINUTE);
+                        // int() for Visual Studio, compile errors with std::abs(time_t)
+                        return (std::abs(int(ArchavonDeath - EmalonDeath)) < MINUTE && \
+                                std::abs(int(EmalonDeath - KoralonDeath)) < MINUTE && \
+                                std::abs(int(KoralonDeath - ArchavonDeath)) < MINUTE);
                     }
                     break;
                 default:

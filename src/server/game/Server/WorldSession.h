@@ -71,6 +71,10 @@ namespace lfg
 
 namespace WorldPackets
 {
+    namespace Totem
+    {
+        class TotemDestroyed;
+    }
 
     namespace Bank
     {
@@ -852,7 +856,7 @@ public:                                                 // opcodes handlers
     void HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameInfo, PreparedQueryResult result);
     void HandleSetPlayerDeclinedNames(WorldPacket& recvData);
 
-    void HandleTotemDestroyed(WorldPacket& recvData);
+    void HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed);
     void HandleDismissCritter(WorldPacket& recvData);
 
     //Battleground
