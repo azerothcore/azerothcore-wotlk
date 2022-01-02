@@ -37,6 +37,11 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
     recvData >> guid;
     uint32 questStatus = DIALOG_STATUS_NONE;
 
+    GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
+    // Did we already get get a gossip menu? if so no need to status query
+    if (!gossipMenu.Empty())
+        return;
+
     Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
     if (!questGiver)
     {

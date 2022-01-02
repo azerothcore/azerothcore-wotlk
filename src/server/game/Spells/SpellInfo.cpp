@@ -1652,10 +1652,10 @@ bool SpellInfo::IsStrongerAuraActive(Unit const* caster, Unit const* target) con
                 if (player->m_spellModTakingSpell && player->m_spellModTakingSpell->m_spellInfo->Id == Id)
                     basePoints = player->m_spellModTakingSpell->GetSpellValue()->EffectBasePoints[i];
 
-            int32 curValue = abs(Effects[i].CalcValue(caster, &basePoints));
+            int32 curValue = std::abs(Effects[i].CalcValue(caster, &basePoints));
             int32 auraValue = (sFlag & SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK) ?
-                              abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
-                              abs((*iter)->GetAmount());
+                              std::abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
+                              std::abs((*iter)->GetAmount());
 
             // xinef: for same spells, divide amount by stack amount
             if (Id == (*iter)->GetId())
@@ -2291,14 +2291,14 @@ int32 SpellInfo::GetDuration() const
 {
     if (!DurationEntry)
         return 0;
-    return (DurationEntry->Duration[0] == -1) ? -1 : abs(DurationEntry->Duration[0]);
+    return (DurationEntry->Duration[0] == -1) ? -1 : std::abs(DurationEntry->Duration[0]);
 }
 
 int32 SpellInfo::GetMaxDuration() const
 {
     if (!DurationEntry)
         return 0;
-    return (DurationEntry->Duration[2] == -1) ? -1 : abs(DurationEntry->Duration[2]);
+    return (DurationEntry->Duration[2] == -1) ? -1 : std::abs(DurationEntry->Duration[2]);
 }
 
 uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
