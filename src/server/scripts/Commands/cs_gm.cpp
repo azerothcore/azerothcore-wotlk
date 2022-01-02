@@ -50,8 +50,8 @@ public:
             { "ingame",  HandleGMListIngameCommand, SEC_PLAYER,         Console::Yes },
             { "list",    HandleGMListFullCommand,   SEC_ADMINISTRATOR,  Console::Yes },
             { "visible", HandleGMVisibleCommand,    SEC_GAMEMASTER,     Console::No },
-            { "on",      HandleGMOnCommand,         SEC_GAMEMASTER,     Console::No },
-            { "off",     HandleGMOffCommand,        SEC_GAMEMASTER,     Console::No }
+            { "on",      HandleGMOnCommand,         SEC_MODERATOR,      Console::No },
+            { "off",     HandleGMOffCommand,        SEC_MODERATOR,      Console::No }
         };
         static ChatCommandTable commandTable =
         {
