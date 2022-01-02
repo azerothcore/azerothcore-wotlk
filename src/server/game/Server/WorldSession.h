@@ -140,7 +140,7 @@ enum AccountDataType
 
 struct AccountData
 {
-    AccountData() :  Data("") = default;
+    AccountData() :  Data("") {}
 
     time_t Time{0};
     std::string Data;

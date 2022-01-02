@@ -58,7 +58,7 @@ public:
     [[nodiscard]] RealmBuildInfo const* GetBuildInfo(uint32 build) const;
 
 private:
-    RealmList() = delete;
+    RealmList();
     ~RealmList() = default;
 
     void LoadBuildInfo();
