@@ -352,7 +352,7 @@ namespace lfg
     /// Stores group data related to proposal to join
     struct LfgProposal
     {
-        LfgProposal(uint32 dungeon = 0):  dungeonId(dungeon) 
+        LfgProposal(uint32 dungeon = 0):  dungeonId(dungeon)
         { }
 
         uint32 id{0};                                             ///< Proposal Id
@@ -391,7 +391,7 @@ namespace lfg
 
     struct LFGDungeonData
     {
-        LFGDungeonData():  name("") 
+        LFGDungeonData():  name("")
         { }
         LFGDungeonData(LFGDungeonEntry const* dbc): id(dbc->ID), name(dbc->name[0]), map(dbc->map),
             type(dbc->type), expansion(dbc->expansion), group(dbc->grouptype),

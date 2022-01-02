@@ -41,7 +41,7 @@ namespace lfg
     /// Stores player or group queue info
     struct LfgQueueData
     {
-        LfgQueueData(): joinTime(time_t(time(nullptr))), lastRefreshTime(joinTime) 
+        LfgQueueData(): joinTime(time_t(time(nullptr))), lastRefreshTime(joinTime)
         { }
 
         LfgQueueData(time_t _joinTime, LfgDungeonSet  _dungeons, LfgRolesMap  _roles):

@@ -35,7 +35,7 @@ public:
 
     UpdateMask()  = default;
 
-    UpdateMask(UpdateMask const& right)  
+    UpdateMask(UpdateMask const& right)
     {
         SetCount(right.GetCount());
         memcpy(_bits, right._bits, sizeof(uint8) * _blockCount * 32);
