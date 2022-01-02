@@ -17,7 +17,6 @@
 
 #include "DatabaseWorkerPool.h"
 #include "AdhocStatement.h"
-#include "Common.h"
 #include "Errors.h"
 #include "Implementation/CharacterDatabase.h"
 #include "Implementation/LoginDatabase.h"
