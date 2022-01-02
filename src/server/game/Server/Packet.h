@@ -30,13 +30,13 @@ namespace WorldPackets
         virtual ~Packet() = default;
 
         Packet(Packet const& right) = delete;
-        Packet& operator=(Packet const& right) = delete;
+        auto operator=(Packet const& right) -> Packet& = delete;
 
-        virtual WorldPacket const* Write() = 0;
+        virtual auto Write() -> WorldPacket const* = 0;
         virtual void Read() = 0;
 
-        WorldPacket const* GetRawPacket() const { return &_worldPacket; }
-        size_t GetSize() const { return _worldPacket.size(); }
+        [[nodiscard]] auto GetRawPacket() const -> WorldPacket const* { return &_worldPacket; }
+        [[nodiscard]] auto GetSize() const -> size_t { return _worldPacket.size(); }
 
     protected:
         WorldPacket _worldPacket;
@@ -50,10 +50,10 @@ namespace WorldPackets
         void Read() final;
 
         void Clear() { _worldPacket.clear(); }
-        WorldPacket&& Move() { return std::move(_worldPacket); }
+        auto Move() -> WorldPacket&& { return std::move(_worldPacket); }
         void ShrinkToFit() { _worldPacket.shrink_to_fit(); }
 
-        OpcodeServer GetOpcode() const { return OpcodeServer(_worldPacket.GetOpcode()); }
+        [[nodiscard]] auto GetOpcode() const -> OpcodeServer { return OpcodeServer(_worldPacket.GetOpcode()); }
     };
 
     class AC_GAME_API ClientPacket : public Packet
@@ -62,9 +62,9 @@ namespace WorldPackets
         ClientPacket(WorldPacket&& packet);
         ClientPacket(OpcodeClient expectedOpcode, WorldPacket&& packet);
 
-        WorldPacket const* Write() final;
+        auto Write() -> WorldPacket const* final;
 
-        OpcodeClient GetOpcode() const { return OpcodeClient(_worldPacket.GetOpcode()); }
+        [[nodiscard]] auto GetOpcode() const -> OpcodeClient { return OpcodeClient(_worldPacket.GetOpcode()); }
     };
 }
 

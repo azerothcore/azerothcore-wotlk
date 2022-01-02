@@ -46,6 +46,6 @@ protected:
 public:
     GridReference() : Reference<GridRefMgr<OBJECT>, OBJECT>() {}
     ~GridReference() override { this->unlink(); }
-    GridReference* next() { return (GridReference*)Reference<GridRefMgr<OBJECT>, OBJECT>::next(); }
+    auto next() -> GridReference* { return (GridReference*)Reference<GridRefMgr<OBJECT>, OBJECT>::next(); }
 };
 #endif

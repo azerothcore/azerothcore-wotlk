@@ -42,23 +42,23 @@ public:
 
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
-    bool CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caster, uint32 spellId, Position const& pos, float radius, DynamicObjectType type);
+    auto CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caster, uint32 spellId, Position const& pos, float radius, DynamicObjectType type) -> bool;
     void Update(uint32 p_time) override;
     void Remove();
     void SetDuration(int32 newDuration);
-    [[nodiscard]] int32 GetDuration() const;
+    [[nodiscard]] auto GetDuration() const -> int32;
     void Delay(int32 delaytime);
     void SetAura(Aura* aura);
     void RemoveAura();
     void SetCasterViewpoint();
     void RemoveCasterViewpoint();
-    [[nodiscard]] Unit* GetCaster() const { return _caster; }
+    [[nodiscard]] auto GetCaster() const -> Unit* { return _caster; }
     void BindToCaster();
     void UnbindFromCaster();
-    [[nodiscard]] uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
-    [[nodiscard]] ObjectGuid GetCasterGUID() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
-    [[nodiscard]] float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
-    [[nodiscard]] bool IsViewpoint() const { return _isViewpoint; }
+    [[nodiscard]] auto GetSpellId() const -> uint32 {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
+    [[nodiscard]] auto GetCasterGUID() const -> ObjectGuid { return GetGuidValue(DYNAMICOBJECT_CASTER); }
+    [[nodiscard]] auto GetRadius() const -> float { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
+    [[nodiscard]] auto IsViewpoint() const -> bool { return _isViewpoint; }
 
 protected:
     Aura* _aura;

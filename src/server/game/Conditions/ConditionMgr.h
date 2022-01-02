@@ -226,10 +226,10 @@ struct Condition
         NegativeCondition  = false;
     }
 
-    bool Meets(ConditionSourceInfo& sourceInfo);
-    uint32 GetSearcherTypeMaskForCondition();
-    [[nodiscard]] bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
-    uint32 GetMaxAvailableConditionTargets();
+    auto Meets(ConditionSourceInfo& sourceInfo) -> bool;
+    auto GetSearcherTypeMaskForCondition() -> uint32;
+    [[nodiscard]] auto isLoaded() const -> bool { return ConditionType > CONDITION_NONE || ReferenceId; }
+    auto GetMaxAvailableConditionTargets() -> uint32;
 };
 
 typedef std::list<Condition*> ConditionList;
@@ -248,31 +248,31 @@ private:
     ~ConditionMgr();
 
 public:
-    static ConditionMgr* instance();
+    static auto instance() -> ConditionMgr*;
 
     void LoadConditions(bool isReload = false);
-    bool isConditionTypeValid(Condition* cond);
-    ConditionList GetConditionReferences(uint32 refId);
+    auto isConditionTypeValid(Condition* cond) -> bool;
+    auto GetConditionReferences(uint32 refId) -> ConditionList;
 
-    uint32 GetSearcherTypeMaskForConditionList(ConditionList const& conditions);
-    bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
-    bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
-    bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
-    [[nodiscard]] bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
-    [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
-    ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
-    ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
-    ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
-    ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
-    ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+    auto GetSearcherTypeMaskForConditionList(ConditionList const& conditions) -> uint32;
+    auto IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions) -> bool;
+    auto IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions) -> bool;
+    auto IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) -> bool;
+    [[nodiscard]] auto CanHaveSourceGroupSet(ConditionSourceType sourceType) const -> bool;
+    [[nodiscard]] auto CanHaveSourceIdSet(ConditionSourceType sourceType) const -> bool;
+    auto GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry) -> ConditionList;
+    auto GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId) -> ConditionList;
+    auto GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType) -> ConditionList;
+    auto GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId) -> ConditionList;
+    auto GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId) -> ConditionList;
 
 private:
-    bool isSourceTypeValid(Condition* cond);
-    bool addToLootTemplate(Condition* cond, LootTemplate* loot);
-    bool addToGossipMenus(Condition* cond);
-    bool addToGossipMenuItems(Condition* cond);
-    bool addToSpellImplicitTargetConditions(Condition* cond);
-    bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    auto isSourceTypeValid(Condition* cond) -> bool;
+    auto addToLootTemplate(Condition* cond, LootTemplate* loot) -> bool;
+    auto addToGossipMenus(Condition* cond) -> bool;
+    auto addToGossipMenuItems(Condition* cond) -> bool;
+    auto addToSpellImplicitTargetConditions(Condition* cond) -> bool;
+    auto IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions) -> bool;
 
     void Clean(); // free up resources
     std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)

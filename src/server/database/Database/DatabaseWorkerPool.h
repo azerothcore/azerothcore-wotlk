@@ -50,14 +50,14 @@ public:
 
     void SetConnectionInfo(std::string const& infoString, uint8 const asyncThreads, uint8 const synchThreads);
 
-    uint32 Open();
+    auto Open() -> uint32;
 
     void Close();
 
     //! Prepares all prepared statements
-    bool PrepareStatements();
+    auto PrepareStatements() -> bool;
 
-    inline MySQLConnectionInfo const* GetConnectionInfo() const
+    [[nodiscard]] inline auto GetConnectionInfo() const -> MySQLConnectionInfo const*
     {
         return _connectionInfo.get();
     }
@@ -114,15 +114,15 @@ public:
 
     //! Directly executes an SQL query in string format that will block the calling thread until finished.
     //! Returns reference counted auto pointer, no need for manual memory management in upper level code.
-    QueryResult Query(char const* sql, T* connection = nullptr);
+    auto Query(char const* sql, T* connection = nullptr) -> QueryResult;
 
     //! Directly executes an SQL query in string format -with variable args- that will block the calling thread until finished.
     //! Returns reference counted auto pointer, no need for manual memory management in upper level code.
     template<typename Format, typename... Args>
-    QueryResult PQuery(Format&& sql, T* conn, Args&&... args)
+    auto PQuery(Format&& sql, T* conn, Args&&... args) -> QueryResult
     {
         if (Acore::IsFormatEmptyOrNull(sql))
-            return QueryResult(nullptr);
+            return {nullptr};
 
         return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str(), conn);
     }
@@ -130,10 +130,10 @@ public:
     //! Directly executes an SQL query in string format -with variable args- that will block the calling thread until finished.
     //! Returns reference counted auto pointer, no need for manual memory management in upper level code.
     template<typename Format, typename... Args>
-    QueryResult PQuery(Format&& sql, Args&&... args)
+    auto PQuery(Format&& sql, Args&&... args) -> QueryResult
     {
         if (Acore::IsFormatEmptyOrNull(sql))
-            return QueryResult(nullptr);
+            return {nullptr};
 
         return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
@@ -141,7 +141,7 @@ public:
     //! Directly executes an SQL query in prepared format that will block the calling thread until finished.
     //! Returns reference counted auto pointer, no need for manual memory management in upper level code.
     //! Statement must be prepared with CONNECTION_SYNCH flag.
-    PreparedQueryResult Query(PreparedStatement<T>* stmt);
+    auto Query(PreparedStatement<T>* stmt) -> PreparedQueryResult;
 
     /**
         Asynchronous query (with resultset) methods.
@@ -149,25 +149,25 @@ public:
 
     //! Enqueues a query in string format that will set the value of the QueryResultFuture return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
-    QueryCallback AsyncQuery(char const* sql);
+    auto AsyncQuery(char const* sql) -> QueryCallback;
 
     //! Enqueues a query in prepared format that will set the value of the PreparedQueryResultFuture return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
     //! Statement must be prepared with CONNECTION_ASYNC flag.
-    QueryCallback AsyncQuery(PreparedStatement<T>* stmt);
+    auto AsyncQuery(PreparedStatement<T>* stmt) -> QueryCallback;
 
     //! Enqueues a vector of SQL operations (can be both adhoc and prepared) that will set the value of the QueryResultHolderFuture
     //! return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
     //! Any prepared statements added to this holder need to be prepared with the CONNECTION_ASYNC flag.
-    SQLQueryHolderCallback DelayQueryHolder(std::shared_ptr<SQLQueryHolder<T>> holder);
+    auto DelayQueryHolder(std::shared_ptr<SQLQueryHolder<T>> holder) -> SQLQueryHolderCallback;
 
     /**
         Transaction context methods.
     */
 
     //! Begins an automanaged transaction pointer that will automatically rollback if not commited. (Autocommit=0)
-    SQLTransaction<T> BeginTransaction();
+    auto BeginTransaction() -> SQLTransaction<T>;
 
     //! Enqueues a collection of one-way SQL operations (can be both adhoc and prepared). The order in which these operations
     //! were appended to the transaction will be respected during execution.
@@ -175,7 +175,7 @@ public:
 
     //! Enqueues a collection of one-way SQL operations (can be both adhoc and prepared). The order in which these operations
     //! were appended to the transaction will be respected during execution.
-    TransactionCallback AsyncCommitTransaction(SQLTransaction<T> transaction);
+    auto AsyncCommitTransaction(SQLTransaction<T> transaction) -> TransactionCallback;
 
     //! Directly executes a collection of one-way SQL operations (can be both adhoc and prepared). The order in which these operations
     //! were appended to the transaction will be respected during execution.
@@ -198,7 +198,7 @@ public:
     //! Automanaged (internally) pointer to a prepared statement object for usage in upper level code.
     //! Pointer is deleted in this->DirectExecute(PreparedStatement*), this->Query(PreparedStatement*) or PreparedStatementTask::~PreparedStatementTask.
     //! This object is not tied to the prepared statement on the MySQL context yet until execution.
-    PreparedStatement<T>* GetPreparedStatement(PreparedStatementIndex index);
+    auto GetPreparedStatement(PreparedStatementIndex index) -> PreparedStatement<T>*;
 
     //! Apply escape string'ing for current collation. (utf8)
     void EscapeString(std::string& str);
@@ -213,20 +213,20 @@ public:
 #endif
     }
 
-    size_t QueueSize() const;
+    [[nodiscard]] auto QueueSize() const -> size_t;
 
 private:
-    uint32 OpenConnections(InternalIndex type, uint8 numConnections);
+    auto OpenConnections(InternalIndex type, uint8 numConnections) -> uint32;
 
-    unsigned long EscapeString(char* to, char const* from, unsigned long length);
+    auto EscapeString(char* to, char const* from, unsigned long length) -> unsigned long;
 
     void Enqueue(SQLOperation* op);
 
     //! Gets a free connection in the synchronous connection pool.
     //! Caller MUST call t->Unlock() after touching the MySQL context to prevent deadlocks.
-    T* GetFreeConnection();
+    auto GetFreeConnection() -> T*;
 
-    char const* GetDatabaseName() const;
+    [[nodiscard]] auto GetDatabaseName() const -> char const*;
 
     //! Queue shared by async worker threads.
     std::unique_ptr<ProducerConsumerQueue<SQLOperation*>> _queue;

@@ -29,7 +29,7 @@ namespace Acore
 
 } // namespace Acore
 
-std::string GetDebugInfo();
+auto GetDebugInfo() -> std::string;
 
 #if AC_COMPILER == AC_COMPILER_MICROSOFT
 #define ASSERT_BEGIN __pragma(warning(push)) __pragma(warning(disable: 4127))
@@ -63,7 +63,7 @@ std::string GetDebugInfo();
 #define ABORT_MSG WPAbort_MSG
 
 template <typename T>
-inline T* ASSERT_NOTNULL_IMPL(T* pointer, char const* expr)
+inline auto ASSERT_NOTNULL_IMPL(T* pointer, char const* expr) -> T*
 {
     ASSERT(pointer, "%s", expr);
     return pointer;

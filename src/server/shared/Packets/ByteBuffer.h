@@ -31,12 +31,12 @@ class MessageBuffer;
 class AC_SHARED_API ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() noexcept = default;
+    ~ByteBufferException() noexcept override = default;
 
-    char const* what() const noexcept override { return msg_.c_str(); }
+    [[nodiscard]] auto what() const noexcept -> char const* override { return msg_.c_str(); }
 
 protected:
-    std::string & message() noexcept { return msg_; }
+    auto message() noexcept -> std::string & { return msg_; }
 
 private:
     std::string msg_;
@@ -47,7 +47,7 @@ class AC_SHARED_API ByteBufferPositionException : public ByteBufferException
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferPositionException() noexcept = default;
+    ~ByteBufferPositionException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBufferSourceException : public ByteBufferException
@@ -55,7 +55,7 @@ class AC_SHARED_API ByteBufferSourceException : public ByteBufferException
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
 
-    ~ByteBufferSourceException() noexcept = default;
+    ~ByteBufferSourceException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBufferInvalidValueException : public ByteBufferException
@@ -63,7 +63,7 @@ class AC_SHARED_API ByteBufferInvalidValueException : public ByteBufferException
 public:
     ByteBufferInvalidValueException(char const* type, char const* value);
 
-    ~ByteBufferInvalidValueException() noexcept = default;
+    ~ByteBufferInvalidValueException() noexcept override = default;
 };
 
 class AC_SHARED_API ByteBuffer
@@ -72,7 +72,7 @@ public:
     constexpr static size_t DEFAULT_SIZE = 0x1000;
 
     // constructor
-    ByteBuffer() : _rpos(0), _wpos(0)
+    ByteBuffer()  
     {
         _storage.reserve(DEFAULT_SIZE);
     }
@@ -93,7 +93,7 @@ public:
     ByteBuffer(MessageBuffer&& buffer);
     virtual ~ByteBuffer() = default;
 
-    ByteBuffer& operator=(ByteBuffer const& right)
+    auto operator=(ByteBuffer const& right) -> ByteBuffer&
     {
         if (this != &right)
         {
@@ -105,7 +105,7 @@ public:
         return *this;
     }
 
-    ByteBuffer& operator=(ByteBuffer&& right) noexcept
+    auto operator=(ByteBuffer&& right) noexcept -> ByteBuffer&
     {
         if (this != &right)
         {
@@ -141,75 +141,75 @@ public:
         put(pos, (uint8*)&value, sizeof(value));
     }
 
-    ByteBuffer& operator<<(bool value)
+    auto operator<<(bool value) -> ByteBuffer&
     {
         append<uint8>(value ? 1 : 0);
         return *this;
     }
 
-    ByteBuffer& operator<<(uint8 value)
+    auto operator<<(uint8 value) -> ByteBuffer&
     {
         append<uint8>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(uint16 value)
+    auto operator<<(uint16 value) -> ByteBuffer&
     {
         append<uint16>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(uint32 value)
+    auto operator<<(uint32 value) -> ByteBuffer&
     {
         append<uint32>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(uint64 value)
+    auto operator<<(uint64 value) -> ByteBuffer&
     {
         append<uint64>(value);
         return *this;
     }
 
     // signed as in 2e complement
-    ByteBuffer& operator<<(int8 value)
+    auto operator<<(int8 value) -> ByteBuffer&
     {
         append<int8>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(int16 value)
+    auto operator<<(int16 value) -> ByteBuffer&
     {
         append<int16>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(int32 value)
+    auto operator<<(int32 value) -> ByteBuffer&
     {
         append<int32>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(int64 value)
+    auto operator<<(int64 value) -> ByteBuffer&
     {
         append<int64>(value);
         return *this;
     }
 
     // floating points
-    ByteBuffer& operator<<(float value)
+    auto operator<<(float value) -> ByteBuffer&
     {
         append<float>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(double value)
+    auto operator<<(double value) -> ByteBuffer&
     {
         append<double>(value);
         return *this;
     }
 
-    ByteBuffer& operator<<(std::string_view value)
+    auto operator<<(std::string_view value) -> ByteBuffer&
     {
         if (size_t len = value.length())
         {
@@ -220,81 +220,81 @@ public:
         return *this;
     }
 
-    ByteBuffer& operator<<(std::string const& str)
+    auto operator<<(std::string const& str) -> ByteBuffer&
     {
         return operator<<(std::string_view(str));
     }
 
-    ByteBuffer& operator<<(char const* str)
+    auto operator<<(char const* str) -> ByteBuffer&
     {
         return operator<<(std::string_view(str ? str : ""));
     }
 
-    ByteBuffer& operator>>(bool& value)
+    auto operator>>(bool& value) -> ByteBuffer&
     {
         value = read<char>() > 0;
         return *this;
     }
 
-    ByteBuffer& operator>>(uint8& value)
+    auto operator>>(uint8& value) -> ByteBuffer&
     {
         value = read<uint8>();
         return *this;
     }
 
-    ByteBuffer& operator>>(uint16& value)
+    auto operator>>(uint16& value) -> ByteBuffer&
     {
         value = read<uint16>();
         return *this;
     }
 
-    ByteBuffer& operator>>(uint32& value)
+    auto operator>>(uint32& value) -> ByteBuffer&
     {
         value = read<uint32>();
         return *this;
     }
 
-    ByteBuffer& operator>>(uint64& value)
+    auto operator>>(uint64& value) -> ByteBuffer&
     {
         value = read<uint64>();
         return *this;
     }
 
     //signed as in 2e complement
-    ByteBuffer& operator>>(int8& value)
+    auto operator>>(int8& value) -> ByteBuffer&
     {
         value = read<int8>();
         return *this;
     }
 
-    ByteBuffer& operator>>(int16& value)
+    auto operator>>(int16& value) -> ByteBuffer&
     {
         value = read<int16>();
         return *this;
     }
 
-    ByteBuffer& operator>>(int32& value)
+    auto operator>>(int32& value) -> ByteBuffer&
     {
         value = read<int32>();
         return *this;
     }
 
-    ByteBuffer& operator>>(int64& value)
+    auto operator>>(int64& value) -> ByteBuffer&
     {
         value = read<int64>();
         return *this;
     }
 
-    ByteBuffer& operator>>(float& value);
-    ByteBuffer& operator>>(double& value);
+    auto operator>>(float& value) -> ByteBuffer&;
+    auto operator>>(double& value) -> ByteBuffer&;
 
-    ByteBuffer& operator>>(std::string& value)
+    auto operator>>(std::string& value) -> ByteBuffer&
     {
         value = ReadCString(true);
         return *this;
     }
 
-    uint8& operator[](size_t const pos)
+    auto operator[](size_t const pos) -> uint8&
     {
         if (pos >= size())
         {
@@ -304,7 +304,7 @@ public:
         return _storage[pos];
     }
 
-    uint8 const& operator[](size_t const pos) const
+    auto operator[](size_t const pos) const -> uint8 const&
     {
         if (pos >= size())
         {
@@ -314,9 +314,9 @@ public:
         return _storage[pos];
     }
 
-    [[nodiscard]] size_t rpos() const { return _rpos; }
+    [[nodiscard]] auto rpos() const -> size_t { return _rpos; }
 
-    size_t rpos(size_t rpos_)
+    auto rpos(size_t rpos_) -> size_t
     {
         _rpos = rpos_;
         return _rpos;
@@ -327,9 +327,9 @@ public:
         _rpos = wpos();
     }
 
-    [[nodiscard]] size_t wpos() const { return _wpos; }
+    [[nodiscard]] auto wpos() const -> size_t { return _wpos; }
 
-    size_t wpos(size_t wpos_)
+    auto wpos(size_t wpos_) -> size_t
     {
         _wpos = wpos_;
         return _wpos;
@@ -348,14 +348,14 @@ public:
         _rpos += skip;
     }
 
-    template <typename T> T read()
+    template <typename T> auto read() -> T
     {
         T r = read<T>(_rpos);
         _rpos += sizeof(T);
         return r;
     }
 
-    template <typename T> T read(size_t pos) const
+    template <typename T> [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] auto read(size_t pos) const -> T
     {
         if (pos + sizeof(T) > size())
         {
@@ -412,16 +412,16 @@ public:
         }
     }
 
-    std::string ReadCString(bool requireValidUtf8 = true);
-    uint32 ReadPackedTime();
+    auto ReadCString(bool requireValidUtf8 = true) -> std::string;
+    auto ReadPackedTime() -> uint32;
 
-    ByteBuffer& ReadPackedTime(uint32& time)
+    auto ReadPackedTime(uint32& time) -> ByteBuffer&
     {
         time = ReadPackedTime();
         return *this;
     }
 
-    uint8* contents()
+    auto contents() -> uint8*
     {
         if (_storage.empty())
         {
@@ -431,7 +431,7 @@ public:
         return _storage.data();
     }
 
-    [[nodiscard]] uint8 const* contents() const
+    [[nodiscard]] auto contents() const -> uint8 const*
     {
         if (_storage.empty())
         {
@@ -441,8 +441,8 @@ public:
         return _storage.data();
     }
 
-    [[nodiscard]] size_t size() const { return _storage.size(); }
-    [[nodiscard]] bool empty() const { return _storage.empty(); }
+    [[nodiscard]] auto size() const -> size_t { return _storage.size(); }
+    [[nodiscard]] auto empty() const -> bool { return _storage.empty(); }
 
     void resize(size_t newsize)
     {
@@ -528,13 +528,13 @@ public:
     void hexlike() const;
 
 protected:
-    size_t _rpos, _wpos;
+    size_t _rpos{0}, _wpos{0};
     std::vector<uint8> _storage;
 };
 
 /// @todo Make a ByteBuffer.cpp and move all this inlining to it.
 template<>
-inline std::string ByteBuffer::read<std::string>()
+inline auto ByteBuffer::read<std::string>() -> std::string
 {
     std::string tmp;
     *this >> tmp;

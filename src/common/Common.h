@@ -92,7 +92,7 @@ enum LocaleConstant
 
 AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
-AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
+AC_COMMON_API auto GetLocaleByName(const std::string& name) -> LocaleConstant;
 AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
 // we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)

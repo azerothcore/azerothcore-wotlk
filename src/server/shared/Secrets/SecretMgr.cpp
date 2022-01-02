@@ -42,7 +42,7 @@ struct SecretInfo
     int bits;
     ServerProcessTypes owner;
     uint64 _flags;
-    uint16 flags() const { return static_cast<uint16>(_flags >> (16*THIS_SERVER_PROCESS)); }
+    [[nodiscard]] auto flags() const -> uint16 { return static_cast<uint16>(_flags >> (16*THIS_SERVER_PROCESS)); }
 };
 
 static constexpr SecretInfo secret_info[NUM_SECRETS] =
@@ -50,7 +50,7 @@ static constexpr SecretInfo secret_info[NUM_SECRETS] =
     { "TOTPMasterSecret", "TOTPOldMasterSecret", 128, SERVER_PROCESS_AUTHSERVER, WORLDSERVER_DEFER_LOAD }
 };
 
-/*static*/ SecretMgr* SecretMgr::instance()
+/*static*/ auto SecretMgr::instance() -> SecretMgr*
 {
     static SecretMgr instance;
     return &instance;
@@ -95,7 +95,7 @@ void SecretMgr::Initialize()
     }
 }
 
-SecretMgr::Secret const& SecretMgr::GetSecret(Secrets i)
+auto SecretMgr::GetSecret(Secrets i) -> SecretMgr::Secret const&
 {
     std::unique_lock<std::mutex> lock(_secrets[i].lock);
 

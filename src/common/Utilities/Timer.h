@@ -21,7 +21,7 @@
 #include "Common.h"
 #include "Duration.h"
 
-inline TimePoint GetApplicationStartTime()
+inline auto GetApplicationStartTime() -> TimePoint
 {
     using namespace std::chrono;
 
@@ -30,14 +30,14 @@ inline TimePoint GetApplicationStartTime()
     return ApplicationStartTime;
 }
 
-inline uint32 getMSTime()
+inline auto getMSTime() -> uint32
 {
     using namespace std::chrono;
 
     return uint32(duration_cast<milliseconds>(steady_clock::now() - GetApplicationStartTime()).count());
 }
 
-inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
+inline auto getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime) -> uint32
 {
     // getMSTime() have limited data range and this is case when it overflow in this tick
     if (oldMSTime > newMSTime)
@@ -50,7 +50,7 @@ inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
     }
 }
 
-inline uint32 getMSTimeDiff(uint32 oldMSTime, TimePoint newTime)
+inline auto getMSTimeDiff(uint32 oldMSTime, TimePoint newTime) -> uint32
 {
     using namespace std::chrono;
 
@@ -58,7 +58,7 @@ inline uint32 getMSTimeDiff(uint32 oldMSTime, TimePoint newTime)
     return getMSTimeDiff(oldMSTime, newMSTime);
 }
 
-inline uint32 GetMSTimeDiffToNow(uint32 oldMSTime)
+inline auto GetMSTimeDiffToNow(uint32 oldMSTime) -> uint32
 {
     return getMSTimeDiff(oldMSTime, getMSTime());
 }
@@ -68,8 +68,7 @@ struct IntervalTimer
 public:
     IntervalTimer()
 
-    {
-    }
+    = default;
 
     void Update(time_t diff)
     {
@@ -80,7 +79,7 @@ public:
         }
     }
 
-    bool Passed()
+    auto Passed() -> bool
     {
         return _current >= _interval;
     }
@@ -103,12 +102,12 @@ public:
         _interval = interval;
     }
 
-    [[nodiscard]] time_t GetInterval() const
+    [[nodiscard]] auto GetInterval() const -> time_t
     {
         return _interval;
     }
 
-    [[nodiscard]] time_t GetCurrent() const
+    [[nodiscard]] auto GetCurrent() const -> time_t
     {
         return _current;
     }
@@ -131,7 +130,7 @@ public:
         i_expiryTime -= diff;
     }
 
-    [[nodiscard]] bool Passed() const
+    [[nodiscard]] auto Passed() const -> bool
     {
         return i_expiryTime <= 0;
     }
@@ -141,7 +140,7 @@ public:
         i_expiryTime = interval;
     }
 
-    [[nodiscard]] time_t GetExpiry() const
+    [[nodiscard]] auto GetExpiry() const -> time_t
     {
         return i_expiryTime;
     }
@@ -163,7 +162,7 @@ public:
         i_expiryTime -= diff;
     }
 
-    [[nodiscard]] bool Passed() const
+    [[nodiscard]] auto Passed() const -> bool
     {
         return i_expiryTime <= 0;
     }
@@ -173,7 +172,7 @@ public:
         i_expiryTime = interval;
     }
 
-    [[nodiscard]] int32 GetExpiry() const
+    [[nodiscard]] auto GetExpiry() const -> int32
     {
         return i_expiryTime;
     }
@@ -190,7 +189,7 @@ public:
     {
     }
 
-    bool Update(const uint32 diff)
+    auto Update(const uint32 diff) -> bool
     {
         if ((i_expireTime -= diff) > 0)
         {
@@ -209,7 +208,7 @@ public:
 
     // Tracker interface
     void TUpdate(int32 diff) { i_expireTime -= diff; }
-    [[nodiscard]] bool TPassed() const { return i_expireTime <= 0; }
+    [[nodiscard]] auto TPassed() const -> bool { return i_expireTime <= 0; }
     void TReset(int32 diff, int32 period)  { i_expireTime += period > diff ? period : diff; }
 
 private:

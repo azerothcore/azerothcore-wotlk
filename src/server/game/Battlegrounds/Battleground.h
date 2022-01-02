@@ -187,7 +187,7 @@ enum BattlegroundTeams
 
 struct BattlegroundObjectInfo
 {
-    BattlegroundObjectInfo()  {}
+    BattlegroundObjectInfo()  = default;
 
     GameObject*  object{nullptr};
     int32       timer{0};
@@ -269,24 +269,24 @@ struct BattlegroundScore
     uint32 HealingDone;
     Player* player;
 
-    [[nodiscard]] uint32 GetKillingBlows() const { return KillingBlows; }
-    [[nodiscard]] uint32 GetDeaths() const { return Deaths; }
-    [[nodiscard]] uint32 GetHonorableKills() const { return HonorableKills; }
-    [[nodiscard]] uint32 GetBonusHonor() const { return BonusHonor; }
-    [[nodiscard]] uint32 GetDamageDone() const { return DamageDone; }
-    [[nodiscard]] uint32 GetHealingDone() const { return HealingDone; }
+    [[nodiscard]] auto GetKillingBlows() const -> uint32 { return KillingBlows; }
+    [[nodiscard]] auto GetDeaths() const -> uint32 { return Deaths; }
+    [[nodiscard]] auto GetHonorableKills() const -> uint32 { return HonorableKills; }
+    [[nodiscard]] auto GetBonusHonor() const -> uint32 { return BonusHonor; }
+    [[nodiscard]] auto GetDamageDone() const -> uint32 { return DamageDone; }
+    [[nodiscard]] auto GetHealingDone() const -> uint32 { return HealingDone; }
 
-    [[nodiscard]] virtual uint32 GetAttr1() const { return 0; }
-    [[nodiscard]] virtual uint32 GetAttr2() const { return 0; }
-    [[nodiscard]] virtual uint32 GetAttr3() const { return 0; }
-    [[nodiscard]] virtual uint32 GetAttr4() const { return 0; }
-    [[nodiscard]] virtual uint32 GetAttr5() const { return 0; }
+    [[nodiscard]] virtual auto GetAttr1() const -> uint32 { return 0; }
+    [[nodiscard]] virtual auto GetAttr2() const -> uint32 { return 0; }
+    [[nodiscard]] virtual auto GetAttr3() const -> uint32 { return 0; }
+    [[nodiscard]] virtual auto GetAttr4() const -> uint32 { return 0; }
+    [[nodiscard]] virtual auto GetAttr5() const -> uint32 { return 0; }
 };
 
 class ArenaLogEntryData
 {
 public:
-    ArenaLogEntryData()  {}
+    ArenaLogEntryData()  = default;
     void Fill(const char* name, ObjectGuid::LowType guid, uint32 acc, uint32 arenaTeamId, std::string ip)
     {
         Name = std::string(name);
@@ -340,7 +340,7 @@ public:
 
     void Update(uint32 diff);
 
-    virtual bool SetupBattleground()                    // must be implemented in BG subclass
+    virtual auto SetupBattleground() -> bool                    // must be implemented in BG subclass
     {
         return true;
     }
@@ -352,33 +352,33 @@ public:
     virtual void DestroyGate(Player* /*player*/, GameObject* /*go*/) {}
 
     /* achievement req. */
-    [[nodiscard]] virtual bool AllNodesConrolledByTeam(TeamId /*teamId*/) const { return false; }
+    [[nodiscard]] virtual auto AllNodesConrolledByTeam(TeamId /*teamId*/) const -> bool { return false; }
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
 
     /* Battleground */
     // Get methods:
-    [[nodiscard]] char const* GetName() const         { return m_Name; }
-    [[nodiscard]] BattlegroundTypeId GetBgTypeID(bool GetRandom = false) const { return GetRandom ? m_RandomTypeID : m_RealTypeID; }
-    [[nodiscard]] uint32 GetInstanceID() const        { return m_InstanceID; }
-    [[nodiscard]] BattlegroundStatus GetStatus() const { return m_Status; }
-    [[nodiscard]] uint32 GetClientInstanceID() const  { return m_ClientInstanceID; }
-    [[nodiscard]] uint32 GetStartTime() const         { return m_StartTime; }
-    [[nodiscard]] uint32 GetEndTime() const           { return m_EndTime; }
-    [[nodiscard]] uint32 GetLastResurrectTime() const { return m_LastResurrectTime; }
+    [[nodiscard]] auto GetName() const -> char const*         { return m_Name; }
+    [[nodiscard]] auto GetBgTypeID(bool GetRandom = false) const -> BattlegroundTypeId { return GetRandom ? m_RandomTypeID : m_RealTypeID; }
+    [[nodiscard]] auto GetInstanceID() const -> uint32        { return m_InstanceID; }
+    [[nodiscard]] auto GetStatus() const -> BattlegroundStatus { return m_Status; }
+    [[nodiscard]] auto GetClientInstanceID() const -> uint32  { return m_ClientInstanceID; }
+    [[nodiscard]] auto GetStartTime() const -> uint32         { return m_StartTime; }
+    [[nodiscard]] auto GetEndTime() const -> uint32           { return m_EndTime; }
+    [[nodiscard]] auto GetLastResurrectTime() const -> uint32 { return m_LastResurrectTime; }
 
-    [[nodiscard]] uint32 GetMinLevel() const          { return m_LevelMin; }
-    [[nodiscard]] uint32 GetMaxLevel() const          { return m_LevelMax; }
+    [[nodiscard]] auto GetMinLevel() const -> uint32          { return m_LevelMin; }
+    [[nodiscard]] auto GetMaxLevel() const -> uint32          { return m_LevelMax; }
 
-    [[nodiscard]] uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
-    [[nodiscard]] uint32 GetMinPlayersPerTeam() const { return m_MinPlayersPerTeam; }
+    [[nodiscard]] auto GetMaxPlayersPerTeam() const -> uint32 { return m_MaxPlayersPerTeam; }
+    [[nodiscard]] auto GetMinPlayersPerTeam() const -> uint32 { return m_MinPlayersPerTeam; }
 
-    [[nodiscard]] int32 GetStartDelayTime() const     { return m_StartDelayTime; }
-    [[nodiscard]] uint8 GetArenaType() const          { return m_ArenaType; }
-    [[nodiscard]] TeamId GetWinner() const             { return m_WinnerId; }
-    [[nodiscard]] uint32 GetScriptId() const          { return ScriptId; }
-    [[nodiscard]] uint32 GetBonusHonorFromKill(uint32 kills) const;
+    [[nodiscard]] auto GetStartDelayTime() const -> int32     { return m_StartDelayTime; }
+    [[nodiscard]] auto GetArenaType() const -> uint8          { return m_ArenaType; }
+    [[nodiscard]] auto GetWinner() const -> TeamId             { return m_WinnerId; }
+    [[nodiscard]] auto GetScriptId() const -> uint32          { return ScriptId; }
+    [[nodiscard]] auto GetBonusHonorFromKill(uint32 kills) const -> uint32;
 
-    bool IsRandom()                     { return m_IsRandom; }
+    auto IsRandom() -> bool                     { return m_IsRandom; }
 
     // Set methods:
     void SetName(char const* Name)      { m_Name = Name; }
@@ -406,29 +406,29 @@ public:
 
     void DecreaseInvitedCount(TeamId teamId)    { if (m_BgInvitedPlayers[teamId]) --m_BgInvitedPlayers[teamId]; }
     void IncreaseInvitedCount(TeamId teamId)    { ++m_BgInvitedPlayers[teamId]; }
-    [[nodiscard]] uint32 GetInvitedCount(TeamId teamId) const { return m_BgInvitedPlayers[teamId]; }
+    [[nodiscard]] auto GetInvitedCount(TeamId teamId) const -> uint32 { return m_BgInvitedPlayers[teamId]; }
 
-    [[nodiscard]] bool HasFreeSlots() const;
-    [[nodiscard]] uint32 GetFreeSlotsForTeam(TeamId teamId) const;
-    [[nodiscard]] uint32 GetMaxFreeSlots() const;
+    [[nodiscard]] auto HasFreeSlots() const -> bool;
+    [[nodiscard]] auto GetFreeSlotsForTeam(TeamId teamId) const -> uint32;
+    [[nodiscard]] auto GetMaxFreeSlots() const -> uint32;
 
     typedef std::set<Player*> SpectatorList;
     typedef std::map<ObjectGuid, ObjectGuid> ToBeTeleportedMap;
     void AddSpectator(Player* p) { m_Spectators.insert(p); }
     void RemoveSpectator(Player* p) { m_Spectators.erase(p); }
-    bool HaveSpectators() { return !m_Spectators.empty(); }
-    [[nodiscard]] const SpectatorList& GetSpectators() const { return m_Spectators; }
+    auto HaveSpectators() -> bool { return !m_Spectators.empty(); }
+    [[nodiscard]] auto GetSpectators() const -> const SpectatorList& { return m_Spectators; }
     void AddToBeTeleported(ObjectGuid spectator, ObjectGuid participant) { m_ToBeTeleported[spectator] = participant; }
     void RemoveToBeTeleported(ObjectGuid spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
     void SpectatorsSendPacket(WorldPacket& data);
 
-    [[nodiscard]] bool isArena() const        { return m_IsArena; }
-    [[nodiscard]] bool isBattleground() const { return !m_IsArena; }
-    [[nodiscard]] bool isRated() const        { return m_IsRated; }
+    [[nodiscard]] auto isArena() const -> bool        { return m_IsArena; }
+    [[nodiscard]] auto isBattleground() const -> bool { return !m_IsArena; }
+    [[nodiscard]] auto isRated() const -> bool        { return m_IsRated; }
 
     typedef std::map<ObjectGuid, Player*> BattlegroundPlayerMap;
-    [[nodiscard]] BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
-    [[nodiscard]] uint32 GetPlayersSize() const { return m_Players.size(); }
+    [[nodiscard]] auto GetPlayers() const -> BattlegroundPlayerMap const& { return m_Players; }
+    [[nodiscard]] auto GetPlayersSize() const -> uint32 { return m_Players.size(); }
 
     void ReadyMarkerClicked(Player* p); // pussywizard
     GuidSet readyMarkerClickedSet; // pussywizard
@@ -436,11 +436,11 @@ public:
     typedef std::map<ObjectGuid, BattlegroundScore*> BattlegroundScoreMap;
     typedef std::map<ObjectGuid, ArenaLogEntryData> ArenaLogEntryDataMap;// pussywizard
     ArenaLogEntryDataMap ArenaLogEntries; // pussywizard
-    [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresBegin() const { return PlayerScores.begin(); }
-    [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresEnd() const { return PlayerScores.end(); }
-    [[nodiscard]] uint32 GetPlayerScoresSize() const { return PlayerScores.size(); }
+    [[nodiscard]] auto GetPlayerScoresBegin() const -> BattlegroundScoreMap::const_iterator { return PlayerScores.begin(); }
+    [[nodiscard]] auto GetPlayerScoresEnd() const -> BattlegroundScoreMap::const_iterator { return PlayerScores.end(); }
+    [[nodiscard]] auto GetPlayerScoresSize() const -> uint32 { return PlayerScores.size(); }
 
-    [[nodiscard]] uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
+    [[nodiscard]] auto GetReviveQueueSize() const -> uint32 { return m_ReviveQueue.size(); }
 
     void AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid);
     void RemovePlayerFromResurrectQueue(Player* player);
@@ -450,17 +450,17 @@ public:
 
     void StartBattleground();
 
-    GameObject* GetBGObject(uint32 type);
-    Creature* GetBGCreature(uint32 type);
+    auto GetBGObject(uint32 type) -> GameObject*;
+    auto GetBGCreature(uint32 type) -> Creature*;
 
     // Location
     void SetMapId(uint32 MapID) { m_MapId = MapID; }
-    [[nodiscard]] uint32 GetMapId() const { return m_MapId; }
+    [[nodiscard]] auto GetMapId() const -> uint32 { return m_MapId; }
 
     // Map pointers
     void SetBgMap(BattlegroundMap* map) { m_Map = map; }
-    [[nodiscard]] BattlegroundMap* GetBgMap() const { ASSERT(m_Map); return m_Map; }
-    [[nodiscard]] BattlegroundMap* FindBgMap() const { return m_Map; }
+    [[nodiscard]] auto GetBgMap() const -> BattlegroundMap* { ASSERT(m_Map); return m_Map; }
+    [[nodiscard]] auto FindBgMap() const -> BattlegroundMap* { return m_Map; }
 
     void SetTeamStartLoc(TeamId teamId, float X, float Y, float Z, float O);
     void GetTeamStartLoc(TeamId teamId, float& X, float& Y, float& Z, float& O) const
@@ -472,7 +472,7 @@ public:
     }
 
     void SetStartMaxDist(float startMaxDist) { m_StartMaxDist = startMaxDist; }
-    [[nodiscard]] float GetStartMaxDist() const { return m_StartMaxDist; }
+    [[nodiscard]] auto GetStartMaxDist() const -> float { return m_StartMaxDist; }
 
     // Packet Transfer
     // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
@@ -489,7 +489,7 @@ public:
     void RemoveAuraOnTeam(uint32 spellId, TeamId teamId);
     void RewardHonorToTeam(uint32 honor, TeamId teamId);
     void RewardReputationToTeam(uint32 factionId, uint32 reputation, TeamId teamId);
-    uint32 GetRealRepFactionForPlayer(uint32 factionId, Player* player);
+    auto GetRealRepFactionForPlayer(uint32 factionId, Player* player) -> uint32;
 
     void UpdateWorldState(uint32 Field, uint32 Value);
     void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* player);
@@ -505,13 +505,13 @@ public:
     void SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 strId1 = 0, uint32 strId2 = 0);
 
     // Raid Group
-    [[nodiscard]] Group* GetBgRaid(TeamId teamId) const { return m_BgRaids[teamId]; }
+    [[nodiscard]] auto GetBgRaid(TeamId teamId) const -> Group* { return m_BgRaids[teamId]; }
     void SetBgRaid(TeamId teamId, Group* bg_raid);
 
     virtual void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
 
-    [[nodiscard]] uint32 GetPlayersCountByTeam(TeamId teamId) const { return m_PlayersCount[teamId]; }
-    [[nodiscard]] uint32 GetAlivePlayersCountByTeam(TeamId teamId) const;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
+    [[nodiscard]] auto GetPlayersCountByTeam(TeamId teamId) const -> uint32 { return m_PlayersCount[teamId]; }
+    [[nodiscard]] auto GetAlivePlayersCountByTeam(TeamId teamId) const -> uint32;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
     void UpdatePlayersCountByTeam(TeamId teamId, bool remove)
     {
         if (remove)
@@ -522,11 +522,11 @@ public:
 
     // used for rated arena battles
     void SetArenaTeamIdForTeam(TeamId teamId, uint32 ArenaTeamId) { m_ArenaTeamIds[teamId] = ArenaTeamId; }
-    [[nodiscard]] uint32 GetArenaTeamIdForTeam(TeamId teamId) const             { return m_ArenaTeamIds[teamId]; }
+    [[nodiscard]] auto GetArenaTeamIdForTeam(TeamId teamId) const -> uint32             { return m_ArenaTeamIds[teamId]; }
     void SetArenaTeamRatingChangeForTeam(TeamId teamId, int32 RatingChange) { m_ArenaTeamRatingChanges[teamId] = RatingChange; }
-    [[nodiscard]] int32 GetArenaTeamRatingChangeForTeam(TeamId teamId) const    { return m_ArenaTeamRatingChanges[teamId]; }
+    [[nodiscard]] auto GetArenaTeamRatingChangeForTeam(TeamId teamId) const -> int32    { return m_ArenaTeamRatingChanges[teamId]; }
     void SetArenaMatchmakerRating(TeamId teamId, uint32 MMR)      { m_ArenaTeamMMR[teamId] = MMR; }
-    [[nodiscard]] uint32 GetArenaMatchmakerRating(TeamId teamId) const          { return m_ArenaTeamMMR[teamId]; }
+    [[nodiscard]] auto GetArenaMatchmakerRating(TeamId teamId) const -> uint32          { return m_ArenaTeamMMR[teamId]; }
     void CheckArenaAfterTimerConditions();
     void CheckArenaWinConditions();
     virtual void UpdateArenaWorldState();
@@ -550,7 +550,7 @@ public:
     virtual void HandlePlayerResurrect(Player* /*player*/) {}
 
     // Death related
-    virtual GraveyardStruct const* GetClosestGraveyard(Player* player);
+    virtual auto GetClosestGraveyard(Player* player) -> GraveyardStruct const*;
 
     virtual void AddPlayer(Player* player);                // must be implemented in BG subclass
 
@@ -568,70 +568,70 @@ public:
     BGObjects BgObjects;
     BGCreatures BgCreatures;
     void SpawnBGObject(uint32 type, uint32 respawntime, uint32 forceRespawnDelay = 0);
-    bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0, GOState goState = GO_STATE_READY);
-    Creature* AddCreature(uint32 entry, uint32 type, float x, float y, float z, float o, uint32 respawntime = 0, MotionTransport* transport = nullptr);
-    bool DelCreature(uint32 type);
-    bool DelObject(uint32 type);
-    bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId);
-    int32 GetObjectType(ObjectGuid guid);
+    auto AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0, GOState goState = GO_STATE_READY) -> bool;
+    auto AddCreature(uint32 entry, uint32 type, float x, float y, float z, float o, uint32 respawntime = 0, MotionTransport* transport = nullptr) -> Creature*;
+    auto DelCreature(uint32 type) -> bool;
+    auto DelObject(uint32 type) -> bool;
+    auto AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId) -> bool;
+    auto GetObjectType(ObjectGuid guid) -> int32;
 
     void DoorOpen(uint32 type);
     void DoorClose(uint32 type);
     //to be removed
-    const char* GetAcoreString(int32 entry);
+    auto GetAcoreString(int32 entry) -> const char*;
 
-    virtual bool HandlePlayerUnderMap(Player* /*player*/) { return false; }
+    virtual auto HandlePlayerUnderMap(Player* /*player*/) -> bool { return false; }
 
     // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
-    static TeamId GetOtherTeamId(TeamId teamId);
-    [[nodiscard]] bool IsPlayerInBattleground(ObjectGuid guid) const;
+    static auto GetOtherTeamId(TeamId teamId) -> TeamId;
+    [[nodiscard]] auto IsPlayerInBattleground(ObjectGuid guid) const -> bool;
 
-    [[nodiscard]] bool ToBeDeleted() const { return m_SetDeleteThis; }
+    [[nodiscard]] auto ToBeDeleted() const -> bool { return m_SetDeleteThis; }
     //void SetDeleteThis() { m_SetDeleteThis = true; }
 
     void RewardXPAtKill(Player* killer, Player* victim);
 
-    [[nodiscard]] virtual ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return ObjectGuid::Empty; }
+    [[nodiscard]] virtual auto GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const -> ObjectGuid { return ObjectGuid::Empty; }
     virtual void SetDroppedFlagGUID(ObjectGuid /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
-    [[nodiscard]] uint32 GetTeamScore(TeamId teamId) const;
+    [[nodiscard]] auto GetTeamScore(TeamId teamId) const -> uint32;
 
-    virtual TeamId GetPrematureWinner();
+    virtual auto GetPrematureWinner() -> TeamId;
 
     // because BattleGrounds with different types and same level range has different m_BracketId
-    [[nodiscard]] uint8 GetUniqueBracketId() const;
+    [[nodiscard]] auto GetUniqueBracketId() const -> uint8;
 
-    BattlegroundAV* ToBattlegroundAV() { if (GetBgTypeID(true) == BATTLEGROUND_AV) return reinterpret_cast<BattlegroundAV*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundAV const* ToBattlegroundAV() const { if (GetBgTypeID(true) == BATTLEGROUND_AV) return reinterpret_cast<const BattlegroundAV*>(this); else return nullptr; }
+    auto ToBattlegroundAV() -> BattlegroundAV* { if (GetBgTypeID(true) == BATTLEGROUND_AV) return reinterpret_cast<BattlegroundAV*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundAV() const -> BattlegroundAV const* { if (GetBgTypeID(true) == BATTLEGROUND_AV) return reinterpret_cast<const BattlegroundAV*>(this); else return nullptr; }
 
-    BattlegroundWS* ToBattlegroundWS() { if (GetBgTypeID(true) == BATTLEGROUND_WS) return reinterpret_cast<BattlegroundWS*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundWS const* ToBattlegroundWS() const { if (GetBgTypeID(true) == BATTLEGROUND_WS) return reinterpret_cast<const BattlegroundWS*>(this); else return nullptr; }
+    auto ToBattlegroundWS() -> BattlegroundWS* { if (GetBgTypeID(true) == BATTLEGROUND_WS) return reinterpret_cast<BattlegroundWS*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundWS() const -> BattlegroundWS const* { if (GetBgTypeID(true) == BATTLEGROUND_WS) return reinterpret_cast<const BattlegroundWS*>(this); else return nullptr; }
 
-    BattlegroundAB* ToBattlegroundAB() { if (GetBgTypeID(true) == BATTLEGROUND_AB) return reinterpret_cast<BattlegroundAB*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundAB const* ToBattlegroundAB() const { if (GetBgTypeID(true) == BATTLEGROUND_AB) return reinterpret_cast<const BattlegroundAB*>(this); else return nullptr; }
+    auto ToBattlegroundAB() -> BattlegroundAB* { if (GetBgTypeID(true) == BATTLEGROUND_AB) return reinterpret_cast<BattlegroundAB*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundAB() const -> BattlegroundAB const* { if (GetBgTypeID(true) == BATTLEGROUND_AB) return reinterpret_cast<const BattlegroundAB*>(this); else return nullptr; }
 
-    BattlegroundNA* ToBattlegroundNA() { if (GetBgTypeID(true) == BATTLEGROUND_NA) return reinterpret_cast<BattlegroundNA*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundNA const* ToBattlegroundNA() const { if (GetBgTypeID(true) == BATTLEGROUND_NA) return reinterpret_cast<const BattlegroundNA*>(this); else return nullptr; }
+    auto ToBattlegroundNA() -> BattlegroundNA* { if (GetBgTypeID(true) == BATTLEGROUND_NA) return reinterpret_cast<BattlegroundNA*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundNA() const -> BattlegroundNA const* { if (GetBgTypeID(true) == BATTLEGROUND_NA) return reinterpret_cast<const BattlegroundNA*>(this); else return nullptr; }
 
-    BattlegroundBE* ToBattlegroundBE() { if (GetBgTypeID(true) == BATTLEGROUND_BE) return reinterpret_cast<BattlegroundBE*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundBE const* ToBattlegroundBE() const { if (GetBgTypeID(true) == BATTLEGROUND_BE) return reinterpret_cast<const BattlegroundBE*>(this); else return nullptr; }
+    auto ToBattlegroundBE() -> BattlegroundBE* { if (GetBgTypeID(true) == BATTLEGROUND_BE) return reinterpret_cast<BattlegroundBE*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundBE() const -> BattlegroundBE const* { if (GetBgTypeID(true) == BATTLEGROUND_BE) return reinterpret_cast<const BattlegroundBE*>(this); else return nullptr; }
 
-    BattlegroundEY* ToBattlegroundEY() { if (GetBgTypeID(true) == BATTLEGROUND_EY) return reinterpret_cast<BattlegroundEY*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundEY const* ToBattlegroundEY() const { if (GetBgTypeID(true) == BATTLEGROUND_EY) return reinterpret_cast<const BattlegroundEY*>(this); else return nullptr; }
+    auto ToBattlegroundEY() -> BattlegroundEY* { if (GetBgTypeID(true) == BATTLEGROUND_EY) return reinterpret_cast<BattlegroundEY*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundEY() const -> BattlegroundEY const* { if (GetBgTypeID(true) == BATTLEGROUND_EY) return reinterpret_cast<const BattlegroundEY*>(this); else return nullptr; }
 
-    BattlegroundRL* ToBattlegroundRL() { if (GetBgTypeID(true) == BATTLEGROUND_RL) return reinterpret_cast<BattlegroundRL*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundRL const* ToBattlegroundRL() const { if (GetBgTypeID(true) == BATTLEGROUND_RL) return reinterpret_cast<const BattlegroundRL*>(this); else return nullptr; }
+    auto ToBattlegroundRL() -> BattlegroundRL* { if (GetBgTypeID(true) == BATTLEGROUND_RL) return reinterpret_cast<BattlegroundRL*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundRL() const -> BattlegroundRL const* { if (GetBgTypeID(true) == BATTLEGROUND_RL) return reinterpret_cast<const BattlegroundRL*>(this); else return nullptr; }
 
-    BattlegroundSA* ToBattlegroundSA() { if (GetBgTypeID(true) == BATTLEGROUND_SA) return reinterpret_cast<BattlegroundSA*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundSA const* ToBattlegroundSA() const { if (GetBgTypeID(true) == BATTLEGROUND_SA) return reinterpret_cast<const BattlegroundSA*>(this); else return nullptr; }
+    auto ToBattlegroundSA() -> BattlegroundSA* { if (GetBgTypeID(true) == BATTLEGROUND_SA) return reinterpret_cast<BattlegroundSA*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundSA() const -> BattlegroundSA const* { if (GetBgTypeID(true) == BATTLEGROUND_SA) return reinterpret_cast<const BattlegroundSA*>(this); else return nullptr; }
 
-    BattlegroundDS* ToBattlegroundDS() { if (GetBgTypeID(true) == BATTLEGROUND_DS) return reinterpret_cast<BattlegroundDS*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundDS const* ToBattlegroundDS() const { if (GetBgTypeID(true) == BATTLEGROUND_DS) return reinterpret_cast<const BattlegroundDS*>(this); else return nullptr; }
+    auto ToBattlegroundDS() -> BattlegroundDS* { if (GetBgTypeID(true) == BATTLEGROUND_DS) return reinterpret_cast<BattlegroundDS*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundDS() const -> BattlegroundDS const* { if (GetBgTypeID(true) == BATTLEGROUND_DS) return reinterpret_cast<const BattlegroundDS*>(this); else return nullptr; }
 
-    BattlegroundRV* ToBattlegroundRV() { if (GetBgTypeID(true) == BATTLEGROUND_RV) return reinterpret_cast<BattlegroundRV*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundRV const* ToBattlegroundRV() const { if (GetBgTypeID(true) == BATTLEGROUND_RV) return reinterpret_cast<const BattlegroundRV*>(this); else return nullptr; }
+    auto ToBattlegroundRV() -> BattlegroundRV* { if (GetBgTypeID(true) == BATTLEGROUND_RV) return reinterpret_cast<BattlegroundRV*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundRV() const -> BattlegroundRV const* { if (GetBgTypeID(true) == BATTLEGROUND_RV) return reinterpret_cast<const BattlegroundRV*>(this); else return nullptr; }
 
-    BattlegroundIC* ToBattlegroundIC() { if (GetBgTypeID(true) == BATTLEGROUND_IC) return reinterpret_cast<BattlegroundIC*>(this); else return nullptr; }
-    [[nodiscard]] BattlegroundIC const* ToBattlegroundIC() const { if (GetBgTypeID(true) == BATTLEGROUND_IC) return reinterpret_cast<const BattlegroundIC*>(this); else return nullptr; }
+    auto ToBattlegroundIC() -> BattlegroundIC* { if (GetBgTypeID(true) == BATTLEGROUND_IC) return reinterpret_cast<BattlegroundIC*>(this); else return nullptr; }
+    [[nodiscard]] auto ToBattlegroundIC() const -> BattlegroundIC const* { if (GetBgTypeID(true) == BATTLEGROUND_IC) return reinterpret_cast<const BattlegroundIC*>(this); else return nullptr; }
 
 protected:
     // this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends Battleground
@@ -708,7 +708,7 @@ private:
      *
      * @see Update(), PostUpdateImpl().
      */
-    virtual bool PreUpdateImpl(uint32 /* diff */) { return true; }
+    virtual auto PreUpdateImpl(uint32 /* diff */) -> bool { return true; }
 
     /**
      * @brief Post-update hook.

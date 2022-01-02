@@ -152,11 +152,11 @@ struct CreatureTemplate
     uint32  flags_extra;
     uint32  ScriptID;
     WorldPacket queryData; // pussywizard
-    [[nodiscard]] uint32  GetRandomValidModelId() const;
-    [[nodiscard]] uint32  GetFirstValidModelId() const;
+    [[nodiscard]] auto  GetRandomValidModelId() const -> uint32;
+    [[nodiscard]] auto  GetFirstValidModelId() const -> uint32;
 
     // helpers
-    [[nodiscard]] SkillType GetRequiredLootSkill() const
+    [[nodiscard]] auto GetRequiredLootSkill() const -> SkillType
     {
         if (type_flags & CREATURE_TYPE_FLAG_SKIN_WITH_HERBALISM)
             return SKILL_HERBALISM;
@@ -168,12 +168,12 @@ struct CreatureTemplate
             return SKILL_SKINNING;                          // normal case
     }
 
-    [[nodiscard]] bool IsExotic() const
+    [[nodiscard]] auto IsExotic() const -> bool
     {
         return (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC) != 0;
     }
 
-    [[nodiscard]] bool IsTameable(bool exotic) const
+    [[nodiscard]] auto IsTameable(bool exotic) const -> bool
     {
         if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE) == 0)
             return false;
@@ -182,7 +182,7 @@ struct CreatureTemplate
         return exotic || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC) == 0;
     }
 
-    [[nodiscard]] bool HasFlagsExtra (uint32 flag) const { return (flags_extra & flag) != 0; }
+    [[nodiscard]] auto HasFlagsExtra (uint32 flag) const -> bool { return (flags_extra & flag) != 0; }
 
     void InitializeQueryData();
 };
@@ -212,12 +212,12 @@ struct CreatureBaseStats
 
     // Helpers
 
-    uint32 GenerateHealth(CreatureTemplate const* info) const
+    auto GenerateHealth(CreatureTemplate const* info) const -> uint32
     {
         return uint32(ceil(BaseHealth[info->expansion] * info->ModHealth));
     }
 
-    uint32 GenerateMana(CreatureTemplate const* info) const
+    auto GenerateMana(CreatureTemplate const* info) const -> uint32
     {
         // Mana can be 0.
         if (!BaseMana)
@@ -226,17 +226,17 @@ struct CreatureBaseStats
         return uint32(ceil(BaseMana * info->ModMana));
     }
 
-    uint32 GenerateArmor(CreatureTemplate const* info) const
+    auto GenerateArmor(CreatureTemplate const* info) const -> uint32
     {
         return uint32(ceil(BaseArmor * info->ModArmor));
     }
 
-    float GenerateBaseDamage(CreatureTemplate const* info) const
+    auto GenerateBaseDamage(CreatureTemplate const* info) const -> float
     {
         return BaseDamage[info->expansion];
     }
 
-    static CreatureBaseStats const* GetBaseStats(uint8 level, uint8 unitClass);
+    static auto GetBaseStats(uint8 level, uint8 unitClass) -> CreatureBaseStats const*;
 };
 
 typedef std::unordered_map<uint16, CreatureBaseStats> CreatureBaseStatsContainer;
@@ -270,7 +270,7 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 // from `creature` table
 struct CreatureData
 {
-    CreatureData()  { }
+    CreatureData()  = default;
     uint32 id{0};                                              // entry in creature_template
     uint16 mapid{0};
     uint32 phaseMask{0};
@@ -362,7 +362,7 @@ struct VendorItem
     uint32 ExtendedCost;
 
     //helpers
-    bool IsGoldRequired(ItemTemplate const* pProto) const { return pProto->Flags2 & ITEM_FLAGS_EXTRA_EXT_COST_REQUIRES_GOLD || !ExtendedCost; }
+    auto IsGoldRequired(ItemTemplate const* pProto) const -> bool { return pProto->Flags2 & ITEM_FLAGS_EXTRA_EXT_COST_REQUIRES_GOLD || !ExtendedCost; }
 };
 typedef std::vector<VendorItem*> VendorItemList;
 
@@ -370,21 +370,21 @@ struct VendorItemData
 {
     VendorItemList m_items;
 
-    [[nodiscard]] VendorItem* GetItem(uint32 slot) const
+    [[nodiscard]] auto GetItem(uint32 slot) const -> VendorItem*
     {
         if (slot >= m_items.size())
             return nullptr;
 
         return m_items[slot];
     }
-    [[nodiscard]] bool Empty() const { return m_items.empty(); }
-    [[nodiscard]] uint8 GetItemCount() const { return m_items.size(); }
+    [[nodiscard]] auto Empty() const -> bool { return m_items.empty(); }
+    [[nodiscard]] auto GetItemCount() const -> uint8 { return m_items.size(); }
     void AddItem(uint32 item, int32 maxcount, uint32 ptime, uint32 ExtendedCost)
     {
         m_items.push_back(new VendorItem(item, maxcount, ptime, ExtendedCost));
     }
-    bool RemoveItem(uint32 item_id);
-    [[nodiscard]] VendorItem const* FindItemCostPair(uint32 item_id, uint32 extendedCost) const;
+    auto RemoveItem(uint32 item_id) -> bool;
+    [[nodiscard]] auto FindItemCostPair(uint32 item_id, uint32 extendedCost) const -> VendorItem const*;
     void Clear()
     {
         for (VendorItemList::const_iterator itr = m_items.begin(); itr != m_items.end(); ++itr)
@@ -422,29 +422,29 @@ struct TrainerSpell
     uint32 reqSpell{0};
 
     // helpers
-    [[nodiscard]] bool IsCastable() const { return learnedSpell[0] != spell; }
+    [[nodiscard]] auto IsCastable() const -> bool { return learnedSpell[0] != spell; }
 };
 
 typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
 
 struct TrainerSpellData
 {
-    TrainerSpellData()  {}
+    TrainerSpellData()  = default;
     ~TrainerSpellData() { spellList.clear(); }
 
     TrainerSpellMap spellList;
     uint32 trainerType{0};                                     // trainer type based at trainer spells, can be different from creature_template value.
     // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
-    [[nodiscard]] TrainerSpell const* Find(uint32 spell_id) const;
+    [[nodiscard]] auto Find(uint32 spell_id) const -> TrainerSpell const*;
 };
 
 struct CreatureSpellCooldown
 {
-    CreatureSpellCooldown() : category(0), end(0) { }
+    CreatureSpellCooldown()  = default;
     CreatureSpellCooldown(uint16 categoryId, uint32 endTime) : category(categoryId), end(endTime) { }
 
-    uint16 category;
-    uint32 end;
+    uint16 category{0};
+    uint32 end{0};
 };
 
 typedef std::map<uint32, CreatureSpellCooldown> CreatureSpellCooldowns;

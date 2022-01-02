@@ -49,14 +49,14 @@ namespace Acore
     namespace Impl
     {
         template <class T, class Tuple, size_t... I>
-        T* new_from_tuple(Tuple&& args, std::index_sequence<I...>)
+        auto new_from_tuple(Tuple&& args, std::index_sequence<I...>) -> T*
         {
             return new T(std::get<I>(std::forward<Tuple>(args))...);
         }
     }
 
     template<class T, class Tuple>
-    [[nodiscard]] T* new_from_tuple(Tuple&& args)
+    [[nodiscard]] auto new_from_tuple(Tuple&& args) -> T*
     {
         return Impl::new_from_tuple<T>(std::forward<Tuple>(args), std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<Tuple>>>{});
     }

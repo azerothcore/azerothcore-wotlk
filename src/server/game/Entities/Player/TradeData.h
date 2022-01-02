@@ -38,27 +38,27 @@ public:                                                 // constructors
     TradeData(Player* player, Player* trader) :
         m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0) { }
 
-    [[nodiscard]] Player* GetTrader() const { return m_trader; }
-    [[nodiscard]] TradeData* GetTraderData() const;
+    [[nodiscard]] auto GetTrader() const -> Player* { return m_trader; }
+    [[nodiscard]] auto GetTraderData() const -> TradeData*;
 
-    [[nodiscard]] Item* GetItem(TradeSlots slot) const;
-    [[nodiscard]] bool HasItem(ObjectGuid itemGuid) const;
-    [[nodiscard]] TradeSlots GetTradeSlotForItem(ObjectGuid itemGuid) const;
+    [[nodiscard]] auto GetItem(TradeSlots slot) const -> Item*;
+    [[nodiscard]] auto HasItem(ObjectGuid itemGuid) const -> bool;
+    [[nodiscard]] auto GetTradeSlotForItem(ObjectGuid itemGuid) const -> TradeSlots;
     void SetItem(TradeSlots slot, Item* item);
 
-    [[nodiscard]] uint32 GetSpell() const { return m_spell; }
+    [[nodiscard]] auto GetSpell() const -> uint32 { return m_spell; }
     void SetSpell(uint32 spell_id, Item* castItem = nullptr);
 
-    [[nodiscard]] Item*  GetSpellCastItem() const;
-    [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem; }
+    [[nodiscard]] auto  GetSpellCastItem() const -> Item*;
+    [[nodiscard]] auto HasSpellCastItem() const -> bool { return m_spellCastItem; }
 
-    [[nodiscard]] uint32 GetMoney() const { return m_money; }
+    [[nodiscard]] auto GetMoney() const -> uint32 { return m_money; }
     void SetMoney(uint32 money);
 
-    [[nodiscard]] bool IsAccepted() const { return m_accepted; }
+    [[nodiscard]] auto IsAccepted() const -> bool { return m_accepted; }
     void SetAccepted(bool state, bool crosssend = false);
 
-    [[nodiscard]] bool IsInAcceptProcess() const { return m_acceptProccess; }
+    [[nodiscard]] auto IsInAcceptProcess() const -> bool { return m_acceptProccess; }
     void SetInAcceptProcess(bool state) { m_acceptProccess = state; }
 
 private:                                                // internal functions

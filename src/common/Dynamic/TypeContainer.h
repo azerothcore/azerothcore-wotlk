@@ -102,11 +102,11 @@ template<class OBJECT_TYPES>
 class TypeMapContainer
 {
 public:
-    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
+    template<class SPECIFIC_TYPE> [[nodiscard]] auto Count() const -> size_t { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
     /// inserts a specific object into the container
     template<class SPECIFIC_TYPE>
-    bool insert(SPECIFIC_TYPE* obj)
+    auto insert(SPECIFIC_TYPE* obj) -> bool
     {
         SPECIFIC_TYPE* t = Acore::Insert(i_elements, obj);
         return (t != nullptr);
@@ -120,8 +120,8 @@ public:
     //    return (t != nullptr);
     //}
 
-    ContainerMapList<OBJECT_TYPES>& GetElements() { return i_elements; }
-    [[nodiscard]] const ContainerMapList<OBJECT_TYPES>& GetElements() const { return i_elements;}
+    auto GetElements() -> ContainerMapList<OBJECT_TYPES>& { return i_elements; }
+    [[nodiscard]] auto GetElements() const -> const ContainerMapList<OBJECT_TYPES>& { return i_elements;}
 
 private:
     ContainerMapList<OBJECT_TYPES> i_elements;
@@ -132,33 +132,33 @@ class TypeUnorderedMapContainer
 {
 public:
     template<class SPECIFIC_TYPE>
-    bool Insert(KEY_TYPE const& handle, SPECIFIC_TYPE* obj)
+    auto Insert(KEY_TYPE const& handle, SPECIFIC_TYPE* obj) -> bool
     {
         return Acore::Insert(_elements, handle, obj);
     }
 
     template<class SPECIFIC_TYPE>
-    bool Remove(KEY_TYPE const& handle)
+    auto Remove(KEY_TYPE const& handle) -> bool
     {
         return Acore::Remove(_elements, handle, (SPECIFIC_TYPE*)nullptr);
     }
 
     template<class SPECIFIC_TYPE>
-    SPECIFIC_TYPE* Find(KEY_TYPE const& handle)
+    auto Find(KEY_TYPE const& handle) -> SPECIFIC_TYPE*
     {
         return Acore::Find(_elements, handle, (SPECIFIC_TYPE*)nullptr);
     }
 
     template<class SPECIFIC_TYPE>
-    std::size_t Size() const
+    [[nodiscard]] auto Size() const -> std::size_t
     {
         std::size_t size = 0;
         Acore::Size(_elements, &size, (SPECIFIC_TYPE*)nullptr);
         return size;
     }
 
-    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }
-    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> const& GetElements() const { return _elements; }
+    auto GetElements() -> ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& { return _elements; }
+    [[nodiscard]] auto GetElements() const -> ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> const& { return _elements; }
 
 private:
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> _elements;

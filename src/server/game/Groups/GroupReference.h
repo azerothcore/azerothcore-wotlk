@@ -31,11 +31,11 @@ protected:
     void targetObjectDestroyLink() override;
     void sourceObjectDestroyLink() override;
 public:
-    GroupReference() : Reference<Group, Player>() {}
+    GroupReference() : Reference<Group, Player>() = default;
     ~GroupReference() override { unlink(); }
-    GroupReference* next() { return (GroupReference*)Reference<Group, Player>::next(); }
-    [[nodiscard]] GroupReference const* next() const { return (GroupReference const*)Reference<Group, Player>::next(); }
-    [[nodiscard]] uint8 getSubGroup() const { return iSubGroup; }
+    auto next() -> GroupReference* { return (GroupReference*)Reference<Group, Player>::next(); }
+    [[nodiscard]] auto next() const -> GroupReference const* { return (GroupReference const*)Reference<Group, Player>::next(); }
+    [[nodiscard]] auto getSubGroup() const -> uint8 { return iSubGroup; }
     void setSubGroup(uint8 pSubGroup) { iSubGroup = pSubGroup; }
 };
 #endif

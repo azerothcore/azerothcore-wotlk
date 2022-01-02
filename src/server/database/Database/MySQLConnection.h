@@ -62,37 +62,37 @@ public:
     MySQLConnection(ProducerConsumerQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo);  //! Constructor for asynchronous connections.
     virtual ~MySQLConnection();
 
-    virtual uint32 Open();
+    virtual auto Open() -> uint32;
     void Close();
 
-    bool PrepareStatements();
+    auto PrepareStatements() -> bool;
 
-    bool Execute(char const* sql);
-    bool Execute(PreparedStatementBase* stmt);
-    ResultSet* Query(char const* sql);
-    PreparedResultSet* Query(PreparedStatementBase* stmt);
-    bool _Query(char const* sql, MySQLResult** pResult, MySQLField** pFields, uint64* pRowCount, uint32* pFieldCount);
-    bool _Query(PreparedStatementBase* stmt, MySQLPreparedStatement** mysqlStmt, MySQLResult** pResult, uint64* pRowCount, uint32* pFieldCount);
+    auto Execute(char const* sql) -> bool;
+    auto Execute(PreparedStatementBase* stmt) -> bool;
+    auto Query(char const* sql) -> ResultSet*;
+    auto Query(PreparedStatementBase* stmt) -> PreparedResultSet*;
+    auto _Query(char const* sql, MySQLResult** pResult, MySQLField** pFields, uint64* pRowCount, uint32* pFieldCount) -> bool;
+    auto _Query(PreparedStatementBase* stmt, MySQLPreparedStatement** mysqlStmt, MySQLResult** pResult, uint64* pRowCount, uint32* pFieldCount) -> bool;
 
     void BeginTransaction();
     void RollbackTransaction();
     void CommitTransaction();
-    int ExecuteTransaction(std::shared_ptr<TransactionBase> transaction);
-    size_t EscapeString(char* to, const char* from, size_t length);
+    auto ExecuteTransaction(std::shared_ptr<TransactionBase> transaction) -> int;
+    auto EscapeString(char* to, const char* from, size_t length) -> size_t;
     void Ping();
 
-    uint32 GetLastError();
+    auto GetLastError() -> uint32;
 
 protected:
     /// Tries to acquire lock. If lock is acquired by another thread
     /// the calling parent will just try another connection
-    bool LockIfReady();
+    auto LockIfReady() -> bool;
 
     /// Called by parent databasepool. Will let other threads access this connection
     void Unlock();
 
-    uint32 GetServerVersion() const;
-    MySQLPreparedStatement* GetPreparedStatement(uint32 index);
+    [[nodiscard]] auto GetServerVersion() const -> uint32;
+    auto GetPreparedStatement(uint32 index) -> MySQLPreparedStatement*;
     void PrepareStatement(uint32 index, std::string const& sql, ConnectionFlags flags);
 
     virtual void DoPrepareStatements() = 0;
@@ -104,7 +104,7 @@ protected:
     bool                                 m_prepareError;  //! Was there any error while preparing statements?
 
 private:
-    bool _HandleMySQLErrno(uint32 errNo, uint8 attempts = 5);
+    auto _HandleMySQLErrno(uint32 errNo, uint8 attempts = 5) -> bool;
 
     ProducerConsumerQueue<SQLOperation*>* m_queue;      //! Queue shared with other asynchronous connections.
     std::unique_ptr<DatabaseWorker> m_worker;           //! Core worker task.
@@ -114,7 +114,7 @@ private:
     std::mutex            m_Mutex;
 
     MySQLConnection(MySQLConnection const& right) = delete;
-    MySQLConnection& operator=(MySQLConnection const& right) = delete;
+    auto operator=(MySQLConnection const& right) -> MySQLConnection& = delete;
 };
 
 #endif

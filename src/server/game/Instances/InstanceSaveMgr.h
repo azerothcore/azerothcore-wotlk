@@ -58,34 +58,34 @@ class InstanceSave
 public:
     InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime);
     ~InstanceSave();
-    [[nodiscard]] uint32 GetInstanceId() const { return m_instanceid; }
-    [[nodiscard]] uint32 GetMapId() const { return m_mapid; }
-    [[nodiscard]] Difficulty GetDifficulty() const { return m_difficulty; }
+    [[nodiscard]] auto GetInstanceId() const -> uint32 { return m_instanceid; }
+    [[nodiscard]] auto GetMapId() const -> uint32 { return m_mapid; }
+    [[nodiscard]] auto GetDifficulty() const -> Difficulty { return m_difficulty; }
 
     /* Saved when the instance is generated for the first time */
     void InsertToDB();
     // pussywizard: deleting is done internally when there are no binds left
 
-    [[nodiscard]] std::string GetInstanceData() const { return m_instanceData; }
+    [[nodiscard]] auto GetInstanceData() const -> std::string { return m_instanceData; }
     void SetInstanceData(std::string str) { m_instanceData = str; }
-    [[nodiscard]] uint32 GetCompletedEncounterMask() const { return m_completedEncounterMask; }
+    [[nodiscard]] auto GetCompletedEncounterMask() const -> uint32 { return m_completedEncounterMask; }
     void SetCompletedEncounterMask(uint32 mask) { m_completedEncounterMask = mask; }
 
     // pussywizard: for normal instances this corresponds to 0, for raid/heroic instances this caches the global reset time for the map
-    [[nodiscard]] time_t GetResetTime() const { return m_resetTime; }
-    [[nodiscard]] time_t GetExtendedResetTime() const { return m_extendedResetTime; }
-    time_t GetResetTimeForDB();
+    [[nodiscard]] auto GetResetTime() const -> time_t { return m_resetTime; }
+    [[nodiscard]] auto GetExtendedResetTime() const -> time_t { return m_extendedResetTime; }
+    auto GetResetTimeForDB() -> time_t;
     void SetResetTime(time_t resetTime) { m_resetTime = resetTime; }
     void SetExtendedResetTime(time_t extendedResetTime) { m_extendedResetTime = extendedResetTime; }
 
-    [[nodiscard]] bool CanReset() const { return m_canReset; }
+    [[nodiscard]] auto CanReset() const -> bool { return m_canReset; }
     void SetCanReset(bool canReset) { m_canReset = canReset; }
 
-    InstanceTemplate const* GetTemplate();
-    MapEntry const* GetMapEntry();
+    auto GetTemplate() -> InstanceTemplate const*;
+    auto GetMapEntry() -> MapEntry const*;
 
     void AddPlayer(ObjectGuid guid);
-    bool RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism);
+    auto RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism) -> bool;
 
 private:
     GuidList m_playerList;
@@ -108,11 +108,11 @@ class InstanceSaveMgr
     friend class InstanceSave;
 
 private:
-    InstanceSaveMgr()  {};
+    InstanceSaveMgr()  = default;;
     ~InstanceSaveMgr();
 
 public:
-    static InstanceSaveMgr* instance();
+    static auto instance() -> InstanceSaveMgr*;
 
     typedef std::unordered_map<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
 
@@ -133,13 +133,13 @@ public:
     void LoadInstanceSaves();
     void LoadCharacterBinds();
 
-    [[nodiscard]] time_t GetResetTimeFor(uint32 mapid, Difficulty d) const
+    [[nodiscard]] auto GetResetTimeFor(uint32 mapid, Difficulty d) const -> time_t
     {
         ResetTimeByMapDifficultyMap::const_iterator itr  = m_resetTimeByMapDifficulty.find(MAKE_PAIR32(mapid, d));
         return itr != m_resetTimeByMapDifficulty.end() ? itr->second : 0;
     }
 
-    [[nodiscard]] time_t GetExtendedResetTimeFor(uint32 mapid, Difficulty d) const
+    [[nodiscard]] auto GetExtendedResetTimeFor(uint32 mapid, Difficulty d) const -> time_t
     {
         ResetTimeByMapDifficultyMap::const_iterator itr  = m_resetExtendedTimeByMapDifficulty.find(MAKE_PAIR32(mapid, d));
         return itr != m_resetExtendedTimeByMapDifficulty.end() ? itr->second : 0;
@@ -155,7 +155,7 @@ public:
         m_resetExtendedTimeByMapDifficulty[MAKE_PAIR32(mapid, d)] = t;
     }
 
-    [[nodiscard]] ResetTimeByMapDifficultyMap const& GetResetTimeMap() const
+    [[nodiscard]] auto GetResetTimeMap() const -> ResetTimeByMapDifficultyMap const&
     {
         return m_resetTimeByMapDifficulty;
     }
@@ -164,21 +164,21 @@ public:
 
     void Update();
 
-    InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, bool startup = false);
-    bool DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck);
-    bool DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck);
+    auto AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, bool startup = false) -> InstanceSave*;
+    auto DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck) -> bool;
+    auto DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck) -> bool;
 
-    InstanceSave* GetInstanceSave(uint32 InstanceId);
+    auto GetInstanceSave(uint32 InstanceId) -> InstanceSave*;
 
-    InstancePlayerBind* PlayerBindToInstance(ObjectGuid guid, InstanceSave* save, bool permanent, Player* player = nullptr);
+    auto PlayerBindToInstance(ObjectGuid guid, InstanceSave* save, bool permanent, Player* player = nullptr) -> InstancePlayerBind*;
     void PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = nullptr);
     void PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint32 mapid, Difficulty difficulty, Player* player = nullptr);
-    InstancePlayerBind* PlayerGetBoundInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty);
-    bool PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty);
-    BoundInstancesMap const& PlayerGetBoundInstances(ObjectGuid guid, Difficulty difficulty);
+    auto PlayerGetBoundInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty) -> InstancePlayerBind*;
+    auto PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty) -> bool;
+    auto PlayerGetBoundInstances(ObjectGuid guid, Difficulty difficulty) -> BoundInstancesMap const&;
     void PlayerCreateBoundInstancesMaps(ObjectGuid guid);
-    InstanceSave* PlayerGetInstanceSave(ObjectGuid guid, uint32 mapid, Difficulty difficulty);
-    uint32 PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty);
+    auto PlayerGetInstanceSave(ObjectGuid guid, uint32 mapid, Difficulty difficulty) -> InstanceSave*;
+    auto PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty) -> uint32;
     void CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr = nullptr);
     void UnbindAllFor(InstanceSave* save);
 

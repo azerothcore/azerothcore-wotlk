@@ -54,7 +54,7 @@ ByteBufferInvalidValueException::ByteBufferInvalidValueException(char const* typ
     message().assign(Acore::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
 }
 
-ByteBuffer& ByteBuffer::operator>>(float& value)
+auto ByteBuffer::operator>>(float& value) -> ByteBuffer&
 {
     value = read<float>();
 
@@ -64,7 +64,7 @@ ByteBuffer& ByteBuffer::operator>>(float& value)
     return *this;
 }
 
-ByteBuffer& ByteBuffer::operator>>(double& value)
+auto ByteBuffer::operator>>(double& value) -> ByteBuffer&
 {
     value = read<double>();
 
@@ -74,7 +74,7 @@ ByteBuffer& ByteBuffer::operator>>(double& value)
     return *this;
 }
 
-std::string ByteBuffer::ReadCString(bool requireValidUtf8 /*= true*/)
+auto ByteBuffer::ReadCString(bool requireValidUtf8 /*= true*/) -> std::string
 {
     std::string value;
 
@@ -92,7 +92,7 @@ std::string ByteBuffer::ReadCString(bool requireValidUtf8 /*= true*/)
     return value;
 }
 
-uint32 ByteBuffer::ReadPackedTime()
+auto ByteBuffer::ReadPackedTime() -> uint32
 {
     uint32 packedDate = read<uint32>();
     tm lt = tm();

@@ -27,7 +27,7 @@ class WorldPacket : public ByteBuffer
 {
 public:
     // just container for later use
-    WorldPacket() : ByteBuffer(0), m_opcode(NULL_OPCODE) { }
+    WorldPacket() : ByteBuffer(0) { }
 
     explicit WorldPacket(uint16 opcode, size_t res = 200) :
         ByteBuffer(res), m_opcode(opcode) { }
@@ -41,7 +41,7 @@ public:
     WorldPacket(WorldPacket const& right) :
         ByteBuffer(right), m_opcode(right.m_opcode) { }
 
-    WorldPacket& operator=(WorldPacket const& right)
+    auto operator=(WorldPacket const& right) -> WorldPacket&
     {
         if (this != &right)
         {
@@ -52,7 +52,7 @@ public:
         return *this;
     }
 
-    WorldPacket& operator=(WorldPacket&& right) noexcept
+    auto operator=(WorldPacket&& right) noexcept -> WorldPacket&
     {
         if (this != &right)
         {
@@ -73,13 +73,13 @@ public:
         m_opcode = opcode;
     }
 
-    [[nodiscard]] uint16 GetOpcode() const { return m_opcode; }
+    [[nodiscard]] auto GetOpcode() const -> uint16 { return m_opcode; }
     void SetOpcode(uint16 opcode) { m_opcode = opcode; }
 
-    [[nodiscard]] TimePoint GetReceivedTime() const { return m_receivedTime; }
+    [[nodiscard]] auto GetReceivedTime() const -> TimePoint { return m_receivedTime; }
 
 protected:
-    uint16 m_opcode;
+    uint16 m_opcode{NULL_OPCODE};
     TimePoint m_receivedTime; // only set for a specific set of opcodes, for performance reasons.
 };
 

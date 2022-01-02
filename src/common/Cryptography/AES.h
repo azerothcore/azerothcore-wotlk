@@ -28,7 +28,7 @@ namespace Acore::Crypto
 
         void Init(Key const& key);
 
-        bool Process(IV const& iv, uint8* data, size_t length, Tag& tag);
+        auto Process(IV const& iv, uint8* data, size_t length, Tag& tag) -> bool;
 
     private:
         EVP_CIPHER_CTX* _ctx;

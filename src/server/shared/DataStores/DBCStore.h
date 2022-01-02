@@ -146,16 +146,16 @@ public:
     DBCStorageBase(char const* fmt);
     virtual ~DBCStorageBase();
 
-    [[nodiscard]] char const* GetFormat() const { return _fileFormat; }
-    [[nodiscard]] uint32 GetFieldCount() const { return _fieldCount; }
+    [[nodiscard]] auto GetFormat() const -> char const* { return _fileFormat; }
+    [[nodiscard]] auto GetFieldCount() const -> uint32 { return _fieldCount; }
 
-    virtual bool Load(char const* path) = 0;
-    virtual bool LoadStringsFrom(char const* path) = 0;
+    virtual auto Load(char const* path) -> bool = 0;
+    virtual auto LoadStringsFrom(char const* path) -> bool = 0;
     virtual void LoadFromDB(char const* table, char const* format) = 0;
 
 protected:
-    bool Load(char const* path, char**& indexTable);
-    bool LoadStringsFrom(char const* path, char** indexTable);
+    auto Load(char const* path, char**& indexTable) -> bool;
+    auto LoadStringsFrom(char const* path, char** indexTable) -> bool;
     void LoadFromDB(char const* table, char const* format, char**& indexTable);
 
     uint32 _fieldCount;
@@ -181,8 +181,8 @@ public:
         delete[] reinterpret_cast<char*>(_indexTable.AsT);
     }
 
-    [[nodiscard]] T const* LookupEntry(uint32 id) const { return (id >= _indexTableSize) ? nullptr : _indexTable.AsT[id]; }
-    [[nodiscard]] T const* AssertEntry(uint32 id) const { return ASSERT_NOTNULL(LookupEntry(id)); }
+    [[nodiscard]] auto LookupEntry(uint32 id) const -> T const* { return (id >= _indexTableSize) ? nullptr : _indexTable.AsT[id]; }
+    [[nodiscard]] auto AssertEntry(uint32 id) const -> T const* { return ASSERT_NOTNULL(LookupEntry(id)); }
 
     void SetEntry(uint32 id, T* t)
     {
@@ -203,14 +203,14 @@ public:
         _indexTable.AsT[id] = t;
     }
 
-    [[nodiscard]] uint32 GetNumRows() const { return _indexTableSize; }
+    [[nodiscard]] auto GetNumRows() const -> uint32 { return _indexTableSize; }
 
-    bool Load(char const* path) override
+    auto Load(char const* path) -> bool override
     {
         return DBCStorageBase::Load(path, _indexTable.AsChar);
     }
 
-    bool LoadStringsFrom(char const* path) override
+    auto LoadStringsFrom(char const* path) -> bool override
     {
         return DBCStorageBase::LoadStringsFrom(path, _indexTable.AsChar);
     }
@@ -220,8 +220,8 @@ public:
         DBCStorageBase::LoadFromDB(table, format, _indexTable.AsChar);
     }
 
-    iterator begin() { return iterator(_indexTable.AsT, _indexTableSize); }
-    iterator end() { return iterator(_indexTable.AsT, _indexTableSize, _indexTableSize); }
+    auto begin() -> iterator { return iterator(_indexTable.AsT, _indexTableSize); }
+    auto end() -> iterator { return iterator(_indexTable.AsT, _indexTableSize, _indexTableSize); }
 
 private:
     union
@@ -232,7 +232,7 @@ private:
     _indexTable;
 
     DBCStorage(DBCStorage const& right) = delete;
-    DBCStorage& operator=(DBCStorage const& right) = delete;
+    auto operator=(DBCStorage const& right) -> DBCStorage& = delete;
 };
 
 #endif

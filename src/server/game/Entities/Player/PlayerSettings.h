@@ -39,8 +39,8 @@ struct PlayerSetting
 {
     uint32 value;
 
-    [[nodiscard]] bool HasFlag(uint32 flag) { return (value & flag) != 0; }
-    [[nodiscard]] bool IsEnabled(uint32 equals = 1) { return value == equals; }
+    [[nodiscard]] auto HasFlag(uint32 flag) -> bool { return (value & flag) != 0; }
+    [[nodiscard]] auto IsEnabled(uint32 equals = 1) -> bool { return value == equals; }
     void AddFlag(uint32 flag) { value = value | flag; }
     void RemoveFlag(uint32 flag) { value = value &~ flag; }
 };

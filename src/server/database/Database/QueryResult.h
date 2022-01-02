@@ -28,13 +28,13 @@ public:
     ResultSet(MySQLResult* result, MySQLField* fields, uint64 rowCount, uint32 fieldCount);
     ~ResultSet();
 
-    bool NextRow();
-    uint64 GetRowCount() const { return _rowCount; }
-    uint32 GetFieldCount() const { return _fieldCount; }
-    std::string GetFieldName(uint32 index) const;
+    auto NextRow() -> bool;
+    [[nodiscard]] auto GetRowCount() const -> uint64 { return _rowCount; }
+    [[nodiscard]] auto GetFieldCount() const -> uint32 { return _fieldCount; }
+    [[nodiscard]] auto GetFieldName(uint32 index) const -> std::string;
 
-    Field* Fetch() const { return _currentRow; }
-    Field const& operator[](std::size_t index) const;
+    [[nodiscard]] auto Fetch() const -> Field* { return _currentRow; }
+    auto operator[](std::size_t index) const -> Field const&;
 
 protected:
     std::vector<QueryResultFieldMetadata> _fieldMetadata;
@@ -48,7 +48,7 @@ private:
     MySQLField* _fields;
 
     ResultSet(ResultSet const& right) = delete;
-    ResultSet& operator=(ResultSet const& right) = delete;
+    auto operator=(ResultSet const& right) -> ResultSet& = delete;
 };
 
 class AC_DATABASE_API PreparedResultSet
@@ -57,12 +57,12 @@ public:
     PreparedResultSet(MySQLStmt* stmt, MySQLResult* result, uint64 rowCount, uint32 fieldCount);
     ~PreparedResultSet();
 
-    bool NextRow();
-    uint64 GetRowCount() const { return m_rowCount; }
-    uint32 GetFieldCount() const { return m_fieldCount; }
+    auto NextRow() -> bool;
+    [[nodiscard]] auto GetRowCount() const -> uint64 { return m_rowCount; }
+    [[nodiscard]] auto GetFieldCount() const -> uint32 { return m_fieldCount; }
 
-    Field* Fetch() const;
-    Field const& operator[](std::size_t index) const;
+    [[nodiscard]] auto Fetch() const -> Field*;
+    auto operator[](std::size_t index) const -> Field const&;
 
 protected:
     std::vector<QueryResultFieldMetadata> m_fieldMetadata;
@@ -77,10 +77,10 @@ private:
     MySQLResult* m_metadataResult;    ///< Field metadata, returned by mysql_stmt_result_metadata
 
     void CleanUp();
-    bool _NextRow();
+    auto _NextRow() -> bool;
 
     PreparedResultSet(PreparedResultSet const& right) = delete;
-    PreparedResultSet& operator=(PreparedResultSet const& right) = delete;
+    auto operator=(PreparedResultSet const& right) -> PreparedResultSet& = delete;
 };
 
 #endif

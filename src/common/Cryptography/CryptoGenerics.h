@@ -30,7 +30,7 @@ namespace Acore::Impl
     struct CryptoGenericsImpl
     {
         template <typename Cipher>
-        static typename Cipher::IV GenerateRandomIV()
+        static auto GenerateRandomIV() -> typename Cipher::IV
         {
             typename Cipher::IV iv;
             Acore::Crypto::GetRandomBytes(iv);
@@ -85,7 +85,7 @@ namespace Acore::Crypto
     }
 
     template <typename Cipher>
-    bool AEDecrypt(std::vector<uint8>& data, typename Cipher::Key const& key)
+    auto AEDecrypt(std::vector<uint8>& data, typename Cipher::Key const& key) -> bool
     {
         using IV = typename Cipher::IV;
         using Tag = typename Cipher::Tag;
@@ -102,7 +102,7 @@ namespace Acore::Crypto
     }
 
     template <typename Cipher>
-    bool AEDecrypt(std::vector<uint8>& data, BigNumber const& key)
+    auto AEDecrypt(std::vector<uint8>& data, BigNumber const& key) -> bool
     {
         return AEDecrypt<Cipher>(data, key.ToByteArray<Cipher::KEY_SIZE_BYTES>());
     }

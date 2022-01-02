@@ -33,7 +33,7 @@ namespace Movement
         evaluate_derivative(Index, u, hermite);
     }
 
-    template<typename length_type> SplineBase::index_type Spline<length_type>::computeIndexInBounds(length_type length_) const
+    template<typename length_type> auto Spline<length_type>::computeIndexInBounds(length_type length_) const -> SplineBase::index_type
     {
         // Temporary disabled: causes infinite loop with t = 1.f
         /*
@@ -69,7 +69,7 @@ namespace Movement
         u = (length_ - length(index)) / (float)length(index, index + 1);
     }
 
-    template<typename length_type> SplineBase::index_type Spline<length_type>::computeIndexInBounds( float t ) const
+    template<typename length_type> auto Spline<length_type>::computeIndexInBounds( float t ) const -> SplineBase::index_type
     {
         ASSERT(t >= 0.f && t <= 1.f);
         return computeIndexInBounds(t * length());

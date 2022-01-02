@@ -32,7 +32,7 @@ namespace Acore::Crypto
     }
 
     template <size_t S>
-    std::array<uint8, S> GetRandomBytes()
+    auto GetRandomBytes() -> std::array<uint8, S>
     {
         std::array<uint8, S> arr;
         GetRandomBytes(arr);

@@ -34,7 +34,7 @@ struct LogMessage;
 typedef Appender*(*AppenderCreatorFn)(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& extraArgs);
 
 template <class AppenderImpl>
-Appender* CreateAppender(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& extraArgs)
+auto CreateAppender(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& extraArgs) -> Appender*
 {
     return new AppenderImpl(id, name, level, flags, extraArgs);
 }
@@ -48,17 +48,17 @@ private:
     ~Log();
     Log(Log const&) = delete;
     Log(Log&&) = delete;
-    Log& operator=(Log const&) = delete;
-    Log& operator=(Log&&) = delete;
+    auto operator=(Log const&) -> Log& = delete;
+    auto operator=(Log&&) -> Log& = delete;
 
 public:
-    static Log* instance();
+    static auto instance() -> Log*;
 
     void Initialize();
     void LoadFromConfig();
     void Close();
-    bool ShouldLog(std::string const& type, LogLevel level) const;
-    bool SetLogLevel(std::string const& name, int32 level, bool isLogger = true);
+    [[nodiscard]] auto ShouldLog(std::string const& type, LogLevel level) const -> bool;
+    auto SetLogLevel(std::string const& name, int32 level, bool isLogger = true) -> bool;
 
     template<typename Format, typename... Args>
     inline void outMessage(std::string const& filter, LogLevel const level, Format&& fmt, Args&&... args)
@@ -93,8 +93,8 @@ public:
         RegisterAppender(AppenderImpl::type, &CreateAppender<AppenderImpl>);
     }
 
-    std::string const& GetLogsDir() const { return m_logsDir; }
-    std::string const& GetLogsTimestamp() const { return m_logsTimestamp; }
+    [[nodiscard]] auto GetLogsDir() const -> std::string const& { return m_logsDir; }
+    [[nodiscard]] auto GetLogsTimestamp() const -> std::string const& { return m_logsTimestamp; }
 
     // Deprecated functions
     template<typename Format, typename... Args>
@@ -182,12 +182,12 @@ public:
     }
 
 private:
-    static std::string GetTimestampStr();
+    static auto GetTimestampStr() -> std::string;
     void write(std::unique_ptr<LogMessage>&& msg) const;
 
-    Logger const* GetLoggerByType(std::string const& type) const;
-    Appender* GetAppenderByName(std::string_view name);
-    uint8 NextAppenderId();
+    [[nodiscard]] auto GetLoggerByType(std::string const& type) const -> Logger const*;
+    auto GetAppenderByName(std::string_view name) -> Appender*;
+    auto NextAppenderId() -> uint8;
     void CreateAppenderFromConfig(std::string const& name);
     void CreateLoggerFromConfig(std::string const& name);
     void ReadAppendersFromConfig();

@@ -36,7 +36,7 @@ public:
     explicit HostileRefMgr(Unit* owner) { iOwner = owner; }
     ~HostileRefMgr() override;
 
-    Unit* GetOwner() { return iOwner; }
+    auto GetOwner() -> Unit* { return iOwner; }
 
     // send threat to all my hateres for the victim
     // The victim is hated than by them as well
@@ -57,7 +57,7 @@ public:
     // pussywizard: for combat bugs
     void deleteReferencesOutOfRange(float range);
 
-    HostileReference* getFirst() { return ((HostileReference*) RefMgr<Unit, ThreatMgr>::getFirst()); }
+    auto getFirst() -> HostileReference* { return ((HostileReference*) RefMgr<Unit, ThreatMgr>::getFirst()); }
 
     void setOnlineOfflineState(bool isOnline);
 

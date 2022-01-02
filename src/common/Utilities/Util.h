@@ -37,7 +37,7 @@ template<typename T, class S> struct Finder
     T S::* idMember_;
 
     Finder(T val, T S::* idMember) : val_(val), idMember_(idMember) {}
-    bool operator()(const std::pair<int, S>& obj) { return obj.second.*idMember_ == val_; }
+    auto operator()(const std::pair<int, S>& obj) -> bool { return obj.second.*idMember_ == val_; }
 };
 
 class Tokenizer
@@ -55,32 +55,32 @@ public:
     Tokenizer(const std::string& src, char const sep, uint32 vectorReserve = 0);
     ~Tokenizer() { delete[] m_str; }
 
-    [[nodiscard]] const_iterator begin() const { return m_storage.begin(); }
-    [[nodiscard]] const_iterator end() const { return m_storage.end(); }
+    [[nodiscard]] auto begin() const -> const_iterator { return m_storage.begin(); }
+    [[nodiscard]] auto end() const -> const_iterator { return m_storage.end(); }
 
-    [[nodiscard]] size_type size() const { return m_storage.size(); }
+    [[nodiscard]] auto size() const -> size_type { return m_storage.size(); }
 
-    reference operator [] (size_type i) { return m_storage[i]; }
-    const_reference operator [] (size_type i) const { return m_storage[i]; }
+    auto operator [] (size_type i) -> reference { return m_storage[i]; }
+    auto operator [] (size_type i) const -> const_reference { return m_storage[i]; }
 
 private:
     char* m_str;
     StorageType m_storage;
 };
 
-struct tm* localtime_r(time_t const* time, struct tm* result);
-time_t LocalTimeToUTCTime(time_t time);
-time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime = true);
-tm TimeBreakdown(time_t t);
+auto localtime_r(time_t const* time, struct tm* result) -> struct tm*;
+auto LocalTimeToUTCTime(time_t time) -> time_t;
+auto GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime = true) -> time_t;
+auto TimeBreakdown(time_t t) -> tm;
 
 void stripLineInvisibleChars(std::string& src);
 
-AC_COMMON_API Optional<int32> MoneyStringToMoney(std::string_view moneyString);
+AC_COMMON_API auto MoneyStringToMoney(std::string_view moneyString) -> Optional<int32>;
 
-std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
-uint32 TimeStringToSecs(const std::string& timestring);
-std::string TimeToTimestampStr(time_t t);
-std::string TimeToHumanReadable(time_t t);
+auto secsToTimeString(uint64 timeInSecs, bool shortText = false) -> std::string;
+auto TimeStringToSecs(const std::string& timestring) -> uint32;
+auto TimeToTimestampStr(time_t t) -> std::string;
+auto TimeToHumanReadable(time_t t) -> std::string;
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
@@ -93,50 +93,50 @@ inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 
 // Percentage calculation
 template <class T, class U>
-inline T CalculatePct(T base, U pct)
+inline auto CalculatePct(T base, U pct) -> T
 {
     return T(base * static_cast<float>(pct) / 100.0f);
 }
 
 template <class T, class U>
-inline T AddPct(T& base, U pct)
+inline auto AddPct(T& base, U pct) -> T
 {
     return base += CalculatePct(base, pct);
 }
 
 template <class T, class U>
-inline T ApplyPct(T& base, U pct)
+inline auto ApplyPct(T& base, U pct) -> T
 {
     return base = CalculatePct(base, pct);
 }
 
 template <class T>
-inline T RoundToInterval(T& num, T floor, T ceil)
+inline auto RoundToInterval(T& num, T floor, T ceil) -> T
 {
     return num = std::min(std::max(num, floor), ceil);
 }
 
 // UTF8 handling
-AC_COMMON_API bool Utf8toWStr(std::string_view utf8str, std::wstring& wstr);
+AC_COMMON_API auto Utf8toWStr(std::string_view utf8str, std::wstring& wstr) -> bool;
 
 // in wsize==max size of buffer, out wsize==real string size
-AC_COMMON_API bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+AC_COMMON_API auto Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize) -> bool;
 
-inline bool Utf8toWStr(std::string_view utf8str, wchar_t* wstr, size_t& wsize)
+inline auto Utf8toWStr(std::string_view utf8str, wchar_t* wstr, size_t& wsize) -> bool
 {
     return Utf8toWStr(utf8str.data(), utf8str.size(), wstr, wsize);
 }
 
-AC_COMMON_API bool WStrToUtf8(std::wstring_view wstr, std::string& utf8str);
+AC_COMMON_API auto WStrToUtf8(std::wstring_view wstr, std::string& utf8str) -> bool;
 
 // size==real string size
-AC_COMMON_API bool WStrToUtf8(wchar_t const* wstr, size_t size, std::string& utf8str);
+AC_COMMON_API auto WStrToUtf8(wchar_t const* wstr, size_t size, std::string& utf8str) -> bool;
 
 // set string to "" if invalid utf8 sequence
-size_t utf8length(std::string& utf8str);
+auto utf8length(std::string& utf8str) -> size_t;
 void utf8truncate(std::string& utf8str, size_t len);
 
-inline bool isBasicLatinCharacter(wchar_t wchar)
+inline auto isBasicLatinCharacter(wchar_t wchar) -> bool
 {
     if (wchar >= L'a' && wchar <= L'z')                      // LATIN SMALL LETTER A - LATIN SMALL LETTER Z
     {
@@ -149,7 +149,7 @@ inline bool isBasicLatinCharacter(wchar_t wchar)
     return false;
 }
 
-inline bool isExtendedLatinCharacter(wchar_t wchar)
+inline auto isExtendedLatinCharacter(wchar_t wchar) -> bool
 {
     if (isBasicLatinCharacter(wchar))
     {
@@ -186,7 +186,7 @@ inline bool isExtendedLatinCharacter(wchar_t wchar)
     return false;
 }
 
-inline bool isCyrillicCharacter(wchar_t wchar)
+inline auto isCyrillicCharacter(wchar_t wchar) -> bool
 {
     if (wchar >= 0x0410 && wchar <= 0x044F)                  // CYRILLIC CAPITAL LETTER A - CYRILLIC SMALL LETTER YA
     {
@@ -199,7 +199,7 @@ inline bool isCyrillicCharacter(wchar_t wchar)
     return false;
 }
 
-inline bool isEastAsianCharacter(wchar_t wchar)
+inline auto isEastAsianCharacter(wchar_t wchar) -> bool
 {
     if (wchar >= 0x1100 && wchar <= 0x11F9)                  // Hangul Jamo
     {
@@ -236,17 +236,17 @@ inline bool isEastAsianCharacter(wchar_t wchar)
     return false;
 }
 
-inline bool isNumeric(wchar_t wchar)
+inline auto isNumeric(wchar_t wchar) -> bool
 {
     return (wchar >= L'0' && wchar <= L'9');
 }
 
-inline bool isNumeric(char c)
+inline auto isNumeric(char c) -> bool
 {
     return (c >= '0' && c <= '9');
 }
 
-inline bool isNumeric(char const* str)
+inline auto isNumeric(char const* str) -> bool
 {
     for (char const* c = str; *c; ++c)
         if (!isNumeric(*c))
@@ -257,12 +257,12 @@ inline bool isNumeric(char const* str)
     return true;
 }
 
-inline bool isNumericOrSpace(wchar_t wchar)
+inline auto isNumericOrSpace(wchar_t wchar) -> bool
 {
     return isNumeric(wchar) || wchar == L' ';
 }
 
-inline bool isBasicLatinString(std::wstring_view wstr, bool numericOrSpace)
+inline auto isBasicLatinString(std::wstring_view wstr, bool numericOrSpace) -> bool
 {
     for (wchar_t i : wstr)
         if (!isBasicLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -272,7 +272,7 @@ inline bool isBasicLatinString(std::wstring_view wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isExtendedLatinString(std::wstring_view wstr, bool numericOrSpace)
+inline auto isExtendedLatinString(std::wstring_view wstr, bool numericOrSpace) -> bool
 {
     for (wchar_t i : wstr)
         if (!isExtendedLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -282,7 +282,7 @@ inline bool isExtendedLatinString(std::wstring_view wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isCyrillicString(std::wstring_view wstr, bool numericOrSpace)
+inline auto isCyrillicString(std::wstring_view wstr, bool numericOrSpace) -> bool
 {
     for (wchar_t i : wstr)
         if (!isCyrillicCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -292,7 +292,7 @@ inline bool isCyrillicString(std::wstring_view wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isEastAsianString(std::wstring_view wstr, bool numericOrSpace)
+inline auto isEastAsianString(std::wstring_view wstr, bool numericOrSpace) -> bool
 {
     for (wchar_t i : wstr)
         if (!isEastAsianCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
@@ -302,10 +302,10 @@ inline bool isEastAsianString(std::wstring_view wstr, bool numericOrSpace)
     return true;
 }
 
-inline char charToUpper(char c) { return std::toupper(c); }
-inline char charToLower(char c) { return std::tolower(c); }
+inline auto charToUpper(char c) -> char { return std::toupper(c); }
+inline auto charToLower(char c) -> char { return std::tolower(c); }
 
-inline wchar_t wcharToUpper(wchar_t wchar)
+inline auto wcharToUpper(wchar_t wchar) -> wchar_t
 {
     if (wchar >= L'a' && wchar <= L'z')                      // LATIN SMALL LETTER A - LATIN SMALL LETTER Z
     {
@@ -342,12 +342,12 @@ inline wchar_t wcharToUpper(wchar_t wchar)
     return wchar;
 }
 
-inline wchar_t wcharToUpperOnlyLatin(wchar_t wchar)
+inline auto wcharToUpperOnlyLatin(wchar_t wchar) -> wchar_t
 {
     return isBasicLatinCharacter(wchar) ? wcharToUpper(wchar) : wchar;
 }
 
-inline wchar_t wcharToLower(wchar_t wchar)
+inline auto wcharToLower(wchar_t wchar) -> wchar_t
 {
     if (wchar >= L'A' && wchar <= L'Z')                      // LATIN CAPITAL LETTER A - LATIN CAPITAL LETTER Z
     {
@@ -387,28 +387,28 @@ inline wchar_t wcharToLower(wchar_t wchar)
 void wstrToUpper(std::wstring& str);
 void wstrToLower(std::wstring& str);
 
-std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
+auto GetMainPartOfName(std::wstring const& wname, uint32 declension) -> std::wstring;
 
-AC_COMMON_API bool utf8ToConsole(std::string_view utf8str, std::string& conStr);
-AC_COMMON_API bool consoleToUtf8(std::string_view conStr, std::string& utf8str);
-AC_COMMON_API bool Utf8FitTo(std::string_view str, std::wstring_view search);
+AC_COMMON_API auto utf8ToConsole(std::string_view utf8str, std::string& conStr) -> bool;
+AC_COMMON_API auto consoleToUtf8(std::string_view conStr, std::string& utf8str) -> bool;
+AC_COMMON_API auto Utf8FitTo(std::string_view str, std::wstring_view search) -> bool;
 AC_COMMON_API void utf8printf(FILE* out, const char* str, ...);
 AC_COMMON_API void vutf8printf(FILE* out, const char* str, va_list* ap);
-AC_COMMON_API bool Utf8ToUpperOnlyLatin(std::string& utf8String);
+AC_COMMON_API auto Utf8ToUpperOnlyLatin(std::string& utf8String) -> bool;
 
-bool IsIPAddress(char const* ipaddress);
+auto IsIPAddress(char const* ipaddress) -> bool;
 
-uint32 CreatePIDFile(const std::string& filename);
-uint32 GetPID();
+auto CreatePIDFile(const std::string& filename) -> uint32;
+auto GetPID() -> uint32;
 
 namespace Acore::Impl
 {
-    AC_COMMON_API std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
+    AC_COMMON_API auto ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false) -> std::string;
     AC_COMMON_API void HexStrToByteArray(std::string_view str, uint8* out, size_t outlen, bool reverse = false);
 }
 
 template<typename Container>
-std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
+auto ByteArrayToHexStr(Container const& c, bool reverse = false) -> std::string
 {
     return Acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
 }
@@ -420,29 +420,29 @@ void HexStrToByteArray(std::string_view str, std::array<uint8, Size>& buf, bool 
 }
 
 template<size_t Size>
-std::array<uint8, Size> HexStrToByteArray(std::string_view str, bool reverse = false)
+auto HexStrToByteArray(std::string_view str, bool reverse = false) -> std::array<uint8, Size>
 {
     std::array<uint8, Size> arr;
     HexStrToByteArray(str, arr, reverse);
     return arr;
 }
 
-AC_COMMON_API bool StringEqualI(std::string_view str1, std::string_view str2);
-inline bool StringStartsWith(std::string_view haystack, std::string_view needle) { return (haystack.substr(0, needle.length()) == needle); }
-inline bool StringStartsWithI(std::string_view haystack, std::string_view needle) { return StringEqualI(haystack.substr(0, needle.length()), needle); }
-AC_COMMON_API bool StringContainsStringI(std::string_view haystack, std::string_view needle);
+AC_COMMON_API auto StringEqualI(std::string_view str1, std::string_view str2) -> bool;
+inline auto StringStartsWith(std::string_view haystack, std::string_view needle) -> bool { return (haystack.substr(0, needle.length()) == needle); }
+inline auto StringStartsWithI(std::string_view haystack, std::string_view needle) -> bool { return StringEqualI(haystack.substr(0, needle.length()), needle); }
+AC_COMMON_API auto StringContainsStringI(std::string_view haystack, std::string_view needle) -> bool;
 
 template <typename T>
-inline bool ValueContainsStringI(std::pair<T, std::string_view> const& haystack, std::string_view needle)
+inline auto ValueContainsStringI(std::pair<T, std::string_view> const& haystack, std::string_view needle) -> bool
 {
     return StringContainsStringI(haystack.second, needle);
 }
 
-AC_COMMON_API bool StringCompareLessI(std::string_view a, std::string_view b);
+AC_COMMON_API auto StringCompareLessI(std::string_view a, std::string_view b) -> bool;
 
 struct StringCompareLessI_T
 {
-    bool operator()(std::string_view a, std::string_view b) const { return StringCompareLessI(a, b); }
+    auto operator()(std::string_view a, std::string_view b) const -> bool { return StringCompareLessI(a, b); }
 };
 
 // simple class for not-modifyable list
@@ -453,25 +453,25 @@ class HookList
 private:
     typename std::list<T> m_list;
 public:
-    HookList<T>& operator+=(T t)
+    auto operator+=(T t) -> HookList<T>&
     {
         m_list.push_back(t);
         return *this;
     }
-    HookList<T>& operator-=(T t)
+    auto operator-=(T t) -> HookList<T>&
     {
         m_list.remove(t);
         return *this;
     }
-    size_t size()
+    auto size() -> size_t
     {
         return m_list.size();
     }
-    ListIterator begin()
+    auto begin() -> ListIterator
     {
         return m_list.begin();
     }
-    ListIterator end()
+    auto end() -> ListIterator
     {
         return m_list.end();
     }
@@ -490,12 +490,12 @@ public:
         part[2] = p3;
     }
 
-    [[nodiscard]] inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline auto IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const -> bool
     {
         return (part[0] == p1 && part[1] == p2 && part[2] == p3);
     }
 
-    [[nodiscard]] inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline auto HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const -> bool
     {
         return (part[0] & p1 || part[1] & p2 || part[2] & p3);
     }
@@ -507,7 +507,7 @@ public:
         part[2] = p3;
     }
 
-    inline bool operator<(flag96 const& right) const
+    inline auto operator<(flag96 const& right) const -> bool
     {
         for (uint8 i = 3; i > 0; --i)
         {
@@ -523,7 +523,7 @@ public:
         return false;
     }
 
-    inline bool operator==(flag96 const& right) const
+    inline auto operator==(flag96 const& right) const -> bool
     {
         return
             (
@@ -533,12 +533,12 @@ public:
             );
     }
 
-    inline bool operator!=(flag96 const& right) const
+    inline auto operator!=(flag96 const& right) const -> bool
     {
         return !(*this == right);
     }
 
-    inline flag96& operator=(flag96 const& right)
+    inline auto operator=(flag96 const& right) -> flag96&
     {
         part[0] = right.part[0];
         part[1] = right.part[1];
@@ -551,12 +551,12 @@ public:
     flag96(flag96&&) = default;
 #endif
 
-    inline flag96 operator&(flag96 const& right) const
+    inline auto operator&(flag96 const& right) const -> flag96
     {
-        return flag96(part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]);
+        return {part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]};
     }
 
-    inline flag96& operator&=(flag96 const& right)
+    inline auto operator&=(flag96 const& right) -> flag96&
     {
         part[0] &= right.part[0];
         part[1] &= right.part[1];
@@ -564,12 +564,12 @@ public:
         return *this;
     }
 
-    inline flag96 operator|(flag96 const& right) const
+    inline auto operator|(flag96 const& right) const -> flag96
     {
-        return flag96(part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]);
+        return {part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]};
     }
 
-    inline flag96& operator |=(flag96 const& right)
+    inline auto operator |=(flag96 const& right) -> flag96&
     {
         part[0] |= right.part[0];
         part[1] |= right.part[1];
@@ -577,17 +577,17 @@ public:
         return *this;
     }
 
-    inline flag96 operator~() const
+    inline auto operator~() const -> flag96
     {
-        return flag96(~part[0], ~part[1], ~part[2]);
+        return {~part[0], ~part[1], ~part[2]};
     }
 
-    inline flag96 operator^(flag96 const& right) const
+    inline auto operator^(flag96 const& right) const -> flag96
     {
-        return flag96(part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]);
+        return {part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]};
     }
 
-    inline flag96& operator^=(flag96 const& right)
+    inline auto operator^=(flag96 const& right) -> flag96&
     {
         part[0] ^= right.part[0];
         part[1] ^= right.part[1];
@@ -600,17 +600,17 @@ public:
         return (part[0] != 0 || part[1] != 0 || part[2] != 0);
     }
 
-    inline bool operator !() const
+    inline auto operator !() const -> bool
     {
         return !(bool(*this));
     }
 
-    inline uint32& operator[](uint8 el)
+    inline auto operator[](uint8 el) -> uint32&
     {
         return part[el];
     }
 
-    inline uint32 const& operator [](uint8 el) const
+    inline auto operator [](uint8 el) const -> uint32 const&
     {
         return part[el];
     }
@@ -627,7 +627,7 @@ enum ComparisionType
 };
 
 template <class T>
-bool CompareValues(ComparisionType type, T val1, T val2)
+auto CompareValues(ComparisionType type, T val1, T val2) -> bool
 {
     switch (type)
     {
@@ -653,7 +653,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap()  { }
+    EventMap()  = default;
 
     /**
     * @name Reset
@@ -680,7 +680,7 @@ public:
     * @name GetTimer
     * @return Current timer value.
     */
-    [[nodiscard]] uint32 GetTimer() const
+    [[nodiscard]] auto GetTimer() const -> uint32
     {
         return _time;
     }
@@ -694,7 +694,7 @@ public:
     * @name GetPhaseMask
     * @return Active phases as mask.
     */
-    [[nodiscard]] uint8 GetPhaseMask() const
+    [[nodiscard]] auto GetPhaseMask() const -> uint8
     {
         return _phase;
     }
@@ -703,7 +703,7 @@ public:
     * @name Empty
     * @return True, if there are no events scheduled.
     */
-    [[nodiscard]] bool Empty() const
+    [[nodiscard]] auto Empty() const -> bool
     {
         return _eventMap.empty();
     }
@@ -806,7 +806,7 @@ public:
     * @brief Returns the next event to execute and removes it from map.
     * @return Id of the event to execute.
     */
-    uint32 ExecuteEvent()
+    auto ExecuteEvent() -> uint32
     {
         while (!Empty())
         {
@@ -944,7 +944,7 @@ public:
     * @param eventId Wanted event id.
     * @return Time of found event.
     */
-    [[nodiscard]] uint32 GetNextEventTime(uint32 eventId) const
+    [[nodiscard]] auto GetNextEventTime(uint32 eventId) const -> uint32
     {
         if (Empty())
         {
@@ -966,7 +966,7 @@ public:
      * @name GetNextEventTime
      * @return Time of next event.
      */
-    [[nodiscard]] uint32 GetNextEventTime() const
+    [[nodiscard]] auto GetNextEventTime() const -> uint32
     {
         return Empty() ? 0 : _eventMap.begin()->first;
     }
@@ -977,7 +977,7 @@ public:
     * @param phase Wanted phase.
     * @return True, if phase of event map contains specified phase.
     */
-    bool IsInPhase(uint8 phase)
+    auto IsInPhase(uint8 phase) -> bool
     {
         return phase <= 8 && (!phase || _phase & (1 << (phase - 1)));
     }
@@ -991,14 +991,14 @@ private:
 };
 
 template<typename E>
-constexpr typename std::underlying_type<E>::type AsUnderlyingType(E enumValue)
+constexpr auto AsUnderlyingType(E enumValue) -> typename std::underlying_type<E>::type
 {
     static_assert(std::is_enum<E>::value, "AsUnderlyingType can only be used with enums");
     return static_cast<typename std::underlying_type<E>::type>(enumValue);
 }
 
 template<typename Ret, typename T1, typename... T>
-Ret* Coalesce(T1* first, T*... rest)
+auto Coalesce(T1* first, T*... rest) -> Ret*
 {
     if constexpr (sizeof...(T) > 0)
         return (first ? static_cast<Ret*>(first) : Coalesce<Ret>(rest...));
@@ -1006,12 +1006,12 @@ Ret* Coalesce(T1* first, T*... rest)
         return static_cast<Ret*>(first);
 }
 
-AC_COMMON_API std::string GetTypeName(std::type_info const&);
+AC_COMMON_API auto GetTypeName(std::type_info const&) -> std::string;
 
 template <typename T>
-std::string GetTypeName() { return GetTypeName(typeid(T)); }
+auto GetTypeName() -> std::string { return GetTypeName(typeid(T)); }
 
 template <typename T>
-std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::type_info>, std::string> GetTypeName(T&& v) { return GetTypeName(typeid(v)); }
+auto GetTypeName(T&& v) -> std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::type_info>, std::string> { return GetTypeName(typeid(v)); }
 
 #endif

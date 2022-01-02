@@ -124,62 +124,62 @@ class ObjectGuid
         typedef uint32 LowType;
 
         template<HighGuid type>
-        static typename std::enable_if<ObjectGuidTraits<type>::Global, ObjectGuid>::type Create(LowType counter) { return Global(type, counter); }
+        static auto Create(LowType counter) -> typename std::enable_if<ObjectGuidTraits<type>::Global, ObjectGuid>::type { return Global(type, counter); }
 
         template<HighGuid type>
-        static typename std::enable_if<ObjectGuidTraits<type>::MapSpecific, ObjectGuid>::type Create(uint32 entry, LowType counter) { return MapSpecific(type, entry, counter); }
+        static auto Create(uint32 entry, LowType counter) -> typename std::enable_if<ObjectGuidTraits<type>::MapSpecific, ObjectGuid>::type { return MapSpecific(type, entry, counter); }
 
-        ObjectGuid() : _guid(0) { }
+        ObjectGuid()  = default;
         explicit ObjectGuid(uint64 guid) : _guid(guid) { }
         ObjectGuid(HighGuid hi, uint32 entry, LowType counter) : _guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) { }
         ObjectGuid(HighGuid hi, LowType counter) : _guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) { }
 
-        PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
+        auto ReadAsPacked() -> PackedGuidReader { return PackedGuidReader(*this); }
 
         void Set(uint64 guid) { _guid = guid; }
         void Clear() { _guid = 0; }
 
-        PackedGuid WriteAsPacked() const;
+        [[nodiscard]] auto WriteAsPacked() const -> PackedGuid;
 
-        uint64   GetRawValue() const { return _guid; }
-        HighGuid GetHigh() const { return HighGuid((_guid >> 48) & 0x0000FFFF); }
-        uint32   GetEntry() const { return HasEntry() ? uint32((_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
-        LowType  GetCounter()  const
+        [[nodiscard]] auto   GetRawValue() const -> uint64 { return _guid; }
+        [[nodiscard]] auto GetHigh() const -> HighGuid { return HighGuid((_guid >> 48) & 0x0000FFFF); }
+        [[nodiscard]] auto   GetEntry() const -> uint32 { return HasEntry() ? uint32((_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
+        [[nodiscard]] auto  GetCounter()  const -> LowType
         {
             return HasEntry()
                    ? LowType(_guid & UI64LIT(0x0000000000FFFFFF))
                    : LowType(_guid & UI64LIT(0x00000000FFFFFFFF));
         }
 
-        static LowType GetMaxCounter(HighGuid high)
+        static auto GetMaxCounter(HighGuid high) -> LowType
         {
             return HasEntry(high)
                    ? LowType(0x00FFFFFF)
                    : LowType(0xFFFFFFFF);
         }
 
-        ObjectGuid::LowType GetMaxCounter() const { return GetMaxCounter(GetHigh()); }
+        [[nodiscard]] auto GetMaxCounter() const -> ObjectGuid::LowType { return GetMaxCounter(GetHigh()); }
 
-        bool IsEmpty()             const { return _guid == 0; }
-        bool IsCreature()          const { return GetHigh() == HighGuid::Unit; }
-        bool IsPet()               const { return GetHigh() == HighGuid::Pet; }
-        bool IsVehicle()           const { return GetHigh() == HighGuid::Vehicle; }
-        bool IsCreatureOrPet()     const { return IsCreature() || IsPet(); }
-        bool IsCreatureOrVehicle() const { return IsCreature() || IsVehicle(); }
-        bool IsAnyTypeCreature()   const { return IsCreature() || IsPet() || IsVehicle(); }
-        bool IsPlayer()            const { return !IsEmpty() && GetHigh() == HighGuid::Player; }
-        bool IsUnit()              const { return IsAnyTypeCreature() || IsPlayer(); }
-        bool IsItem()              const { return GetHigh() == HighGuid::Item; }
-        bool IsGameObject()        const { return GetHigh() == HighGuid::GameObject; }
-        bool IsDynamicObject()     const { return GetHigh() == HighGuid::DynamicObject; }
-        bool IsCorpse()            const { return GetHigh() == HighGuid::Corpse; }
-        bool IsTransport()         const { return GetHigh() == HighGuid::Transport; }
-        bool IsMOTransport()       const { return GetHigh() == HighGuid::Mo_Transport; }
-        bool IsAnyTypeGameObject() const { return IsGameObject() || IsTransport() || IsMOTransport(); }
-        bool IsInstance()          const { return GetHigh() == HighGuid::Instance; }
-        bool IsGroup()             const { return GetHigh() == HighGuid::Group; }
+        [[nodiscard]] auto IsEmpty()             const -> bool { return _guid == 0; }
+        [[nodiscard]] auto IsCreature()          const -> bool { return GetHigh() == HighGuid::Unit; }
+        [[nodiscard]] auto IsPet()               const -> bool { return GetHigh() == HighGuid::Pet; }
+        [[nodiscard]] auto IsVehicle()           const -> bool { return GetHigh() == HighGuid::Vehicle; }
+        [[nodiscard]] auto IsCreatureOrPet()     const -> bool { return IsCreature() || IsPet(); }
+        [[nodiscard]] auto IsCreatureOrVehicle() const -> bool { return IsCreature() || IsVehicle(); }
+        [[nodiscard]] auto IsAnyTypeCreature()   const -> bool { return IsCreature() || IsPet() || IsVehicle(); }
+        [[nodiscard]] auto IsPlayer()            const -> bool { return !IsEmpty() && GetHigh() == HighGuid::Player; }
+        [[nodiscard]] auto IsUnit()              const -> bool { return IsAnyTypeCreature() || IsPlayer(); }
+        [[nodiscard]] auto IsItem()              const -> bool { return GetHigh() == HighGuid::Item; }
+        [[nodiscard]] auto IsGameObject()        const -> bool { return GetHigh() == HighGuid::GameObject; }
+        [[nodiscard]] auto IsDynamicObject()     const -> bool { return GetHigh() == HighGuid::DynamicObject; }
+        [[nodiscard]] auto IsCorpse()            const -> bool { return GetHigh() == HighGuid::Corpse; }
+        [[nodiscard]] auto IsTransport()         const -> bool { return GetHigh() == HighGuid::Transport; }
+        [[nodiscard]] auto IsMOTransport()       const -> bool { return GetHigh() == HighGuid::Mo_Transport; }
+        [[nodiscard]] auto IsAnyTypeGameObject() const -> bool { return IsGameObject() || IsTransport() || IsMOTransport(); }
+        [[nodiscard]] auto IsInstance()          const -> bool { return GetHigh() == HighGuid::Instance; }
+        [[nodiscard]] auto IsGroup()             const -> bool { return GetHigh() == HighGuid::Group; }
 
-        static TypeID GetTypeId(HighGuid high)
+        static auto GetTypeId(HighGuid high) -> TypeID
         {
             switch (high)
             {
@@ -200,21 +200,21 @@ class ObjectGuid
             }
         }
 
-        TypeID GetTypeId() const { return GetTypeId(GetHigh()); }
+        [[nodiscard]] auto GetTypeId() const -> TypeID { return GetTypeId(GetHigh()); }
 
         operator bool() const { return !IsEmpty(); }
-        bool operator!() const { return !(bool(*this)); }
-        bool operator==(ObjectGuid const& guid) const { return GetRawValue() == guid.GetRawValue(); }
-        bool operator!=(ObjectGuid const& guid) const { return GetRawValue() != guid.GetRawValue(); }
-        bool operator< (ObjectGuid const& guid) const { return GetRawValue() < guid.GetRawValue(); }
-        bool operator<= (ObjectGuid const& guid) const { return GetRawValue() <= guid.GetRawValue(); }
+        auto operator!() const -> bool { return !(bool(*this)); }
+        auto operator==(ObjectGuid const& guid) const -> bool { return GetRawValue() == guid.GetRawValue(); }
+        auto operator!=(ObjectGuid const& guid) const -> bool { return GetRawValue() != guid.GetRawValue(); }
+        auto operator< (ObjectGuid const& guid) const -> bool { return GetRawValue() < guid.GetRawValue(); }
+        auto operator<= (ObjectGuid const& guid) const -> bool { return GetRawValue() <= guid.GetRawValue(); }
 
-        static char const* GetTypeName(HighGuid high);
-        char const* GetTypeName() const { return !IsEmpty() ? GetTypeName(GetHigh()) : "None"; }
-        std::string ToString() const;
+        static auto GetTypeName(HighGuid high) -> char const*;
+        [[nodiscard]] auto GetTypeName() const -> char const* { return !IsEmpty() ? GetTypeName(GetHigh()) : "None"; }
+        [[nodiscard]] auto ToString() const -> std::string;
 
     private:
-        static bool HasEntry(HighGuid high)
+        static auto HasEntry(HighGuid high) -> bool
         {
             switch (high)
             {
@@ -236,10 +236,10 @@ class ObjectGuid
             }
         }
 
-        bool HasEntry() const { return HasEntry(GetHigh()); }
+        [[nodiscard]] auto HasEntry() const -> bool { return HasEntry(GetHigh()); }
 
-        static ObjectGuid Global(HighGuid type, LowType counter);
-        static ObjectGuid MapSpecific(HighGuid type, uint32 entry, LowType counter);
+        static auto Global(HighGuid type, LowType counter) -> ObjectGuid;
+        static auto MapSpecific(HighGuid type, uint32 entry, LowType counter) -> ObjectGuid;
 
         explicit ObjectGuid(uint32 const&) = delete;                // no implementation, used to catch wrong type assignment
         ObjectGuid(HighGuid, uint32, uint64 counter) = delete;      // no implementation, used to catch wrong type assignment
@@ -248,7 +248,7 @@ class ObjectGuid
         // used to catch wrong type assignment
         operator int64() const = delete;
 
-        uint64 _guid;
+        uint64 _guid{0};
 };
 
 // Some Shared defines
@@ -263,7 +263,7 @@ typedef std::unordered_set<ObjectGuid> GuidUnorderedSet;
 
 class PackedGuid
 {
-    friend ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
+    friend auto operator<<(ByteBuffer& buf, PackedGuid const& guid) -> ByteBuffer&;
 
     public:
         explicit PackedGuid() : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(0); }
@@ -273,7 +273,7 @@ class PackedGuid
         void Set(uint64 guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid); }
         void Set(ObjectGuid guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid.GetRawValue()); }
 
-        std::size_t size() const { return _packedGuid.size(); }
+        [[nodiscard]] auto size() const -> std::size_t { return _packedGuid.size(); }
 
     private:
         ByteBuffer _packedGuid;
@@ -285,9 +285,9 @@ public:
     ObjectGuidGeneratorBase(ObjectGuid::LowType start = 1) : _nextGuid(start) { }
 
     virtual void Set(ObjectGuid::LowType val) { _nextGuid = val; }
-    virtual ObjectGuid::LowType Generate() = 0;
-    ObjectGuid::LowType GetNextAfterMaxUsed() const { return _nextGuid; }
-    virtual ~ObjectGuidGeneratorBase() { }
+    virtual auto Generate() -> ObjectGuid::LowType = 0;
+    [[nodiscard]] auto GetNextAfterMaxUsed() const -> ObjectGuid::LowType { return _nextGuid; }
+    virtual ~ObjectGuidGeneratorBase() = default;
 
 protected:
     static void HandleCounterOverflow(HighGuid high);
@@ -300,7 +300,7 @@ class ObjectGuidGenerator : public ObjectGuidGeneratorBase
 public:
     explicit ObjectGuidGenerator(ObjectGuid::LowType start = 1) : ObjectGuidGeneratorBase(start) { }
 
-    ObjectGuid::LowType Generate() override
+    auto Generate() -> ObjectGuid::LowType override
     {
         if (_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
             HandleCounterOverflow(high);
@@ -309,13 +309,13 @@ public:
     }
 };
 
-ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
-ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
+auto operator<<(ByteBuffer& buf, ObjectGuid const& guid) -> ByteBuffer&;
+auto operator>>(ByteBuffer& buf, ObjectGuid&       guid) -> ByteBuffer&;
 
-ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
-ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid);
+auto operator<<(ByteBuffer& buf, PackedGuid const& guid) -> ByteBuffer&;
+auto operator>>(ByteBuffer& buf, PackedGuidReader const& guid) -> ByteBuffer&;
 
-inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
+inline auto ObjectGuid::WriteAsPacked() const -> PackedGuid { return PackedGuid(*this); }
 
 namespace std
 {
@@ -323,7 +323,7 @@ namespace std
     struct hash<ObjectGuid>
     {
         public:
-            size_t operator()(ObjectGuid const& key) const
+            auto operator()(ObjectGuid const& key) const -> size_t
             {
                 return std::hash<uint64>()(key.GetRawValue());
             }

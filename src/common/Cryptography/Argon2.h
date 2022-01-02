@@ -22,7 +22,7 @@ namespace Acore::Crypto
         static constexpr uint32 PARALLELISM = 1;                  // we don't support threaded hashing
 
         static Optional<std::string> Hash(std::string const& password, BigNumber const& salt, uint32 nIterations = DEFAULT_ITERATIONS, uint32 kibMemoryCost = DEFAULT_MEMORY_COST);
-        static bool Verify(std::string const& password, std::string const& hash);
+        static auto Verify(std::string const& password, std::string const& hash) -> bool;
     };
 }
 

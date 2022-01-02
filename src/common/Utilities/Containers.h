@@ -30,13 +30,13 @@
 namespace Acore
 {
     template<class T>
-    constexpr inline T* AddressOrSelf(T* ptr)
+    constexpr inline auto AddressOrSelf(T* ptr) -> T*
     {
         return ptr;
     }
 
     template<class T>
-    constexpr inline T* AddressOrSelf(T& not_ptr)
+    constexpr inline auto AddressOrSelf(T& not_ptr) -> T*
     {
         return std::addressof(not_ptr);
     }
@@ -53,11 +53,11 @@ namespace Acore
 
         CheckedBufferOutputIterator(T* buf, size_t n) : _buf(buf), _end(buf + n) {}
 
-        T& operator*() const { check(); return *_buf; }
-        CheckedBufferOutputIterator& operator++() { check(); ++_buf; return *this; }
-        CheckedBufferOutputIterator operator++(int) { CheckedBufferOutputIterator v = *this; operator++(); return v; }
+        auto operator*() const -> T& { check(); return *_buf; }
+        auto operator++() -> CheckedBufferOutputIterator& { check(); ++_buf; return *this; }
+        auto operator++(int) -> CheckedBufferOutputIterator { CheckedBufferOutputIterator v = *this; operator++(); return v; }
 
-        [[nodiscard]] size_t remaining() const { return (_end - _buf); }
+        [[nodiscard]] auto remaining() const -> size_t { return (_end - _buf); }
 
     private:
         T* _buf;
@@ -227,7 +227,7 @@ namespace Acore::Containers
     }
 
     template <typename Container, typename Predicate>
-    std::enable_if_t<std::is_move_assignable_v<decltype(*std::declval<Container>().begin())>, void> EraseIf(Container& c, Predicate p)
+    auto EraseIf(Container& c, Predicate p) -> std::enable_if_t<std::is_move_assignable_v<decltype(*std::declval<Container>().begin())>, void>
     {
         auto wpos = c.begin();
         for (auto rpos = c.begin(), end = c.end(); rpos != end; ++rpos)
@@ -245,7 +245,7 @@ namespace Acore::Containers
     }
 
     template <typename Container, typename Predicate>
-    std::enable_if_t<!std::is_move_assignable_v<decltype(*std::declval<Container>().begin())>, void> EraseIf(Container& c, Predicate p)
+    auto EraseIf(Container& c, Predicate p) -> std::enable_if_t<!std::is_move_assignable_v<decltype(*std::declval<Container>().begin())>, void>
     {
         for (auto it = c.begin(); it != c.end();)
         {

@@ -98,9 +98,9 @@ struct ChaseAngle
     float RelativeAngle; // we want to be at this angle relative to the target (0 = front, M_PI = back)
     float Tolerance;     // but we'll tolerate anything within +- this much
 
-    float UpperBound() const;
-    float LowerBound() const;
-    bool IsAngleOkay(float relativeAngle) const;
+    [[nodiscard]] auto UpperBound() const -> float;
+    [[nodiscard]] auto LowerBound() const -> float;
+    [[nodiscard]] auto IsAngleOkay(float relativeAngle) const -> bool;
 };
 
 // assume it is 25 yard per 0.6 second
@@ -122,7 +122,7 @@ private:
             --_top;
     }
 
-    [[nodiscard]] bool needInitTop() const
+    [[nodiscard]] auto needInitTop() const -> bool
     {
         if (empty())
             return false;
@@ -143,20 +143,20 @@ public:
     void Initialize();
     void InitDefault();
 
-    [[nodiscard]] bool empty() const { return (_top < 0); }
-    [[nodiscard]] int size() const { return _top + 1; }
-    [[nodiscard]] _Ty top() const
+    [[nodiscard]] auto empty() const -> bool { return (_top < 0); }
+    [[nodiscard]] auto size() const -> int { return _top + 1; }
+    [[nodiscard]] auto top() const -> _Ty
     {
         ASSERT(!empty());
         return Impl[_top];
     }
-    [[nodiscard]] _Ty GetMotionSlot(int slot) const
+    [[nodiscard]] auto GetMotionSlot(int slot) const -> _Ty
     {
         ASSERT(slot >= 0);
         return Impl[slot];
     }
 
-    [[nodiscard]] uint8 GetCleanFlags() const { return _cleanFlag; }
+    [[nodiscard]] auto GetCleanFlags() const -> uint8 { return _cleanFlag; }
 
     void DirectDelete(_Ty curr);
     void DelayedDelete(_Ty curr);
@@ -233,14 +233,14 @@ public:
     void MovePath(uint32 path_id, bool repeatable);
     void MoveRotate(uint32 time, RotateDirection direction);
 
-    [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
-    [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
-    [[nodiscard]] uint32 GetCurrentSplineId() const; // Xinef: Escort system
+    [[nodiscard]] auto GetCurrentMovementGeneratorType() const -> MovementGeneratorType;
+    [[nodiscard]] auto GetMotionSlotType(int slot) const -> MovementGeneratorType;
+    [[nodiscard]] auto GetCurrentSplineId() const -> uint32; // Xinef: Escort system
 
     void propagateSpeedChange();
     void ReinitializeMovement();
 
-    bool GetDestination(float& x, float& y, float& z);
+    auto GetDestination(float& x, float& y, float& z) -> bool;
 private:
     void Mutate(MovementGenerator* m, MovementSlot slot);                  // use Move* functions instead
 

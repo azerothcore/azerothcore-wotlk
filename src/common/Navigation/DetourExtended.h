@@ -10,10 +10,10 @@
 class dtQueryFilterExt: public dtQueryFilter
 {
 public:
-    float getCost(const float* pa, const float* pb,
+    auto getCost(const float* pa, const float* pb,
         const dtPolyRef prevRef, const dtMeshTile* prevTile, const dtPoly* prevPoly,
         const dtPolyRef curRef, const dtMeshTile* curTile, const dtPoly* curPoly,
-        const dtPolyRef nextRef, const dtMeshTile* nextTile, const dtPoly* nextPoly) const override;
+        const dtPolyRef nextRef, const dtMeshTile* nextTile, const dtPoly* nextPoly) const -> float override;
 };
 
 #endif // _ACORE_DETOUR_EXTENDED_H

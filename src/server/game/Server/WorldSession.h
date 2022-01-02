@@ -140,7 +140,7 @@ enum AccountDataType
 
 struct AccountData
 {
-    AccountData() :  Data("") {}
+    AccountData() :  Data("") = default;
 
     time_t Time{0};
     std::string Data;
@@ -193,8 +193,8 @@ public:
     explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession) {}
     virtual ~PacketFilter() = default;
 
-    virtual bool Process(WorldPacket* /*packet*/) { return true; }
-    [[nodiscard]] virtual bool ProcessUnsafe() const { return true; }
+    virtual auto Process(WorldPacket* /*packet*/) -> bool { return true; }
+    [[nodiscard]] virtual auto ProcessUnsafe() const -> bool { return true; }
 
 protected:
     WorldSession* const m_pSession;
@@ -206,9 +206,9 @@ public:
     explicit MapSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
     ~MapSessionFilter() override = default;
 
-    bool Process(WorldPacket* packet) override;
+    auto Process(WorldPacket* packet) -> bool override;
     //in Map::Update() we do not process player logout!
-    [[nodiscard]] bool ProcessUnsafe() const override { return false; }
+    [[nodiscard]] auto ProcessUnsafe() const -> bool override { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -219,7 +219,7 @@ public:
     explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
     ~WorldSessionFilter() override = default;
 
-    bool Process(WorldPacket* packet) override;
+    auto Process(WorldPacket* packet) -> bool override;
 };
 
 // Proxy structure to contain data passed to callback function,
@@ -292,9 +292,9 @@ public:
     WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
-    bool PlayerLoading() const { return m_playerLoading; }
-    bool PlayerLogout() const { return m_playerLogout; }
-    bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }
+    auto PlayerLoading() const -> bool { return m_playerLoading; }
+    auto PlayerLogout() const -> bool { return m_playerLogout; }
+    auto PlayerLogoutWithSave() const -> bool { return m_playerLogout && m_playerSave; }
 
     void ReadAddonsInfo(ByteBuffer& data);
     void SendAddonsInfo();
@@ -314,24 +314,24 @@ public:
     void SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos = 0);
     void SendClientCacheVersion(uint32 version);
 
-    AccountTypes GetSecurity() const { return _security; }
-    bool CanSkipQueue() const { return _skipQueue; }
-    uint32 GetAccountId() const { return _accountId; }
-    Player* GetPlayer() const { return _player; }
-    std::string const& GetPlayerName() const;
-    std::string GetPlayerInfo() const;
+    auto GetSecurity() const -> AccountTypes { return _security; }
+    auto CanSkipQueue() const -> bool { return _skipQueue; }
+    auto GetAccountId() const -> uint32 { return _accountId; }
+    auto GetPlayer() const -> Player* { return _player; }
+    auto GetPlayerName() const -> std::string const&;
+    auto GetPlayerInfo() const -> std::string;
 
-    uint32 GetCurrentVendor() const { return m_currentVendorEntry; }
+    auto GetCurrentVendor() const -> uint32 { return m_currentVendorEntry; }
     void SetCurrentVendor(uint32 vendorEntry) { m_currentVendorEntry = vendorEntry; }
 
-    ObjectGuid::LowType GetGuidLow() const;
+    auto GetGuidLow() const -> ObjectGuid::LowType;
     void SetSecurity(AccountTypes security) { _security = security; }
-    std::string const& GetRemoteAddress() { return m_Address; }
+    auto GetRemoteAddress() -> std::string const& { return m_Address; }
     void SetPlayer(Player* player);
-    uint8 Expansion() const { return m_expansion; }
+    auto Expansion() const -> uint8 { return m_expansion; }
 
     void SetTotalTime(uint32 TotalTime) { m_total_time = TotalTime; }
-    uint32 GetTotalTime() const { return m_total_time; }
+    auto GetTotalTime() const -> uint32 { return m_total_time; }
 
     void InitWarden(SessionKey const&, std::string const& os);
 
@@ -339,7 +339,7 @@ public:
     void SetInQueue(bool state) { m_inQueue = state; }
 
     /// Is the user engaged in a log out process?
-    bool isLogingOut() const { return _logoutTime || m_playerLogout; }
+    auto isLogingOut() const -> bool { return _logoutTime || m_playerLogout; }
 
     /// Engage the logout process for the user
     void LogoutRequest(time_t requestTime)
@@ -348,7 +348,7 @@ public:
     }
 
     /// Is logout cooldown expired?
-    bool ShouldLogOut(time_t currTime) const
+    auto ShouldLogOut(time_t currTime) const -> bool
     {
         return (_logoutTime > 0 && currTime >= _logoutTime + 20);
     }
@@ -359,13 +359,13 @@ public:
 
     // Returns true if all contained hyperlinks are valid
     // May kick player on false depending on world config (handler should abort)
-    bool ValidateHyperlinksAndMaybeKick(std::string_view str);
+    auto ValidateHyperlinksAndMaybeKick(std::string_view str) -> bool;
     // Returns true if the message contains no hyperlinks
     // May kick player on false depending on world config (handler should abort)
-    bool DisallowHyperlinksAndMaybeKick(std::string_view str);
+    auto DisallowHyperlinksAndMaybeKick(std::string_view str) -> bool;
 
     void QueuePacket(WorldPacket* new_packet);
-    bool Update(uint32 diff, PacketFilter& updater);
+    auto Update(uint32 diff, PacketFilter& updater) -> bool;
 
     /// Handle the authentication waiting queue (to be completed)
     void SendAuthWaitQueue(uint32 position);
@@ -377,7 +377,7 @@ public:
     void SendTrainerList(ObjectGuid guid, std::string const& strTitle);
     void SendListInventory(ObjectGuid guid, uint32 vendorEntry = 0);
     void SendShowBank(ObjectGuid guid);
-    bool CanOpenMailBox(ObjectGuid guid);
+    auto CanOpenMailBox(ObjectGuid guid) -> bool;
     void SendShowMailBox(ObjectGuid guid);
     void SendTabardVendorActivate(ObjectGuid guid);
     void SendSpiritResurrect();
@@ -401,10 +401,10 @@ public:
     void SendStablePet(ObjectGuid guid);
     void SendStablePetCallback(ObjectGuid guid, PreparedQueryResult result);
     void SendStableResult(uint8 guid);
-    bool CheckStableMaster(ObjectGuid guid);
+    auto CheckStableMaster(ObjectGuid guid) -> bool;
 
     // Account Data
-    AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
+    auto GetAccountData(AccountDataType type) -> AccountData* { return &m_accountData[type]; }
     void SetAccountData(AccountDataType type, time_t tm, std::string const& data);
     void SendAccountDataTimes(uint32 mask);
     void LoadGlobalAccountData();
@@ -413,7 +413,7 @@ public:
     void LoadTutorialsData();
     void SendTutorialsData();
     void SaveTutorialsData(CharacterDatabaseTransaction trans);
-    uint32 GetTutorialInt(uint8 index) const { return m_Tutorials[index]; }
+    auto GetTutorialInt(uint8 index) const -> uint32 { return m_Tutorials[index]; }
     void SetTutorialInt(uint8 index, uint32 value)
     {
         if (m_Tutorials[index] != value)
@@ -436,7 +436,7 @@ public:
     void SendTaxiStatus(ObjectGuid guid);
     void SendTaxiMenu(Creature* unit);
     void SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathNode = 0);
-    bool SendLearnNewTaxiNode(Creature* unit);
+    auto SendLearnNewTaxiNode(Creature* unit) -> bool;
     void SendDiscoverNewTaxiNode(uint32 nodeid);
 
     // Guild/Arena Team
@@ -452,11 +452,11 @@ public:
     time_t m_muteTime;
 
     // Locales
-    LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
-    LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
-    char const* GetAcoreString(uint32 entry) const;
+    auto GetSessionDbcLocale() const -> LocaleConstant { return m_sessionDbcLocale; }
+    auto GetSessionDbLocaleIndex() const -> LocaleConstant { return m_sessionDbLocaleIndex; }
+    auto GetAcoreString(uint32 entry) const -> char const*;
 
-    uint32 GetLatency() const { return m_latency; }
+    auto GetLatency() const -> uint32 { return m_latency; }
     void SetLatency(uint32 latency) { m_latency = latency; }
 
     std::atomic<time_t> m_timeOutTime;
@@ -474,17 +474,17 @@ public:
         else if (!onlyActive)
             m_timeOutTime = int32(sWorld->getIntConfig(CONFIG_SOCKET_TIMEOUTTIME));
     }
-    bool IsConnectionIdle() const
+    auto IsConnectionIdle() const -> bool
     {
         return (m_timeOutTime <= 0 && !m_inQueue);
     }
 
     // Recruit-A-Friend Handling
-    uint32 GetRecruiterId() const { return recruiterId; }
-    bool IsARecruiter() const { return isRecruiter; }
+    auto GetRecruiterId() const -> uint32 { return recruiterId; }
+    auto IsARecruiter() const -> bool { return isRecruiter; }
 
     // Packets cooldown
-    time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
+    auto GetCalendarEventCreationCooldown() const -> time_t { return _calendarEventCreationCooldown; }
     void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
     // Time Synchronisation
@@ -1020,22 +1020,22 @@ public:                                                 // opcodes handlers
     uint32 _lastAuctionListOwnerItemsMSTime;
 
     void HandleTeleportTimeout(bool updateInSessions);
-    bool HandleSocketClosed();
+    auto HandleSocketClosed() -> bool;
     void SetOfflineTime(uint32 time) { _offlineTime = time; }
-    uint32 GetOfflineTime() const { return _offlineTime; }
-    bool IsKicked() const { return _kicked; }
+    auto GetOfflineTime() const -> uint32 { return _offlineTime; }
+    auto IsKicked() const -> bool { return _kicked; }
     void SetKicked(bool val) { _kicked = val; }
     void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
-    bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
-    bool IsSocketClosed() const;
+    auto GetShouldSetOfflineInDB() const -> bool { return _shouldSetOfflineInDB; }
+    auto IsSocketClosed() const -> bool;
 
     /*
      * CALLBACKS
      */
 
-    QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
-    TransactionCallback& AddTransactionCallback(TransactionCallback&& callback);
-    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback);
+    auto GetQueryProcessor() -> QueryCallbackProcessor& { return _queryProcessor; }
+    auto AddTransactionCallback(TransactionCallback&& callback) -> TransactionCallback&;
+    auto AddQueryHolderCallback(SQLQueryHolderCallback&& callback) -> SQLQueryHolderCallback&;
 
 private:
     void ProcessQueryCallbacks();
@@ -1051,7 +1051,7 @@ protected:
         friend class World;
     public:
         DosProtection(WorldSession* s);
-        bool EvaluateOpcode(WorldPacket& p, time_t time) const;
+        auto EvaluateOpcode(WorldPacket& p, time_t time) const -> bool;
     protected:
         enum Policy
         {
@@ -1060,7 +1060,7 @@ protected:
             POLICY_BAN
         };
 
-        uint32 GetMaxPacketCounterAllowed(uint16 opcode) const;
+        auto GetMaxPacketCounterAllowed(uint16 opcode) const -> uint32;
 
         WorldSession* Session;
 
@@ -1071,23 +1071,23 @@ protected:
         mutable PacketThrottlingMap _PacketThrottlingMap;
 
         DosProtection(DosProtection const& right) = delete;
-        DosProtection& operator=(DosProtection const& right) = delete;
+        auto operator=(DosProtection const& right) -> DosProtection& = delete;
     } AntiDOS;
 
 private:
     // private trade methods
     void moveItems(Item* myItems[], Item* hisItems[]);
 
-    bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
+    auto CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const -> bool;
 
-    bool recoveryItem(Item* pItem);
+    auto recoveryItem(Item* pItem) -> bool;
 
     // logging helper
     void LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason);
     void LogUnprocessedTail(WorldPacket* packet);
 
     // EnumData helpers
-    bool IsLegitCharacterForAccount(ObjectGuid guid)
+    auto IsLegitCharacterForAccount(ObjectGuid guid) -> bool
     {
         return _legitCharacters.find(guid) != _legitCharacters.end();
     }
@@ -1145,7 +1145,7 @@ private:
     uint32 _timeSyncTimer;
 
     WorldSession(WorldSession const& right) = delete;
-    WorldSession& operator=(WorldSession const& right) = delete;
+    auto operator=(WorldSession const& right) -> WorldSession& = delete;
 };
 #endif
 /// @}

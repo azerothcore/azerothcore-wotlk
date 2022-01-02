@@ -287,7 +287,7 @@ enum SpellSchoolMask
     SPELL_SCHOOL_MASK_ALL     = (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_MAGIC)
 };
 
-inline SpellSchools GetFirstSchoolInMask(SpellSchoolMask mask)
+inline auto GetFirstSchoolInMask(SpellSchoolMask mask) -> SpellSchools
 {
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
         if (mask & (1 << i))
@@ -2801,7 +2801,7 @@ enum QuestSort
     QUEST_SORT_LOVE_IS_IN_THE_AIR  = 376,
 };
 
-inline uint8 ClassByQuestSort(int32 QuestSort)
+inline auto ClassByQuestSort(int32 QuestSort) -> uint8
 {
     switch (QuestSort)
     {
@@ -2987,7 +2987,7 @@ enum SkillType
 
 #define MAX_SKILL_TYPE               789
 
-inline SkillType SkillByLockType(LockType locktype)
+inline auto SkillByLockType(LockType locktype) -> SkillType
 {
     switch (locktype)
     {
@@ -3007,7 +3007,7 @@ inline SkillType SkillByLockType(LockType locktype)
     return SKILL_NONE;
 }
 
-inline uint32 SkillByQuestSort(int32 QuestSort)
+inline auto SkillByQuestSort(int32 QuestSort) -> uint32
 {
     switch (QuestSort)
     {
@@ -3684,7 +3684,7 @@ namespace Acore::Impl
 {
     struct AC_SHARED_API CurrentServerProcessHolder
     {
-        static ServerProcessTypes type() { return _type; }
+        static auto type() -> ServerProcessTypes { return _type; }
         static ServerProcessTypes _type;
     };
 }

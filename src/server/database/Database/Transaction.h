@@ -24,6 +24,7 @@
 #include "StringFormat.h"
 #include <functional>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 /*! Transactions, high level class. */
@@ -36,7 +37,7 @@ template <typename T>
 friend class DatabaseWorkerPool;
 
 public:
-    TransactionBase() : _cleanedUp(false) { }
+    TransactionBase()  = default;
     virtual ~TransactionBase() { Cleanup(); }
 
     void Append(char const* sql);
@@ -46,7 +47,7 @@ public:
         Append(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
 
-    std::size_t GetSize() const { return m_queries.size(); }
+    [[nodiscard]] auto GetSize() const -> std::size_t { return m_queries.size(); }
 
 protected:
     void AppendPreparedStatement(PreparedStatementBase* statement);
@@ -54,7 +55,7 @@ protected:
     std::vector<SQLElementData> m_queries;
 
 private:
-    bool _cleanedUp;
+    bool _cleanedUp{false};
 };
 
 template<typename T>
@@ -76,12 +77,12 @@ friend class DatabaseWorker;
 friend class TransactionCallback;
 
 public:
-    TransactionTask(std::shared_ptr<TransactionBase> trans) : m_trans(trans) { }
-    ~TransactionTask() { }
+    TransactionTask(std::shared_ptr<TransactionBase> trans) : m_trans(std::move(trans)) { }
+    ~TransactionTask() override = default;
 
 protected:
-    bool Execute() override;
-    int TryExecute();
+    auto Execute() -> bool override;
+    auto TryExecute() -> int;
     void CleanupOnFailure();
 
     std::shared_ptr<TransactionBase> m_trans;
@@ -93,10 +94,10 @@ class AC_DATABASE_API TransactionWithResultTask : public TransactionTask
 public:
     TransactionWithResultTask(std::shared_ptr<TransactionBase> trans) : TransactionTask(trans) { }
 
-    TransactionFuture GetFuture() { return m_result.get_future(); }
+    auto GetFuture() -> TransactionFuture { return m_result.get_future(); }
 
 protected:
-    bool Execute() override;
+    auto Execute() -> bool override;
 
     TransactionPromise m_result;
 };
@@ -107,14 +108,14 @@ public:
     TransactionCallback(TransactionFuture&& future) : m_future(std::move(future)) { }
     TransactionCallback(TransactionCallback&&) = default;
 
-    TransactionCallback& operator=(TransactionCallback&&) = default;
+    auto operator=(TransactionCallback&&) -> TransactionCallback& = default;
 
     void AfterComplete(std::function<void(bool)> callback) &
     {
         m_callback = std::move(callback);
     }
 
-    bool InvokeIfReady();
+    auto InvokeIfReady() -> bool;
 
     TransactionFuture m_future;
     std::function<void(bool)> m_callback;

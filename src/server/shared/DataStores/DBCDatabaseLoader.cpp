@@ -34,7 +34,7 @@ DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcForma
     ASSERT(_recordSize);
 }
 
-char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
+auto DBCDatabaseLoader::Load(uint32& records, char**& indexTable) -> char*
 {
     std::string query = Acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
 
@@ -128,7 +128,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     return dataTable.release();
 }
 
-char* DBCDatabaseLoader::CloneStringToPool(std::string const& str)
+auto DBCDatabaseLoader::CloneStringToPool(std::string const& str) -> char*
 {
     char* buf = new char[str.size() + 1];
     memcpy(buf, str.c_str(), str.size() + 1);

@@ -72,8 +72,8 @@ private:
     uint32 iType;
 public:
     UnitBaseEvent(uint32 pType) { iType = pType; }
-    [[nodiscard]] uint32 getType() const { return iType; }
-    [[nodiscard]] bool matchesTypeMask(uint32 pMask) const { return iType & pMask; }
+    [[nodiscard]] auto getType() const -> uint32 { return iType; }
+    [[nodiscard]] auto matchesTypeMask(uint32 pMask) const -> bool { return iType & pMask; }
 
     void setType(uint32 pType) { iType = pType; }
 };
@@ -100,19 +100,19 @@ public:
 
     ThreatRefStatusChangeEvent(uint32 pType, HostileReference* pHostileReference, bool pValue) : UnitBaseEvent(pType), iThreatMgr(nullptr) { iHostileReference = pHostileReference; iBValue = pValue; }
 
-    [[nodiscard]] int32 getIValue() const { return iIValue; }
+    [[nodiscard]] auto getIValue() const -> int32 { return iIValue; }
 
-    [[nodiscard]] float getFValue() const { return iFValue; }
+    [[nodiscard]] auto getFValue() const -> float { return iFValue; }
 
-    [[nodiscard]] bool getBValue() const { return iBValue; }
+    [[nodiscard]] auto getBValue() const -> bool { return iBValue; }
 
     void setBValue(bool pValue) { iBValue = pValue; }
 
-    [[nodiscard]] HostileReference* getReference() const { return iHostileReference; }
+    [[nodiscard]] auto getReference() const -> HostileReference* { return iHostileReference; }
 
     void setThreatMgr(ThreatMgr* pThreatMgr) { iThreatMgr = pThreatMgr; }
 
-    [[nodiscard]] ThreatMgr* getThreatMgr() const { return iThreatMgr; }
+    [[nodiscard]] auto getThreatMgr() const -> ThreatMgr* { return iThreatMgr; }
 };
 
 //==============================================================
@@ -127,7 +127,7 @@ public:
 
     void setThreatContainer(ThreatContainer* pThreatContainer) { iThreatContainer = pThreatContainer; }
 
-    [[nodiscard]] ThreatContainer* getThreatContainer() const { return iThreatContainer; }
+    [[nodiscard]] auto getThreatContainer() const -> ThreatContainer* { return iThreatContainer; }
 };
 
 //==============================================================

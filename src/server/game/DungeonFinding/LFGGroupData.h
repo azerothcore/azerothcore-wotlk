@@ -31,13 +31,13 @@ namespace lfg
         LfgGroupData();
         ~LfgGroupData();
 
-        bool IsLfgGroup();
+        auto IsLfgGroup() -> bool;
 
         // General
         void SetState(LfgState state);
         void RestoreState();
         void AddPlayer(ObjectGuid guid);
-        uint8 RemovePlayer(ObjectGuid guid);
+        auto RemovePlayer(ObjectGuid guid) -> uint8;
         void RemoveAllPlayers();
         void SetLeader(ObjectGuid guid);
 
@@ -48,17 +48,17 @@ namespace lfg
         void DecreaseKicksLeft();
 
         // General
-        LfgState GetState() const;
-        LfgState GetOldState() const;
-        LfgGuidSet const& GetPlayers() const;
-        uint8 GetPlayerCount() const;
-        ObjectGuid GetLeader() const;
+        [[nodiscard]] auto GetState() const -> LfgState;
+        [[nodiscard]] auto GetOldState() const -> LfgState;
+        [[nodiscard]] auto GetPlayers() const -> LfgGuidSet const&;
+        [[nodiscard]] auto GetPlayerCount() const -> uint8;
+        [[nodiscard]] auto GetLeader() const -> ObjectGuid;
 
         // Dungeon
-        uint32 GetDungeon(bool asId = true) const;
+        [[nodiscard]] auto GetDungeon(bool asId = true) const -> uint32;
 
         // VoteKick
-        uint8 GetKicksLeft() const;
+        [[nodiscard]] auto GetKicksLeft() const -> uint8;
 
     private:
         // General

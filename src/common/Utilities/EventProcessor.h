@@ -43,16 +43,16 @@ class BasicEvent
 
     public:
         BasicEvent()
-            : m_abortState(AbortState::STATE_RUNNING), m_addTime(0), m_execTime(0) { }
+             = default;
 
-        virtual ~BasicEvent() { } // override destructor to perform some actions on event removal
+        virtual ~BasicEvent() = default; // override destructor to perform some actions on event removal
 
         // this method executes when the event is triggered
         // return false if event does not want to be deleted
         // e_time is execution time, p_time is update interval
-        [[nodiscard]] virtual bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) { return true; }
+        [[nodiscard]] virtual auto Execute(uint64 /*e_time*/, uint32 /*p_time*/) -> bool { return true; }
 
-        [[nodiscard]] virtual bool IsDeletable() const { return true; }   // this event can be safely deleted
+        [[nodiscard]] virtual auto IsDeletable() const -> bool { return true; }   // this event can be safely deleted
 
         virtual void Abort(uint64 /*e_time*/) { }           // this method executes when the event is aborted
 
@@ -61,15 +61,15 @@ class BasicEvent
 
     private:
         void SetAborted();
-        bool IsRunning() const { return (m_abortState == AbortState::STATE_RUNNING); }
-        bool IsAbortScheduled() const { return (m_abortState == AbortState::STATE_ABORT_SCHEDULED); }
-        bool IsAborted() const { return (m_abortState == AbortState::STATE_ABORTED); }
+        [[nodiscard]] auto IsRunning() const -> bool { return (m_abortState == AbortState::STATE_RUNNING); }
+        [[nodiscard]] auto IsAbortScheduled() const -> bool { return (m_abortState == AbortState::STATE_ABORT_SCHEDULED); }
+        [[nodiscard]] auto IsAborted() const -> bool { return (m_abortState == AbortState::STATE_ABORTED); }
 
-        AbortState m_abortState;                            // set by externals when the event is aborted, aborted events don't execute
+        AbortState m_abortState{AbortState::STATE_RUNNING};                            // set by externals when the event is aborted, aborted events don't execute
 
         // these can be used for time offset control
-        uint64 m_addTime;                                   // time when the event was added to queue, filled by event handler
-        uint64 m_execTime;                                  // planned time of next execution, filled by event handler
+        uint64 m_addTime{0};                                   // time when the event was added to queue, filled by event handler
+        uint64 m_execTime{0};                                  // planned time of next execution, filled by event handler
 };
 
 template<typename T>
@@ -78,7 +78,7 @@ class LambdaBasicEvent : public BasicEvent
     public:
         LambdaBasicEvent(T&& callback) : BasicEvent(), _callback(std::move(callback)) { }
 
-        bool Execute(uint64, uint32) override
+        auto Execute(uint64, uint32) -> bool override
         {
             _callback();
             return true;
@@ -97,28 +97,28 @@ typedef std::multimap<uint64, BasicEvent*> EventList;
 class EventProcessor
 {
     public:
-        EventProcessor() : m_time(0) { }
+        EventProcessor()  = default;
         ~EventProcessor();
 
         void Update(uint32 p_time);
         void KillAllEvents(bool force);
         void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
         template<typename T>
-        is_lambda_event<T> AddEvent(T&& event, Milliseconds e_time, bool set_addtime = true) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), e_time, set_addtime); }
+        auto AddEvent(T&& event, Milliseconds e_time, bool set_addtime = true) -> is_lambda_event<T> { AddEvent(new LambdaBasicEvent<T>(std::move(event)), e_time, set_addtime); }
         void AddEventAtOffset(BasicEvent* event, Milliseconds offset) { AddEvent(event, CalculateTime(offset.count())); }
         void AddEventAtOffset(BasicEvent* event, Milliseconds offset, Milliseconds offset2) { AddEvent(event, CalculateTime(randtime(offset, offset2).count())); }
         template<typename T>
-        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset); }
+        auto AddEventAtOffset(T&& event, Milliseconds offset) -> is_lambda_event<T> { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset); }
         template<typename T>
-        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, Milliseconds offset2) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset, offset2); }
+        auto AddEventAtOffset(T&& event, Milliseconds offset, Milliseconds offset2) -> is_lambda_event<T> { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset, offset2); }
         void ModifyEventTime(BasicEvent* event, Milliseconds newTime);
-        [[nodiscard]] uint64 CalculateTime(uint64 t_offset) const;
+        [[nodiscard]] auto CalculateTime(uint64 t_offset) const -> uint64;
 
         //calculates next queue tick time
-        [[nodiscard]] uint64 CalculateQueueTime(uint64 delay) const;
+        [[nodiscard]] auto CalculateQueueTime(uint64 delay) const -> uint64;
 
     protected:
-        uint64 m_time;
+        uint64 m_time{0};
         EventList m_events;
         bool m_aborting;
 };

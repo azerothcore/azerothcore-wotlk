@@ -213,84 +213,84 @@ public:
     void LoadQuestOfferReward(Field* fields);
     void LoadQuestTemplateAddon(Field* fields);
 
-    uint32 XPValue(uint8 playerLevel = 0) const;
+    [[nodiscard]] auto XPValue(uint8 playerLevel = 0) const -> uint32;
 
-    [[nodiscard]] bool HasFlag(uint32 flag) const { return (Flags & flag) != 0; }
+    [[nodiscard]] auto HasFlag(uint32 flag) const -> bool { return (Flags & flag) != 0; }
     void SetFlag(uint32 flag) { Flags |= flag; }
 
-    [[nodiscard]] bool HasSpecialFlag(uint32 flag) const { return (SpecialFlags & flag) != 0; }
+    [[nodiscard]] auto HasSpecialFlag(uint32 flag) const -> bool { return (SpecialFlags & flag) != 0; }
     void SetSpecialFlag(uint32 flag) { SpecialFlags |= flag; }
 
     // table data accessors:
-    [[nodiscard]] uint32 GetQuestId() const { return Id; }
-    [[nodiscard]] uint32 GetQuestMethod() const { return Method; }
-    [[nodiscard]] int32  GetZoneOrSort() const { return ZoneOrSort; }
-    [[nodiscard]] uint32 GetMinLevel() const { return MinLevel; }
-    [[nodiscard]] uint32 GetMaxLevel() const { return MaxLevel; }
-    [[nodiscard]] int32  GetQuestLevel() const { return Level; }
-    [[nodiscard]] uint32 GetType() const { return Type; }
-    [[nodiscard]] uint32 GetRequiredClasses() const { return RequiredClasses; }
-    [[nodiscard]] uint32 GetAllowableRaces() const { return AllowableRaces; }
-    [[nodiscard]] uint32 GetRequiredSkill() const { return RequiredSkillId; }
-    [[nodiscard]] uint32 GetRequiredSkillValue() const { return RequiredSkillPoints; }
-    [[nodiscard]] uint32 GetRepObjectiveFaction() const { return RequiredFactionId1; }
-    [[nodiscard]] int32  GetRepObjectiveValue() const { return RequiredFactionValue1; }
-    [[nodiscard]] uint32 GetRepObjectiveFaction2() const { return RequiredFactionId2; }
-    [[nodiscard]] int32  GetRepObjectiveValue2() const { return RequiredFactionValue2; }
-    [[nodiscard]] uint32 GetRequiredMinRepFaction() const { return RequiredMinRepFaction; }
-    [[nodiscard]] int32  GetRequiredMinRepValue() const { return RequiredMinRepValue; }
-    [[nodiscard]] uint32 GetRequiredMaxRepFaction() const { return RequiredMaxRepFaction; }
-    [[nodiscard]] int32  GetRequiredMaxRepValue() const { return RequiredMaxRepValue; }
-    [[nodiscard]] uint32 GetSuggestedPlayers() const { return SuggestedPlayers; }
-    [[nodiscard]] uint32 GetTimeAllowed() const { return TimeAllowed; }
-    [[nodiscard]] int32  GetPrevQuestId() const { return PrevQuestId; }
-    [[nodiscard]] uint32 GetNextQuestId() const { return NextQuestId; }
-    [[nodiscard]] int32  GetExclusiveGroup() const { return ExclusiveGroup; }
-    [[nodiscard]] uint32 GetNextQuestInChain() const { return RewardNextQuest; }
-    [[nodiscard]] uint32 GetCharTitleId() const { return RewardTitleId; }
-    [[nodiscard]] uint32 GetPlayersSlain() const { return RequiredPlayerKills; }
-    [[nodiscard]] uint32 GetBonusTalents() const { return RewardTalents; }
-    [[nodiscard]] int32  GetRewArenaPoints() const {return RewardArenaPoints; }
-    [[nodiscard]] uint32 GetXPId() const { return RewardXPDifficulty; }
-    [[nodiscard]] uint32 GetSrcItemId() const { return StartItem; }
-    [[nodiscard]] uint32 GetSrcItemCount() const { return StartItemCount; }
-    [[nodiscard]] uint32 GetSrcSpell() const { return SourceSpellid; }
-    [[nodiscard]] std::string const& GetTitle() const { return Title; }
-    [[nodiscard]] std::string const& GetDetails() const { return Details; }
-    [[nodiscard]] std::string const& GetObjectives() const { return Objectives; }
-    [[nodiscard]] std::string const& GetOfferRewardText() const { return OfferRewardText; }
-    [[nodiscard]] std::string const& GetRequestItemsText() const { return RequestItemsText; }
-    [[nodiscard]] std::string const& GetAreaDescription() const { return AreaDescription; }
-    [[nodiscard]] std::string const& GetCompletedText() const { return CompletedText; }
-    [[nodiscard]] int32  GetRewOrReqMoney(uint8 playerLevel = 0) const;
-    [[nodiscard]] uint32 GetRewHonorAddition() const { return RewardHonor; }
-    [[nodiscard]] float GetRewHonorMultiplier() const { return RewardKillHonor; }
-    [[nodiscard]] uint32 GetRewMoneyMaxLevel() const; // use in XP calculation at client
-    [[nodiscard]] uint32 GetRewSpell() const { return RewardDisplaySpell; }
-    [[nodiscard]] int32  GetRewSpellCast() const { return RewardSpell; }
-    [[nodiscard]] uint32 GetRewMailTemplateId() const { return RewardMailTemplateId; }
-    [[nodiscard]] uint32 GetRewMailDelaySecs() const { return RewardMailDelay; }
-    [[nodiscard]] uint32 GetRewMailSenderEntry() const { return RewardMailSenderEntry; }
-    [[nodiscard]] uint32 GetPOIContinent() const { return POIContinent; }
-    [[nodiscard]] float  GetPOIx() const { return POIx; }
-    [[nodiscard]] float  GetPOIy() const { return POIy; }
-    [[nodiscard]] uint32 GetPointOpt() const { return POIPriority; }
-    [[nodiscard]] uint32 GetIncompleteEmote() const { return EmoteOnIncomplete; }
-    [[nodiscard]] uint32 GetCompleteEmote() const { return EmoteOnComplete; }
-    [[nodiscard]] bool   IsRepeatable() const { return SpecialFlags & QUEST_SPECIAL_FLAGS_REPEATABLE; }
-    [[nodiscard]] bool   IsAutoAccept() const;
-    [[nodiscard]] bool   IsAutoComplete() const;
-    [[nodiscard]] uint32 GetFlags() const { return Flags; }
-    [[nodiscard]] bool   IsDaily() const { return Flags & QUEST_FLAGS_DAILY; }
-    [[nodiscard]] bool   IsWeekly() const { return Flags & QUEST_FLAGS_WEEKLY; }
-    [[nodiscard]] bool   IsMonthly() const { return SpecialFlags & QUEST_SPECIAL_FLAGS_MONTHLY; }
-    [[nodiscard]] bool   IsSeasonal() const { return (ZoneOrSort == -QUEST_SORT_SEASONAL || ZoneOrSort == -QUEST_SORT_SPECIAL || ZoneOrSort == -QUEST_SORT_LUNAR_FESTIVAL || ZoneOrSort == -QUEST_SORT_MIDSUMMER || ZoneOrSort == -QUEST_SORT_BREWFEST || ZoneOrSort == -QUEST_SORT_LOVE_IS_IN_THE_AIR || ZoneOrSort == -QUEST_SORT_NOBLEGARDEN) && !IsRepeatable(); }
-    [[nodiscard]] bool   IsDailyOrWeekly() const { return Flags & (QUEST_FLAGS_DAILY | QUEST_FLAGS_WEEKLY); }
-    [[nodiscard]] bool   IsRaidQuest(Difficulty difficulty) const;
-    [[nodiscard]] bool   IsAllowedInRaid(Difficulty difficulty) const;
-    [[nodiscard]] bool   IsDFQuest() const { return SpecialFlags & QUEST_SPECIAL_FLAGS_DF_QUEST; }
-    [[nodiscard]] bool   IsPVPQuest() const { return Type == QUEST_TYPE_PVP; }
-    [[nodiscard]] uint32 CalculateHonorGain(uint8 level) const;
+    [[nodiscard]] auto GetQuestId() const -> uint32 { return Id; }
+    [[nodiscard]] auto GetQuestMethod() const -> uint32 { return Method; }
+    [[nodiscard]] auto  GetZoneOrSort() const -> int32 { return ZoneOrSort; }
+    [[nodiscard]] auto GetMinLevel() const -> uint32 { return MinLevel; }
+    [[nodiscard]] auto GetMaxLevel() const -> uint32 { return MaxLevel; }
+    [[nodiscard]] auto  GetQuestLevel() const -> int32 { return Level; }
+    [[nodiscard]] auto GetType() const -> uint32 { return Type; }
+    [[nodiscard]] auto GetRequiredClasses() const -> uint32 { return RequiredClasses; }
+    [[nodiscard]] auto GetAllowableRaces() const -> uint32 { return AllowableRaces; }
+    [[nodiscard]] auto GetRequiredSkill() const -> uint32 { return RequiredSkillId; }
+    [[nodiscard]] auto GetRequiredSkillValue() const -> uint32 { return RequiredSkillPoints; }
+    [[nodiscard]] auto GetRepObjectiveFaction() const -> uint32 { return RequiredFactionId1; }
+    [[nodiscard]] auto  GetRepObjectiveValue() const -> int32 { return RequiredFactionValue1; }
+    [[nodiscard]] auto GetRepObjectiveFaction2() const -> uint32 { return RequiredFactionId2; }
+    [[nodiscard]] auto  GetRepObjectiveValue2() const -> int32 { return RequiredFactionValue2; }
+    [[nodiscard]] auto GetRequiredMinRepFaction() const -> uint32 { return RequiredMinRepFaction; }
+    [[nodiscard]] auto  GetRequiredMinRepValue() const -> int32 { return RequiredMinRepValue; }
+    [[nodiscard]] auto GetRequiredMaxRepFaction() const -> uint32 { return RequiredMaxRepFaction; }
+    [[nodiscard]] auto  GetRequiredMaxRepValue() const -> int32 { return RequiredMaxRepValue; }
+    [[nodiscard]] auto GetSuggestedPlayers() const -> uint32 { return SuggestedPlayers; }
+    [[nodiscard]] auto GetTimeAllowed() const -> uint32 { return TimeAllowed; }
+    [[nodiscard]] auto  GetPrevQuestId() const -> int32 { return PrevQuestId; }
+    [[nodiscard]] auto GetNextQuestId() const -> uint32 { return NextQuestId; }
+    [[nodiscard]] auto  GetExclusiveGroup() const -> int32 { return ExclusiveGroup; }
+    [[nodiscard]] auto GetNextQuestInChain() const -> uint32 { return RewardNextQuest; }
+    [[nodiscard]] auto GetCharTitleId() const -> uint32 { return RewardTitleId; }
+    [[nodiscard]] auto GetPlayersSlain() const -> uint32 { return RequiredPlayerKills; }
+    [[nodiscard]] auto GetBonusTalents() const -> uint32 { return RewardTalents; }
+    [[nodiscard]] auto  GetRewArenaPoints() const -> int32 {return RewardArenaPoints; }
+    [[nodiscard]] auto GetXPId() const -> uint32 { return RewardXPDifficulty; }
+    [[nodiscard]] auto GetSrcItemId() const -> uint32 { return StartItem; }
+    [[nodiscard]] auto GetSrcItemCount() const -> uint32 { return StartItemCount; }
+    [[nodiscard]] auto GetSrcSpell() const -> uint32 { return SourceSpellid; }
+    [[nodiscard]] auto GetTitle() const -> std::string const& { return Title; }
+    [[nodiscard]] auto GetDetails() const -> std::string const& { return Details; }
+    [[nodiscard]] auto GetObjectives() const -> std::string const& { return Objectives; }
+    [[nodiscard]] auto GetOfferRewardText() const -> std::string const& { return OfferRewardText; }
+    [[nodiscard]] auto GetRequestItemsText() const -> std::string const& { return RequestItemsText; }
+    [[nodiscard]] auto GetAreaDescription() const -> std::string const& { return AreaDescription; }
+    [[nodiscard]] auto GetCompletedText() const -> std::string const& { return CompletedText; }
+    [[nodiscard]] auto  GetRewOrReqMoney(uint8 playerLevel = 0) const -> int32;
+    [[nodiscard]] auto GetRewHonorAddition() const -> uint32 { return RewardHonor; }
+    [[nodiscard]] auto GetRewHonorMultiplier() const -> float { return RewardKillHonor; }
+    [[nodiscard]] auto GetRewMoneyMaxLevel() const -> uint32; // use in XP calculation at client
+    [[nodiscard]] auto GetRewSpell() const -> uint32 { return RewardDisplaySpell; }
+    [[nodiscard]] auto  GetRewSpellCast() const -> int32 { return RewardSpell; }
+    [[nodiscard]] auto GetRewMailTemplateId() const -> uint32 { return RewardMailTemplateId; }
+    [[nodiscard]] auto GetRewMailDelaySecs() const -> uint32 { return RewardMailDelay; }
+    [[nodiscard]] auto GetRewMailSenderEntry() const -> uint32 { return RewardMailSenderEntry; }
+    [[nodiscard]] auto GetPOIContinent() const -> uint32 { return POIContinent; }
+    [[nodiscard]] auto  GetPOIx() const -> float { return POIx; }
+    [[nodiscard]] auto  GetPOIy() const -> float { return POIy; }
+    [[nodiscard]] auto GetPointOpt() const -> uint32 { return POIPriority; }
+    [[nodiscard]] auto GetIncompleteEmote() const -> uint32 { return EmoteOnIncomplete; }
+    [[nodiscard]] auto GetCompleteEmote() const -> uint32 { return EmoteOnComplete; }
+    [[nodiscard]] auto   IsRepeatable() const -> bool { return SpecialFlags & QUEST_SPECIAL_FLAGS_REPEATABLE; }
+    [[nodiscard]] auto   IsAutoAccept() const -> bool;
+    [[nodiscard]] auto   IsAutoComplete() const -> bool;
+    [[nodiscard]] auto GetFlags() const -> uint32 { return Flags; }
+    [[nodiscard]] auto   IsDaily() const -> bool { return Flags & QUEST_FLAGS_DAILY; }
+    [[nodiscard]] auto   IsWeekly() const -> bool { return Flags & QUEST_FLAGS_WEEKLY; }
+    [[nodiscard]] auto   IsMonthly() const -> bool { return SpecialFlags & QUEST_SPECIAL_FLAGS_MONTHLY; }
+    [[nodiscard]] auto   IsSeasonal() const -> bool { return (ZoneOrSort == -QUEST_SORT_SEASONAL || ZoneOrSort == -QUEST_SORT_SPECIAL || ZoneOrSort == -QUEST_SORT_LUNAR_FESTIVAL || ZoneOrSort == -QUEST_SORT_MIDSUMMER || ZoneOrSort == -QUEST_SORT_BREWFEST || ZoneOrSort == -QUEST_SORT_LOVE_IS_IN_THE_AIR || ZoneOrSort == -QUEST_SORT_NOBLEGARDEN) && !IsRepeatable(); }
+    [[nodiscard]] auto   IsDailyOrWeekly() const -> bool { return Flags & (QUEST_FLAGS_DAILY | QUEST_FLAGS_WEEKLY); }
+    [[nodiscard]] auto   IsRaidQuest(Difficulty difficulty) const -> bool;
+    [[nodiscard]] auto   IsAllowedInRaid(Difficulty difficulty) const -> bool;
+    [[nodiscard]] auto   IsDFQuest() const -> bool { return SpecialFlags & QUEST_SPECIAL_FLAGS_DF_QUEST; }
+    [[nodiscard]] auto   IsPVPQuest() const -> bool { return Type == QUEST_TYPE_PVP; }
+    [[nodiscard]] auto CalculateHonorGain(uint8 level) const -> uint32;
 
     // multiple values
     std::string ObjectiveText[QUEST_OBJECTIVES_COUNT];
@@ -312,10 +312,10 @@ public:
     uint32 OfferRewardEmote[QUEST_EMOTE_COUNT];
     uint32 OfferRewardEmoteDelay[QUEST_EMOTE_COUNT];
 
-    [[nodiscard]] uint32 GetReqItemsCount() const { return _reqItemsCount; }
-    [[nodiscard]] uint32 GetReqCreatureOrGOcount() const { return _reqCreatureOrGOcount; }
-    [[nodiscard]] uint32 GetRewChoiceItemsCount() const { return _rewChoiceItemsCount; }
-    [[nodiscard]] uint32 GetRewItemsCount() const { return _rewItemsCount; }
+    [[nodiscard]] auto GetReqItemsCount() const -> uint32 { return _reqItemsCount; }
+    [[nodiscard]] auto GetReqCreatureOrGOcount() const -> uint32 { return _reqCreatureOrGOcount; }
+    [[nodiscard]] auto GetRewChoiceItemsCount() const -> uint32 { return _rewChoiceItemsCount; }
+    [[nodiscard]] auto GetRewItemsCount() const -> uint32 { return _rewItemsCount; }
 
     typedef std::vector<int32> PrevQuests;
     PrevQuests prevQuests;
@@ -326,7 +326,7 @@ public:
     void InitializeQueryData(); // pussywizard
 
     void SetEventIdForQuest(uint16 eventId) { _eventIdForQuest = eventId; }
-    [[nodiscard]] uint16 GetEventIdForQuest() const { return _eventIdForQuest; }
+    [[nodiscard]] auto GetEventIdForQuest() const -> uint16 { return _eventIdForQuest; }
 
     // cached data
 private:

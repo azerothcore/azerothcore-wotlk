@@ -28,16 +28,16 @@ public:
     typedef LinkedListHead::Iterator< MapReference > iterator;
     typedef LinkedListHead::Iterator< MapReference const > const_iterator;
 
-    MapReference* getFirst() { return (MapReference*)RefMgr<Map, Player>::getFirst(); }
-    [[nodiscard]] MapReference const* getFirst() const { return (MapReference const*)RefMgr<Map, Player>::getFirst(); }
-    MapReference* getLast() { return (MapReference*)RefMgr<Map, Player>::getLast(); }
-    [[nodiscard]] MapReference const* getLast() const { return (MapReference const*)RefMgr<Map, Player>::getLast(); }
+    auto getFirst() -> MapReference* { return (MapReference*)RefMgr<Map, Player>::getFirst(); }
+    [[nodiscard]] auto getFirst() const -> MapReference const* { return (MapReference const*)RefMgr<Map, Player>::getFirst(); }
+    auto getLast() -> MapReference* { return (MapReference*)RefMgr<Map, Player>::getLast(); }
+    [[nodiscard]] auto getLast() const -> MapReference const* { return (MapReference const*)RefMgr<Map, Player>::getLast(); }
 
-    iterator begin() { return iterator(getFirst()); }
-    iterator end() { return iterator(nullptr); }
-    iterator rbegin() { return iterator(getLast()); }
-    iterator rend() { return iterator(nullptr); }
-    [[nodiscard]] const_iterator begin() const { return const_iterator(getFirst()); }
-    [[nodiscard]] const_iterator end() const  { return const_iterator(nullptr); }
+    auto begin() -> iterator { return {getFirst()}; }
+    auto end() -> iterator { return {nullptr}; }
+    auto rbegin() -> iterator { return {getLast()}; }
+    auto rend() -> iterator { return {nullptr}; }
+    [[nodiscard]] auto begin() const -> const_iterator { return {getFirst()}; }
+    [[nodiscard]] auto end() const -> const_iterator  { return {nullptr}; }
 };
 #endif

@@ -41,11 +41,11 @@ public:
 
     std::string const GetFilename();
     std::string const GetConfigPath();
-    std::vector<std::string> const& GetArguments() const;
+    [[nodiscard]] std::vector<std::string> const& GetArguments() const;
     std::vector<std::string> GetKeysByString(std::string const& name);
 
     template<class T>
-    T GetOption(std::string const& name, T const& def, bool showLogs = true) const;
+    [[nodiscard]] [[nodiscard]] [[nodiscard]] T GetOption(std::string const& name, T const& def, bool showLogs = true) const;
 
     /*
      * Deprecated geters. This geters will be deleted

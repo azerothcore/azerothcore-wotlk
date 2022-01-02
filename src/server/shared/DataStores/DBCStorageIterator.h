@@ -35,13 +35,13 @@ public:
         }
     }
 
-    T const* operator->() { return _index[_pos]; }
-    T const* operator*() { return _index[_pos]; }
+    auto operator->() -> T const* { return _index[_pos]; }
+    auto operator*() -> T const* { return _index[_pos]; }
 
-    bool operator==(DBCStorageIterator const& right) const { /*ASSERT(_index == right._index, "Iterator belongs to a different container")*/ return _pos == right._pos; }
-    bool operator!=(DBCStorageIterator const& right) const { return !(*this == right); }
+    auto operator==(DBCStorageIterator const& right) const -> bool { /*ASSERT(_index == right._index, "Iterator belongs to a different container")*/ return _pos == right._pos; }
+    auto operator!=(DBCStorageIterator const& right) const -> bool { return !(*this == right); }
 
-    DBCStorageIterator& operator++()
+    auto operator++() -> DBCStorageIterator&
     {
         if (_pos < _end)
         {
@@ -53,7 +53,7 @@ public:
         return *this;
     }
 
-    DBCStorageIterator operator++(int)
+    auto operator++(int) -> DBCStorageIterator
     {
         DBCStorageIterator tmp = *this;
         ++*this;

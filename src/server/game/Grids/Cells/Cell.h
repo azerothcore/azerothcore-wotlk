@@ -30,7 +30,7 @@ struct CellArea
     CellArea() = default;
     CellArea(CellCoord low, CellCoord high) : low_bound(low), high_bound(high) {}
 
-    bool operator!() const { return low_bound == high_bound; }
+    auto operator!() const -> bool { return low_bound == high_bound; }
 
     void ResizeBorders(CellCoord& begin_cell, CellCoord& end_cell) const
     {
@@ -55,40 +55,40 @@ struct Cell
         y = data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y;
     }
 
-    [[nodiscard]] bool DiffCell(const Cell& cell) const
+    [[nodiscard]] auto DiffCell(const Cell& cell) const -> bool
     {
         return(data.Part.cell_x != cell.data.Part.cell_x ||
                data.Part.cell_y != cell.data.Part.cell_y);
     }
 
-    [[nodiscard]] bool DiffGrid(const Cell& cell) const
+    [[nodiscard]] auto DiffGrid(const Cell& cell) const -> bool
     {
         return(data.Part.grid_x != cell.data.Part.grid_x ||
                data.Part.grid_y != cell.data.Part.grid_y);
     }
 
-    [[nodiscard]] uint32 CellX() const { return data.Part.cell_x; }
-    [[nodiscard]] uint32 CellY() const { return data.Part.cell_y; }
-    [[nodiscard]] uint32 GridX() const { return data.Part.grid_x; }
-    [[nodiscard]] uint32 GridY() const { return data.Part.grid_y; }
-    [[nodiscard]] bool NoCreate() const { return data.Part.nocreate; }
+    [[nodiscard]] auto CellX() const -> uint32 { return data.Part.cell_x; }
+    [[nodiscard]] auto CellY() const -> uint32 { return data.Part.cell_y; }
+    [[nodiscard]] auto GridX() const -> uint32 { return data.Part.grid_x; }
+    [[nodiscard]] auto GridY() const -> uint32 { return data.Part.grid_y; }
+    [[nodiscard]] auto NoCreate() const -> bool { return data.Part.nocreate; }
     void SetNoCreate() { data.Part.nocreate = 1; }
 
-    [[nodiscard]] CellCoord GetCellCoord() const
+    [[nodiscard]] auto GetCellCoord() const -> CellCoord
     {
-        return CellCoord(
+        return {
                    data.Part.grid_x * MAX_NUMBER_OF_CELLS + data.Part.cell_x,
-                   data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y);
+                   data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y};
     }
 
-    Cell& operator=(Cell const& cell)
+    auto operator=(Cell const& cell) -> Cell&
     {
         this->data.All = cell.data.All;
         return *this;
     }
 
-    bool operator == (Cell const& cell) const { return (data.All == cell.data.All); }
-    bool operator != (Cell const& cell) const { return !operator == (cell); }
+    auto operator == (Cell const& cell) const -> bool { return (data.All == cell.data.All); }
+    auto operator != (Cell const& cell) const -> bool { return !operator == (cell); }
     union
     {
         struct
@@ -106,7 +106,7 @@ struct Cell
     template<class T, class CONTAINER> void Visit(CellCoord const&, TypeContainerVisitor<T, CONTAINER>& visitor, Map&, WorldObject const& obj, float radius) const;
     template<class T, class CONTAINER> void Visit(CellCoord const&, TypeContainerVisitor<T, CONTAINER>& visitor, Map&, float x, float y, float radius) const;
 
-    static CellArea CalculateCellArea(float x, float y, float radius);
+    static auto CalculateCellArea(float x, float y, float radius) -> CellArea;
 
     template<class T> static void VisitGridObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
     template<class T> static void VisitWorldObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);

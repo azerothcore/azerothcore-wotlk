@@ -42,11 +42,11 @@ namespace Acore::Asio
         operator IoContextBaseNamespace::IoContextBase&() { return _impl; }
         operator IoContextBaseNamespace::IoContextBase const&() const { return _impl; }
 
-        std::size_t run() { return _impl.run(); }
+        auto run() -> std::size_t { return _impl.run(); }
         void stop() { _impl.stop(); }
 
 #if BOOST_VERSION >= 106600
-        boost::asio::io_context::executor_type get_executor() noexcept { return _impl.get_executor(); }
+        auto get_executor() noexcept -> boost::asio::io_context::executor_type { return _impl.get_executor(); }
 #endif
 
     private:
@@ -54,7 +54,7 @@ namespace Acore::Asio
     };
 
     template<typename T>
-    inline decltype(auto) post(IoContextBaseNamespace::IoContextBase& ioContext, T&& t)
+    inline auto post(IoContextBaseNamespace::IoContextBase& ioContext, T&& t) -> decltype(auto)
     {
 #if BOOST_VERSION >= 106600
         return boost::asio::post(ioContext, std::forward<T>(t));
@@ -64,7 +64,7 @@ namespace Acore::Asio
     }
 
     template<typename T>
-    inline decltype(auto) get_io_context(T&& ioObject)
+    inline auto get_io_context(T&& ioObject) -> decltype(auto)
     {
 #if BOOST_VERSION >= 106600
         return ioObject.get_executor().context();

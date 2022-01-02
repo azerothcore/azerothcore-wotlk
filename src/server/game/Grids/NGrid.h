@@ -42,27 +42,27 @@ public:
     {
     }
 
-    GridType& GetGridType(const uint32 x, const uint32 y)
+    auto GetGridType(const uint32 x, const uint32 y) -> GridType&
     {
         ASSERT(x < N && y < N);
         return i_cells[x][y];
     }
 
-    [[nodiscard]] GridType const& GetGridType(const uint32 x, const uint32 y) const
+    [[nodiscard]] auto GetGridType(const uint32 x, const uint32 y) const -> GridType const&
     {
         ASSERT(x < N && y < N);
         return i_cells[x][y];
     }
 
-    [[nodiscard]] uint32 GetGridId() const { return i_gridId; }
-    [[nodiscard]] int32 getX() const { return i_x; }
-    [[nodiscard]] int32 getY() const { return i_y; }
+    [[nodiscard]] auto GetGridId() const -> uint32 { return i_gridId; }
+    [[nodiscard]] auto getX() const -> int32 { return i_x; }
+    [[nodiscard]] auto getY() const -> int32 { return i_y; }
 
     void link(GridRefMgr<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> >* pTo)
     {
         i_Reference.link(pTo, this);
     }
-    [[nodiscard]] bool isGridObjectDataLoaded() const { return i_GridObjectDataLoaded; }
+    [[nodiscard]] auto isGridObjectDataLoaded() const -> bool { return i_GridObjectDataLoaded; }
     void setGridObjectDataLoaded(bool pLoaded) { i_GridObjectDataLoaded = pLoaded; }
 
     /*

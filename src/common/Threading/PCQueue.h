@@ -34,7 +34,7 @@ private:
     std::atomic<bool> _shutdown;
 
 public:
-    ProducerConsumerQueue<T>() : _shutdown(false) { }
+    ProducerConsumerQueue<T>() : _shutdown(false) = default;
 
     void Push(const T& value)
     {
@@ -44,19 +44,19 @@ public:
         _condition.notify_one();
     }
 
-    bool Empty()
+    auto Empty() -> bool
     {
         std::lock_guard<std::mutex> lock(_queueLock);
 
         return _queue.empty();
     }
 
-    size_t Size() const
+    [[nodiscard]] auto Size() const -> size_t
     {
         return _queue.size();
     }
 
-    bool Pop(T& value)
+    auto Pop(T& value) -> bool
     {
         std::lock_guard<std::mutex> lock(_queueLock);
 
@@ -113,10 +113,10 @@ public:
 
 private:
     template<typename E = T>
-    typename std::enable_if<std::is_pointer<E>::value>::type DeleteQueuedObject(E& obj) { delete obj; }
+    auto DeleteQueuedObject(E& obj) -> typename std::enable_if<std::is_pointer<E>::value>::type { delete obj; }
 
     template<typename E = T>
-    typename std::enable_if<!std::is_pointer<E>::value>::type DeleteQueuedObject(E const& /*packet*/) { }
+    auto DeleteQueuedObject(E const& /*packet*/) -> typename std::enable_if<!std::is_pointer<E>::value>::type { }
 };
 
 #endif

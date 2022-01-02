@@ -140,47 +140,47 @@ public:
     ArenaTeam();
     ~ArenaTeam();
 
-    bool Create(ObjectGuid captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
+    auto Create(ObjectGuid captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor) -> bool;
     void Disband(WorldSession* session);
     void Disband();
 
     typedef std::list<ArenaTeamMember> MemberList;
 
-    [[nodiscard]] uint32 GetId() const              { return TeamId; }
-    [[nodiscard]] uint32 GetType() const            { return Type; }
-    [[nodiscard]] uint8  GetSlot() const            { return GetSlotByType(GetType()); }
-    static uint8 GetSlotByType(uint32 type);
-    static uint8 GetReqPlayersForType(uint32 type);
-    [[nodiscard]] ObjectGuid GetCaptain() const { return CaptainGuid; }
-    [[nodiscard]] std::string const& GetName() const       { return TeamName; }
-    [[nodiscard]] const ArenaTeamStats& GetStats() const { return Stats; }
+    [[nodiscard]] auto GetId() const -> uint32              { return TeamId; }
+    [[nodiscard]] auto GetType() const -> uint32            { return Type; }
+    [[nodiscard]] auto  GetSlot() const -> uint8            { return GetSlotByType(GetType()); }
+    static auto GetSlotByType(uint32 type) -> uint8;
+    static auto GetReqPlayersForType(uint32 type) -> uint8;
+    [[nodiscard]] auto GetCaptain() const -> ObjectGuid { return CaptainGuid; }
+    [[nodiscard]] auto GetName() const -> std::string const&       { return TeamName; }
+    [[nodiscard]] auto GetStats() const -> const ArenaTeamStats& { return Stats; }
     void SetArenaTeamStats(ArenaTeamStats& stats) { Stats = stats; }
 
-    [[nodiscard]] uint32 GetRating() const          { return Stats.Rating; }
-    uint32 GetAverageMMR(Group* group) const;
+    [[nodiscard]] auto GetRating() const -> uint32          { return Stats.Rating; }
+    auto GetAverageMMR(Group* group) const -> uint32;
 
     void SetCaptain(ObjectGuid guid);
-    bool SetName(std::string const& name);
-    bool AddMember(ObjectGuid playerGuid);
+    auto SetName(std::string const& name) -> bool;
+    auto AddMember(ObjectGuid playerGuid) -> bool;
 
     // Shouldn't be ObjectGuid, because than can reference guid from members on Disband
     // and this method removes given record from list. So invalid reference can happen.
     void DelMember(ObjectGuid guid, bool cleanDb);
 
-    [[nodiscard]] size_t GetMembersSize() const         { return Members.size(); }
-    [[nodiscard]] bool   Empty() const                  { return Members.empty(); }
-    MemberList::iterator m_membersBegin() { return Members.begin(); }
-    MemberList::iterator m_membersEnd()   { return Members.end(); }
-    MemberList& GetMembers() { return Members; }
-    [[nodiscard]] bool IsMember(ObjectGuid guid) const;
+    [[nodiscard]] auto GetMembersSize() const -> size_t         { return Members.size(); }
+    [[nodiscard]] auto   Empty() const -> bool                  { return Members.empty(); }
+    auto m_membersBegin() -> MemberList::iterator { return Members.begin(); }
+    auto m_membersEnd() -> MemberList::iterator   { return Members.end(); }
+    auto GetMembers() -> MemberList& { return Members; }
+    [[nodiscard]] auto IsMember(ObjectGuid guid) const -> bool;
 
-    ArenaTeamMember* GetMember(ObjectGuid guid);
-    ArenaTeamMember* GetMember(std::string const& name);
+    auto GetMember(ObjectGuid guid) -> ArenaTeamMember*;
+    auto GetMember(std::string const& name) -> ArenaTeamMember*;
 
-    [[nodiscard]] bool IsFighting() const;
+    [[nodiscard]] auto IsFighting() const -> bool;
 
-    bool LoadArenaTeamFromDB(QueryResult arenaTeamDataResult);
-    bool LoadMembersFromDB(QueryResult arenaTeamMembersResult);
+    auto LoadArenaTeamFromDB(QueryResult arenaTeamDataResult) -> bool;
+    auto LoadMembersFromDB(QueryResult arenaTeamMembersResult) -> bool;
     void LoadStatsFromDB(uint32 ArenaTeamId);
     void SaveToDB();
 
@@ -195,13 +195,13 @@ public:
     void SendStats(WorldSession* session);
     void Inspect(WorldSession* session, ObjectGuid guid);
 
-    uint32 GetPoints(uint32 MemberRating);
-    int32  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
-    int32  GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
-    float  GetChanceAgainst(uint32 ownRating, uint32 opponentRating);
-    int32  WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap);
+    auto GetPoints(uint32 MemberRating) -> uint32;
+    auto  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won) -> int32;
+    auto  GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won) -> int32;
+    auto  GetChanceAgainst(uint32 ownRating, uint32 opponentRating) -> float;
+    auto  WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap) -> int32;
     void   MemberWon(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange);
-    int32  LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap);
+    auto  LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap) -> int32;
     void   MemberLost(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange = -12);
 
     void UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& PlayerPoints);

@@ -94,7 +94,7 @@ struct CoordPair
         , y_coord(obj.y_coord)
     {}
 
-    CoordPair<LIMIT>& operator=(const CoordPair<LIMIT>& obj)
+    auto operator=(const CoordPair<LIMIT>& obj) -> CoordPair<LIMIT>&
     {
         x_coord = obj.x_coord;
         y_coord = obj.y_coord;
@@ -133,19 +133,19 @@ struct CoordPair
             y_coord = LIMIT - 1;
     }
 
-    [[nodiscard]] bool IsCoordValid() const
+    [[nodiscard]] auto IsCoordValid() const -> bool
     {
         return x_coord < LIMIT && y_coord < LIMIT;
     }
 
-    CoordPair& normalize()
+    auto normalize() -> CoordPair&
     {
         x_coord = std::min(x_coord, LIMIT - 1);
         y_coord = std::min(y_coord, LIMIT - 1);
         return *this;
     }
 
-    [[nodiscard]] uint32 GetId() const
+    [[nodiscard]] auto GetId() const -> uint32
     {
         return y_coord * LIMIT + x_coord;
     }
@@ -155,13 +155,13 @@ struct CoordPair
 };
 
 template<uint32 LIMIT>
-bool operator==(const CoordPair<LIMIT>& p1, const CoordPair<LIMIT>& p2)
+auto operator==(const CoordPair<LIMIT>& p1, const CoordPair<LIMIT>& p2) -> bool
 {
     return (p1.x_coord == p2.x_coord && p1.y_coord == p2.y_coord);
 }
 
 template<uint32 LIMIT>
-bool operator!=(const CoordPair<LIMIT>& p1, const CoordPair<LIMIT>& p2)
+auto operator!=(const CoordPair<LIMIT>& p1, const CoordPair<LIMIT>& p2) -> bool
 {
     return !(p1 == p2);
 }
@@ -172,7 +172,7 @@ typedef CoordPair<TOTAL_NUMBER_OF_CELLS_PER_MAP> CellCoord;
 namespace Acore
 {
     template<class RET_TYPE, int CENTER_VAL>
-    inline RET_TYPE Compute(float x, float y, float center_offset, float size)
+    inline auto Compute(float x, float y, float center_offset, float size) -> RET_TYPE
     {
         // calculate and store temporary values in double format for having same result as same mySQL calculations
         double x_offset = (double(x) - center_offset) / size;
@@ -183,17 +183,17 @@ namespace Acore
         return RET_TYPE(x_val, y_val);
     }
 
-    inline GridCoord ComputeGridCoord(float x, float y)
+    inline auto ComputeGridCoord(float x, float y) -> GridCoord
     {
         return Compute<GridCoord, CENTER_GRID_ID>(x, y, CENTER_GRID_OFFSET, SIZE_OF_GRIDS);
     }
 
-    inline CellCoord ComputeCellCoord(float x, float y)
+    inline auto ComputeCellCoord(float x, float y) -> CellCoord
     {
         return Compute<CellCoord, CENTER_GRID_CELL_ID>(x, y, CENTER_GRID_CELL_OFFSET, SIZE_OF_GRID_CELL);
     }
 
-    inline CellCoord ComputeCellCoord(float x, float y, float& x_off, float& y_off)
+    inline auto ComputeCellCoord(float x, float y, float& x_off, float& y_off) -> CellCoord
     {
         double x_offset = (double(x) - CENTER_GRID_CELL_OFFSET) / SIZE_OF_GRID_CELL;
         double y_offset = (double(y) - CENTER_GRID_CELL_OFFSET) / SIZE_OF_GRID_CELL;
@@ -202,7 +202,7 @@ namespace Acore
         int y_val = int(y_offset + CENTER_GRID_CELL_ID + 0.5f);
         x_off = (float(x_offset) - x_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
         y_off = (float(y_offset) - y_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
-        return CellCoord(x_val, y_val);
+        return {x_val, y_val};
     }
 
     inline void NormalizeMapCoord(float& c)
@@ -213,22 +213,22 @@ namespace Acore
             c = -(MAP_HALFSIZE - 0.5f);
     }
 
-    inline bool IsValidMapCoord(float c)
+    inline auto IsValidMapCoord(float c) -> bool
     {
         return std::isfinite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5f);
     }
 
-    inline bool IsValidMapCoord(float x, float y)
+    inline auto IsValidMapCoord(float x, float y) -> bool
     {
         return IsValidMapCoord(x) && IsValidMapCoord(y);
     }
 
-    inline bool IsValidMapCoord(float x, float y, float z)
+    inline auto IsValidMapCoord(float x, float y, float z) -> bool
     {
         return IsValidMapCoord(x, y) && IsValidMapCoord(z);
     }
 
-    inline bool IsValidMapCoord(float x, float y, float z, float o)
+    inline auto IsValidMapCoord(float x, float y, float z, float o) -> bool
     {
         return IsValidMapCoord(x, y, z) && std::isfinite(o);
     }

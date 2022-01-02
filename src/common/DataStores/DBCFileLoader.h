@@ -41,12 +41,12 @@ public:
     DBCFileLoader();
     ~DBCFileLoader();
 
-    bool Load(const char* filename, const char* fmt);
+    auto Load(const char* filename, const char* fmt) -> bool;
 
     class Record
     {
     public:
-        [[nodiscard]] float getFloat(size_t field) const
+        [[nodiscard]] auto getFloat(size_t field) const -> float
         {
             ASSERT(field < file.fieldCount);
             float val = *reinterpret_cast<float*>(offset + file.GetOffset(field));
@@ -54,7 +54,7 @@ public:
             return val;
         }
 
-        [[nodiscard]] uint32 getUInt(size_t field) const
+        [[nodiscard]] auto getUInt(size_t field) const -> uint32
         {
             ASSERT(field < file.fieldCount);
             uint32 val = *reinterpret_cast<uint32*>(offset + file.GetOffset(field));
@@ -62,13 +62,13 @@ public:
             return val;
         }
 
-        [[nodiscard]] uint8 getUInt8(size_t field) const
+        [[nodiscard]] auto getUInt8(size_t field) const -> uint8
         {
             ASSERT(field < file.fieldCount);
             return *reinterpret_cast<uint8*>(offset + file.GetOffset(field));
         }
 
-        [[nodiscard]] const char* getString(size_t field) const
+        [[nodiscard]] auto getString(size_t field) const -> const char*
         {
             ASSERT(field < file.fieldCount);
             size_t stringOffset = getUInt(field);
@@ -85,16 +85,16 @@ public:
     };
 
     // Get record by id
-    Record getRecord(size_t id);
+    auto getRecord(size_t id) -> Record;
 
-    [[nodiscard]] uint32 GetNumRows() const { return recordCount; }
-    [[nodiscard]] uint32 GetRowSize() const { return recordSize; }
-    [[nodiscard]] uint32 GetCols() const { return fieldCount; }
-    [[nodiscard]] uint32 GetOffset(size_t id) const { return (fieldsOffset != nullptr && id < fieldCount) ? fieldsOffset[id] : 0; }
-    [[nodiscard]] bool IsLoaded() const { return data != nullptr; }
-    char* AutoProduceData(char const* fmt, uint32& count, char**& indexTable);
-    char* AutoProduceStrings(char const* fmt, char* dataTable);
-    static uint32 GetFormatRecordSize(const char* format, int32* index_pos = nullptr);
+    [[nodiscard]] auto GetNumRows() const -> uint32 { return recordCount; }
+    [[nodiscard]] auto GetRowSize() const -> uint32 { return recordSize; }
+    [[nodiscard]] auto GetCols() const -> uint32 { return fieldCount; }
+    [[nodiscard]] auto GetOffset(size_t id) const -> uint32 { return (fieldsOffset != nullptr && id < fieldCount) ? fieldsOffset[id] : 0; }
+    [[nodiscard]] auto IsLoaded() const -> bool { return data != nullptr; }
+    auto AutoProduceData(char const* fmt, uint32& count, char**& indexTable) -> char*;
+    auto AutoProduceStrings(char const* fmt, char* dataTable) -> char*;
+    static auto GetFormatRecordSize(const char* format, int32* index_pos = nullptr) -> uint32;
 
 private:
     uint32 recordSize;
@@ -106,7 +106,7 @@ private:
     unsigned char* stringTable;
 
     DBCFileLoader(DBCFileLoader const& right) = delete;
-    DBCFileLoader& operator=(DBCFileLoader const& right) = delete;
+    auto operator=(DBCFileLoader const& right) -> DBCFileLoader& = delete;
 };
 
 #endif

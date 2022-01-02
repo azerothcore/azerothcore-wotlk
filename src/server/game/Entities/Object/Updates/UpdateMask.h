@@ -33,9 +33,9 @@ public:
         CLIENT_UPDATE_MASK_BITS = sizeof(ClientUpdateMaskType) * 8,
     };
 
-    UpdateMask()  { }
+    UpdateMask()  = default;
 
-    UpdateMask(UpdateMask const& right) : _bits(nullptr)
+    UpdateMask(UpdateMask const& right)  
     {
         SetCount(right.GetCount());
         memcpy(_bits, right._bits, sizeof(uint8) * _blockCount * 32);
@@ -45,7 +45,7 @@ public:
 
     void SetBit(uint32 index) { _bits[index] = 1; }
     void UnsetBit(uint32 index) { _bits[index] = 0; }
-    [[nodiscard]] bool GetBit(uint32 index) const { return _bits[index] != 0; }
+    [[nodiscard]] auto GetBit(uint32 index) const -> bool { return _bits[index] != 0; }
 
     void AppendToPacket(ByteBuffer* data)
     {
@@ -60,8 +60,8 @@ public:
         }
     }
 
-    [[nodiscard]] uint32 GetBlockCount() const { return _blockCount; }
-    [[nodiscard]] uint32 GetCount() const { return _fieldCount; }
+    [[nodiscard]] auto GetBlockCount() const -> uint32 { return _blockCount; }
+    [[nodiscard]] auto GetCount() const -> uint32 { return _fieldCount; }
 
     void SetCount(uint32 valuesCount)
     {
@@ -80,7 +80,7 @@ public:
             memset(_bits, 0, sizeof(uint8) * _blockCount * CLIENT_UPDATE_MASK_BITS);
     }
 
-    UpdateMask& operator=(UpdateMask const& right)
+    auto operator=(UpdateMask const& right) -> UpdateMask&
     {
         if (this == &right)
             return *this;
@@ -90,7 +90,7 @@ public:
         return *this;
     }
 
-    UpdateMask& operator&=(UpdateMask const& right)
+    auto operator&=(UpdateMask const& right) -> UpdateMask&
     {
         ASSERT(right.GetCount() <= GetCount());
         for (uint32 i = 0; i < _fieldCount; ++i)
@@ -99,7 +99,7 @@ public:
         return *this;
     }
 
-    UpdateMask& operator|=(UpdateMask const& right)
+    auto operator|=(UpdateMask const& right) -> UpdateMask&
     {
         ASSERT(right.GetCount() <= GetCount());
         for (uint32 i = 0; i < _fieldCount; ++i)
@@ -108,7 +108,7 @@ public:
         return *this;
     }
 
-    UpdateMask operator|(UpdateMask const& right)
+    auto operator|(UpdateMask const& right) -> UpdateMask
     {
         UpdateMask ret(*this);
         ret |= right;

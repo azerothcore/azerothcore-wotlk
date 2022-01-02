@@ -89,10 +89,10 @@ enum AuctionSortOrder
 
 struct AuctionSortInfo
 {
-    AuctionSortInfo() : sortOrder(AUCTION_SORT_MAX), isDesc(true) { }
+    AuctionSortInfo()  = default;
 
-    AuctionSortOrder sortOrder;
-    bool isDesc;
+    AuctionSortOrder sortOrder{AUCTION_SORT_MAX};
+    bool isDesc{true};
 };
 
 typedef std::vector<AuctionSortInfo> AuctionSortOrderVector;
@@ -114,15 +114,15 @@ struct AuctionEntry
     AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
 
     // helpers
-    [[nodiscard]] uint8 GetHouseId() const { return houseId; }
-    [[nodiscard]] uint32 GetAuctionCut() const;
-    [[nodiscard]] uint32 GetAuctionOutBid() const;
-    bool BuildAuctionInfo(WorldPacket& data) const;
+    [[nodiscard]] auto GetHouseId() const -> uint8 { return houseId; }
+    [[nodiscard]] auto GetAuctionCut() const -> uint32;
+    [[nodiscard]] auto GetAuctionOutBid() const -> uint32;
+    auto BuildAuctionInfo(WorldPacket& data) const -> bool;
     void DeleteFromDB(CharacterDatabaseTransaction trans) const;
     void SaveToDB(CharacterDatabaseTransaction trans) const;
-    bool LoadFromDB(Field* fields);
-    [[nodiscard]] std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
-    static std::string BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit = 0, uint32 cut = 0, uint32 moneyDelay = 0, uint32 eta = 0);
+    auto LoadFromDB(Field* fields) -> bool;
+    [[nodiscard]] auto BuildAuctionMailSubject(MailAuctionAnswers response) const -> std::string;
+    static auto BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit = 0, uint32 cut = 0, uint32 moneyDelay = 0, uint32 eta = 0) -> std::string;
 };
 
 //this class is used as auctionhouse instance
@@ -139,13 +139,13 @@ public:
 
     typedef std::map<uint32, AuctionEntry*> AuctionEntryMap;
 
-    [[nodiscard]] uint32 Getcount() const { return AuctionsMap.size(); }
+    [[nodiscard]] auto Getcount() const -> uint32 { return AuctionsMap.size(); }
 
-    AuctionEntryMap::iterator GetAuctionsBegin() { return AuctionsMap.begin(); }
-    AuctionEntryMap::iterator GetAuctionsEnd() { return AuctionsMap.end(); }
-    AuctionEntryMap const& GetAuctions() { return AuctionsMap; }
+    auto GetAuctionsBegin() -> AuctionEntryMap::iterator { return AuctionsMap.begin(); }
+    auto GetAuctionsEnd() -> AuctionEntryMap::iterator { return AuctionsMap.end(); }
+    auto GetAuctions() -> AuctionEntryMap const& { return AuctionsMap; }
 
-    [[nodiscard]] AuctionEntry* GetAuction(uint32 id) const
+    [[nodiscard]] auto GetAuction(uint32 id) const -> AuctionEntry*
     {
         AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
         return itr != AuctionsMap.end() ? itr->second : nullptr;
@@ -153,16 +153,16 @@ public:
 
     void AddAuction(AuctionEntry* auction);
 
-    bool RemoveAuction(AuctionEntry* auction);
+    auto RemoveAuction(AuctionEntry* auction) -> bool;
 
     void Update();
 
     void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-    bool BuildListAuctionItems(WorldPacket& data, Player* player,
+    auto BuildListAuctionItems(WorldPacket& data, Player* player,
                                std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
                                uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder);
+                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder) -> bool;
 
 private:
     AuctionEntryMap AuctionsMap;
@@ -180,13 +180,13 @@ private:
 public:
     typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
 
-    static AuctionHouseMgr* instance();
+    static auto instance() -> AuctionHouseMgr*;
 
-    AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
-    AuctionHouseObject* GetAuctionsMapByHouseId(uint8 auctionHouseId);
-    AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
+    auto GetAuctionsMap(uint32 factionTemplateId) -> AuctionHouseObject*;
+    auto GetAuctionsMapByHouseId(uint8 auctionHouseId) -> AuctionHouseObject*;
+    auto GetBidsMap(uint32 factionTemplateId) -> AuctionHouseObject*;
 
-    Item* GetAItem(ObjectGuid itemGuid)
+    auto GetAItem(ObjectGuid itemGuid) -> Item*
     {
         ItemMap::const_iterator itr = mAitems.find(itemGuid);
         if (itr != mAitems.end())
@@ -203,9 +203,9 @@ public:
     void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, CharacterDatabaseTransaction trans, bool sendNotification = true, bool sendMail = true);
     void SendAuctionCancelledToBidderMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail = true);
 
-    static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
-    static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
-    static AuctionHouseEntry const* GetAuctionHouseEntryFromHouse(uint8 houseId);
+    static auto GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count) -> uint32;
+    static auto GetAuctionHouseEntry(uint32 factionTemplateId) -> AuctionHouseEntry const*;
+    static auto GetAuctionHouseEntryFromHouse(uint8 houseId) -> AuctionHouseEntry const*;
 
 public:
     //load first auction items, because of check if item exists, when loading
@@ -213,7 +213,7 @@ public:
     void LoadAuctions();
 
     void AddAItem(Item* it);
-    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr);
+    auto RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr) -> bool;
 
     void Update();
 

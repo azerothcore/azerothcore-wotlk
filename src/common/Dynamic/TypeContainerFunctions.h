@@ -34,7 +34,7 @@ namespace Acore
     // Helpers
     // Insert helpers
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    bool Insert(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* obj)
+    auto Insert(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* obj) -> bool
     {
         auto i = elements._element.find(handle);
         if (i == elements._element.end())
@@ -50,19 +50,19 @@ namespace Acore
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    bool Insert(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    auto Insert(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         return false;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
-    bool Insert(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    auto Insert(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         return false;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
-    bool Insert(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* obj)
+    auto Insert(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* obj) -> bool
     {
         bool ret = Insert(elements._elements, handle, obj);
         return ret ? ret : Insert(elements._TailElements, handle, obj);
@@ -70,7 +70,7 @@ namespace Acore
 
     // Find helpers
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    SPECIFIC_TYPE* Find(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE> const& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    auto Find(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE> const& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/) -> SPECIFIC_TYPE*
     {
         auto i = elements._element.find(handle);
         if (i == elements._element.end())
@@ -84,19 +84,19 @@ namespace Acore
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    SPECIFIC_TYPE* Find(ContainerUnorderedMap<TypeNull, KEY_TYPE> const& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    auto Find(ContainerUnorderedMap<TypeNull, KEY_TYPE> const& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/) -> SPECIFIC_TYPE*
     {
         return nullptr;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
-    SPECIFIC_TYPE* Find(ContainerUnorderedMap<T, KEY_TYPE> const& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    auto Find(ContainerUnorderedMap<T, KEY_TYPE> const& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/) -> SPECIFIC_TYPE*
     {
         return nullptr;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
-    SPECIFIC_TYPE* Find(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE> const& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    auto Find(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE> const& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/) -> SPECIFIC_TYPE*
     {
         SPECIFIC_TYPE* ret = Find(elements._elements, handle, (SPECIFIC_TYPE*)nullptr);
         return ret ? ret : Find(elements._TailElements, handle, (SPECIFIC_TYPE*)nullptr);
@@ -104,26 +104,26 @@ namespace Acore
 
     // Erase helpers
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    bool Remove(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    auto Remove(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         elements._element.erase(handle);
         return true;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    bool Remove(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    auto Remove(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         return false;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
-    bool Remove(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/)
+    auto Remove(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE const& /*handle*/, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         return false;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
-    bool Remove(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/)
+    auto Remove(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>& elements, KEY_TYPE const& handle, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         bool ret = Remove(elements._elements, handle, (SPECIFIC_TYPE*)nullptr);
         return ret ? ret : Remove(elements._TailElements, handle, (SPECIFIC_TYPE*)nullptr);
@@ -131,26 +131,26 @@ namespace Acore
 
     // Count helpers
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    bool Size(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/)
+    auto Size(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         *size = elements._element.size();
         return true;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE>
-    bool Size(ContainerUnorderedMap<TypeNull, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/)
+    auto Size(ContainerUnorderedMap<TypeNull, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         return false;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
-    bool Size(ContainerUnorderedMap<T, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/)
+    auto Size(ContainerUnorderedMap<T, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         return false;
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
-    bool Size(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/)
+    auto Size(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/) -> bool
     {
         bool ret = Size(elements._elements, size, (SPECIFIC_TYPE*)nullptr);
         return ret ? ret : Size(elements._TailElements, size, (SPECIFIC_TYPE*)nullptr);
@@ -159,38 +159,38 @@ namespace Acore
     /* ContainerMapList Helpers */
     // count functions
     template<class SPECIFIC_TYPE>
-    size_t Count(const ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* /*fake*/)
+    auto Count(const ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* /*fake*/) -> size_t
     {
         return elements._element.getSize();
     }
 
     template<class SPECIFIC_TYPE>
-    size_t Count(const ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
+    auto Count(const ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*fake*/) -> size_t
     {
         return 0;
     }
 
     template<class SPECIFIC_TYPE, class T>
-    size_t Count(const ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
+    auto Count(const ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*fake*/) -> size_t
     {
         return 0;
     }
 
     template<class SPECIFIC_TYPE, class T>
-    size_t Count(const ContainerMapList<TypeList<SPECIFIC_TYPE, T>>& elements, SPECIFIC_TYPE* fake)
+    auto Count(const ContainerMapList<TypeList<SPECIFIC_TYPE, T>>& elements, SPECIFIC_TYPE* fake) -> size_t
     {
         return Count(elements._elements, fake);
     }
 
     template<class SPECIFIC_TYPE, class H, class T>
-    size_t Count(const ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* fake)
+    auto Count(const ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* fake) -> size_t
     {
         return Count(elements._TailElements, fake);
     }
 
     // non-const insert functions
     template<class SPECIFIC_TYPE>
-    SPECIFIC_TYPE* Insert(ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* obj)
+    auto Insert(ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* obj) -> SPECIFIC_TYPE*
     {
         //elements._element[hdl] = obj;
         obj->AddToGrid(elements._element);
@@ -198,21 +198,21 @@ namespace Acore
     }
 
     template<class SPECIFIC_TYPE>
-    SPECIFIC_TYPE* Insert(ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
+    auto Insert(ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*obj*/) -> SPECIFIC_TYPE*
     {
         return nullptr;
     }
 
     // this is a missed
     template<class SPECIFIC_TYPE, class T>
-    SPECIFIC_TYPE* Insert(ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
+    auto Insert(ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*obj*/) -> SPECIFIC_TYPE*
     {
         return nullptr;                                        // a missed
     }
 
     // Recursion
     template<class SPECIFIC_TYPE, class H, class T>
-    SPECIFIC_TYPE* Insert(ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* obj)
+    auto Insert(ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* obj) -> SPECIFIC_TYPE*
     {
         SPECIFIC_TYPE* t = Insert(elements._elements, obj);
         return (t != nullptr ? t : Insert(elements._TailElements, obj));

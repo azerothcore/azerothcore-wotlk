@@ -160,21 +160,21 @@ enum LiquidStatus
 
 struct LiquidData
 {
-    LiquidData() : Entry(0), Flags(0), Level(INVALID_HEIGHT), DepthLevel(INVALID_HEIGHT), Status(LIQUID_MAP_NO_WATER) { }
+    LiquidData()  = default;
 
-    uint32 Entry;
-    uint32 Flags;
-    float  Level;
-    float  DepthLevel;
-    LiquidStatus Status;
+    uint32 Entry{0};
+    uint32 Flags{0};
+    float  Level{INVALID_HEIGHT};
+    float  DepthLevel{INVALID_HEIGHT};
+    LiquidStatus Status{LIQUID_MAP_NO_WATER};
 };
 
 struct PositionFullTerrainStatus
 {
-    PositionFullTerrainStatus() : areaId(0), floorZ(INVALID_HEIGHT), outdoors(false) { }
-    uint32 areaId;
-    float floorZ;
-    bool outdoors;
+    PositionFullTerrainStatus()  = default;
+    uint32 areaId{0};
+    float floorZ{INVALID_HEIGHT};
+    bool outdoors{false};
     LiquidData liquidInfo;
 };
 
@@ -223,31 +223,31 @@ class GridMap
     uint8 _liquidHeight;
     uint16* _holes;
 
-    bool loadAreaData(FILE* in, uint32 offset, uint32 size);
-    bool loadHeightData(FILE* in, uint32 offset, uint32 size);
-    bool loadLiquidData(FILE* in, uint32 offset, uint32 size);
-    bool loadHolesData(FILE* in, uint32 offset, uint32 size);
-    bool isHole(int row, int col) const;
+    auto loadAreaData(FILE* in, uint32 offset, uint32 size) -> bool;
+    auto loadHeightData(FILE* in, uint32 offset, uint32 size) -> bool;
+    auto loadLiquidData(FILE* in, uint32 offset, uint32 size) -> bool;
+    auto loadHolesData(FILE* in, uint32 offset, uint32 size) -> bool;
+    [[nodiscard]] auto isHole(int row, int col) const -> bool;
 
     // Get height functions and pointers
     typedef float (GridMap::*GetHeightPtr) (float x, float y) const;
     GetHeightPtr _gridGetHeight;
-    [[nodiscard]] float getHeightFromFloat(float x, float y) const;
-    [[nodiscard]] float getHeightFromUint16(float x, float y) const;
-    [[nodiscard]] float getHeightFromUint8(float x, float y) const;
-    [[nodiscard]] float getHeightFromFlat(float x, float y) const;
+    [[nodiscard]] auto getHeightFromFloat(float x, float y) const -> float;
+    [[nodiscard]] auto getHeightFromUint16(float x, float y) const -> float;
+    [[nodiscard]] auto getHeightFromUint8(float x, float y) const -> float;
+    [[nodiscard]] auto getHeightFromFlat(float x, float y) const -> float;
 
 public:
     GridMap();
     ~GridMap();
-    bool loadData(char* filaname);
+    auto loadData(char* filaname) -> bool;
     void unloadData();
 
-    [[nodiscard]] uint16 getArea(float x, float y) const;
-    [[nodiscard]] inline float getHeight(float x, float y) const {return (this->*_gridGetHeight)(x, y);}
-    [[nodiscard]] float getMinHeight(float x, float y) const;
-    [[nodiscard]] float getLiquidLevel(float x, float y) const;
-    LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
+    [[nodiscard]] auto getArea(float x, float y) const -> uint16;
+    [[nodiscard]] inline auto getHeight(float x, float y) const -> float {return (this->*_gridGetHeight)(x, y);}
+    [[nodiscard]] auto getMinHeight(float x, float y) const -> float;
+    [[nodiscard]] auto getLiquidLevel(float x, float y) const -> float;
+    [[nodiscard]] auto GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const -> LiquidData const;
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
@@ -271,7 +271,7 @@ enum LevelRequirementVsMode
 
 struct ZoneDynamicInfo
 {
-    ZoneDynamicInfo()  { }
+    ZoneDynamicInfo()  = default;
 
     uint32 MusicId{0};
     uint32 WeatherId{0};
@@ -303,10 +303,10 @@ public:
     Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
     ~Map() override;
 
-    [[nodiscard]] MapEntry const* GetEntry() const { return i_mapEntry; }
+    [[nodiscard]] auto GetEntry() const -> MapEntry const* { return i_mapEntry; }
 
     // currently unused for normal maps
-    bool CanUnload(uint32 diff)
+    auto CanUnload(uint32 diff) -> bool
     {
         if (!m_unloadTimer)
             return false;
@@ -318,10 +318,10 @@ public:
         return false;
     }
 
-    virtual bool AddPlayerToMap(Player*);
+    virtual auto AddPlayerToMap(Player*) -> bool;
     virtual void RemovePlayerFromMap(Player*, bool);
     virtual void AfterPlayerUnlinkFromMap();
-    template<class T> bool AddToMap(T*, bool checkTransport = false);
+    template<class T> auto AddToMap(T*, bool checkTransport = false) -> bool;
     template<class T> void RemoveFromMap(T*, bool);
 
     void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
@@ -335,7 +335,7 @@ public:
 
     virtual void Update(const uint32, const uint32, bool thread = true);
 
-    [[nodiscard]] float GetVisibilityRange() const { return m_VisibleDistance; }
+    [[nodiscard]] auto GetVisibilityRange() const -> float { return m_VisibleDistance; }
     void SetVisibilityRange(float range) { m_VisibleDistance = range; }
     //function for setting up visibility distance for maps on per-type/per-Id basis
     virtual void InitVisibilityDistance();
@@ -347,55 +347,55 @@ public:
 
     template<class T, class CONTAINER> void Visit(const Cell& cell, TypeContainerVisitor<T, CONTAINER>& visitor);
 
-    [[nodiscard]] bool IsRemovalGrid(float x, float y) const
+    [[nodiscard]] auto IsRemovalGrid(float x, float y) const -> bool
     {
         GridCoord p = Acore::ComputeGridCoord(x, y);
         return !getNGrid(p.x_coord, p.y_coord);
     }
 
-    [[nodiscard]] bool IsGridLoaded(float x, float y) const
+    [[nodiscard]] auto IsGridLoaded(float x, float y) const -> bool
     {
         return IsGridLoaded(Acore::ComputeGridCoord(x, y));
     }
 
     void LoadGrid(float x, float y);
     void LoadAllCells();
-    bool UnloadGrid(NGridType& ngrid);
+    auto UnloadGrid(NGridType& ngrid) -> bool;
     virtual void UnloadAll();
 
-    [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
+    [[nodiscard]] auto GetId() const -> uint32 { return i_mapEntry->MapID; }
 
-    static bool ExistMap(uint32 mapid, int gx, int gy);
-    static bool ExistVMap(uint32 mapid, int gx, int gy);
+    static auto ExistMap(uint32 mapid, int gx, int gy) -> bool;
+    static auto ExistVMap(uint32 mapid, int gx, int gy) -> bool;
 
-    [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
+    [[nodiscard]] auto GetParent() const -> Map const* { return m_parentMap; }
 
     // pussywizard: movemaps, mmaps
-    [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
+    [[nodiscard]] auto GetMMapLock() const -> std::shared_mutex& { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
     // pussywizard:
     std::unordered_set<Unit*> i_objectsForDelayedVisibility;
     void HandleDelayedVisibility();
 
     // some calls like isInWater should not use vmaps due to processor power
     // can return INVALID_HEIGHT if under z+2 z coord not found height
-    [[nodiscard]] float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-    [[nodiscard]] float GetGridHeight(float x, float y) const;
-    [[nodiscard]] float GetMinHeight(float x, float y) const;
-    Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
+    [[nodiscard]] auto GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const -> float;
+    [[nodiscard]] auto GetGridHeight(float x, float y) const -> float;
+    [[nodiscard]] auto GetMinHeight(float x, float y) const -> float;
+    auto GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr) -> Transport*;
 
     void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType = MAP_ALL_LIQUIDS);
-    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType);
+    auto GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) -> LiquidData const;
 
-    [[nodiscard]] bool GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
-    [[nodiscard]] uint32 GetAreaId(uint32 phaseMask, float x, float y, float z) const;
-    [[nodiscard]] uint32 GetZoneId(uint32 phaseMask, float x, float y, float z) const;
+    [[nodiscard]] auto GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const -> bool;
+    [[nodiscard]] auto GetAreaId(uint32 phaseMask, float x, float y, float z) const -> uint32;
+    [[nodiscard]] auto GetZoneId(uint32 phaseMask, float x, float y, float z) const -> uint32;
     void GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, float x, float y, float z) const;
 
-    [[nodiscard]] float GetWaterLevel(float x, float y) const;
-    bool IsInWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
-    [[nodiscard]] bool IsUnderWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
-    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const;
-    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData const& liquidData) const;
+    [[nodiscard]] auto GetWaterLevel(float x, float y) const -> float;
+    [[nodiscard]] auto IsInWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const -> bool;
+    [[nodiscard]] auto IsUnderWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const -> bool;
+    [[nodiscard]] auto HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const -> bool;
+    [[nodiscard]] auto HasEnoughWater(WorldObject const* searcher, LiquidData const& liquidData) const -> bool;
 
     void MoveAllCreaturesInMoveList();
     void MoveAllGameObjectsInMoveList();
@@ -403,8 +403,8 @@ public:
     void RemoveAllObjectsInRemoveList();
     virtual void RemoveAllPlayers();
 
-    [[nodiscard]] uint32 GetInstanceId() const { return i_InstanceId; }
-    [[nodiscard]] uint8 GetSpawnMode() const { return (i_spawnMode); }
+    [[nodiscard]] auto GetInstanceId() const -> uint32 { return i_InstanceId; }
+    [[nodiscard]] auto GetSpawnMode() const -> uint8 { return (i_spawnMode); }
 
     enum EnterState
     {
@@ -422,27 +422,27 @@ public:
         CANNOT_ENTER_UNSPECIFIED_REASON
     };
 
-    virtual EnterState CannotEnter(Player* /*player*/, bool /*loginCheck = false*/) { return CAN_ENTER; }
+    virtual auto CannotEnter(Player* /*player*/, bool /*loginCheck = false*/) -> EnterState { return CAN_ENTER; }
 
-    [[nodiscard]] const char* GetMapName() const;
+    [[nodiscard]] auto GetMapName() const -> const char*;
 
     // have meaning only for instanced map (that have set real difficulty)
-    [[nodiscard]] Difficulty GetDifficulty() const { return Difficulty(GetSpawnMode()); }
-    [[nodiscard]] bool IsRegularDifficulty() const { return GetDifficulty() == REGULAR_DIFFICULTY; }
-    [[nodiscard]] MapDifficulty const* GetMapDifficulty() const;
+    [[nodiscard]] auto GetDifficulty() const -> Difficulty { return Difficulty(GetSpawnMode()); }
+    [[nodiscard]] auto IsRegularDifficulty() const -> bool { return GetDifficulty() == REGULAR_DIFFICULTY; }
+    [[nodiscard]] auto GetMapDifficulty() const -> MapDifficulty const*;
 
-    [[nodiscard]] bool Instanceable() const { return i_mapEntry && i_mapEntry->Instanceable(); }
-    [[nodiscard]] bool IsDungeon() const { return i_mapEntry && i_mapEntry->IsDungeon(); }
-    [[nodiscard]] bool IsNonRaidDungeon() const { return i_mapEntry && i_mapEntry->IsNonRaidDungeon(); }
-    [[nodiscard]] bool IsRaid() const { return i_mapEntry && i_mapEntry->IsRaid(); }
-    [[nodiscard]] bool IsRaidOrHeroicDungeon() const { return IsRaid() || i_spawnMode > DUNGEON_DIFFICULTY_NORMAL; }
-    [[nodiscard]] bool IsHeroic() const { return IsRaid() ? i_spawnMode >= RAID_DIFFICULTY_10MAN_HEROIC : i_spawnMode >= DUNGEON_DIFFICULTY_HEROIC; }
-    [[nodiscard]] bool Is25ManRaid() const { return IsRaid() && i_spawnMode & RAID_DIFFICULTY_MASK_25MAN; }   // since 25man difficulties are 1 and 3, we can check them like that
-    [[nodiscard]] bool IsBattleground() const { return i_mapEntry && i_mapEntry->IsBattleground(); }
-    [[nodiscard]] bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
-    [[nodiscard]] bool IsBattlegroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattlegroundOrArena(); }
+    [[nodiscard]] auto Instanceable() const -> bool { return i_mapEntry && i_mapEntry->Instanceable(); }
+    [[nodiscard]] auto IsDungeon() const -> bool { return i_mapEntry && i_mapEntry->IsDungeon(); }
+    [[nodiscard]] auto IsNonRaidDungeon() const -> bool { return i_mapEntry && i_mapEntry->IsNonRaidDungeon(); }
+    [[nodiscard]] auto IsRaid() const -> bool { return i_mapEntry && i_mapEntry->IsRaid(); }
+    [[nodiscard]] auto IsRaidOrHeroicDungeon() const -> bool { return IsRaid() || i_spawnMode > DUNGEON_DIFFICULTY_NORMAL; }
+    [[nodiscard]] auto IsHeroic() const -> bool { return IsRaid() ? i_spawnMode >= RAID_DIFFICULTY_10MAN_HEROIC : i_spawnMode >= DUNGEON_DIFFICULTY_HEROIC; }
+    [[nodiscard]] auto Is25ManRaid() const -> bool { return IsRaid() && i_spawnMode & RAID_DIFFICULTY_MASK_25MAN; }   // since 25man difficulties are 1 and 3, we can check them like that
+    [[nodiscard]] auto IsBattleground() const -> bool { return i_mapEntry && i_mapEntry->IsBattleground(); }
+    [[nodiscard]] auto IsBattleArena() const -> bool { return i_mapEntry && i_mapEntry->IsBattleArena(); }
+    [[nodiscard]] auto IsBattlegroundOrArena() const -> bool { return i_mapEntry && i_mapEntry->IsBattlegroundOrArena(); }
 
-    bool GetEntrancePos(int32& mapid, float& x, float& y)
+    auto GetEntrancePos(int32& mapid, float& x, float& y) -> bool
     {
         if (!i_mapEntry)
             return false;
@@ -454,14 +454,14 @@ public:
     virtual void DelayedUpdate(const uint32 diff);
 
     void resetMarkedCells() { marked_cells.reset(); }
-    bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
+    auto isCellMarked(uint32 pCellId) -> bool { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
     void resetMarkedCellsLarge() { marked_cells_large.reset(); }
-    bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
+    auto isCellMarkedLarge(uint32 pCellId) -> bool { return marked_cells_large.test(pCellId); }
     void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
-    [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.isEmpty(); }
-    [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
+    [[nodiscard]] auto HavePlayers() const -> bool { return !m_mapRefMgr.isEmpty(); }
+    [[nodiscard]] auto GetPlayersCountExceptGMs() const -> uint32;
 
     void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
     void RemoveWorldObject(WorldObject* obj) { i_worldObjects.erase(obj); }
@@ -469,7 +469,7 @@ public:
     void SendToPlayers(WorldPacket const* data) const;
 
     typedef MapRefMgr PlayerList;
-    [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefMgr; }
+    [[nodiscard]] auto GetPlayers() const -> PlayerList const& { return m_mapRefMgr; }
 
     //per-map script storage
     void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
@@ -488,26 +488,26 @@ public:
 
     void UpdateIteratorBack(Player* player);
 
-    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
-    GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
+    auto SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0) -> TempSummon*;
+    auto SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true) -> GameObject*;
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
-    Corpse* GetCorpse(ObjectGuid const guid);
-    Creature* GetCreature(ObjectGuid const guid);
-    GameObject* GetGameObject(ObjectGuid const guid);
-    Transport* GetTransport(ObjectGuid const guid);
-    DynamicObject* GetDynamicObject(ObjectGuid const guid);
-    Pet* GetPet(ObjectGuid const guid);
+    auto GetCorpse(ObjectGuid const guid) -> Corpse*;
+    auto GetCreature(ObjectGuid const guid) -> Creature*;
+    auto GetGameObject(ObjectGuid const guid) -> GameObject*;
+    auto GetTransport(ObjectGuid const guid) -> Transport*;
+    auto GetDynamicObject(ObjectGuid const guid) -> DynamicObject*;
+    auto GetPet(ObjectGuid const guid) -> Pet*;
 
-    MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
+    auto GetObjectsStore() -> MapStoredObjectTypesContainer& { return _objectsStore; }
 
     typedef std::unordered_multimap<ObjectGuid::LowType, Creature*> CreatureBySpawnIdContainer;
-    CreatureBySpawnIdContainer& GetCreatureBySpawnIdStore() { return _creatureBySpawnIdStore; }
+    auto GetCreatureBySpawnIdStore() -> CreatureBySpawnIdContainer& { return _creatureBySpawnIdStore; }
 
     typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
-    GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameobjectBySpawnIdStore; }
+    auto GetGameObjectBySpawnIdStore() -> GameObjectBySpawnIdContainer& { return _gameobjectBySpawnIdStore; }
 
-    std::unordered_set<Corpse*> const* GetCorpsesInCell(uint32 cellId) const
+    [[nodiscard]] auto GetCorpsesInCell(uint32 cellId) const -> std::unordered_set<Corpse*> const*
     {
         auto itr = _corpsesByCell.find(cellId);
         if (itr != _corpsesByCell.end())
@@ -516,7 +516,7 @@ public:
         return nullptr;
     }
 
-    Corpse* GetCorpseByPlayer(ObjectGuid const& ownerGuid) const
+    [[nodiscard]] auto GetCorpseByPlayer(ObjectGuid const& ownerGuid) const -> Corpse*
     {
         auto itr = _corpsesByPlayer.find(ownerGuid);
         if (itr != _corpsesByPlayer.end())
@@ -525,37 +525,37 @@ public:
         return nullptr;
     }
 
-    MapInstanced* ToMapInstanced() { if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return nullptr;  }
-    [[nodiscard]] const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return nullptr;  }
+    auto ToMapInstanced() -> MapInstanced* { if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return nullptr;  }
+    [[nodiscard]] auto ToMapInstanced() const -> const MapInstanced* { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return nullptr;  }
 
-    InstanceMap* ToInstanceMap() { if (IsDungeon())  return reinterpret_cast<InstanceMap*>(this); else return nullptr;  }
-    [[nodiscard]] const InstanceMap* ToInstanceMap() const { if (IsDungeon())  return (const InstanceMap*)((InstanceMap*)this); else return nullptr;  }
+    auto ToInstanceMap() -> InstanceMap* { if (IsDungeon())  return reinterpret_cast<InstanceMap*>(this); else return nullptr;  }
+    [[nodiscard]] auto ToInstanceMap() const -> const InstanceMap* { if (IsDungeon())  return (const InstanceMap*)((InstanceMap*)this); else return nullptr;  }
 
-    BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return nullptr;  }
-    [[nodiscard]] const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
+    auto ToBattlegroundMap() -> BattlegroundMap* { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return nullptr;  }
+    [[nodiscard]] auto ToBattlegroundMap() const -> const BattlegroundMap* { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
 
-    float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
-    [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-    [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
-    bool CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
-    bool CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
-    bool CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
-    bool CheckCollisionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true) const;
+    auto GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const -> float;
+    [[nodiscard]] auto GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const -> float;
+    [[nodiscard]] auto isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const -> bool;
+    auto CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const -> bool;
+    auto CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const -> bool;
+    auto CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const -> bool;
+    auto CheckCollisionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true) const -> bool;
     void Balance() { _dynamicTree.balance(); }
     void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
-    [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
-    [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
-    bool GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
-    [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
+    [[nodiscard]] auto ContainsGameObjectModel(const GameObjectModel& model) const -> bool { return _dynamicTree.contains(model);}
+    [[nodiscard]] auto GetDynamicMapTree() const -> DynamicMapTree const& { return _dynamicTree; }
+    auto GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist) -> bool;
+    [[nodiscard]] auto GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const -> float
     {
         return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
     }
     /*
         RESPAWN TIMES
     */
-    [[nodiscard]] time_t GetLinkedRespawnTime(ObjectGuid guid) const;
-    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const
+    [[nodiscard]] auto GetLinkedRespawnTime(ObjectGuid guid) const -> time_t;
+    [[nodiscard]] auto GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const -> time_t
     {
         std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
         if (itr != _creatureRespawnTimes.end())
@@ -564,7 +564,7 @@ public:
         return time_t(0);
     }
 
-    [[nodiscard]] time_t GetGORespawnTime(ObjectGuid::LowType dbGuid) const
+    [[nodiscard]] auto GetGORespawnTime(ObjectGuid::LowType dbGuid) const -> time_t
     {
         std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
         if (itr != _goRespawnTimes.end())
@@ -579,13 +579,13 @@ public:
     void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
-    [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
+    [[nodiscard]] auto GetInstanceResetPeriod() const -> time_t { return _instanceResetPeriod; }
 
     void LoadCorpseData();
     void DeleteCorpseData();
     void AddCorpse(Corpse* corpse);
     void RemoveCorpse(Corpse* corpse);
-    Corpse* ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia = false);
+    auto ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia = false) -> Corpse*;
     void RemoveOldCorpses();
 
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
@@ -604,16 +604,16 @@ public:
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
     void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);
 
-    GridMap* GetGrid(float x, float y);
+    auto GetGrid(float x, float y) -> GridMap*;
     void EnsureGridCreated(const GridCoord&);
-    [[nodiscard]] bool AllTransportsEmpty() const; // pussywizard
+    [[nodiscard]] auto AllTransportsEmpty() const -> bool; // pussywizard
     void AllTransportsRemovePassengers(); // pussywizard
-    [[nodiscard]] TransportsContainer const& GetAllTransports() const { return _transports; }
+    [[nodiscard]] auto GetAllTransports() const -> TransportsContainer const& { return _transports; }
 
     DataMap CustomData;
 
     template<HighGuid high>
-    inline ObjectGuid::LowType GenerateLowGuid()
+    inline auto GenerateLowGuid() -> ObjectGuid::LowType
     {
         static_assert(ObjectGuidTraits<high>::MapSpecific, "Only map specific guid can be generated in Map context");
         return GetGuidSequenceGenerator<high>().Generate();
@@ -649,19 +649,19 @@ private:
     std::vector<GameObject*> _gameObjectsToMove;
     std::vector<DynamicObject*> _dynamicObjectsToMove;
 
-    [[nodiscard]] bool IsGridLoaded(const GridCoord&) const;
+    [[nodiscard]] auto IsGridLoaded(const GridCoord&) const -> bool;
     void EnsureGridCreated_i(const GridCoord&);
 
     void buildNGridLinkage(NGridType* pNGridType) { pNGridType->link(this); }
 
-    [[nodiscard]] NGridType* getNGrid(uint32 x, uint32 y) const
+    [[nodiscard]] auto getNGrid(uint32 x, uint32 y) const -> NGridType*
     {
         ASSERT(x < MAX_NUMBER_OF_GRIDS && y < MAX_NUMBER_OF_GRIDS);
         return i_grids[x][y];
     }
 
-    bool EnsureGridLoaded(Cell const&);
-    [[nodiscard]] bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x, y)->isGridObjectDataLoaded(); }
+    auto EnsureGridLoaded(Cell const&) -> bool;
+    [[nodiscard]] auto isGridObjectDataLoaded(uint32 x, uint32 y) const -> bool { return getNGrid(x, y)->isGridObjectDataLoaded(); }
     void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x, y)->setGridObjectDataLoaded(pLoaded); }
 
     void setNGrid(NGridType* grid, uint32 x, uint32 y);
@@ -696,14 +696,14 @@ protected:
     TransportsContainer::iterator _transportsUpdateIter;
 
 private:
-    Player* _GetScriptPlayerSourceOrTarget(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
-    Creature* _GetScriptCreatureSourceOrTarget(Object* source, Object* target, const ScriptInfo* scriptInfo, bool bReverse = false) const;
-    Unit* _GetScriptUnit(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
-    Player* _GetScriptPlayer(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
-    Creature* _GetScriptCreature(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
-    WorldObject* _GetScriptWorldObject(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
+    auto _GetScriptPlayerSourceOrTarget(Object* source, Object* target, const ScriptInfo* scriptInfo) const -> Player*;
+    auto _GetScriptCreatureSourceOrTarget(Object* source, Object* target, const ScriptInfo* scriptInfo, bool bReverse = false) const -> Creature*;
+    auto _GetScriptUnit(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const -> Unit*;
+    auto _GetScriptPlayer(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const -> Player*;
+    auto _GetScriptCreature(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const -> Creature*;
+    auto _GetScriptWorldObject(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const -> WorldObject*;
     void _ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
-    GameObject* _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const;
+    auto _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const -> GameObject*;
 
     //used for fast base_map (e.g. MapInstanced class object) search for
     //InstanceMaps and BattlegroundMaps...
@@ -757,7 +757,7 @@ private:
     uint32 _defaultLight;
 
     template<HighGuid high>
-    inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
+    inline auto GetGuidSequenceGenerator() -> ObjectGuidGeneratorBase&
     {
         auto itr = _guidGenerators.find(high);
         if (itr == _guidGenerators.end())
@@ -791,23 +791,23 @@ class InstanceMap : public Map
 public:
     InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
     ~InstanceMap() override;
-    bool AddPlayerToMap(Player*) override;
+    auto AddPlayerToMap(Player*) -> bool override;
     void RemovePlayerFromMap(Player*, bool) override;
     void AfterPlayerUnlinkFromMap() override;
     void Update(const uint32, const uint32, bool thread = true) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
-    bool Reset(uint8 method, GuidList* globalSkipList = nullptr);
-    [[nodiscard]] uint32 GetScriptId() const { return i_script_id; }
-    [[nodiscard]] std::string const& GetScriptName() const;
-    [[nodiscard]] InstanceScript* GetInstanceScript() { return instance_data; }
-    [[nodiscard]] InstanceScript const* GetInstanceScript() const { return instance_data; }
+    auto Reset(uint8 method, GuidList* globalSkipList = nullptr) -> bool;
+    [[nodiscard]] auto GetScriptId() const -> uint32 { return i_script_id; }
+    [[nodiscard]] auto GetScriptName() const -> std::string const&;
+    [[nodiscard]] auto GetInstanceScript() -> InstanceScript* { return instance_data; }
+    [[nodiscard]] auto GetInstanceScript() const -> InstanceScript const* { return instance_data; }
     void PermBindAllPlayers();
     void UnloadAll() override;
-    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
+    auto CannotEnter(Player* player, bool loginCheck = false) -> EnterState override;
     void SendResetWarnings(uint32 timeLeft) const;
 
-    [[nodiscard]] uint32 GetMaxPlayers() const;
-    [[nodiscard]] uint32 GetMaxResetDelay() const;
+    [[nodiscard]] auto GetMaxPlayers() const -> uint32;
+    [[nodiscard]] auto GetMaxResetDelay() const -> uint32;
 
     void InitVisibilityDistance() override;
 private:
@@ -823,15 +823,15 @@ public:
     BattlegroundMap(uint32 id, uint32 InstanceId, Map* _parent, uint8 spawnMode);
     ~BattlegroundMap() override;
 
-    bool AddPlayerToMap(Player*) override;
+    auto AddPlayerToMap(Player*) -> bool override;
     void RemovePlayerFromMap(Player*, bool) override;
-    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
+    auto CannotEnter(Player* player, bool loginCheck = false) -> EnterState override;
     void SetUnload();
     //void UnloadAll(bool pForce);
     void RemoveAllPlayers() override;
 
     void InitVisibilityDistance() override;
-    Battleground* GetBG() { return m_bg; }
+    auto GetBG() -> Battleground* { return m_bg; }
     void SetBG(Battleground* bg) { m_bg = bg; }
 private:
     Battleground* m_bg;

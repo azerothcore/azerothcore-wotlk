@@ -1374,7 +1374,7 @@ class OpcodeHandler
 {
 public:
     OpcodeHandler(char const* name, SessionStatus status) : Name(name), Status(status) { }
-    virtual ~OpcodeHandler() { }
+    virtual ~OpcodeHandler() = default;
 
     char const* Name;
     SessionStatus Status;
@@ -1404,13 +1404,13 @@ public:
     OpcodeTable();
 
     OpcodeTable(OpcodeTable const&) = delete;
-    OpcodeTable& operator=(OpcodeTable const&) = delete;
+    auto operator=(OpcodeTable const&) -> OpcodeTable& = delete;
 
     ~OpcodeTable();
 
     void Initialize();
 
-    ClientOpcodeHandler const* operator[](Opcodes index) const
+    auto operator[](Opcodes index) const -> ClientOpcodeHandler const*
     {
         return _internalTableClient[index];
     }
@@ -1427,6 +1427,6 @@ private:
 extern OpcodeTable opcodeTable;
 
 /// Lookup opcode name for human understandable logging
-std::string GetOpcodeNameForLogging(Opcodes opcode);
+auto GetOpcodeNameForLogging(Opcodes opcode) -> std::string;
 
 #endif

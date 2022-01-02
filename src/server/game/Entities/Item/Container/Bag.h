@@ -33,26 +33,26 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
-    bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner) override;
+    auto Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner) -> bool override;
 
     void Clear();
     void StoreItem(uint8 slot, Item* pItem, bool update);
     void RemoveItem(uint8 slot, bool update);
 
-    [[nodiscard]] Item* GetItemByPos(uint8 slot) const;
-    uint32 GetItemCount(uint32 item, Item* eItem = nullptr) const;
-    uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
+    [[nodiscard]] auto GetItemByPos(uint8 slot) const -> Item*;
+    auto GetItemCount(uint32 item, Item* eItem = nullptr) const -> uint32;
+    auto GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const -> uint32;
 
-    [[nodiscard]] uint8 GetSlotByItemGUID(ObjectGuid guid) const;
-    [[nodiscard]] bool IsEmpty() const;
-    [[nodiscard]] uint32 GetFreeSlots() const;
-    [[nodiscard]] uint32 GetBagSize() const { return GetUInt32Value(CONTAINER_FIELD_NUM_SLOTS); }
+    [[nodiscard]] auto GetSlotByItemGUID(ObjectGuid guid) const -> uint8;
+    [[nodiscard]] auto IsEmpty() const -> bool;
+    [[nodiscard]] auto GetFreeSlots() const -> uint32;
+    [[nodiscard]] auto GetBagSize() const -> uint32 { return GetUInt32Value(CONTAINER_FIELD_NUM_SLOTS); }
 
     // DB operations
     // overwrite virtual Item::SaveToDB
     void SaveToDB(CharacterDatabaseTransaction trans) override;
     // overwrite virtual Item::LoadFromDB
-    bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry) override;
+    auto LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry) -> bool override;
     // overwrite virtual Item::DeleteFromDB
     void DeleteFromDB(CharacterDatabaseTransaction trans) override;
 
@@ -63,7 +63,7 @@ protected:
     Item* m_bagslot[MAX_BAG_SIZE];
 };
 
-inline Item* NewItemOrBag(ItemTemplate const* proto)
+inline auto NewItemOrBag(ItemTemplate const* proto) -> Item*
 {
     return (proto->InventoryType == INVTYPE_BAG) ? new Bag : new Item;
 }

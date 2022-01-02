@@ -33,18 +33,18 @@ namespace Movement
     using G3D::Vector3;
     using G3D::Vector4;
 
-    inline uint32 SecToMS(float sec)
+    inline auto SecToMS(float sec) -> uint32
     {
         return static_cast<uint32>(sec * 1000.f);
     }
 
-    inline float MSToSec(uint32 ms)
+    inline auto MSToSec(uint32 ms) -> float
     {
         return ms / 1000.f;
     }
 
-    float computeFallTime(float path_length, bool isSafeFall);
-    float computeFallElevation(float t_passed, bool isSafeFall, float start_velocity = 0.0f);
+    auto computeFallTime(float path_length, bool isSafeFall) -> float;
+    auto computeFallElevation(float t_passed, bool isSafeFall, float start_velocity = 0.0f) -> float;
 
     template<class T, T limit>
     class counter
@@ -60,8 +60,8 @@ namespace Movement
                 ++m_counter;
         }
 
-        T NewId() { Increase(); return m_counter; }
-        T getCurrent() const { return m_counter; }
+        auto NewId() -> T { Increase(); return m_counter; }
+        auto getCurrent() const -> T { return m_counter; }
 
     private:
         void init() { m_counter = 0; }

@@ -27,7 +27,7 @@ class MessageBuffer
     using size_type = std::vector<uint8>::size_type;
 
 public:
-    MessageBuffer() : _wpos(0), _rpos(0), _storage()
+    MessageBuffer() :  _storage()
     {
         _storage.resize(4096);
     }
@@ -54,9 +54,9 @@ public:
         _storage.resize(bytes);
     }
 
-    uint8* GetBasePointer() { return _storage.data(); }
-    uint8* GetReadPointer() { return GetBasePointer() + _rpos; }
-    uint8* GetWritePointer() { return GetBasePointer() + _wpos; }
+    auto GetBasePointer() -> uint8* { return _storage.data(); }
+    auto GetReadPointer() -> uint8* { return GetBasePointer() + _rpos; }
+    auto GetWritePointer() -> uint8* { return GetBasePointer() + _wpos; }
 
     void ReadCompleted(size_type bytes) { _rpos += bytes; }
     void WriteCompleted(size_type bytes) { _wpos += bytes; }
@@ -107,7 +107,7 @@ public:
         return std::move(_storage);
     }
 
-    MessageBuffer& operator=(MessageBuffer const& right)
+    auto operator=(MessageBuffer const& right) -> MessageBuffer&
     {
         if (this != &right)
         {
@@ -119,7 +119,7 @@ public:
         return *this;
     }
 
-    MessageBuffer& operator=(MessageBuffer&& right) noexcept
+    auto operator=(MessageBuffer&& right) noexcept -> MessageBuffer&
     {
         if (this != &right)
         {
@@ -132,8 +132,8 @@ public:
     }
 
 private:
-    size_type _wpos;
-    size_type _rpos;
+    size_type _wpos{0};
+    size_type _rpos{0};
     std::vector<uint8> _storage;
 };
 

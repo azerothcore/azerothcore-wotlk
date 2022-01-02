@@ -29,15 +29,15 @@ public:
     RefMgr() = default;
     virtual ~RefMgr() { clearReferences(); }
 
-    Reference<TO, FROM>* getFirst() { return ((Reference<TO, FROM>*) LinkedListHead::getFirst()); }
-    [[nodiscard]] Reference<TO, FROM> const* getFirst() const { return ((Reference<TO, FROM> const*) LinkedListHead::getFirst()); }
-    Reference<TO, FROM>* getLast() { return ((Reference<TO, FROM>*) LinkedListHead::getLast()); }
-    [[nodiscard]] Reference<TO, FROM> const* getLast() const { return ((Reference<TO, FROM> const*) LinkedListHead::getLast()); }
+    auto getFirst() -> Reference<TO, FROM>* { return ((Reference<TO, FROM>*) LinkedListHead::getFirst()); }
+    [[nodiscard]] auto getFirst() const -> Reference<TO, FROM> const* { return ((Reference<TO, FROM> const*) LinkedListHead::getFirst()); }
+    auto getLast() -> Reference<TO, FROM>* { return ((Reference<TO, FROM>*) LinkedListHead::getLast()); }
+    [[nodiscard]] auto getLast() const -> Reference<TO, FROM> const* { return ((Reference<TO, FROM> const*) LinkedListHead::getLast()); }
 
-    iterator begin() { return iterator(getFirst()); }
-    iterator end() { return iterator(nullptr); }
-    iterator rbegin() { return iterator(getLast()); }
-    iterator rend() { return iterator(nullptr); }
+    auto begin() -> iterator { return iterator(getFirst()); }
+    auto end() -> iterator { return iterator(nullptr); }
+    auto rbegin() -> iterator { return iterator(getLast()); }
+    auto rend() -> iterator { return iterator(nullptr); }
 
     void clearReferences()
     {

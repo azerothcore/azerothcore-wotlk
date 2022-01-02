@@ -467,7 +467,7 @@ public:
         auras[petEntry] = aura;
     }
 
-    [[nodiscard]] uint32 GetAura(uint32 petEntry) const
+    [[nodiscard]] auto GetAura(uint32 petEntry) const -> uint32
     {
         PetAuraMap::const_iterator itr = auras.find(petEntry);
         if (itr != auras.end())
@@ -483,12 +483,12 @@ public:
         auras[petEntry] = aura;
     }
 
-    [[nodiscard]] bool IsRemovedOnChangePet() const
+    [[nodiscard]] auto IsRemovedOnChangePet() const -> bool
     {
         return removeOnChangePet;
     }
 
-    [[nodiscard]] int32 GetDamage() const
+    [[nodiscard]] auto GetDamage() const -> int32
     {
         return damage;
     }
@@ -521,7 +521,7 @@ struct SpellArea
     bool autocast;                                          // if true then auto applied at area enter, in other case just allowed to cast
 
     // helpers
-    bool IsFitToRequirements(Player const* player, uint32 newZone, uint32 newArea) const;
+    auto IsFitToRequirements(Player const* player, uint32 newZone, uint32 newArea) const -> bool;
 };
 
 typedef std::multimap<uint32, SpellArea> SpellAreaMap;
@@ -587,26 +587,26 @@ typedef std::vector<SpellInfo*> SpellInfoMap;
 
 typedef std::map<int32, std::vector<int32> > SpellLinkedMap;
 
-bool IsPrimaryProfessionSkill(uint32 skill);
+auto IsPrimaryProfessionSkill(uint32 skill) -> bool;
 
-inline bool IsProfessionSkill(uint32 skill)
+inline auto IsProfessionSkill(uint32 skill) -> bool
 {
     return  IsPrimaryProfessionSkill(skill) || skill == SKILL_FISHING || skill == SKILL_COOKING || skill == SKILL_FIRST_AID;
 }
 
-inline bool IsProfessionOrRidingSkill(uint32 skill)
+inline auto IsProfessionOrRidingSkill(uint32 skill) -> bool
 {
     return  IsProfessionSkill(skill) || skill == SKILL_RIDING;
 }
 
-bool IsPartOfSkillLine(uint32 skillId, uint32 spellId);
+auto IsPartOfSkillLine(uint32 skillId, uint32 spellId) -> bool;
 
 // spell diminishing returns
-DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto, bool triggered);
-DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
-DiminishingLevels GetDiminishingReturnsMaxLevel(DiminishingGroup group);
-int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const* spellproto);
-bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group);
+auto GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto, bool triggered) -> DiminishingGroup;
+auto GetDiminishingReturnsGroupType(DiminishingGroup group) -> DiminishingReturnsType;
+auto GetDiminishingReturnsMaxLevel(DiminishingGroup group) -> DiminishingLevels;
+auto GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const* spellproto) -> int32;
+auto IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group) -> bool;
 
 typedef std::set<uint32> TalentAdditionalSet;
 
@@ -619,87 +619,87 @@ private:
 
     // Accessors (const or static functions)
 public:
-    static SpellMgr* instance();
+    static auto instance() -> SpellMgr*;
 
     // Spell correctness for client using
-    static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
-    static bool IsSpellValid(SpellInfo const* spellInfo);
-    static bool CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool isTalent);
+    static auto ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true) -> bool;
+    static auto IsSpellValid(SpellInfo const* spellInfo) -> bool;
+    static auto CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool isTalent) -> bool;
 
     // Spell difficulty
-    [[nodiscard]] uint32 GetSpellDifficultyId(uint32 spellId) const;
+    [[nodiscard]] auto GetSpellDifficultyId(uint32 spellId) const -> uint32;
     void SetSpellDifficultyId(uint32 spellId, uint32 id);
-    uint32 GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) const;
-    SpellInfo const* GetSpellForDifficultyFromSpell(SpellInfo const* spell, Unit const* caster) const;
+    auto GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) const -> uint32;
+    auto GetSpellForDifficultyFromSpell(SpellInfo const* spell, Unit const* caster) const -> SpellInfo const*;
 
     // Spell Ranks table
-    [[nodiscard]] SpellChainNode const* GetSpellChainNode(uint32 spell_id) const;
-    [[nodiscard]] uint32 GetFirstSpellInChain(uint32 spell_id) const;
-    [[nodiscard]] uint32 GetLastSpellInChain(uint32 spell_id) const;
-    [[nodiscard]] uint32 GetNextSpellInChain(uint32 spell_id) const;
-    [[nodiscard]] uint32 GetPrevSpellInChain(uint32 spell_id) const;
-    [[nodiscard]] uint8 GetSpellRank(uint32 spell_id) const;
+    [[nodiscard]] auto GetSpellChainNode(uint32 spell_id) const -> SpellChainNode const*;
+    [[nodiscard]] auto GetFirstSpellInChain(uint32 spell_id) const -> uint32;
+    [[nodiscard]] auto GetLastSpellInChain(uint32 spell_id) const -> uint32;
+    [[nodiscard]] auto GetNextSpellInChain(uint32 spell_id) const -> uint32;
+    [[nodiscard]] auto GetPrevSpellInChain(uint32 spell_id) const -> uint32;
+    [[nodiscard]] auto GetSpellRank(uint32 spell_id) const -> uint8;
     // not strict check returns provided spell if rank not avalible
-    [[nodiscard]] uint32 GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict = false) const;
+    [[nodiscard]] auto GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict = false) const -> uint32;
 
     // Spell Required table
-    [[nodiscard]] SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
-    [[nodiscard]] SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
-    [[nodiscard]] bool IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const;
+    [[nodiscard]] auto GetSpellsRequiredForSpellBounds(uint32 spell_id) const -> SpellRequiredMapBounds;
+    [[nodiscard]] auto GetSpellsRequiringSpellBounds(uint32 spell_id) const -> SpellsRequiringSpellMapBounds;
+    [[nodiscard]] auto IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const -> bool;
 
     // Spell learning
-    [[nodiscard]] SpellLearnSkillNode const* GetSpellLearnSkill(uint32 spell_id) const;
+    [[nodiscard]] auto GetSpellLearnSkill(uint32 spell_id) const -> SpellLearnSkillNode const*;
 
     // Spell target coordinates
-    [[nodiscard]] SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
+    [[nodiscard]] auto GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const -> SpellTargetPosition const*;
 
     // Spell Groups
-    [[nodiscard]] uint32 GetSpellGroup(uint32 spellid) const;
-    [[nodiscard]] SpellGroupSpecialFlags GetSpellGroupSpecialFlags(uint32 spell_id) const;
-    [[nodiscard]] SpellGroupStackFlags GetGroupStackFlags(uint32 groupid) const;
-    SpellGroupStackFlags CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const;
+    [[nodiscard]] auto GetSpellGroup(uint32 spellid) const -> uint32;
+    [[nodiscard]] auto GetSpellGroupSpecialFlags(uint32 spell_id) const -> SpellGroupSpecialFlags;
+    [[nodiscard]] auto GetGroupStackFlags(uint32 groupid) const -> SpellGroupStackFlags;
+    auto CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const -> SpellGroupStackFlags;
     void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
 
     // Spell proc event table
-    [[nodiscard]] SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
-    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const;
+    [[nodiscard]] auto GetSpellProcEvent(uint32 spellId) const -> SpellProcEventEntry const*;
+    auto IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const -> bool;
 
     // Spell proc table
-    [[nodiscard]] SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
-    bool CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
+    [[nodiscard]] auto GetSpellProcEntry(uint32 spellId) const -> SpellProcEntry const*;
+    auto CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const -> bool;
 
     // Spell bonus data table
-    [[nodiscard]] SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const;
+    [[nodiscard]] auto GetSpellBonusData(uint32 spellId) const -> SpellBonusEntry const*;
 
     // Spell threat table
-    [[nodiscard]] SpellThreatEntry const* GetSpellThreatEntry(uint32 spellID) const;
+    [[nodiscard]] auto GetSpellThreatEntry(uint32 spellID) const -> SpellThreatEntry const*;
 
     // Spell mixology table
-    [[nodiscard]] float GetSpellMixologyBonus(uint32 spellId) const;
+    [[nodiscard]] auto GetSpellMixologyBonus(uint32 spellId) const -> float;
 
-    [[nodiscard]] SkillLineAbilityMapBounds GetSkillLineAbilityMapBounds(uint32 spell_id) const;
+    [[nodiscard]] auto GetSkillLineAbilityMapBounds(uint32 spell_id) const -> SkillLineAbilityMapBounds;
 
-    [[nodiscard]] PetAura const* GetPetAura(uint32 spell_id, uint8 eff) const;
+    [[nodiscard]] auto GetPetAura(uint32 spell_id, uint8 eff) const -> PetAura const*;
 
-    [[nodiscard]] SpellEnchantProcEntry const* GetSpellEnchantProcEvent(uint32 enchId) const;
-    [[nodiscard]] bool IsArenaAllowedEnchancment(uint32 ench_id) const;
+    [[nodiscard]] auto GetSpellEnchantProcEvent(uint32 enchId) const -> SpellEnchantProcEntry const*;
+    [[nodiscard]] auto IsArenaAllowedEnchancment(uint32 ench_id) const -> bool;
 
-    [[nodiscard]] const std::vector<int32>* GetSpellLinked(int32 spell_id) const;
+    [[nodiscard]] auto GetSpellLinked(int32 spell_id) const -> const std::vector<int32>*;
 
-    [[nodiscard]] PetLevelupSpellSet const* GetPetLevelupSpellList(uint32 petFamily) const;
-    [[nodiscard]] PetDefaultSpellsEntry const* GetPetDefaultSpellsEntry(int32 id) const;
+    [[nodiscard]] auto GetPetLevelupSpellList(uint32 petFamily) const -> PetLevelupSpellSet const*;
+    [[nodiscard]] auto GetPetDefaultSpellsEntry(int32 id) const -> PetDefaultSpellsEntry const*;
 
     // Spell area
-    [[nodiscard]] SpellAreaMapBounds GetSpellAreaMapBounds(uint32 spell_id) const;
-    [[nodiscard]] SpellAreaForQuestMapBounds GetSpellAreaForQuestMapBounds(uint32 quest_id) const;
-    [[nodiscard]] SpellAreaForQuestMapBounds GetSpellAreaForQuestEndMapBounds(uint32 quest_id) const;
-    [[nodiscard]] SpellAreaForAuraMapBounds GetSpellAreaForAuraMapBounds(uint32 spell_id) const;
-    [[nodiscard]] SpellAreaForAreaMapBounds GetSpellAreaForAreaMapBounds(uint32 area_id) const;
+    [[nodiscard]] auto GetSpellAreaMapBounds(uint32 spell_id) const -> SpellAreaMapBounds;
+    [[nodiscard]] auto GetSpellAreaForQuestMapBounds(uint32 quest_id) const -> SpellAreaForQuestMapBounds;
+    [[nodiscard]] auto GetSpellAreaForQuestEndMapBounds(uint32 quest_id) const -> SpellAreaForQuestMapBounds;
+    [[nodiscard]] auto GetSpellAreaForAuraMapBounds(uint32 spell_id) const -> SpellAreaForAuraMapBounds;
+    [[nodiscard]] auto GetSpellAreaForAreaMapBounds(uint32 area_id) const -> SpellAreaForAreaMapBounds;
 
     // SpellInfo object management
-    [[nodiscard]] SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
+    [[nodiscard]] auto GetSpellInfo(uint32 spellId) const -> SpellInfo const* { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
     // Use this only with 100% valid spellIds
-    SpellInfo const* AssertSpellInfo(uint32 spellId) const
+    [[nodiscard]] auto AssertSpellInfo(uint32 spellId) const -> SpellInfo const*
     {
         ASSERT(spellId < GetSpellInfoStoreSize());
         SpellInfo const* spellInfo = mSpellInfoMap[spellId];
@@ -707,7 +707,7 @@ public:
         return spellInfo;
     }
     // use this instead of AssertSpellInfo to have the problem logged instead of crashing the server
-    SpellInfo const* CheckSpellInfo(uint32 spellId) const
+    [[nodiscard]] auto CheckSpellInfo(uint32 spellId) const -> SpellInfo const*
     {
         if (spellId >= GetSpellInfoStoreSize())
         {
@@ -722,13 +722,13 @@ public:
         }
         return spellInfo;
     }
-    [[nodiscard]] uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
+    [[nodiscard]] auto GetSpellInfoStoreSize() const -> uint32 { return mSpellInfoMap.size(); }
 
     // Talent Additional Set
-    [[nodiscard]] bool IsAdditionalTalentSpell(uint32 spellId) const;
+    [[nodiscard]] auto IsAdditionalTalentSpell(uint32 spellId) const -> bool;
 
 private:
-    SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
+    auto _GetSpellInfo(uint32 spellId) -> SpellInfo* { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
     // Modifiers
 public:

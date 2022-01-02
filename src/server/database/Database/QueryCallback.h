@@ -32,24 +32,24 @@ public:
     explicit QueryCallback(QueryResultFuture&& result);
     explicit QueryCallback(PreparedQueryResultFuture&& result);
     QueryCallback(QueryCallback&& right);
-    QueryCallback& operator=(QueryCallback&& right);
+    auto operator=(QueryCallback&& right) -> QueryCallback&;
     ~QueryCallback();
 
-    QueryCallback&& WithCallback(std::function<void(QueryResult)>&& callback);
-    QueryCallback&& WithPreparedCallback(std::function<void(PreparedQueryResult)>&& callback);
+    auto WithCallback(std::function<void(QueryResult)>&& callback) -> QueryCallback&&;
+    auto WithPreparedCallback(std::function<void(PreparedQueryResult)>&& callback) -> QueryCallback&&;
 
-    QueryCallback&& WithChainingCallback(std::function<void(QueryCallback&, QueryResult)>&& callback);
-    QueryCallback&& WithChainingPreparedCallback(std::function<void(QueryCallback&, PreparedQueryResult)>&& callback);
+    auto WithChainingCallback(std::function<void(QueryCallback&, QueryResult)>&& callback) -> QueryCallback&&;
+    auto WithChainingPreparedCallback(std::function<void(QueryCallback&, PreparedQueryResult)>&& callback) -> QueryCallback&&;
 
     // Moves std::future from next to this object
     void SetNextQuery(QueryCallback&& next);
 
     // returns true when completed
-    bool InvokeIfReady();
+    auto InvokeIfReady() -> bool;
 
 private:
     QueryCallback(QueryCallback const& right) = delete;
-    QueryCallback& operator=(QueryCallback const& right) = delete;
+    auto operator=(QueryCallback const& right) -> QueryCallback& = delete;
 
     template<typename T> friend void ConstructActiveMember(T* obj);
     template<typename T> friend void DestroyActiveMember(T* obj);

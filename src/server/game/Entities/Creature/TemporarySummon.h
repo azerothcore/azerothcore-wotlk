@@ -48,13 +48,13 @@ public:
     void RemoveFromWorld() override;
     void SetTempSummonType(TempSummonType type);
     void SaveToDB(uint32 /*mapid*/, uint8 /*spawnMask*/, uint32 /*phaseMask*/) override {}
-    [[nodiscard]] WorldObject* GetSummoner() const;
-    [[nodiscard]] Unit* GetSummonerUnit() const;
-    [[nodiscard]] Creature* GetSummonerCreatureBase() const;
-    [[nodiscard]] GameObject* GetSummonerGameObject() const;
-    ObjectGuid GetSummonerGUID() { return m_summonerGUID; }
-    TempSummonType const& GetSummonType() { return m_type; }
-    uint32 GetTimer() { return m_timer; }
+    [[nodiscard]] auto GetSummoner() const -> WorldObject*;
+    [[nodiscard]] auto GetSummonerUnit() const -> Unit*;
+    [[nodiscard]] auto GetSummonerCreatureBase() const -> Creature*;
+    [[nodiscard]] auto GetSummonerGameObject() const -> GameObject*;
+    auto GetSummonerGUID() -> ObjectGuid { return m_summonerGUID; }
+    auto GetSummonType() -> TempSummonType const& { return m_type; }
+    auto GetTimer() -> uint32 { return m_timer; }
     void SetTimer(uint32 t) { m_timer = t; }
 
     const SummonPropertiesEntry* const m_Properties;
@@ -71,11 +71,11 @@ public:
     Minion(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
     void InitStats(uint32 duration) override;
     void RemoveFromWorld() override;
-    [[nodiscard]] Unit* GetOwner() const;
-    [[nodiscard]] float GetFollowAngle() const override { return m_followAngle; }
+    [[nodiscard]] auto GetOwner() const -> Unit*;
+    [[nodiscard]] auto GetFollowAngle() const -> float override { return m_followAngle; }
     void SetFollowAngle(float angle) { m_followAngle = angle; }
-    [[nodiscard]] bool IsPetGhoul() const {return GetEntry() == 26125 /*normal ghoul*/ || GetEntry() == 30230 /*Raise Ally ghoul*/;} // Ghoul may be guardian or pet
-    [[nodiscard]] bool IsGuardianPet() const;
+    [[nodiscard]] auto IsPetGhoul() const -> bool {return GetEntry() == 26125 /*normal ghoul*/ || GetEntry() == 30230 /*Raise Ally ghoul*/;} // Ghoul may be guardian or pet
+    [[nodiscard]] auto IsGuardianPet() const -> bool;
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 protected:
     const ObjectGuid m_owner;
@@ -87,11 +87,11 @@ class Guardian : public Minion
 public:
     Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
     void InitStats(uint32 duration) override;
-    bool InitStatsForLevel(uint8 level);
+    auto InitStatsForLevel(uint8 level) -> bool;
     void InitSummon() override;
 
-    bool UpdateStats(Stats stat) override;
-    bool UpdateAllStats() override;
+    auto UpdateStats(Stats stat) -> bool override;
+    auto UpdateAllStats() -> bool override;
     void UpdateArmor() override;
     void UpdateMaxHealth() override;
     void UpdateMaxPower(Powers power) override;
@@ -108,7 +108,7 @@ public:
     void Update(uint32 time) override;
     void RemoveFromWorld() override;
 protected:
-    [[nodiscard]] Player* GetOwner() const;
+    [[nodiscard]] auto GetOwner() const -> Player*;
     const ObjectGuid m_owner;
 };
 
@@ -116,7 +116,7 @@ class ForcedUnsummonDelayEvent : public BasicEvent
 {
 public:
     ForcedUnsummonDelayEvent(TempSummon& owner) : BasicEvent(), m_owner(owner) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
+    auto Execute(uint64 e_time, uint32 p_time) -> bool override;
 
 private:
     TempSummon& m_owner;

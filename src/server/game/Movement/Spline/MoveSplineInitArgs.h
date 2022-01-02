@@ -61,10 +61,10 @@ namespace Movement
         bool TransformForTransport{true};
 
         /** Returns true to show that the arguments were configured correctly and MoveSpline initialization will succeed. */
-        bool Validate(Unit* unit) const;
+        auto Validate(Unit* unit) const -> bool;
 
     private:
-        [[nodiscard]] bool _checkPathBounds() const;
+        [[nodiscard]] auto _checkPathBounds() const -> bool;
     };
 }
 

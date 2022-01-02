@@ -29,7 +29,7 @@ DBCStorageBase::~DBCStorageBase()
         delete[] strings;
 }
 
-bool DBCStorageBase::Load(char const* path, char**& indexTable)
+auto DBCStorageBase::Load(char const* path, char**& indexTable) -> bool
 {
     indexTable = nullptr;
 
@@ -52,7 +52,7 @@ bool DBCStorageBase::Load(char const* path, char**& indexTable)
     return indexTable != nullptr;
 }
 
-bool DBCStorageBase::LoadStringsFrom(char const* path, char** indexTable)
+auto DBCStorageBase::LoadStringsFrom(char const* path, char** indexTable) -> bool
 {
     // DBC must be already loaded using Load
     if (!indexTable)

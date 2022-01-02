@@ -56,8 +56,8 @@ public:
     void AddOutOfRangeGUID(ObjectGuid guid);
     void AddUpdateBlock(const ByteBuffer& block);
     void AddUpdateBlock(const UpdateData& block);
-    bool BuildPacket(WorldPacket* packet);
-    [[nodiscard]] bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
+    auto BuildPacket(WorldPacket* packet) -> bool;
+    [[nodiscard]] auto HasData() const -> bool { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
     void Clear();
 
 protected:

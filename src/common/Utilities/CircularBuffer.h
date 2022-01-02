@@ -40,24 +40,24 @@ public:
         full_ = head_ == tail_;
     }
 
-    bool empty() const
+    [[nodiscard]] auto empty() const -> bool
     {
         //if head and tail are equal, we are empty
         return (!full_ && (head_ == tail_));
     }
 
-    bool full() const
+    [[nodiscard]] auto full() const -> bool
     {
         //If tail is ahead the head by 1, we are full
         return full_;
     }
 
-    size_t capacity() const
+    [[nodiscard]] auto capacity() const -> size_t
     {
         return max_size_;
     }
 
-    size_t size() const
+    [[nodiscard]] auto size() const -> size_t
     {
         size_t size = max_size_;
 
@@ -78,14 +78,14 @@ public:
 
     // the implementation of this function is simplified by the fact that head_ will never be lower than tail_
     // when compared to the original implementation of this class
-    std::vector<T> content()
+    auto content() -> std::vector<T>
     {
         std::lock_guard<std::mutex> lock(mutex_);
 
         return std::vector<T>(buf_.get(), buf_.get() + size());
     }
 
-    T peak_back()
+    auto peak_back() -> T
     {
         std::lock_guard<std::mutex> lock(mutex_);
 
@@ -98,6 +98,6 @@ private:
     size_t head_ = 0;
     size_t tail_ = 0;
     const size_t max_size_;
-    bool full_ = 0;
+    bool full_ = false;
 };
 #endif

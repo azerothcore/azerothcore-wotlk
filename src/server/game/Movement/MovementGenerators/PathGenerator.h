@@ -64,16 +64,16 @@ class PathGenerator
 
         // Calculate the path from owner to given destination
         // return: true if new path was calculated, false otherwise (no change needed)
-        bool CalculatePath(float destX, float destY, float destZ, bool forceDest = false);
-        bool CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest);
-        [[nodiscard]] bool IsInvalidDestinationZ(Unit const* target) const;
-        [[nodiscard]] bool IsWalkableClimb(float const* v1, float const* v2) const;
-        [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
-        [[nodiscard]] static bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
-        [[nodiscard]] bool IsWaterPath(Movement::PointsArray pathPoints) const;
-        [[nodiscard]] bool IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim = true) const;
-        [[nodiscard]] bool IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim = true) const;
-        [[nodiscard]] static float GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
+        auto CalculatePath(float destX, float destY, float destZ, bool forceDest = false) -> bool;
+        auto CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest) -> bool;
+        [[nodiscard]] auto IsInvalidDestinationZ(Unit const* target) const -> bool;
+        [[nodiscard]] auto IsWalkableClimb(float const* v1, float const* v2) const -> bool;
+        [[nodiscard]] auto IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const -> bool;
+        [[nodiscard]] static auto IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) -> bool;
+        [[nodiscard]] auto IsWaterPath(Movement::PointsArray pathPoints) const -> bool;
+        [[nodiscard]] auto IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim = true) const -> bool;
+        [[nodiscard]] auto IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim = true) const -> bool;
+        [[nodiscard]] static auto GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) -> float;
 
         // option setters - use optional
 
@@ -84,18 +84,18 @@ class PathGenerator
         void SetUseRaycast(bool useRaycast) { _useRaycast = useRaycast; }
 
         // result getters
-        G3D::Vector3 const& GetStartPosition() const { return _startPosition; }
-        G3D::Vector3 const& GetEndPosition() const { return _endPosition; }
-        G3D::Vector3 const& GetActualEndPosition() const { return _actualEndPosition; }
+        [[nodiscard]] auto GetStartPosition() const -> G3D::Vector3 const& { return _startPosition; }
+        [[nodiscard]] auto GetEndPosition() const -> G3D::Vector3 const& { return _endPosition; }
+        [[nodiscard]] auto GetActualEndPosition() const -> G3D::Vector3 const& { return _actualEndPosition; }
 
-        Movement::PointsArray const& GetPath() const { return _pathPoints; }
+        [[nodiscard]] auto GetPath() const -> Movement::PointsArray const& { return _pathPoints; }
 
-        PathType GetPathType() const { return _type; }
+        [[nodiscard]] auto GetPathType() const -> PathType { return _type; }
 
         // shortens the path until the destination is the specified distance from the target point
         void ShortenPathUntilDist(G3D::Vector3 const& point, float dist);
 
-        float getPathLength() const
+        [[nodiscard]] auto getPathLength() const -> float
         {
             float len = 0.0f;
             float dx, dy, dz;
@@ -156,29 +156,29 @@ class PathGenerator
         void SetActualEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; }
         void NormalizePath();
 
-        bool InRange(G3D::Vector3 const& p1, G3D::Vector3 const& p2, float r, float h) const;
-        float Dist3DSqr(G3D::Vector3 const& p1, G3D::Vector3 const& p2) const;
-        bool InRangeYZX(float const* v1, float const* v2, float r, float h) const;
+        [[nodiscard]] auto InRange(G3D::Vector3 const& p1, G3D::Vector3 const& p2, float r, float h) const -> bool;
+        [[nodiscard]] auto Dist3DSqr(G3D::Vector3 const& p1, G3D::Vector3 const& p2) const -> float;
+        auto InRangeYZX(float const* v1, float const* v2, float r, float h) const -> bool;
 
-        dtPolyRef GetPathPolyByPosition(dtPolyRef const* polyPath, uint32 polyPathSize, float const* Point, float* Distance = nullptr) const;
-        dtPolyRef GetPolyByLocation(float const* Point, float* Distance) const;
-        bool HaveTile(G3D::Vector3 const& p) const;
+        auto GetPathPolyByPosition(dtPolyRef const* polyPath, uint32 polyPathSize, float const* Point, float* Distance = nullptr) const -> dtPolyRef;
+        auto GetPolyByLocation(float const* Point, float* Distance) const -> dtPolyRef;
+        [[nodiscard]] auto HaveTile(G3D::Vector3 const& p) const -> bool;
 
         void BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos);
         void BuildPointPath(float const* startPoint, float const* endPoint);
         void BuildShortcut();
 
-        NavTerrain GetNavTerrain(float x, float y, float z) const;
+        [[nodiscard]] auto GetNavTerrain(float x, float y, float z) const -> NavTerrain;
         void CreateFilter();
         void UpdateFilter();
 
         // smooth path aux functions
-        uint32 FixupCorridor(dtPolyRef* path, uint32 npath, uint32 maxPath, dtPolyRef const* visited, uint32 nvisited);
-        bool GetSteerTarget(float const* startPos, float const* endPos, float minTargetDist, dtPolyRef const* path, uint32 pathSize, float* steerPos,
-                            unsigned char& steerPosFlag, dtPolyRef& steerPosRef);
-        dtStatus FindSmoothPath(float const* startPos, float const* endPos,
+        auto FixupCorridor(dtPolyRef* path, uint32 npath, uint32 maxPath, dtPolyRef const* visited, uint32 nvisited) -> uint32;
+        auto GetSteerTarget(float const* startPos, float const* endPos, float minTargetDist, dtPolyRef const* path, uint32 pathSize, float* steerPos,
+                            unsigned char& steerPosFlag, dtPolyRef& steerPosRef) -> bool;
+        auto FindSmoothPath(float const* startPos, float const* endPos,
                               dtPolyRef const* polyPath, uint32 polyPathSize,
-                              float* smoothPath, int* smoothPathSize, uint32 smoothPathMaxSize);
+                              float* smoothPath, int* smoothPathSize, uint32 smoothPathMaxSize) -> dtStatus;
 
         void AddFarFromPolyFlags(bool startFarFromPoly, bool endFarFromPoly);
 };

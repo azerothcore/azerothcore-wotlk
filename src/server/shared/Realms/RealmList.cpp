@@ -24,10 +24,10 @@
 #include "Util.h"
 #include <boost/asio/ip/tcp.hpp>
 
-RealmList::RealmList() :
-    _updateInterval(0) { }
+RealmList::RealmList() 
+    = default;
 
-RealmList* RealmList::Instance()
+auto RealmList::Instance() -> RealmList*
 {
     static RealmList instance;
     return &instance;
@@ -231,11 +231,11 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
     if (_updateInterval)
     {
         _updateTimer->expires_from_now(boost::posix_time::seconds(_updateInterval));
-        _updateTimer->async_wait(std::bind(&RealmList::UpdateRealms, this, std::placeholders::_1));
+        _updateTimer->async_wait([this](auto && PH1) { UpdateRealms(std::forward<decltype(PH1)>(PH1)); });
     }
 }
 
-Realm const* RealmList::GetRealm(RealmHandle const& id) const
+auto RealmList::GetRealm(RealmHandle const& id) const -> Realm const*
 {
     auto itr = _realms.find(id);
     if (itr != _realms.end())
@@ -246,7 +246,7 @@ Realm const* RealmList::GetRealm(RealmHandle const& id) const
     return nullptr;
 }
 
-RealmBuildInfo const* RealmList::GetBuildInfo(uint32 build) const
+auto RealmList::GetBuildInfo(uint32 build) const -> RealmBuildInfo const*
 {
     for (RealmBuildInfo const& clientBuild : _builds)
     {

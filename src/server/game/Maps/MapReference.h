@@ -41,11 +41,11 @@ protected:
         getTarget()->m_mapRefMgr.decSize();
     }
 public:
-    MapReference() : Reference<Map, Player>() {}
+    MapReference() : Reference<Map, Player>() = default;
     ~MapReference() override { unlink(); }
-    MapReference* next() { return (MapReference*)Reference<Map, Player>::next(); }
-    [[nodiscard]] MapReference const* next() const { return (MapReference const*)Reference<Map, Player>::next(); }
-    MapReference* nockeck_prev() { return (MapReference*)Reference<Map, Player>::nocheck_prev(); }
-    [[nodiscard]] MapReference const* nocheck_prev() const { return (MapReference const*)Reference<Map, Player>::nocheck_prev(); }
+    auto next() -> MapReference* { return (MapReference*)Reference<Map, Player>::next(); }
+    [[nodiscard]] auto next() const -> MapReference const* { return (MapReference const*)Reference<Map, Player>::next(); }
+    auto nockeck_prev() -> MapReference* { return (MapReference*)Reference<Map, Player>::nocheck_prev(); }
+    [[nodiscard]] auto nocheck_prev() const -> MapReference const* { return (MapReference const*)Reference<Map, Player>::nocheck_prev(); }
 };
 #endif

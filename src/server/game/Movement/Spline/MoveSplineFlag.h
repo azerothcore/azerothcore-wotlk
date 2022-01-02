@@ -73,8 +73,8 @@ namespace Movement
             Mask_Unused         = No_Spline | Enter_Cycle | Frozen | Unknown7 | Unknown8 | Unknown10 | Unknown11 | Unknown12 | Unknown13
         };
 
-        inline uint32& raw() { return (uint32&) * this; }
-        [[nodiscard]] inline const uint32& raw() const { return (const uint32&) * this; }
+        inline auto raw() -> uint32& { return (uint32&) * this; }
+        [[nodiscard]] inline auto raw() const -> const uint32& { return (const uint32&) * this; }
 
         MoveSplineFlag() { raw() = 0; }
         MoveSplineFlag(uint32 f) { raw() = f; }
@@ -82,22 +82,22 @@ namespace Movement
         /* requried as of C++ 11 */
 #if __cplusplus >= 201103L
         MoveSplineFlag(MoveSplineFlag&&) = default;
-        MoveSplineFlag& operator=(const MoveSplineFlag&) = default;
-        MoveSplineFlag& operator=(MoveSplineFlag&&) = default;
+        auto operator=(const MoveSplineFlag&) -> MoveSplineFlag& = default;
+        auto operator=(MoveSplineFlag&&) -> MoveSplineFlag& = default;
 #endif
 
         // Constant interface
 
-        [[nodiscard]] bool isSmooth() const { return raw() & Mask_CatmullRom; }
-        [[nodiscard]] bool isLinear() const { return !isSmooth(); }
-        [[nodiscard]] bool isFacing() const { return raw() & Mask_Final_Facing; }
+        [[nodiscard]] auto isSmooth() const -> bool { return raw() & Mask_CatmullRom; }
+        [[nodiscard]] auto isLinear() const -> bool { return !isSmooth(); }
+        [[nodiscard]] auto isFacing() const -> bool { return raw() & Mask_Final_Facing; }
 
-        [[nodiscard]] uint8 getAnimationId() const { return animId; }
-        [[nodiscard]] bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
-        [[nodiscard]] bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
-        uint32 operator & (uint32 f) const { return (raw() & f); }
-        uint32 operator | (uint32 f) const { return (raw() | f); }
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] auto getAnimationId() const -> uint8 { return animId; }
+        [[nodiscard]] auto hasAllFlags(uint32 f) const -> bool { return (raw() & f) == f; }
+        [[nodiscard]] auto hasFlag(uint32 f) const -> bool { return (raw() & f) != 0; }
+        auto operator & (uint32 f) const -> uint32 { return (raw() & f); }
+        auto operator | (uint32 f) const -> uint32 { return (raw() | f); }
+        [[nodiscard]] auto ToString() const -> std::string;
 
         // Not constant interface
 

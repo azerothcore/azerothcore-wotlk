@@ -54,28 +54,28 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
-    bool Create(ObjectGuid::LowType guidlow);
-    bool Create(ObjectGuid::LowType guidlow, Player* owner);
+    auto Create(ObjectGuid::LowType guidlow) -> bool;
+    auto Create(ObjectGuid::LowType guidlow, Player* owner) -> bool;
 
     void SaveToDB();
-    bool LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields);
+    auto LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields) -> bool;
 
     void DeleteFromDB(CharacterDatabaseTransaction trans);
     static void DeleteFromDB(ObjectGuid const ownerGuid, CharacterDatabaseTransaction trans);
 
-    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
+    [[nodiscard]] auto GetOwnerGUID() const -> ObjectGuid { return GetGuidValue(CORPSE_FIELD_OWNER); }
 
-    [[nodiscard]] time_t const& GetGhostTime() const { return m_time; }
+    [[nodiscard]] auto GetGhostTime() const -> time_t const& { return m_time; }
     void ResetGhostTime() { m_time = time(nullptr); }
-    [[nodiscard]] CorpseType GetType() const { return m_type; }
+    [[nodiscard]] auto GetType() const -> CorpseType { return m_type; }
 
-    CellCoord const& GetCellCoord() const { return _cellCoord; }
+    [[nodiscard]] auto GetCellCoord() const -> CellCoord const& { return _cellCoord; }
     void SetCellCoord(CellCoord const& cellCoord) { _cellCoord = cellCoord; }
 
     Loot loot;                                          // remove insignia ONLY at BG
     Player* lootRecipient;
 
-    [[nodiscard]] bool IsExpired(time_t t) const;
+    [[nodiscard]] auto IsExpired(time_t t) const -> bool;
 
 private:
     CorpseType m_type;

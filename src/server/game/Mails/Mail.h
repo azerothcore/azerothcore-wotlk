@@ -93,9 +93,9 @@ public:                                                 // Constructors
     MailSender(Player* sender);
     MailSender(uint32 senderEntry);
 public:                                                 // Accessors
-    [[nodiscard]] MailMessageType GetMailMessageType() const { return m_messageType; }
-    [[nodiscard]] uint32 GetSenderId() const { return m_senderId; }
-    [[nodiscard]] MailStationery GetStationery() const { return m_stationery; }
+    [[nodiscard]] auto GetMailMessageType() const -> MailMessageType { return m_messageType; }
+    [[nodiscard]] auto GetSenderId() const -> uint32 { return m_senderId; }
+    [[nodiscard]] auto GetStationery() const -> MailStationery { return m_stationery; }
 private:
     MailMessageType m_messageType;
     uint32 m_senderId;                                  // player low guid or other object entry
@@ -109,8 +109,8 @@ public:                                                 // Constructors
     MailReceiver(Player* receiver);
     MailReceiver(Player* receiver, ObjectGuid::LowType receiver_lowguid);
 public:                                                 // Accessors
-    [[nodiscard]] Player* GetPlayer() const { return m_receiver; }
-    [[nodiscard]] ObjectGuid::LowType  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
+    [[nodiscard]] auto GetPlayer() const -> Player* { return m_receiver; }
+    [[nodiscard]] auto  GetPlayerGUIDLow() const -> ObjectGuid::LowType { return m_receiver_lowguid; }
 private:
     Player* m_receiver;
     ObjectGuid::LowType  m_receiver_lowguid;
@@ -127,16 +127,16 @@ public:                                                 // Constructors
     MailDraft(std::string  subject, std::string  body)
         : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(std::move(subject)), m_body(std::move(body)), m_money(0), m_COD(0) {}
 public:                                                 // Accessors
-    [[nodiscard]] uint16 GetMailTemplateId() const { return m_mailTemplateId; }
-    [[nodiscard]] std::string const& GetSubject() const { return m_subject; }
-    [[nodiscard]] uint32 GetMoney() const { return m_money; }
-    [[nodiscard]] uint32 GetCOD() const { return m_COD; }
-    [[nodiscard]] std::string const& GetBody() const { return m_body; }
+    [[nodiscard]] auto GetMailTemplateId() const -> uint16 { return m_mailTemplateId; }
+    [[nodiscard]] auto GetSubject() const -> std::string const& { return m_subject; }
+    [[nodiscard]] auto GetMoney() const -> uint32 { return m_money; }
+    [[nodiscard]] auto GetCOD() const -> uint32 { return m_COD; }
+    [[nodiscard]] auto GetBody() const -> std::string const& { return m_body; }
 
 public:                                                 // modifiers
-    MailDraft& AddItem(Item* item);
-    MailDraft& AddMoney(uint32 money) { m_money = money; return *this; }
-    MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
+    auto AddItem(Item* item) -> MailDraft&;
+    auto AddMoney(uint32 money) -> MailDraft& { m_money = money; return *this; }
+    auto AddCOD(uint32 COD) -> MailDraft& { m_COD = COD; return *this; }
 
 public:                                                 // finishers
     void SendReturnToSender(uint32 sender_acc, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, CharacterDatabaseTransaction trans);
@@ -195,7 +195,7 @@ struct Mail
         items.push_back(mii);
     }
 
-    bool RemoveItem(ObjectGuid::LowType item_guid)
+    auto RemoveItem(ObjectGuid::LowType item_guid) -> bool
     {
         for (MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
@@ -208,11 +208,11 @@ struct Mail
         return false;
     }
 
-    [[nodiscard]] bool HasItems() const { return !items.empty(); }
-    [[nodiscard]] bool IsSentByPlayer() const { return messageType == MAIL_NORMAL; }
-    [[nodiscard]] bool IsSentByGM() const { return stationery == MAIL_STATIONERY_GM; }
-    [[nodiscard]] bool IsCODPayment() const { return checked & MAIL_CHECK_MASK_COD_PAYMENT; }
-    [[nodiscard]] bool IsReturnedMail() const { return checked & MAIL_CHECK_MASK_RETURNED; }
+    [[nodiscard]] auto HasItems() const -> bool { return !items.empty(); }
+    [[nodiscard]] auto IsSentByPlayer() const -> bool { return messageType == MAIL_NORMAL; }
+    [[nodiscard]] auto IsSentByGM() const -> bool { return stationery == MAIL_STATIONERY_GM; }
+    [[nodiscard]] auto IsCODPayment() const -> bool { return checked & MAIL_CHECK_MASK_COD_PAYMENT; }
+    [[nodiscard]] auto IsReturnedMail() const -> bool { return checked & MAIL_CHECK_MASK_RETURNED; }
 };
 
 #endif

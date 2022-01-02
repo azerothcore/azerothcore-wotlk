@@ -44,14 +44,14 @@ struct PreparedStatementData
     > data;
 
     template<typename T>
-    static std::string ToString(T value);
+    static auto ToString(T value) -> std::string;
 
-    static std::string ToString(bool value);
-    static std::string ToString(uint8 value);
-    static std::string ToString(int8 value);
-    static std::string ToString(std::string const& value);
-    static std::string ToString(std::vector<uint8> const& value);
-    static std::string ToString(std::nullptr_t);
+    static auto ToString(bool value) -> std::string;
+    static auto ToString(uint8 value) -> std::string;
+    static auto ToString(int8 value) -> std::string;
+    static auto ToString(std::string const& value) -> std::string;
+    static auto ToString(std::vector<uint8> const& value) -> std::string;
+    static auto ToString(std::nullptr_t) -> std::string;
 };
 
 //- Upper-level class that is used in code
@@ -85,8 +85,8 @@ public:
         setBinary(index, vec);
     }
 
-    uint32 GetIndex() const { return m_index; }
-    std::vector<PreparedStatementData> const& GetParameters() const { return statement_data; }
+    [[nodiscard]] auto GetIndex() const -> uint32 { return m_index; }
+    [[nodiscard]] auto GetParameters() const -> std::vector<PreparedStatementData> const& { return statement_data; }
 
 protected:
     uint32 m_index;
@@ -95,7 +95,7 @@ protected:
     std::vector<PreparedStatementData> statement_data;
 
     PreparedStatementBase(PreparedStatementBase const& right) = delete;
-    PreparedStatementBase& operator=(PreparedStatementBase const& right) = delete;
+    auto operator=(PreparedStatementBase const& right) -> PreparedStatementBase& = delete;
 };
 
 template<typename T>
@@ -108,7 +108,7 @@ public:
 
 private:
     PreparedStatement(PreparedStatement const& right) = delete;
-    PreparedStatement& operator=(PreparedStatement const& right) = delete;
+    auto operator=(PreparedStatement const& right) -> PreparedStatement& = delete;
 };
 
 //- Lower-level class, enqueuable operation
@@ -116,10 +116,10 @@ class AC_DATABASE_API PreparedStatementTask : public SQLOperation
 {
 public:
     PreparedStatementTask(PreparedStatementBase* stmt, bool async = false);
-    ~PreparedStatementTask();
+    ~PreparedStatementTask() override;
 
-    bool Execute() override;
-    PreparedQueryResultFuture GetFuture() { return m_result->get_future(); }
+    auto Execute() -> bool override;
+    auto GetFuture() -> PreparedQueryResultFuture { return m_result->get_future(); }
 
 protected:
     PreparedStatementBase* m_stmt;

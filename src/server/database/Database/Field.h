@@ -89,40 +89,40 @@ public:
     Field();
     ~Field();
 
-    bool GetBool() const // Wrapper, actually gets integer
+    [[nodiscard]] auto GetBool() const -> bool // Wrapper, actually gets integer
     {
         return GetUInt8() == 1 ? true : false;
     }
 
-    uint8 GetUInt8() const;
-    int8 GetInt8() const;
-    uint16 GetUInt16() const;
-    int16 GetInt16() const;
-    uint32 GetUInt32() const;
-    int32 GetInt32() const;
-    uint64 GetUInt64() const;
-    int64 GetInt64() const;
-    float GetFloat() const;
-    double GetDouble() const;
-    char const* GetCString() const;
-    std::string GetString() const;
-    std::string_view GetStringView() const;
-    std::vector<uint8> GetBinary() const;
+    [[nodiscard]] auto GetUInt8() const -> uint8;
+    [[nodiscard]] auto GetInt8() const -> int8;
+    [[nodiscard]] auto GetUInt16() const -> uint16;
+    [[nodiscard]] auto GetInt16() const -> int16;
+    [[nodiscard]] auto GetUInt32() const -> uint32;
+    [[nodiscard]] auto GetInt32() const -> int32;
+    [[nodiscard]] auto GetUInt64() const -> uint64;
+    [[nodiscard]] auto GetInt64() const -> int64;
+    [[nodiscard]] auto GetFloat() const -> float;
+    [[nodiscard]] auto GetDouble() const -> double;
+    [[nodiscard]] auto GetCString() const -> char const*;
+    [[nodiscard]] auto GetString() const -> std::string;
+    [[nodiscard]] auto GetStringView() const -> std::string_view;
+    [[nodiscard]] auto GetBinary() const -> std::vector<uint8>;
 
     template <size_t S>
-    std::array<uint8, S> GetBinary() const
+    auto GetBinary() const -> std::array<uint8, S>
     {
         std::array<uint8, S> buf;
         GetBinarySizeChecked(buf.data(), S);
         return buf;
     }
 
-    bool IsNull() const
+    [[nodiscard]] auto IsNull() const -> bool
     {
         return data.value == nullptr;
     }
 
-    DatabaseFieldTypes GetType() { return meta->Type; }
+    auto GetType() -> DatabaseFieldTypes { return meta->Type; }
 
 protected:
     struct
@@ -134,8 +134,8 @@ protected:
 
     void SetByteValue(char const* newValue, uint32 length);
     void SetStructuredValue(char const* newValue, uint32 length);
-    bool IsType(DatabaseFieldTypes type) const;
-    bool IsNumeric() const;
+    [[nodiscard]] auto IsType(DatabaseFieldTypes type) const -> bool;
+    [[nodiscard]] auto IsNumeric() const -> bool;
 
 private:
     QueryResultFieldMetadata const* meta;

@@ -25,9 +25,9 @@ namespace Movement
 {
     struct Location : public Vector3
     {
-        Location()  {}
+        Location()  = default;
         Location(float x, float y, float z, float o) : Vector3(x, y, z), orientation(o) {}
-        Location(const Vector3& v) : Vector3(v), orientation(0) {}
+        Location(const Vector3& v) : Vector3(v) {}
         Location(const Vector3& v, float o) : Vector3(v), orientation(o) {}
 
         float orientation{0};
@@ -71,26 +71,26 @@ namespace Movement
         void init_spline(const MoveSplineInitArgs& args);
 
     protected:
-        [[nodiscard]] const MySpline::ControlArray& getPath(bool visual) const { return spline.getPoints(visual); }
+        [[nodiscard]] auto getPath(bool visual) const -> const MySpline::ControlArray& { return spline.getPoints(visual); }
         void computeParabolicElevation(float& el) const;
         void computeFallElevation(float& el) const;
 
-        UpdateResult _updateState(int32& ms_time_diff);
-        [[nodiscard]] int32 next_timestamp() const { return spline.length(point_Idx + 1); }
-        [[nodiscard]] int32 segment_time_elapsed() const { return next_timestamp() - time_passed; }
+        auto _updateState(int32& ms_time_diff) -> UpdateResult;
+        [[nodiscard]] auto next_timestamp() const -> int32 { return spline.length(point_Idx + 1); }
+        [[nodiscard]] auto segment_time_elapsed() const -> int32 { return next_timestamp() - time_passed; }
 
     public:
-        [[nodiscard]] int32 timeElapsed() const { return Duration() - time_passed; }  // xinef: moved to public for waypoint movegen
-        [[nodiscard]] int32 timePassed() const { return time_passed; }                // xinef: moved to public for waypoint movegen
-        [[nodiscard]] int32 Duration() const { return spline.length(); }
-        [[nodiscard]] MySpline const& _Spline() const { return spline; }
-        [[nodiscard]] int32 _currentSplineIdx() const { return point_Idx; }
+        [[nodiscard]] auto timeElapsed() const -> int32 { return Duration() - time_passed; }  // xinef: moved to public for waypoint movegen
+        [[nodiscard]] auto timePassed() const -> int32 { return time_passed; }                // xinef: moved to public for waypoint movegen
+        [[nodiscard]] auto Duration() const -> int32 { return spline.length(); }
+        [[nodiscard]] auto _Spline() const -> MySpline const& { return spline; }
+        [[nodiscard]] auto _currentSplineIdx() const -> int32 { return point_Idx; }
         void _Finalize();
         void _Interrupt() { splineflags.done = true; }
 
     public:
         void Initialize(const MoveSplineInitArgs&);
-        [[nodiscard]] bool Initialized() const { return !spline.empty(); }
+        [[nodiscard]] auto Initialized() const -> bool { return !spline.empty(); }
 
         MoveSpline();
 
@@ -110,23 +110,23 @@ namespace Movement
             while (difftime > 0);
         }
 
-        [[nodiscard]] Location ComputePosition() const;
+        [[nodiscard]] auto ComputePosition() const -> Location;
 
-        [[nodiscard]] uint32 GetId() const { return m_Id; }
-        [[nodiscard]] bool Finalized() const { return splineflags.done; }
-        [[nodiscard]] bool isCyclic() const { return splineflags.cyclic; }
-        [[nodiscard]] bool isFalling() const { return splineflags.falling; }
-        [[nodiscard]] bool isWalking() const { return splineflags.walkmode; }
-        [[nodiscard]] Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last(), false) : Vector3(); }
-        [[nodiscard]] Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1, false) : Vector3(); }
-        [[nodiscard]] int32 currentPathIdx() const;
+        [[nodiscard]] auto GetId() const -> uint32 { return m_Id; }
+        [[nodiscard]] auto Finalized() const -> bool { return splineflags.done; }
+        [[nodiscard]] auto isCyclic() const -> bool { return splineflags.cyclic; }
+        [[nodiscard]] auto isFalling() const -> bool { return splineflags.falling; }
+        [[nodiscard]] auto isWalking() const -> bool { return splineflags.walkmode; }
+        [[nodiscard]] auto FinalDestination() const -> Vector3 { return Initialized() ? spline.getPoint(spline.last(), false) : Vector3(); }
+        [[nodiscard]] auto CurrentDestination() const -> Vector3 { return Initialized() ? spline.getPoint(point_Idx + 1, false) : Vector3(); }
+        [[nodiscard]] auto currentPathIdx() const -> int32;
 
-        [[nodiscard]] bool HasAnimation() const { return splineflags.animation; }
-        [[nodiscard]] uint8 GetAnimationType() const { return splineflags.animId; }
+        [[nodiscard]] auto HasAnimation() const -> bool { return splineflags.animation; }
+        [[nodiscard]] auto GetAnimationType() const -> uint8 { return splineflags.animId; }
 
         bool onTransport;
-        [[nodiscard]] std::string ToString() const;
-        [[nodiscard]] bool HasStarted() const
+        [[nodiscard]] auto ToString() const -> std::string;
+        [[nodiscard]] auto HasStarted() const -> bool
         {
             return time_passed > 0;
         }

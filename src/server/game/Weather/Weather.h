@@ -67,19 +67,19 @@ public:
     Weather(uint32 zone, WeatherData const* weatherChances);
     ~Weather() = default;
 
-    bool Update(uint32 diff);
-    bool ReGenerate();
-    bool UpdateWeather();
+    auto Update(uint32 diff) -> bool;
+    auto ReGenerate() -> bool;
+    auto UpdateWeather() -> bool;
 
     void SendWeatherUpdateToPlayer(Player* player);
     void SetWeather(WeatherType type, float grade);
 
     /// For which zone is this weather?
-    [[nodiscard]] uint32 GetZone() const { return m_zone; };
-    [[nodiscard]] uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
+    [[nodiscard]] auto GetZone() const -> uint32 { return m_zone; };
+    [[nodiscard]] auto GetScriptId() const -> uint32 { return m_weatherChances->ScriptId; }
 
 private:
-    [[nodiscard]] WeatherState GetWeatherState() const;
+    [[nodiscard]] auto GetWeatherState() const -> WeatherState;
     uint32 m_zone;
     WeatherType m_type;
     float m_grade;

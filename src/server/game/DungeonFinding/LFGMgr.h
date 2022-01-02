@@ -18,6 +18,8 @@
 #ifndef _LFGMGR_H
 #define _LFGMGR_H
 
+#include <utility>
+
 #include "DBCStructure.h"
 #include "Field.h"
 #include "LFG.h"
@@ -150,8 +152,8 @@ namespace lfg
 
     struct RBEntryInfo
     {
-        RBEntryInfo() {}
-        RBEntryInfo(uint8 _roles, std::string const& _comment) : roles(_roles), comment(_comment) {}
+        RBEntryInfo() = default;
+        RBEntryInfo(uint8 _roles, std::string  _comment) : roles(_roles), comment(std::move(_comment)) {}
         uint8 roles;
         std::string comment;
     };
@@ -199,21 +201,21 @@ namespace lfg
         uint32 _hasteRating;
         uint32 _expertiseRating;
 
-        RBInternalInfo() {}
-        RBInternalInfo(ObjectGuid guid, std::string const& comment, bool isGroupLeader, ObjectGuid groupGuid, uint8 roles, uint32 encounterMask, ObjectGuid instanceGuid,
+        RBInternalInfo() = default;
+        RBInternalInfo(ObjectGuid guid, std::string  comment, bool isGroupLeader, ObjectGuid groupGuid, uint8 roles, uint32 encounterMask, ObjectGuid instanceGuid,
                        uint8 _online, uint8 _level, uint8 _class, uint8 _race, float _avgItemLevel,
                        uint8 (&_talents)[3], uint32 _area, uint32 _armor, uint32 _spellDamage, uint32 _spellHeal,
                        uint32 _critRatingMelee, uint32 _critRatingRanged, uint32 _critRatingSpell, float _mp5, float _mp5combat,
                        uint32 _attackPower, uint32 _agility, uint32 _health, uint32 _mana, uint32 _defenseSkill,
                        uint32 _dodgeRating, uint32 _blockRating, uint32 _parryRating, uint32 _hasteRating, uint32 _expertiseRating)
-            : guid(guid), comment(comment), isGroupLeader(isGroupLeader), groupGuid(groupGuid), roles(roles), encounterMask(encounterMask), instanceGuid(instanceGuid),
+            : guid(guid), comment(std::move(comment)), isGroupLeader(isGroupLeader), groupGuid(groupGuid), roles(roles), encounterMask(encounterMask), instanceGuid(instanceGuid),
               _online(_online), _level(_level), _class(_class), _race(_race), _avgItemLevel(_avgItemLevel),
               _talents0(_talents[0]), _talents1(_talents[1]), _talents2(_talents[2]), _area(_area), _armor(_armor), _spellDamage(_spellDamage), _spellHeal(_spellHeal),
               _critRatingMelee(_critRatingMelee), _critRatingRanged(_critRatingRanged), _critRatingSpell(_critRatingSpell), _mp5(_mp5), _mp5combat(_mp5combat),
               _attackPower(_attackPower), _agility(_agility), _health(_health), _mana(_mana), _defenseSkill(_defenseSkill),
               _dodgeRating(_dodgeRating), _blockRating(_blockRating), _parryRating(_parryRating), _hasteRating(_hasteRating), _expertiseRating(_expertiseRating)
         {}
-        bool PlayerSameAs(RBInternalInfo const& i) const
+        [[nodiscard]] auto PlayerSameAs(RBInternalInfo const& i) const -> bool
         {
             return isGroupLeader == i.isGroupLeader && groupGuid == i.groupGuid && roles == i.roles && (isGroupLeader || (comment == i.comment && encounterMask == i.encounterMask && instanceGuid == i.instanceGuid))
                    && _online == i._online && _level == i._level && _class == i._class && _race == i._race && std::fabs(_avgItemLevel - i._avgItemLevel) < 0.01f
@@ -285,14 +287,14 @@ namespace lfg
     // Data needed by SMSG_LFG_UPDATE_PARTY and SMSG_LFG_UPDATE_PLAYER
     struct LfgUpdateData
     {
-        LfgUpdateData(LfgUpdateType _type = LFG_UPDATETYPE_DEFAULT): updateType(_type), state(LFG_STATE_NONE), comment("") { }
-        LfgUpdateData(LfgUpdateType _type, LfgDungeonSet const& _dungeons, std::string const& _comment):
-            updateType(_type), state(LFG_STATE_NONE), dungeons(_dungeons), comment(_comment) { }
-        LfgUpdateData(LfgUpdateType _type, LfgState _state, LfgDungeonSet const& _dungeons, std::string const& _comment = ""):
-            updateType(_type), state(_state), dungeons(_dungeons), comment(_comment) { }
+        LfgUpdateData(LfgUpdateType _type = LFG_UPDATETYPE_DEFAULT): updateType(_type),  comment("") { }
+        LfgUpdateData(LfgUpdateType _type, LfgDungeonSet  _dungeons, std::string  _comment):
+            updateType(_type), state(LFG_STATE_NONE), dungeons(std::move(_dungeons)), comment(std::move(_comment)) { }
+        LfgUpdateData(LfgUpdateType _type, LfgState _state, LfgDungeonSet  _dungeons, std::string  _comment = ""):
+            updateType(_type), state(_state), dungeons(std::move(_dungeons)), comment(std::move(_comment)) { }
 
         LfgUpdateType updateType;
-        LfgState state;
+        LfgState state{LFG_STATE_NONE};
         LfgDungeonSet dungeons;
         std::string comment;
     };
@@ -341,26 +343,26 @@ namespace lfg
     /// Stores player data related to proposal to join
     struct LfgProposalPlayer
     {
-        LfgProposalPlayer(): role(0), accept(LFG_ANSWER_PENDING) { }
-        uint8 role;                                            ///< Proposed role
-        LfgAnswer accept;                                      ///< Accept status (-1 not answer | 0 Not agree | 1 agree)
+        LfgProposalPlayer() = default;
+        uint8 role{0};                                            ///< Proposed role
+        LfgAnswer accept{LFG_ANSWER_PENDING};                                      ///< Accept status (-1 not answer | 0 Not agree | 1 agree)
         ObjectGuid group;                                      ///< Original group guid. 0 if no original group
     };
 
     /// Stores group data related to proposal to join
     struct LfgProposal
     {
-        LfgProposal(uint32 dungeon = 0): id(0), dungeonId(dungeon), state(LFG_PROPOSAL_INITIATING), cancelTime(0), encounters(0), isNew(true)
+        LfgProposal(uint32 dungeon = 0):  dungeonId(dungeon) 
         { }
 
-        uint32 id;                                             ///< Proposal Id
+        uint32 id{0};                                             ///< Proposal Id
         uint32 dungeonId;                                      ///< Dungeon to join
-        LfgProposalState state;                                ///< State of the proposal
+        LfgProposalState state{LFG_PROPOSAL_INITIATING};                                ///< State of the proposal
         ObjectGuid group;                                      ///< Proposal group (0 if new)
         ObjectGuid leader;                                     ///< Leader guid.
-        time_t cancelTime;                                     ///< Time when we will cancel this proposal
-        uint32 encounters;                                     ///< Dungeon Encounters
-        bool isNew;                                            ///< Determines if it's new group or not
+        time_t cancelTime{0};                                     ///< Time when we will cancel this proposal
+        uint32 encounters{0};                                     ///< Dungeon Encounters
+        bool isNew{true};                                            ///< Determines if it's new group or not
         Lfg5Guids queues;                                      ///< Queue Ids to remove/readd
         LfgGuidList showorder;                                 ///< Show order in update window
         LfgProposalPlayerContainer players;                    ///< Players data
@@ -389,8 +391,7 @@ namespace lfg
 
     struct LFGDungeonData
     {
-        LFGDungeonData(): id(0), name(""), map(0), type(0), expansion(0), group(0), minlevel(0),
-            maxlevel(0), difficulty(REGULAR_DIFFICULTY), seasonal(false), x(0.0f), y(0.0f), z(0.0f), o(0.0f)
+        LFGDungeonData():  name("") 
         { }
         LFGDungeonData(LFGDungeonEntry const* dbc): id(dbc->ID), name(dbc->name[0]), map(dbc->map),
             type(dbc->type), expansion(dbc->expansion), group(dbc->grouptype),
@@ -398,20 +399,20 @@ namespace lfg
             seasonal(dbc->flags & LFG_FLAG_SEASONAL), x(0.0f), y(0.0f), z(0.0f), o(0.0f)
         { }
 
-        uint32 id;
+        uint32 id{0};
         std::string name;
-        uint16 map;
-        uint8 type;
-        uint8 expansion;
-        uint8 group;
-        uint8 minlevel;
-        uint8 maxlevel;
-        Difficulty difficulty;
-        bool seasonal;
-        float x, y, z, o;
+        uint16 map{0};
+        uint8 type{0};
+        uint8 expansion{0};
+        uint8 group{0};
+        uint8 minlevel{0};
+        uint8 maxlevel{0};
+        Difficulty difficulty{REGULAR_DIFFICULTY};
+        bool seasonal{false};
+        float x{0.0f}, y{0.0f}, z{0.0f}, o{0.0f};
 
         // Helpers
-        uint32 Entry() const { return id + (type << 24); }
+        [[nodiscard]] auto Entry() const -> uint32 { return id + (type << 24); }
     };
 
     class LFGMgr
@@ -436,7 +437,7 @@ namespace lfg
         RBUsedDungeonsSet RBUsedDungeonsStore[2]; // for 2 factions
 
     public:
-        static LFGMgr* instance();
+        static auto instance() -> LFGMgr*;
 
         // Functions used outside lfg namespace
         void Update(uint32 diff, uint8 task);
@@ -451,43 +452,43 @@ namespace lfg
 
         // Multiple files
         /// Check if given guid applied for random dungeon
-        bool selectedRandomLfgDungeon(ObjectGuid guid);
+        auto selectedRandomLfgDungeon(ObjectGuid guid) -> bool;
         /// Check if given guid applied for given map and difficulty. Used to know
-        bool inLfgDungeonMap(ObjectGuid guid, uint32 map, Difficulty difficulty);
+        auto inLfgDungeonMap(ObjectGuid guid, uint32 map, Difficulty difficulty) -> bool;
         /// Get selected dungeons
-        LfgDungeonSet const& GetSelectedDungeons(ObjectGuid guid);
+        auto GetSelectedDungeons(ObjectGuid guid) -> LfgDungeonSet const&;
         /// Get current lfg state
-        LfgState GetState(ObjectGuid guid);
+        auto GetState(ObjectGuid guid) -> LfgState;
         /// Get current dungeon
-        uint32 GetDungeon(ObjectGuid guid, bool asId = true);
+        auto GetDungeon(ObjectGuid guid, bool asId = true) -> uint32;
         /// Get the map id of the current dungeon
-        uint32 GetDungeonMapId(ObjectGuid guid);
+        auto GetDungeonMapId(ObjectGuid guid) -> uint32;
         /// Get kicks left in current group
-        uint8 GetKicksLeft(ObjectGuid gguid);
+        auto GetKicksLeft(ObjectGuid gguid) -> uint8;
         /// Load Lfg group info from DB
         void _LoadFromDB(Field* fields, ObjectGuid guid);
         /// Initializes player data after loading group data from DB
         void SetupGroupMember(ObjectGuid guid, ObjectGuid gguid);
         /// Return Lfg dungeon entry for given dungeon id
-        uint32 GetLFGDungeonEntry(uint32 id);
+        auto GetLFGDungeonEntry(uint32 id) -> uint32;
 
         // cs_lfg
         /// Get current player roles
-        uint8 GetRoles(ObjectGuid guid);
+        auto GetRoles(ObjectGuid guid) -> uint8;
         /// Get current player comment (used for LFR)
-        std::string const& GetComment(ObjectGuid gguid);
+        auto GetComment(ObjectGuid gguid) -> std::string const&;
         /// Gets current lfg options
-        uint32 GetOptions();
+        auto GetOptions() -> uint32;
         /// Sets new lfg options
         void SetOptions(uint32 options);
         /// Checks if given lfg option is enabled
-        bool isOptionEnabled(uint32 option);
+        auto isOptionEnabled(uint32 option) -> bool;
         /// Clears queue - Only for internal testing
         void Clean();
 
         // LFGScripts
         /// Get leader of the group (using internal data)
-        ObjectGuid GetLeader(ObjectGuid guid);
+        auto GetLeader(ObjectGuid guid) -> ObjectGuid;
         /// Initializes locked dungeons for given player (called at login or level change)
         void InitializeLockedDungeons(Player* player, uint8 level = 0);
         /// Sets player team
@@ -495,31 +496,31 @@ namespace lfg
         /// Sets player group
         void SetGroup(ObjectGuid guid, ObjectGuid group);
         /// Gets player group
-        ObjectGuid GetGroup(ObjectGuid guid);
+        auto GetGroup(ObjectGuid guid) -> ObjectGuid;
         /// Sets the leader of the group
         void SetLeader(ObjectGuid gguid, ObjectGuid leader);
         /// Removes saved group data
         void RemoveGroupData(ObjectGuid guid);
         /// Removes a player from a group
-        uint8 RemovePlayerFromGroup(ObjectGuid gguid, ObjectGuid guid);
+        auto RemovePlayerFromGroup(ObjectGuid gguid, ObjectGuid guid) -> uint8;
         /// Adds player to group
         void AddPlayerToGroup(ObjectGuid gguid, ObjectGuid guid);
         /// Xinef: Set Random Players Count
         void SetRandomPlayersCount(ObjectGuid guid, uint8 count);
         /// Xinef: Get Random Players Count
-        uint8 GetRandomPlayersCount(ObjectGuid guid);
+        auto GetRandomPlayersCount(ObjectGuid guid) -> uint8;
 
         // LFGHandler
         /// Get locked dungeons
-        LfgLockMap const& GetLockedDungeons(ObjectGuid guid);
+        auto GetLockedDungeons(ObjectGuid guid) -> LfgLockMap const&;
         /// Returns current lfg status
-        LfgUpdateData GetLfgStatus(ObjectGuid guid);
+        auto GetLfgStatus(ObjectGuid guid) -> LfgUpdateData;
         /// Checks if Seasonal dungeon is active
-        bool IsSeasonActive(uint32 dungeonId);
+        auto IsSeasonActive(uint32 dungeonId) -> bool;
         /// Gets the random dungeon reward corresponding to given dungeon and player level
-        LfgReward const* GetRandomDungeonReward(uint32 dungeon, uint8 level);
+        auto GetRandomDungeonReward(uint32 dungeon, uint8 level) -> LfgReward const*;
         /// Returns all random and seasonal dungeons for given level and expansion
-        LfgDungeonSet GetRandomAndSeasonalDungeons(uint8 level, uint8 expansion);
+        auto GetRandomAndSeasonalDungeons(uint8 level, uint8 expansion) -> LfgDungeonSet;
         /// Teleport a player to/from selected dungeon
         void TeleportPlayer(Player* player, bool out, WorldLocation const* teleportLocation = nullptr);
         /// Inits new proposal to boot a player
@@ -556,30 +557,30 @@ namespace lfg
 
         // LfgQueue
         /// Get last lfg state (NONE, DUNGEON or FINISHED_DUNGEON)
-        LfgState GetOldState(ObjectGuid guid);
+        auto GetOldState(ObjectGuid guid) -> LfgState;
         /// Check if given group guid is lfg
-        bool IsLfgGroup(ObjectGuid guid);
+        auto IsLfgGroup(ObjectGuid guid) -> bool;
         /// Gets the player count of given group
-        uint8 GetPlayerCount(ObjectGuid guid);
+        auto GetPlayerCount(ObjectGuid guid) -> uint8;
         /// Add a new Proposal
-        uint32 AddProposal(LfgProposal& proposal);
+        auto AddProposal(LfgProposal& proposal) -> uint32;
         /// Checks if all players are queued
-        bool AllQueued(Lfg5Guids const& check);
+        auto AllQueued(Lfg5Guids const& check) -> bool;
         /// Checks if given roles match, modifies given roles map with new roles
-        static uint8 CheckGroupRoles(LfgRolesMap& groles, bool removeLeaderFlag = true);
+        static auto CheckGroupRoles(LfgRolesMap& groles, bool removeLeaderFlag = true) -> uint8;
         /// Checks if given players are ignoring each other
-        static bool HasIgnore(ObjectGuid guid1, ObjectGuid guid2);
+        static auto HasIgnore(ObjectGuid guid1, ObjectGuid guid2) -> bool;
         /// Sends queue status to player
         static void SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data);
         // debug lfg command
         void ToggleTesting();
         /// For 1 player queue testing
-        [[nodiscard]] bool IsTesting() const { return m_Testing; }
+        [[nodiscard]] auto IsTesting() const -> bool { return m_Testing; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
 
     private:
-        TeamId GetTeam(ObjectGuid guid);
+        auto GetTeam(ObjectGuid guid) -> TeamId;
         void RestoreState(ObjectGuid guid, char const* debugMsg);
         void ClearState(ObjectGuid guid, char const* debugMsg);
         void SetSelectedDungeons(ObjectGuid guid, LfgDungeonSet const& dungeons);
@@ -589,16 +590,16 @@ namespace lfg
         void SetCanOverrideRBState(ObjectGuid guid, bool val);
         void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap);
         void _SaveToDB(ObjectGuid guid);
-        LFGDungeonData const* GetLFGDungeon(uint32 id);
+        auto GetLFGDungeon(uint32 id) -> LFGDungeonData const*;
 
         // Proposals
         void RemoveProposal(LfgProposalContainer::iterator itProposal, LfgUpdateType type);
         void MakeNewGroup(LfgProposal const& proposal);
 
         // Generic
-        LFGQueue& GetQueue(ObjectGuid guid);
-        LfgDungeonSet const& GetDungeonsByRandom(uint32 randomdungeon);
-        LfgType GetDungeonType(uint32 dungeon);
+        auto GetQueue(ObjectGuid guid) -> LFGQueue&;
+        auto GetDungeonsByRandom(uint32 randomdungeon) -> LfgDungeonSet const&;
+        auto GetDungeonType(uint32 dungeon) -> LfgType;
 
         void SendLfgBootProposalUpdate(ObjectGuid guid, LfgPlayerBoot const& boot);
         void SendLfgJoinResult(ObjectGuid guid, LfgJoinResultData const& data);
@@ -608,7 +609,7 @@ namespace lfg
         void SendLfgUpdatePlayer(ObjectGuid guid, LfgUpdateData const& data);
         void SendLfgUpdateProposal(ObjectGuid guid, LfgProposal const& proposal);
 
-        LfgGuidSet const& GetPlayers(ObjectGuid guid);
+        auto GetPlayers(ObjectGuid guid) -> LfgGuidSet const&;
 
         // General variables
         uint32 m_lfgProposalId;                            ///< used as internal counter for proposals

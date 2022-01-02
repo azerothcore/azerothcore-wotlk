@@ -167,23 +167,23 @@ public:
     void AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, uint32 action);
 
     void SetMenuId(uint32 menu_id) { _menuId = menu_id; }
-    [[nodiscard]] uint32 GetMenuId() const { return _menuId; }
+    [[nodiscard]] auto GetMenuId() const -> uint32 { return _menuId; }
     void SetLocale(LocaleConstant locale) { _locale = locale; }
-    [[nodiscard]] LocaleConstant GetLocale() const { return _locale; }
+    [[nodiscard]] auto GetLocale() const -> LocaleConstant { return _locale; }
 
     void AddGossipMenuItemData(uint32 menuItemId, uint32 gossipActionMenuId, uint32 gossipActionPoi);
 
-    [[nodiscard]] uint32 GetMenuItemCount() const
+    [[nodiscard]] auto GetMenuItemCount() const -> uint32
     {
         return _menuItems.size();
     }
 
-    [[nodiscard]] bool Empty() const
+    [[nodiscard]] auto Empty() const -> bool
     {
         return _menuItems.empty();
     }
 
-    [[nodiscard]] GossipMenuItem const* GetItem(uint32 id) const
+    [[nodiscard]] auto GetItem(uint32 id) const -> GossipMenuItem const*
     {
         GossipMenuItemContainer::const_iterator itr = _menuItems.find(id);
         if (itr != _menuItems.end())
@@ -192,7 +192,7 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] GossipMenuItemData const* GetItemData(uint32 indexId) const
+    [[nodiscard]] auto GetItemData(uint32 indexId) const -> GossipMenuItemData const*
     {
         GossipMenuItemDataContainer::const_iterator itr = _menuItemData.find(indexId);
         if (itr != _menuItemData.end())
@@ -201,13 +201,13 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] uint32 GetMenuItemSender(uint32 menuItemId) const;
-    [[nodiscard]] uint32 GetMenuItemAction(uint32 menuItemId) const;
-    [[nodiscard]] bool IsMenuItemCoded(uint32 menuItemId) const;
+    [[nodiscard]] auto GetMenuItemSender(uint32 menuItemId) const -> uint32;
+    [[nodiscard]] auto GetMenuItemAction(uint32 menuItemId) const -> uint32;
+    [[nodiscard]] auto IsMenuItemCoded(uint32 menuItemId) const -> bool;
 
     void ClearMenu();
 
-    [[nodiscard]] GossipMenuItemContainer const& GetMenuItems() const
+    [[nodiscard]] auto GetMenuItems() const -> GossipMenuItemContainer const&
     {
         return _menuItems;
     }
@@ -228,19 +228,19 @@ public:
     void AddMenuItem(uint32 QuestId, uint8 Icon);
     void ClearMenu();
 
-    [[nodiscard]] uint8 GetMenuItemCount() const
+    [[nodiscard]] auto GetMenuItemCount() const -> uint8
     {
         return _questMenuItems.size();
     }
 
-    [[nodiscard]] bool Empty() const
+    [[nodiscard]] auto Empty() const -> bool
     {
         return _questMenuItems.empty();
     }
 
-    [[nodiscard]] bool HasItem(uint32 questId) const;
+    [[nodiscard]] auto HasItem(uint32 questId) const -> bool;
 
-    [[nodiscard]] QuestMenuItem const& GetItem(uint16 index) const
+    [[nodiscard]] auto GetItem(uint16 index) const -> QuestMenuItem const&
     {
         return _questMenuItems[index];
     }
@@ -255,15 +255,15 @@ public:
     explicit PlayerMenu(WorldSession* session);
     ~PlayerMenu();
 
-    GossipMenu& GetGossipMenu() { return _gossipMenu; }
-    QuestMenu& GetQuestMenu() { return _questMenu; }
+    auto GetGossipMenu() -> GossipMenu& { return _gossipMenu; }
+    auto GetQuestMenu() -> QuestMenu& { return _questMenu; }
 
-    [[nodiscard]] bool Empty() const { return _gossipMenu.Empty() && _questMenu.Empty(); }
+    [[nodiscard]] auto Empty() const -> bool { return _gossipMenu.Empty() && _questMenu.Empty(); }
 
     void ClearMenus();
-    [[nodiscard]] uint32 GetGossipOptionSender(uint32 selection) const { return _gossipMenu.GetMenuItemSender(selection); }
-    [[nodiscard]] uint32 GetGossipOptionAction(uint32 selection) const { return _gossipMenu.GetMenuItemAction(selection); }
-    [[nodiscard]] bool IsGossipOptionCoded(uint32 selection) const { return _gossipMenu.IsMenuItemCoded(selection); }
+    [[nodiscard]] auto GetGossipOptionSender(uint32 selection) const -> uint32 { return _gossipMenu.GetMenuItemSender(selection); }
+    [[nodiscard]] auto GetGossipOptionAction(uint32 selection) const -> uint32 { return _gossipMenu.GetMenuItemAction(selection); }
+    [[nodiscard]] auto IsGossipOptionCoded(uint32 selection) const -> bool { return _gossipMenu.IsMenuItemCoded(selection); }
 
     void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID) const;
     void SendCloseGossip() const;

@@ -39,7 +39,7 @@ namespace MMAP
     class MMapFactory
     {
     public:
-        static MMapMgr* createOrGetMMapMgr();
+        static auto createOrGetMMapMgr() -> MMapMgr*;
         static void clear();
         static void InitializeDisabledMaps();
         static bool forbiddenMaps[1000];

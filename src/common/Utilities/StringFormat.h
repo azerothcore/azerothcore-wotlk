@@ -15,7 +15,7 @@ namespace Acore
 {
     /// Default AC string format function.
     template<typename Format, typename... Args>
-    inline std::string StringFormat(Format&& fmt, Args&& ... args)
+    inline auto StringFormat(Format&& fmt, Args&& ... args) -> std::string
     {
         try
         {
@@ -30,7 +30,7 @@ namespace Acore
 
     // Default string format function.
     template<typename... Args>
-    inline std::string StringFormatFmt(std::string_view fmt, Args&&... args)
+    inline auto StringFormatFmt(std::string_view fmt, Args&&... args) -> std::string
     {
         try
         {
@@ -43,13 +43,13 @@ namespace Acore
     }
 
     /// Returns true if the given char pointer is null.
-    inline bool IsFormatEmptyOrNull(char const* fmt)
+    inline auto IsFormatEmptyOrNull(char const* fmt) -> bool
     {
         return fmt == nullptr;
     }
 
     /// Returns true if the given std::string is empty.
-    inline bool IsFormatEmptyOrNull(std::string_view fmt)
+    inline auto IsFormatEmptyOrNull(std::string_view fmt) -> bool
     {
         return fmt.empty();
     }
@@ -58,7 +58,7 @@ namespace Acore
 namespace Acore::String
 {
     template<class Str>
-    Str Trim(const Str& s, const std::locale& loc = std::locale());
+    auto Trim(const Str& s, const std::locale& loc = std::locale()) -> Str;
 }
 
 #endif

@@ -32,17 +32,17 @@ enum BanReturn
 class BanMgr
 {
 public:
-    static BanMgr* instance();
+    static auto instance() -> BanMgr*;
 
-    BanReturn BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author);
-    BanReturn BanAccountByPlayerName(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author);
-    BanReturn BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author);
-    BanReturn BanCharacter(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author);
+    auto BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author) -> BanReturn;
+    auto BanAccountByPlayerName(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author) -> BanReturn;
+    auto BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author) -> BanReturn;
+    auto BanCharacter(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author) -> BanReturn;
 
-    bool RemoveBanAccount(std::string const& AccountName);
-    bool RemoveBanAccountByPlayerName(std::string const& CharacterName);
-    bool RemoveBanIP(std::string const& IP);
-    bool RemoveBanCharacter(std::string const& CharacterName);
+    auto RemoveBanAccount(std::string const& AccountName) -> bool;
+    auto RemoveBanAccountByPlayerName(std::string const& CharacterName) -> bool;
+    auto RemoveBanIP(std::string const& IP) -> bool;
+    auto RemoveBanCharacter(std::string const& CharacterName) -> bool;
 };
 
 #define sBan BanMgr::instance()

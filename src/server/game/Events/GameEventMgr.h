@@ -54,7 +54,7 @@ typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventCon
 
 struct GameEventData
 {
-    GameEventData()  { }
+    GameEventData()  = default;
     uint32 eventId;
     time_t start{1};           // occurs after this time
     time_t end{0};             // occurs before this time
@@ -69,7 +69,7 @@ struct GameEventData
     std::string description;
     uint8 announce;         // if 0 dont announce, if 1 announce, if 2 take config value
 
-    [[nodiscard]] bool isValid() const { return length > 0 || state > GAMEEVENT_NORMAL; }
+    [[nodiscard]] auto isValid() const -> bool { return length > 0 || state > GAMEEVENT_NORMAL; }
 };
 
 struct ModelEquip
@@ -100,27 +100,27 @@ private:
     ~GameEventMgr() = default;
 
 public:
-    static GameEventMgr* instance();
+    static auto instance() -> GameEventMgr*;
 
     typedef std::set<uint16> ActiveEvents;
     typedef std::vector<GameEventData> GameEventDataMap;
-    [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
-    [[nodiscard]] GameEventDataMap const& GetEventMap() const { return mGameEvent; }
-    [[nodiscard]] bool CheckOneGameEvent(uint16 entry) const;
-    [[nodiscard]] uint32 NextCheck(uint16 entry) const;
+    [[nodiscard]] auto GetActiveEventList() const -> ActiveEvents const& { return m_ActiveEvents; }
+    [[nodiscard]] auto GetEventMap() const -> GameEventDataMap const& { return mGameEvent; }
+    [[nodiscard]] auto CheckOneGameEvent(uint16 entry) const -> bool;
+    [[nodiscard]] auto NextCheck(uint16 entry) const -> uint32;
     void LoadFromDB();
     void LoadHolidayDates();
-    uint32 Update();
-    bool IsActiveEvent(uint16 event_id) { return (m_ActiveEvents.find(event_id) != m_ActiveEvents.end()); }
-    uint32 StartSystem();
+    auto Update() -> uint32;
+    auto IsActiveEvent(uint16 event_id) -> bool { return (m_ActiveEvents.find(event_id) != m_ActiveEvents.end()); }
+    auto StartSystem() -> uint32;
     void Initialize();
     void StartArenaSeason();
     void StartInternalEvent(uint16 event_id);
-    bool StartEvent(uint16 event_id, bool overwrite = false);
+    auto StartEvent(uint16 event_id, bool overwrite = false) -> bool;
     void StopEvent(uint16 event_id, bool overwrite = false);
     void HandleQuestComplete(uint32 quest_id);  // called on world event type quest completions
-    uint32 GetNPCFlag(Creature* cr);
-    [[nodiscard]] uint32 GetHolidayEventId(uint32 holidayId) const;
+    auto GetNPCFlag(Creature* cr) -> uint32;
+    [[nodiscard]] auto GetHolidayEventId(uint32 holidayId) const -> uint32;
 private:
     void SendWorldStateUpdate(Player* player, uint16 event_id);
     void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
@@ -136,12 +136,12 @@ private:
     void UpdateEventNPCVendor(uint16 event_id, bool activate);
     void UpdateBattlegroundSettings();
     void RunSmartAIScripts(uint16 event_id, bool activate);    //! Runs SMART_EVENT_GAME_EVENT_START/_END SAI
-    bool CheckOneGameEventConditions(uint16 event_id);
+    auto CheckOneGameEventConditions(uint16 event_id) -> bool;
     void SaveWorldEventStateToDB(uint16 event_id);
-    bool hasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-    bool hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-    bool hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id);
-    bool hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id);
+    auto hasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id) -> bool;
+    auto hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id) -> bool;
+    auto hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id) -> bool;
+    auto hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id) -> bool;
     void SetHolidayEventTime(GameEventData& event);
 
     typedef std::list<ObjectGuid::LowType> GuidLowList;
@@ -182,7 +182,7 @@ public:
 
 #define sGameEventMgr GameEventMgr::instance()
 
-bool IsHolidayActive(HolidayIds id);
-bool IsEventActive(uint16 event_id);
+auto IsHolidayActive(HolidayIds id) -> bool;
+auto IsEventActive(uint16 event_id) -> bool;
 
 #endif

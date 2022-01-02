@@ -47,18 +47,18 @@ class AC_SHARED_API RealmList
 public:
     typedef std::map<RealmHandle, Realm> RealmMap;
 
-    static RealmList* Instance();
+    static auto Instance() -> RealmList*;
 
     void Initialize(Acore::Asio::IoContext& ioContext, uint32 updateInterval);
     void Close();
 
-    RealmMap const& GetRealms() const { return _realms; }
-    Realm const* GetRealm(RealmHandle const& id) const;
+    [[nodiscard]] auto GetRealms() const -> RealmMap const& { return _realms; }
+    [[nodiscard]] auto GetRealm(RealmHandle const& id) const -> Realm const*;
 
-    RealmBuildInfo const* GetBuildInfo(uint32 build) const;
+    [[nodiscard]] auto GetBuildInfo(uint32 build) const -> RealmBuildInfo const*;
 
 private:
-    RealmList();
+    RealmList() = delete;
     ~RealmList() = default;
 
     void LoadBuildInfo();
@@ -69,7 +69,7 @@ private:
 
     std::vector<RealmBuildInfo> _builds;
     RealmMap _realms;
-    uint32 _updateInterval;
+    uint32 _updateInterval{0};
     std::unique_ptr<Acore::Asio::DeadlineTimer> _updateTimer;
     std::unique_ptr<Acore::Asio::Resolver> _resolver;
 };
