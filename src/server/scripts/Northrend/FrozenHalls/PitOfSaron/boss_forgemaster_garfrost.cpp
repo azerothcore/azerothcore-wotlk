@@ -242,7 +242,7 @@ public:
                     break;
                 case EVENT_SPELL_THROW_SARONITE:
                     bCanSayBoulderHit = true;
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 140.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
                     {
                         WorldPacket data;
                         ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_THROW_SARONITE);
@@ -264,7 +264,7 @@ public:
                     events.RepeatEvent(35000);
                     break;
                 case EVENT_SPELL_DEEP_FREEZE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         Talk(EMOTE_DEEP_FREEZE, target);
                         me->CastSpell(target, SPELL_DEEP_FREEZE, false);

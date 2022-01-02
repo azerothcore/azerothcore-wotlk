@@ -802,7 +802,7 @@ public:
                     events.RepeatEvent(22000);
                     break;
                 case EVEMT_MAGE_SPELL_POLYMORPH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POLYMORPH, false);
                     events.RepeatEvent(8000);
                     break;
@@ -810,7 +810,7 @@ public:
 
                 /****************** SHAMAN ******************/
                 case EVENT_SHAMAN_SPELL_CHAIN_LIGHTNING:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.RepeatEvent(16000);
                     break;
@@ -852,7 +852,7 @@ public:
                     {
                         if( !UnitTargetGUID )
                         {
-                            if( Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 30.0f, true) )
+                            if( Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 30.0f, true) )
                             {
                                 me->CastSpell(target, SPELL_SHOOT, false);
                                 UnitTargetGUID = target->GetGUID();
@@ -896,7 +896,7 @@ public:
                     events.RepeatEvent(14000);
                     break;
                 case EVENT_ROGUE_SPELL_POISON_BOTTLE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_POISON_BOTTLE, false);
                     events.RepeatEvent(19000);
                     break;
