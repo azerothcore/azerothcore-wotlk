@@ -24,8 +24,8 @@
 #include "Util.h"
 #include <boost/asio/ip/tcp.hpp>
 
-RealmList::RealmList() :
-    _updateInterval(0) { }
+RealmList::RealmList() 
+    = default;
 
 RealmList* RealmList::Instance()
 {

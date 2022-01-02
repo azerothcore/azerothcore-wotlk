@@ -54,7 +54,7 @@ typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventCon
 
 struct GameEventData
 {
-    GameEventData()  { }
+    GameEventData()  = default;
     uint32 eventId;
     time_t start{1};           // occurs after this time
     time_t end{0};             // occurs before this time

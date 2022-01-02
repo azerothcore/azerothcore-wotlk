@@ -34,7 +34,7 @@ private:
     std::atomic<bool> _shutdown;
 
 public:
-    ProducerConsumerQueue<T>() : _shutdown(false) { }
+    ProducerConsumerQueue<T>() : _shutdown(false) = default;
 
     void Push(const T& value)
     {
@@ -51,7 +51,7 @@ public:
         return _queue.empty();
     }
 
-    size_t Size() const
+    [[nodiscard]] size_t Size() const
     {
         return _queue.size();
     }

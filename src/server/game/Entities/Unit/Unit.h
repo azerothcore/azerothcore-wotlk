@@ -27,6 +27,7 @@
 #include "SpellAuraDefines.h"
 #include "ThreatMgr.h"
 #include <functional>
+#include <utility>
 
 #define WORLD_TRIGGER   12999
 
@@ -357,11 +358,11 @@ enum SpellImmuneBlockType
 
 struct SpellImmune
 {
-    SpellImmune() : spellId(0), type(IMMUNITY_EFFECT), blockType(SPELL_BLOCK_TYPE_ALL) { }
+    SpellImmune()  = default;
 
-    uint32 spellId;
-    uint32 type;
-    uint32 blockType;
+    uint32 spellId{0};
+    uint32 type{IMMUNITY_EFFECT};
+    uint32 blockType{SPELL_BLOCK_TYPE_ALL};
 };
 
 typedef std::vector<SpellImmune> SpellImmuneList;
@@ -1074,7 +1075,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 
 struct RedirectThreatInfo
 {
-    RedirectThreatInfo()  { }
+    RedirectThreatInfo()  = default;
     ObjectGuid _targetGUID;
     uint32 _threatPct{0};
 
@@ -1303,7 +1304,7 @@ private:
 };
 
 struct AttackPosition {
-    AttackPosition(Position pos) : _pos(pos), _taken(false) {}
+    AttackPosition(Position pos) : _pos(std::move(pos)), _taken(false) {}
     bool operator==(const int val)
     {
         return !val;
@@ -2146,7 +2147,7 @@ public:
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     [[nodiscard]] int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
-    virtual bool IsMovementPreventedByCasting() const;
+    [[nodiscard]] virtual bool IsMovementPreventedByCasting() const;
 
     ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
     ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
@@ -2653,7 +2654,7 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
 
-    float processDummyAuras(float TakenTotalMod) const;
+    [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 };
 
 namespace Acore

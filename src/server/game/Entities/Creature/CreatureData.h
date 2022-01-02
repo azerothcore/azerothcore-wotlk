@@ -270,7 +270,7 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 // from `creature` table
 struct CreatureData
 {
-    CreatureData()  { }
+    CreatureData()  = default;
     uint32 id{0};                                              // entry in creature_template
     uint16 mapid{0};
     uint32 phaseMask{0};
@@ -429,7 +429,7 @@ typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
 
 struct TrainerSpellData
 {
-    TrainerSpellData()  {}
+    TrainerSpellData()  = default;
     ~TrainerSpellData() { spellList.clear(); }
 
     TrainerSpellMap spellList;
@@ -440,11 +440,11 @@ struct TrainerSpellData
 
 struct CreatureSpellCooldown
 {
-    CreatureSpellCooldown() : category(0), end(0) { }
+    CreatureSpellCooldown()  = default;
     CreatureSpellCooldown(uint16 categoryId, uint32 endTime) : category(categoryId), end(endTime) { }
 
-    uint16 category;
-    uint32 end;
+    uint16 category{0};
+    uint32 end{0};
 };
 
 typedef std::map<uint32, CreatureSpellCooldown> CreatureSpellCooldowns;

@@ -41,7 +41,7 @@ protected:
         getTarget()->m_mapRefMgr.decSize();
     }
 public:
-    MapReference() : Reference<Map, Player>() {}
+    MapReference() : Reference<Map, Player>() = default;
     ~MapReference() override { unlink(); }
     MapReference* next() { return (MapReference*)Reference<Map, Player>::next(); }
     [[nodiscard]] MapReference const* next() const { return (MapReference const*)Reference<Map, Player>::next(); }
