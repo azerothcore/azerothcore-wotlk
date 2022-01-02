@@ -20082,8 +20082,15 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     }
             }
             else
+            {
+                if (!sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                {
+                    continue;
+                }
+
                 // send in current format (float as float, uint32 as uint32)
                 fieldBuffer << m_uint32Values[index];
+            }
         }
     }
 
