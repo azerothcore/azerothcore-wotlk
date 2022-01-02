@@ -19,6 +19,7 @@
 #define _OBJECT_POS_SELECTOR_H
 
 #include "Define.h"
+#include <cmath>
 #include <map>
 #include <math.h>
 
