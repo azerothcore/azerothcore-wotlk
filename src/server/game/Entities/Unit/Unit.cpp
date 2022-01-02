@@ -20083,7 +20083,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
             }
             else
             {
-                if (!sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                if (sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
                 {
                     continue;
                 }
