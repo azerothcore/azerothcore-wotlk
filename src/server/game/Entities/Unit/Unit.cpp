@@ -681,7 +681,7 @@ bool Unit::GetRandomContactPoint(const Unit* obj, float& x, float& y, float& z, 
                  GetAngle(obj) + (attacker_number ? (static_cast<float>(M_PI / 2) - static_cast<float>(M_PI) * (float)rand_norm()) * float(attacker_number) / combat_reach * 0.3f : 0));
 
     // pussywizard
-    if (fabs(this->GetPositionZ() - z) > this->GetCollisionHeight() || !IsWithinLOS(x, y, z))
+    if (std::fabs(this->GetPositionZ() - z) > this->GetCollisionHeight() || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -1910,7 +1910,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         float discreteResistProbability[11];
         for (uint32 i = 0; i < 11; ++i)
         {
-            discreteResistProbability[i] = 0.5f - 2.5f * fabs(0.1f * i - averageResist);
+            discreteResistProbability[i] = 0.5f - 2.5f * std::fabs(0.1f * i - averageResist);
             if (discreteResistProbability[i] < 0.0f)
                 discreteResistProbability[i] = 0.0f;
         }
@@ -20082,8 +20082,15 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     }
             }
             else
+            {
+                if (sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                {
+                    continue;
+                }
+
                 // send in current format (float as float, uint32 as uint32)
                 fieldBuffer << m_uint32Values[index];
+            }
         }
     }
 
