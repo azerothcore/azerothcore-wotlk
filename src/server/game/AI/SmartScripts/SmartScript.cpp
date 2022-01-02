@@ -3846,7 +3846,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                             if (Player* recipient = it->GetSource())
                             {
                                 l->push_back(recipient);
-                            } 
+                            }
                         }
                     }
                     else
