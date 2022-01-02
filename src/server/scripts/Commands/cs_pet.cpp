@@ -25,7 +25,6 @@
 #include "SpellMgr.h"
 #include "SpellInfo.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
 
 using namespace Acore::ChatCommands;
 
