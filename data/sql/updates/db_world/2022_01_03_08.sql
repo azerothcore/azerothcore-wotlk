@@ -1,3 +1,19 @@
+-- DB update 2022_01_03_07 -> 2022_01_03_08
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_03_07';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_03_07 2022_01_03_08 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1640873815468810463'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640873815468810463');
 
 -- Cleanup Southshore Guards "Fix movement, position, and remove overspawns
@@ -197,3 +213,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,112,-806.83167,-531.29114,15.661038,0,0,0,0,100,0),
 (@PATH,113,-779.9744,-544.9393,18.170403,0,0,0,0,100,0),
 (@PATH,114,-766.5353,-547.13434,17.7619,0,0,0,0,100,0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_03_08' WHERE sql_rev = '1640873815468810463';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
