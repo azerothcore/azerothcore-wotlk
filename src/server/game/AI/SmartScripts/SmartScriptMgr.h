@@ -183,6 +183,8 @@ enum SMART_EVENT
 
     SMART_EVENT_TC_END                   = 78,
 
+    SMART_EVENT_SUMMONED_UNIT_DIES       = 82,      // CreatureId(0 all), CooldownMin, CooldownMax
+
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
 
@@ -1658,7 +1660,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     { 0, 0 }, // 79
     { 0, 0 }, // 80
     { 0, 0 }, // 81
-    { 0, 0 }, // 82
+    {SMART_EVENT_SUMMONED_UNIT_DIES,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     { 0, 0 }, // 83
     { 0, 0 }, // 84
     { 0, 0 }, // 85
