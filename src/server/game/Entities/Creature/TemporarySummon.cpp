@@ -104,7 +104,23 @@ void TempSummon::Update(uint32 diff)
 
                 break;
             }
+        case TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE:
+            {
+                if (!IsInCombat() && m_deathState != CORPSE)
+                {
+                    if (m_timer <= diff)
+                    {
+                        UnSummon();
+                        return;
+                    }
 
+                    m_timer -= diff;
+                }
+                else if (m_timer != m_lifetime)
+                    m_timer = m_lifetime;
+
+                break;
+            }
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
             {
                 if (m_deathState == CORPSE)

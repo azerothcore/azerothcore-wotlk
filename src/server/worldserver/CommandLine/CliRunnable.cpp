@@ -20,12 +20,9 @@
 /// \file
 
 #include "CliRunnable.h"
-#include "Common.h"
 #include "Config.h"
 #include "Errors.h"
-#include "Log.h"
 #include "ObjectMgr.h"
-#include "Util.h"
 #include "World.h"
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
