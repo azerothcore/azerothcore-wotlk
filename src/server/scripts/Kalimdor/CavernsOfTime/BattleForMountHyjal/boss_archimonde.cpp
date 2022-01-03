@@ -490,7 +490,7 @@ public:
         {
             // Three doomfire can be up at the same time
             Talk(SAY_DOOMFIRE);
-            Unit* temp = SelectTarget(SELECT_TARGET_RANDOM, 1);
+            Unit* temp = SelectTarget(SelectTargetMethod::Random, 1);
             if (!temp)
                 temp = me->GetVictim();
 
@@ -647,19 +647,19 @@ public:
                 case EVENT_SPELL_FINGER_OF_DEATH:
                     if (CanUseFingerOfDeath())
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                        Unit* target = SelectTarget(SelectTargetMethod::Random, 0);
                         DoCast(target, SPELL_FINGER_OF_DEATH);
                         DoCastVictim(SPELL_RED_SKY_EFFECT);
                     }
                     events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 3500);
                     break;
                 case EVENT_SPELL_GRIP_OF_THE_LEGION:
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_GRIP_OF_THE_LEGION);
+                    DoCast(SelectTarget(SelectTargetMethod::Random, 0), SPELL_GRIP_OF_THE_LEGION);
                     events.ScheduleEvent(EVENT_SPELL_GRIP_OF_THE_LEGION, urand(5000, 25000));
                     break;
                 case EVENT_SPELL_AIR_BURST:
                     Talk(SAY_AIR_BURST);
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_AIR_BURST);
+                    DoCast(SelectTarget(SelectTargetMethod::Random, 0), SPELL_AIR_BURST);
                     events.ScheduleEvent(EVENT_SPELL_AIR_BURST, urand(25000, 40000));
                     break;
                 case EVENT_SPELL_FEAR:

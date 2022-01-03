@@ -35,350 +35,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-class LoadPetFromDBQueryHolder : public CharacterDatabaseQueryHolder
-{
-public:
-    LoadPetFromDBQueryHolder(uint32 petNumber, bool current, uint32 diffTime, std::string&& actionBar, uint32 health, uint32 mana)
-        : _petNumber(petNumber),
-        _current(current),
-        _diffTime(diffTime),
-        _actionBar(std::move(actionBar)),
-        _savedHealth(health),
-        _savedMana(mana) { }
-
-    uint32 GetPetNumber() const { return _petNumber; }
-    uint32 GetDiffTime() const { return _diffTime; }
-    bool GetCurrent() const { return _current; }
-    uint32 GetSavedHealth() const { return _savedHealth; }
-    uint32 GetSavedMana() const { return _savedMana; }
-    std::string GetActionBar() const { return _actionBar; }
-
-    bool Initialize();
-private:
-    enum
-    {
-        AURAS,
-        SPELLS,
-        COOLDOWNS,
-
-        MAX
-    };
-
-    const uint32 _petNumber;
-    const bool   _current;
-    const uint32 _diffTime;
-    const std::string _actionBar;
-    const uint32 _savedHealth;
-    const uint32 _savedMana;
-};
-
-bool LoadPetFromDBQueryHolder::Initialize()
-{
-    SetSize(MAX);
-
-    bool res = true;
-    CharacterDatabasePreparedStatement* stmt = nullptr;
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURA);
-    stmt->setUInt32(0, _petNumber);
-    res &= SetPreparedQuery(AURAS, stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL);
-    stmt->setUInt32(0, _petNumber);
-    res &= SetPreparedQuery(SPELLS, stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL_COOLDOWN);
-    stmt->setUInt32(0, _petNumber);
-    res &= SetPreparedQuery(COOLDOWNS, stmt);
-
-    return res;
-}
-
-uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType)
-{
-    if (!result)
-        return PET_LOAD_NO_RESULT;
-
-    Player* owner = GetPlayer();
-    if (!owner || owner->GetPet() || owner->GetVehicle() || owner->IsSpectator() || owner->IsBeingTeleportedFar())
-    {
-        return PET_LOAD_ERROR;
-    }
-
-    Field* fields = result->Fetch();
-
-    // Xinef: this can happen if fetch is called twice, impossibru.
-    if (!fields)
-        return PET_LOAD_ERROR;
-
-    // update for case of current pet "slot = 0"
-    uint32 petentry = fields[1].GetUInt32();
-    if (!petentry)
-        return PET_LOAD_NO_RESULT;
-
-    uint8 petSlot = fields[7].GetUInt8();
-    bool current = petSlot == PET_SAVE_AS_CURRENT;
-    uint32 summon_spell_id = fields[15].GetUInt32();
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id); // CANT BE nullptr
-    bool is_temporary_summoned = spellInfo && spellInfo->GetDuration() > 0;
-    uint32 pet_number = fields[0].GetUInt32();
-    uint32 savedhealth = fields[10].GetUInt32();
-    uint32 savedmana = fields[11].GetUInt32();
-    PetType pet_type = PetType(fields[16].GetUInt8());
-
-    // xinef: BG resurrect, overwrite saved value
-    if (asynchLoadType == PET_LOAD_BG_RESURRECT)
-        savedhealth = 1;
-
-    if (pet_type == HUNTER_PET && savedhealth == 0 && asynchLoadType != PET_LOAD_SUMMON_DEAD_PET)
-    {
-        WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1 + 4);
-        data << uint8(0);
-        data << uint32(883);
-        data << uint8(SPELL_FAILED_TARGETS_DEAD);
-        SendPacket(&data);
-        owner->RemoveSpellCooldown(883, false);
-        return PET_LOAD_ERROR;
-    }
-
-    // check temporary summoned pets like mage water elemental
-    if (current && is_temporary_summoned)
-        return PET_LOAD_ERROR;
-
-    if (pet_type == HUNTER_PET)
-    {
-        CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(petentry);
-        if (!creatureInfo || !creatureInfo->IsTameable(owner->CanTameExoticPets()))
-            return PET_LOAD_ERROR;
-    }
-
-    Map* map = owner->GetMap();
-    ObjectGuid::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
-    Pet* pet = new Pet(owner, pet_type);
-    if (!pet->Create(guid, map, owner->GetPhaseMask(), petentry, pet_number))
-    {
-        delete pet;
-        return PET_LOAD_ERROR;
-    }
-
-    std::shared_ptr<LoadPetFromDBQueryHolder> holder = std::make_shared<LoadPetFromDBQueryHolder>(pet_number, current, uint32(time(nullptr) - fields[14].GetUInt32()), fields[13].GetString(), savedhealth, savedmana);
-    if (!holder->Initialize())
-    {
-        delete pet;
-        return PET_LOAD_ERROR;
-    }
-
-    float px, py, pz;
-    owner->GetClosePoint(px, py, pz, pet->GetObjectSize(), PET_FOLLOW_DIST, pet->GetFollowAngle());
-    if (!pet->IsPositionValid())
-    {
-        LOG_ERROR("network.opcode", "Pet (%s, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
-            pet->GetGUID().ToString().c_str(), pet->GetEntry(), pet->GetPositionX(), pet->GetPositionY());
-        delete pet;
-        return PET_LOAD_ERROR;
-    }
-
-    pet->SetLoading(true);
-    pet->Relocate(px, py, pz, owner->GetOrientation());
-    pet->setPetType(pet_type);
-    pet->SetFaction(owner->GetFaction());
-    pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
-
-    if (pet->IsCritter())
-    {
-        pet->UpdatePositionData();
-        map->AddToMap(pet->ToCreature(), true);
-        pet->SetLoading(false); // xinef, mine
-        return PET_LOAD_OK;
-    }
-
-    if (pet->getPetType() == HUNTER_PET || pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
-        pet->GetCharmInfo()->SetPetNumber(pet_number, pet->IsPermanentPetFor(owner)); // Show pet details tab (Shift+P) only for hunter pets, demons or undead
-    else
-        pet->GetCharmInfo()->SetPetNumber(pet_number, false);
-
-    pet->SetDisplayId(fields[3].GetUInt32());
-    pet->UpdatePositionData();
-    pet->SetNativeDisplayId(fields[3].GetUInt32());
-    pet->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-    pet->SetName(fields[8].GetString());
-    uint32 petlevel = fields[4].GetUInt16();
-
-    switch (pet->getPetType())
-    {
-        case SUMMON_PET:
-            petlevel = owner->getLevel();
-
-            if (pet->IsPetGhoul())
-                pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 0x400); // class = rogue
-            else
-                pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
-
-            pet->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-            // this enables popup window (pet dismiss, cancel)
-            break;
-        case HUNTER_PET:
-            pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100); // class = warrior, gender = none, power = focus
-            pet->SetSheath(SHEATH_STATE_MELEE);
-            pet->SetByteFlag(UNIT_FIELD_BYTES_2, 2, fields[9].GetBool() ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
-            pet->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-            // this enables popup window (pet abandon, cancel)
-            pet->SetMaxPower(POWER_HAPPINESS, pet->GetCreatePowers(POWER_HAPPINESS));
-            pet->SetPower(POWER_HAPPINESS, fields[12].GetUInt32());
-            pet->setPowerType(POWER_FOCUS);
-            break;
-        default:
-            if (!pet->IsPetGhoul())
-                LOG_ERROR("network.opcode", "Pet have incorrect type (%u) for pet loading.", pet->getPetType());
-            break;
-    }
-
-    pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped here
-    pet->SetCreatorGUID(owner->GetGUID());
-    owner->SetMinion(pet, true);
-
-    pet->InitStatsForLevel(petlevel);
-    pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
-    pet->SynchronizeLevelWithOwner();
-    pet->SetReactState(ReactStates(fields[6].GetUInt8()));
-    pet->SetCanModifyStats(true);
-
-    // set current pet as current
-    // 0=current
-    // 1..MAX_PET_STABLES in stable slot
-    // PET_SAVE_NOT_IN_SLOT(100) = not stable slot (summoning))
-    if (petSlot)
-    {
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT_EXCLUDE_ID);
-        stmt->setUInt8(0, uint8(PET_SAVE_NOT_IN_SLOT));
-        stmt->setUInt32(1, owner->GetGUID().GetCounter());
-        stmt->setUInt8(2, uint8(PET_SAVE_AS_CURRENT));
-        stmt->setUInt32(3, pet_number);
-        trans->Append(stmt);
-
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
-        stmt->setUInt8(0, uint8(PET_SAVE_AS_CURRENT));
-        stmt->setUInt32(1, owner->GetGUID().GetCounter());
-        stmt->setUInt32(2, pet_number);
-        trans->Append(stmt);
-
-        CharacterDatabase.CommitTransaction(trans);
-    }
-
-    // Send fake summon spell cast - this is needed for correct cooldown application for spells
-    // Example: 46584 - without this cooldown (which should be set always when pet is loaded) isn't set clientside
-    // TODO: pets should be summoned from real cast instead of just faking it?
-    if (summon_spell_id)
-    {
-        WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
-        data << owner->GetPackGUID();
-        data << owner->GetPackGUID();
-        data << uint8(0);
-        data << uint32(summon_spell_id);
-        data << uint32(256); // CAST_FLAG_UNKNOWN3
-        data << uint32(0);
-        owner->SendMessageToSet(&data, true);
-    }
-
-    // do it as early as possible!
-    pet->InitTalentForLevel();                                   // set original talents points before spell loading
-
-    if (!is_temporary_summoned)
-        pet->GetCharmInfo()->InitPetActionBar();
-
-    map->AddToMap(pet->ToCreature(), true);
-
-    if (pet->getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
-        pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
-    else
-    {
-        pet->SetHealth(savedhealth > pet->GetMaxHealth() ? pet->GetMaxHealth() : savedhealth);
-        pet->SetPower(POWER_MANA, savedmana > pet->GetMaxPower(POWER_MANA) ? pet->GetMaxPower(POWER_MANA) : savedmana);
-    }
-
-    pet->SetAsynchLoadType(asynchLoadType);
-
-    AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this](SQLQueryHolderBase const& holder)
-    {
-        HandleLoadPetFromDBSecondCallback(static_cast<LoadPetFromDBQueryHolder const&>(holder));
-    });
-
-    return PET_LOAD_OK;
-}
-
-void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder)
-{
-    if (!GetPlayer())
-        return;
-
-    Player* owner = GetPlayer();
-    Pet* pet = owner->GetPet();
-    if (!pet)
-        return;
-
-    pet->_LoadAuras(holder.GetPreparedResult(PET_LOAD_QUERY_LOADAURAS), holder.GetDiffTime());
-    bool current = holder.GetCurrent();
-    uint32 summon_spell_id = pet->GetUInt32Value(UNIT_CREATED_BY_SPELL);
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id); // CANT BE nullptr
-    bool is_temporary_summoned = spellInfo && spellInfo->GetDuration() > 0;
-
-    // load action bar, if data broken will fill later by default spells.
-    if (!is_temporary_summoned)
-    {
-        pet->GetCharmInfo()->LoadPetActionBar(holder.GetActionBar()); // action bar stored in already read string
-        pet->_LoadSpells(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLS));
-        pet->InitTalentForLevel();                               // re-init to check talent count
-        pet->_LoadSpellCooldowns(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLCOOLDOWN));
-        pet->LearnPetPassives();
-        pet->InitLevelupSpellsForLevel();
-        pet->CastPetAuras(current);
-    }
-
-    pet->CleanupActionBar();                                     // remove unknown spells from action bar after load
-    owner->PetSpellInitialize();
-    owner->SendTalentsInfoData(true);
-
-    if (owner->GetGroup())
-        owner->SetGroupUpdateFlag(GROUP_UPDATE_PET);
-
-    //set last used pet number (for use in BG's)
-    if (owner->GetTypeId() == TYPEID_PLAYER && pet->isControlled() && !pet->isTemporarySummoned() && (pet->getPetType() == SUMMON_PET || pet->getPetType() == HUNTER_PET))
-    {
-        owner->ToPlayer()->SetLastPetNumber(holder.GetPetNumber());
-        owner->SetLastPetSpell(pet->GetUInt32Value(UNIT_CREATED_BY_SPELL));
-    }
-
-    if (pet->getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
-    {
-        pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
-        pet->SetHealth(pet->GetMaxHealth());
-    }
-    else
-    {
-        if (!holder.GetSavedHealth() && pet->getPetType() == HUNTER_PET && pet->GetAsynchLoadType() != PET_LOAD_SUMMON_DEAD_PET)
-            pet->setDeathState(JUST_DIED);
-        else
-        {
-            pet->SetHealth(holder.GetSavedHealth() > pet->GetMaxHealth() ? pet->GetMaxHealth() : holder.GetSavedHealth());
-            pet->SetPower(POWER_MANA, holder.GetSavedMana() > pet->GetMaxPower(POWER_MANA) ? pet->GetMaxPower(POWER_MANA) : holder.GetSavedMana());
-        }
-    }
-
-    pet->SetLoading(false);
-    owner->SetTemporaryUnsummonedPetNumber(0); // clear this only if pet is loaded successfuly
-
-    // current
-    if (current && owner->IsPetNeedBeTemporaryUnsummoned())
-    {
-        owner->UnsummonPetTemporaryIfAny();
-        return;
-    }
-
-    pet->HandleAsynchLoadSucceed();
-}
-
 void WorldSession::HandleDismissCritter(WorldPacket& recvData)
 {
     ObjectGuid guid;
@@ -411,12 +67,12 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     recvData >> data;
     recvData >> guid2;                                     //tag guid
 
-    uint32 spellid = UNIT_ACTION_BUTTON_ACTION(data);
+    uint32 spellId = UNIT_ACTION_BUTTON_ACTION(data);
     uint8 flag = UNIT_ACTION_BUTTON_TYPE(data);             //delete = 0x07 CastSpell = C1
 
     // used also for charmed creature
     Unit* pet = ObjectAccessor::GetUnit(*_player, guid1);
-    LOG_DEBUG("network.opcode", "HandlePetAction: Pet %s - flag: %u, spellid: %u, target: %s.", guid1.ToString().c_str(), uint32(flag), spellid, guid2.ToString().c_str());
+    LOG_DEBUG("network.opcode", "HandlePetAction: Pet %s - flag: %u, spellId: %u, target: %s.", guid1.ToString().c_str(), uint32(flag), spellId, guid2.ToString().c_str());
 
     if (!pet)
     {
@@ -433,8 +89,8 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     if (!pet->IsAlive())
     {
         // xinef: allow dissmis dead pets
-        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellid) : nullptr;
-        if ((flag != ACT_COMMAND || spellid != COMMAND_ABANDON) && (!spell || !spell->HasAttribute(SPELL_ATTR0_ALLOW_CAST_WHILE_DEAD)))
+        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellId) : nullptr;
+        if ((flag != ACT_COMMAND || spellId != COMMAND_ABANDON) && (!spell || !spell->HasAttribute(SPELL_ATTR0_ALLOW_CAST_WHILE_DEAD)))
             return;
     }
 
@@ -443,13 +99,13 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
         return;
 
     // Do not follow itself vehicle
-    if (spellid == COMMAND_FOLLOW && _player->IsOnVehicle(pet))
+    if (spellId == COMMAND_FOLLOW && _player->IsOnVehicle(pet))
     {
         return;
     }
 
     if (GetPlayer()->m_Controlled.size() == 1)
-        HandlePetActionHelper(pet, guid1, spellid, flag, guid2);
+        HandlePetActionHelper(pet, guid1, spellId, flag, guid2);
     else
     {
         //If a pet is dismissed, m_Controlled will change
@@ -457,10 +113,10 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
         for (Unit::ControlSet::iterator itr = GetPlayer()->m_Controlled.begin(); itr != GetPlayer()->m_Controlled.end(); ++itr)
         {
             // xinef: allow to dissmis dead pets
-            if ((*itr)->GetEntry() == pet->GetEntry() && ((*itr)->IsAlive() || (flag == ACT_COMMAND && spellid == COMMAND_ABANDON)))
+            if ((*itr)->GetEntry() == pet->GetEntry() && ((*itr)->IsAlive() || (flag == ACT_COMMAND && spellId == COMMAND_ABANDON)))
                 controlled.push_back(*itr);
             // xinef: mirror image blizzard crappness
-            else if ((*itr)->GetEntry() == NPC_MIRROR_IMAGE && flag == ACT_COMMAND && spellid == COMMAND_FOLLOW)
+            else if ((*itr)->GetEntry() == NPC_MIRROR_IMAGE && flag == ACT_COMMAND && spellId == COMMAND_FOLLOW)
             {
                 (*itr)->InterruptNonMeleeSpells(false);
             }
@@ -468,7 +124,7 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
 
         for (Unit* pet : controlled)
             if (pet && pet->IsInWorld() && pet->GetMap() == _player->GetMap())
-                HandlePetActionHelper(pet, guid1, spellid, flag, guid2);
+                HandlePetActionHelper(pet, guid1, spellId, flag, guid2);
     }
 }
 
@@ -500,20 +156,20 @@ void WorldSession::HandlePetStopAttack(WorldPacket& recvData)
     pet->ClearInPetCombat();
 }
 
-void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2)
+void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellId, uint16 flag, ObjectGuid guid2)
 {
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
     {
         LOG_ERROR("network.opcode", "WorldSession::HandlePetAction(petGuid: %s, tagGuid: %s, spellId: %u, flag: %u): object (%s) is considered pet-like but doesn't have a charminfo!",
-                       guid1.ToString().c_str(), guid2.ToString().c_str(), spellid, flag, pet->GetGUID().ToString().c_str());
+                       guid1.ToString().c_str(), guid2.ToString().c_str(), spellId, flag, pet->GetGUID().ToString().c_str());
         return;
     }
 
     switch (flag)
     {
         case ACT_COMMAND:                                   //0x07
-            switch (spellid)
+            switch (spellId)
             {
                 case COMMAND_STAY:                          //flat=1792  //STAY
                     {
@@ -539,7 +195,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         charmInfo->SetForcedTargetGUID();
                         break;
                     }
-                case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
+                case COMMAND_FOLLOW:                        //spellId=1792  //FOLLOW
                     {
                         pet->AttackStop();
                         pet->InterruptNonMeleeSpells(false);
@@ -559,12 +215,12 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         charmInfo->SetForcedTargetGUID();
                         break;
                     }
-                case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
+                case COMMAND_ATTACK:                        //spellId=1792  //ATTACK
                     {
                         // Can't attack if owner is pacified
                         if (_player->HasAuraType(SPELL_AURA_MOD_PACIFY))
                         {
-                            //pet->SendPetCastFail(spellid, SPELL_FAILED_PACIFIED);
+                            //pet->SendPetCastFail(spellId, SPELL_FAILED_PACIFIED);
                             //TODO: Send proper error message to client
                             return;
                         }
@@ -663,11 +319,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     }
                     break;
                 default:
-                    LOG_ERROR("network.opcode", "WORLD: unknown PET flag Action %i and spellid %i.", uint32(flag), spellid);
+                    LOG_ERROR("network.opcode", "WORLD: unknown PET flag Action %i and spellId %i.", uint32(flag), spellId);
             }
             break;
         case ACT_REACTION:                                  // 0x6
-            switch (spellid)
+            switch (spellId)
             {
                 case REACT_PASSIVE:                         //passive
                     pet->AttackStop();
@@ -679,9 +335,9 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete
                     if (pet->GetTypeId() == TYPEID_UNIT)
-                        pet->ToCreature()->SetReactState(ReactStates(spellid));
+                        pet->ToCreature()->SetReactState(ReactStates(spellId));
                     else
-                        charmInfo->SetPlayerReactState(ReactStates(spellid));
+                        charmInfo->SetPlayerReactState(ReactStates(spellId));
                     break;
             }
             break;
@@ -692,10 +348,10 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 Unit* unit_target = nullptr;
 
                 // do not cast unknown spells
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 if (!spellInfo)
                 {
-                    LOG_ERROR("network.opcode", "WORLD: unknown PET spell id %i", spellid);
+                    LOG_ERROR("network.opcode", "WORLD: unknown PET spell id %i", spellId);
                     return;
                 }
 
@@ -710,10 +366,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         return;
                 }
 
-                // do not cast not learned spells
-                if (!pet->HasSpell(spellid) || spellInfo->IsPassive())
-                    return;
-
                 //  Clear the flags as if owner clicked 'attack'. AI will reset them
                 //  after AttackStart, even if spell failed
                 charmInfo->SetIsAtStay(false);
@@ -721,7 +373,28 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 charmInfo->SetIsReturning(false);
                 charmInfo->SetIsFollowing(false);
 
-                Spell* spell = new Spell(pet, spellInfo, TRIGGERED_NONE);
+                TriggerCastFlags triggerCastFlags = TRIGGERED_NONE;
+
+                if (spellInfo->IsPassive())
+                    return;
+
+                // cast only learned spells
+                if (!pet->HasSpell(spellId))
+                {
+                    bool allow = false;
+
+                    // allow casting of spells triggered by clientside periodic trigger auras
+                    if (pet->HasAuraTypeWithTriggerSpell(SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT, spellId))
+                    {
+                        allow = true;
+                        triggerCastFlags = TRIGGERED_FULL_MASK;
+                    }
+
+                    if (!allow)
+                        return;
+                }
+
+                Spell* spell = new Spell(pet, spellInfo, triggerCastFlags);
                 spell->LoadScripts(); // xinef: load for CheckPetCast
 
                 SpellCastResult result = spell->CheckPetCast(unit_target);
@@ -752,7 +425,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 {
                     if (!spellInfo->IsCooldownStartedOnEvent())
                     {
-                        pet->ToCreature()->AddSpellCooldown(spellid, 0, 0);
+                        pet->ToCreature()->AddSpellCooldown(spellId, 0, 0);
                     }
 
                     unit_target = spell->m_targets.GetUnitTarget();
@@ -806,9 +479,9 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     else
                         spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);
 
-                    if (!pet->HasSpellCooldown(spellid))
+                    if (!pet->HasSpellCooldown(spellId))
                         if(pet->ToPet())
-                            pet->ToPet()->RemoveSpellCooldown(spellid, true);
+                            pet->ToPet()->RemoveSpellCooldown(spellId, true);
 
                     spell->finish(false);
                     delete spell;
@@ -866,7 +539,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, nullptr, tempspellIsPositive);
+                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, nullptr, tempspellIsPositive);
                         }
                     }
                     else if (haspositiveeffect)
@@ -902,7 +575,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, victim, tmpSpellIsPositive);
+                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, victim, tmpSpellIsPositive);
                         }
                     }
                 }
@@ -917,8 +590,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             spell->SendPetCastResult(result);
                     }
 
-                    if (!pet->ToCreature()->HasSpellCooldown(spellid))
-                        GetPlayer()->SendClearCooldown(spellid, pet);
+                    if (!pet->ToCreature()->HasSpellCooldown(spellId))
+                        GetPlayer()->SendClearCooldown(spellId, pet);
 
                     spell->finish(false);
                     delete spell;
@@ -929,7 +602,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 break;
             }
         default:
-            LOG_ERROR("network.opcode", "WORLD: unknown PET flag Action %i and spellid %i.", uint32(flag), spellid);
+            LOG_ERROR("network.opcode", "WORLD: unknown PET flag Action %i and spellId %i.", uint32(flag), spellId);
     }
 }
 
@@ -1171,12 +844,18 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
     recvData >> name;
     recvData >> isdeclined;
 
+    PetStable* petStable = _player->GetPetStable();
+
     Pet* pet = ObjectAccessor::GetPet(*_player, petguid);
+
     // check it!
     if (!pet || !pet->IsPet() || ((Pet*)pet)->getPetType() != HUNTER_PET ||
-            !pet->HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ||
-            pet->GetOwnerGUID() != _player->GetGUID() || !pet->GetCharmInfo())
+        !pet->HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ||
+        pet->GetOwnerGUID() != _player->GetGUID() || !pet->GetCharmInfo() ||
+        !petStable || !petStable->CurrentPet || petStable->CurrentPet->PetNumber != pet->GetCharmInfo()->GetPetNumber())
+    {
         return;
+    }
 
     PetNameInvalidReason res = ObjectMgr::CheckPetName(name);
     if (res != PET_NAME_SUCCESS)
@@ -1198,6 +877,9 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
         owner->ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_NAME);
 
     pet->RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+
+    petStable->CurrentPet->Name = name;
+    petStable->CurrentPet->WasRenamed = true;
 
     if (isdeclined)
     {
@@ -1277,9 +959,9 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
 {
     LOG_DEBUG("network.opcode", "CMSG_PET_SPELL_AUTOCAST");
     ObjectGuid guid;
-    uint32 spellid;
+    uint32 spellId;
     uint8  state;                                           //1 for on, 0 for off
-    recvPacket >> guid >> spellid >> state;
+    recvPacket >> guid >> spellId >> state;
 
     if (!_player->GetGuardianPet() && !_player->GetCharm())
         return;
@@ -1287,7 +969,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
     if (guid.IsPlayer())
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 
@@ -1312,7 +994,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
             continue;
 
         // do not add not learned spells/ passive spells
-        if (!pet->HasSpell(spellid) || !spellInfo->IsAutocastable())
+        if (!pet->HasSpell(spellId) || !spellInfo->IsAutocastable())
             continue;
 
         CharmInfo* charmInfo = pet->GetCharmInfo();

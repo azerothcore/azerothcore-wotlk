@@ -52,6 +52,7 @@
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
@@ -576,7 +577,17 @@ void Creature::Update(uint32 diff)
                 time_t now = time(nullptr);
                 if (m_respawnTime <= now)
                 {
-                    bool allowed = !IsAIEnabled || AI()->CanRespawn();     // First check if there are any scripts that object to us respawning
+
+                    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_RESPAWN, GetEntry());
+
+                    if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
+                    {
+                        // Creature should not respawn, reset respawn timer. Conditions will be checked again the next time it tries to respawn.
+                        m_respawnTime = time(nullptr) + m_respawnDelay;
+                        break;
+                    }
+
+                    bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that prevent us respawning
                     if (!allowed)                                               // Will be rechecked on next Update call
                         break;
 
@@ -853,7 +864,7 @@ void Creature::Regenerate(Powers power)
         if (Powers((*i)->GetMiscValue()) == power)
             AddPct(addvalue, (*i)->GetAmount());
 
-    addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * (power == POWER_FOCUS ? PET_FOCUS_REGEN_INTERVAL : CREATURE_REGEN_INTERVAL) / (5 * IN_MILLISECONDS);
+    addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * (power == POWER_FOCUS ? PET_FOCUS_REGEN_INTERVAL.count() : CREATURE_REGEN_INTERVAL) / (5 * IN_MILLISECONDS);
 
     ModifyPower(power, int32(addvalue));
 }
@@ -2578,20 +2589,26 @@ void Creature::SetInCombatWithZone()
 void Creature::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
 {
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    {
         if (idSchoolMask & (1 << i))
+        {
             m_ProhibitSchoolTime[i] = World::GetGameTimeMS() + unTimeMs;
+        }
+    }
 }
 
 bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
 {
-    const CreatureTemplate* cinfo = GetCreatureTemplate();
-    if (!(cinfo && cinfo->flags_extra & CREATURE_FLAG_EXTRA_ALL_DIMINISH) && (isWorldBoss() || IsDungeonBoss()))
-        return false;
-
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    {
         if (idSchoolMask & (1 << i))
+        {
             if (m_ProhibitSchoolTime[i] >= World::GetGameTimeMS())
+            {
                 return true;
+            }
+        }
+    }
 
     return false;
 }
