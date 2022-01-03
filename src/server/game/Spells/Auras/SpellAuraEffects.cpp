@@ -4316,7 +4316,7 @@ void AuraEffect::HandleAuraModIncreaseMaxHealth(AuraApplication const* aurApp, u
     // refresh percentage
     if (oldhealth > 0)
     {
-        uint32 newhealth = uint32(ceil((double)target->GetMaxHealth() * healthPercentage));
+        uint32 newhealth = uint32(std::ceil((double)target->GetMaxHealth() * healthPercentage));
         if (newhealth == 0)
             newhealth = 1;
 
@@ -6328,7 +6328,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         }
     }
     else // xinef: ceil obtained value, it may happen that 10 ticks for 10% damage may not kill owner
-        damage = uint32(ceil(CalculatePct<float, float>(target->GetMaxHealth(), damage)));
+        damage = uint32(std::ceil(CalculatePct<float, float>(target->GetMaxHealth(), damage)));
 
     // calculate crit chance
     bool crit = false;
