@@ -361,6 +361,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_PLAYER_WITH_AURA:
         case SMART_TARGET_RANDOM_POINT:
         case SMART_TARGET_ROLE_SELECTION:
+        case SMART_TARGET_LOOT_RECIPIENTS:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled target_type(%u), Entry %d SourceType %u Event %u Action %u, skipped.", e.GetTargetType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
