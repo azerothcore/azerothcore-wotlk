@@ -445,6 +445,8 @@ public:
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
 
+    [[nodiscard]] virtual bool OnBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player* /*target*/, uint16 /*index*/) { return false; }
+
     /**
      * @brief This hook runs in Unit::Update
      *
@@ -2361,6 +2363,7 @@ public: /* UnitScript */
     bool IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
     bool CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update);
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
+    bool OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index);
     void OnUnitUpdate(Unit* unit, uint32 diff);
 
 public: /* MovementHandlerScript */
