@@ -18,12 +18,11 @@
 #include "Totem.h"
 #include "Group.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "WorldPacket.h"
+#include "TotemPackets.h"
 
 Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false)
 {
@@ -57,14 +56,15 @@ void Totem::InitStats(uint32 duration)
     // Xinef: Set level for Unit totems
     if (Unit* owner = ObjectAccessor::GetUnit(*this, m_owner))
     {
-        if (owner->GetTypeId() == TYPEID_PLAYER && m_Properties->Slot >= SUMMON_SLOT_TOTEM && m_Properties->Slot < MAX_TOTEM_SLOT)
+        uint32 slot = m_Properties->Slot;
+        if (owner->GetTypeId() == TYPEID_PLAYER && slot >= SUMMON_SLOT_TOTEM && slot < MAX_TOTEM_SLOT)
         {
-            WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
-            data << uint8(m_Properties->Slot - 1);
-            data << GetGUID();
-            data << uint32(duration);
-            data << uint32(GetUInt32Value(UNIT_CREATED_BY_SPELL));
-            owner->ToPlayer()->SendDirectMessage(&data);
+            WorldPackets::Totem::TotemCreated data;
+            data.Totem = GetGUID();
+            data.Slot = slot - SUMMON_SLOT_TOTEM;
+            data.Duration = duration;
+            data.SpellID = GetUInt32Value(UNIT_CREATED_BY_SPELL);
+            owner->ToPlayer()->SendDirectMessage(data.Write());
 
             // set display id depending on caster's race
             SetDisplayId(owner->GetModelForTotem(PlayerTotemType(m_Properties->Id)));

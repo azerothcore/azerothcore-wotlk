@@ -1679,7 +1679,31 @@ class spell_gen_pet_summoned : public SpellScript
     {
         Player* player = GetCaster()->ToPlayer();
         if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-            Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
+        {
+            PetType newPetType = (player->getClass() == CLASS_HUNTER) ? HUNTER_PET : SUMMON_PET;
+            Pet* newPet = new Pet(player, newPetType);
+            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true))
+            {
+                // revive the pet if it is dead
+                if (newPet->getDeathState() != ALIVE && newPet->getDeathState() != JUST_RESPAWNED)
+                    newPet->setDeathState(JUST_RESPAWNED);
+
+                newPet->SetFullHealth();
+                newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
+
+                switch (newPet->GetEntry())
+                {
+                    case NPC_DOOMGUARD:
+                    case NPC_INFERNAL:
+                        newPet->SetEntry(NPC_IMP);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+                delete newPet;
+        }
     }
 
     void Register() override

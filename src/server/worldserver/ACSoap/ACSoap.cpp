@@ -19,7 +19,6 @@
 #include "AccountMgr.h"
 #include "Log.h"
 #include "World.h"
-#include "soapH.h"
 #include "soapStub.h"
 
 void ACSoapThread(const std::string& host, uint16 port)

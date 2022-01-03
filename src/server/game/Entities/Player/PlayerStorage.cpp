@@ -4399,7 +4399,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             // Random Property Exist - try found basepoints for spell (basepoints depends from item suffix factor)
                             if (item->GetItemRandomPropertyId())
                             {
-                                ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(abs(item->GetItemRandomPropertyId()));
+                                ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
                                 if (item_rand)
                                 {
                                     // Search enchant_amount
@@ -4426,7 +4426,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
                     if (!enchant_amount)
                     {
-                        ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(abs(item->GetItemRandomPropertyId()));
+                        ItemRandomSuffixEntry const* item_rand = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
                         if (item_rand)
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
@@ -4446,7 +4446,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 {
                     if (!enchant_amount)
                     {
-                        ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(abs(item->GetItemRandomPropertyId()));
+                        ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(std::abs(item->GetItemRandomPropertyId()));
                         if (item_rand_suffix)
                         {
                             for (int k = 0; k < MAX_ITEM_ENCHANTMENT_EFFECTS; ++k)
@@ -5215,7 +5215,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
             map = sMapMgr->CreateMap(mapId, this);
             if (map)
             {
-                auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(abs(transLowGUID));
+                auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(std::abs(transLowGUID));
                 if (bounds.first != bounds.second)
                     transGO = bounds.first->second->ToTransport();
             }
@@ -5375,12 +5375,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     uint32 extraflags = fields[36].GetUInt16();
 
-    m_stableSlots = fields[37].GetUInt8();
-    if (m_stableSlots > MAX_PET_STABLES)
-    {
-        LOG_ERROR("entities.player", "Player can have not more %u stable slots, but have in DB %u", MAX_PET_STABLES, uint32(m_stableSlots));
-        m_stableSlots = MAX_PET_STABLES;
-    }
+    _LoadPetStable(fields[37].GetUInt8(), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS));
 
     m_atLoginFlags = fields[38].GetUInt16();
 
@@ -6293,9 +6288,11 @@ void Player::LoadPet()
 {
     //fixme: the pet should still be loaded if the player is not in world
     // just not added to the map
-    if (IsInWorld())
+    if (m_petStable && IsInWorld())
     {
-        Pet::LoadPetFromDB(this, PET_LOAD_SUMMON_PET, 0, 0, true);
+        Pet* pet = new Pet(this);
+        if (!pet->LoadPetFromDB(this, 0, 0, true))
+            delete pet;
     }
 }
 
@@ -7177,7 +7174,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, logout);
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state
