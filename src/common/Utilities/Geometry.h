@@ -34,7 +34,7 @@
     auto dx = destX - startX;
     auto dy = destY - startY;
 
-    auto ang = atan2(dy, dx);
+    auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * float(M_PI) + ang;
     return ang;
 }
