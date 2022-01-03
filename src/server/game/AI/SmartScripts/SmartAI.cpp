@@ -866,11 +866,6 @@ void SmartAI::DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType /*damag
     GetScript()->ProcessEventsFor(SMART_EVENT_DAMAGED_TARGET, doneTo, damage);
 }
 
-void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
-{
-    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
-}
-
 void SmartAI::SummonedCreatureDespawn(Creature* unit)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMON_DESPAWNED, unit);
@@ -906,7 +901,10 @@ void SmartAI::InitializeAI()
 }
 
 void SmartAI::OnCharmed(bool apply)
+{void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
 {
+    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
+}
     GetScript()->ProcessEventsFor(SMART_EVENT_CHARMED, nullptr, 0, 0, apply);
 }
 
@@ -1092,6 +1090,11 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
     //    return;
 
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELLCLICK, clicker);
+}
+
+void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
+{
+    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
 }
 
 int SmartGameObjectAI::Permissible(const GameObject* g)
