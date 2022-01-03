@@ -1000,6 +1000,26 @@ enum WindStone
     SAY_ON_SPAWN_IN      = 0
 };
 
+class DelayedWindstoneSummonEvent : public BasicEvent
+{
+public:
+    DelayedWindstoneSummonEvent(TempSummon* summon, ObjectGuid playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
+        {
+            _summon->AI()->AttackStart(player);
+        }
+
+        return true;
+    }
+
+private:
+    TempSummon* _summon;
+    ObjectGuid _playerGUID;
+};
+
 class go_wind_stone : public GameObjectScript
 {
 public:
@@ -1165,12 +1185,14 @@ public:
                 return;
             }
             player->CastSpell(player, spellInfoTrigger->Id, false);
-            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000))
+            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE, 6000))
             {
-                summons->CastSpell(summons, SPELL_SPAWN_IN, false);
+                summons->SetCorpseDelay(5 * MINUTE);
                 summons->SetTarget(player->GetGUID());
+                summons->SetLootRecipient(player);
+                summons->CastSpell(summons, SPELL_SPAWN_IN, false);
                 summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
-                summons->AI()->AttackStart(player);
+                summons->m_Events.AddEvent(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), summons->m_Events.CalculateTime(5200));
                 _creatureGuid = summons->GetGUID();
             }
         }

@@ -270,7 +270,7 @@ public:
 
             Position pos = rift->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
-            if (TempSummon* summon = instance->SummonCreature(abs(entry), pos))
+            if (TempSummon* summon = instance->SummonCreature(std::abs(entry), pos))
             {
                 summon->SetTempSummonType(TEMPSUMMON_CORPSE_TIMED_DESPAWN);
                 summon->SetTimer(3 * MINUTE * IN_MILLISECONDS);

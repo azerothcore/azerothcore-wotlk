@@ -1177,7 +1177,7 @@ public:
             switch (combatEvents.ExecuteEvent())
             {
                 case EVENT_COMBAT_EXORCISM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_ARTHAS_EXORCISM_N, SPELL_ARTHAS_EXORCISM_H), false);
 
                     combatEvents.RepeatEvent(7300);
