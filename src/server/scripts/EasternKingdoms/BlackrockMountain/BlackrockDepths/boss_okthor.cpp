@@ -78,7 +78,7 @@ public:
                 switch (eventId)
                 {
                 case SPELL_ARCANE_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(target, SPELL_ARCANE_BOLT);
                     }
@@ -97,7 +97,7 @@ public:
                     events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, nextArcaneExplosionTime);
                     break;
                 case SPELL_POLYMORPH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(target, SPELL_POLYMORPH);
                     }
