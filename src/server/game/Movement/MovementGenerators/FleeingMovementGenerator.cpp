@@ -160,11 +160,11 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
             break;
         }
 
-        if (!(temp_z - z) || distance / fabs(temp_z - z) > 1.0f)
+        if (!(temp_z - z) || distance / std::fabs(temp_z - z) > 1.0f)
         {
             float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), z, true);
             float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), z, true);
-            if (fabs(temp_z_left - temp_z) < 1.2f && fabs(temp_z_right - temp_z) < 1.2f)
+            if (std::fabs(temp_z_left - temp_z) < 1.2f && std::fabs(temp_z_right - temp_z) < 1.2f)
             {
                 // use new values
                 x = temp_x;

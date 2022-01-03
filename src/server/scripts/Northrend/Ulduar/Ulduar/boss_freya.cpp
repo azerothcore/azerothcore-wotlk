@@ -718,7 +718,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (me->GetEntry() == killer->GetEntry())
+            if (killer && me->GetEntry() == killer->GetEntry())
                 return;
             me->Yell("Matron, flee! They are ruthless....", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_STONEBARK_DEATH);
@@ -824,7 +824,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (me->GetEntry() == killer->GetEntry())
+            if (killer && me->GetEntry() == killer->GetEntry())
                 return;
             me->Yell("Matron, one has fallen!", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_BRIGHTLEAF_DEATH);
@@ -945,7 +945,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (me->GetEntry() == killer->GetEntry())
+            if (killer && me->GetEntry() == killer->GetEntry())
                 return;
             me->Yell("Freya! They come for you.", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_IRONBRANCH_DEATH);
@@ -1011,7 +1011,7 @@ public:
     {
         boss_freya_iron_rootAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (!me->IsSummon())
                 return;
@@ -1139,7 +1139,7 @@ public:
                 AttackStart(target);
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (Creature* freya = ObjectAccessor::GetCreature(*me, _freyaGUID))
             {
