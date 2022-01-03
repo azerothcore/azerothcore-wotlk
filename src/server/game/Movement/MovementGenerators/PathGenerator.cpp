@@ -1004,7 +1004,7 @@ bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, floa
  */
 bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight)
 {
-    float diffHeight = abs(destZ - z);
+    float diffHeight = std::abs(destZ - z);
     float reqHeight = GetRequiredHeightToClimb(x, y, z, destX, destY, destZ, sourceHeight);
     // check walkable slopes, based on unit height
     return diffHeight <= reqHeight;
