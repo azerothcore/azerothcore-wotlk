@@ -5543,7 +5543,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 17731, 69294 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-        spellInfo->CastingTimeIndex = 3;
+        spellInfo->CastingTimeIndex = 3; // 500ms
         spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
     });
 
@@ -7427,7 +7427,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Shadow Hunter Vosh'gajin - Hex
     ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->CastingTimeIndex = 16;
+        spellInfo->CastingTimeIndex = 16; // 1500ms
     });
 
     // Sacred Cleansing
