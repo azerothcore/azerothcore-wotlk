@@ -1022,7 +1022,7 @@ bool Position::HasInLine(WorldObject const* target, float width) const
         return false;
     width += target->GetObjectSize();
     float angle = GetRelativeAngle(target);
-    return fabs(sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
+    return std::fabs(sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
 }
 
 std::string Position::ToString() const
@@ -1247,7 +1247,7 @@ InstanceScript* WorldObject::GetInstanceScript() const
 
 float WorldObject::GetDistanceZ(const WorldObject* obj) const
 {
-    float dz = fabs(GetPositionZ() - obj->GetPositionZ());
+    float dz = std::fabs(GetPositionZ() - obj->GetPositionZ());
     float sizefactor = GetObjectSize() + obj->GetObjectSize();
     float dist = dz - sizefactor;
     return (dist > 0 ? dist : 0);
@@ -1555,7 +1555,7 @@ void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos)
     float dx = GetPositionX() - x;
     float dy = GetPositionY() - y;
 
-    if (fabs(dx) < 0.001f && fabs(dy) < 0.001f)
+    if (std::fabs(dx) < 0.001f && std::fabs(dy) < 0.001f)
     {
         float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
         vcos = cos(angle);
@@ -1651,7 +1651,7 @@ bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, 
     float A = (obj2->GetPositionY() - obj1->GetPositionY()) / (obj2->GetPositionX() - obj1->GetPositionX());
     float B = -1;
     float C = obj1->GetPositionY() - A * obj1->GetPositionX();
-    float dist = fabs(A * GetPositionX() + B * GetPositionY() + C) / sqrt(A * A + B * B);
+    float dist = std::fabs(A * GetPositionX() + B * GetPositionY() + C) / sqrt(A * A + B * B);
     return dist <= size;
 }
 
@@ -2786,7 +2786,7 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     // angle calculated from current orientation
     GetNearPoint(forWho, x, y, z, size, distance2d, GetOrientation() + angle);
 
-    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
+    if (std::fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2830,7 +2830,7 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
     // Exclude gameobjects from LoS calculations
-    if (fabs(this->GetPositionZ() - z) > 3.0f || (GetTypeId() != TYPEID_GAMEOBJECT && !IsWithinLOS(x, y, z)))
+    if (std::fabs(this->GetPositionZ() - z) > 3.0f || (GetTypeId() != TYPEID_GAMEOBJECT && !IsWithinLOS(x, y, z)))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2844,7 +2844,7 @@ void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float&
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
-    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
+    if (std::fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2874,20 +2874,20 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
 
     ground = GetMapHeight(destx, desty, MAX_HEIGHT);
     floor = GetMapHeight(destx, desty, pos.m_positionZ);
-    destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
+    destz = std::fabs(ground - pos.m_positionZ) <= std::fabs(floor - pos.m_positionZ) ? ground : floor;
 
     float step = dist / 10.0f;
 
     for (uint8 j = 0; j < 10; ++j)
     {
         // do not allow too big z changes
-        if (fabs(pos.m_positionZ - destz) > 6.0f)
+        if (std::fabs(pos.m_positionZ - destz) > 6.0f)
         {
             destx -= step * cos(angle);
             desty -= step * sin(angle);
             ground = GetMapHeight(destx, desty, MAX_HEIGHT);
             floor = GetMapHeight(destx, desty, pos.m_positionZ);
-            destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
+            destz = std::fabs(ground - pos.m_positionZ) <= std::fabs(floor - pos.m_positionZ) ? ground : floor;
         }
         // we have correct destz now
         else

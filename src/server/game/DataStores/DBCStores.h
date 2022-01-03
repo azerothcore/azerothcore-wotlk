@@ -23,6 +23,7 @@
 #include "DBCStructure.h"
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 
 typedef std::list<uint32> SimpleFactionsList;
 typedef std::vector<FlyByCamera> FlyByCameraCollection;
@@ -155,6 +156,7 @@ extern DBCStorage <SpellItemEnchantmentEntry>    sSpellItemEnchantmentStore;
 extern DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore;
 extern SpellCategoryStore                        sSpellsByCategoryStore;
 extern PetFamilySpellsStore                      sPetFamilySpellsStore;
+extern std::unordered_set<uint32>                sPetTalentSpells;
 extern DBCStorage <SpellRadiusEntry>             sSpellRadiusStore;
 extern DBCStorage <SpellRangeEntry>              sSpellRangeStore;
 extern DBCStorage <SpellRuneCostEntry>           sSpellRuneCostStore;

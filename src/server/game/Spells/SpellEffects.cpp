@@ -2502,7 +2502,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             //float x, y, z;
             //m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE);
             // xinef: vehicles summoned in air, eg. Cold Hearted quest
-            if (fabs(m_caster->GetPositionZ() - destTarget->GetPositionZ()) > 6.0f)
+            if (std::fabs(m_caster->GetPositionZ() - destTarget->GetPositionZ()) > 6.0f)
                 destTarget->m_positionZ = m_caster->GetPositionZ();
 
             summon = m_originalCaster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, m_caster, m_spellInfo->Id);
@@ -3141,7 +3141,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         m_caster->ToPlayer()->PetSpellInitialize();
     }
 }
@@ -3219,19 +3219,45 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
         }
 
         if (owner->GetTypeId() == TYPEID_PLAYER)
-            owner->ToPlayer()->RemovePet(OldSummon, (OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT), false);
+            owner->ToPlayer()->RemovePet(OldSummon, PET_SAVE_NOT_IN_SLOT, false);
         else
             return;
     }
 
     float x, y, z;
     owner->GetClosePoint(x, y, z, owner->GetObjectSize());
-    owner->SummonPet(petentry, x, y, z, owner->GetOrientation(), SUMMON_PET, 0, m_spellInfo->Id, m_caster->GetGUID(), PET_LOAD_SUMMON_PET);
-    //if (!pet)
-    //    return;
+    Pet* pet = owner->SummonPet(petentry, x, y, z, owner->GetOrientation(), SUMMON_PET);
+    if (!pet)
+        return;
 
-    // xinef: cant execute this... :( hope nothing relevant gets bugged
-    //ExecuteLogEffectSummonObject(effIndex, pet);
+    if (m_caster->GetTypeId() == TYPEID_UNIT)
+    {
+        if (m_caster->ToCreature()->IsTotem())
+            pet->SetReactState(REACT_AGGRESSIVE);
+        else
+            pet->SetReactState(REACT_DEFENSIVE);
+    }
+
+    pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
+
+    // Reset cooldowns
+    if (owner->getClass() != CLASS_HUNTER)
+    {
+        pet->m_CreatureSpellCooldowns.clear();
+        owner->PetSpellInitialize();
+    }
+
+    // Set health to max if new pet is summoned
+    // in this function old pet is saved with current health eg. 20% and new one is loaded from db with same amount
+    // pet should have full health
+    pet->SetHealth(pet->GetMaxHealth());
+
+    // generate new name for summon pet
+    std::string new_name = sObjectMgr->GeneratePetName(petentry);
+    if (!new_name.empty())
+        pet->SetName(new_name);
+
+    // ExecuteLogEffectSummonObject(effectInfo->EffectIndex, pet);
 }
 
 void Spell::EffectLearnPetSpell(SpellEffIndex effIndex)
@@ -3256,7 +3282,7 @@ void Spell::EffectLearnPetSpell(SpellEffIndex effIndex)
         return;
 
     pet->learnSpell(learn_spellproto->Id);
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
     pet->GetOwner()->PetSpellInitialize();
 }
 
@@ -5362,41 +5388,55 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
+    if (damage < 0)
+        return;
+
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
 
-    Pet* pet = player->GetPet();
-    if (pet && pet->IsAlive())
-        return;
+    // Maybe player dismissed dead pet or pet despawned?
+    bool hadPet = true;
 
-    if (damage < 0)
-        return;
-
-    float x, y, z;
-    player->GetPosition(x, y, z);
-    if (!pet)
+    if (!player->GetPet())
     {
-        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET, damage);
-        return;
+        // Position passed to SummonPet is irrelevant with current implementation,
+        // pet will be relocated without using these coords in Pet::LoadPetFromDB
+        player->SummonPet(0, 0.0f, 0.0f, 0.0f, 0.0f, SUMMON_PET);
+        hadPet = false;
     }
 
-    pet->SetPosition(x, y, z, player->GetOrientation());
+    // TODO: Better to fail Hunter's "Revive Pet" at cast instead of here when casting ends
+    Pet* pet = player->GetPet(); // Attempt to get current pet
+    if (!pet || pet->IsAlive())
+        return;
+
+    // If player did have a pet before reviving, teleport it
+    if (hadPet)
+    {
+        // Reposition the pet's corpse before reviving so as not to grab aggro
+        // We can use a different, more accurate version of GetClosePoint() since we have a pet
+        float x, y, z; // Will be used later to reposition the pet if we have one
+        player->GetClosePoint(x, y, z, pet->GetCombatReach(), PET_FOLLOW_DIST, pet->GetFollowAngle());
+        pet->NearTeleportTo(x, y, z, player->GetOrientation());
+        pet->Relocate(x, y, z, player->GetOrientation()); // This is needed so SaveStayPosition() will get the proper coords.
+    }
 
     pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
     pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
     pet->setDeathState(ALIVE);
     pet->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_POSSESSED))); // xinef: just in case
     pet->SetHealth(pet->CountPctFromMaxHealth(damage));
+    pet->SetDisplayId(pet->GetNativeDisplayId());
 
     // xinef: restore movement
-    if (pet->GetCharmInfo())
+    if (auto ci = pet->GetCharmInfo())
     {
-        pet->GetCharmInfo()->SetIsAtStay(false);
-        pet->GetCharmInfo()->SetIsFollowing(false);
+        ci->SetIsAtStay(false);
+        ci->SetIsFollowing(false);
     }
 
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
 void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
@@ -6015,7 +6055,7 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
     {
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         unitTarget->ToPlayer()->PetSpellInitialize();
     }
 }
