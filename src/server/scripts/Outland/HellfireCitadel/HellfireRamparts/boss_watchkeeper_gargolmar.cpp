@@ -120,7 +120,7 @@ public:
                     break;
                 case EVENT_SURGE:
                     Talk(SAY_SURGE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0))
                         me->CastSpell(target, SPELL_SURGE, false);
                     events.ScheduleEvent(EVENT_SURGE, 11000);
                     break;

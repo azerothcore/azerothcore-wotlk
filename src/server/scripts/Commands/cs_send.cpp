@@ -24,7 +24,6 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "WorldSession.h"
 #include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
