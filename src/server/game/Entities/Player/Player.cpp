@@ -12371,13 +12371,6 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 {
     if (apply)
     {
-        // target must be in world
-        if (!target->IsInWorld())
-            return;
-
-        if (!IsInWorld() || IsDuringRemoveFromWorld())
-            return;
-
         LOG_DEBUG("maps", "Player::CreateViewpoint: Player %s create seer %u (TypeId: %u).", GetName().c_str(), target->GetEntry(), target->GetTypeId());
 
         if (!AddGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
@@ -12391,6 +12384,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
             ((Unit*)target)->AddPlayerToVision(this);
+        SetSeer(target);
     }
     else
     {
@@ -12399,14 +12393,17 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         LOG_DEBUG("maps", "Player::CreateViewpoint: Player %s remove seer", GetName().c_str());
 
-        if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
-            ((Unit*)target)->RemovePlayerFromVision(this);
-
         if (!RemoveGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
         {
             LOG_FATAL("entities.player", "Player::CreateViewpoint: Player %s cannot remove current viewpoint!", GetName().c_str());
             return;
         }
+
+        if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
+            static_cast<Unit*>(target)->RemovePlayerFromVision(this);
+
+        // must immediately set seer back otherwise may crash
+        SetSeer(this);
 
         //WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
         //GetSession()->SendPacket(&data);

@@ -1196,7 +1196,7 @@ struct UnitActionBarEntry
     }
 };
 
-typedef std::set<Player*> SharedVisionList;
+typedef std::list<Player*> SharedVisionList;
 
 enum CharmType
 {
