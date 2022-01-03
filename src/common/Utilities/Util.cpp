@@ -20,7 +20,6 @@
 #include "Containers.h"
 #include "IpAddress.h"
 #include "StringConvert.h"
-#include "StringFormat.h"
 #include "Tokenize.h"
 #include <algorithm>
 #include <boost/core/demangle.hpp>
