@@ -2261,16 +2261,16 @@ void SpellMgr::LoadSpellLinked()
         int32 effect = fields[1].GetInt32();
         int32 type = fields[2].GetUInt8();
 
-        SpellInfo const* spellInfo = GetSpellInfo(abs(trigger));
+        SpellInfo const* spellInfo = GetSpellInfo(std::abs(trigger));
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", abs(trigger));
+            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", std::abs(trigger));
             continue;
         }
-        spellInfo = GetSpellInfo(abs(effect));
+        spellInfo = GetSpellInfo(std::abs(effect));
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", abs(effect));
+            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", std::abs(effect));
             continue;
         }
 
@@ -2576,16 +2576,16 @@ void SpellMgr::LoadSpellAreas()
 
         if (spellArea.auraSpell)
         {
-            SpellInfo const* spellInfo = GetSpellInfo(abs(spellArea.auraSpell));
+            SpellInfo const* spellInfo = GetSpellInfo(std::abs(spellArea.auraSpell));
             if (!spellInfo)
             {
-                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have wrong aura spell (%u) requirement", spell, abs(spellArea.auraSpell));
+                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have wrong aura spell (%u) requirement", spell, std::abs(spellArea.auraSpell));
                 continue;
             }
 
-            if (uint32(abs(spellArea.auraSpell)) == spellArea.spellId)
+            if (uint32(std::abs(spellArea.auraSpell)) == spellArea.spellId)
             {
-                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have aura spell (%u) requirement for itself", spell, abs(spellArea.auraSpell));
+                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have aura spell (%u) requirement for itself", spell, std::abs(spellArea.auraSpell));
                 continue;
             }
 
@@ -2655,7 +2655,7 @@ void SpellMgr::LoadSpellAreas()
 
         // for search at aura apply
         if (spellArea.auraSpell)
-            mSpellAreaForAuraMap.insert(SpellAreaForAuraMap::value_type(abs(spellArea.auraSpell), sa));
+            mSpellAreaForAuraMap.insert(SpellAreaForAuraMap::value_type(std::abs(spellArea.auraSpell), sa));
 
         ++count;
     } while (result->NextRow());
@@ -5543,7 +5543,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 17731, 69294 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-        spellInfo->CastingTimeIndex = 3;
+        spellInfo->CastingTimeIndex = 3; // 500ms
         spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
     });
 
@@ -7427,7 +7427,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Shadow Hunter Vosh'gajin - Hex
     ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->CastingTimeIndex = 16;
+        spellInfo->CastingTimeIndex = 16; // 1500ms
     });
 
     // Sacred Cleansing

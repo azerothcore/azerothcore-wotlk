@@ -1184,12 +1184,18 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
     recvData >> name;
     recvData >> isdeclined;
 
+    PetStable* petStable = _player->GetPetStable();
+
     Pet* pet = ObjectAccessor::GetPet(*_player, petguid);
+
     // check it!
     if (!pet || !pet->IsPet() || ((Pet*)pet)->getPetType() != HUNTER_PET ||
-            !pet->HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ||
-            pet->GetOwnerGUID() != _player->GetGUID() || !pet->GetCharmInfo())
+        !pet->HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ||
+        pet->GetOwnerGUID() != _player->GetGUID() || !pet->GetCharmInfo() ||
+        !petStable || !petStable->CurrentPet || petStable->CurrentPet->PetNumber != pet->GetCharmInfo()->GetPetNumber())
+    {
         return;
+    }
 
     PetNameInvalidReason res = ObjectMgr::CheckPetName(name);
     if (res != PET_NAME_SUCCESS)
@@ -1211,6 +1217,9 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
         owner->ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_NAME);
 
     pet->RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+
+    petStable->CurrentPet->Name = name;
+    petStable->CurrentPet->WasRenamed = true;
 
     if (isdeclined)
     {

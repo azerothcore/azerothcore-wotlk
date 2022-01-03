@@ -80,6 +80,18 @@ namespace WorldPackets
         class RequestPetInfo;
     }
 
+    namespace Totem
+    {
+        class TotemDestroyed;
+    }
+
+    namespace Bank
+    {
+        class AutoBankItem;
+        class AutoStoreBankItem;
+        class BuyBankSlot;
+    }
+
     namespace Guild
     {
         class QueryGuildInfo;
@@ -678,8 +690,6 @@ public:                                                 // opcodes handlers
     void SendActivateTaxiReply(ActivateTaxiReply reply);
 
     void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
-    void HandleBankerActivateOpcode(WorldPacket& recvPacket);
-    void HandleBuyBankSlotOpcode(WorldPacket& recvPacket);
     void HandleTrainerListOpcode(WorldPacket& recvPacket);
     void HandleTrainerBuySpellOpcode(WorldPacket& recvPacket);
     void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
@@ -690,18 +700,13 @@ public:                                                 // opcodes handlers
     void HandleBinderActivateOpcode(WorldPacket& recvPacket);
     void HandleListStabledPetsOpcode(WorldPacket& recvPacket);
     void HandleStablePet(WorldPacket& recvPacket);
-    void HandleStablePetCallback(PreparedQueryResult result);
     void HandleUnstablePet(WorldPacket& recvPacket);
-    void HandleUnstablePetCallback(uint32 petId, PreparedQueryResult result);
     void HandleBuyStableSlot(WorldPacket& recvPacket);
     void HandleStableRevivePet(WorldPacket& recvPacket);
     void HandleStableSwapPet(WorldPacket& recvPacket);
-    void HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult result);
     void HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result);
     void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
     void HandleCharacterAuraFrozen(PreparedQueryResult result);
-    uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType, AsynchPetSummon* info);
-    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder, AsynchPetSummon* info);
 
     void HandleDuelAcceptedOpcode(WorldPacket& recvPacket);
     void HandleDuelCancelledOpcode(WorldPacket& recvPacket);
@@ -726,6 +731,12 @@ public:                                                 // opcodes handlers
     void HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid);
     void HandleAuctionPlaceBid(WorldPacket& recvData);
     void HandleAuctionListPendingSales(WorldPacket& recvData);
+
+    // Bank
+    void HandleBankerActivateOpcode(WorldPacket& recvData);
+    void HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& packet);
+    void HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBankItem& packet);
+    void HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot);
 
     void HandleGetMailList(WorldPacket& recvData);
     void HandleSendMail(WorldPacket& recvData);
@@ -753,8 +764,6 @@ public:                                                 // opcodes handlers
     void HandleAutoEquipItemSlotOpcode(WorldPacket& recvPacket);
     void HandleSwapItem(WorldPacket& recvPacket);
     void HandleBuybackItem(WorldPacket& recvPacket);
-    void HandleAutoBankItemOpcode(WorldPacket& recvPacket);
-    void HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket);
     void HandleWrapItemOpcode(WorldPacket& recvPacket);
 
     void HandleAttackSwingOpcode(WorldPacket& recvPacket);
@@ -856,7 +865,7 @@ public:                                                 // opcodes handlers
     void HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameInfo, PreparedQueryResult result);
     void HandleSetPlayerDeclinedNames(WorldPacket& recvData);
 
-    void HandleTotemDestroyed(WorldPacket& recvData);
+    void HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed);
     void HandleDismissCritter(WorldPackets::Pet::DismissCritter& dismissCritter);
 
     //Battleground

@@ -494,7 +494,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer == me)
+            if (killer && killer == me)
                 return;
 
             summons.DespawnAll();

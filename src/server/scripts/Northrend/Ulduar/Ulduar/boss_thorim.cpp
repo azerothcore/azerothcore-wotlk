@@ -759,7 +759,7 @@ public:
                     me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P2, true);
                     break;
                 case EVENT_THORIM_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.RepeatEvent(15000);
                     break;
@@ -1218,7 +1218,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_ACOLYTE_HS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_HOLY_SMITE, false);
                     events.RepeatEvent(1600);
                     break;
@@ -1343,7 +1343,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_ACOLYTE_HS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_HOLY_SMITE, false);
                     events.RepeatEvent(1600);
                     break;
@@ -1499,7 +1499,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_RC_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.RepeatEvent(15000);
                     break;
@@ -1574,7 +1574,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ARG_RD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_RUNE_DETONATION, false);
                     events.RepeatEvent(12000);
                     break;
@@ -1696,7 +1696,7 @@ public:
                     events.RepeatEvent(8000);
                     break;
                 case EVENT_DR_EVOKER_RL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_RUNIC_LIGHTNING, false);
                     events.RepeatEvent(2500);
                     break;
@@ -1712,7 +1712,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_DR_CHAMPION_CH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);
                     events.RepeatEvent(12000);
                     break;

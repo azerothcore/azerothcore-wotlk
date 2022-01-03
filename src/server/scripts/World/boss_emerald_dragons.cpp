@@ -149,7 +149,7 @@ struct emerald_dragonAI : public WorldBossAI
         while (uint32 eventId = events.ExecuteEvent())
             ExecuteEvent(eventId);
 
-        if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, -50.0f, true))
+        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, -50.0f, true))
             DoCast(target, SPELL_SUMMON_PLAYER);
 
         DoMeleeAttackIfReady();
@@ -184,7 +184,7 @@ public:
             if (!_roamTimer)
             {
                 // Chase target, but don't attack - otherwise just roam around
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                 {
                     _roamTimer = urand(15000, 30000);
                     me->GetMotionMaster()->Clear(false);

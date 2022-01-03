@@ -89,7 +89,7 @@ bool BattlegroundQueue::SelectionPool::KickGroup(const uint32 size)
     for (auto itr = groupToKick; itr != SelectedGroups.end(); ++itr)
     {
         // if proper size - overwrite to kick last one
-        if (abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
+        if (std::abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
         {
             groupToKick = itr;
             foundProper = true;
@@ -421,7 +421,7 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
     }
 
     // balance the teams based on the difference allowed
-    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (std::abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -504,7 +504,7 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
     }
 
     // if free space differs too much, ballance
-    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (std::abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -610,7 +610,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
             return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
         case BG_QUEUE_INVITATION_TYPE_BALANCED: // check difference between selection pools - if = 1 or less start.
-            return abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+            return std::abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
         case BG_QUEUE_INVITATION_TYPE_EVEN: // if both counts are same then it's an even match
             return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() == m_SelectionPools[TEAM_HORDE].GetPlayerCount()) && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
@@ -984,7 +984,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundBracket
                 uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
                 uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
 
-                sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qPlayers, MaxPlayers);
+                sWorld->SendWorldTextOptional(LANG_BG_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_BG_QUEUE, bgName, q_min_level, q_max_level, qPlayers, MaxPlayers);
             }
             else
             {
@@ -1068,7 +1068,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
                 return;
             }
 
-            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+            sWorld->SendWorldTextOptional(LANG_BG_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_BG_QUEUE, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
         }
     }
 }
@@ -1119,7 +1119,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
                 return;
             }
 
-            sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD, bgName, arenatype.c_str(), q_min_level, q_max_level, qPlayers, playersNeed);
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, bgName, arenatype.c_str(), q_min_level, q_max_level, qPlayers, playersNeed);
         }
     }
     else
@@ -1134,7 +1134,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
         uint32 ArenaTeamRating = ginfo->ArenaTeamRating;
         std::string TeamName = team->GetName();
 
-        sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+        sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
     }
 }
 
@@ -1158,7 +1158,9 @@ void BattlegroundQueue::SendExitMessageArenaQueue(GroupQueueInfo* ginfo)
     std::string TeamName = team->GetName();
 
     if (ArenaType && ginfo->Players.empty())
-        sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+    {
+        sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+    }
 }
 
 void BattlegroundQueue::SetQueueAnnouncementTimer(uint32 bracketId, int32 timer, bool isCrossFactionBG /*= true*/)

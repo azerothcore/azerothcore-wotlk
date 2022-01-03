@@ -390,7 +390,7 @@ public:
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
                         advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_THALADRED_AGGRO);
@@ -404,7 +404,7 @@ public:
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
                         advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_SANGUINAR_AGGRO);
@@ -418,7 +418,7 @@ public:
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
                         advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_CAPERNIAN_AGGRO);
@@ -432,7 +432,7 @@ public:
                     {
                         advisor->SetReactState(REACT_AGGRESSIVE);
                         advisor->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             advisor->AI()->AttackStart(target);
                         advisor->SetInCombatWithZone();
                         advisor->AI()->Talk(SAY_TELONICUS_AGGRO);
@@ -451,7 +451,7 @@ public:
                             {
                                 summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                                 summon->SetInCombatWithZone();
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                     summon->AI()->AttackStart(target);
                             }
                     }
@@ -474,7 +474,7 @@ public:
                                 summon->SetReactState(REACT_AGGRESSIVE);
                                 summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 summon->SetInCombatWithZone();
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                     summon->AI()->AttackStart(target);
                             }
                     events2.ScheduleEvent(EVENT_PREFIGHT_PHASE71, 3 * MINUTE * IN_MILLISECONDS);
@@ -485,7 +485,7 @@ public:
                     phase = PHASE_FINAL;
                     DoResetThreat();
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         AttackStart(target);
 
                     events2.Reset();
@@ -648,7 +648,7 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_PYROBLAST, false);
                     break;
                 case EVENT_SPELL_FLAMESTRIKE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_FLAME_STRIKE, false);
                     events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 20000);
                     break;

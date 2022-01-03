@@ -65,7 +65,7 @@ void LiquidHandler::HandleNewLiquid()
             if ((Utils::IsAllZero(renderMask.Mask, 8) || (information.Width == 8 && information.Height == 8)) && information.OffsetMask2)
             {
                 fseek(stream, chunk->Offset + information.OffsetMask2, SEEK_SET);
-                uint32 size = ceil(information.Width * information.Height / 8.0f);
+                uint32 size = std::ceil(information.Width * information.Height / 8.0f);
                 uint8* altMask = new uint8[size];
                 if (fread(altMask, sizeof(uint8), size, stream) == size)
                     for (uint32 mi = 0; mi < size; mi++)

@@ -1243,6 +1243,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION] = sConfigMgr->GetOption<int32>("LootNeedBeforeGreedILvlRestriction", 70);
 
+    m_bool_configs[CONFIG_PLAYER_SETTINGS_ENABLED] = sConfigMgr->GetOption<bool>("EnablePlayerSettings", 0);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1324,6 +1326,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_AUTOBROADCAST]         = sConfigMgr->GetOption<bool>("AutoBroadcast.On", false);
     m_int_configs[CONFIG_AUTOBROADCAST_CENTER]   = sConfigMgr->GetOption<int32>("AutoBroadcast.Center", 0);
     m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL] = sConfigMgr->GetOption<int32>("AutoBroadcast.Timer", 60000);
+    m_int_configs[CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE] = sConfigMgr->GetOption<int32>("AutoBroadcast.MinDisableLevel", 0);
     if (reload)
     {
         m_timers[WUPDATE_AUTOBROADCAST].SetInterval(m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL]);
@@ -2479,7 +2482,7 @@ void World::ForceGameEventUpdate()
 }
 
 /// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     SessionMap::const_iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -2496,7 +2499,7 @@ void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, TeamId te
 }
 
 /// Send a packet to all GMs (except self if mentioned)
-void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     SessionMap::iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -2576,6 +2579,34 @@ void World::SendWorldText(uint32 string_id, ...)
     va_end(ap);
 }
 
+void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
+{
+    va_list ap;
+    va_start(ap, flag);
+
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (auto const& itr : m_sessions)
+    {
+        if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
+        {
+            continue;
+        }
+
+        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+        {
+            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+            {
+                continue;
+            }
+        }
+
+        wt_do(itr.second->GetPlayer());
+    }
+
+    va_end(ap);
+}
+
 /// Send a System Message to all GMs (except self if mentioned)
 void World::SendGMText(uint32 string_id, ...)
 {
@@ -2617,7 +2648,7 @@ void World::SendGlobalText(const char* text, WorldSession* self)
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-bool World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self, TeamId teamId)
+bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     bool foundPlayerToSend = false;
     SessionMap::const_iterator itr;
@@ -2953,7 +2984,9 @@ void World::SendAutoBroadcast()
     uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
 
     if (abcenter == 0)
-        sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+    {
+        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
+    }
 
     else if (abcenter == 1)
     {
@@ -2964,7 +2997,7 @@ void World::SendAutoBroadcast()
 
     else if (abcenter == 2)
     {
-        sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
 
         WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
         data << msg;
@@ -3377,7 +3410,7 @@ uint32 World::GetNextWhoListUpdateDelaySecs()
     uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
     t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
 
-    return uint32(ceil(t / 1000.0f));
+    return uint32(std::ceil(t / 1000.0f));
 }
 
 void World::FinalizePlayerWorldSession(WorldSession* session)
