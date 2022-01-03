@@ -203,7 +203,7 @@ public:
                     events.RepeatEvent(urand(7000, 15000));
                     break;
                 case EVENT_RAIN_OF_FIRE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         me->CastSpell(target, RAID_MODE(SPELL_RAIN_OF_FIRE_10, SPELL_RAIN_OF_FIRE_25), false);
                     }

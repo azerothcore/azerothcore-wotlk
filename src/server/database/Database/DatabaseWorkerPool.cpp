@@ -17,7 +17,6 @@
 
 #include "DatabaseWorkerPool.h"
 #include "AdhocStatement.h"
-#include "Common.h"
 #include "Errors.h"
 #include "Implementation/CharacterDatabase.h"
 #include "Implementation/LoginDatabase.h"
@@ -175,7 +174,7 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
                     uint32 const paramCount = stmt->GetParameterCount();
 
                     // TC only supports uint8 indices.
-                    ASSERT(paramCount < std::numeric_limits<uint8>::max());
+                    ASSERT(paramCount < (std::numeric_limits<uint8>::max)());
 
                     _preparedStatementSize[i] = static_cast<uint8>(paramCount);
                 }

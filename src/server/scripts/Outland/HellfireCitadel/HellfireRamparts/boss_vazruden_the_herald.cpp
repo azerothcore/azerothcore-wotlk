@@ -217,7 +217,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_FIREBALL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_FIREBALL, false);
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(4000, 6000));
                     break;

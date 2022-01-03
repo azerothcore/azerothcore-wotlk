@@ -137,7 +137,7 @@ public:
                         _events.ScheduleEvent(EVENT_QUAKE, urand(30000, 55000));
                         break;
                     case EVENT_CHAIN:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                             DoCast(target, SPELL_CHAIN_LIGHTNING);
                         _events.ScheduleEvent(EVENT_CHAIN, urand(7000, 27000));
                         break;
