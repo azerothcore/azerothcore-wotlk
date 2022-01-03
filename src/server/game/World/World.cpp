@@ -3414,7 +3414,7 @@ uint32 World::GetNextWhoListUpdateDelaySecs()
     uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
     t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
 
-    return uint32(ceil(t / 1000.0f));
+    return uint32(std::ceil(t / 1000.0f));
 }
 
 void World::FinalizePlayerWorldSession(WorldSession* session)
