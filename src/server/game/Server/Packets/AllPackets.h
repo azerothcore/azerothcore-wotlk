@@ -19,6 +19,7 @@
 #define AllPackets_h__
 
 #include "MiscPackets.h"
+#include "TotemPackets.h"
 #include "BankPackets.h"
 #include "GuildPackets.h"
 

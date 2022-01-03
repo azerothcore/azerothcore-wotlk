@@ -20,8 +20,6 @@
 #include "DatabaseEnv.h"
 #include "GroupMgr.h"
 #include "Language.h"
-#include "LFG.h"
-#include "ObjectAccessor.h"
 #include "Player.h"
 
 using namespace Acore::ChatCommands;

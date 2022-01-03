@@ -17,7 +17,6 @@
 
 #include "Pet.h"
 #include "ArenaSpectator.h"
-#include "Battleground.h"
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
