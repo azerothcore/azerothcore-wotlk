@@ -87,7 +87,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer->GetGUID() != me->GetGUID())
+            if (killer && killer->GetGUID() != me->GetGUID())
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                     pInstance->SetData(DATA_ON_THE_ROCKS_ACHIEV, 0);
 
