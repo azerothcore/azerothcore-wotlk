@@ -16,7 +16,6 @@
  */
 
 #include "MySQLConnection.h"
-#include "Common.h"
 #include "DatabaseWorker.h"
 #include "Log.h"
 #include "MySQLHacks.h"
