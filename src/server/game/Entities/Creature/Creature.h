@@ -293,7 +293,7 @@ public:
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id)  const override;
 
-    bool isRegeneratingHealth() { return m_regenHealth; }
+    bool IsRegeneratingHealth() { return m_regenHealth; }
     void SetRegeneratingHealth(bool c) { m_regenHealth = c; }
     [[nodiscard]] virtual uint8 GetPetAutoSpellSize() const { return MAX_SPELL_CHARM; }
     [[nodiscard]] virtual uint32 GetPetAutoSpellOnPos(uint8 pos) const

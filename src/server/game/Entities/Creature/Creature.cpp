@@ -871,7 +871,7 @@ void Creature::Regenerate(Powers power)
 
 void Creature::RegenerateHealth()
 {
-    if (!isRegeneratingHealth())
+    if (!IsRegeneratingHealth())
         return;
 
     uint32 curValue = GetHealth();

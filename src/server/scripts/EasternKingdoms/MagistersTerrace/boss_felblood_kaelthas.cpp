@@ -159,7 +159,7 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = me->GetHealth() - 1;
-                if (me->isRegeneratingHealth())
+                if (me->IsRegeneratingHealth())
                 {
                     me->SetRegeneratingHealth(false);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);

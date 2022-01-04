@@ -228,7 +228,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            if (me->isRegeneratingHealth())
+            if (me->IsRegeneratingHealth())
                 ScriptedAI::EnterEvadeMode();
         }
 
