@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164003722706748470
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640037227067484700');
 
--- Turning quest 'Onu is Meditating' to auto-complete
+-- Turning quest 'Onu is Meditating' to auto-complete.
 UPDATE `quest_template` SET `Flags` = `Flags`| 65536 WHERE (`ID` = 961);
 
 -- Adding conditions to quest: 'Onu is Meditating'

@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164105726082115801
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641057260821158016');
 
--- 5263 Pocket Lint - Is only dropped by Mizzle the Crafty NPC, not other NPCS.
+-- 5263 Pocket Lint - Is only dropped by Mizzle the Crafty NPC, not other NPCS
 DELETE FROM `creature_loot_template` WHERE  `Entry`=13036 AND `Item`=5263 AND `Reference`=0 AND `GroupId`=0;
 
 -- 18255 Runn Tum Tuber - Is only dropped by Pusillin, not other NPCs.

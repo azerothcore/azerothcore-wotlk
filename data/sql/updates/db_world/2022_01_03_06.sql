@@ -18,7 +18,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640803052473980355');
 
 -- Dalaran Crater, Alterac Mountains
 
--- Pathing for Elemental Slave Entry: 2359
+-- Pathing for Elemental Slave Entry: 2359.
 SET @NPC := 16818;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=457.73822,`position_y`=214.55646,`position_z`=42.041195 WHERE `guid`=@NPC;
