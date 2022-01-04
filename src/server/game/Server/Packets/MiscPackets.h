@@ -15,13 +15,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
+#ifndef MiscPackets_h__
+#define MiscPackets_h__
 
-#include "MiscPackets.h"
-#include "WorldStatePackets.h"
-#include "TotemPackets.h"
-#include "BankPackets.h"
-#include "GuildPackets.h"
+#include "Packet.h"
+#include "Weather.h"
 
-#endif // AllPackets_h__
+enum WeatherState : uint32;
+
+namespace WorldPackets
+{
+    namespace Misc
+    {
+        class AC_GAME_API Weather final : public ServerPacket
+        {
+        public:
+            Weather();
+            Weather(WeatherState weatherID, float intensity = 0.0f, bool abrupt = false);
+
+            WorldPacket const* Write() override;
+
+            bool Abrupt = false;
+            float Intensity = 0.0f;
+            WeatherState WeatherID = WeatherState(0);
+        };
+    }
+}
+
+#endif // MiscPackets_h__
