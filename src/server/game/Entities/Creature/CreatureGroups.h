@@ -94,7 +94,7 @@ public:
     Creature* GetLeader() const { return m_leader; }
     uint32 GetId() const { return m_groupID; }
     bool isEmpty() const { return m_members.empty(); }
-    bool isFormed() const { return m_Formed; }
+    bool IsFormed() const { return m_Formed; }
     const CreatureGroupMemberType& GetMembers() const { return m_members; }
 
     void AddMember(Creature* member);
