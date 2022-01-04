@@ -1928,6 +1928,30 @@ public:
     }
 };
 
+/*########
+#### go_duskwither_spire_power_source
+#####*/
+
+enum DuskwitherSpirePowersource
+{
+    NPC_POWER_SOURCE_INVISIBLE_BUNNY = 17984
+};
+
+class go_duskwither_spire_power_source : public GameObjectScript
+{
+public:
+    go_duskwither_spire_power_source() : GameObjectScript("go_duskwither_spire_power_source") {}
+
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    {
+        if (Creature* bunny = go->FindNearestCreature(NPC_POWER_SOURCE_INVISIBLE_BUNNY, 1.0f))
+        {
+            bunny->DespawnOrUnsummon(0ms, 10s);
+        }
+        return false;
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1943,6 +1967,7 @@ void AddSC_go_scripts()
     new go_flames();
     new go_heat();
     new go_bear_trap();
+    new go_duskwither_spire_power_source();
 
     // Theirs
     new go_brewfest_music();

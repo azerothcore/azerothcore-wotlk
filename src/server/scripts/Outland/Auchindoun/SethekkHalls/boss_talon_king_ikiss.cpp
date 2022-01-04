@@ -125,7 +125,7 @@ public:
                     events.RepeatEvent(urand(7000, 12000));
                     break;
                 case EVENT_SPELL_POLYMORPH:
-                    if (Unit* target = (IsHeroic() ? SelectTarget(SELECT_TARGET_RANDOM, 0) : SelectTarget(SELECT_TARGET_TOPAGGRO, 1)))
+                    if (Unit* target = (IsHeroic() ? SelectTarget(SelectTargetMethod::Random, 0) : SelectTarget(SelectTargetMethod::MaxThreat, 1)))
                         me->CastSpell(target, SPELL_POLYMORPH_N, false);
                     events.RepeatEvent(urand(15000, 17500));
                     break;
@@ -143,7 +143,7 @@ public:
                     break;
                 case EVENT_SPELL_BLINK:
                     Talk(EMOTE_ARCANE_EXP);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         me->CastSpell(target, SPELL_BLINK, false);
                         me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
@@ -290,13 +290,13 @@ public:
                     events.DelayEvents(3000);
                     break;
                 case EVENT_SPELL_BOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_SPELL_BOMB, false);
                     events.RepeatEvent(urand(16000, 24500));
                     events.DelayEvents(3000);
                     break;
                 case EVENT_SPELL_CYCLONE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 45.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45.0f, true))
                         me->CastSpell(target, SPELL_CYCLONE, false);
                     events.RepeatEvent(urand(22000, 27000));
                     events.DelayEvents(3000);

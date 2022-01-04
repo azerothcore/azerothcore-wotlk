@@ -244,12 +244,12 @@ public:
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
                 case EVENT_SPAWN_DARKNESS:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_DARKNESS, true);
                     events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 15000);
                     break;
                 case EVENT_SPAWN_BLACK_HOLE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_BLACK_HOLE, true);
                     events.ScheduleEvent(EVENT_SPAWN_BLACK_HOLE, 15000);
                     break;

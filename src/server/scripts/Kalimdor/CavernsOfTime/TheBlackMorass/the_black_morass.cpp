@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetRespawnTime(DAY);
             events.Reset();

@@ -188,7 +188,7 @@ public:
                 case EVENT_SPELL_TOXIC_WASTE:
                     if (Creature* k = GetKrick())
                         if (!k->HasUnitState(UNIT_STATE_CASTING))
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                             {
                                 k->CastSpell(target, SPELL_TOXIC_WASTE);
                                 events.RepeatEvent(urand(7000, 10000));
@@ -203,7 +203,7 @@ public:
                 case EVENT_SPELL_SHADOW_BOLT:
                     if (Creature* k = GetKrick())
                         if (!k->HasUnitState(UNIT_STATE_CASTING))
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                             {
                                 k->CastSpell(target, SPELL_SHADOW_BOLT);
                                 events.RepeatEvent(14000);
@@ -223,7 +223,7 @@ public:
                         case 0: // Pursuit
                             if (Creature* k = GetKrick())
                                 k->AI()->Talk(RAND(SAY_TARGET_1, SAY_TARGET_2, SAY_TARGET_3));
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 70.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true))
                                 me->CastSpell(target, SPELL_PURSUIT, false);
                             break;
                         case 1: // Poison Nova

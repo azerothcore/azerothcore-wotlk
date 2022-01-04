@@ -625,7 +625,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_DEATH_PLAGUE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_RECENTLY_INFECTED))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_RECENTLY_INFECTED))
                         {
                             Talk(EMOTE_DEATH_PLAGUE_WARNING, target);
                             DoCast(target, SPELL_DEATH_PLAGUE);
@@ -1173,7 +1173,7 @@ public:
                     Talk(SAY_SVALNA_AGGRO);
                     break;
                 case EVENT_IMPALING_SPEAR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_IMPALING_SPEAR))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         me->AddAura(70203, me);
@@ -1359,7 +1359,7 @@ public:
                     Events.ScheduleEvent(EVENT_ARNATH_SMITE, urand(4000, 7000));
                     break;
                 case EVENT_ARNATH_DOMINATE_MIND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_DOMINATE_MIND))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, -SPELL_DOMINATE_MIND))
                         DoCast(target, SPELL_DOMINATE_MIND);
                     Events.ScheduleEvent(EVENT_ARNATH_DOMINATE_MIND, urand(28000, 37000));
                     break;
@@ -1437,7 +1437,7 @@ public:
                         Events.ScheduleEvent(EVENT_BRANDON_JUDGEMENT_OF_COMMAND, urand(8000, 13000));
                         break;
                     case EVENT_BRANDON_HAMMER_OF_BETRAYAL:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                             DoCast(target, SPELL_HAMMER_OF_BETRAYAL);
                         Events.ScheduleEvent(EVENT_BRANDON_HAMMER_OF_BETRAYAL, urand(45000, 60000));
                         break;
@@ -1505,7 +1505,7 @@ public:
                         Events.ScheduleEvent(EVENT_GRONDEL_SUNDER_ARMOR, urand(5000, 17000));
                         break;
                     case EVENT_GRONDEL_CONFLAGRATION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                             DoCast(target, SPELL_CONFLAGRATION);
                         Events.ScheduleEvent(EVENT_GRONDEL_CONFLAGRATION, urand(10000, 15000));
                         break;
@@ -1559,17 +1559,17 @@ public:
                 switch (eventId)
                 {
                     case EVENT_RUPERT_FEL_IRON_BOMB:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_FEL_IRON_BOMB);
                         Events.ScheduleEvent(EVENT_RUPERT_FEL_IRON_BOMB, urand(15000, 20000));
                         break;
                     case EVENT_RUPERT_MACHINE_GUN:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                             DoCast(target, SPELL_MACHINE_GUN);
                         Events.ScheduleEvent(EVENT_RUPERT_MACHINE_GUN, urand(25000, 30000));
                         break;
                     case EVENT_RUPERT_ROCKET_LAUNCH:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                             DoCast(target, SPELL_ROCKET_LAUNCH);
                         Events.ScheduleEvent(EVENT_RUPERT_ROCKET_LAUNCH, urand(10000, 15000));
                         break;
@@ -1711,7 +1711,7 @@ public:
                     break;
                 case 3: // Volley
                     {
-                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true);
+                        Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true);
                         if (target && me->GetDistance(target) > 10.0f)
                         {
                             me->CastSpell(target, 71252, false);
@@ -1740,7 +1740,7 @@ public:
                     me->CastSpell(me, 71270, true);
                     break;
                 case 32: // Frozen Orb
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 30.0f, true))
                         me->CastSpell(target, 71274, false);
                     events.RepeatEvent(urand(40000, 50000));
                     break;
@@ -2901,7 +2901,7 @@ public:
                         uint8 count = me->GetMap()->Is25ManRaid() ? 4 : 2;
                         bool casted = false;
                         for (uint8 i = 0; i < count; ++i)
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 37.5f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 37.5f, true))
                             {
                                 casted = true;
                                 me->CastSpell(target, 71906, true); // Severed Essence
@@ -3114,7 +3114,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case 1:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, 70362, false);
                     events.RepeatEvent(urand(25000, 35000));
                     break;
@@ -3408,7 +3408,7 @@ public:
                     events.RepeatEvent(urand(20000, 30000));
                     break;
                 case 3:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, 70980, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
