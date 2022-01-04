@@ -1231,7 +1231,7 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
 }
 
 // return true if this creature is tapped by the player or by a member of his group.
-bool Creature::isTappedBy(Player const* player) const
+bool Creature::IsTappedBy(Player const* player) const
 {
     if (player->GetGUID() == m_lootRecipient)
         return true;

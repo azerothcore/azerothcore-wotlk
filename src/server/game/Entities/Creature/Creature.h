@@ -214,7 +214,7 @@ public:
     [[nodiscard]] ObjectGuid::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
-    bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
+    bool IsTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
     [[nodiscard]] bool CanGeneratePickPocketLoot() const { return lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < time(nullptr); }
     void SetPickPocketLootTime() { lootPickPocketRestoreTime = time(nullptr) + MINUTE + GetCorpseDelay() + GetRespawnTime(); }
     void ResetPickPocketLootTime() { lootPickPocketRestoreTime = 0; }
