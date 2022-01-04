@@ -18,7 +18,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641238616670655918');
 
 -- Fixes issue: https://github.com/azerothcore/azerothcore-wotlk/issues/8146
 -- Made corrections to the original script, made it so you cant attack while its tagged like on retail
--- Blacksilt Scout Update SAI
+-- Blacksilt Scout Update SAI.
 SET @ENTRY := 17326;
 SET @SOURCETYPE := 0;
 UPDATE creature_template SET AIName="SmartAI" WHERE entry=@ENTRY;

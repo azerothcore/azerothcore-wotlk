@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164121398660905110
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641213986609051100');
 
--- Grethok immunity flags
+-- Grethok immunity flags.
 UPDATE `creature_template` SET `mechanic_immune_mask` = 33636209 WHERE (`entry` = 12557);
 
 -- Grethok - Update arcane missiles to correct spell id (was using triggered spell)

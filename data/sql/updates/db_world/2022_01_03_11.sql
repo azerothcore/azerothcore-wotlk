@@ -18,7 +18,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641001827126152885');
 
 -- Hammerfall
 
--- Add missing equipment
+-- Add missing equipment.
 DELETE FROM `creature_equip_template` WHERE `CreatureID`=2621 AND `ID`=2;
 INSERT INTO `creature_equip_template` (`CreatureID`,`ID`,`ItemID1`,`ItemID2`,`ItemID3`,`VerifiedBuild`) VALUES
 (2621,2,5956,12453,0,0);

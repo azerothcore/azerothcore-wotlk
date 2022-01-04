@@ -18,7 +18,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640896254599408944');
 
 -- This fixes: https://github.com/azerothcore/azerothcore-wotlk/issues/6780
 
--- Condition for source Gossip menu condition type Queststate
+-- Condition for source Gossip menu condition type Quest state
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=14 AND `SourceGroup`=7376 AND `SourceEntry`=8826 AND `SourceId`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 7376, 8826, 0, 0, 47, 0, 9451, 64, 0, 0, 0, 0, '', 'Show gossip menu 7376 text id 8826 if quest Call of Earth is rewarded');

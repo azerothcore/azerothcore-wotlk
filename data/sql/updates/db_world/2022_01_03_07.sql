@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164081040798673872
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640810407986738722');
 
--- Lordamere Internment Camp, Alterac Mountains
+-- Lordamere Internment Camp, Alterac Mountains.
 
 -- Pathing for Dalaran Shield Guard Entry: 2271
 SET @NPC := 17100;

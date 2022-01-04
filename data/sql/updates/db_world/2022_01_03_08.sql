@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164087381546881046
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640873815468810463');
 
--- Cleanup Southshore Guards "Fix movement, position, and remove overspawns
+-- Cleanup Southshore Guards "Fix movement, position, and remove overspawns.
 UPDATE `creature` SET `wander_distance`=2,`MovementType`=1,`position_x`=-696.3634,`position_y`=-428.55398,`position_z`=31.63203 WHERE `guid`=15668;
 UPDATE `creature` SET `wander_distance`=2,`MovementType`=1,`position_x`=-678.02656,`position_y`=-427.078430,`position_z`=31.63488 WHERE `guid`=15667;
 UPDATE `creature` SET `wander_distance`=2,`MovementType`=1,`position_x`=-777.4129,`position_y`=-576.014648,`position_z`=20.289885 WHERE `guid`=16386;

@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164096980438836616
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640969804388366165');
 
--- removes loot id 7549 link from Tree Frog
+-- removes loot id 7549 link from Tree Frog.
 UPDATE `creature_template` SET `lootid`=0 WHERE  `entry`=7549;
 
 -- Removes Loot from creature Tree Frog NPC ID 7549

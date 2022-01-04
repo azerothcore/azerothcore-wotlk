@@ -16,6 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '163925599452134020
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1639255994521340200');
 
+-- creauture addon
 ALTER TABLE `creature_addon` CHANGE `visibilityDistanceType` `visibilityDistanceType` TINYINT UNSIGNED DEFAULT 0 NOT NULL;
 ALTER TABLE `creature_template_addon` CHANGE `visibilityDistanceType` `visibilityDistanceType` TINYINT UNSIGNED DEFAULT 0 NOT NULL;
 

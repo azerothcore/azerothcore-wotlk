@@ -16,6 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164081519077940150
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640815190779401500');
 
+-- quest
 UPDATE `quest_template_addon` SET `PrevQuestID` = 9578 WHERE `ID` = 9706;
 
 --

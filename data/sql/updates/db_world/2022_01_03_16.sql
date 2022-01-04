@@ -16,6 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164058144212059136
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640581442120591362');
 
+-- cmd
 UPDATE `command` SET `name`='lookup item set' WHERE `name`='lookup itemset';
 
 --
