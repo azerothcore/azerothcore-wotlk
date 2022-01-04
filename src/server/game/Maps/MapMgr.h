@@ -121,11 +121,11 @@ public:
         if (o < 0)
         {
             float mod = o * -1;
-            mod = fmod(mod, 2.0f * static_cast<float>(M_PI));
+            mod = std::fmod(mod, 2.0f * static_cast<float>(M_PI));
             mod = -mod + 2.0f * static_cast<float>(M_PI);
             return mod;
         }
-        return fmod(o, 2.0f * static_cast<float>(M_PI));
+        return std::fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 
     void DoDelayedMovesAndRemoves();
