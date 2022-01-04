@@ -502,7 +502,7 @@ public:
             if (Unit* target = _owner->SelectVictim())
                 _owner->AI()->AttackStart(target);
         if (!_owner->GetVictim())
-            if (Unit* target = _summoner->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(_summoner)))
+            if (Unit* target = _summoner->AI()->SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(_summoner)))
                 _owner->AI()->AttackStart(target);
         _owner->AI()->DoZoneInCombat();
         return true;
@@ -1055,7 +1055,7 @@ public:
                     events.ScheduleEvent(EVENT_INFEST, 22500, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_NECROTIC_PLAGUE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NecroticPlagueTargetCheck(me, NECROTIC_PLAGUE_LK, NECROTIC_PLAGUE_PLR)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NecroticPlagueTargetCheck(me, NECROTIC_PLAGUE_LK, NECROTIC_PLAGUE_PLR)))
                     {
                         Talk(EMOTE_NECROTIC_PLAGUE_WARNING, target);
                         me->CastSpell(target, SPELL_NECROTIC_PLAGUE, false);
@@ -1065,12 +1065,12 @@ public:
                         events.ScheduleEvent(EVENT_NECROTIC_PLAGUE, 5000, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SHADOW_TRAP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, ShadowTrapLKTargetSelector(me, true, true, 100.0f)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ShadowTrapLKTargetSelector(me, true, true, 100.0f)))
                         me->CastSpell(target, SPELL_SHADOW_TRAP, false);
                     events.ScheduleEvent(EVENT_SHADOW_TRAP, 15500, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_PAIN_AND_SUFFERING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         //events.DelayEventsToMax(500, EVENT_GROUP_ABILITIES);
                         me->SetFacingTo(me->GetAngle(target));
@@ -1083,7 +1083,7 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 7500, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_RAGING_SPIRIT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_RAGING_SPIRIT, false);
                     events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15000 : 20000), EVENT_GROUP_ABILITIES);
                     break;
@@ -1108,7 +1108,7 @@ public:
                             events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5000, EVENT_GROUP_ABILITIES);
                         }
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, DefileTargetSelector(me)))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, DefileTargetSelector(me)))
                         {
                             Talk(EMOTE_DEFILE_WARNING);
                             me->CastSpell(target, SPELL_DEFILE, false);
@@ -1155,7 +1155,7 @@ public:
                     events.ScheduleEvent(EVENT_VILE_SPIRITS, 30000, EVENT_GROUP_VILE_SPIRITS);
                     break;
                 case EVENT_HARVEST_SOUL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(me, true, true, 55.0f)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(me, true, true, 55.0f)))
                     {
                         Talk(SAY_LK_HARVEST_SOUL);
                         me->CastSpell(target, SPELL_HARVEST_SOUL, false);
@@ -2700,7 +2700,7 @@ public:
                                     }
                         if (!target)
                             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
-                                target = lichKing->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
+                                target = lichKing->AI()->SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
                         if (target)
                             me->CastSpell(target, SPELL_LIFE_SIPHON, false);
                         _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2500);

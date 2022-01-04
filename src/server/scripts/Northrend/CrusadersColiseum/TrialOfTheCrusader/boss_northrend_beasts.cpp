@@ -623,7 +623,7 @@ struct boss_jormungarAI : public ScriptedAI
                 }
                 break;
             case EVENT_SPELL_SPRAY:
-                if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
                     me->CastSpell(target, _SPELL_SPRAY, false);
                 events.RepeatEvent(20000);
                 break;
@@ -884,7 +884,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true) )
                         me->CastSpell(target, SPELL_ARCTIC_BREATH, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
@@ -906,7 +906,7 @@ public:
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 500.0f, true) )
                     {
                         TargetGUID = target->GetGUID();
                         me->SetGuidValue(UNIT_FIELD_TARGET, TargetGUID);

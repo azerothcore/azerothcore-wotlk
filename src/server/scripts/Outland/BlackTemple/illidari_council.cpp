@@ -342,7 +342,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_AURA, 30000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, HammerOfJusticeSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, HammerOfJusticeSelector(me)))
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE, false);
                         events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 20000);
@@ -417,17 +417,17 @@ public:
                 case EVENT_SPELL_FLAMESTRIKE:
                     if (roll_chance_i(50))
                         Talk(SAY_COUNCIL_SPECIAL);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
                         me->CastSpell(target, SPELL_FLAMESTRIKE, false);
                     events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 40000);
                     break;
                 case EVENT_SPELL_BLIZZARD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
                         me->CastSpell(target, SPELL_BLIZZARD, false);
                     events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 40000);
                     break;
                 case EVENT_SPELL_ARCANE_EXPLOSION:
-                    if (SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
+                    if (SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
                         me->CastSpell(me, SPELL_ARCANE_EXPLOSION, false);
                     events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 10000);
                     break;
@@ -489,7 +489,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_REFLECTIVE_SHIELD, 40000);
                     break;
                 case EVENT_SPELL_DIVINE_WRATH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
                         me->CastSpell(target, SPELL_DIVINE_WRATH, false);
                     events.ScheduleEvent(EVENT_SPELL_DIVINE_WRATH, 20000);
                     break;
@@ -733,7 +733,7 @@ public:
         void Update(AuraEffect const* effect)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
             {
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
                 GetUnitOwner()->m_Events.AddEvent(new VerasEnvenom(*GetUnitOwner(), target->GetGUID()), GetUnitOwner()->m_Events.CalculateTime(urand(1500, 3500)));

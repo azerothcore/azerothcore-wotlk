@@ -190,12 +190,12 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_DRAIN_LIFE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_DRAIN_LIFE_N, SPELL_DRAIN_LIFE_H), false);
                     events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, 10000, 1);
                     return;
                 case EVENT_SPELL_DRAIN_MANA:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
                         me->CastSpell(target, SPELL_DRAIN_MANA, false);
                     events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 10000, 1);
                     return;

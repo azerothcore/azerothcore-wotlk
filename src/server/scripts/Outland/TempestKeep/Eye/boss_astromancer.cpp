@@ -146,12 +146,12 @@ public:
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     break;
                 case EVENT_SPELL_ARCANE_MISSILES:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_ARCANE_MISSILES, false);
                     events.ScheduleEvent(EVENT_SPELL_ARCANE_MISSILES, 3000);
                     break;
                 case EVENT_SPELL_WRATH_OF_ASTROMANCER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_WRATH_OF_THE_ASTROMANCER, false);
                     events.ScheduleEvent(EVENT_SPELL_WRATH_OF_ASTROMANCER, 22000);
                     break;

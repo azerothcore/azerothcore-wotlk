@@ -1151,7 +1151,7 @@ public:
                         if (!pList.empty())
                             pTarget = pList[urand(0, pList.size() - 1)];
                         else
-                            pTarget = (Player*)SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
+                            pTarget = (Player*)SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
 
                         if( pTarget )
                             cannon->CastSpell(pTarget, SPELL_NAPALM_SHELL, false);
@@ -1806,7 +1806,7 @@ public:
                         }
                         else
                         {
-                            if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 27.5f, true))
+                            if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 27.5f, true))
                             {
                                 me->SetFacingToObject(victim);
                                 me->CastSpell(victim, SPELL_PLASMA_BALL, false);

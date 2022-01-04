@@ -87,7 +87,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer->GetGUID() != me->GetGUID())
+            if (killer && killer->GetGUID() != me->GetGUID())
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                     pInstance->SetData(DATA_ON_THE_ROCKS_ACHIEV, 0);
 
@@ -197,7 +197,7 @@ public:
                     events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);

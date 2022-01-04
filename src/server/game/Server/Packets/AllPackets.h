@@ -18,6 +18,9 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
+#include "WorldStatePackets.h"
+#include "TotemPackets.h"
+#include "BankPackets.h"
 #include "GuildPackets.h"
 
 #endif // AllPackets_h__

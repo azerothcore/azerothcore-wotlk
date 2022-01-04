@@ -775,12 +775,12 @@ public:
                         _events.ScheduleEvent(EVENT_FROSTBOLT_VOLLEY, urand(8000, 15000));
                         break;
                     case EVENT_MANA_VOID:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, ManaVoidSelector(me)))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ManaVoidSelector(me)))
                             me->CastSpell(target, SPELL_MANA_VOID, false);
                         _events.ScheduleEvent(EVENT_MANA_VOID, urand(20000, 25000));
                         break;
                     case EVENT_COLUMN_OF_FROST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, -10.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -10.0f, true))
                             me->CastSpell(target, SPELL_COLUMN_OF_FROST, false);
                         _events.ScheduleEvent(EVENT_COLUMN_OF_FROST, urand(15000, 25000));
                         break;
