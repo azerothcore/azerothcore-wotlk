@@ -18,7 +18,6 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "TemporarySummon.h"
 #include "molten_core.h"
 
@@ -51,6 +50,8 @@ MCBossObject const linkedBossObjData[MAX_MC_LINKED_BOSS_OBJ]=
     { DATA_GOLEMAGG,    GO_RUNE_THERI,      GO_CIRCLE_GOLEMAGG  },
     { DATA_SULFURON,    GO_RUNE_KORO,       GO_CIRCLE_SULFURON  },
 };
+
+constexpr uint8 SAY_SPAWN = 1;
 
 class instance_molten_core : public InstanceMapScript
 {
@@ -208,6 +209,14 @@ public:
                     _lavaSplashGUID = go->GetGUID();
                     break;
                 }
+                case GO_LAVA_BURST:
+                {
+                    if (Creature* ragnaros = instance->GetCreature(_ragnarosGUID))
+                    {
+                        ragnaros->AI()->SetGUID(go->GetGUID(), GO_LAVA_BURST);
+                    }
+                    break;
+                }
             }
         }
 
@@ -349,7 +358,17 @@ public:
                 return;
             }
 
-            instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE ? MajordomoSummonPos : MajordomoRagnaros);
+            if (GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
+            {
+                if (Creature* creature = instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, MajordomoSummonPos))
+                {
+                    creature->AI()->Talk(SAY_SPAWN);
+                }
+            }
+            else
+            {
+                instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, MajordomoRagnaros);
+            }
         }
 
         bool CheckMajordomoExecutus() const

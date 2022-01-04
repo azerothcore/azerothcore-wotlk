@@ -40,10 +40,6 @@
 #include "VMapMgr2.h"
 #include "Vehicle.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 union u_map_magic
 {
     char asChar[4];
@@ -2057,7 +2053,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
 
             // we are already under the surface or vmap height above map heigt
             // or if the distance of the vmap height is less the land height distance
-            if (vmapHeight > mapHeight || fabs(mapHeight - z) > fabs(vmapHeight - z))
+            if (vmapHeight > mapHeight || std::fabs(mapHeight - z) > std::fabs(vmapHeight - z))
                 return vmapHeight;
             else
                 return mapHeight;                           // better use .map surface height
@@ -2999,37 +2995,38 @@ void InstanceMap::AfterPlayerUnlinkFromMap()
 
 void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask)
 {
-    if (instance_data != nullptr)
-        return;
-#ifdef ELUNA
-    bool isElunaAI = false;
-    instance_data = sEluna->GetInstanceData(this);
     if (instance_data)
-        isElunaAI = true;
+    {
+        return;
+    }
+
+    bool isOtherAI = false;
+
+    sScriptMgr->OnBeforeCreateInstanceScript(this, instance_data, load, data, completedEncounterMask);
+
+    if (instance_data)
+        isOtherAI = true;
 
     // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
-    if (!isElunaAI)
+    if (!isOtherAI)
     {
-#endif
         InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(GetId());
         if (mInstance)
         {
             i_script_id = mInstance->ScriptId;
             instance_data = sScriptMgr->CreateInstanceScript(this);
         }
-#ifdef ELUNA
     }
-#endif
 
     if (!instance_data)
         return;
 
-#ifdef ELUNA
     // use mangos behavior if we are dealing with Eluna AI
     // initialize should then be called only if load is false
-    if (!isElunaAI || !load)
-#endif
+    if (!isOtherAI || !load)
+    {
         instance_data->Initialize();
+    }
 
     if (load)
     {

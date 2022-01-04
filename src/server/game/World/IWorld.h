@@ -171,6 +171,7 @@ enum WorldBoolConfigs
     CONFIG_SET_BOP_ITEM_TRADEABLE,
     CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
     CONFIG_REALM_LOGIN_ENABLED,
+    CONFIG_PLAYER_SETTINGS_ENABLED,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -334,6 +335,7 @@ enum WorldIntConfigs
     CONFIG_CHARDELETE_MIN_LEVEL,
     CONFIG_AUTOBROADCAST_CENTER,
     CONFIG_AUTOBROADCAST_INTERVAL,
+    CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE,
     CONFIG_MAX_RESULTS_LOOKUP_COMMANDS,
     CONFIG_DB_PING_INTERVAL,
     CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION,
@@ -439,6 +441,7 @@ enum Rates
     RATE_XP_KILL,
     RATE_XP_BG_KILL,
     RATE_XP_QUEST,
+    RATE_XP_QUEST_DF,
     RATE_XP_EXPLORE,
     RATE_XP_PET,
     RATE_XP_PET_NEXT_LEVEL,
@@ -536,11 +539,12 @@ public:
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
     virtual void SendWorldText(uint32 string_id, ...) = 0;
+    virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
     virtual void SendGlobalText(const char* text, WorldSession* self) = 0;
     virtual void SendGMText(uint32 string_id, ...) = 0;
-    virtual void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendServerMessage(ServerMessageType type, const char* text = "", Player* player = nullptr) = 0;
     virtual bool IsShuttingDown() const = 0;

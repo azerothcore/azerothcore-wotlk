@@ -193,7 +193,7 @@ void WorldSession::HandleMoveWorldportAck()
     {
         if (mEntry->IsDungeon())
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->SpawnCorpseBones();
         }
     }
@@ -203,7 +203,7 @@ void WorldSession::HandleMoveWorldportAck()
         // resurrect character upon entering instance when the corpse is not available anymore
         if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->RemoveCorpse();
         }
     }
@@ -491,13 +491,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
-    if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
-    {
-        // now client not include swimming flag in case jumping under water
-        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseMask(), movementInfo.pos.GetPositionX(),
-            movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ(), plrMover->GetCollisionHeight()));
-    }
-
     bool jumpopcode = false;
     if (opcode == MSG_MOVE_JUMP)
     {
@@ -672,7 +665,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
             return;
     }
 
-    if (!_player->GetTransport() && fabs(_player->GetSpeed(move_type) - newspeed) > 0.01f)
+    if (!_player->GetTransport() && std::fabs(_player->GetSpeed(move_type) - newspeed) > 0.01f)
     {
         if (_player->GetSpeed(move_type) > newspeed)         // must be greater - just correct
         {
@@ -995,6 +988,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     else
     {
         movementInfo.time = (uint32)movementTime;
+    }
+
+    if (G3D::fuzzyEq(movementInfo.fallTime, 0.f))
+    {
+        movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FALLING);
     }
 
     movementInfo.guid = mover->GetGUID();

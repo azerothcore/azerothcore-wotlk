@@ -34,6 +34,7 @@
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 enum HunterSpells
@@ -947,7 +948,20 @@ class spell_hun_tame_beast : public SpellScript
                 return SPELL_FAILED_DONT_REPORT;
             }
 
-            if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->IsPetDismissed() || player->GetCharmGUID())
+            PetStable const* petStable = player->GetPetStable();
+            if (petStable)
+            {
+                if (petStable->CurrentPet)
+                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+
+                if (petStable->GetUnslottedHunterPet())
+                {
+                    caster->SendTameFailure(PET_TAME_TOO_MANY);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+            }
+
+            if (player->GetCharmGUID())
             {
                 player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                 return SPELL_FAILED_DONT_REPORT;
@@ -1217,7 +1231,27 @@ class spell_hun_lock_and_load : public AuraScript
 
         AfterProc += AuraProcFn(spell_hun_lock_and_load::ApplyMarker);
     }
+};
 
+// 19577 - Intimidation
+class spell_hun_intimidation : public AuraScript
+{
+    PrepareAuraScript(spell_hun_intimidation);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            return !spellInfo->IsPositive();
+        }
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_intimidation::CheckProc);
+    }
 };
 
 void AddSC_hunter_spell_scripts()
@@ -1248,4 +1282,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_viper_attack_speed);
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);
+    RegisterSpellScript(spell_hun_intimidation);
 }

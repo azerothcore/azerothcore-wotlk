@@ -33,12 +33,15 @@
 
 #define MAX_KILL_CREDIT 2
 #define CREATURE_REGEN_INTERVAL 2 * IN_MILLISECONDS
-#define PET_FOCUS_REGEN_INTERVAL 4 * IN_MILLISECONDS
 
 #define MAX_CREATURE_QUEST_ITEMS 6
 
 #define MAX_EQUIPMENT_ITEMS 3
+
+constexpr Milliseconds PET_FOCUS_REGEN_INTERVAL = 4s;
+
 enum class VisibilityDistanceType : uint8;
+
 // TODO: Implement missing flags from TC in places that custom flags from xinef&pussywizzard use flag values.
 // EnumUtils: DESCRIBE THIS
 enum CreatureFlagsExtra : uint32
@@ -211,7 +214,7 @@ struct CreatureBaseStats
 
     uint32 GenerateHealth(CreatureTemplate const* info) const
     {
-        return uint32(ceil(BaseHealth[info->expansion] * info->ModHealth));
+        return uint32(std::ceil(BaseHealth[info->expansion] * info->ModHealth));
     }
 
     uint32 GenerateMana(CreatureTemplate const* info) const
@@ -220,12 +223,12 @@ struct CreatureBaseStats
         if (!BaseMana)
             return 0;
 
-        return uint32(ceil(BaseMana * info->ModMana));
+        return uint32(std::ceil(BaseMana * info->ModMana));
     }
 
     uint32 GenerateArmor(CreatureTemplate const* info) const
     {
-        return uint32(ceil(BaseArmor * info->ModArmor));
+        return uint32(std::ceil(BaseArmor * info->ModArmor));
     }
 
     float GenerateBaseDamage(CreatureTemplate const* info) const
@@ -416,6 +419,7 @@ struct TrainerSpell
     uint32 reqSkillValue{0};
     uint32 reqLevel{0};
     uint32 learnedSpell[3];
+    uint32 reqSpell{0};
 
     // helpers
     [[nodiscard]] bool IsCastable() const { return learnedSpell[0] != spell; }

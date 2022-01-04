@@ -580,10 +580,7 @@ public:
             object->SetByteValue(GAMEOBJECT_BYTES_1, objectType, *objectState);
         else if (objectType == 4)
         {
-            WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8+4);
-            data << object->GetGUID();
-            data << static_cast<uint32>(*objectState);
-            object->SendMessageToSet(&data, true);
+            object->SendCustomAnim(*objectState);
         }
         handler->PSendSysMessage("Set gobject type %d state %u", objectType, *objectState);
         return true;

@@ -365,12 +365,12 @@ public:
                         }
                     break;
                 case EVENT_SPELL_FIREBALL:
-                    if( Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true) )
+                    if( Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
                         me->CastSpell(pTarget, SPELL_FIREBALL, false);
                     events.RepeatEvent(4000);
                     break;
                 case EVENT_SPELL_DEVOURING_FLAME:
-                    if( Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true) )
+                    if( Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
                         me->CastSpell(pTarget, SPELL_DEVOURINGFLAME, false);
                     events.RepeatEvent(13000);
                     break;
@@ -488,7 +488,7 @@ public:
                         me->SetControlled(false, UNIT_STATE_ROOT);
                         me->DisableRotate(false);
                         DoResetThreat();
-                        Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0, true);
+                        Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0, true);
                         if (!target)
                             target = me->SelectNearestPlayer(200.0f);
                         if (target)
@@ -850,7 +850,7 @@ public:
                                 if( me->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_STATE_WORK )
                                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_WORK);
 
-                                if (fabs(me->GetOrientation() - me->GetAngle(c)) > M_PI / 4)
+                                if (std::fabs(me->GetOrientation() - me->GetAngle(c)) > M_PI / 4)
                                     me->SetFacingToObject(c);
 
                                 c->AI()->SetData(2, 0);

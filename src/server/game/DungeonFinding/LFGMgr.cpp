@@ -577,8 +577,7 @@ namespace lfg
                             rDungeonId = (*dungeons.begin());
                             sScriptMgr->OnPlayerQueueRandomDungeon(player, rDungeonId);
                         }
-                        // No break on purpose (Random can only be dungeon or heroic dungeon)
-                        [[fallthrough]];
+                        [[fallthrough]]; // On purpose (Random can only be dungeon or heroic dungeon)
                     case LFG_TYPE_HEROIC:
                     case LFG_TYPE_DUNGEON:
                         if (isRaid)
@@ -2104,15 +2103,25 @@ namespace lfg
         LfgTeleportError error = LFG_TELEPORTERROR_OK;
 
         if (!player->IsAlive())
+        {
             error = LFG_TELEPORTERROR_PLAYER_DEAD;
+        }
         else if (player->IsFalling() || player->HasUnitState(UNIT_STATE_JUMPING))
+        {
             error = LFG_TELEPORTERROR_FALLING;
+        }
         else if (player->IsMirrorTimerActive(FATIGUE_TIMER))
+        {
             error = LFG_TELEPORTERROR_FATIGUE;
+        }
         else if (player->GetVehicle())
+        {
             error = LFG_TELEPORTERROR_IN_VEHICLE;
-        else if (player->GetCharmGUID())
-            error = LFG_TELEPORTERROR_CHARMING;
+        }
+        else if (player->GetCharmGUID() || player->IsInCombat())
+        {
+            error = LFG_TELEPORTERROR_COMBAT;
+        }
         else
         {
             uint32 mapid = dungeon->map;
@@ -2233,7 +2242,7 @@ namespace lfg
 
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             else
             {
                 done = true;
@@ -2241,7 +2250,7 @@ namespace lfg
                 if (!quest)
                     continue;
                 // we give reward without informing client (retail does this)
-                player->RewardQuest(quest, 0, nullptr, false);
+                player->RewardQuest(quest, 0, nullptr, false, true);
             }
 
             // Give rewards

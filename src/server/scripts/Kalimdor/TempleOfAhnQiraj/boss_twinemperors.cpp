@@ -289,7 +289,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (!who || me->GetVictim())
             return;
 
-        if (me->_CanDetectFeignDeathOf(who) && me->CanCreatureAttack(who))
+        if (me->CanCreatureAttack(who))
         {
             if (me->IsWithinDistInMap(who, PULL_RANGE, true, false) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
             {
@@ -439,7 +439,7 @@ public:
 
             if (UpperCut_Timer <= diff)
             {
-                Unit* randomMelee = SelectTarget(SELECT_TARGET_RANDOM, 0, NOMINAL_MELEE_RANGE, true);
+                Unit* randomMelee = SelectTarget(SelectTargetMethod::Random, 0, NOMINAL_MELEE_RANGE, true);
                 if (randomMelee)
                     DoCast(randomMelee, SPELL_UPPERCUT);
                 UpperCut_Timer = 15000 + rand() % 15000;
@@ -536,7 +536,7 @@ public:
             //Blizzard_Timer
             if (Blizzard_Timer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45, true);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45, true);
                 if (target)
                 {
                     DoCast(target, SPELL_BLIZZARD);
@@ -548,7 +548,7 @@ public:
             if (ArcaneBurst_Timer <= diff)
             {
                 Unit* mvic;
-                if ((mvic = SelectTarget(SELECT_TARGET_NEAREST, 0, NOMINAL_MELEE_RANGE, true)) != nullptr)
+                if ((mvic = SelectTarget(SelectTargetMethod::MaxDistance, 0, NOMINAL_MELEE_RANGE, true)) != nullptr)
                 {
                     DoCast(mvic, SPELL_ARCANEBURST);
                     ArcaneBurst_Timer = 5000;
