@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164070688420890264
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640706884208902644');
 
--- Pathing for Zixil Entry: 3537 with broadcast text 1119
+-- Pathing for Zixil Entry: 3537 with broadcast text 1119.
 SET @NPC := 15424;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-339.08447,`position_y`=-708.55786,`position_z`=57.732002 WHERE `guid`=@NPC;

@@ -18,6 +18,7 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
+#include "MiscPackets.h"
 #include "WorldStatePackets.h"
 #include "TotemPackets.h"
 #include "BankPackets.h"

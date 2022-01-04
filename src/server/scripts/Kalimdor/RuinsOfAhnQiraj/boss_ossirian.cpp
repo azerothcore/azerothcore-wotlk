@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MiscPackets.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -140,9 +141,8 @@ public:
             if (!map->IsDungeon())
                 return;
 
-            WorldPacket data(SMSG_WEATHER, (4 + 4 + 4));
-            data << uint32(WEATHER_STATE_HEAVY_SANDSTORM) << float(1) << uint8(0);
-            map->SendToPlayers(&data);
+            WorldPackets::Misc::Weather weather(WEATHER_STATE_HEAVY_SANDSTORM, 1.0f);
+            map->SendToPlayers(weather.Write());
 
             for (uint8 i = 0; i < NUM_TORNADOS; ++i)
             {

@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164072201536330385
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640722015363303857');
 
--- Pathing for Jason Lemieux Entry: 3544
+-- Pathing for Jason Lemieux Entry: 3544.
 SET @NPC := 15530;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-34.749947,`position_y`=-819.71674,`position_z`=57.503563 WHERE `guid`=@NPC;

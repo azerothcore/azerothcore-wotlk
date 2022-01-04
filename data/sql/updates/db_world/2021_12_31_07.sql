@@ -16,6 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164023762623509852
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640237626235098529');
 
+-- remove loot
 DELETE FROM `creature_loot_template` WHERE `Item` = 2997;
 
 --
