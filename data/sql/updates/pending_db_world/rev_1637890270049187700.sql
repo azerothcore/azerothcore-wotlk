@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1637890270049187700');
 
 -- Adding Boss to Game event 13: Elemental Invasions
 DELETE FROM `game_event_creature` WHERE `eventEntry` = 13 AND `guid` = 14461;
-INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES ('13', '14461');
+INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES (13, 14461);
 
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 179666;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 179666);
