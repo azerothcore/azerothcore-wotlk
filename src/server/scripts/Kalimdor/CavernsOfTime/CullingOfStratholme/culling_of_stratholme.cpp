@@ -1444,7 +1444,7 @@ public:
 
                 if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
                 {
-                    me->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+                    player->AddItem(ITEM_ARCANE_DISRUPTOR, 1);
                 }
             }
             // Skip Event
