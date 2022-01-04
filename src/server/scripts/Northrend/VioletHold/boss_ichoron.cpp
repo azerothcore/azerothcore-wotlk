@@ -145,7 +145,7 @@ public:
         void IchoronDoCastToAllHostilePlayers(uint32 spellId, bool triggered)
         {
             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-            if (PlayerList.isEmpty())
+            if (PlayerList.IsEmpty())
                 return;
 
             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)

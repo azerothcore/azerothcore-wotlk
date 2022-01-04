@@ -302,7 +302,7 @@ public:
 
             bool finished = false;
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     if (Player* player = i->GetSource())
                     {

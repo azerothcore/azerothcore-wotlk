@@ -301,7 +301,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         Map::PlayerList const& players = me->GetMap()->GetPlayers();
                         targets = new ObjectList();
 
-                        if (!players.isEmpty())
+                        if (!players.IsEmpty())
                         {
                             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                                 if (Player* player = i->GetSource())
@@ -350,7 +350,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         Map::PlayerList const& players = me->GetMap()->GetPlayers();
                         targets = new ObjectList();
 
-                        if (!players.isEmpty())
+                        if (!players.IsEmpty())
                         {
                             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                                 if (Player* player = i->GetSource())

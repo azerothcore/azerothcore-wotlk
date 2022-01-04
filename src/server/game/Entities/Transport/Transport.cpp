@@ -124,7 +124,7 @@ void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 void MotionTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
 {
     Map::PlayerList const& players = GetMap()->GetPlayers();
-    if (players.isEmpty())
+    if (players.IsEmpty())
         return;
 
     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -798,7 +798,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 void StaticTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
 {
     Map::PlayerList const& players = GetMap()->GetPlayers();
-    if (players.isEmpty())
+    if (players.IsEmpty())
         return;
 
     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)

@@ -426,7 +426,7 @@ void Unit::Update(uint32 p_time)
         // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
         // These flags are reset after target dies or another command is given.
-        if (m_HostileRefMgr.isEmpty())
+        if (m_HostileRefMgr.IsEmpty())
         {
             // m_CombatTimer set at aura start and it will be freeze until aura removing
             if (m_CombatTimer <= p_time)

@@ -363,7 +363,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
 {
     // Send packet to all players in The Frozen Throne
     Map::PlayerList const& players = source->GetMap()->GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
                 if (player->GetAreaId() == AREA_THE_FROZEN_THRONE)
@@ -973,7 +973,7 @@ public:
             {
                 _positionCheckTimer = 5000;
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* player = itr->GetSource())
                             if (player->GetPositionZ() < 700.0f)

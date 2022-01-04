@@ -189,7 +189,7 @@ public:
                                 {
                                     unit->SetVisible(false);
                                     Map::PlayerList const& PlayerList = map->GetPlayers();
-                                    if (PlayerList.isEmpty())
+                                    if (PlayerList.IsEmpty())
                                         return;
 
                                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)

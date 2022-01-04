@@ -74,7 +74,7 @@ public:
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
             }

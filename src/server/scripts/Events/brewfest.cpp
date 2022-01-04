@@ -1641,7 +1641,7 @@ struct npc_coren_direbrew : public ScriptedAI
         _summons.DespawnAll();
 
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
-        if (!players.isEmpty())
+        if (!players.IsEmpty())
         {
             if (Group* group = players.begin()->GetSource()->GetGroup())
             {
