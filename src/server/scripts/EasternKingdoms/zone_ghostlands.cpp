@@ -31,6 +31,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "ObjectGuid.h"
 
 /*######
 ## npc_ranger_lilatha
@@ -261,8 +262,180 @@ private:
     bool     _helpCalled;
 };
 
+/*######
+## npc_sentinel_infiltrator
+######*/
+
+enum SentinelInfiltrator
+{
+    EMOTE_FLEE               = 0,
+    EVENT_TALK2              = 1,
+    EVENT_QUESTION2          = 2,
+    EVENT_EXCLAMATION        = 3,
+    EVENT_SALUTE             = 4,
+    EVENT_GOUGE2             = 5,
+    EVENT_BACKSTAB2          = 6,
+    NPC_SENTINEL_INFILTRATOR = 16333,
+    PATH_ONE                 = 841030,
+    PATH_TWO                 = 859400,
+    SPELL_GOUGE              = 12540
+};
+
+struct npc_sentinel_infiltrator : public ScriptedAI
+{
+    npc_sentinel_infiltrator(Creature* creature) : ScriptedAI(creature)
+    {
+        Initialize();
+    }
+
+    void Initialize()
+    {
+        _path = me->GetWaypointPath();
+    }
+
+    void Reset() override
+    {
+        _fleedForAssistance = false;
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == WAYPOINT_MOTION_TYPE)
+        {
+            switch (_path)
+            {
+            case PATH_ONE:
+                switch (id)
+                {
+                    case 5:
+                    case 8:
+                    case 14:
+                    case 18:
+                        Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
+                        if (SentinelInfiltrator)
+                        {
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                            SentinelInfiltrator->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                            _events.ScheduleEvent(EVENT_TALK2, 2000);
+                        }
+                        break;
+                }
+                break;
+            case PATH_TWO:
+                switch (id)
+                {
+                    case 5:
+                    case 7:
+                    case 14:
+                    case 17:
+                        Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
+                        if (SentinelInfiltrator)
+                        {
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                            SentinelInfiltrator->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                            _events.ScheduleEvent(EVENT_TALK, 2000);
+                        }
+                        break;
+                }
+                break;
+            }
+        }
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _events.ScheduleEvent(EVENT_GOUGE2, urand(9000, 15000));
+        _events.ScheduleEvent(EVENT_BACKSTAB2, urand(3000, 5000));
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        if (!UpdateVictim())
+        {
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_TALK2:
+                {
+                    Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
+                    if (SentinelInfiltrator)
+                    {
+                        SentinelInfiltrator->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    }
+                    _events.ScheduleEvent(EVENT_QUESTION, 2000);
+                    break;
+                }
+                case EVENT_QUESTION2:
+                {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                    _events.ScheduleEvent(EVENT_EXCLAMATION, 1000);
+                    break;
+                }
+                case EVENT_EXCLAMATION:
+                {
+                    Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
+                    if (SentinelInfiltrator)
+                    {
+                        SentinelInfiltrator->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                    }
+                    _events.ScheduleEvent(EVENT_SALUTE, 3000);
+                    break;
+                }
+                case EVENT_SALUTE:
+                {
+                    Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
+                    if (SentinelInfiltrator)
+                    {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                        SentinelInfiltrator->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                        break;
+                    }
+                }
+                default:
+                    break;
+                }
+            }
+            return;
+        }
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_GOUGE2:
+                DoCastVictim(SPELL_GOUGE, true);
+                _events.ScheduleEvent(EVENT_GOUGE2, urand(9000, 15000));
+                break;
+            case EVENT_BACKSTAB2:
+                DoCastVictim(SPELL_BACKSTAB, true);
+                _events.ScheduleEvent(EVENT_BACKSTAB, urand(7000, 11000));
+                break;
+            default:
+                break;
+            }
+        }
+
+        if (me->HealthBelowPct(15) && !_fleedForAssistance)
+        {
+            _fleedForAssistance = true;
+            me->DoFleeToGetAssistance();
+            Talk(EMOTE_FLEE);
+        }
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    EventMap _events;
+    bool     _fleedForAssistance;
+    int32    _path;
+};
+
 void AddSC_ghostlands()
 {
     new npc_ranger_lilatha();
     RegisterCreatureAI(npc_sentinel_leader);
+    RegisterCreatureAI(npc_sentinel_infiltrator);
 }
