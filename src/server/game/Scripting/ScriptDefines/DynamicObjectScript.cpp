@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
 
 void ScriptMgr::OnDynamicObjectUpdate(DynamicObject* dynobj, uint32 diff)
 {

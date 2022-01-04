@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
 
 bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id)
 {

@@ -453,7 +453,7 @@ public:
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                     }
                     me->getThreatMgr().resetAggro(NotOnSameSide(me));
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
                     {
                         me->getThreatMgr().addThreat(pTarget, 100.0f);
                         AttackStart(pTarget);

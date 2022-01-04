@@ -28,7 +28,6 @@
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
 #include "DisableMgr.h"
@@ -50,7 +49,6 @@
 #include "Pet.h"
 #include "PetAI.h"
 #include "Player.h"
-#include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -67,7 +65,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include <math.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -479,12 +476,9 @@ void Unit::Update(uint32 p_time)
     // update abilities available only for fraction of time
     UpdateReactives(p_time);
 
-    if (IsAlive())
-    {
-        ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, HealthBelowPct(20));
-        ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, HealthBelowPct(35));
-        ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, HealthAbovePct(75));
-    }
+    ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, IsAlive() ? HealthBelowPct(20) : false);
+    ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, IsAlive() ? HealthBelowPct(35) : false);
+    ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, IsAlive() ? HealthBelowPct(75) : false);
 
     UpdateSplineMovement(p_time);
     GetMotionMaster()->UpdateMotion(p_time);
@@ -687,7 +681,7 @@ bool Unit::GetRandomContactPoint(const Unit* obj, float& x, float& y, float& z, 
                  GetAngle(obj) + (attacker_number ? (static_cast<float>(M_PI / 2) - static_cast<float>(M_PI) * (float)rand_norm()) * float(attacker_number) / combat_reach * 0.3f : 0));
 
     // pussywizard
-    if (fabs(this->GetPositionZ() - z) > this->GetCollisionHeight() || !IsWithinLOS(x, y, z))
+    if (std::fabs(this->GetPositionZ() - z) > this->GetCollisionHeight() || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -815,6 +809,25 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         }
         else
             victim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TAKE_DAMAGE, 0);
+
+        // interrupt spells with SPELL_INTERRUPT_FLAG_ABORT_ON_DMG on absorbed damage (no dots)
+        if (!damage && damagetype != DOT && cleanDamage && cleanDamage->absorbed_damage)
+        {
+            if (victim != attacker && victim->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
+                {
+                    if (spell->getState() == SPELL_STATE_PREPARING)
+                    {
+                        uint32 interruptFlags = spell->m_spellInfo->InterruptFlags;
+                        if (interruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
+                        {
+                            victim->InterruptNonMeleeSpells(false);
+                        }
+                    }
+                }
+            }
+        }
 
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
@@ -1897,7 +1910,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         float discreteResistProbability[11];
         for (uint32 i = 0; i < 11; ++i)
         {
-            discreteResistProbability[i] = 0.5f - 2.5f * fabs(0.1f * i - averageResist);
+            discreteResistProbability[i] = 0.5f - 2.5f * std::fabs(0.1f * i - averageResist);
             if (discreteResistProbability[i] < 0.0f)
                 discreteResistProbability[i] = 0.0f;
         }
@@ -3777,10 +3790,13 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
             return false;
     }
 
-    if (IsInWater())
+    // In water or jumping in water
+    if (IsInWater() || (GetLiquidData().Status == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
+    {
         return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
-    else
-        return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
+    }
+
+    return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
 }
 
 void Unit::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
@@ -5113,7 +5129,7 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
     if (dispelMask & (1 << DISPEL_DISEASE) && HasAura(50536))
         dispelMask &= ~(1 << DISPEL_DISEASE);
 
-    ReputationRank rank = GetReactionTo(caster);
+    ReputationRank rank = GetReactionTo(caster, IsCharmed());
     bool positive = rank >= REP_FRIENDLY;
 
     // Neutral unit not at war with caster should be treated as a friendly unit
@@ -5249,6 +5265,19 @@ bool Unit::HasAuraTypeWithValue(AuraType auratype, int32 value) const
     for (AuraEffectList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
         if (value == (*i)->GetAmount())
             return true;
+    return false;
+}
+
+bool Unit::HasAuraTypeWithTriggerSpell(AuraType auratype, uint32 triggerSpell) const
+{
+    for (AuraEffect const* aura : GetAuraEffectsByType(auratype))
+    {
+        if (aura->GetSpellInfo()->Effects[aura->GetEffIndex()].TriggerSpell == triggerSpell)
+        {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -9282,7 +9311,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
                     uint8 fofRank = sSpellMgr->GetSpellRank(triggeredByAura->GetId());
                     uint8 fbRank  = sSpellMgr->GetSpellRank(aurEff->GetId());
-                    uint8 chance = uint8(ceil(fofRank * fbRank * 16.6f));
+                    uint8 chance = uint8(std::ceil(fofRank * fbRank * 16.6f));
 
                     if (roll_chance_i(chance))
                         CastSpell(victim, aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
@@ -9514,7 +9543,7 @@ void Unit::SetFaction(uint32 faction)
 }
 
 // function based on function Unit::UnitReaction from 13850 client
-ReputationRank Unit::GetReactionTo(Unit const* target) const
+ReputationRank Unit::GetReactionTo(Unit const* target, bool checkOriginalFaction /*= false*/) const
 {
     // always friendly to self
     if (this == target)
@@ -9596,11 +9625,42 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
     }
 
     ReputationRank repRank = REP_HATED;
-
     if (!sScriptMgr->IfNormalReaction(this, target, repRank))
+    {
         return ReputationRank(repRank);
+    }
+
+    FactionTemplateEntry const* factionTemplateEntry = nullptr;
+    if (checkOriginalFaction)
+    {
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(getRace()))
+            {
+                factionTemplateEntry = sFactionTemplateStore.LookupEntry(rEntry->FactionID);
+            }
+        }
+        else
+        {
+            Unit* owner = GetOwner();
+            if (HasUnitTypeMask(UNIT_MASK_MINION) && owner)
+            {
+                factionTemplateEntry = sFactionTemplateStore.LookupEntry(owner->GetFaction());
+            }
+            else if (CreatureTemplate const* cinfo = ToCreature()->GetCreatureTemplate())
+            {
+                factionTemplateEntry = sFactionTemplateStore.LookupEntry(cinfo->faction);
+            }
+        }
+    }
+
+    if (!factionTemplateEntry)
+    {
+        factionTemplateEntry = GetFactionTemplateEntry();
+    }
+
     // do checks dependant only on our faction
-    return GetFactionReactionTo(GetFactionTemplateEntry(), target);
+    return GetFactionReactionTo(factionTemplateEntry, target);
 }
 
 ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, Unit const* target) const
@@ -13744,10 +13804,6 @@ void Unit::setDeathState(DeathState s, bool despawn)
 
     if (s == JUST_DIED)
     {
-        ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
-        ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
-        ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, false);
-
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
@@ -16553,11 +16609,10 @@ bool Unit::IsPetAura(Aura const* aura)
         return false;
 
     // if the owner has that pet aura, return true
-    for (PetAuraSet::const_iterator itr = owner->m_petAuras.begin(); itr != owner->m_petAuras.end(); ++itr)
-    {
-        if ((*itr)->GetAura(GetEntry()) == aura->GetId())
+    for (PetAura const* petAura : owner->m_petAuras)
+        if (petAura->GetAura(GetEntry()) == aura->GetId())
             return true;
-    }
+
     return false;
 }
 
@@ -16576,7 +16631,11 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget, uint32 spell_id)
 
     uint8 level = creatureTarget->getLevel() + 5 < getLevel() ? (getLevel() - 5) : creatureTarget->getLevel();
 
-    InitTamedPet(pet, level, spell_id);
+    if (!InitTamedPet(pet, level, spell_id))
+    {
+        delete pet;
+        return nullptr;
+    }
 
     return pet;
 }
@@ -16603,6 +16662,11 @@ Pet* Unit::CreateTamedPetFrom(uint32 creatureEntry, uint32 spell_id)
 
 bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
 {
+    Player* player = ToPlayer();
+    PetStable& petStable = player->GetOrInitPetStable();
+    if (petStable.CurrentPet || petStable.GetUnslottedHunterPet())
+        return false;
+
     pet->SetCreatorGUID(GetGUID());
     pet->SetFaction(GetFaction());
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell_id);
@@ -16620,6 +16684,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     // this enables pet details window (Shift+P)
     pet->InitPetCreateSpells();
     pet->SetFullHealth();
+    pet->FillPetInfo(&petStable.CurrentPet.emplace());
     return true;
 }
 
@@ -17118,7 +17183,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             creature->DeleteThreatList();
 
             // must be after setDeathState which resets dynamic flags
-            if (!creature->loot.empty())
+            if (!creature->loot.isLooted())
             {
                 creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
@@ -17133,8 +17198,10 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             killer->ToCreature()->AI()->KilledUnit(victim);
 
         // Call creature just died function
-        if (creature->IsAIEnabled)
-            creature->AI()->JustDied(killer ? killer : victim);
+        if (CreatureAI* ai = creature->AI())
+        {
+            ai->JustDied(killer);
+        }
 
         if (TempSummon* summon = creature->ToTempSummon())
             if (Unit* summoner = summon->GetSummonerUnit())
@@ -17363,11 +17430,11 @@ void Unit::SetRooted(bool apply)
 
         if (IsFalling())
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
         }
         else
         {
-            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
 
          // Creature specific
@@ -20015,8 +20082,15 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     }
             }
             else
+            {
+                if (sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                {
+                    continue;
+                }
+
                 // send in current format (float as float, uint32 as uint32)
                 fieldBuffer << m_uint32Values[index];
+            }
         }
     }
 

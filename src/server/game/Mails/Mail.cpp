@@ -28,7 +28,6 @@
 #include "ScriptMgr.h"
 #include "Unit.h"
 #include "World.h"
-#include "WorldSession.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {

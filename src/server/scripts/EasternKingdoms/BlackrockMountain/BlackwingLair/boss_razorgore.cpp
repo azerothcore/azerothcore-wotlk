@@ -141,7 +141,7 @@ public:
                     case EVENT_CONFLAGRATION:
                         DoCastVictim(SPELL_CONFLAGRATION);
                         if (me->GetVictim() && me->GetVictim()->HasAura(SPELL_CONFLAGRATION))
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
                                 me->TauntApply(target);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 30000);
                         break;
