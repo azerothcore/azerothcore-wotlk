@@ -183,6 +183,8 @@ enum SMART_EVENT
 
     SMART_EVENT_TC_END                   = 78,
 
+    SMART_EVENT_SUMMONED_UNIT_DIES       = 82,      // CreatureId(0 all), CooldownMin, CooldownMax
+
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
 
@@ -584,9 +586,9 @@ enum SMART_ACTION
     SMART_ACTION_START_CLOSEST_WAYPOINT             = 113,    // wp1, wp2, wp3, wp4, wp5, wp6, wp7
     SMART_ACTION_RISE_UP                            = 114,    // distance
     SMART_ACTION_RANDOM_SOUND                       = 115,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf
-    SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // timer
     SMART_ACTION_DISABLE_EVADE                      = 117,    // 0/1 (1 = disabled, 0 = enabled)
-    SMART_ACTION_GO_SET_GO_STATE                    = 118,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_GO_SET_GO_STATE                    = 118,    // state
     SMART_ACTION_SET_CAN_FLY                        = 119,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_REMOVE_AURAS_BY_TYPE               = 120,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_SET_SIGHT_DIST                     = 121,    // sightDistance
@@ -1279,6 +1281,11 @@ struct SmartAction
         {
             uint32 disable;
         } disableEvade;
+
+        struct
+        {
+            uint32 timer;
+        } corpseDelay;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1334,7 +1341,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_THREAT_LIST                    = 24,   // All units on creature's threat list, maxdist, playerOnly
     SMART_TARGET_CLOSEST_ENEMY                  = 25,   // maxDist, playerOnly
     SMART_TARGET_CLOSEST_FRIENDLY               = 26,   // maxDist, playerOnly
-    SMART_TARGET_LOOT_RECIPIENTS                = 27,   // TODO: NOT SUPPORTED YET
+    SMART_TARGET_LOOT_RECIPIENTS                = 27,   // all players that have tagged this creature (for kill credit)
     SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
     SMART_TARGET_VEHICLE_PASSENGER              = 29,   // seat number (vehicle can target it's own accessory)
 
@@ -1658,7 +1665,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     { 0, 0 }, // 79
     { 0, 0 }, // 80
     { 0, 0 }, // 81
-    { 0, 0 }, // 82
+    {SMART_EVENT_SUMMONED_UNIT_DIES,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     { 0, 0 }, // 83
     { 0, 0 }, // 84
     { 0, 0 }, // 85

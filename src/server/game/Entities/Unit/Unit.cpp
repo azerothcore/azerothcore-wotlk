@@ -9311,7 +9311,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
                     uint8 fofRank = sSpellMgr->GetSpellRank(triggeredByAura->GetId());
                     uint8 fbRank  = sSpellMgr->GetSpellRank(aurEff->GetId());
-                    uint8 chance = uint8(ceil(fofRank * fbRank * 16.6f));
+                    uint8 chance = uint8(std::ceil(fofRank * fbRank * 16.6f));
 
                     if (roll_chance_i(chance))
                         CastSpell(victim, aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
@@ -20082,8 +20082,15 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     }
             }
             else
+            {
+                if (sScriptMgr->OnBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                {
+                    continue;
+                }
+
                 // send in current format (float as float, uint32 as uint32)
                 fieldBuffer << m_uint32Values[index];
+            }
         }
     }
 
