@@ -520,13 +520,23 @@ public:
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
 
-    // loading helpers
-    void _InitializeExplicitTargetMask();
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS> const& GetEffects() const { return Effects; }
+    SpellEffectInfo const& GetEffect(SpellEffIndex index) const { ASSERT(index < Effects.size()); return Effects[index]; }
+
     bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
     bool _IsPositiveSpell() const;
     static bool _IsPositiveTarget(uint32 targetA, uint32 targetB);
+
+private:
+    // loading helpers
+    void _InitializeExplicitTargetMask();
+
     AuraStateType LoadAuraState() const;
     SpellSpecificType LoadSpellSpecific() const;
+
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }
+    SpellEffectInfo& _GetEffect(SpellEffIndex index) { ASSERT(index < Effects.size()); return Effects[index]; }
+
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
 };

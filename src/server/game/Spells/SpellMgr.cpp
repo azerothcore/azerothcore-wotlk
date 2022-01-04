@@ -2705,7 +2705,7 @@ void SpellMgr::LoadSpellInfoStore()
 
 void SpellMgr::UnloadSpellInfoStore()
 {
-    for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
         delete mSpellInfoMap[i];
 
     mSpellInfoMap.clear();
@@ -2713,7 +2713,7 @@ void SpellMgr::UnloadSpellInfoStore()
 
 void SpellMgr::UnloadSpellInfoImplicitTargetConditionLists()
 {
-    for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         if (mSpellInfoMap[i])
             mSpellInfoMap[i]->_UnloadImplicitTargetConditionLists();
@@ -2738,7 +2738,7 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
     LOG_INFO("server.loading", " ");
 }
 
-void SpellMgr::LoadSpellCustomAttr()
+void SpellMgr::LoadSpellInfoCustomAttributes()
 {
     uint32 const oldMSTime = getMSTime();
     uint32 const customAttrTime = getMSTime();
@@ -2957,7 +2957,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                 if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                                     continue;
 
-                                SpellInfo* procInfo = (SpellInfo*)GetSpellInfo(enchant->spellid[s]);
+                                SpellInfo* procInfo = _GetSpellInfo(enchant->spellid[s]);
                                 if (!procInfo)
                                     continue;
 
@@ -3418,7 +3418,7 @@ void SpellMgr::LoadSpellCustomAttr()
             spellInfo->AttributesCu &= ~SPELL_ATTR0_CU_BINARY_SPELL;
     }
 
-    LOG_INFO("server.loading", ">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded SpellInfo custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -3437,7 +3437,7 @@ inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(Spe
     }
 }
 
-void SpellMgr::LoadDbcDataCorrections()
+void SpellMgr::LoadSpellInfoCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
@@ -7518,9 +7518,9 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
-        SpellInfo* spellInfo = (SpellInfo*)sSpellStore.LookupEntry(i);
+        SpellInfo* spellInfo = mSpellInfoMap[i];
         if (!spellInfo)
         {
             continue;
@@ -7549,19 +7549,20 @@ void SpellMgr::LoadDbcDataCorrections()
             }
         }
 
-        // @todo: fix later
-        // SpellInfo doesn't work on the if statement below.
-        uint32 spellId = 0;
-        SpellEntry const* spellEntry = (SpellEntry*)sSpellStore.LookupEntry(spellId);
-
-        // Xinef: Fix range for trajectories and triggered spells
-        for (uint8 j = 0; j < 3; ++j)
+        // Fix range for trajectory triggered spell
+        for (SpellEffectInfo const& spellEffectInfo : spellInfo->GetEffects())
         {
-            if (spellInfo->RangeEntry == sSpellRangeStore.LookupEntry(1) && (spellEntry->EffectImplicitTargetA[j] == TARGET_DEST_TRAJ || spellEntry->EffectImplicitTargetB[j] == TARGET_DEST_TRAJ))
+            if (spellEffectInfo.IsEffect() && (spellEffectInfo.TargetA.GetTarget() == TARGET_DEST_TRAJ || spellEffectInfo.TargetB.GetTarget() == TARGET_DEST_TRAJ))
             {
-                if (SpellInfo* spellInfo2 = (SpellInfo*)sSpellStore.LookupEntry(spellInfo->Effects[j].TriggerSpell))
+                // Get triggered spell if any
+                if (SpellInfo* spellInfoTrigger = const_cast<SpellInfo*>(GetSpellInfo(spellEffectInfo.TriggerSpell)))
                 {
-                    spellInfo2->RangeEntry = sSpellRangeStore.LookupEntry(187); // 300yd
+                    float maxRangeMain = spellInfo->RangeEntry ? spellInfo->RangeEntry->RangeMax[0] : 0.0f;
+                    float maxRangeTrigger = spellInfoTrigger->RangeEntry ? spellInfoTrigger->RangeEntry->RangeMax[0] : 0.0f;
+
+                    // check if triggered spell has enough max range to cover trajectory
+                    if (maxRangeTrigger < maxRangeMain)
+                        spellInfoTrigger->RangeEntry = spellInfo->RangeEntry;
                 }
             }
         }
