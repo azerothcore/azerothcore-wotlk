@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164091916795175569
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640919167951755692');
 
--- Pathing for Broom Entry: 17213 -- 0 points to 134 points
+-- Pathing for Broom Entry: 17213 -- 0 points to 134 points.
 SET @NPC := 62000;
 SET @PATH := @NPC * 10;
 DELETE FROM `creature` WHERE `guid`=@NPC;

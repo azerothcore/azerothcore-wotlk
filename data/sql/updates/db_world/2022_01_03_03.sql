@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164070808396822579
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640708083968225794');
 
--- Forsaken Raiders missing auras
+-- Forsaken Raiders missing auras.
 DELETE FROM `creature_template_addon` WHERE `entry`=17108;
 INSERT INTO `creature_template_addon` (`entry`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (17108,0,0,0,1,0,0, '6718 8601');
 UPDATE `creature_addon` SET `auras`='6718 8601' WHERE `guid` IN (15577,15702,15705);
