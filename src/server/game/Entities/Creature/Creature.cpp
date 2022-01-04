@@ -2070,7 +2070,7 @@ bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) 
     return Unit::IsImmunedToSpellEffect(spellInfo, index);
 }
 
-SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
+SpellInfo const* Creature::ReachWithSpellAttack(Unit* victim)
 {
     if (!victim)
         return nullptr;
@@ -2118,7 +2118,7 @@ SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
     return nullptr;
 }
 
-SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
+SpellInfo const* Creature::ReachWithSpellCure(Unit* victim)
 {
     if (!victim)
         return nullptr;

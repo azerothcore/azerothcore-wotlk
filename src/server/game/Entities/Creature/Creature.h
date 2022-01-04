@@ -229,8 +229,8 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    SpellInfo const* reachWithSpellAttack(Unit* victim);
-    SpellInfo const* reachWithSpellCure(Unit* victim);
+    SpellInfo const* ReachWithSpellAttack(Unit* victim);
+    SpellInfo const* ReachWithSpellCure(Unit* victim);
 
     uint32 m_spells[MAX_CREATURE_SPELLS];
     CreatureSpellCooldowns m_CreatureSpellCooldowns;
