@@ -328,7 +328,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
 
             if (state == DONE)
                 for (MinionSet::iterator i = bossInfo->minion.begin(); i != bossInfo->minion.end(); ++i)
-                    if ((*i)->isWorldBoss() && (*i)->IsAlive())
+                    if ((*i)->IsWorldBoss() && (*i)->IsAlive())
                         return false;
 
             bossInfo->state = state;

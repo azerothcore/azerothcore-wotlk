@@ -265,7 +265,7 @@ class spell_dk_aotd_taunt : public SpellScript
         {
             // ignore bosses
             if (Creature* cr = (*itr)->ToCreature())
-                if (cr->isWorldBoss())
+                if (cr->IsWorldBoss())
                 {
                     targets.erase(itr++);
                     continue;
@@ -1331,7 +1331,7 @@ class spell_dk_death_grip : public SpellScript
 
         if (caster != target)
         {
-            if (targetCreature && (targetCreature->isWorldBoss() || targetCreature->IsDungeonBoss()) && targetCreature->GetEntry() != EntryCheck(targetCreature->GetEntry()))
+            if (targetCreature && (targetCreature->IsWorldBoss() || targetCreature->IsDungeonBoss()) && targetCreature->GetEntry() != EntryCheck(targetCreature->GetEntry()))
             {
                 return;
             }

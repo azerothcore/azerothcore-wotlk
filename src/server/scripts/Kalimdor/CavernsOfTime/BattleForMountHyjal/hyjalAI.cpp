@@ -514,7 +514,7 @@ void hyjalAI::SummonCreature(uint32 entry, float Base[4][3])
         if (instance->GetData(DATA_RAIDDAMAGE) < MINRAIDDAMAGE)
             creature->SetDisableReputationGain(true);//no repu for solo farming
         // Check if Creature is a boss.
-        if (creature->isWorldBoss())
+        if (creature->IsWorldBoss())
         {
             if (!FirstBossDead)  BossGUID[0] = creature->GetGUID();
             else                BossGUID[1] = creature->GetGUID();

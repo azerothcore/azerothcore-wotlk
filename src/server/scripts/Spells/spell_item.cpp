@@ -379,7 +379,7 @@ class spell_item_lil_phylactery : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetActionTarget() && (eventInfo.GetActionTarget()->GetTypeId() != TYPEID_UNIT || eventInfo.GetActionTarget()->ToCreature()->isWorldBoss());
+        return eventInfo.GetActionTarget() && (eventInfo.GetActionTarget()->GetTypeId() != TYPEID_UNIT || eventInfo.GetActionTarget()->ToCreature()->IsWorldBoss());
     }
 
     void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo&  /*eventInfo*/)

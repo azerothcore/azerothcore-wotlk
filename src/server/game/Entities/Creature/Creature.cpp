@@ -1192,7 +1192,7 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
     m_lootRecipient = player->GetGUID();
 
     Map* map = GetMap();
-    if (map && map->IsDungeon() && (isWorldBoss() || IsDungeonBoss()))
+    if (map && map->IsDungeon() && (IsWorldBoss() || IsDungeonBoss()))
     {
         AddAllowedLooter(m_lootRecipient);
     }
@@ -1203,7 +1203,7 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
         {
             m_lootRecipientGroup = group->GetGUID().GetCounter();
 
-            if (map && map->IsDungeon() && (isWorldBoss() || IsDungeonBoss()))
+            if (map && map->IsDungeon() && (IsWorldBoss() || IsDungeonBoss()))
             {
                 Map::PlayerList const& PlayerList = map->GetPlayers();
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -1804,7 +1804,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         m_respawnTime = time(nullptr) + m_respawnDelay + m_corpseDelay;
 
         // always save boss respawn time at death to prevent crash cheating
-        if (GetMap()->IsDungeon() || isWorldBoss() || GetCreatureTemplate()->rank >= CREATURE_ELITE_ELITE)
+        if (GetMap()->IsDungeon() || IsWorldBoss() || GetCreatureTemplate()->rank >= CREATURE_ELITE_ELITE)
             SaveRespawnTime();
 
         SetTarget();                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
@@ -2437,7 +2437,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
         // pussywizard: don't check distance to home position if recently damaged (allow kiting away from spawnpoint!)
         // xinef: this should include taunt auras
-        if (!isWorldBoss() && (GetLastDamagedTime() > sWorld->GetGameTime() || HasAuraType(SPELL_AURA_MOD_TAUNT)))
+        if (!IsWorldBoss() && (GetLastDamagedTime() > sWorld->GetGameTime() || HasAuraType(SPELL_AURA_MOD_TAUNT)))
             return true;
     }
 
@@ -2765,7 +2765,7 @@ void Creature::AllLootRemovedFromCorpse()
 
 uint8 Creature::getLevelForTarget(WorldObject const* target) const
 {
-    if (!isWorldBoss() || !target->ToUnit())
+    if (!IsWorldBoss() || !target->ToUnit())
         return Unit::getLevelForTarget(target);
 
     uint16 level = target->ToUnit()->getLevel() + sWorld->getIntConfig(CONFIG_WORLD_BOSS_LEVEL_DIFF);

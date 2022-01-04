@@ -396,10 +396,10 @@ void hyjal_trashAI::UpdateAI(uint32 /*diff*/)
 
 void hyjal_trashAI::JustDied(Unit* /*killer*/)
 {
-    if (IsEvent && !me->isWorldBoss())
+    if (IsEvent && !me->IsWorldBoss())
         instance->SetData(DATA_TRASH, 0);//signal trash is dead
 
-    if ((instance->GetData(DATA_RAIDDAMAGE) < MINRAIDDAMAGE && !me->isWorldBoss()) || (damageTaken < me->GetMaxHealth() / 4 && me->isWorldBoss()))
+    if ((instance->GetData(DATA_RAIDDAMAGE) < MINRAIDDAMAGE && !me->IsWorldBoss()) || (damageTaken < me->GetMaxHealth() / 4 && me->IsWorldBoss()))
         me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);//no loot
 }
 

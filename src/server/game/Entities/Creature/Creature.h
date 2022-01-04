@@ -97,7 +97,7 @@ public:
     // redefine Unit::IsImmunedToSpell
     bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const override;
     // redefine Unit::IsImmunedToSpellEffect
-    [[nodiscard]] bool isElite() const
+    [[nodiscard]] bool IsElite() const
     {
         if (IsPet())
             return false;
@@ -106,7 +106,7 @@ public:
         return rank != CREATURE_ELITE_NORMAL && rank != CREATURE_ELITE_RARE;
     }
 
-    [[nodiscard]] bool isWorldBoss() const
+    [[nodiscard]] bool IsWorldBoss() const
     {
         if (IsPet())
             return false;

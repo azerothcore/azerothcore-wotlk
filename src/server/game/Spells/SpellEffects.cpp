@@ -4289,7 +4289,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
                 if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->GetTypeId() == TYPEID_UNIT)
                 {
                     Creature* c = (*iter)->ToCreature();
-                    if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->isWorldBoss() || c->IsDungeonBoss())
+                    if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->IsWorldBoss() || c->IsDungeonBoss())
                         continue;
                 }
                 bool interrupt = false; // pussywizard: skip spells that don't target units, but casted on unit (eg. TARGET_DEST_TARGET_ENEMY)
@@ -4982,7 +4982,7 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
                     if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->GetTypeId() == TYPEID_UNIT)
                     {
                         Creature* c = (*iter)->ToCreature();
-                        if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->isWorldBoss() || c->IsDungeonBoss())
+                        if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->IsWorldBoss() || c->IsDungeonBoss())
                             continue;
                     }
 
@@ -5067,7 +5067,7 @@ void Spell::EffectSkinning(SpellEffIndex /*effIndex*/)
     int32 skillValue = m_caster->ToPlayer()->GetPureSkillValue(skill);
 
     // Double chances for elites
-    m_caster->ToPlayer()->UpdateGatherSkill(skill, skillValue, reqValue, creature->isElite() ? 2 : 1);
+    m_caster->ToPlayer()->UpdateGatherSkill(skill, skillValue, reqValue, creature->IsElite() ? 2 : 1);
 }
 
 void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
@@ -5170,7 +5170,7 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
             return;
 
         if (Creature* creatureTarget = unitTarget->ToCreature())
-            if (creatureTarget->isWorldBoss() || creatureTarget->IsDungeonBoss() || creatureTarget->IsImmuneToKnockback() || unitTarget->ToCreature()->GetCreatureType() == CREATURE_TYPE_GIANT)
+            if (creatureTarget->IsWorldBoss() || creatureTarget->IsDungeonBoss() || creatureTarget->IsImmuneToKnockback() || unitTarget->ToCreature()->GetCreatureType() == CREATURE_TYPE_GIANT)
                 return;
     }
 
