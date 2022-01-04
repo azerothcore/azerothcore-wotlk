@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164082762125098730
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640827621250987300');
 
--- Golorn Frostbeard Waypoints
+-- Golorn Frostbeard Waypoints.
 SET @NPC := 219;
 UPDATE `creature` SET `position_x`=-5633.440, `position_y`=-496.4770, `position_z`=396.8753, `orientation`=2.539195, `MovementType`=2 WHERE `guid`=@NPC;
 SET @POINT := 0;

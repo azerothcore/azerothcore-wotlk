@@ -2907,7 +2907,7 @@ Position WorldObject::GetFirstCollisionPosition(float startX, float startY, floa
     auto dx = destX - startX;
     auto dy = destY - startY;
 
-    auto ang = atan2(dy, dx);
+    auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * M_PI + ang;
     Position pos = Position(startX, startY, startZ, ang);
 
@@ -2925,7 +2925,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     auto dx = destX - pos.GetPositionX();
     auto dy = destY - pos.GetPositionY();
 
-    auto ang = atan2(dy, dx);
+    auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * M_PI + ang;
 
     MovePositionToFirstCollision(pos, distance, ang);
