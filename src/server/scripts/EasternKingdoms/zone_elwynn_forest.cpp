@@ -33,15 +33,6 @@ enum COG_Paths
     LISA_PATH = 80700
 };
 
-enum COG_Waypoints
-{
-    STORMWIND_WAYPOINT = 57,
-    GOLDSHIRE_WAYPOINT = 32,
-    WOODS_WAYPOINT = 22,
-    HOUSE_WAYPOINT = 35,
-    LISA_WAYPOINT = 4
-};
-
 enum COG_Sounds
 {
     BANSHEE_DEATH = 1171,
@@ -129,50 +120,35 @@ struct npc_cameron : public ScriptedAI
         me->GetMotionMaster()->MovePoint(0, MovePosPositions.back(), true, MovePosPositions.back().GetOrientation());
     }
 
-    void WaypointReached(uint32 waypointId)
+    void PathEndReached(uint32 pathId) override
     {
-        switch (waypointId)
+        switch (pathId)
         {
             case STORMWIND_PATH:
             {
-                if (waypointId == STORMWIND_WAYPOINT)
-                {
-                    me->GetMotionMaster()->MoveRandom(10.f);
-                    _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 11 * MINUTE);
-                }
-
+                me->GetMotionMaster()->MoveRandom(10.f);
+                _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 11 * MINUTE);
                 break;
             }
             case GOLDSHIRE_PATH:
             {
-                if (waypointId == GOLDSHIRE_WAYPOINT)
-                {
-                    me->GetMotionMaster()->MoveRandom(10.f);
-                    _events.ScheduleEvent(EVENT_WP_START_WOODS, 15 * MINUTE);
-                }
+                me->GetMotionMaster()->MoveRandom(10.f);
+                _events.ScheduleEvent(EVENT_WP_START_WOODS, 15 * MINUTE);
                 break;
             }
             case WOODS_PATH:
             {
-                if (waypointId == WOODS_WAYPOINT)
-                {
-                    me->GetMotionMaster()->MoveRandom(10.f);
-                    _events.ScheduleEvent(EVENT_WP_START_HOUSE, 6 * MINUTE);
-                    _events.ScheduleEvent(EVENT_WP_START_LISA, 2000);
-                }
-
+                me->GetMotionMaster()->MoveRandom(10.f);
+                _events.ScheduleEvent(EVENT_WP_START_HOUSE, 6 * MINUTE);
+                _events.ScheduleEvent(EVENT_WP_START_LISA, 2000);
                 break;
             }
             case HOUSE_PATH:
             {
-                if (waypointId == HOUSE_WAYPOINT)
-                {
-                    // Move childeren at last point
-                    MoveTheChildren();
-
-                    // After 30 seconds a random sound should play
-                    _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30000);
-                }
+                // Move childeren at last point
+                MoveTheChildren();
+                // After 30 seconds a random sound should play
+                _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30000);
                 break;
             }
         }
