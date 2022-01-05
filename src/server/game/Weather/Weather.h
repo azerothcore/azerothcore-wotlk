@@ -42,7 +42,7 @@ struct WeatherData
     uint32 ScriptId;
 };
 
-enum WeatherState
+enum WeatherState : uint32
 {
     WEATHER_STATE_FINE              = 0,
     WEATHER_STATE_FOG               = 1,
