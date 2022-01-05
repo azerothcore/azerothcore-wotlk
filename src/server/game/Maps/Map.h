@@ -273,7 +273,7 @@ enum LevelRequirementVsMode
 
 struct ZoneDynamicInfo
 {
-    ZoneDynamicInfo()  = default;
+    ZoneDynamicInfo();
 
     uint32 MusicId;
     WeatherState WeatherId;
