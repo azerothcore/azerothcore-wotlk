@@ -2,8 +2,13 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641422836099367029');
 -- Fixes issue: https://github.com/azerothcore/azerothcore-wotlk/issues/4136
 
 -- Corrected Script For Orcales 17190 where they would cast lightning shield in combat which is incorrect, tested on retail
-UPDATE creature_template SET AIName="SmartAI" WHERE entry=@ENTRY LIMIT 1;
+
+-- Siltfin Oracle
+SET @ENTRY := 17191;
+SET @SOURCETYPE := 0;
+
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=@SOURCETYPE;
+UPDATE creature_template SET AIName="SmartAI" WHERE entry=@ENTRY LIMIT 1;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
 (@ENTRY,@SOURCETYPE,0,1,1,0,100,1,0,0,0,0,21,0,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Siltfin Oracle - Out of Combat - Disable Combat Movement (No Repeat)"),
 (@ENTRY,@SOURCETYPE,1,0,61,0,100,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Siltfin Oracle - Out of Combat - Set Event Phase 0 (No Repeat)"),
@@ -20,6 +25,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,@SOURCETYPE,12,13,2,0,100,1,0,15,0,0,22,3,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Siltfin Oracle - Between 0-15% Health - Set Event Phase 3 (No Repeat)"),
 (@ENTRY,@SOURCETYPE,13,14,61,0,100,0,0,0,0,0,21,1,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Siltfin Oracle - Between 0-15% Health - Enable Combat Movement (No Repeat)"),
 (@ENTRY,@SOURCETYPE,14,0,61,0,100,0,0,0,0,0,25,1,0,0,0,0,0,0,0,0,0,0.0,0.0,0.0,0.0,"Siltfin Oracle - Between 0-15% Health - Flee For Assist (No Repeat)");
+
 -- This fixes the entire murloc overpop issue and adds waypoints to the missing ones
 DELETE FROM `creature` WHERE `id`='17192';
 DELETE FROM `creature` WHERE `id`='17191';
@@ -172,7 +178,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,34,-3453.2812,-11787.156,-10.818729,0,0,0,0,100,0),
 (@PATH,35,-3460.9214,-11754.151,-13.45673,0,0,0,0,100,0),
 (@PATH,36,-3484.9644,-11730.426,-9.596426,0,0,0,0,100,0);
--- 0x2045AC424010CA000000BF00004DE53B .go xyz -3507.3623 -11723.294 -2.4598432
 
 -- Pathing for Siltfin Hunter Entry: 17192
 SET @NPC := 60849;
@@ -208,7 +213,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,24,-3140.2388,-11907.929,0.8125229,0,0,0,0,100,0),
 (@PATH,25,-3125.7214,-11924.45,1.9875517,0,0,0,0,100,0),
 (@PATH,26,-3110.902,-11939.24,1.2054844,0,0,0,0,100,0);
--- 0x2045AC424010CA000000BF00004DE20E .go xyz -3102.4048 -11964.337 1.3131504
 
 -- Pathing for Murgurgula Entry: 17475
 SET @NPC := 62989;
@@ -252,7 +256,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,32,-3473.328,-11883.536,0.692852,0,0,0,0,100,0),
 (@PATH,33,-3502.587,-11883.379,2.1981564,0,0,0,0,100,0),
 (@PATH,34,-3528.9163,-11864.7,2.2262845,0,0,0,0,100,0);
--- 0x2045FC42401110C000009D0000366CCE .go xyz -3532.4504 -11839.493 0.24215364
 
 -- Pathing for Siltfin Hunter Entry: 17192
 SET @NPC := 60917;
@@ -282,7 +285,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,18,-4843.6704,-10883.837,2.5746179,0,0,0,0,100,0),
 (@PATH,19,-4818.099,-10886.483,2.694218,0,0,0,0,100,0),
 (@PATH,20,-4797.7446,-10903.832,2.4763858,0,0,0,0,100,0);
--- 0x2045AC424010CA000000BF00004F517F .go xyz -4777.058 -10930.01 0.9688175
 
 -- Pathing for Siltfin Hunter Entry: 17192
 SET @NPC := 60918;
@@ -318,7 +320,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,24,-5335.377,-10957.705,-1.714967,0,0,0,0,100,0),
 (@PATH,25,-5361.497,-10969.956,-2.6465244,0,0,0,0,100,0),
 (@PATH,26,-5398.987,-10970.419,-3.200484,0,0,0,0,100,0);
--- 0x2045AC424010CA000000BF00004F5498 .go xyz -5423.1123 -10979.838 -4.759457
 
 -- Gameobject spawn missing Water Barel
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
