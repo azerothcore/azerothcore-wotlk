@@ -1172,6 +1172,16 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 }
                 break;
             }
+        case SMART_ACTION_SET_HEALTH_PCT:
+            {
+                if (e.action.setHealthPct.percent > 100 || !e.action.setHealthPct.percent)
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u is trying to set invalid HP percent %u, skipped.",
+                                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.setHealthPct.percent);
+                    return false;
+                }
+                break;
+            }
         case SMART_ACTION_SET_MOVEMENT_SPEED:
             {
                 if (e.action.movementSpeed.movementType >= MAX_MOVE_TYPE)
@@ -1185,8 +1195,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     LOG_ERROR("sql.sql", "SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses speed 0, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
                 }
-
-                break;
             }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
