@@ -219,4 +219,3 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (@NPC,52,-4510.735,-11697.223,14.548721,'Stillpine Ancestor Yor'),
 (@NPC,53,-4490.1094,-11672.723,10.858275,'Stillpine Ancestor Yor'),
 (@NPC,54,-4486.507,-11657.934,10.678984,'Stillpine Ancestor Yor');
--- 0x2045FC424010FC4000009D0000363B2D .go xyz -4646.6274 -13015.363 -1.386728
