@@ -355,7 +355,7 @@ public:
         return r;
     }
 
-    template <typename T> [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] T read(size_t pos) const
+    template <typename T> [[nodiscard]] T read(size_t pos) const
     {
         if (pos + sizeof(T) > size())
         {
