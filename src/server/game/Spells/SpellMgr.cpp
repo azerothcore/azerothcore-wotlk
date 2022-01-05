@@ -3058,7 +3058,14 @@ void SpellMgr::LoadSpellCustomAttr()
             case SPELLFAMILY_HUNTER:
                 // Aspects
                 if (spellInfo->GetCategory() == 47)
+                {
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                }
+                // Aimed Shot
+                if (spellInfo->SpellFamilyFlags[0] & 0x00020000)
+                {
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_FORCE_SEND_CATEGORY_COOLDOWNS;
+                }
                 break;
             default:
                 break;
@@ -5543,7 +5550,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 17731, 69294 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-        spellInfo->CastingTimeIndex = 3;
+        spellInfo->CastingTimeIndex = 3; // 500ms
         spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
     });
 
@@ -6180,6 +6187,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 69768 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
     });
 
     ApplySpellFix({ 69767 }, [](SpellEntry* spellInfo)
@@ -7427,7 +7435,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Shadow Hunter Vosh'gajin - Hex
     ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->CastingTimeIndex = 16;
+        spellInfo->CastingTimeIndex = 16; // 1500ms
     });
 
     // Sacred Cleansing
@@ -7521,6 +7529,18 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
+    // Judgement of Light
+    // Judgement of Command
+    // Judgement of Blood
+    // Judgement of Justice
+    // Judgement of Wisdom
+    // Judgement of the Martyr
+    // Judgement of Light
+    ApplySpellFix({ 20271, 20425, 32220, 53407, 53408, 53725, 57774 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
@@ -7580,6 +7600,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 // Icy Touch - extend FamilyFlags (unused value) for Sigil of the Frozen Conscience to use
                 if (spellInfo->SpellIconID == 2721 && spellInfo->SpellFamilyFlags[0] & 0x2)
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
+                break;
+            case SPELLFAMILY_HUNTER:
+                // Aimed Shot not affected by category cooldown modifiers
+                if (spellInfo->SpellFamilyFlags[0] & 0x00020000)
+                {
+                    spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
+                    spellInfo->RecoveryTime = 10 * IN_MILLISECONDS;
+                }
                 break;
         }
 
