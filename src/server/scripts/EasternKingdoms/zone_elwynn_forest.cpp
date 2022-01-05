@@ -140,7 +140,7 @@ struct npc_cameron : public ScriptedAI
                     me->GetMotionMaster()->MoveRandom(10.f);
                     _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 11 * MINUTE);
                 }
-            
+
                 break;
             }
             case GOLDSHIRE_PATH:
@@ -160,7 +160,7 @@ struct npc_cameron : public ScriptedAI
                     _events.ScheduleEvent(EVENT_WP_START_HOUSE, 6 * MINUTE);
                     _events.ScheduleEvent(EVENT_WP_START_LISA, 2000);
                 }
-            
+
                 break;
             }
             case HOUSE_PATH:
@@ -169,7 +169,7 @@ struct npc_cameron : public ScriptedAI
                 {
                     // Move childeren at last point
                     MoveTheChildren();
-            
+
                     // After 30 seconds a random sound should play
                     _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30000);
                 }
