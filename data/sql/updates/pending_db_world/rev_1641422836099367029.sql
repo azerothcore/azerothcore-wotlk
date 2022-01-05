@@ -323,4 +323,4 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 
 -- Gameobject spawn missing Water Barel
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
-(0, 3658, 530, 3524, 3575, 1, 1, -3518.95654296875, -11840.4130859375, -0.04765300080180168, 1.570795774459838867, 0, 0, 0.707106590270996093, 0.707106947898864746, 300, 255, 1, 41446); -- 3658 (Area: 3575 - Difficulty: 0)
+(0, 3658, 530, 3524, 3575, 1, 1, -3518.95654296875, -11840.4130859375, -0.04765300080180168, 1.570795774459838867, 0, 0, 0.707106590270996093, 0.707106947898864746, 300, 255, 1, 0); -- 3658 (Area: 3575 - Difficulty: 0)
