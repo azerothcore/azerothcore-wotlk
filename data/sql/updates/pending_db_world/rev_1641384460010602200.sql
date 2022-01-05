@@ -18,5 +18,5 @@ UPDATE `creature_onkill_reputation` SET `MaxStanding1` = @HONORED WHERE `creatur
 -- Cauldron Lords should reward 30 reputation <= Honored (5)
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1` = 30 WHERE `creature_id` IN (@CAULDRON_LORDS, @CAULDRON_LORDS + 1, @CAULDRON_LORDS + 2, @CAULDRON_LORDS + 3);
 
--- Araj the Summoner should reward 50 reputation <= Honored (5)
+-- Araj the Summoner should reward 50 reputation <= Revered (6)
 UPDATE `creature_onkill_reputation` SET `MaxStanding1` = @REVERED, `RewOnKillRepValue1` = 50 WHERE `creature_id` IN (@ARAJ);
