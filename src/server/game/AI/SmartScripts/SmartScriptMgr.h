@@ -608,6 +608,8 @@ enum SMART_ACTION
 
     SMART_ACTION_TC_END                             = 135,    // placeholder
 
+    SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
+
     // AC-only SmartActions:
 
     SMART_ACTION_AC_START                           = 200,    // placeholder
@@ -1286,6 +1288,11 @@ struct SmartAction
         {
             uint32 timer;
         } corpseDelay;
+
+        struct
+        {
+            uint32 percent;
+        } setHealthPct;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
