@@ -147,7 +147,6 @@ void AddSC_eastern_plaguelands();
 void AddSC_eversong_woods();
 void AddSC_elwynn_forest();
 void AddSC_ghostlands();
-void AddSC_elwynn_forest();
 void AddSC_hinterlands();
 //void AddSC_ironforge();
 void AddSC_isle_of_queldanas();
