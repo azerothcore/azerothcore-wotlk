@@ -197,9 +197,7 @@ class PetStable
 public:
     struct PetInfo
     {
-        PetInfo() = default;
-        PetInfo(PetInfo&& other) = default;
-        PetInfo& operator=(PetInfo&& other) = default;
+        PetInfo() { }
 
         std::string Name;
         std::string ActionBar;
