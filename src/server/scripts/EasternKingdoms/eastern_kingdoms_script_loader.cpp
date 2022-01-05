@@ -293,9 +293,9 @@ void AddEasternKingdomsScripts()
     AddSC_blasted_lands();
     AddSC_duskwood();
     AddSC_eastern_plaguelands();
+    AddSC_elwynn_forest();
     AddSC_eversong_woods();
     AddSC_ghostlands();
-    AddSC_elwynn_forest();
     AddSC_hinterlands();
 //    AddSC_ironforge();
     AddSC_isle_of_queldanas();

@@ -60,7 +60,8 @@ enum COG_Events
     EVENT_WP_START_HOUSE = 3,
     EVENT_WP_START_LISA = 4,
     EVENT_PLAY_SOUNDS = 5,
-    EVENT_BEGIN_EVENT = 6
+    EVENT_BEGIN_EVENT = 6,
+    EVENT_RANDOM_MOVEMENT = 7
 };
 
 enum COG_GameEvent
@@ -126,20 +127,20 @@ struct npc_cameron : public ScriptedAI
         {
             case STORMWIND_PATH:
             {
-                me->GetMotionMaster()->MoveRandom(10.f);
-                _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 11 * MINUTE);
+                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2000);
+                _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 660000); // 11 minutes
                 break;
             }
             case GOLDSHIRE_PATH:
             {
-                me->GetMotionMaster()->MoveRandom(10.f);
-                _events.ScheduleEvent(EVENT_WP_START_WOODS, 15 * MINUTE);
+                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2000);
+                _events.ScheduleEvent(EVENT_WP_START_WOODS, 900000); // 15 minutes
                 break;
             }
             case WOODS_PATH:
             {
-                me->GetMotionMaster()->MoveRandom(10.f);
-                _events.ScheduleEvent(EVENT_WP_START_HOUSE, 6 * MINUTE);
+                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2000);
+                _events.ScheduleEvent(EVENT_WP_START_HOUSE, 360000); // 6 minutes
                 _events.ScheduleEvent(EVENT_WP_START_LISA, 2000);
                 break;
             }
@@ -236,6 +237,11 @@ struct npc_cameron : public ScriptedAI
                 // Start movement
                 me->GetMotionMaster()->MovePath(STORMWIND_PATH, false);
 
+                break;
+            }
+            case EVENT_RANDOM_MOVEMENT:
+            {
+                me->GetMotionMaster()->MoveRandom(10.0f);
                 break;
             }
             default:
