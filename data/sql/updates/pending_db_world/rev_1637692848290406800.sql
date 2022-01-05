@@ -29,7 +29,6 @@ INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`,
 (247157, 1, 0, 1, 1, 0, 0, NULL),
 (130896, 1, 0, 1, 0, 0, 0, NULL); -- lich king platform hackfix
 
-
 UPDATE `acore_string` SET `content_default`='Movement type: %s' WHERE `entry`=11008;
 
 DELETE FROM `command` WHERE `name`='reload creature_movement_override';
