@@ -178,7 +178,7 @@ struct npc_cameron : public ScriptedAI
         }
     }
 
-    void sOnGameEvent(bool start, uint16 eventId)
+    void sOnGameEvent(bool start, uint16 eventId) override
     {
         if (start && eventId == GAME_EVENT_CHILDEREN_OF_GOLDSHIRE)
         {
