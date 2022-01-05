@@ -138,6 +138,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
         {
             creature->GetMotionMaster()->Initialize();
+            creature->AI()->PathEndReached();
             return false;
         }
 
