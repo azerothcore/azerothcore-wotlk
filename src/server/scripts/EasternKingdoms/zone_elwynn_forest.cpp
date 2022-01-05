@@ -66,7 +66,7 @@ enum COG_Events
 
 enum COG_GameEvent
 {
-    GAME_EVENT_CHILDEREN_OF_GOLDSHIRE = 74
+    GAME_EVENT_CHILDREN_OF_GOLDSHIRE = 74
 };
 
 struct npc_cameron : public ScriptedAI
@@ -157,14 +157,14 @@ struct npc_cameron : public ScriptedAI
 
     void sOnGameEvent(bool start, uint16 eventId) override
     {
-        if (start && eventId == GAME_EVENT_CHILDEREN_OF_GOLDSHIRE)
+        if (start && eventId == GAME_EVENT_CHILDREN_OF_GOLDSHIRE)
         {
             // Start event at 7 am
             // Begin pathing
             _events.ScheduleEvent(EVENT_BEGIN_EVENT, 2000);
             _started = true;
         }
-        else if (!start && eventId == GAME_EVENT_CHILDEREN_OF_GOLDSHIRE)
+        else if (!start && eventId == GAME_EVENT_CHILDREN_OF_GOLDSHIRE)
         {
             // Reset event at 8 am
             _started = false;
