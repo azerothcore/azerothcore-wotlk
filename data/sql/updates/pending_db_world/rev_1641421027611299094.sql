@@ -1,5 +1,4 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641421027611299094');
-
 -- Correct Values from sniffer for npcs involved in this quest chain
 UPDATE `creature_template` SET `speed_walk`='0.6666', `speed_run`='0.9285' WHERE `entry`='17379';
 UPDATE `creature_template` SET `speed_walk`='0.6666', `speed_run`='0.8571' WHERE `entry`='17391';
@@ -7,10 +6,8 @@ UPDATE `creature_template` SET `speed_walk`='0.6666', `speed_run`='0.8571' WHERE
 UPDATE `creature_template` SET `speed_walk`='1', `speed_run`='0.8571' WHERE `entry`='17393';
 UPDATE `creature_template` SET `speed_walk`='0.6666', `speed_run`='0.8571' WHERE `entry`='17410';
 
--- Corrected timer to work with the new speed values
-
 -- Entire Quest Chain for: https://tbc.wowhead.com/quest=9538/learning-the-language
-
+-- Corrected timer to work with the new speed values
 
 -- Stillpine Ancestor Akida
 SET @ENTRY := 1737900;
@@ -92,7 +89,6 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 -- Stillpine Ancestor Tikti
 SET @ENTRY := 17392;
 SET @SOURCETYPE := 0;
-
 
 -- Totem of Yor
 SET @ENTRY := 17363;
