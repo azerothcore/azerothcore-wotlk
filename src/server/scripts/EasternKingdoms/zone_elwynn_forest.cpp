@@ -292,7 +292,7 @@ public:
     }
 };
 
-void AddSC_goldshire()
+void AddSC_elwynn_forest()
 {
     new npc_cameron();
 }
