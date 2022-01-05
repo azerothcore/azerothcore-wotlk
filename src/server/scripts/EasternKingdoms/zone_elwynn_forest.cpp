@@ -141,7 +141,7 @@ struct npc_cameron : public ScriptedAI
             {
                 _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2000);
                 _events.ScheduleEvent(EVENT_WP_START_HOUSE, 360000); // 6 minutes
-                _events.ScheduleEvent(EVENT_WP_START_LISA, 2000);
+                _events.ScheduleEvent(EVENT_WP_START_LISA, 362000);
                 break;
             }
             case HOUSE_PATH:
