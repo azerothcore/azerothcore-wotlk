@@ -5,7 +5,7 @@
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
 #include "GameEventMgr.h"
-#include "worldsession.h"
+#include "Worldsession.h"
 
 enum GameEvent
 {
