@@ -1,3 +1,19 @@
+-- DB update 2022_01_05_02 -> 2022_01_05_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_05_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_05_02 2022_01_05_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1641403331598101028'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641403331598101028');
 
 -- Darrow Hill "Full type2 respawn for Cave Yeti's and Ferocious Yeti's"
@@ -136,3 +152,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,14,-309.13687,-276.40756,45.9816,0,0,0,0,100,0),
 (@PATH,15,-285.18143,-268.797,50.044495,0,0,0,0,100,0),
 (@PATH,16,-265.10806,-280.22586,52.20138,0,0,0,0,100,0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_05_03' WHERE sql_rev = '1641403331598101028';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
