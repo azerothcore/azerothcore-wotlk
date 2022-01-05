@@ -1195,6 +1195,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     LOG_ERROR("sql.sql", "SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses speed 0, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
                 }
+                break;
             }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
