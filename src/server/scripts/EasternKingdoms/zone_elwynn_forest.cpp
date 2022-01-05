@@ -1,3 +1,21 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "Common.h"
 #include "CreatureGroups.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
@@ -115,52 +133,52 @@ struct npc_cameron : public ScriptedAI
     {
         switch (waypointId)
         {
-        case STORMWIND_PATH:
-        {
-            if (waypointId == STORMWIND_WAYPOINT)
+            case STORMWIND_PATH:
             {
-                me->GetMotionMaster()->MoveRandom(10.f);
-                _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 660000);
+                if (waypointId == STORMWIND_WAYPOINT)
+                {
+                    me->GetMotionMaster()->MoveRandom(10.f);
+                    _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 11 * MINUTE);
+                }
+            
+                break;
             }
-
-            break;
-        }
-        case GOLDSHIRE_PATH:
-        {
-            if (waypointId == GOLDSHIRE_WAYPOINT)
+            case GOLDSHIRE_PATH:
             {
-                me->GetMotionMaster()->MoveRandom(10.f);
-                _events.ScheduleEvent(EVENT_WP_START_WOODS, 900000);
+                if (waypointId == GOLDSHIRE_WAYPOINT)
+                {
+                    me->GetMotionMaster()->MoveRandom(10.f);
+                    _events.ScheduleEvent(EVENT_WP_START_WOODS, 15 * MINUTE);
+                }
+                break;
             }
-            break;
-        }
-        case WOODS_PATH:
-        {
-            if (waypointId == WOODS_WAYPOINT)
+            case WOODS_PATH:
             {
-                me->GetMotionMaster()->MoveRandom(10.f);
-                _events.ScheduleEvent(EVENT_WP_START_HOUSE, 360000);
-                _events.ScheduleEvent(EVENT_WP_START_LISA, 2000);
+                if (waypointId == WOODS_WAYPOINT)
+                {
+                    me->GetMotionMaster()->MoveRandom(10.f);
+                    _events.ScheduleEvent(EVENT_WP_START_HOUSE, 6 * MINUTE);
+                    _events.ScheduleEvent(EVENT_WP_START_LISA, 2000);
+                }
+            
+                break;
             }
-
-            break;
-        }
-        case HOUSE_PATH:
-        {
-            if (waypointId == HOUSE_WAYPOINT)
+            case HOUSE_PATH:
             {
-                // Move childeren at last point
-                MoveTheChildren();
-
-                // After 30 seconds a random sound should play
-                _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30000);
+                if (waypointId == HOUSE_WAYPOINT)
+                {
+                    // Move childeren at last point
+                    MoveTheChildren();
+            
+                    // After 30 seconds a random sound should play
+                    _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30000);
+                }
+                break;
             }
-            break;
-        }
         }
     }
 
-    void OnGameEvent(bool start, uint16 eventId)
+    void sOnGameEvent(bool start, uint16 eventId)
     {
         if (start && eventId == GAME_EVENT_CHILDEREN_OF_GOLDSHIRE)
         {
