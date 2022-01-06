@@ -491,6 +491,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
+    if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
+    {
+        // now client not include swimming flag in case jumping under water
+        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseMask(), movementInfo.pos.GetPositionX(),
+            movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ(), plrMover->GetCollisionHeight()));
+    }
+
     bool jumpopcode = false;
     if (opcode == MSG_MOVE_JUMP)
     {
