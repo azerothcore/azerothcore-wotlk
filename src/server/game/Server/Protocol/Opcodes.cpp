@@ -762,7 +762,7 @@ void OpcodeTable::Initialize()
     /*0x277*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PLAY_MUSIC,                                         STATUS_NEVER);
     /*0x278*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PLAY_OBJECT_SOUND,                                  STATUS_NEVER);
     /*0x279*/ DEFINE_HANDLER(CMSG_REQUEST_PET_INFO,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleRequestPetInfoOpcode               );
-    /*0x27A*/ DEFINE_HANDLER(CMSG_FAR_SIGHT,                                                        STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleFarSightOpcode                     );
+    /*0x27A*/ DEFINE_HANDLER(CMSG_FAR_SIGHT,                                                        STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,     &WorldSession::HandleFarSightOpcode                     );
     /*0x27B*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPELLDISPELLOG,                                     STATUS_NEVER);
     /*0x27C*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_DAMAGE_CALC_LOG,                                    STATUS_NEVER);
     /*0x27D*/ DEFINE_HANDLER(CMSG_ENABLE_DAMAGE_LOG,                                                STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );

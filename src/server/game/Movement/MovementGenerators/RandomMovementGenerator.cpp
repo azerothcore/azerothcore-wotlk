@@ -195,18 +195,30 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     _currDestPosition.Relocate(finalPoint.x, finalPoint.y, finalPoint.z);
 
     creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
-    ++_moveCount;
-    if (roll_chance_i((int32)_moveCount * 25 + 10))
+    bool walk = true;
+    switch (creature->GetMovementTemplate().GetRandom())
     {
-        _moveCount = 0;
-        _nextMoveTime.Reset(urand(4000, 8000));
+    case CreatureRandomMovementType::CanRun:
+        walk = creature->IsWalking();
+        break;
+    case CreatureRandomMovementType::AlwaysRun:
+        walk = false;
+        break;
+    default:
+        break;
     }
 
     Movement::MoveSplineInit init(creature);
     init.MovebyPath(finalPath);
-    init.SetWalk(true);
+    init.SetWalk(walk);
     init.Launch();
 
+    ++_moveCount;
+    if (roll_chance_i((int32) _moveCount * 25 + 10))
+    {
+        _moveCount = 0;
+        _nextMoveTime.Reset(urand(4000, 8000));
+    }
     if (sWorld->getBoolConfig(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS))
         _preComputedPaths.erase(pathIdx);
 

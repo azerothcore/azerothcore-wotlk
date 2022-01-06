@@ -137,6 +137,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         // Xinef: moved the upper IF here
         if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
         {
+            creature->AI()->PathEndReached(path_id);
             creature->GetMotionMaster()->Initialize();
             return false;
         }
