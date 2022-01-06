@@ -1,3 +1,19 @@
+-- DB update 2022_01_06_09 -> 2022_01_06_10
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_06_09';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_06_09 2022_01_06_10 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1637890270049187700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1637890270049187700');
 
 -- Adding Boss to Game event 13: Elemental Invasions
@@ -19,3 +35,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14460, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 89, 30, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Blazing Invader - On Just Summoned - Start Random Movement'),
 (14460, 0, 1, 0, 0, 0, 100, 0, 0, 11000, 10000, 16000, 0, 11, 23113, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Blazing Invader - In Combat - Cast \'Blast Wave\''),
 (14460, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 63, 1, 1, 0, 1, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Blazing Invader - On Just Died - Missing comment for action_type 63');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_06_10' WHERE sql_rev = '1637890270049187700';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
