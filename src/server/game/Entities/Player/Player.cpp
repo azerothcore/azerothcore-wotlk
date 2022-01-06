@@ -234,6 +234,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_MirrorTimerFlags = UNDERWATER_NONE;
     m_MirrorTimerFlagsLast = UNDERWATER_NONE;
+    m_isInWater = false;
     m_drunkTimer = 0;
     m_deathTimer = 0;
     m_deathExpireTime = 0;
@@ -2085,6 +2086,24 @@ bool Player::IsFalling() const
 {
     // Xinef: Added !IsInFlight check
     return GetPositionZ() < m_lastFallZ && !IsInFlight();
+}
+
+void Player::SetInWater(bool apply)
+{
+    if (m_isInWater == apply)
+        return;
+
+    //define player in water by opcodes
+    //move player's guid into HateOfflineList of those mobs
+    //which can't swim and move guid back into ThreatList when
+    //on surface.
+    //TODO: exist also swimming mobs, and function must be symmetric to enter/leave water
+    m_isInWater = apply;
+
+    // remove auras that need water/land
+    RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
+
+    getHostileRefMgr().updateThreatTables();
 }
 
 bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
@@ -12385,13 +12404,6 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 {
     if (apply)
     {
-        // target must be in world
-        if (!target->IsInWorld())
-            return;
-
-        if (!IsInWorld() || IsDuringRemoveFromWorld())
-            return;
-
         LOG_DEBUG("maps", "Player::CreateViewpoint: Player %s create seer %u (TypeId: %u).", GetName().c_str(), target->GetEntry(), target->GetTypeId());
 
         if (!AddGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
@@ -12405,6 +12417,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
             ((Unit*)target)->AddPlayerToVision(this);
+        SetSeer(target);
     }
     else
     {
@@ -12413,14 +12426,17 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         LOG_DEBUG("maps", "Player::CreateViewpoint: Player %s remove seer", GetName().c_str());
 
-        if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
-            ((Unit*)target)->RemovePlayerFromVision(this);
-
         if (!RemoveGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
         {
             LOG_FATAL("entities.player", "Player::CreateViewpoint: Player %s cannot remove current viewpoint!", GetName().c_str());
             return;
         }
+
+        if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
+            static_cast<Unit*>(target)->RemovePlayerFromVision(this);
+
+        // must immediately set seer back otherwise may crash
+        SetSeer(this);
 
         //WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
         //GetSession()->SendPacket(&data);

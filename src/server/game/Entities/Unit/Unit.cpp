@@ -39,6 +39,7 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "MovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
@@ -350,19 +351,6 @@ Unit::~Unit()
     ASSERT(!m_duringRemoveFromWorld);
     ASSERT(!m_attacking);
     ASSERT(m_attackers.empty());
-
-    // pussywizard: clear m_sharedVision along with back references
-    if (!m_sharedVision.empty())
-    {
-        LOG_INFO("misc", "Unit::~Unit (B1)");
-        do
-        {
-            LOG_INFO("misc", "Unit::~Unit (B2)");
-            Player* p = *(m_sharedVision.begin());
-            p->m_isInSharedVisionOf.erase(this);
-            m_sharedVision.erase(p);
-        } while (!m_sharedVision.empty());
-    }
 
     ASSERT(m_Controlled.empty());
     ASSERT(m_appliedAuras.empty());
@@ -3790,13 +3778,14 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
             return false;
     }
 
-    // In water or jumping in water
-    if (IsInWater() || (GetLiquidData().Status == LIQUID_MAP_ABOVE_WATER && (IsFalling() || (ToPlayer() && ToPlayer()->IsFalling()))))
+    if (IsInWater())
     {
-        return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
+        return c->CanEnterWater();
     }
-
-    return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
+    else
+    {
+        return c->CanWalk() || c->CanFly();
+    }
 }
 
 void Unit::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
@@ -10624,15 +10613,13 @@ void Unit::AddPlayerToVision(Player* player)
         setActive(true);
         SetWorldObject(true);
     }
-    m_sharedVision.insert(player);
-    player->m_isInSharedVisionOf.insert(this);
+    m_sharedVision.push_back(player);
 }
 
 // only called in Player::SetSeer
 void Unit::RemovePlayerFromVision(Player* player)
 {
-    m_sharedVision.erase(player);
-    player->m_isInSharedVisionOf.erase(this);
+    m_sharedVision.remove(player);
     if (m_sharedVision.empty())
     {
         setActive(false);
@@ -13593,28 +13580,29 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         case MOVE_RUN:
         case MOVE_SWIM:
         case MOVE_FLIGHT:
+        {
+            // Set creature speed rate
+            if (GetTypeId() == TYPEID_UNIT)
+                speed *= ToCreature()->GetCreatureTemplate()->speed_run; // at this point, MOVE_WALK is never reached
+
+            // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
+            /// @todo possible affect only on MOVE_RUN
+            if (int32 normalization = GetMaxPositiveAuraModifier(SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED))
             {
-                if (GetTypeId() == TYPEID_UNIT)
+                if (Creature* creature = ToCreature())
                 {
-                    speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
+                    uint32 immuneMask = creature->GetCreatureTemplate()->MechanicImmuneMask;
+                    if (immuneMask & (1 << (MECHANIC_SNARE - 1)) || immuneMask & (1 << (MECHANIC_DAZE - 1)))
+                        break;
                 }
 
-                // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
-                // TODO: possible affect only on MOVE_RUN
-                if (int32 normalization = GetMaxPositiveAuraModifier(SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED))
-                {
-                    // Use speed from aura
-                    float max_speed = normalization / (IsControlledByPlayer() ? playerBaseMoveSpeed[mtype] : baseMoveSpeed[mtype]);
-
-                    // Xinef: normal movement speed - multiply by creature db modifer
-                    if (GetTypeId() == TYPEID_UNIT)
-                        max_speed *= ToCreature()->GetCreatureTemplate()->speed_run;
-
-                    if (speed > max_speed)
-                        speed = max_speed;
-                }
-                break;
+                // Use speed from aura
+                float max_speed = normalization / (IsControlledByPlayer() ? playerBaseMoveSpeed[mtype] : baseMoveSpeed[mtype]);
+                if (speed > max_speed)
+                    speed = max_speed;
             }
+            break;
+        }
         default:
             break;
     }
@@ -16054,6 +16042,11 @@ void Unit::SendPetAIReaction(ObjectGuid guid)
 
 ///----------End of Pet responses methods----------
 
+MovementGeneratorType Unit::GetDefaultMovementType() const
+{
+    return IDLE_MOTION_TYPE;
+}
+
 void Unit::StopMoving()
 {
     ClearUnitState(UNIT_STATE_MOVING);
@@ -16071,6 +16064,26 @@ void Unit::StopMoving()
 
     Movement::MoveSplineInit init(this);
     init.Stop();
+}
+
+void Unit::PauseMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
+{
+    if (slot >= MAX_MOTION_SLOT)
+        return;
+
+    if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(slot))
+        movementGenerator->Pause(timer);
+
+    StopMoving();
+}
+
+void Unit::ResumeMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
+{
+    if (slot >= MAX_MOTION_SLOT)
+        return;
+
+    if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(slot))
+        movementGenerator->Resume(timer);
 }
 
 void Unit::StopMovingOnCurrentPos() // pussywizard
@@ -17664,8 +17677,16 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     if (GetTypeId() == TYPEID_UNIT)
     {
+        if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE))
+        {
+            movementGenerator->Pause(0);
+        }
+
+        GetMotionMaster()->Clear(MOTION_SLOT_ACTIVE);
+
+        StopMoving();
+
         ToCreature()->AI()->OnCharmed(true);
-        GetMotionMaster()->MoveIdle();
 
         // Xinef: If creature can fly, add normal player flying flag (fixes speed)
         if (charmer->GetTypeId() == TYPEID_PLAYER && ToCreature()->CanFly())
@@ -19122,7 +19143,7 @@ bool Unit::CanSwim() const
         return true;
     if (HasFlag(UNIT_FIELD_FLAGS_2, 0x1000000))
         return false;
-    if (IsPet() && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
         return true;
     return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME | UNIT_FLAG_SWIMMING);
 }
