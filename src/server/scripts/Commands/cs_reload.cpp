@@ -556,7 +556,7 @@ public:
     {
         LOG_INFO("server.loading", "Re-Loading Creature movement overrides...");
         sObjectMgr->LoadCreatureMovementOverrides();
-        handler->SendGlobalGMSysMessage("DB table `creature_movement_override` reloaded. All Praise MDic.");
+        handler->SendGlobalGMSysMessage("DB table `creature_movement_override` reloaded.");
         return true;
     }
 
