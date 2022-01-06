@@ -14,8 +14,8 @@ UPDATE `creature` SET `position_x`=-9535.653,`position_y`=-1329.8119,`position_z
 -- Update Eastvale Lumberjacks
 UPDATE `creature` SET `wander_distance`=2 WHERE `guid` IN (81259,81345);
 
-
-(XXXXXX, 13159, 0, 0, 0, 1, 1, 0, 0, -9493.731, -1193.5862, 49.64713, 3.89947509765625, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0), -- .go xyz -9493.731 -1193.5862 49.64713
+-- Update James Clark
+UPDATE `creature` SET `wander_distance`=1,`MovementType`=1,`position_x`=-9493.731,`position_y`=-1193.5862,`position_z`=49.64713, `orientation`=3.89947509765625 WHERE `guid`=81247;
 
 -- Pathing for Eastvale Lumberjack Entry: 1975
 SET @NPC := 81257;
@@ -119,51 +119,3 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH+2,1,-9517.359,-1283.467,44.269764,0,0,0,0,100,0),
 (@PATH+2,2,-9524.299,-1288.3755,43.83373,0,0,0,0,100,0),
 (@PATH+2,3,-9523.21,-1290.2489,44.11742,0,0,0,0,100,0);
-
--- Ridgepoint Tower Guards
-
--- Pathing for Stormwind Guard Entry: 1423
-SET @NPC := 81365;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-9771.3,`position_y`=-1406.9572,`position_z`=97.88677 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,-9771.3,-1406.9572,97.88677,0,0,0,0,100,0),
-(@PATH,2,-9771.3,-1406.9572,97.88677,1.169370651245117187,60000,0,0,100,0),
-(@PATH,3,-9776.593,-1394.8129,97.88729,0,0,0,0,100,0),
-(@PATH,4,-9776.593,-1394.8129,97.88729,2.740167140960693359,60000,0,0,100,0),
-(@PATH,5,-9788.505,-1399.9374,97.88729,0,0,0,0,100,0),
-(@PATH,6,-9788.505,-1399.9374,97.88729,4.345870018005371093,60000,0,0,100,0),
-(@PATH,7,-9783.521,-1412.0233,97.88729,0,0,0,0,100,0),
-(@PATH,8,-9783.521,-1412.0233,97.88729,5.846853256225585937,60000,0,0,100,0);
-
--- Pathing for Stormwind Guard Entry: 1423
-SET @NPC := 81362;
-SET @PATH := @NPC * 10;
-UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=-9776.632,`position_y`=-1383.5325,`position_z`=62.792778 WHERE `guid`=@NPC;
-DELETE FROM `creature_addon` WHERE `guid`=@NPC;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,-9776.632,-1383.5325,62.792778,0,2000,0,0,100,0),
-(@PATH,2,-9787.192,-1384.7284,62.70096,0,0,0,0,100,0),
-(@PATH,3,-9796.349,-1393.6975,62.78296,0,0,0,0,100,0),
-(@PATH,4,-9799.684,-1403.431,62.7103,0,0,0,0,100,0),
-(@PATH,5,-9797.448,-1413.294,62.797836,0,0,0,0,100,0),
-(@PATH,6,-9791.156,-1420.47,62.699223,0,0,0,0,100,0),
-(@PATH,7,-9780.899,-1422.8915,62.66864,0,0,0,0,100,0),
-(@PATH,8,-9771.842,-1421.9237,62.697872,0,0,0,0,100,0),
-(@PATH,9,-9762.633,-1412.1235,62.792976,0,0,0,0,100,0),
-(@PATH,10,-9760.813,-1402.7131,62.72537,0,0,0,0,100,0),
-(@PATH,11,-9763.664,-1392.0123,62.800457,0,2000,0,0,100,0),
-(@PATH,12,-9760.813,-1402.7131,62.72537,0,0,0,0,100,0),
-(@PATH,13,-9762.633,-1412.1235,62.792976,0,0,0,0,100,0),
-(@PATH,14,-9771.842,-1421.9237,62.697872,0,0,0,0,100,0),
-(@PATH,15,-9780.899,-1422.8915,62.66864,0,0,0,0,100,0),
-(@PATH,16,-9791.156,-1420.47,62.699223,0,0,0,0,100,0),
-(@PATH,17,-9797.448,-1413.294,62.797836,0,0,0,0,100,0),
-(@PATH,18,-9799.684,-1403.431,62.7103,0,0,0,0,100,0),
-(@PATH,19,-9796.349,-1393.6975,62.78296,0,0,0,0,100,0),
-(@PATH,20,-9787.192,-1384.7284,62.70096,0,0,0,0,100,0);
