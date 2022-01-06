@@ -247,7 +247,7 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
         {
             float angle = (M_PI * 2.0f / (float)RANDOM_POINTS_NUMBER) * i;
             float factor = 0.5f + rand_norm() * 0.5f;
-            _destinationPoints.push_back(G3D::Vector3(_initialPosition.GetPositionX() + _wanderDistance * cos(angle)*factor, _initialPosition.GetPositionY() + _wanderDistance * sin(angle)*factor, _initialPosition.GetPositionZ()));
+            _destinationPoints.push_back(G3D::Vector3(_initialPosition.GetPositionX() + _wanderDistance * cos(angle)*factor, _initialPosition.GetPositionY() + _wanderDistance * std::sin(angle)*factor, _initialPosition.GetPositionZ()));
         }
     }
 
