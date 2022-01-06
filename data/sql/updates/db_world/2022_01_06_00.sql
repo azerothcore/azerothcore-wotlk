@@ -1,3 +1,19 @@
+-- DB update 2022_01_05_04 -> 2022_01_06_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_05_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_05_04 2022_01_06_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1641421027611299094'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641421027611299094');
 -- Correct Values from sniffer for npcs involved in this quest chain
 UPDATE `creature_template` SET `speed_walk`='0.6666', `speed_run`='0.9285' WHERE `entry`='17379';
@@ -224,3 +240,13 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (@NPC,52,-4510.735,-11697.223,14.548721,'Stillpine Ancestor Yor'),
 (@NPC,53,-4490.1094,-11672.723,10.858275,'Stillpine Ancestor Yor'),
 (@NPC,54,-4486.507,-11657.934,10.678984,'Stillpine Ancestor Yor');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_06_00' WHERE sql_rev = '1641421027611299094';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
