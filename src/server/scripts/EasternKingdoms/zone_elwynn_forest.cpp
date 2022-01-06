@@ -332,7 +332,7 @@ struct npc_supervisor_raelen : public ScriptedAI
     }
 private:
     EventMap _events;
-    uint8 _PeasentId;  
+    uint8 _PeasentId;
     GuidVector peasentGUIDs;
 };
 
