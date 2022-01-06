@@ -1,3 +1,19 @@
+-- DB update 2022_01_06_00 -> 2022_01_06_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_06_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_06_00 2022_01_06_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1641422836099367029'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641422836099367029');
 -- Fixes issue: https://github.com/azerothcore/azerothcore-wotlk/issues/4136
 
@@ -315,3 +331,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 DELETE FROM `gameobject` WHERE `guid`=268970;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
 (268970, 3658, 530, 3524, 3575, 1, 1, -3518.95654296875, -11840.4130859375, -0.04765300080180168, 1.570795774459838867, 0, 0, 0.707106590270996093, 0.707106947898864746, 300, 255, 1, 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_06_01' WHERE sql_rev = '1641422836099367029';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
