@@ -4229,9 +4229,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 //if range is ok and we are actually in LOS
                 if (me->IsWithinDistInMap(unit, range) && me->IsWithinLOSInMap(unit))
                 {
+                    SmartEvent::LOSHostilityMode hostilityMode = static_cast<SmartEvent::LOSHostilityMode>(e.event.los.hostilityMode);
                     //if friendly event&&who is not hostile OR hostile event&&who is hostile
-                    if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
-                            (!e.event.los.noHostile && me->IsHostileTo(unit)))
+                    if ((hostilityMode == SmartEvent::LOSHostilityMode::Any) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::NotHostile && !me->IsHostileTo(unit)) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::Hostile && me->IsHostileTo(unit)))
                     {
                         if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
                             return;
@@ -4251,9 +4253,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 //if range is ok and we are actually in LOS
                 if (me->IsWithinDistInMap(unit, range) && me->IsWithinLOSInMap(unit))
                 {
+                    SmartEvent::LOSHostilityMode hostilityMode = static_cast<SmartEvent::LOSHostilityMode>(e.event.los.hostilityMode);
                     //if friendly event&&who is not hostile OR hostile event&&who is hostile
-                    if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
-                            (!e.event.los.noHostile && me->IsHostileTo(unit)))
+                    if ((hostilityMode == SmartEvent::LOSHostilityMode::Any) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::NotHostile && !me->IsHostileTo(unit)) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::Hostile && me->IsHostileTo(unit)))
                     {
                         if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
                             return;
