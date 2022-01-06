@@ -1234,7 +1234,7 @@ void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
             _player->SetSeer(target);
         else
         {
-            LOG_ERROR("network.opcode", "Player %s requests non-existing seer %s", _player->GetName().c_str(), _player->GetGuidValue(PLAYER_FARSIGHT).ToString().c_str());
+            LOG_DEBUG("network.opcode", "Player %s requests non-existing seer %s", _player->GetName().c_str(), _player->GetGuidValue(PLAYER_FARSIGHT).ToString().c_str());
         }
     }
     else
