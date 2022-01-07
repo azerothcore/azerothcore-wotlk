@@ -65,6 +65,8 @@ public:
     virtual void EventInform(uint32 /*eventId*/) {}
     virtual void SpellHit(Unit* /*unit*/, const SpellInfo* /*spellInfo*/) {}
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
+
+    virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) { }
 };
 
 class NullGameObjectAI : public GameObjectAI

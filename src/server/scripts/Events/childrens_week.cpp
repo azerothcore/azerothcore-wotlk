@@ -187,7 +187,7 @@ struct npc_winterfin_playmate : public ScriptedAI
             switch (phase)
             {
                 case 1:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     orphan->AI()->Talk(TEXT_ORACLE_ORPHAN_1);
                     timer = 3000;
                     break;
@@ -273,7 +273,7 @@ struct npc_snowfall_glade_playmate : public ScriptedAI
             switch (phase)
             {
                 case 1:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     orphan->AI()->Talk(TEXT_WOLVAR_ORPHAN_1);
                     timer = 5000;
                     break;
@@ -362,7 +362,7 @@ struct npc_the_biggest_tree : public ScriptedAI
             switch (phase)
             {
                 case 1:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     timer = 2000;
                     break;
                 case 2:
@@ -436,7 +436,7 @@ struct npc_high_oracle_soo_roo : public ScriptedAI
             switch (phase)
             {
                 case 1:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     orphan->AI()->Talk(TEXT_ORACLE_ORPHAN_5);
                     timer = 3000;
                     break;
@@ -512,7 +512,7 @@ struct npc_elder_kekek : public ScriptedAI
             switch (phase)
             {
                 case 1:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     orphan->AI()->Talk(TEXT_WOLVAR_ORPHAN_4);
                     timer = 3000;
                     break;
@@ -588,7 +588,7 @@ struct npc_the_etymidian : public ScriptedAI
             switch (phase)
             {
                 case 1:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     orphan->AI()->Talk(TEXT_ORACLE_ORPHAN_7);
                     timer = 5000;
                     break;
@@ -697,7 +697,7 @@ struct npc_alexstraza_the_lifebinder : public ScriptedAI
             switch (phase)
             {
                 case 1:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     orphan->AI()->Talk(TEXT_ORACLE_ORPHAN_11);
                     timer = 5000;
                     break;
@@ -728,7 +728,7 @@ struct npc_alexstraza_the_lifebinder : public ScriptedAI
                     Reset();
                     return;
                 case 7:
-                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + sin(me->GetOrientation()) * 5, me->GetPositionZ());
+                    orphan->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(me->GetOrientation()) * 5, me->GetPositionY() + std::sin(me->GetOrientation()) * 5, me->GetPositionZ());
                     orphan->AI()->Talk(TEXT_WOLVAR_ORPHAN_11);
                     timer = 5000;
                     break;
