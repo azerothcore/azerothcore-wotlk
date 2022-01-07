@@ -2369,8 +2369,19 @@ public:
     void DisableRotate(bool apply);
     void DisableSpline();
 
-    void AddComboPointHolder(ObjectGuid lowguid) { m_ComboPointHolders.insert(lowguid); }
-    void RemoveComboPointHolder(ObjectGuid lowguid) { m_ComboPointHolders.erase(lowguid); }
+    ///-----------Combo point system-------------------
+       // This unit having CP on other units
+    [[nodiscard]] uint8 GetComboPoints(Unit const* who = nullptr) const { return (who && m_comboTarget != who) ? 0 : m_comboPoints; }
+    [[nodiscard]] uint8 GetComboPoints(ObjectGuid const& guid) const { return (m_comboTarget && m_comboTarget->GetGUID() == guid) ? m_comboPoints : 0; }
+    [[nodiscard]] Unit* GetComboTarget() const { return m_comboTarget; }
+    [[nodiscard]] ObjectGuid const GetComboTargetGUID() const { return m_comboTarget ? m_comboTarget->GetGUID() : ObjectGuid::Empty; }
+    void AddComboPoints(Unit* target, int8 count);
+    void AddComboPoints(int8 count) { AddComboPoints(nullptr, count); }
+    void ClearComboPoints();
+    void SendComboPoints();
+    // Other units having CP on this unit
+    void AddComboPointHolder(Unit* unit) { m_ComboPointHolders.insert(unit); }
+    void RemoveComboPointHolder(Unit* unit) { m_ComboPointHolders.erase(unit); }
     void ClearComboPointHolders();
 
     ///----------Pet responses methods-----------------
@@ -2647,9 +2658,10 @@ private:
     HostileRefMgr m_HostileRefMgr;
 
     FollowerRefMgr m_FollowingRefMgr;
-    Unit* m_comboTarget;
 
-    ComboPointHolderSet m_ComboPointHolders;
+    Unit* m_comboTarget;
+    int8 m_comboPoints;
+    std::unordered_set<Unit*> m_ComboPointHolders;
 
     RedirectThreatInfo _redirectThreatInfo;
 
