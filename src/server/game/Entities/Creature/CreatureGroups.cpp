@@ -317,7 +317,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
         float followAngle = pFormationInfo.follow_angle;
-        if (static_cast<float>(M_PI) - fabs(fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.5f)
+        if (static_cast<float>(M_PI) - std::fabs(std::fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.5f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle
             // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1

@@ -63,7 +63,7 @@ public:
                 }
                 case EVENT_RAIN_OF_FIRE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         DoCast(target, SPELL_RAIN_OF_FIRE, true);
                     }
@@ -74,7 +74,7 @@ public:
                 {
                     if (urand(0, 1))
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                         {
                             DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
                         }
