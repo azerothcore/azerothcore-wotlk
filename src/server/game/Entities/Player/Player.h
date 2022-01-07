@@ -1086,6 +1086,9 @@ public:
 
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
+    void SetInWater(bool apply);
+
+    [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
     [[nodiscard]] bool IsFalling() const;
     bool IsInAreaTriggerRadius(const AreaTrigger* trigger) const;
 
@@ -1578,13 +1581,6 @@ public:
 
     void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
     void SetSelection(ObjectGuid guid);
-
-    [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
-    [[nodiscard]] ObjectGuid GetComboTarget() const { return m_comboTarget; }
-
-    void AddComboPoints(Unit* target, int8 count);
-    void ClearComboPoints();
-    void SendComboPoints();
 
     void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0);
     void SendNewMail();
@@ -2559,9 +2555,6 @@ public:
     void PrepareCharmAISpells();
     uint32 m_charmUpdateTimer;
 
-    int8 GetComboPointGain() { return m_comboPointGain; }
-    void SetComboPointGain(int8 combo) { m_comboPointGain = combo; }
-
     bool NeedToSaveGlyphs() { return m_NeedToSaveGlyphs; }
     void SetNeedToSaveGlyphs(bool val) { m_NeedToSaveGlyphs = val; }
 
@@ -2607,8 +2600,6 @@ public:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
-    // Combo Points
-    int8 m_comboPointGain;
     // Performance Varibales
     bool m_NeedToSaveGlyphs;
     // Mount block bug
@@ -2749,9 +2740,6 @@ public:
     bool m_itemUpdateQueueBlocked;
 
     uint32 m_ExtraFlags;
-
-    ObjectGuid m_comboTarget;
-    int8 m_comboPoints;
 
     QuestStatusMap m_QuestStatus;
     QuestStatusSaveMap m_QuestStatusSave;
@@ -2915,6 +2903,7 @@ private:
     int32 m_MirrorTimer[MAX_TIMERS];
     uint8 m_MirrorTimerFlags;
     uint8 m_MirrorTimerFlagsLast;
+    bool m_isInWater;
 
     // Current teleport data
     WorldLocation teleportStore_dest;
