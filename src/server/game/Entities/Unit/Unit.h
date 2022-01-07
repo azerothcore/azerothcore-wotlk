@@ -1196,7 +1196,7 @@ struct UnitActionBarEntry
     }
 };
 
-typedef std::set<Player*> SharedVisionList;
+typedef std::list<Player*> SharedVisionList;
 
 enum CharmType
 {
@@ -2345,10 +2345,13 @@ public:
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
     [[nodiscard]] const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
+    [[nodiscard]] virtual MovementGeneratorType GetDefaultMovementType() const;
 
     [[nodiscard]] bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
     void StopMoving();
     void StopMovingOnCurrentPos();
+    virtual void PauseMovement(uint32 timer = 0, uint8 slot = 0); // timer in ms
+    void ResumeMovement(uint32 timer = 0, uint8 slot = 0);
 
     void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
     void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
@@ -2625,6 +2628,7 @@ private:
     [[nodiscard]] float GetCombatRatingReduction(CombatRating cr) const;
     [[nodiscard]] uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;
 
+protected:
     void SetFeared(bool apply);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
@@ -2632,6 +2636,7 @@ private:
 
     uint32 m_rootTimes;
 
+private:
     uint32 m_state;                                     // Even derived shouldn't modify
     uint32 m_CombatTimer;
     uint32 m_lastManaUse;                               // msecs

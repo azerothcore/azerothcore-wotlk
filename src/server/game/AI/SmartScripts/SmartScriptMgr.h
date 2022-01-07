@@ -1007,6 +1007,7 @@ struct SmartAction
             uint32 counterId;
             uint32 value;
             SAIBool reset;
+            uint32 subtract;
         } setCounter;
 
         struct

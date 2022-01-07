@@ -1086,6 +1086,9 @@ public:
 
     static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
+    void SetInWater(bool apply);
+
+    [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
     [[nodiscard]] bool IsFalling() const;
     bool IsInAreaTriggerRadius(const AreaTrigger* trigger) const;
 
@@ -2915,6 +2918,7 @@ private:
     int32 m_MirrorTimer[MAX_TIMERS];
     uint8 m_MirrorTimerFlags;
     uint8 m_MirrorTimerFlagsLast;
+    bool m_isInWater;
 
     // Current teleport data
     WorldLocation teleportStore_dest;
