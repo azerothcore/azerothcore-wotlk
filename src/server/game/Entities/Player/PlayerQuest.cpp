@@ -987,7 +987,7 @@ bool Player::SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const
 
     for (Quest::PrevQuests::const_iterator iter = qInfo->prevQuests.begin(); iter != qInfo->prevQuests.end(); ++iter)
     {
-        uint32 prevId = abs(*iter);
+        uint32 prevId = std::abs(*iter);
 
         Quest const* qPrevInfo = sObjectMgr->GetQuestTemplate(prevId);
 
@@ -1697,13 +1697,15 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
                             }
                         }
                     }
-                    else if (isNotLowLevelQuest)
+                    else
                     {
-                        result2 = DIALOG_STATUS_AVAILABLE;
+                        result2 = isNotLowLevelQuest ? DIALOG_STATUS_AVAILABLE : DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
                     }
                 }
                 else
+                {
                     result2 = DIALOG_STATUS_UNAVAILABLE;
+                }
             }
         }
 
