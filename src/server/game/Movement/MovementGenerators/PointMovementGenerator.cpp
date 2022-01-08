@@ -65,7 +65,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
             if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
             {
                 i_x += 0.2f * cos(unit->GetOrientation());
-                i_y += 0.2f * sin(unit->GetOrientation());
+                i_y += 0.2f * std::sin(unit->GetOrientation());
             }
 
             init.MoveTo(i_x, i_y, i_z, true);
@@ -77,7 +77,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
         {
             i_x += 0.2f * cos(unit->GetOrientation());
-            i_y += 0.2f * sin(unit->GetOrientation());
+            i_y += 0.2f * std::sin(unit->GetOrientation());
         }
 
         init.MoveTo(i_x, i_y, i_z, true);

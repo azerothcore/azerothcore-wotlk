@@ -41,7 +41,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
             std::string source = fields[0].GetString();;
             std::string data = fields[1].GetString();
 
-            std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', true);
+            std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
             PlayerSettingVector setting;
             setting.resize(tokens.size());
@@ -50,9 +50,15 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
 
             for (auto token : tokens)
             {
+                if (token.empty())
+                {
+                    continue;
+                }
+
                 PlayerSetting set;
                 set.value = Acore::StringTo<uint32>(token).value();
-                setting[++count] = set;
+                setting[count] = set;
+                ++count;
             }
 
             m_charSettingsMap[source] = setting;
