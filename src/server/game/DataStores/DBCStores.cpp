@@ -26,7 +26,6 @@
 #include "TransportMgr.h"
 #include "World.h"
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <map>
 
@@ -160,6 +159,7 @@ DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
 DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
 DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
 TalentSpellPosMap sTalentSpellPosMap;
+std::unordered_set<uint32> sPetTalentSpells;
 DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 
 // store absolute bit position for first rank for talent inspect
@@ -475,9 +475,22 @@ void LoadDBCStores(const std::string& dataPath)
 
     // create talent spells set
     for (TalentEntry const* talentInfo : sTalentStore)
+    {
+        TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+
         for (uint8 j = 0; j < MAX_TALENT_RANK; ++j)
+        {
             if (talentInfo->RankID[j])
+            {
                 sTalentSpellPosMap[talentInfo->RankID[j]] = TalentSpellPos(talentInfo->TalentID, j);
+
+                if (talentTab && talentTab->petTalentMask)
+                {
+                    sPetTalentSpells.insert(talentInfo->RankID[j]);
+                }
+            }
+        }
+    }
 
     // prepare fast data access to bit pos of talent ranks for use at inspecting
     {
@@ -643,7 +656,7 @@ G3D::Vector3 TranslateLocation(G3D::Vector4 const* DBCPosition, G3D::Vector3 con
         angle += 2 * float(M_PI);
     }
 
-    work.x = DBCPosition->x + (distance * sin(angle));
+    work.x = DBCPosition->x + (distance * std::sin(angle));
     work.y = DBCPosition->y + (distance * cos(angle));
     work.z = DBCPosition->z + z;
     return work;

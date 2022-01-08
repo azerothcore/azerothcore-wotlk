@@ -90,12 +90,12 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
     return false;
 }
 
-Unit* UnitAI::SelectTarget(SelectAggroTarget targetType, uint32 position, float dist, bool playerOnly, int32 aura)
+Unit* UnitAI::SelectTarget(SelectTargetMethod targetType, uint32 position, float dist, bool playerOnly, int32 aura)
 {
     return SelectTarget(targetType, position, DefaultTargetSelector(me, dist, playerOnly, aura));
 }
 
-void UnitAI::SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectAggroTarget targetType, float dist, bool playerOnly, int32 aura)
+void UnitAI::SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, float dist, bool playerOnly, int32 aura)
 {
     SelectTargetList(targetList, DefaultTargetSelector(me, dist, playerOnly, aura), num, targetType);
 }
@@ -152,7 +152,7 @@ void UnitAI::DoCast(uint32 spellId)
                 const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                 //float range = GetSpellMaxRange(spellInfo, false);
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
+                target = SelectTarget(SelectTargetMethod::Random, 0, spellInfo->GetMaxRange(false), playerOnly);
                 break;
             }
         case AITARGET_ALLY:
@@ -172,7 +172,7 @@ void UnitAI::DoCast(uint32 spellId)
                         && targetSelector(me->GetVictim()))
                     target = me->GetVictim();
                 else
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, targetSelector);
+                    target = SelectTarget(SelectTargetMethod::Random, 0, targetSelector);
                 break;
             }
     }
@@ -212,7 +212,7 @@ void UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, floa
         return;
     }
 
-    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, threatTablePosition, dist, playerOnly))
+    if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly))
     {
         me->CastSpell(target, spellId, triggered);
     }

@@ -97,7 +97,7 @@ public:
                 pInstance->SetData(EVENT_KORALON, IN_PROGRESS);
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
                 pInstance->SetData(EVENT_KORALON, DONE);

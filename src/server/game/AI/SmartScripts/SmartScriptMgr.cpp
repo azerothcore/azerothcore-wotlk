@@ -16,9 +16,7 @@
  */
 
 #include "SmartScriptMgr.h"
-#include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
 #include "GameEventMgr.h"
 #include "GridDefines.h"
@@ -193,9 +191,9 @@ void SmartAIMgr::LoadSmartAIFromDB()
         }
         else
         {
-            if (!sObjectMgr->GetCreatureData(uint32(abs(temp.entryOrGuid))))
+            if (!sObjectMgr->GetCreatureData(uint32(std::abs(temp.entryOrGuid))))
             {
-                LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid (%u) does not exist, skipped loading.", uint32(abs(temp.entryOrGuid)));
+                LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid (%u) does not exist, skipped loading.", uint32(std::abs(temp.entryOrGuid)));
                 continue;
             }
         }
@@ -274,7 +272,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
 
         // xinef: rozpierdol tc, niedojeby ze szok
         if (temp.action.type == SMART_ACTION_MOVE_TO_POS)
-            if (temp.target.type == SMART_TARGET_SELF && (fabs(temp.target.x) > 200.0f || fabs(temp.target.y) > 200.0f || fabs(temp.target.z) > 200.0f))
+            if (temp.target.type == SMART_TARGET_SELF && (std::fabs(temp.target.x) > 200.0f || std::fabs(temp.target.y) > 200.0f || std::fabs(temp.target.z) > 200.0f))
                 temp.target.type = SMART_TARGET_POSITION;
 
         // creature entry / guid not found in storage, create empty event list for it and increase counters
@@ -363,6 +361,8 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_PLAYER_WITH_AURA:
         case SMART_TARGET_RANDOM_POINT:
         case SMART_TARGET_ROLE_SELECTION:
+        case SMART_TARGET_LOOT_RECIPIENTS:
+        case SMART_EVENT_SUMMONED_UNIT_DIES:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled target_type(%u), Entry %d SourceType %u Event %u Action %u, skipped.", e.GetTargetType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -494,6 +494,12 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 }
 
+                if (e.event.los.hostilityMode >= AsUnderlyingType(SmartEvent::LOSHostilityMode::End))
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses hostilityMode with invalid value %u (max allowed value %u), skipped.",
+                                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.los.hostilityMode, AsUnderlyingType(SmartEvent::LOSHostilityMode::End) - 1);
+                    return false;
+                }
                 break;
             case SMART_EVENT_RESPAWN:
                 if (e.event.respawn.type == SMART_SCRIPT_RESPAWN_CONDITION_MAP && !sMapStore.LookupEntry(e.event.respawn.map))
@@ -554,6 +560,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             case SMART_EVENT_SUMMON_DESPAWNED:
             case SMART_EVENT_SUMMONED_UNIT:
+            case SMART_EVENT_SUMMONED_UNIT_DIES:
                 if (e.event.summoned.creature && !IsCreatureValid(e, e.event.summoned.creature))
                     return false;
 
@@ -1171,6 +1178,31 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 }
                 break;
             }
+        case SMART_ACTION_SET_HEALTH_PCT:
+            {
+                if (e.action.setHealthPct.percent > 100 || !e.action.setHealthPct.percent)
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u is trying to set invalid HP percent %u, skipped.",
+                                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.setHealthPct.percent);
+                    return false;
+                }
+                break;
+            }
+        case SMART_ACTION_SET_MOVEMENT_SPEED:
+            {
+                if (e.action.movementSpeed.movementType >= MAX_MOVE_TYPE)
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses invalid movementType %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.movementSpeed.movementType);
+                    return false;
+                }
+
+                if (!e.action.movementSpeed.speedInteger && !e.action.movementSpeed.speedFraction)
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses speed 0, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
+                break;
+            }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
         case SMART_ACTION_SET_ORIENTATION:
@@ -1231,6 +1263,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_JUMP_TO_POS:
         case SMART_ACTION_SEND_GOSSIP_MENU:
         case SMART_ACTION_GO_SET_LOOT_STATE:
+        case SMART_ACTION_GO_SET_GO_STATE:
         case SMART_ACTION_SEND_TARGET_TO_TARGET:
         case SMART_ACTION_SET_HOME_POS:
         case SMART_ACTION_SET_HEALTH_REGEN:
@@ -1266,6 +1299,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_PLAYER_TALK:
         case SMART_ACTION_CU_ENCOUNTER_START:
         case SMART_ACTION_DO_ACTION:
+        case SMART_ACTION_SET_CORPSE_DELAY:
+        case SMART_ACTION_ATTACK_STOP:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
@@ -1282,7 +1317,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
     if (e.entryOrGuid >= 0)
         entry = uint32(e.entryOrGuid);
     else {
-        entry = uint32(abs(e.entryOrGuid));
+        entry = uint32(std::abs(e.entryOrGuid));
         CreatureData const* data = sObjectMgr->GetCreatureData(entry);
         if (!data)
         {

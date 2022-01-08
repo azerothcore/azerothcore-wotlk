@@ -121,6 +121,15 @@ Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f };
 Position const MajordomoMoveRagPos = { 830.9636f, -814.7055f, -228.9733f, 0.0f };   // Position used at Ragnaros summoning event
 Position const RagnarosSummonPos = { 838.3082f, -831.4665f, -232.1853f, 2.199115f };
 
+struct MajordomoAddData
+{
+    ObjectGuid guid;
+    uint32 creatureEntry;
+    Position spawnPos;
+
+    MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
+};
+
 class boss_majordomo : public CreatureScript
 {
 public:
@@ -163,6 +172,7 @@ public:
                         if (summon)
                         {
                             static_minionsGUIDS.insert(summon->GetGUID());
+                            majordomoSummonsData.push_back(MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition()));
                         }
                     }
                 }
@@ -186,10 +196,26 @@ public:
             {
                 events.SetPhase(PHASE_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
+
+                for (auto summon : majordomoSummonsData)
+                {
+                    if (ObjectAccessor::GetCreature(*me, summon.guid))
+                    {
+                        continue;
+                    }
+
+                    if (Creature* spawn = me->SummonCreature(summon.creatureEntry, summon.spawnPos))
+                    {
+                        static_minionsGUIDS.erase(summon.guid); // Erase the guid from the previous, no longer existing, spawn.
+                        static_minionsGUIDS.insert(spawn->GetGUID());
+                        summon.guid = spawn->GetGUID();
+                    }
+                }
             }
             else
             {
                 static_minionsGUIDS.clear();
+                majordomoSummonsData.clear();
                 summons.DespawnAll();
             }
         }
@@ -322,7 +348,7 @@ public:
                             }
                             case EVENT_TELEPORT_RANDOM:
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                                 {
                                     DoCastSelf(SPELL_HATE_TO_ZERO, true);
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
@@ -495,6 +521,7 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
+        std::list<MajordomoAddData> majordomoSummonsData;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override

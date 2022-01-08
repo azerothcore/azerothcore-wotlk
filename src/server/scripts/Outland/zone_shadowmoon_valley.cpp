@@ -44,7 +44,6 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
 
 // Ours
 class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader
@@ -1455,7 +1454,7 @@ public:
             {
                 if (SpellTimer1 <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         if (target->GetTypeId() == TYPEID_PLAYER)
                         {
