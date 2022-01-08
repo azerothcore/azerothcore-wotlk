@@ -747,7 +747,7 @@ public:
                     _channelTimer = 0;
                     float o = urand(0, 5) * M_PI / 3.0f;
                     me->InterruptNonMeleeSpells(false);
-                    me->GetMotionMaster()->MovePoint(POINT_CHANNEL_STEELBREAKER, 1587.18f + 10.0f * cos(o), 121.02f + 10.0f * sin(o), 427.3f);
+                    me->GetMotionMaster()->MovePoint(POINT_CHANNEL_STEELBREAKER, 1587.18f + 10.0f * cos(o), 121.02f + 10.0f * std::sin(o), 427.3f);
                 }
             }
 
