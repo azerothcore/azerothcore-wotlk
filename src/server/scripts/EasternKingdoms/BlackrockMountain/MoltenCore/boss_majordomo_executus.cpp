@@ -127,6 +127,7 @@ struct MajordomoAddData
     uint32 creatureEntry;
     Position spawnPos;
 
+    MajordomoAddData() { }
     MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
 };
 
@@ -172,7 +173,7 @@ public:
                         if (summon)
                         {
                             static_minionsGUIDS.insert(summon->GetGUID());
-                            majordomoSummonsData.push_back(MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition()));
+                            majordomoSummonsData[summon->GetGUID().GetCounter()] = MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition());
                         }
                     }
                 }
@@ -192,23 +193,26 @@ public:
             events.Reset();
             aliveMinionsGUIDS.clear();
 
-            majordomoSummonsData.remove_if([this](MajordomoAddData data) { return ObjectAccessor::GetCreature(*me, data.guid); });
-
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
                 events.SetPhase(PHASE_COMBAT);
+                instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
 
-                for (auto summon : majordomoSummonsData)
+                for (auto const& summon : majordomoSummonsData)
                 {
-                    if (Creature* spawn = me->SummonCreature(summon.creatureEntry, summon.spawnPos))
+                    if (ObjectAccessor::GetCreature(*me, summon.second.guid))
                     {
-                        static_minionsGUIDS.erase(summon.guid); // Erase the guid from the previous, no longer existing, spawn.
+                        continue;
+                    }
+
+                    if (Creature* spawn = me->SummonCreature(summon.second.creatureEntry, summon.second.spawnPos))
+                    {
+                        static_minionsGUIDS.erase(summon.second.guid); // Erase the guid from the previous, no longer existing, spawn.
                         static_minionsGUIDS.insert(spawn->GetGUID());
-                        summon.guid = spawn->GetGUID();
+                        majordomoSummonsData.erase(summon.second.guid.GetCounter());
+                        majordomoSummonsData[spawn->GetGUID().GetCounter()] = MajordomoAddData(spawn->GetGUID(), spawn->GetEntry(), spawn->GetPosition());
                     }
                 }
-
-                instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
             }
             else
             {
@@ -519,7 +523,7 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
-        std::list<MajordomoAddData> majordomoSummonsData;
+        std::unordered_map<uint32, MajordomoAddData> majordomoSummonsData;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override
