@@ -112,7 +112,7 @@ enum SMART_EVENT
     SMART_EVENT_EVADE                    = 7,       // NONE
     SMART_EVENT_SPELLHIT                 = 8,       // SpellID, School, CooldownMin, CooldownMax
     SMART_EVENT_RANGE                    = 9,       // MinDist, MaxDist, RepeatMin, RepeatMax
-    SMART_EVENT_OOC_LOS                  = 10,      // NoHostile, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
+    SMART_EVENT_OOC_LOS                  = 10,      // HostilityMode, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_RESPAWN                  = 11,      // type, MapId, ZoneId
     SMART_EVENT_TARGET_HEALTH_PCT        = 12,      // HPMin%, HPMax%, RepeatMin, RepeatMax
     SMART_EVENT_VICTIM_CASTING           = 13,      // RepeatMin, RepeatMax, spellid
@@ -128,7 +128,7 @@ enum SMART_EVENT
     SMART_EVENT_HAS_AURA                 = 23,      // Param1 = SpellID, Param2 = Stack amount, Param3/4 RepeatMin, RepeatMax
     SMART_EVENT_TARGET_BUFFED            = 24,      // Param1 = SpellID, Param2 = Stack amount, Param3/4 RepeatMin, RepeatMax
     SMART_EVENT_RESET                    = 25,      // Called after combat, when the creature respawn and spawn.
-    SMART_EVENT_IC_LOS                   = 26,      // NoHostile, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
+    SMART_EVENT_IC_LOS                   = 26,      // HostilityMode, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_PASSENGER_BOARDED        = 27,      // CooldownMin, CooldownMax
     SMART_EVENT_PASSENGER_REMOVED        = 28,      // CooldownMin, CooldownMax
     SMART_EVENT_CHARMED                  = 29,      // NONE
@@ -183,6 +183,8 @@ enum SMART_EVENT
 
     SMART_EVENT_TC_END                   = 78,
 
+    SMART_EVENT_SUMMONED_UNIT_DIES       = 82,      // CreatureId(0 all), CooldownMin, CooldownMax
+
     /* AC Custom Events */
     SMART_EVENT_AC_START                 = 100,
 
@@ -226,7 +228,10 @@ struct SmartEvent
 
         struct
         {
-            uint32 noHostile;
+            /// <summary>
+            /// Hostility mode of the event. 0: hostile, 1: not hostile, 2: any
+            /// </summary>
+            uint32 hostilityMode;
             uint32 maxDist;
             uint32 cooldownMin;
             uint32 cooldownMax;
@@ -456,6 +461,14 @@ struct SmartEvent
             uint32 param5;
         } raw;
     };
+
+    enum class LOSHostilityMode : uint32
+    {
+        Hostile = 0,
+        NotHostile = 1,
+        Any = 2,
+        End
+    };
 };
 
 enum SMART_SCRIPT_RESPAWN_CONDITION
@@ -584,9 +597,9 @@ enum SMART_ACTION
     SMART_ACTION_START_CLOSEST_WAYPOINT             = 113,    // wp1, wp2, wp3, wp4, wp5, wp6, wp7
     SMART_ACTION_RISE_UP                            = 114,    // distance
     SMART_ACTION_RANDOM_SOUND                       = 115,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf
-    SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // timer
     SMART_ACTION_DISABLE_EVADE                      = 117,    // 0/1 (1 = disabled, 0 = enabled)
-    SMART_ACTION_GO_SET_GO_STATE                    = 118,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_GO_SET_GO_STATE                    = 118,    // state
     SMART_ACTION_SET_CAN_FLY                        = 119,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_REMOVE_AURAS_BY_TYPE               = 120,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_SET_SIGHT_DIST                     = 121,    // sightDistance
@@ -605,6 +618,9 @@ enum SMART_ACTION
     // SMART_ACTION_INVOKER_CAST                    = 134,    // TODO: solve name conflicts
 
     SMART_ACTION_TC_END                             = 135,    // placeholder
+    SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
+
+    SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
 
     // AC-only SmartActions:
 
@@ -634,8 +650,9 @@ enum SMART_ACTION
     SMART_ACTION_VORTEX_SUMMON                      = 221,    // entry, duration (0 = perm), spiral scaling, spiral appearance, range max, phi_delta     <-- yes confusing math, try it ingame and see, my lovely AC boys!
     SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
+    SMART_ACTION_ATTACK_STOP                        = 224,    //
 
-    SMART_ACTION_AC_END                             = 224,    // placeholder
+    SMART_ACTION_AC_END                             = 225,    // placeholder
 };
 
 struct SmartAction
@@ -989,6 +1006,7 @@ struct SmartAction
             uint32 counterId;
             uint32 value;
             uint32 reset;
+            uint32 subtract;
         } setCounter;
 
         struct
@@ -1279,6 +1297,23 @@ struct SmartAction
         {
             uint32 disable;
         } disableEvade;
+
+        struct
+        {
+            uint32 timer;
+        } corpseDelay;
+
+        struct
+        {
+            uint32 movementType;
+            uint32 speedInteger;
+            uint32 speedFraction;
+        } movementSpeed;
+
+        struct
+        {
+            uint32 percent;
+        } setHealthPct;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1334,7 +1369,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_THREAT_LIST                    = 24,   // All units on creature's threat list, maxdist, playerOnly
     SMART_TARGET_CLOSEST_ENEMY                  = 25,   // maxDist, playerOnly
     SMART_TARGET_CLOSEST_FRIENDLY               = 26,   // maxDist, playerOnly
-    SMART_TARGET_LOOT_RECIPIENTS                = 27,   // TODO: NOT SUPPORTED YET
+    SMART_TARGET_LOOT_RECIPIENTS                = 27,   // all players that have tagged this creature (for kill credit)
     SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
     SMART_TARGET_VEHICLE_PASSENGER              = 29,   // seat number (vehicle can target it's own accessory)
 
@@ -1658,7 +1693,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     { 0, 0 }, // 79
     { 0, 0 }, // 80
     { 0, 0 }, // 81
-    { 0, 0 }, // 82
+    {SMART_EVENT_SUMMONED_UNIT_DIES,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     { 0, 0 }, // 83
     { 0, 0 }, // 84
     { 0, 0 }, // 85
