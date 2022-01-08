@@ -381,7 +381,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                         float rand = 8 + rand_norm() * 12;
                         float angle = rand_norm() * 2 * M_PI;
                         float x = 1201.8f + rand * cos(angle);
-                        float y = -4299.6f + rand * sin(angle);
+                        float y = -4299.6f + rand * std::sin(angle);
                         if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 21.3f, 0.0f))
                             cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                     }
@@ -390,7 +390,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                         float rand = rand_norm() * 20;
                         float angle = rand_norm() * 2 * M_PI;
                         float x = -5157.1f + rand * cos(angle);
-                        float y = -598.98f + rand * sin(angle);
+                        float y = -598.98f + rand * std::sin(angle);
                         if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 398.11f, 0.0f))
                             cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                     }
@@ -422,7 +422,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                         thrown = 0;
                         sayer->Say("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL);
                         //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
-                        sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+                        sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * std::sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                     }
                     else
                     {

@@ -1022,7 +1022,8 @@ bool Position::HasInLine(WorldObject const* target, float width) const
         return false;
     width += target->GetObjectSize();
     float angle = GetRelativeAngle(target);
-    return std::fabs(sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
+
+    return std::fabs(std::sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
 }
 
 std::string Position::ToString() const
@@ -1519,8 +1520,8 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
 
 void Position::RelocateOffset(const Position& offset)
 {
-    m_positionX = GetPositionX() + (offset.GetPositionX() * cos(GetOrientation()) + offset.GetPositionY() * sin(GetOrientation() + M_PI));
-    m_positionY = GetPositionY() + (offset.GetPositionY() * cos(GetOrientation()) + offset.GetPositionX() * sin(GetOrientation()));
+    m_positionX = GetPositionX() + (offset.GetPositionX() * cos(GetOrientation()) + offset.GetPositionY() * std::sin(GetOrientation() + M_PI));
+    m_positionY = GetPositionY() + (offset.GetPositionY() * cos(GetOrientation()) + offset.GetPositionX() * std::sin(GetOrientation()));
     m_positionZ = GetPositionZ() + offset.GetPositionZ();
     m_orientation = GetOrientation() + offset.GetOrientation();
 }
@@ -1530,8 +1531,8 @@ void Position::GetPositionOffsetTo(const Position& endPos, Position& retOffset) 
     float dx = endPos.GetPositionX() - GetPositionX();
     float dy = endPos.GetPositionY() - GetPositionY();
 
-    retOffset.m_positionX = dx * cos(GetOrientation()) + dy * sin(GetOrientation());
-    retOffset.m_positionY = dy * cos(GetOrientation()) - dx * sin(GetOrientation());
+    retOffset.m_positionX = dx * cos(GetOrientation()) + dy * std::sin(GetOrientation());
+    retOffset.m_positionY = dy * cos(GetOrientation()) - dx * std::sin(GetOrientation());
     retOffset.m_positionZ = endPos.GetPositionZ() - GetPositionZ();
     retOffset.m_orientation = endPos.GetOrientation() - GetOrientation();
 }
@@ -1559,7 +1560,7 @@ void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos)
     {
         float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
         vcos = cos(angle);
-        vsin = sin(angle);
+        vsin = std::sin(angle);
     }
     else
     {
@@ -1678,7 +1679,7 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     float new_dist = (float)rand_norm() * static_cast<float>(distance);
 
     rand_x = pos.m_positionX + new_dist * cos(angle);
-    rand_y = pos.m_positionY + new_dist * sin(angle);
+    rand_y = pos.m_positionY + new_dist * std::sin(angle);
     rand_z = pos.m_positionZ;
 
     Acore::NormalizeMapCoord(rand_x);
@@ -2195,8 +2196,7 @@ void Unit::BuildHeartBeatMsg(WorldPacket* data) const
     BuildMovementPacket(data);
 }
 
-// pussywizard!
-void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr)
+void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
 {
     dist += GetObjectSize();
     if (includeMargin)
@@ -2270,7 +2270,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, Unit* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2450,7 +2450,7 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, const Position& pos, TempS
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, isType(TYPEMASK_UNIT) ? (Unit*)this : nullptr))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, (WorldObject*) this))
         {
             summon->SetTempSummonType(spwtype);
             return summon;
@@ -2863,7 +2863,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     angle += m_orientation;
     float destx, desty, destz, ground, floor;
     destx = pos.m_positionX + dist * cos(angle);
-    desty = pos.m_positionY + dist * sin(angle);
+    desty = pos.m_positionY + dist * std::sin(angle);
 
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(destx, desty))
@@ -2884,7 +2884,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         if (std::fabs(pos.m_positionZ - destz) > 6.0f)
         {
             destx -= step * cos(angle);
-            desty -= step * sin(angle);
+            desty -= step * std::sin(angle);
             ground = GetMapHeight(destx, desty, MAX_HEIGHT);
             floor = GetMapHeight(destx, desty, pos.m_positionZ);
             destz = std::fabs(ground - pos.m_positionZ) <= std::fabs(floor - pos.m_positionZ) ? ground : floor;
@@ -2945,7 +2945,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     angle += GetOrientation();
     float destx, desty, destz;
     destx = pos.m_positionX + dist * cos(angle);
-    desty = pos.m_positionY + dist * sin(angle);
+    desty = pos.m_positionY + dist * std::sin(angle);
     destz = pos.m_positionZ;
 
     if (!GetMap()->CheckCollisionAndGetValidCoords(this, pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz, false))

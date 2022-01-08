@@ -55,6 +55,31 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+CreatureMovementData::CreatureMovementData() : Ground(CreatureGroundMovementType::Run), Flight(CreatureFlightMovementType::None),
+                                               Swim(true), Rooted(false), Chase(CreatureChaseMovementType::Run),
+                                               Random(CreatureRandomMovementType::Walk), InteractionPauseTimer(sWorld->getIntConfig(CONFIG_CREATURE_STOP_FOR_PLAYER)) {}
+
+std::string CreatureMovementData::ToString() const
+{
+    constexpr std::array<char const*, 3> GroundStates = {"None", "Run", "Hover"};
+    constexpr std::array<char const*, 3> FlightStates = {"None", "DisableGravity", "CanFly"};
+    constexpr std::array<char const*, 3> ChaseStates  = {"Run", "CanWalk", "AlwaysWalk"};
+    constexpr std::array<char const*, 3> RandomStates = {"Walk", "CanRun", "AlwaysRun"};
+
+    std::ostringstream str;
+    str << std::boolalpha
+        << "Ground: " << GroundStates[AsUnderlyingType(Ground)]
+        << ", Swim: " << Swim
+        << ", Flight: " << FlightStates[AsUnderlyingType(Flight)]
+        << ", Chase: " << ChaseStates[AsUnderlyingType(Chase)]
+        << ", Random: " << RandomStates[AsUnderlyingType(Random)];
+    if (Rooted)
+        str << ", Rooted";
+    str << ", InteractionPauseTimer: " << InteractionPauseTimer;
+
+    return str.str();
+}
+
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
@@ -541,7 +566,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
     }
 
-    if (cInfo->InhabitType & INHABIT_ROOT)
+    if (GetMovementTemplate().IsRooted())
     {
         SetControlled(true, UNIT_STATE_ROOT);
     }
@@ -2452,7 +2477,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     else
     {
         // to prevent creatures in air ignore attacks because distance is already too high...
-        if (GetCreatureTemplate()->InhabitType & INHABIT_AIR)
+        if (GetMovementTemplate().IsFlightAllowed())
             return victim->IsInDist2d(&m_homePosition, dist);
         else
             return victim->IsInDist(&m_homePosition, dist);
@@ -2500,7 +2525,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
         //! Check using InhabitType as movement flags are assigned dynamically
         //! basing on whether the creature is in air or not
         //! Set MovementFlag_Hover. Otherwise do nothing.
-        if (GetByteValue(UNIT_FIELD_BYTES_1, 3) & UNIT_BYTE1_FLAG_HOVER /*&& !(GetCreatureTemplate()->InhabitType & INHABIT_AIR)*/)
+        if (CanHover())
             AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
     }
 
@@ -2731,6 +2756,14 @@ void Creature::GetRespawnPosition(float& x, float& y, float& z, float* ori, floa
         *dist = 0;
 }
 
+CreatureMovementData const& Creature::GetMovementTemplate() const
+{
+    if (CreatureMovementData const* movementOverride = sObjectMgr->GetCreatureMovementOverride(m_spawnId))
+        return *movementOverride;
+
+    return GetCreatureTemplate()->Movement;
+}
+
 void Creature::AllLootRemovedFromCorpse()
 {
     if (loot.loot_type != LOOT_SKINNING && !IsPet() && GetCreatureTemplate()->SkinLootId && hasLootRecipient())
@@ -2937,8 +2970,6 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
 
-    applyInhabitFlags();
-
     if (m_movedByPlayer)
     {
         WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
@@ -2960,23 +2991,6 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;
-}
-
-void Creature::applyInhabitFlags()
-{
-    if (IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
-    {
-        if (IsLevitating())
-        {
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-        }
-        else if (IsHovering())
-        {
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-        }
-        else
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
-    }
 }
 
 bool Creature::SetSwim(bool enable)
@@ -3016,7 +3030,7 @@ bool Creature::CanEnterWater() const
     if (CanSwim())
         return true;
 
-    return GetCreatureTemplate()->InhabitType & INHABIT_WATER;
+    return GetMovementTemplate().IsSwimAllowed();
 }
 
 void Creature::RefreshSwimmingFlag(bool recheck)
@@ -3061,14 +3075,6 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;
-}
-
-bool Creature::CanFly() const
-{
-    if (Unit::IsFlying())
-        return true;
-
-    return GetCreatureTemplate()->InhabitType & INHABIT_AIR;
 }
 
 bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
@@ -3131,22 +3137,6 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/)
 {
     if (!packetOnly && !Unit::SetHover(enable))
         return false;
-
-   applyInhabitFlags();
-
-   if (m_movedByPlayer)
-   {
-       WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
-       data << GetPackGUID();
-       data << uint32(0); //! movement counter
-       m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-
-       data.Initialize(MSG_MOVE_HOVER, 64);
-       data << GetPackGUID();
-       BuildMovementPacket(&data);
-       m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-       return true;
-   }
 
     if (!movespline->Initialized())
         return true;
@@ -3217,76 +3207,33 @@ void Creature::UpdateMovementFlags()
     if (info->flags_extra & CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE)
         return;
 
-    float z = GetPositionZ();
     float ground = GetFloorZ();
 
-    bool isInAir = false;
-    bool Swim = false;
-
     bool canHover = CanHover();
+    bool isInAir  = (G3D::fuzzyGt(GetPositionZ(), ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
 
-    LiquidData const& liquidData = GetLiquidData();
-    if (liquidData.Status == LIQUID_MAP_NO_WATER)
+    if (GetMovementTemplate().IsFlightAllowed() && isInAir && !IsFalling())
     {
-        if (ground > INVALID_HEIGHT)
-            isInAir = G3D::fuzzyGt(z, ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(z, ground - GROUND_HEIGHT_TOLERANCE); // Can be underground too, prevent the falling
+        if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly)
+            SetCanFly(true);
         else
-            isInAir = true;
+            SetDisableGravity(true);
+
+        if (!HasAuraType(SPELL_AURA_HOVER))
+            SetHover(false);
     }
     else
     {
-        switch (liquidData.Status)
-        {
-            case LIQUID_MAP_ABOVE_WATER:
-                isInAir = true;
-                break;
-            case LIQUID_MAP_WATER_WALK:
-                isInAir = true;
-                [[fallthrough]];
-            case LIQUID_MAP_IN_WATER:
-                Swim = z - liquidData.DepthLevel > GetCollisionHeight() * 0.75f; // Shallow water at ~75% of collision height
-                break;
-            case LIQUID_MAP_UNDER_WATER:
-                Swim = true;
-                break;
-            default:
-                break;
-        }
+        SetCanFly(false);
+        SetDisableGravity(false);
+        if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
+            SetHover(true);
     }
 
-    SetSwim(CanSwim() && Swim);
+    if (!isInAir)
+        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
-    if (info->InhabitType & INHABIT_AIR)
-    {
-        if (isInAir && !IsFalling())
-        {
-            if (info->InhabitType & INHABIT_GROUND)
-            {
-                SetCanFly(true);
-                SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-            }
-            else
-                SetDisableGravity(true);
-
-            if (!HasAuraType(SPELL_AURA_HOVER))
-                SetHover(false);
-        }
-        else
-        {
-            SetCanFly(false);
-            SetDisableGravity(false);
-
-            if (info->InhabitType & INHABIT_GROUND)
-            {
-                SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
-            }
-
-            if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
-                SetHover(true);
-        }
-    }
-    else if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY) && IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
-        SetHover(true);
+    SetSwim(CanSwim() && IsInWater());
 }
 
 void Creature::SetObjectScale(float scale)
