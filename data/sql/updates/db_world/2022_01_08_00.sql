@@ -1,3 +1,19 @@
+-- DB update 2022_01_07_04 -> 2022_01_08_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_07_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_07_04 2022_01_08_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1641660333161433796'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641660333161433796');
 
 -- Pathing for Timbermaw Woodbender Entry: 11553 "Incorrect"
@@ -158,3 +174,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,8,7031.818,-2119.0874,586.555,0,0,0,0,100,0);
 
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=0 WHERE `guid` IN (39717,39718,39722,39726,39356,39357,39358,40366);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_08_00' WHERE sql_rev = '1641660333161433796';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
