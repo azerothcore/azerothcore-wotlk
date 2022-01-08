@@ -25,6 +25,7 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "MiscPackets.h"
 
 /// Create the Weather object
 Weather::Weather(uint32 zone, WeatherData const* weatherChances)
@@ -186,12 +187,10 @@ bool Weather::ReGenerate()
     return m_type != old_type || m_grade != old_grade;
 }
 
-void Weather::SendWeatherUpdateToPlayer(Player*  /*player*/)
+void Weather::SendWeatherUpdateToPlayer(Player* player)
 {
-    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
-    data << uint32(GetWeatherState());
-    data << (float)m_grade;
-    data << uint8(0);
+    WorldPackets::Misc::Weather weather(GetWeatherState(), m_grade);
+    player->SendDirectMessage(weather.Write());
 }
 
 /// Send the new weather to all players in the zone
@@ -205,13 +204,10 @@ bool Weather::UpdateWeather()
 
     WeatherState state = GetWeatherState();
 
-    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
-    data << uint32(state);
-    data << (float)m_grade;
-    data << uint8(0);
+    WorldPackets::Misc::Weather weather(state, m_grade);
 
     //- Returns false if there were no players found to update
-    if (!sWorld->SendZoneMessage(m_zone, &data))
+    if (!sWorld->SendZoneMessage(m_zone, weather.Write()))
         return false;
 
     ///- Log the event
