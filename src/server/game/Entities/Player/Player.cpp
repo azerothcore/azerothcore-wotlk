@@ -5499,8 +5499,7 @@ void Player::SaveRecallPosition()
     m_recallO = GetOrientation();
 }
 
-// pussywizard!
-void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr)
+void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr) const
 {
     if (self)
         GetSession()->SendPacket(data);
@@ -5512,8 +5511,7 @@ void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, b
     Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-// pussywizard!
-void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self)
+void Player::SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const
 {
     if (self)
         GetSession()->SendPacket(data);
