@@ -190,10 +190,7 @@ public:
         {
             me->ResetLootMode();
             events.Reset();
-<<<<<<< Updated upstream
             aliveMinionsGUIDS.clear();
-=======
->>>>>>> Stashed changes
 
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
@@ -202,11 +199,7 @@ public:
 
                 for (auto summon : majordomoSummonsData)
                 {
-<<<<<<< Updated upstream
                     if (ObjectAccessor::GetCreature(*me, summon.guid))
-=======
-                    if (aliveMinionsGUIDS.find(summon.guid) != aliveMinionsGUIDS.end())
->>>>>>> Stashed changes
                     {
                         continue;
                     }
@@ -225,8 +218,6 @@ public:
                 majordomoSummonsData.clear();
                 summons.DespawnAll();
             }
-
-            aliveMinionsGUIDS.clear();
         }
 
         bool CanAIAttack(Unit const* /*target*/) const override
