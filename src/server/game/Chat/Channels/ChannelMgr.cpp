@@ -185,7 +185,7 @@ void ChannelMgr::LoadChannelRights()
             Tokenizer tokens(moderatorList, ' ');
             for (Tokenizer::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
             {
-                uint64 moderator_acc = atol(*i);
+                uint64 moderator_acc = atoul(*i);
                 if (moderator_acc && ((uint32)moderator_acc) == moderator_acc)
                     moderators.insert((uint32)moderator_acc);
             }

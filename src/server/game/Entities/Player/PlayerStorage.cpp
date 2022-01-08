@@ -4890,7 +4890,7 @@ void Player::_LoadEntryPointData(PreparedQueryResult result)
         Tokenizer tokens(taxi, ' ');
         for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
         {
-            uint32 node = uint32(atol(*iter));
+            uint32 node = atoul(*iter);
             m_entryPointData.taxiPath.push_back(node);
         }
 
@@ -6069,7 +6069,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                     Tokenizer GUIDlist(strGUID, ' ');
                     AllowedLooterSet looters;
                     for (Tokenizer::const_iterator itr = GUIDlist.begin(); itr != GUIDlist.end(); ++itr)
-                        looters.insert(ObjectGuid::Create<HighGuid::Player>(atol(*itr)));
+                        looters.insert(ObjectGuid::Create<HighGuid::Player>(atoul(*itr)));
 
                     if (looters.size() > 1 && item->GetTemplate()->GetMaxStackSize() == 1 && item->IsSoulBound())
                     {

@@ -48,6 +48,8 @@
 #define stricmp strcasecmp
 #endif
 
+inline unsigned long atoul(char const* str) { return strtoul(str, nullptr, 10); }
+
 #define STRINGIZE(a) #a
 
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
