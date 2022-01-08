@@ -547,7 +547,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     if (!changenth(line, 2, chraccount))        // characters.account update
                         ROLLBACK(DUMP_FILE_BROKEN);
 
-                    race = uint8(atoul(getnth(line, 4).c_str())); 
+                    race = uint8(atoul(getnth(line, 4).c_str()));
                     playerClass = uint8(atoul(getnth(line, 5).c_str()));
                     gender = uint8(atoul(getnth(line, 6).c_str()));
                     level = uint8(atoul(getnth(line, 7).c_str()));

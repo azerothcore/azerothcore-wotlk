@@ -782,13 +782,13 @@ void ObjectMgr::LoadCreatureTemplateAddons()
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(atoul(*itr));
             if (!AdditionalSpellInfo)
             {
-                LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong spell %u defined in `auras` field in `creature_template_addon`.", entry, atoul(*itr));
+                LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong spell %u defined in `auras` field in `creature_template_addon`.", entry, uint32(atoul(*itr)));
                 continue;
             }
 
             if (AdditionalSpellInfo->GetDuration() > 0)
             {
-                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, atoul(*itr));
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, uint32(atoul(*itr)));
                 // continue;
             }
 
@@ -1236,13 +1236,13 @@ void ObjectMgr::LoadCreatureAddons()
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(atoul(*itr));
             if (!AdditionalSpellInfo)
             {
-                LOG_ERROR("sql.sql", "Creature (GUID: %u) has wrong spell %u defined in `auras` field in `creature_addon`.", guid, atoul(*itr));
+                LOG_ERROR("sql.sql", "Creature (GUID: %u) has wrong spell %u defined in `auras` field in `creature_addon`.", guid, uint32(atoul(*itr)));
                 continue;
             }
 
             if (AdditionalSpellInfo->GetDuration() > 0)
             {
-                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, atoul(*itr));
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, uint32(atoul(*itr)));
                 // continue;
             }
 
