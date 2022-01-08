@@ -1475,6 +1475,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 delete targets;
                 break;
             }
+        case SMART_ACTION_ATTACK_STOP:
+            {
+                ObjectList* targets = GetTargets(e, unit);
+                if (!targets)
+                {
+                    break;
+                }
+
+                for (auto const& target : *targets)
+                {
+                    if (Unit* unitTarget = target->ToUnit())
+                    {
+                        unitTarget->AttackStop();
+                    }
+                }
+                break;
+            }
         case SMART_ACTION_SUMMON_CREATURE:
             {
                 ObjectList* targets = GetTargets(e, unit);
@@ -1705,24 +1722,24 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (IsCreature(*itr))
                         {
                             if (SmartAI* ai = CAST_AI(SmartAI, (*itr)->ToCreature()->AI()))
-                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
+                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
                             else
                                 LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartAI, skipping");
                         }
                         else if (IsGameObject(*itr))
                         {
                             if (SmartGameObjectAI* ai = CAST_AI(SmartGameObjectAI, (*itr)->ToGameObject()->AI()))
-                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
+                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
                             else
                                 LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartGameObjectAI, skipping");
                         }
                     }
-
                     delete targets;
                 }
                 else
-                    StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
-
+                {
+                    StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
+                }
                 break;
             }
         case SMART_ACTION_WP_START:
@@ -2484,6 +2501,26 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsGameObject(*itr))
                         (*itr)->ToGameObject()->SetLootState((LootState)e.action.setGoLootState.state);
+
+                delete targets;
+                break;
+            }
+        case SMART_ACTION_GO_SET_GO_STATE:
+            {
+                ObjectList* targets = GetTargets(e, unit);
+
+                if (!targets)
+                {
+                    break;
+                }
+
+                for (auto const& target : *targets)
+                {
+                    if (IsGameObject(target))
+                    {
+                        target->ToGameObject()->SetGoState((GOState)e.action.goState.state);
+                    }
+                }
 
                 delete targets;
                 break;
@@ -3275,6 +3312,67 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 CAST_AI(SmartAI, me->AI())->SetEvadeDisabled(e.action.disableEvade.disable != 0);
                 break;
             }
+        case SMART_ACTION_SET_CORPSE_DELAY:
+            {
+                ObjectList* targets = GetTargets(e, unit);
+                if (!targets)
+                {
+                    break;
+                }
+
+                for (auto const& target : *targets)
+                {
+                    if (IsCreature(target))
+                    {
+                        target->ToCreature()->SetCorpseDelay(e.action.corpseDelay.timer);
+                    }
+                }
+
+                delete targets;
+                break;
+            }
+        case SMART_ACTION_SET_HEALTH_PCT:
+            {
+                ObjectList* targets = GetTargets(e, unit);
+                if (!targets)
+                {
+                    break;
+                }
+
+                for (auto const& target : *targets)
+                {
+                    if (Unit* targetUnit = target->ToUnit())
+                    {
+                        targetUnit->SetHealth(targetUnit->CountPctFromMaxHealth(e.action.setHealthPct.percent));
+                    }
+                }
+
+                delete targets;
+                break;
+            }
+        case SMART_ACTION_SET_MOVEMENT_SPEED:
+            {
+                uint32 speedInteger = e.action.movementSpeed.speedInteger;
+                uint32 speedFraction = e.action.movementSpeed.speedFraction;
+                float speed = float(speedInteger) + float(speedFraction) / std::pow(10, std::floor(std::log10(float(speedFraction ? speedFraction : 1)) + 1));
+
+                ObjectList* targets = GetTargets(e, unit);
+                if (!targets)
+                {
+                    break;
+                }
+
+                for (auto const& target : *targets)
+                {
+                    if (IsCreature(target))
+                    {
+                        me->SetSpeed(UnitMoveType(e.action.movementSpeed.movementType), speed);
+                    }
+                }
+
+                delete targets;
+                break;
+            }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry %d SourceType %u, Event %u, Unhandled Action type %u", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -3711,29 +3809,39 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 break;
             }
         case SMART_TARGET_OWNER_OR_SUMMONER:
+            /*
+             * Owners/Summoners should be WorldObjects. This allows to have other objects
+             * such as gameobjects to execute SmartScripts using this type of target.
+             * Otherwise, only Units like creatures can summon other creatures.
+             */
             {
                 if (me)
                 {
-                    if (Unit* owner = ObjectAccessor::GetUnit(*me, me->GetCharmerOrOwnerGUID()))
+                    if (WorldObject* owner = ObjectAccessor::GetWorldObject(*me, me->GetCharmerOrOwnerGUID()))
+                    {
                         l->push_back(owner);
-                    // Xinef: dont add same unit twice
-                    else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit())
-                        l->push_back(me->ToTempSummon()->GetSummonerUnit());
+                    }
                 }
                 else if (go)
                 {
-                    if (Unit* owner = ObjectAccessor::GetUnit(*go, go->GetOwnerGUID()))
+                    if (WorldObject* owner = ObjectAccessor::GetWorldObject(*go, go->GetOwnerGUID()))
+                    {
                         l->push_back(owner);
+                    }
                 }
 
                 // xinef: Get owner of owner
                 if (e.target.owner.useCharmerOrOwner && !l->empty())
                 {
-                    Unit* owner = l->front()->ToUnit();
-                    l->clear();
+                    if (Unit* owner = l->front()->ToUnit())
+                    {
+                        l->clear();
 
-                    if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->GetCharmerOrOwnerGUID()))
-                        l->push_back(base);
+                        if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->GetCharmerOrOwnerGUID()))
+                        {
+                            l->push_back(base);
+                        }
+                    }
                 }
                 break;
             }
@@ -3834,6 +3942,29 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     }
                 }
                 break;
+            }
+        case SMART_TARGET_LOOT_RECIPIENTS:
+            {
+                if (me)
+                {
+                    if (Group* lootGroup = me->GetLootRecipientGroup())
+                    {
+                        for (GroupReference* it = lootGroup->GetFirstMember(); it != nullptr; it = it->next())
+                        {
+                            if (Player* recipient = it->GetSource())
+                            {
+                                l->push_back(recipient);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (Player* recipient = me->GetLootRecipient())
+                        {
+                            l->push_back(recipient);
+                        }
+                    }
+                }
             }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
@@ -4125,9 +4256,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 //if range is ok and we are actually in LOS
                 if (me->IsWithinDistInMap(unit, range) && me->IsWithinLOSInMap(unit))
                 {
+                    SmartEvent::LOSHostilityMode hostilityMode = static_cast<SmartEvent::LOSHostilityMode>(e.event.los.hostilityMode);
                     //if friendly event&&who is not hostile OR hostile event&&who is hostile
-                    if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
-                            (!e.event.los.noHostile && me->IsHostileTo(unit)))
+                    if ((hostilityMode == SmartEvent::LOSHostilityMode::Any) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::NotHostile && !me->IsHostileTo(unit)) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::Hostile && me->IsHostileTo(unit)))
                     {
                         if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
                             return;
@@ -4147,9 +4280,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 //if range is ok and we are actually in LOS
                 if (me->IsWithinDistInMap(unit, range) && me->IsWithinLOSInMap(unit))
                 {
+                    SmartEvent::LOSHostilityMode hostilityMode = static_cast<SmartEvent::LOSHostilityMode>(e.event.los.hostilityMode);
                     //if friendly event&&who is not hostile OR hostile event&&who is hostile
-                    if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
-                            (!e.event.los.noHostile && me->IsHostileTo(unit)))
+                    if ((hostilityMode == SmartEvent::LOSHostilityMode::Any) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::NotHostile && !me->IsHostileTo(unit)) ||
+                        (hostilityMode == SmartEvent::LOSHostilityMode::Hostile && me->IsHostileTo(unit)))
                     {
                         if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
                             return;
@@ -4171,6 +4306,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 break;
             }
         case SMART_EVENT_SUMMONED_UNIT:
+        case SMART_EVENT_SUMMONED_UNIT_DIES:
             {
                 if (!IsCreature(unit))
                     return;
