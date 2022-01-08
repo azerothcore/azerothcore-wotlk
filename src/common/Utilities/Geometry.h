@@ -34,7 +34,7 @@
     auto dx = destX - startX;
     auto dy = destY - startY;
 
-    auto ang = atan2(dy, dx);
+    auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * float(M_PI) + ang;
     return ang;
 }
@@ -42,12 +42,12 @@
 [[nodiscard]] inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
     float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX, 2.0f));
-    return atan(abs(destZ - startZ) / abs(floorDist));
+    return atan(std::abs(destZ - startZ) / std::abs(floorDist));
 }
 
 [[nodiscard]] inline float getSlopeAngleAbs(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    return abs(getSlopeAngle(startX, startY, startZ, destX, destY, destZ));
+    return std::abs(getSlopeAngle(startX, startY, startZ, destX, destY, destZ));
 }
 
 [[nodiscard]] inline double getCircleAreaByRadius(double radius)

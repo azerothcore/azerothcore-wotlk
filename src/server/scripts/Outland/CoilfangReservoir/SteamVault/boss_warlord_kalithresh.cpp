@@ -105,7 +105,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_IMPALE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
                         me->CastSpell(target, SPELL_IMPALE, false);
                     events.RepeatEvent(urand(7500, 12500));
                     break;

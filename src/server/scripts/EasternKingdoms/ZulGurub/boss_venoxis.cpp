@@ -210,7 +210,7 @@ public:
 
                         for (uint8 i = 0; i < 10; ++i)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, i))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, i))
                                 // check if target is within melee-distance
                                 if (me->IsWithinMeleeRange(target))
                                     ++_inMeleeRange;
@@ -223,12 +223,12 @@ public:
                         events.ScheduleEvent(EVENT_HOLY_NOVA, urand(45000, 75000), 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_FIRE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_HOLY_FIRE);
                         events.ScheduleEvent(EVENT_HOLY_FIRE, urand(45000, 60000), 0, PHASE_ONE);
                         break;
                     case EVENT_HOLY_WRATH:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_HOLY_WRATH);
                         events.ScheduleEvent(EVENT_HOLY_WRATH, urand(45000, 60000), 0, PHASE_ONE);
                         break;
@@ -238,17 +238,17 @@ public:
                     //
 
                     case EVENT_VENOM_SPIT:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_VENOM_SPIT);
                         events.ScheduleEvent(EVENT_VENOM_SPIT, urand(5000, 15000), 0, PHASE_TWO);
                         break;
                     case EVENT_POISON_CLOUD:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_POISON_CLOUD);
                         events.ScheduleEvent(EVENT_POISON_CLOUD, urand(15000, 20000), 0, PHASE_TWO);
                         break;
                     case EVENT_PARASITIC_SERPENT:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                             DoCast(target, SPELL_SUMMON_PARASITIC_SERPENT);
                         events.ScheduleEvent(EVENT_PARASITIC_SERPENT, 15000, 0, PHASE_TWO);
                         break;

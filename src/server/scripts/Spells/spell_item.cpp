@@ -3489,6 +3489,28 @@ class spell_item_recall : public SpellScript
     }
 };
 
+// 16414 - Drain Life
+class spell_item_wraith_scythe_drain_life : public SpellScript
+{
+    PrepareSpellScript(spell_item_wraith_scythe_drain_life);
+
+    void CalculateDamage()
+    {
+        Unit* target = GetHitUnit();
+        Unit* caster = GetCaster();
+        if (target && caster)
+        {
+            uint32 sp = caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_ALL);
+            SetHitDamage(GetHitDamage() + sp);
+        }
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_item_wraith_scythe_drain_life::CalculateDamage);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -3596,4 +3618,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_goblin_bomb);
     RegisterSpellScript(spell_item_linken_boomerang);
     RegisterSpellScript(spell_item_recall);
+    RegisterSpellScript(spell_item_wraith_scythe_drain_life);
 }

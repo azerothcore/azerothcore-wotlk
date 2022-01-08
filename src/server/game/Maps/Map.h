@@ -60,6 +60,8 @@ class StaticTransport;
 class MotionTransport;
 class PathGenerator;
 
+enum WeatherState : uint32;
+
 namespace Acore
 {
     struct ObjectUpdater;
@@ -271,13 +273,13 @@ enum LevelRequirementVsMode
 
 struct ZoneDynamicInfo
 {
-    ZoneDynamicInfo()  { }
+    ZoneDynamicInfo();
 
-    uint32 MusicId{0};
-    uint32 WeatherId{0};
-    float WeatherGrade{0.0f};
-    uint32 OverrideLightId{0};
-    uint32 LightFadeInTime{0};
+    uint32 MusicId;
+    WeatherState WeatherId;
+    float WeatherGrade;
+    uint32 OverrideLightId;
+    uint32 LightFadeInTime;
 };
 
 #if defined(__GNUC__)
@@ -488,7 +490,7 @@ public:
 
     void UpdateIteratorBack(Player* player);
 
-    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
+    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, WorldObject* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
@@ -597,7 +599,7 @@ public:
 
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
-    void SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade);
+    void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
     void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
 
     // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
