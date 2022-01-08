@@ -1167,6 +1167,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY]          = sConfigMgr->GetOption<bool> ("Arena.QueueAnnouncer.PlayerOnly", false);
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetOption<bool>("OffhandCheckAtSpellUnlearn", true);
+    m_int_configs[CONFIG_CREATURE_STOP_FOR_PLAYER]                   = sConfigMgr->GetOption<int32>("Creature.MovingStopTimeForPlayer", 3 * MINUTE * IN_MILLISECONDS);
 
     if (int32 clientCacheId = sConfigMgr->GetOption<int32>("ClientCacheVersion", 0))
     {
@@ -1687,6 +1688,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Creature Addon Data...");
     sObjectMgr->LoadCreatureAddons();                            // must be after LoadCreatureTemplates() and LoadCreatures()
+
+    LOG_INFO("server.loading", "Loading Creature Movement Overrides...");
+    sObjectMgr->LoadCreatureMovementOverrides(); // must be after LoadCreatures()
 
     LOG_INFO("server.loading", "Loading Gameobject Data...");
     sObjectMgr->LoadGameobjects();
@@ -2482,7 +2486,7 @@ void World::ForceGameEventUpdate()
 }
 
 /// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     SessionMap::const_iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -2499,7 +2503,7 @@ void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, TeamId te
 }
 
 /// Send a packet to all GMs (except self if mentioned)
-void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     SessionMap::iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -2664,7 +2668,7 @@ void World::SendGlobalText(const char* text, WorldSession* self)
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-bool World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self, TeamId teamId)
+bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     bool foundPlayerToSend = false;
     SessionMap::const_iterator itr;
@@ -3426,7 +3430,7 @@ uint32 World::GetNextWhoListUpdateDelaySecs()
     uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
     t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
 
-    return uint32(ceil(t / 1000.0f));
+    return uint32(std::ceil(t / 1000.0f));
 }
 
 void World::FinalizePlayerWorldSession(WorldSession* session)
