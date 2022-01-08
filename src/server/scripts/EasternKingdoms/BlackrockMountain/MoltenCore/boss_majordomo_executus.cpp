@@ -192,18 +192,14 @@ public:
             events.Reset();
             aliveMinionsGUIDS.clear();
 
+            majordomoSummonsData.remove_if([this](MajordomoAddData data) { return ObjectAccessor::GetCreature(*me, data.guid); });
+
             if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
                 events.SetPhase(PHASE_COMBAT);
-                instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
 
                 for (auto summon : majordomoSummonsData)
                 {
-                    if (ObjectAccessor::GetCreature(*me, summon.guid))
-                    {
-                        continue;
-                    }
-
                     if (Creature* spawn = me->SummonCreature(summon.creatureEntry, summon.spawnPos))
                     {
                         static_minionsGUIDS.erase(summon.guid); // Erase the guid from the previous, no longer existing, spawn.
@@ -211,6 +207,8 @@ public:
                         summon.guid = spawn->GetGUID();
                     }
                 }
+
+                instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
             }
             else
             {
