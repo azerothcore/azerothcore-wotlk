@@ -3623,6 +3623,14 @@ LFG.KickPreventionTimer = 900
 EnablePlayerSettings = 0
 
 #
+#     Allow.Join.BG.And.LFG
+#        Description: Allow join BG and LFG in the same time.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+
+Allow.Join.BG.And.LFG = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
