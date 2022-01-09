@@ -8655,7 +8655,7 @@ Pet* Player::GetPet() const
         if (!pet)
             return nullptr;
 
-        if (IsInWorld() && pet)
+        if (IsInWorld())
             return pet;
 
         //there may be a guardian in slot
@@ -13365,7 +13365,7 @@ void Player::AddKnownCurrency(uint32 itemId)
 void Player::UnsummonPetTemporaryIfAny()
 {
     Pet* pet = GetPet();
-    if (!pet || !pet->IsInWorld())
+    if (!pet)
         return;
 
     if (!m_temporaryUnsummonedPetNumber && pet->isControlled() && !pet->isTemporarySummoned())
