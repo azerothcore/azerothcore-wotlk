@@ -446,8 +446,8 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     SetSpeed(MOVE_WALK, cinfo->speed_walk);
     SetSpeed(MOVE_RUN, runSpeed);
-    SetSpeed(MOVE_SWIM, 1.0f);      // using 1.0 rate
-    SetSpeed(MOVE_FLIGHT, 1.0f);    // using 1.0 rate
+    SetSpeed(MOVE_SWIM, cinfo->speed_swim);
+    SetSpeed(MOVE_FLIGHT, cinfo->speed_flight);
 
     // Will set UNIT_FIELD_BOUNDINGRADIUS and UNIT_FIELD_COMBATREACH
     SetObjectScale(cinfo->scale);
