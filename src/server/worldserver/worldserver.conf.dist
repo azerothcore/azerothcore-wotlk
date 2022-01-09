@@ -3624,7 +3624,7 @@ EnablePlayerSettings = 0
 
 #
 #     Allow.Join.BG.And.LFG
-#        Description: Allow join BG and LFG in the same time.
+#        Description: Allow queueing for BG and LFG at the same time.
 #        Default:     0 - Disabled
 #                     1 - Enabled
 
