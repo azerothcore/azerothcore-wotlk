@@ -1914,7 +1914,7 @@ void Creature::Respawn(bool force)
         SelectLevel();
 
         setDeathState(JUST_RESPAWNED);
-        // MDic - Acid_manifesto
+        // MDic - Acidmanifesto
         // If creature has genders it will consider gender changing on respawn.
         if (sObjectMgr->GetCreatureTemplate(m_originalEntry))
         {
