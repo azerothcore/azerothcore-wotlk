@@ -3750,6 +3750,41 @@ void Spell::_cast(bool skipCheck)
         handle_immediate();
     }
 
+    if (IsAutoActionResetSpell())
+    {
+        bool found = false;
+        Unit::AuraEffectList const& vIgnoreReset = m_caster->GetAuraEffectsByType(SPELL_AURA_IGNORE_MELEE_RESET);
+        for (Unit::AuraEffectList::const_iterator i = vIgnoreReset.begin(); i != vIgnoreReset.end(); ++i)
+        {
+            if ((*i)->IsAffectedOnSpell(m_spellInfo))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found && !m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
+        {
+            bool allow = true;
+            if (m_casttime == 0 && m_spellInfo->CalcCastTime())
+            {
+                allow = false;
+            }
+
+            if (allow)
+            {
+                m_caster->resetAttackTimer(BASE_ATTACK);
+
+                if (m_caster->haveOffhandWeapon())
+                {
+                    m_caster->resetAttackTimer(OFF_ATTACK);
+                }
+
+                m_caster->resetAttackTimer(RANGED_ATTACK);
+            }
+        }
+    }
+
     CallScriptAfterCastHandlers();
 
     if (modOwner)
@@ -4153,34 +4188,6 @@ void Spell::finish(bool ok)
             LOG_DEBUG("spells.aura", "Statue %s is unsummoned in spell %d finish", m_caster->GetGUID().ToString().c_str(), m_spellInfo->Id);
             m_caster->setDeathState(JUST_DIED);
             return;
-        }
-    }
-
-    if (IsAutoActionResetSpell())
-    {
-        bool found = false;
-        Unit::AuraEffectList const& vIgnoreReset = m_caster->GetAuraEffectsByType(SPELL_AURA_IGNORE_MELEE_RESET);
-        for (Unit::AuraEffectList::const_iterator i = vIgnoreReset.begin(); i != vIgnoreReset.end(); ++i)
-        {
-            if ((*i)->IsAffectedOnSpell(m_spellInfo))
-            {
-                found = true;
-                break;
-            }
-        }
-        if (!found && !m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
-        {
-            bool allow = true;
-            if (m_casttime == 0 && m_spellInfo->CalcCastTime())
-                allow = false;
-
-            if (allow)
-            {
-                m_caster->resetAttackTimer(BASE_ATTACK);
-                if (m_caster->haveOffhandWeapon())
-                    m_caster->resetAttackTimer(OFF_ATTACK);
-                m_caster->resetAttackTimer(RANGED_ATTACK);
-            }
         }
     }
 
