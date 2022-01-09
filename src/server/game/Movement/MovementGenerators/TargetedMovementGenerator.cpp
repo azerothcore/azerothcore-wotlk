@@ -308,23 +308,23 @@ static Position const PredictPosition(Unit* target)
     if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))
     {
         pos.m_positionX += cos(orientation) * speed;
-        pos.m_positionY += sin(orientation) * speed;
+        pos.m_positionY += std::sin(orientation) * speed;
     }
     else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_BACKWARD))
     {
         pos.m_positionX -= cos(orientation) * speed;
-        pos.m_positionY -= sin(orientation) * speed;
+        pos.m_positionY -= std::sin(orientation) * speed;
     }
 
     if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
     {
         pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
-        pos.m_positionY += sin(orientation + M_PI / 2.f) * speed;
+        pos.m_positionY += std::sin(orientation + M_PI / 2.f) * speed;
     }
     else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
     {
         pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
-        pos.m_positionY += sin(orientation - M_PI / 2.f) * speed;
+        pos.m_positionY += std::sin(orientation - M_PI / 2.f) * speed;
     }
 
     return pos;

@@ -636,7 +636,7 @@ void OpcodeTable::Initialize()
     /*0x1F9*/ DEFINE_HANDLER(CMSG_GM_SET_SECURITY_GROUP,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x1FA*/ DEFINE_HANDLER(CMSG_GM_NUKE,                                                          STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x1FB*/ DEFINE_HANDLER(MSG_RANDOM_ROLL,                                                       STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleRandomRollOpcode                   );
-    /*0x1FC*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_ENVIRONMENTALDAMAGELOG,                             STATUS_NEVER);
+    /*0x1FC*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_ENVIRONMENTAL_DAMAGE_LOG,                           STATUS_NEVER);
     /*0x1FD*/ DEFINE_HANDLER(CMSG_CHANGEPLAYER_DIFFICULTY,                                          STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x1FE*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_RWHOIS,                                             STATUS_NEVER);
     /*0x1FF*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LFG_PLAYER_REWARD,                                  STATUS_NEVER);
@@ -785,7 +785,7 @@ void OpcodeTable::Initialize()
     /*0x28E*/ DEFINE_HANDLER(CMSG_GROUP_RAID_CONVERT,                                               STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGroupRaidConvertOpcode             );
     /*0x28F*/ DEFINE_HANDLER(CMSG_GROUP_ASSISTANT_LEADER,                                           STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGroupAssistantLeaderOpcode         );
     /*0x290*/ DEFINE_HANDLER(CMSG_BUYBACK_ITEM,                                                     STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleBuybackItem                        );
-    /*0x291*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SERVER_MESSAGE,                                     STATUS_NEVER);
+    /*0x291*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_CHAT_SERVER_MESSAGE,                                STATUS_NEVER);
     /*0x292*/ DEFINE_HANDLER(CMSG_SET_SAVED_INSTANCE_EXTEND,                                        STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleSetSavedInstanceExtend             );
     /*0x293*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LFG_OFFER_CONTINUE,                                 STATUS_NEVER);
     /*0x294*/ DEFINE_HANDLER(CMSG_TEST_DROP_RATE,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
