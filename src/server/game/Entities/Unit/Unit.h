@@ -1031,7 +1031,7 @@ struct UnitActionBarEntry
     }
 };
 
-typedef std::set<Player*> SharedVisionList;
+typedef std::list<Player*> SharedVisionList;
 
 enum CharmType
 {
@@ -1499,7 +1499,7 @@ public:
     void TriggerAurasProcOnEvent(std::list<AuraApplication*>* myProcAuras, std::list<AuraApplication*>* targetProcAuras, Unit* actionTarget, uint32 typeMaskActor, uint32 typeMaskActionTarget, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* spell, DamageInfo* damageInfo, HealInfo* healInfo);
     void TriggerAurasProcOnEvent(ProcEventInfo& eventInfo, std::list<AuraApplication*>& procAuras);
 
-    void HandleEmoteCommand(uint32 anim_id);
+    void HandleEmoteCommand(uint32 emoteId);
     void AttackerStateUpdate (Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false);
 
     void CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK, const bool sittingVictim = false);
@@ -2180,10 +2180,13 @@ public:
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
     [[nodiscard]] const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
+    [[nodiscard]] virtual MovementGeneratorType GetDefaultMovementType() const;
 
     [[nodiscard]] bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
     void StopMoving();
     void StopMovingOnCurrentPos();
+    virtual void PauseMovement(uint32 timer = 0, uint8 slot = 0); // timer in ms
+    void ResumeMovement(uint32 timer = 0, uint8 slot = 0);
 
     void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
     void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
@@ -2201,8 +2204,19 @@ public:
     void DisableRotate(bool apply);
     void DisableSpline();
 
-    void AddComboPointHolder(ObjectGuid lowguid) { m_ComboPointHolders.insert(lowguid); }
-    void RemoveComboPointHolder(ObjectGuid lowguid) { m_ComboPointHolders.erase(lowguid); }
+    ///-----------Combo point system-------------------
+       // This unit having CP on other units
+    [[nodiscard]] uint8 GetComboPoints(Unit const* who = nullptr) const { return (who && m_comboTarget != who) ? 0 : m_comboPoints; }
+    [[nodiscard]] uint8 GetComboPoints(ObjectGuid const& guid) const { return (m_comboTarget && m_comboTarget->GetGUID() == guid) ? m_comboPoints : 0; }
+    [[nodiscard]] Unit* GetComboTarget() const { return m_comboTarget; }
+    [[nodiscard]] ObjectGuid const GetComboTargetGUID() const { return m_comboTarget ? m_comboTarget->GetGUID() : ObjectGuid::Empty; }
+    void AddComboPoints(Unit* target, int8 count);
+    void AddComboPoints(int8 count) { AddComboPoints(nullptr, count); }
+    void ClearComboPoints();
+    void SendComboPoints();
+    // Other units having CP on this unit
+    void AddComboPointHolder(Unit* unit) { m_ComboPointHolders.insert(unit); }
+    void RemoveComboPointHolder(Unit* unit) { m_ComboPointHolders.erase(unit); }
     void ClearComboPointHolders();
 
     ///----------Pet responses methods-----------------
@@ -2460,6 +2474,7 @@ private:
     [[nodiscard]] float GetCombatRatingReduction(CombatRating cr) const;
     [[nodiscard]] uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;
 
+protected:
     void SetFeared(bool apply);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
@@ -2467,6 +2482,7 @@ private:
 
     uint32 m_rootTimes;
 
+private:
     uint32 m_state;                                     // Even derived shouldn't modify
     uint32 m_CombatTimer;
     uint32 m_lastManaUse;                               // msecs
@@ -2477,9 +2493,10 @@ private:
     HostileRefMgr m_HostileRefMgr;
 
     FollowerRefMgr m_FollowingRefMgr;
-    Unit* m_comboTarget;
 
-    ComboPointHolderSet m_ComboPointHolders;
+    Unit* m_comboTarget;
+    int8 m_comboPoints;
+    std::unordered_set<Unit*> m_ComboPointHolders;
 
     RedirectThreatInfo _redirectThreatInfo;
 
