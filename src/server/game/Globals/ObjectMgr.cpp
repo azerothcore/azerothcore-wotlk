@@ -2042,7 +2042,7 @@ void ObjectMgr::LoadCreatures()
         data.npcflag            = fields[18].GetUInt32();
         data.unit_flags         = fields[19].GetUInt32();
         data.dynamicflags       = fields[20].GetUInt32();
-        data.ScriptId           = GetScriptId(fields[22].GetString());
+        data.ScriptId           = GetScriptId(fields[21].GetString());
 
         if (!data.ScriptId)
             data.ScriptId = cInfo->ScriptID;
