@@ -1582,13 +1582,6 @@ public:
     void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
     void SetSelection(ObjectGuid guid);
 
-    [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
-    [[nodiscard]] ObjectGuid GetComboTarget() const { return m_comboTarget; }
-
-    void AddComboPoints(Unit* target, int8 count);
-    void ClearComboPoints();
-    void SendComboPoints();
-
     void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0);
     void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
@@ -1976,10 +1969,10 @@ public:
 
     void ProcessTerrainStatusUpdate() override;
 
-    void SendMessageToSet(WorldPacket* data, bool self) override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
-    void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
-    void SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self); // pussywizard! param includeMargin not needed here
-    void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
+    void SendMessageToSet(WorldPacket const* data, bool self) const override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
+    void SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const; // pussywizard! param includeMargin not needed here
+    void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
 
     void SendTeleportAckPacket();
 
@@ -2562,9 +2555,6 @@ public:
     void PrepareCharmAISpells();
     uint32 m_charmUpdateTimer;
 
-    int8 GetComboPointGain() { return m_comboPointGain; }
-    void SetComboPointGain(int8 combo) { m_comboPointGain = combo; }
-
     bool NeedToSaveGlyphs() { return m_NeedToSaveGlyphs; }
     void SetNeedToSaveGlyphs(bool val) { m_NeedToSaveGlyphs = val; }
 
@@ -2610,8 +2600,6 @@ public:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
-    // Combo Points
-    int8 m_comboPointGain;
     // Performance Varibales
     bool m_NeedToSaveGlyphs;
     // Mount block bug
@@ -2752,9 +2740,6 @@ public:
     bool m_itemUpdateQueueBlocked;
 
     uint32 m_ExtraFlags;
-
-    ObjectGuid m_comboTarget;
-    int8 m_comboPoints;
 
     QuestStatusMap m_QuestStatus;
     QuestStatusSaveMap m_QuestStatusSave;
