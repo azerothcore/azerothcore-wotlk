@@ -565,7 +565,6 @@ uint32 ChatHandler::extractSpellIdFromLink(char* text)
                 if (rank >= MAX_TALENT_RANK)
                     return 0;
 
-
                 return talentEntry->RankID[rank];
             }
         case SPELL_LINK_ENCHANT:
