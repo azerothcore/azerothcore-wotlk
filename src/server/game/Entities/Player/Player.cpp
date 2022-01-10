@@ -8951,30 +8951,30 @@ bool Player::IsExistPet()
     return petStable && (petStable->CurrentPet || petStable->GetUnslottedHunterPet());
 }
 
-bool Player::CreatePet(Creature* creatureTarget, uint32 spellID /*= 0*/)
+Pet* Player::CreatePet(Creature* creatureTarget, uint32 spellID /*= 0*/)
 {
     if (IsExistPet())
     {
-        return false;
+        return nullptr;
     }
 
     if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
     {
-        return false;
+        return nullptr;
     }
 
     CreatureTemplate const* creatrueTemplate = sObjectMgr->GetCreatureTemplate(creatureTarget->GetEntry());
     if (!creatrueTemplate->family)
     {
         // Creatures with family 0 crashes the server
-        return false;
+        return nullptr;
     }
 
     // Everything looks OK, create new pet
     Pet* pet = CreateTamedPetFrom(creatureTarget, spellID);
     if (!pet)
     {
-        return false;
+        return nullptr;
     }
 
     // "kill" original creature
@@ -9000,28 +9000,28 @@ bool Player::CreatePet(Creature* creatureTarget, uint32 spellID /*= 0*/)
     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
     PetSpellInitialize();
 
-    return true;
+    return pet;
 }
 
-bool Player::CreatePet(uint32 creatureEntry, uint32 spellID /*= 0*/)
+Pet* Player::CreatePet(uint32 creatureEntry, uint32 spellID /*= 0*/)
 {
     if (IsExistPet())
     {
-        return false;
+        return nullptr;
     }
 
     CreatureTemplate const* creatrueTemplate = sObjectMgr->GetCreatureTemplate(creatureEntry);
     if (!creatrueTemplate->family)
     {
         // Creatures with family 0 crashes the server
-        return false;
+        return nullptr;
     }
 
     // Everything looks OK, create new pet
     Pet* pet = CreateTamedPetFrom(creatureEntry, spellID);
     if (!pet)
     {
-        return false;
+        return nullptr;
     }
 
     // prepare visual effect for levelup
@@ -9041,7 +9041,7 @@ bool Player::CreatePet(uint32 creatureEntry, uint32 spellID /*= 0*/)
     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
     PetSpellInitialize();
 
-    return true;
+    return pet;
 }
 
 void Player::StopCastingCharm()

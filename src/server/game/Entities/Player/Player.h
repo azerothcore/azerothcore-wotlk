@@ -1175,8 +1175,8 @@ public:
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     bool CanPetResurrect();
     bool IsExistPet();
-    bool CreatePet(Creature* creatureTarget, uint32 spellID = 0);
-    bool CreatePet(uint32 creatureEntry, uint32 spellID = 0);
+    Pet* CreatePet(Creature* creatureTarget, uint32 spellID = 0);
+    Pet* CreatePet(uint32 creatureEntry, uint32 spellID = 0);
 
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
