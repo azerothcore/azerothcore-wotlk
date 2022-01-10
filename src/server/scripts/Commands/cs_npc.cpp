@@ -670,7 +670,7 @@ public:
                 Field* fields = result->Fetch();
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
-                uint32 entry2 = fields[2].GetUInt32();
+                //uint32 entry2 = fields[2].GetUInt32();
                 float x = fields[3].GetFloat();
                 float y = fields[4].GetFloat();
                 float z = fields[5].GetFloat();
