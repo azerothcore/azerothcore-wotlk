@@ -19,6 +19,7 @@
 #include "AccountMgr.h"
 #include "Log.h"
 #include "soapH.h"
+#include "World.h"
 #include "soapStub.h"
 #include "Realm.h"
 #include "World.h"

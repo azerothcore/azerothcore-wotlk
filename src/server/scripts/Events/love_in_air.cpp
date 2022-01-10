@@ -330,7 +330,7 @@ struct npc_love_in_air_hummel : public ScriptedAI
             speachTimer = 1;
     }
 
-    void JustDied(Unit* ) override
+    void JustDied(Unit* /*killer*/) override
     {
         me->AI()->Talk(SAY_HUMMEL_5);
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -465,7 +465,7 @@ struct npc_love_in_air_hummel_helper : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* ) override
+    void JustDied(Unit* /*killer*/) override
     {
         me->AI()->Talk(SAY_HUMMEL_HELPER_SAY_5);
     }
@@ -490,7 +490,7 @@ struct npc_love_in_air_hummel_helper : public ScriptedAI
                 events.RepeatEvent(12000);
                 break;
             case EVENT_SPELL_THROW:
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                 {
                     Position pos(*me);
                     me->Relocate(target);

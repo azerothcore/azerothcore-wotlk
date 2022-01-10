@@ -346,7 +346,7 @@ public:
                     events.RepeatEvent(15000);
                     return;
                 case EVENT_PUNISH:
-                    if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 45.0f, true))
+                    if (!SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
                     {
                         me->CastSpell(me, TABLE_SPELL_PUNISH[horsemanId], false);
                         Talk(EMOTE_RAGECAST);
@@ -361,7 +361,7 @@ public:
 
             if ((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK))
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 45.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
                 {
                     me->CastSpell(target, RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
                 }
