@@ -508,7 +508,7 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
-                uint32 entry2 = fields[2].GetUInt32();
+                //uint32 entry2 = fields[2].GetUInt32();
                 uint16 event_id = fields[3].GetUInt8();
 
                 if (event_id >= mGameEventModelEquip.size())
