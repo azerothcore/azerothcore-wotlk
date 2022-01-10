@@ -15442,7 +15442,6 @@ Guild* Player::GetGuild() const
     return guildId ? sGuildMgr->GetGuildById(guildId) : nullptr;
 }
 
-
 uint32 Player::GetSpec(int8 spec)
 {
     uint32 mostTalentTabId = 0;
