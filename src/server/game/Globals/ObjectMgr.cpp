@@ -2037,7 +2037,11 @@ void ObjectMgr::LoadCreatures()
             LOG_ERROR("sql.sql", "Table `creature` chance_id1 (Value: %u) must be greater than 0 and less than or equal to 100, skipped.", chance);
             continue;
         }
-
+        if (chance == 100 && id2)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has spawnid = %u chance = 100 even though creature_id2 has an entry. changed to 50.", spawnId);
+            chance = 50;
+        }
         CreatureData& data      = _creatureDataStore[spawnId];
         data.id                 = id;
         data.id2                = id2;
