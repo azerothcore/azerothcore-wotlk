@@ -2032,7 +2032,7 @@ void ObjectMgr::LoadCreatures()
             LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in creature_id2 field, skipped.", spawnId, id2);
             continue;
         }
-        if (chance <= 0 || chance > 100)
+        if (!chance || chance > 100)
         {
             LOG_ERROR("sql.sql", "Table `creature` chance_id1 (Value: %u) must be greater than 0 and less than or equal to 100, skipped.", chance);
             continue;
