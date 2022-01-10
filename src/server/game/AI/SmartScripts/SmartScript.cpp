@@ -257,126 +257,120 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             break;
         }
         case SMART_ACTION_MUSIC:
+        {
+            ObjectVector targets;
+
+            if (e.action.music.type > 0)
             {
-                ObjectList* targets = nullptr;
-
-                if (e.action.music.type > 0)
+                if (me && me->FindMap())
                 {
-                    if (me && me->FindMap())
-                    {
-                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                        targets = new ObjectList();
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
 
-                        if (!players.isEmpty())
-                        {
-                            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-                                if (Player* player = i->GetSource())
+                    if (!players.isEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                            if (Player* player = i->GetSource())
+                            {
+                                if (player->GetZoneId() == me->GetZoneId())
                                 {
-                                    if (player->GetZoneId() == me->GetZoneId())
+                                    if (e.action.music.type > 1)
                                     {
-                                        if (e.action.music.type > 1)
-                                        {
-                                            if (player->GetAreaId() == me->GetAreaId())
-                                                targets->push_back(player);
-                                        }
-                                        else
-                                            targets->push_back(player);
+                                        if (player->GetAreaId() == me->GetAreaId())
+                                            targets.push_back(player);
                                     }
+                                    else
+                                        targets.push_back(player);
                                 }
-                        }
+                            }
                     }
                 }
-                else
-                    targets = GetTargets(e, unit);
-
-                if (targets)
-                {
-                    for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-                    {
-                        if (IsUnit(*itr))
-                        {
-                            (*itr)->SendPlayMusic(e.action.music.sound, e.action.music.onlySelf > 0);
-                            LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_MUSIC: target: %s (%s), sound: %u, onlySelf: %u, type: %u",
-                                           (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), e.action.music.sound, e.action.music.onlySelf, e.action.music.type);
-                        }
-                    }
-
-                    delete targets;
-                }
-                break;
             }
+            else
+                GetTargets(targets, e);
+
+            if (!targets.empty())
+            {
+                for (WorldObject* target : targets)
+                {
+                    if (IsUnit(target))
+                    {
+                        target->SendPlayMusic(e.action.music.sound, e.action.music.onlySelf > 0);
+                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_MUSIC: target: %s (%s), sound: %u, onlySelf: %u, type: %u",
+                                       target->GetName().c_str(), target->GetGUID().ToString().c_str(), e.action.music.sound, e.action.music.onlySelf, e.action.music.type);
+                    }
+                }
+            }
+            break;
+        }
         case SMART_ACTION_RANDOM_MUSIC:
+        {
+            ObjectVector targets;
+
+            if (e.action.randomMusic.type > 0)
             {
-                ObjectList* targets = nullptr;
-
-                if (e.action.randomMusic.type > 0)
+                if (me && me->FindMap())
                 {
-                    if (me && me->FindMap())
-                    {
-                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                        targets = new ObjectList();
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
 
-                        if (!players.isEmpty())
-                        {
-                            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-                                if (Player* player = i->GetSource())
+                    if (!players.isEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                            if (Player* player = i->GetSource())
+                            {
+                                if (player->GetZoneId() == me->GetZoneId())
                                 {
-                                    if (player->GetZoneId() == me->GetZoneId())
+                                    if (e.action.randomMusic.type > 1)
                                     {
-                                        if (e.action.randomMusic.type > 1)
-                                        {
-                                            if (player->GetAreaId() == me->GetAreaId())
-                                                targets->push_back(player);
-                                        }
-                                        else
-                                            targets->push_back(player);
+                                        if (player->GetAreaId() == me->GetAreaId())
+                                            targets.push_back(player);
                                     }
+                                    else
+                                        targets.push_back(player);
                                 }
-                        }
+                            }
                     }
                 }
-                else
-                    targets = GetTargets(e, unit);
+            }
+            else
+                GetTargets(targets, e);
 
-                if (!targets)
-                    break;
+            if (targets.empty())
+                break;
 
-                uint32 sounds[4];
-                sounds[0] = e.action.randomMusic.sound1;
-                sounds[1] = e.action.randomMusic.sound2;
-                sounds[2] = e.action.randomMusic.sound3;
-                sounds[3] = e.action.randomMusic.sound4;
-                uint32 temp[4];
-                uint32 count = 0;
-                for (uint8 i = 0; i < 4; i++)
+            uint32 sounds[4];
+            sounds[0] = e.action.randomMusic.sound1;
+            sounds[1] = e.action.randomMusic.sound2;
+            sounds[2] = e.action.randomMusic.sound3;
+            sounds[3] = e.action.randomMusic.sound4;
+            uint32 temp[4];
+            uint32 count = 0;
+            for (uint8 i = 0; i < 4; i++)
+            {
+                if (sounds[i])
                 {
-                    if (sounds[i])
-                    {
-                        temp[count] = sounds[i];
-                        ++count;
-                    }
+                    temp[count] = sounds[i];
+                    ++count;
                 }
+            }
 
-                if (count == 0)
-                {
-                    delete targets;
-                    break;
-                }
-
-                for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-                {
-                    if (IsUnit(*itr))
-                    {
-                        uint32 sound = temp[urand(0, count - 1)];
-                        (*itr)->SendPlayMusic(sound, e.action.randomMusic.onlySelf > 0);
-                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_MUSIC: target: %s (%s), sound: %u, onlyself: %u, type: %u",
-                                       (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), sound, e.action.randomMusic.onlySelf, e.action.randomMusic.type);
-                    }
-                }
-
-                delete targets;
+            if (count == 0)
+            {
                 break;
             }
+
+            for (WorldObject* target : targets)
+            {
+                if (IsUnit(target))
+                {
+                    uint32 sound = temp[urand(0, count - 1)];
+                    target->SendPlayMusic(sound, e.action.randomMusic.onlySelf > 0);
+                    LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_MUSIC: target: %s (%s), sound: %u, onlyself: %u, type: %u",
+                                   target->GetName().c_str(), target->GetGUID().ToString().c_str(), sound, e.action.randomMusic.onlySelf, e.action.randomMusic.type);
+                }
+            }
+
+            break;
+        }
         case SMART_ACTION_SET_FACTION:
         {
             for (WorldObject* target : targets)
