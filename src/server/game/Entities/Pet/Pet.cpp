@@ -17,7 +17,6 @@
 
 #include "Pet.h"
 #include "ArenaSpectator.h"
-#include "Battleground.h"
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
@@ -2253,6 +2252,8 @@ bool Pet::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32
     if (!InitEntry(Entry))
         return false;
 
+    // Force regen flag for player pets, just like we do for players themselves
+    SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
     SetSheath(SHEATH_STATE_MELEE);
 
     return true;

@@ -256,7 +256,7 @@ public:
             {
                 Talk(SAY_ATTUMEN1_MOUNT);
                 _events.Reset();
-                me->GetMotionMaster()->MovePoint(POINT_MOVE_TO_MIDNIGHT, target->GetPositionX() + 2.0f * cos(target->GetAngle(me)), target->GetPositionY() + 2.0f * sin(target->GetAngle(me)), target->GetPositionZ() + 0.2f, true, true, MOTION_SLOT_CONTROLLED);
+                me->GetMotionMaster()->MovePoint(POINT_MOVE_TO_MIDNIGHT, target->GetPositionX() + 2.0f * cos(target->GetAngle(me)), target->GetPositionY() + 2.0f * std::sin(target->GetAngle(me)), target->GetPositionZ() + 0.2f, true, true, MOTION_SLOT_CONTROLLED);
             }
         }
 

@@ -26,7 +26,6 @@
 #include "AppenderDB.h"
 #include "AuthSocketMgr.h"
 #include "Banner.h"
-#include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"

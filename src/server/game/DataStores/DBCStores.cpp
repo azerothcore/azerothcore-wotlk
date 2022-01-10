@@ -656,7 +656,7 @@ G3D::Vector3 TranslateLocation(G3D::Vector4 const* DBCPosition, G3D::Vector3 con
         angle += 2 * float(M_PI);
     }
 
-    work.x = DBCPosition->x + (distance * sin(angle));
+    work.x = DBCPosition->x + (distance * std::sin(angle));
     work.y = DBCPosition->y + (distance * cos(angle));
     work.z = DBCPosition->z + z;
     return work;

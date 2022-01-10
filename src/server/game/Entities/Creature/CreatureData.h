@@ -86,6 +86,92 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS)) // SKIP
 };
 
+enum class CreatureGroundMovementType : uint8
+{
+    None,
+    Run,
+    Hover,
+
+    Max
+};
+
+enum class CreatureFlightMovementType : uint8
+{
+    None,
+    DisableGravity,
+    CanFly,
+
+    Max
+};
+
+enum class CreatureChaseMovementType : uint8
+{
+    Run,
+    CanWalk,
+    AlwaysWalk,
+
+    Max
+};
+
+enum class CreatureRandomMovementType : uint8
+{
+    Walk,
+    CanRun,
+    AlwaysRun,
+
+    Max
+};
+
+struct CreatureMovementData
+{
+    CreatureMovementData();
+
+    CreatureGroundMovementType Ground;
+    CreatureFlightMovementType Flight;
+    bool                       Swim;
+    bool                       Rooted;
+    CreatureChaseMovementType  Chase;
+    CreatureRandomMovementType Random;
+    uint32                     InteractionPauseTimer;
+
+    bool IsGroundAllowed() const
+    {
+        return Ground != CreatureGroundMovementType::None;
+    }
+
+    bool IsSwimAllowed() const
+    {
+        return Swim;
+    }
+
+    bool IsFlightAllowed() const
+    {
+        return Flight != CreatureFlightMovementType::None;
+    }
+
+    bool IsRooted() const
+    {
+        return Rooted;
+    }
+
+    CreatureChaseMovementType GetChase() const
+    {
+        return Chase;
+    }
+
+    CreatureRandomMovementType GetRandom() const
+    {
+        return Random;
+    }
+
+    uint32 GetInteractionPauseTimer() const
+    {
+        return InteractionPauseTimer;
+    }
+
+    std::string ToString() const;
+};
+
 // from `creature_template` table
 struct CreatureTemplate
 {
@@ -107,6 +193,8 @@ struct CreatureTemplate
     uint32  npcflag;
     float   speed_walk;
     float   speed_run;
+    float   speed_swim;
+    float   speed_flight;
     float   detection_range;                                // Detection Range for Line of Sight aggro
     float   scale;
     uint32  rank;
@@ -138,7 +226,7 @@ struct CreatureTemplate
     uint32  maxgold;
     std::string AIName;
     uint32  MovementType;
-    uint32  InhabitType;
+    CreatureMovementData  Movement;
     float   HoverHeight;
     float   ModHealth;
     float   ModMana;
@@ -214,7 +302,7 @@ struct CreatureBaseStats
 
     uint32 GenerateHealth(CreatureTemplate const* info) const
     {
-        return uint32(ceil(BaseHealth[info->expansion] * info->ModHealth));
+        return uint32(std::ceil(BaseHealth[info->expansion] * info->ModHealth));
     }
 
     uint32 GenerateMana(CreatureTemplate const* info) const
@@ -223,12 +311,12 @@ struct CreatureBaseStats
         if (!BaseMana)
             return 0;
 
-        return uint32(ceil(BaseMana * info->ModMana));
+        return uint32(std::ceil(BaseMana * info->ModMana));
     }
 
     uint32 GenerateArmor(CreatureTemplate const* info) const
     {
-        return uint32(ceil(BaseArmor * info->ModArmor));
+        return uint32(std::ceil(BaseArmor * info->ModArmor));
     }
 
     float GenerateBaseDamage(CreatureTemplate const* info) const
