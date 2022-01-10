@@ -507,7 +507,7 @@ public:
                         _landgrenGUID = cr->GetGUID();
 
                         float o = cr->GetAngle(me);
-                        me->GetMotionMaster()->MovePoint(1, cr->GetPositionX() + cos(o) * 3, cr->GetPositionY() + sin(o) * 3, cr->GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(1, cr->GetPositionX() + cos(o) * 3, cr->GetPositionY() + std::sin(o) * 3, cr->GetPositionZ());
                         events.RescheduleEvent(EVENT_SOUL_COAX, 5000);
                     }
                     else
@@ -913,7 +913,7 @@ public:
                                 if (summon->GetEntry() == NPC_DISGUISED_CRUSADER)
                                 {
                                     summon->SetWalk(false);
-                                    summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
+                                    summon->GetMotionMaster()->MovePoint(2, 6132.38f + 4 * cos(2 * M_PI * (i / 3.0)), 2760.76f + 4 * std::sin(2 * M_PI * (i / 3.0)), me->GetPositionZ());
                                 }
                         break;
                     }

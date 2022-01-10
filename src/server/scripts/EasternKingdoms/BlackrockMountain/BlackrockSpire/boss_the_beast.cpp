@@ -217,7 +217,7 @@ public:
                         events.ScheduleEvent(EVENT_TERRIFYING_ROAR, 20 * IN_MILLISECONDS);
                         break;
                     case EVENT_BERSERKER_CHARGE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 38.f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 38.f, true))
                         {
                             DoCast(target, SPELL_BERSERKER_CHARGE);
                         }

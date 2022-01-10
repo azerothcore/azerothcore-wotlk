@@ -87,7 +87,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (killer->GetGUID() != me->GetGUID())
+            if (killer && killer->GetGUID() != me->GetGUID())
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                     pInstance->SetData(DATA_ON_THE_ROCKS_ACHIEV, 0);
 
@@ -197,7 +197,7 @@ public:
                     events.RepeatEvent(urand(4000, 5000));
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);
@@ -214,7 +214,7 @@ public:
                     {
                         float dist = rand_norm() * 4 + 3.0f;
                         float angle = rand_norm() * 2 * M_PI;
-                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
+                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
                             if( Unit* target = c->SelectNearestTarget(250.0f) )
                             {
                                 c->AddThreat(target, 5.0f);

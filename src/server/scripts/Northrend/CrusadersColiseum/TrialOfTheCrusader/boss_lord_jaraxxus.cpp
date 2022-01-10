@@ -211,12 +211,12 @@ public:
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_FEL_LIGHTNING:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         me->CastSpell(target, SPELL_FEL_LIGHTNING, false);
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_INCINERATE_FLESH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                     {
                         Talk(EMOTE_INCINERATE, target);
                         Talk(SAY_INCINERATE);
@@ -230,7 +230,7 @@ public:
                     events.RepeatEvent(urand(25000, 45000));
                     break;
                 case EVENT_SPELL_LEGION_FLAME:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                     {
                         Talk(EMOTE_LEGION_FLAME, target);
                         me->CastSpell(target, SPELL_LEGION_FLAME, false);
@@ -238,7 +238,7 @@ public:
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_SPELL_TOUCH_OF_JARAXXUS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
                         me->CastSpell(target, SPELL_TOUCH_OF_JARAXXUS, false);
                     events.RepeatEvent(urand(10000, 15000));
                     break;
@@ -334,7 +334,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_FEL_STEAK:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 44.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
                     {
                         DoResetThreat();
                         me->AddThreat(target, 50000.0f);
@@ -418,7 +418,7 @@ public:
                     events.RepeatEvent(urand(15000, 25000));
                     break;
                 case EVENT_SPELL_SPINNING_PAIN_SPIKE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 140.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true) )
                         me->CastSpell(target, SPELL_SPINNING_PAIN_SPIKE, false);
                     events.RepeatEvent(urand(25000, 30000));
                     break;

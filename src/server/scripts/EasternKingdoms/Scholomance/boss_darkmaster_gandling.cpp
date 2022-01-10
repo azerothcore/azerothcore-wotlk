@@ -305,7 +305,7 @@ public:
                 if (target->GetGUID() == me->GetVictim()->GetGUID())
                 {
                     me->AddThreat(me->GetVictim(), -1000000); // drop current player, add a ton to second. This should guarantee that we don't end up with both 1 and 2 in a cage...
-                    if (Unit* newTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 200.0f)) // search in whole room
+                    if (Unit* newTarget = SelectTarget(SelectTargetMethod::MaxThreat, 1, 200.0f)) // search in whole room
                     {
                         me->AddThreat(newTarget, 1000000);
                     }
@@ -336,7 +336,7 @@ public:
                     events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
                     break;
                 case SPELL_CURSE_DARKMASTER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         DoCast(target, SPELL_CURSE_DARKMASTER);
                     }
@@ -348,7 +348,7 @@ public:
                     break;
 
                 case SPELL_SHADOW_PORTAL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 15.0, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 15.0, true))
                     {
                         room = FindRoom();
                         if (room < 6)

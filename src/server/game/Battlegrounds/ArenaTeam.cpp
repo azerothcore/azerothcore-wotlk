@@ -727,7 +727,7 @@ int32 ArenaTeam::GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating,
     // Work in progress:
     /*
     // This is a simulation, as there is not much info on how it really works
-    float confidence_mod = min(1.0f - fabs(mod), 0.5f);
+    float confidence_mod = min(1.0f - std::fabs(mod), 0.5f);
 
     // Apply confidence factor to the mod:
     mod *= confidence_factor
