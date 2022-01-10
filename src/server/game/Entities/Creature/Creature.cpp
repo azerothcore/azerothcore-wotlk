@@ -1921,6 +1921,11 @@ void Creature::Respawn(bool force)
                 LoadEquipment(data->equipmentId);                                                     // Reload Equipment
                 AIM_Initialize();                                                                     // Reload AI
             }
+            else
+            {
+                if (m_originalEntry != GetEntry())
+                    UpdateEntry(m_originalEntry);
+            }
         }
 
         LOG_DEBUG("entities.unit", "Respawning creature %s (SpawnId: %u, %s)", GetName().c_str(), GetSpawnId(), GetGUID().ToString().c_str());
