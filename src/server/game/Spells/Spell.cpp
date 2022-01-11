@@ -5932,15 +5932,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (pet && pet->IsAlive())
                         return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
-                    if (Player* player = unitCaster->ToPlayer())
-                    {
-                        // Check pet before resurrect
-                        if (!player->CanPetResurrect())
-                        {
-                            return SPELL_FAILED_NO_PET;
-                        }
-                    }
-
                     break;
                 }
             // This is generic summon effect
