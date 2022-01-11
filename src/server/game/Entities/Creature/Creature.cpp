@@ -1613,7 +1613,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     // Add to world
     uint32 entry = data->id;
     if(data->id2)
-        entry = (rand() % 100 <= data->chance_id1) ? data->id : data->id2;
+        entry = (roll_chance_f(data->chance_id1)) ? data->id : data->id2;
 
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, entry, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
@@ -1911,7 +1911,7 @@ void Creature::Respawn(bool force)
             // Respawn check if spawn has 2 entries
             if (data->id2)
             {
-                uint32 entry = (rand() % 100 <= data->chance_id1) ? data->id : data->id2;
+                uint32 entry = (roll_chance_f(data->chance_id1)) ? data->id : data->id2;
                 UpdateEntry(entry, data, true);  // Select Random Entry
                 m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
                 LoadEquipment(data->equipmentId);                                                     // Reload Equipment
