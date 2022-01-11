@@ -1610,7 +1610,12 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     m_creatureData = data;
     m_spawnId = spawnId;
 
-    if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, data->id, 0, data->posX, data->posY, data->posZ, data->orientation, data))
+    // Add to world
+    uint32 entry = data->id;
+    if(data->id2)
+        entry = (rand() % 100 <= data->chance_id1) ? data->id : data->id2;
+
+    if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, entry, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
 
     //We should set first home position, because then AI calls home movement
@@ -1900,26 +1905,34 @@ void Creature::Respawn(bool force)
     if (getDeathState() == DEAD)
     {
         if (m_spawnId)
+        {
             GetMap()->RemoveCreatureRespawnTime(m_spawnId);
+            CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
+            // Respawn check if spawn has 2 entries
+            if (data->id2)
+            {
+                uint32 entry = (rand() % 100 <= data->chance_id1) ? data->id : data->id2;
+                UpdateEntry(entry, data, true);  // Select Random Entry
+                m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
+                LoadEquipment(data->equipmentId);                                                     // Reload Equipment
+                AIM_Initialize();                                                                     // Reload AI
+            }
+            else
+            {
+                if (m_originalEntry != GetEntry())
+                    UpdateEntry(m_originalEntry);
+            }
+        }
 
         LOG_DEBUG("entities.unit", "Respawning creature %s (SpawnId: %u, %s)", GetName().c_str(), GetSpawnId(), GetGUID().ToString().c_str());
         m_respawnTime = 0;
         ResetPickPocketLootTime();
         loot.clear();
-
-        if (m_originalEntry != GetEntry())
-            UpdateEntry(m_originalEntry);
-
         SelectLevel();
 
         setDeathState(JUST_RESPAWNED);
-        // MDic - Acidmanifesto
-        // If creature has genders it will consider gender changing on respawn.
-        if (sObjectMgr->GetCreatureTemplate(m_originalEntry))
-        {
-            InitEntry(m_originalEntry);
-        }
 
+        // MDic - Acidmanifesto
         uint32 displayID = GetNativeDisplayId();
         if (sObjectMgr->GetCreatureModelRandomGender(&displayID))                                             // Cancel load if no model defined
         {
@@ -2549,10 +2562,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
         SetVisibilityDistanceOverride(cainfo->visibilityDistanceType);
     }
 
-    if (cainfo->emote != 0)
-    {
-        SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
-    }
+    SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
 
     // Check if visibility distance different
     if (cainfo->visibilityDistanceType != VisibilityDistanceType::Normal)
