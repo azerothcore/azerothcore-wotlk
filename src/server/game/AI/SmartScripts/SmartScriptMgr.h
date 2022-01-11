@@ -1500,14 +1500,8 @@ struct SmartTarget
         {
             uint32 entry;
             uint32 dist;
-        } goClosest;
-
-        struct
-        {
-            uint32 entry;
-            uint32 dist;
             uint32 onlySpawned;
-        } closestGameobject;
+        } goClosest;
 
         struct
         {

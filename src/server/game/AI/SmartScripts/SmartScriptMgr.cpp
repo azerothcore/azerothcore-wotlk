@@ -1172,7 +1172,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         }
     }
 
-
     if (!CheckUnusedEventParams(e))
     {
         return false;

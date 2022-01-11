@@ -3936,7 +3936,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             {
                 if (me && me->IsVehicle())
                 {
-                    if (Unit* target = me->GetVehicleKit()->GetPassenger(e.target.vehicle.seat))
+                    if (Unit* target = me->GetVehicleKit()->GetPassenger(e.target.vehicle.seatMask))
                     {
                         l->push_back(target);
                     }
