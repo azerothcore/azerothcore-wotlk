@@ -1228,7 +1228,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
             if (!itemId || *itemId)
             {
                 FMT_LOG_WARN("entities.player.loading", "Player {} has invalid equipment '{}' in `equipmentcache` at index {}. Skipped.",
-                    guid, (visualBase < equipment.size()) ? equipment[visualBase] : "<none>", visualBase);
+                    guid.ToString(), (visualBase < equipment.size()) ? equipment[visualBase] : "<none>", visualBase);
             }
 
             *data << uint32(0);
@@ -1249,7 +1249,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
         if (!enchants)
         {
             FMT_LOG_WARN("entities.player.loading", "Player {} has invalid enchantment info '{}' in `equipmentcache` at index {}. Skipped.",
-                guid, ((visualBase + 1) < equipment.size()) ? equipment[visualBase + 1] : "<none>", visualBase + 1);
+                guid.ToString(), ((visualBase + 1) < equipment.size()) ? equipment[visualBase + 1] : "<none>", visualBase + 1);
 
             enchants = 0;
         }
