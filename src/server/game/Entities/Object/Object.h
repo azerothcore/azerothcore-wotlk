@@ -202,7 +202,7 @@ protected:
     void _InitValues();
     void _Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh);
     [[nodiscard]] std::string _ConcatFields(uint16 startIndex, uint16 size) const;
-    void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
+    bool _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
     uint32 GetUpdateFieldData(Player const* target, uint32*& flags) const;
 
