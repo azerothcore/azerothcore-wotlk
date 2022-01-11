@@ -1545,7 +1545,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
     LOG_INFO("server.loading", ">> Loaded " SZFMTD " movement overrides in %u ms", _creatureMovementOverrides.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
-CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelId)
+CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelId) const
 {
     CreatureModelContainer::const_iterator itr = _creatureModelStore.find(modelId);
     if (itr != _creatureModelStore.end())
@@ -1985,7 +1985,7 @@ void ObjectMgr::LoadCreatures()
     uint32 oldMSTime = getMSTime();
 
     //                                               0              1   2    3        4             5           6           7           8            9              10
-    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
                          //   11               12         13       14            15         16         17          18          19                20                   21
                          "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, "
                          //   22
@@ -2028,26 +2028,25 @@ void ObjectMgr::LoadCreatures()
         CreatureData& data      = _creatureDataStore[spawnId];
         data.id                 = entry;
         data.mapid              = fields[2].GetUInt16();
-        data.displayid          = fields[3].GetUInt32();
-        data.equipmentId        = fields[4].GetInt8();
-        data.posX               = fields[5].GetFloat();
-        data.posY               = fields[6].GetFloat();
-        data.posZ               = fields[7].GetFloat();
-        data.orientation        = fields[8].GetFloat();
-        data.spawntimesecs      = fields[9].GetUInt32();
-        data.wander_distance    = fields[10].GetFloat();
-        data.currentwaypoint    = fields[11].GetUInt32();
-        data.curhealth          = fields[12].GetUInt32();
-        data.curmana            = fields[13].GetUInt32();
-        data.movementType       = fields[14].GetUInt8();
-        data.spawnMask          = fields[15].GetUInt8();
-        data.phaseMask          = fields[16].GetUInt32();
-        int16 gameEvent         = fields[17].GetInt8();
-        uint32 PoolId           = fields[18].GetUInt32();
-        data.npcflag            = fields[19].GetUInt32();
-        data.unit_flags         = fields[20].GetUInt32();
-        data.dynamicflags       = fields[21].GetUInt32();
-        data.ScriptId           = GetScriptId(fields[22].GetString());
+        data.equipmentId        = fields[3].GetInt8();
+        data.posX               = fields[4].GetFloat();
+        data.posY               = fields[5].GetFloat();
+        data.posZ               = fields[6].GetFloat();
+        data.orientation        = fields[7].GetFloat();
+        data.spawntimesecs      = fields[8].GetUInt32();
+        data.wander_distance    = fields[9].GetFloat();
+        data.currentwaypoint    = fields[10].GetUInt32();
+        data.curhealth          = fields[11].GetUInt32();
+        data.curmana            = fields[12].GetUInt32();
+        data.movementType       = fields[13].GetUInt8();
+        data.spawnMask          = fields[14].GetUInt8();
+        data.phaseMask          = fields[15].GetUInt32();
+        int16 gameEvent         = fields[16].GetInt8();
+        uint32 PoolId           = fields[17].GetUInt32();
+        data.npcflag            = fields[18].GetUInt32();
+        data.unit_flags         = fields[19].GetUInt32();
+        data.dynamicflags       = fields[20].GetUInt32();
+        data.ScriptId           = GetScriptId(fields[21].GetString());
 
         if (!data.ScriptId)
             data.ScriptId = cInfo->ScriptID;
