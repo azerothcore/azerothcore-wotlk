@@ -490,8 +490,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                       0           1                       2                                 3                                     4
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.id, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
+        //                                                     0                1                       2                              3                                 4                               5
+        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.creature_id1, creature.creature_id2, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
                              "FROM creature JOIN game_event_model_equip ON creature.guid=game_event_model_equip.guid");
 
         if (!result)
@@ -508,7 +508,8 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
-                uint16 event_id = fields[2].GetUInt8();
+                //uint32 entry2 = fields[2].GetUInt32();
+                uint16 event_id = fields[3].GetUInt8();
 
                 if (event_id >= mGameEventModelEquip.size())
                 {
@@ -518,8 +519,8 @@ void GameEventMgr::LoadFromDB()
 
                 ModelEquipList& equiplist = mGameEventModelEquip[event_id];
                 ModelEquip newModelEquipSet;
-                newModelEquipSet.modelid = fields[3].GetUInt32();
-                newModelEquipSet.equipment_id = fields[4].GetUInt8();
+                newModelEquipSet.modelid = fields[4].GetUInt32();
+                newModelEquipSet.equipment_id = fields[5].GetUInt8();
                 newModelEquipSet.equipement_id_prev = 0;
                 newModelEquipSet.modelid_prev = 0;
 
