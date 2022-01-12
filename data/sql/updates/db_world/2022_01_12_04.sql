@@ -1,3 +1,19 @@
+-- DB update 2022_01_12_03 -> 2022_01_12_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_12_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_12_03 2022_01_12_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1641654057632672300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641654057632672300');
 
 UPDATE `game_event` SET `start_time`='2021-06-22 00:01:00' WHERE `eventEntry`=1;
@@ -28,3 +44,13 @@ UPDATE `game_event` SET `start_time`='2021-11-01 02:00:00' WHERE `eventEntry`=51
 UPDATE `game_event` SET `start_time`='2021-12-25 06:00:00' WHERE `eventEntry`=52;
 UPDATE `game_event` SET `start_time`='2021-09-20 01:01:00' WHERE `eventEntry`=70;
 UPDATE `game_event` SET `start_time`='2021-03-20 07:00:00' WHERE `eventEntry`=78;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_12_04' WHERE sql_rev = '1641654057632672300';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
