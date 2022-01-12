@@ -15,16 +15,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
-
-#include "CombatLogPackets.h"
 #include "ChatPackets.h"
-#include "CharacterPackets.h"
-#include "MiscPackets.h"
-#include "WorldStatePackets.h"
-#include "TotemPackets.h"
-#include "BankPackets.h"
-#include "GuildPackets.h"
 
-#endif // AllPackets_h__
+WorldPacket const* WorldPackets::Chat::Emote::Write()
+{
+    _worldPacket << EmoteID;
+    _worldPacket << Guid;
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Chat::EmoteClient::Read()
+{
+    _worldPacket >> EmoteID;
+}
+
+WorldPacket const* WorldPackets::Chat::ChatServerMessage::Write()
+{
+    _worldPacket << int32(MessageID);
+    _worldPacket << StringParam;
+
+    return &_worldPacket;
+}
