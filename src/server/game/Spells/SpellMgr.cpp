@@ -7482,7 +7482,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->ProcChance = 101;
         spellInfo->Effect[1] = 24;
         spellInfo->EffectImplicitTargetA[1] = 25;
-        spellInfo->EffectItemType[1] = 37888;
+        spellInfo->EffectItemType[1] = 37889;
     });
 
     // Serverside - Create Rocket Pack
