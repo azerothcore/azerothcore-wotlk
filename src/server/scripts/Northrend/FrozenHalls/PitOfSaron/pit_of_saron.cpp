@@ -638,7 +638,7 @@ public:
                         return;
                     pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_1);
                     Talk(SAY_TYRANNUS_AMBUSH_1);
-                    killsLeft = 10;
+                    killsLeft = 1;
                     events.ScheduleEvent(30, 0);
                     events.ScheduleEvent(3, 25000);
                     break;
