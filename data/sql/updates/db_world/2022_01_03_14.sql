@@ -16,6 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164042140288075731
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640421402880757319');
 
+-- quest
 UPDATE `quest_template_addon` SET `SpecialFlags` = 0 WHERE `ID` IN (8799, 8763);
 
 --

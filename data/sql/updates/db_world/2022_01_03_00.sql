@@ -19,7 +19,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640126290282588522');
 DELETE FROM `creature` WHERE `guid` IN (82551,82548,145262,145263,145258,82797,145239,82719,82716,82446);
 DELETE FROM `creature_addon` WHERE `guid` IN (82551,82548,145262,145263,145258,82797,145239,82719,82716,82446);
 
--- Pathing for Spindleweb Spider Entry: 16350
+-- Pathing for Spindleweb Spider Entry: 16350.
 SET @NPC := 82173;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7717.712,`position_y`=-6330.0884,`position_z`=22.734991 WHERE `guid`=@NPC;

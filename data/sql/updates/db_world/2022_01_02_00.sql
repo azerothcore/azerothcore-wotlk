@@ -19,7 +19,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1639803872367552000');
 -- Source: 2.5.2.41446 Alliance Night Elf 03 Area in Shadowglen around Aldrasil includes correct paths for Shadowglen Sentinel creatures 46484 and 46499.pkt
 
 -- Pathing corrections for  Shadowglen Sentinel (Entry 12160) Creature 46499
--- 0x2056B400200BE0000000150001398466 .go xyz 10429.606 878.8465 1324.0096
+-- 0x2056B400200BE0000000150001398466 .go xyz 10429.606 878.8465 1324.0096.
 SET @NPC := 46499;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=10429.606,`position_y`=878.8465,`position_z`=1324.0096 WHERE `guid`=@NPC;

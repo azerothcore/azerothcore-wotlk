@@ -16,6 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164065670278833030
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640656702788330300');
 
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_item_wraith_scythe_drain_life'; 
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (16414, 'spell_item_wraith_scythe_drain_life');
 

@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164030134169217669
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640301341692176690');
 
--- Creature speed update for Eversong woods and Ghostlands
+-- Creature speed update for Eversong woods and Ghostlands.
 UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=20100;
 UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=19456;
 UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=16294;

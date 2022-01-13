@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164115524042360980
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1641155240423609800');
 
--- Adjust ".gm list" to security 3 as default
+-- Adjust ".gm list" to security 3 as default.
 UPDATE `command` SET `security`='3' WHERE  `name`='gm list';
 
 --
