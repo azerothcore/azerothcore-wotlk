@@ -35,6 +35,7 @@
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "CreatureAI.h"
+#include "CombatLogPackets.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "Formulas.h"
@@ -784,13 +785,13 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
 
     Unit::DealDamageMods(this, damage, &absorb);
 
-    WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, (21));
-    data << GetGUID();
-    data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
-    data << uint32(damage);
-    data << uint32(absorb);
-    data << uint32(resist);
-    SendMessageToSet(&data, true);
+    WorldPackets::CombatLog::EnvironmentalDamageLog packet;
+    packet.Victim = GetGUID();
+    packet.Type = type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL;
+    packet.Amount = damage;
+    packet.Absorbed = absorb;
+    packet.Resisted = resist;
+    SendMessageToSet(packet.Write(), true);
 
     uint32 final_damage = Unit::DealDamage(this, this, damage, nullptr, SELF_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 
@@ -5499,8 +5500,7 @@ void Player::SaveRecallPosition()
     m_recallO = GetOrientation();
 }
 
-// pussywizard!
-void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr)
+void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr) const
 {
     if (self)
         GetSession()->SendPacket(data);
@@ -5512,8 +5512,7 @@ void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, b
     Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-// pussywizard!
-void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self)
+void Player::SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const
 {
     if (self)
         GetSession()->SendPacket(data);
@@ -8657,7 +8656,7 @@ Pet* Player::GetPet() const
         if (!pet)
             return nullptr;
 
-        if (IsInWorld() && pet)
+        if (IsInWorld())
             return pet;
 
         //there may be a guardian in slot
@@ -8713,10 +8712,39 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         m_temporaryUnsummonedPetNumber = 0;
     }
 
-    if (!pet || pet->GetOwnerGUID() != GetGUID())
+    if (!pet)
+    {
+        if (mode == PET_SAVE_NOT_IN_SLOT && m_petStable && m_petStable->CurrentPet)
+        {
+            // Handle removing pet while it is in "temporarily unsummoned" state, for example on mount
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+            stmt->setUInt8(0, PET_SAVE_NOT_IN_SLOT);
+            stmt->setUInt32(1, GetGUID().GetCounter());
+            stmt->setUInt32(2, m_petStable->CurrentPet->PetNumber);
+            CharacterDatabase.Execute(stmt);
+
+            m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
+            m_petStable->CurrentPet.reset();
+        }
+
         return;
+    }
 
     pet->CombatStop();
+
+    if (returnreagent)
+    {
+        switch (pet->GetEntry())
+        {
+            //warlock pets except imp are removed(?) when logging out
+            case 1860:
+            case 1863:
+            case 417:
+            case 17252:
+                mode = PET_SAVE_NOT_IN_SLOT;
+                break;
+        }
+    }
 
     // only if current pet in slot
     pet->SavePetToDB(mode);
@@ -13338,7 +13366,7 @@ void Player::AddKnownCurrency(uint32 itemId)
 void Player::UnsummonPetTemporaryIfAny()
 {
     Pet* pet = GetPet();
-    if (!pet || !pet->IsInWorld())
+    if (!pet)
         return;
 
     if (!m_temporaryUnsummonedPetNumber && pet->isControlled() && !pet->isTemporarySummoned())
