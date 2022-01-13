@@ -1590,7 +1590,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         }
         default:
             // it's impossible, but check
-            //TC_LOG_ERROR("entities.player.quest", "GetQuestDialogStatus called for unexpected type %u", questgiver->GetTypeId());
+            //LOG_ERROR("entities.player.quest", "GetQuestDialogStatus called for unexpected type %u", questgiver->GetTypeId());
             return DIALOG_STATUS_NONE;
     }
 
