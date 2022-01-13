@@ -236,7 +236,7 @@ class go_suppression_device : public GameObjectScript
             bool _active;
         };
 
-        GameObjectAI* GetAI(GameObject* go) const
+        GameObjectAI* GetAI(GameObject* go) const override
         {
             return new go_suppression_deviceAI(go);
         }
