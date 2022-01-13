@@ -15,16 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
-
 #include "CombatLogPackets.h"
-#include "ChatPackets.h"
-#include "CharacterPackets.h"
-#include "MiscPackets.h"
-#include "WorldStatePackets.h"
-#include "TotemPackets.h"
-#include "BankPackets.h"
-#include "GuildPackets.h"
 
-#endif // AllPackets_h__
+WorldPacket const* WorldPackets::CombatLog::EnvironmentalDamageLog::Write()
+{
+    _worldPacket << Victim;
+    _worldPacket << uint8(Type);
+    _worldPacket << uint32(Amount);
+    _worldPacket << uint32(Resisted);
+    _worldPacket << uint32(Absorbed);
+
+    return &_worldPacket;
+}
