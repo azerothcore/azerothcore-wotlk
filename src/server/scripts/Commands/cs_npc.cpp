@@ -670,10 +670,11 @@ public:
                 Field* fields = result->Fetch();
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
-                float x = fields[2].GetFloat();
-                float y = fields[3].GetFloat();
-                float z = fields[4].GetFloat();
-                uint16 mapId = fields[5].GetUInt16();
+                //uint32 entry2 = fields[2].GetUInt32();
+                float x = fields[3].GetFloat();
+                float y = fields[4].GetFloat();
+                float z = fields[5].GetFloat();
+                uint16 mapId = fields[6].GetUInt16();
 
                 CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(entry);
                 if (!creatureTemplate)
@@ -1195,7 +1196,7 @@ public:
         // caster have pet now
         player->SetMinion(pet, true);
 
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         player->PetSpellInitialize();
 
         return true;

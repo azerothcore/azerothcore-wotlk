@@ -571,7 +571,7 @@ struct npc_hallows_end_soh : public ScriptedAI
     {
         scheduler.Schedule(6s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.f, true))
             {
                 me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                 target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
@@ -1185,7 +1185,7 @@ struct boss_headless_horseman : public ScriptedAI
                 }
             case EVENT_HORSEMAN_CONFLAGRATION:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                         target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);

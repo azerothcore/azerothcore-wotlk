@@ -162,7 +162,7 @@ public:
                     events.RepeatEvent(15000);
                     break;
                 case EVENT_JAGGED_KNIFE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f))
                     {
                         me->CastSpell(target, SPELL_JAGGED_KNIFE, false);
                     }

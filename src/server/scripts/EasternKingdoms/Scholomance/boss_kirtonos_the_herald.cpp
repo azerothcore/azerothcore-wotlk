@@ -204,7 +204,7 @@ public:
                     events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 20000);
                     break;
                 case EVENT_DOMINATE_MIND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 20.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 20.0f, true))
                     {
                         me->CastSpell(target, SPELL_DOMINATE_MIND, false);
                     }
