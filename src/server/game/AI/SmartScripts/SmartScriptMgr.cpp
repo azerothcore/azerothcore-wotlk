@@ -402,8 +402,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
             if (e.GetScriptType() != SMART_SCRIPT_TYPE_TIMED_ACTIONLIST && e.GetEventType() != SMART_EVENT_LINK && !EventHasInvoker(e.event.type))
             {
                 LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has invoker target, but action does not provide any invoker!", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
-                // allow this to load for now
-                // return false;
+                 return false;
             }
             break;
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
