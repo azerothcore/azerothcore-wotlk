@@ -201,7 +201,7 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_POSITIVE_EFF0                 = 0x02000000,
     SPELL_ATTR0_CU_POSITIVE_EFF1                 = 0x04000000,
     SPELL_ATTR0_CU_POSITIVE_EFF2                 = 0x08000000,
-    // unused                                    = 0x10000000,
+    SPELL_ATTR0_CU_FORCE_SEND_CATEGORY_COOLDOWNS = 0x10000000,
     SPELL_ATTR0_CU_FORCE_AURA_SAVING             = 0x20000800,
     SPELL_ATTR0_CU_ENCOUNTER_REWARD              = 0x40000000, // pussywizard
 

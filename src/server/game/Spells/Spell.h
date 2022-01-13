@@ -172,7 +172,7 @@ public:
 
     float GetDist2d() const { return m_src._position.GetExactDist2d(&m_dst._position); }
     float GetSpeedXY() const { return m_speed * cos(m_elevation); }
-    float GetSpeedZ() const { return m_speed * sin(m_elevation); }
+    float GetSpeedZ() const { return m_speed * std::sin(m_elevation); }
 
     void Update(Unit* caster);
     void OutDebug() const;
@@ -526,6 +526,21 @@ public:
     uint32 m_preCastSpell;
     SpellCastTargets m_targets;
     SpellCustomErrors m_customError;
+
+    void AddComboPointGain(Unit* target, int8 amount)
+    {
+        if (target != m_comboTarget)
+        {
+            m_comboTarget = target;
+            m_comboPointGain = amount;
+        }
+        else
+        {
+            m_comboPointGain += amount;
+        }
+    }
+    Unit* m_comboTarget;
+    int8 m_comboPointGain;
 
     UsedSpellMods m_appliedMods;
 
