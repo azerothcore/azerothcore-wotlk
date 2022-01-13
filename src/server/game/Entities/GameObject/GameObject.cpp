@@ -1514,7 +1514,7 @@ void GameObject::Use(Unit* user)
                     float relativeDistance = (info->size * itr->first) - (info->size * (info->chair.slots - 1) / 2.0f);
 
                     float x_i = GetPositionX() + relativeDistance * cos(orthogonalOrientation);
-                    float y_i = GetPositionY() + relativeDistance * sin(orthogonalOrientation);
+                    float y_i = GetPositionY() + relativeDistance * std::sin(orthogonalOrientation);
 
                     if (itr->second)
                     {
@@ -2082,7 +2082,7 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
     if (!info)
         return IsWithinDist3d(x, y, z, radius);
 
-    float sinA = sin(GetOrientation());
+    float sinA = std::sin(GetOrientation());
     float cosA = cos(GetOrientation());
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
@@ -2103,8 +2103,7 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
            && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
 }
 
-// pussywizard!
-void GameObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr)
+void GameObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
 {
     dist += GetObjectSize();
     if (includeMargin)

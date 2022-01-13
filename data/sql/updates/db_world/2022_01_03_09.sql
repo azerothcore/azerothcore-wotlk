@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164088339858861849
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640883398588618491');
 
--- An'owyn
+-- An'owyn.
 
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_sentinel_infiltrator' WHERE `entry`=16333;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16333 AND `source_type`=0;

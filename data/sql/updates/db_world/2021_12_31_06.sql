@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164097225207168818
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640972252071688181');
 
--- removes unverified corrections of loot drop of the abyssal crest with drop rate based on udb from consolidated sniffs
+-- removes unverified corrections of loot drop of the abyssal crest with drop rate based on udb from consolidated sniffs.
 DELETE FROM `creature_loot_template` WHERE `Entry`=15209 AND `Item`=20513 AND `Reference`=0 AND `GroupId`=0;
 DELETE FROM `creature_loot_template` WHERE `Entry`=15211 AND `Item`=20513 AND `Reference`=0 AND `GroupId`=0;
 DELETE FROM `creature_loot_template` WHERE `Entry`=15212 AND `Item`=20513 AND `Reference`=0 AND `GroupId`=0;

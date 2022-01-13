@@ -195,18 +195,30 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     _currDestPosition.Relocate(finalPoint.x, finalPoint.y, finalPoint.z);
 
     creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
-    ++_moveCount;
-    if (roll_chance_i((int32)_moveCount * 25 + 10))
+    bool walk = true;
+    switch (creature->GetMovementTemplate().GetRandom())
     {
-        _moveCount = 0;
-        _nextMoveTime.Reset(urand(4000, 8000));
+    case CreatureRandomMovementType::CanRun:
+        walk = creature->IsWalking();
+        break;
+    case CreatureRandomMovementType::AlwaysRun:
+        walk = false;
+        break;
+    default:
+        break;
     }
 
     Movement::MoveSplineInit init(creature);
     init.MovebyPath(finalPath);
-    init.SetWalk(true);
+    init.SetWalk(walk);
     init.Launch();
 
+    ++_moveCount;
+    if (roll_chance_i((int32) _moveCount * 25 + 10))
+    {
+        _moveCount = 0;
+        _nextMoveTime.Reset(urand(4000, 8000));
+    }
     if (sWorld->getBoolConfig(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS))
         _preComputedPaths.erase(pathIdx);
 
@@ -235,7 +247,7 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
         {
             float angle = (M_PI * 2.0f / (float)RANDOM_POINTS_NUMBER) * i;
             float factor = 0.5f + rand_norm() * 0.5f;
-            _destinationPoints.push_back(G3D::Vector3(_initialPosition.GetPositionX() + _wanderDistance * cos(angle)*factor, _initialPosition.GetPositionY() + _wanderDistance * sin(angle)*factor, _initialPosition.GetPositionZ()));
+            _destinationPoints.push_back(G3D::Vector3(_initialPosition.GetPositionX() + _wanderDistance * cos(angle)*factor, _initialPosition.GetPositionY() + _wanderDistance * std::sin(angle)*factor, _initialPosition.GetPositionZ()));
         }
     }
 

@@ -572,6 +572,8 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     m_referencedFromCurrentSpell = false;
     m_executedCurrently = false;
     m_needComboPoints = m_spellInfo->NeedsComboPoints();
+    m_comboPointGain = 0;
+    m_comboTarget = nullptr;
     m_delayStart = 0;
     m_delayAtDamageCount = 0;
 
@@ -1781,7 +1783,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     if (m_targets.GetSrcPos()->GetExactDist2d(m_targets.GetDstPos()) > bestDist)
     {
         float x = m_targets.GetSrcPos()->m_positionX + cos(m_caster->GetOrientation()) * bestDist;
-        float y = m_targets.GetSrcPos()->m_positionY + sin(m_caster->GetOrientation()) * bestDist;
+        float y = m_targets.GetSrcPos()->m_positionY + std::sin(m_caster->GetOrientation()) * bestDist;
         float z = m_targets.GetSrcPos()->m_positionZ + bestDist * (a * bestDist + b);
 
         if (itr != targets.end())
@@ -3315,7 +3317,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     m_powerCost = m_CastItem ? 0 : m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask, this);
 
     // Set combo point requirement
-    if ((_triggeredCastFlags & TRIGGERED_IGNORE_COMBO_POINTS) || m_CastItem || !m_caster->m_movedByPlayer)
+    if ((_triggeredCastFlags & TRIGGERED_IGNORE_COMBO_POINTS) || m_CastItem)
         m_needComboPoints = false;
 
     SpellCastResult result = CheckCast(true);
@@ -3946,16 +3948,16 @@ void Spell::_handle_immediate_phase()
 
 void Spell::_handle_finish_phase()
 {
-    if (m_caster->m_movedByPlayer && m_needComboPoints)
+    // Take for real after all targets are processed
+    if (m_needComboPoints)
     {
-        // Take for real after all targets are processed
-        m_caster->m_movedByPlayer->ToPlayer()->ClearComboPoints();
+        m_caster->ClearComboPoints();
+    }
 
-        // Real add combo points from effects
-        if( m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsInWorld() && m_targets.GetUnitTarget()->IsAlive() )
-            m_caster->m_movedByPlayer->ToPlayer()->AddComboPoints(m_targets.GetUnitTarget(), m_caster->m_movedByPlayer->ToPlayer()->GetComboPointGain());
-
-        m_caster->m_movedByPlayer->ToPlayer()->SetComboPointGain(0);
+    // Real add combo points from effects
+    if (m_comboTarget && m_comboPointGain)
+    {
+        m_caster->AddComboPoints(m_comboTarget, m_comboPointGain);
     }
 
     if (m_caster->m_extraAttacks && GetSpellInfo()->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
@@ -6322,11 +6324,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_ITEM_ALREADY_ENCHANTED;
     }
 
-    // check if caster has at least 1 combo point for spells that require combo points
+    // check if caster has at least 1 combo point on target for spells that require combo points
     if (m_needComboPoints)
-        if (Player* plrCaster = m_caster->ToPlayer())
-            if (!plrCaster->GetComboPoints())
+    {
+        if (m_spellInfo->NeedsExplicitUnitTarget())
+        {
+            if (!m_caster->GetComboPoints(m_targets.GetUnitTarget()))
+            {
                 return SPELL_FAILED_NO_COMBO_POINTS;
+            }
+        }
+        else
+        {
+            if (!m_caster->GetComboPoints())
+            {
+                return SPELL_FAILED_NO_COMBO_POINTS;
+            }
+        }
+    }
 
     // xinef: check relic cooldown
     if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
@@ -7746,6 +7761,8 @@ void Spell::HandleLaunchPhase()
             usesAmmo = false;
     }
 
+    PrepareTargetProcessing();
+
     bool firstTarget = true;
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
@@ -7783,6 +7800,8 @@ void Spell::HandleLaunchPhase()
         DoAllEffectOnLaunchTarget(target, multiplier, firstTarget);
         firstTarget = false;
     }
+
+    FinishTargetProcessing();
 }
 
 void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier, bool firstTarget)

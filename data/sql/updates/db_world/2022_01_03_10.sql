@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164097025431347146
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640970254313471461');
 
--- Remove SAI path
+-- Remove SAI path.
 UPDATE `creature_template` SET `AIName`="", `ScriptName`='' WHERE `entry`=18947;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=18947 AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (1894700,1894701,1894702) AND `source_type`=9;
