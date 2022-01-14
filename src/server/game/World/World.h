@@ -262,7 +262,6 @@ public:
     void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) override;
 
-
     void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) override;
 
     /// Are we in the middle of a shutdown?
