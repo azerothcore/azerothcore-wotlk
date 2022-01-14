@@ -638,15 +638,15 @@ public:
                         return;
                     pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_1);
                     Talk(SAY_TYRANNUS_AMBUSH_1);
-                    killsLeft = 1;
+                    killsLeft = 10;
                     events.ScheduleEvent(30, 0);
                     events.ScheduleEvent(3, 25000);
                     break;
                 case 2:
                     if (pInstance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_AFTER_WARN_1)
                         return;
-                    if (killsLeft != 0)
-                        return;
+//                    if (killsLeft != 0)
+//                        return;
                     pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_2);
                     Talk(SAY_TYRANNUS_AMBUSH_2);
                     killsLeft = (Difficulty(me->GetMap()->GetSpawnMode()) == DUNGEON_DIFFICULTY_HEROIC ? 12 : 6);
@@ -657,8 +657,8 @@ public:
                 case 3:
                     if (pInstance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_AFTER_WARN_2)
                         return;
-                    if (killsLeft != 0)
-                        return;
+//                    if (killsLeft != 0)
+//                        return;
                     pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_TUNNEL_WARN);
                     if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, 950.16f, -102.17f, 594.90f - 10.0f, 5.43f, TEMPSUMMON_TIMED_DESPAWN, 1))
                         c->AI()->Talk(SAY_TYRANNUS_TRAP_TUNNEL);
