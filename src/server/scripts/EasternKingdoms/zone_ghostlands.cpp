@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Ghostlands
-SD%Complete: 100
-SDComment: Quest support: 9212.
-SDCategory: Ghostlands
-EndScriptData */
-
-/* ContentData
-npc_ranger_lilatha
-EndContentData */
-
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -53,94 +42,80 @@ enum RangerLilatha
     NPC_SHADOWPINE_ORACLE               = 16343
 };
 
-class npc_ranger_lilatha : public CreatureScript
+struct npc_ranger_lilatha : public npc_escortAI
 {
-public:
-    npc_ranger_lilatha() : CreatureScript("npc_ranger_lilatha") { }
+    npc_ranger_lilatha(Creature* creature) : npc_escortAI(creature) { }
 
-    struct npc_ranger_lilathaAI : public npc_escortAI
+    void WaypointReached(uint32 waypointId) override
     {
-        npc_ranger_lilathaAI(Creature* creature) : npc_escortAI(creature) { }
+        Player* player = GetPlayerForEscort();
+        if (!player)
+            return;
 
-        void WaypointReached(uint32 waypointId) override
+        switch (waypointId)
         {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
+        case 0:
+            me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
+            if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 20.0f))
+                Cage->SetGoState(GO_STATE_ACTIVE);
+            Talk(SAY_START, player);
+            break;
+        case 5:
+            Talk(SAY_PROGRESS1, player);
+            break;
+        case 11:
+            Talk(SAY_PROGRESS2, player);
+            me->SetFacingTo(4.762841f);
+            break;
+        case 18:
+        {
+            Talk(SAY_PROGRESS3, player);
+            Creature* Summ1 = me->SummonCreature(NPC_MUMMIFIED_HEADHUNTER, 7627.083984f, -7532.538086f, 152.128616f, 1.082733f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            Creature* Summ2 = me->SummonCreature(NPC_SHADOWPINE_ORACLE, 7620.432129f, -7532.550293f, 152.454865f, 0.827478f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            if (Summ1 && Summ2)
             {
-                case 0:
-                    me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                    if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 20))
-                        Cage->SetGoState(GO_STATE_ACTIVE);
-                    Talk(SAY_START, player);
-                    break;
-                case 5:
-                    Talk(SAY_PROGRESS1, player);
-                    break;
-                case 11:
-                    Talk(SAY_PROGRESS2, player);
-                    me->SetFacingTo(4.762841f);
-                    break;
-                case 18:
-                    {
-                        Talk(SAY_PROGRESS3, player);
-                        Creature* Summ1 = me->SummonCreature(NPC_MUMMIFIED_HEADHUNTER, 7627.083984f, -7532.538086f, 152.128616f, 1.082733f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                        Creature* Summ2 = me->SummonCreature(NPC_SHADOWPINE_ORACLE, 7620.432129f, -7532.550293f, 152.454865f, 0.827478f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                        if (Summ1 && Summ2)
-                        {
-                            Summ1->Attack(me, true);
-                            Summ2->Attack(player, true);
-                        }
-                        AttackStart(Summ1);
-                    }
-                    break;
-                case 19:
-                    me->SetWalk(false);
-                    break;
-                case 25:
-                    me->SetWalk(true);
-                    break;
-                case 30:
-                    player->GroupEventHappens(QUEST_ESCAPE_FROM_THE_CATACOMBS, me);
-                    break;
-                case 32:
-                    me->SetFacingTo(2.978281f);
-                    Talk(SAY_END1, player);
-                    break;
-                case 33:
-                    me->SetFacingTo(5.858011f);
-                    Talk(SAY_END2, player);
-                    Creature* CaptainHelios = me->FindNearestCreature(NPC_CAPTAIN_HELIOS, 50);
-                    if (CaptainHelios)
-                        CaptainHelios->AI()->Talk(SAY_CAPTAIN_ANSWER, player);
-                    break;
+                Summ1->Attack(me, true);
+                Summ2->Attack(player, true);
             }
+            AttackStart(Summ1);
         }
-
-        void Reset() override
-        {
-            if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 20))
-                Cage->SetGoState(GO_STATE_READY);
+        break;
+        case 19:
+            me->SetWalk(false);
+            break;
+        case 25:
+            me->SetWalk(true);
+            break;
+        case 30:
+            player->GroupEventHappens(QUEST_ESCAPE_FROM_THE_CATACOMBS, me);
+            break;
+        case 32:
+            me->SetFacingTo(2.978281f);
+            Talk(SAY_END1, player);
+            break;
+        case 33:
+            me->SetFacingTo(5.858011f);
+            Talk(SAY_END2, player);
+            Creature* CaptainHelios = me->FindNearestCreature(NPC_CAPTAIN_HELIOS, 50.0f);
+            if (CaptainHelios)
+                CaptainHelios->AI()->Talk(SAY_CAPTAIN_ANSWER, player);
+            break;
         }
-    };
+    }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    void Reset() override
+    {
+        if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 20.0f))
+            Cage->SetGoState(GO_STATE_READY);
+    }
+
+    void sQuestAccept(Player* player, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCAPE_FROM_THE_CATACOMBS)
         {
-            creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_ranger_lilatha::npc_ranger_lilathaAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
+            npc_escortAI::Start(true, false, player->GetGUID());
         }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_ranger_lilathaAI(creature);
     }
 };
 
@@ -435,7 +410,7 @@ private:
 
 void AddSC_ghostlands()
 {
-    new npc_ranger_lilatha();
+    RegisterCreatureAI(npc_ranger_lilatha);
     RegisterCreatureAI(npc_sentinel_leader);
     RegisterCreatureAI(npc_sentinel_infiltrator);
 }

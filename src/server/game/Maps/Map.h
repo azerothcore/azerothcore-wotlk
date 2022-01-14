@@ -462,7 +462,7 @@ public:
     bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
     void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
-    [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.isEmpty(); }
+    [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
 
     void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
@@ -490,7 +490,7 @@ public:
 
     void UpdateIteratorBack(Player* player);
 
-    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
+    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, WorldObject* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
