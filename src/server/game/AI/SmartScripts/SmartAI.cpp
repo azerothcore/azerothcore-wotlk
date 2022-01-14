@@ -256,7 +256,8 @@ void SmartAI::PausePath(uint32 delay, bool forced)
         me->StopMoving();
         me->GetMotionMaster()->MoveIdle();//force stop
 
-        if (float orientation = mWayPoints->at(mCurrentWPID)->o)
+        auto waypoint = mWayPoints->find(mCurrentWPID);
+        if (float orientation = waypoint->second->o)
         {
             me->SetFacingTo(orientation);
         }
