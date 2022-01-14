@@ -50,7 +50,7 @@ namespace MMAP
 
         ~MMapData()
         {
-            for (auto & navMeshQuerie : navMeshQueries)
+            for (auto& navMeshQuerie : navMeshQueries)
             {
                 dtFreeNavMeshQuery(navMeshQuerie.second);
             }
