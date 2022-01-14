@@ -2693,10 +2693,22 @@ void SpellMgr::LoadSpellInfoStore()
     UnloadSpellInfoStore();
     mSpellInfoMap.resize(sSpellStore.GetNumRows(), nullptr);
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+    for (SpellEntry const* spellEntry : sSpellStore)
+        mSpellInfoMap[spellEntry->Id] = new SpellInfo(spellEntry);
+
+    for (uint32 spellIndex = 0; spellIndex < GetSpellInfoStoreSize(); ++spellIndex)
     {
-        if (SpellEntry const* spellEntry = sSpellStore.LookupEntry(i))
-            mSpellInfoMap[i] = new SpellInfo(spellEntry);
+        if (!mSpellInfoMap[spellIndex])
+            continue;
+
+        for (SpellEffectInfo const& spellEffectInfo : mSpellInfoMap[spellIndex]->GetEffects())
+        {
+            //ASSERT(effect.EffectIndex < MAX_SPELL_EFFECTS, "MAX_SPELL_EFFECTS must be at least %u", effect.EffectIndex + 1);
+            ASSERT(spellEffectInfo.Effect < TOTAL_SPELL_EFFECTS, "TOTAL_SPELL_EFFECTS must be at least %u", spellEffectInfo.Effect + 1);
+            ASSERT(spellEffectInfo.ApplyAuraName < TOTAL_AURAS, "TOTAL_AURAS must be at least %u", spellEffectInfo.ApplyAuraName + 1);
+            ASSERT(spellEffectInfo.TargetA.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least %u", spellEffectInfo.TargetA.GetTarget() + 1);
+            ASSERT(spellEffectInfo.TargetB.GetTarget() < TOTAL_SPELL_TARGETS, "TOTAL_SPELL_TARGETS must be at least %u", spellEffectInfo.TargetB.GetTarget() + 1);
+        }
     }
 
     LOG_INFO("server.loading", ">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
@@ -7533,7 +7545,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Judgement of Wisdom
     // Judgement of the Martyr
     // Judgement of Light
-    ApplySpellFix({ 20271, 20425, 32220, 53407, 53408, 53725, 57774 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 20271, 20425, 32220, 53407, 53408, 53725, 57774 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
