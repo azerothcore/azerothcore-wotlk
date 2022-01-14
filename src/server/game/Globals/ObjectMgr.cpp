@@ -2092,7 +2092,7 @@ void ObjectMgr::LoadCreatures()
         {
             if ((_difficultyEntries[diff].find(data.id1) != _difficultyEntries[diff].end()) || (_difficultyEntries[diff].find(data.id2) != _difficultyEntries[diff].end()) || (_difficultyEntries[diff].find(data.id3) != _difficultyEntries[diff].end()))
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u) that listed as difficulty %u template (entry: %u, %u, %u) in `creature_template`, skipped.",
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u) that listed as difficulty %u template (Entries: %u, %u, %u) in `creature_template`, skipped.",
                                  spawnId, diff + 1, data.id1, data.id2, data.id3);
                 ok = false;
             }
@@ -2103,31 +2103,29 @@ void ObjectMgr::LoadCreatures()
         // -1 random, 0 no equipment,
         if (data.equipmentId != 0)
         {
-            if ((!GetEquipmentInfo(data.id1, data.equipmentId)) || (!GetEquipmentInfo(data.id2, data.equipmentId))  || (!GetEquipmentInfo(data.id3, data.equipmentId)))
+            if ((!GetEquipmentInfo(data.id1, data.equipmentId)) || (data.id2 && !GetEquipmentInfo(data.id2, data.equipmentId))  || (data.id3 && !GetEquipmentInfo(data.id3, data.equipmentId)))
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (Entry: %u, %u, %u) one or more with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
+                LOG_ERROR("sql.sql", "Table `creature` have creature (Entries: %u, %u, %u) one or more with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
                     data.id1, data.id2, data.id3, data.equipmentId);
                 data.equipmentId = 0;
             }
         }
-
-        if ((cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (cInfo2->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (cInfo3->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND))
+        if ((cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id2 && cInfo2->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id3 && cInfo3->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND))
         {
             if (!mapEntry->IsDungeon())
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with a `creature_template`.`flags_extra` in one or more entries including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with a `creature_template`.`flags_extra` in one or more entries including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
                     spawnId, data.id1, data.id2, data.id3);
         }
-
         if (data.wander_distance < 0.0f)
         {
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with `wander_distance`< 0, set to 0.", spawnId, data.id1, data.id2, data.id3);
+            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `wander_distance`< 0, set to 0.", spawnId, data.id1, data.id2, data.id3);
             data.wander_distance = 0.0f;
         }
         else if (data.movementType == RANDOM_MOTION_TYPE)
         {
             if (data.wander_distance == 0.0f)
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
                     spawnId, data.id1, data.id2, data.id3);
                 data.movementType = IDLE_MOTION_TYPE;
             }
@@ -2136,7 +2134,7 @@ void ObjectMgr::LoadCreatures()
         {
             if (data.wander_distance != 0.0f)
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", spawnId, data.id1, data.id2, data.id3);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", spawnId, data.id1, data.id2, data.id3);
                 data.wander_distance = 0.0f;
             }
         }
