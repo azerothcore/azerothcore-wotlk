@@ -889,7 +889,7 @@ void GameEventMgr::LoadFromDB()
                 newEntry.entry = 0;
 
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
-                    newEntry.entry = data->id;
+                    newEntry.entry = data->id1;
 
                 // check validity with event's npcflag
                 if (!sObjectMgr->IsVendorItemValid(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))

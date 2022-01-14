@@ -1310,7 +1310,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
             dynamicflags = 0;
     }
 
-    data.id = GetEntry();
+    data.id1 = GetEntry();
     data.mapid = mapid;
     data.phaseMask = phaseMask;
     data.displayid = displayId;
@@ -1613,7 +1613,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     m_spawnId = spawnId;
 
     // Add to world
-    uint32 entry = GetRandomId(data->id, data->id2, data->id3);
+    uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
 
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, entry, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
@@ -1911,7 +1911,7 @@ void Creature::Respawn(bool force)
             // Respawn check if spawn has 2 entries
             if (data->id2)
             {
-                uint32 entry = GetRandomId(data->id, data->id2, data->id3);
+                uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
                 UpdateEntry(entry, data, true);  // Select Random Entry
                 m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
                 LoadEquipment(data->equipmentId);                                                     // Reload Equipment

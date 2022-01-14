@@ -1722,8 +1722,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id, linkedGuidLow);
+                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, guidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
                     break;
                 }
             case CREATURE_TO_GO:
@@ -1759,7 +1759,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id, guidLow);
+                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, guidLow);
                     linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
                     break;
                 }
@@ -1834,7 +1834,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     }
 
                     guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id, linkedGuidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
                     break;
                 }
         }
@@ -1853,7 +1853,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(ObjectGuid::LowType guidLow, ObjectGuid
         return false;
 
     CreatureData const* master = GetCreatureData(guidLow);
-    ObjectGuid guid = ObjectGuid::Create<HighGuid::Unit>(master->id, guidLow);
+    ObjectGuid guid = ObjectGuid::Create<HighGuid::Unit>(master->id1, guidLow);
 
     if (!linkedGuidLow) // we're removing the linking
     {
@@ -1884,7 +1884,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(ObjectGuid::LowType guidLow, ObjectGuid
         return false;
     }
 
-    ObjectGuid linkedGuid = ObjectGuid::Create<HighGuid::Unit>(slave->id, linkedGuidLow);
+    ObjectGuid linkedGuid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, linkedGuidLow);
 
     _linkedRespawnStore[guid] = linkedGuid;
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_REP_CREATURE_LINKED_RESPAWN);
@@ -2044,7 +2044,7 @@ void ObjectMgr::LoadCreatures()
             continue;
         }
         CreatureData& data      = _creatureDataStore[spawnId];
-        data.id                 = id1;
+        data.id1                = id1;
         data.id2                = id2;
         data.id3                = id3;
         data.mapid              = fields[4].GetUInt16();
@@ -2090,10 +2090,10 @@ void ObjectMgr::LoadCreatures()
         bool ok = true;
         for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
         {
-            if (_difficultyEntries[diff].find(data.id) != _difficultyEntries[diff].end())
+            if ((_difficultyEntries[diff].find(data.id1) != _difficultyEntries[diff].end()) || (_difficultyEntries[diff].find(data.id2) != _difficultyEntries[diff].end()) || (_difficultyEntries[diff].find(data.id3) != _difficultyEntries[diff].end()))
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u) that listed as difficulty %u template (entry: %u) in `creature_template`, skipped.",
-                                 spawnId, diff + 1, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u) that listed as difficulty %u template (entry: %u, %u, %u) in `creature_template`, skipped.",
+                                 spawnId, diff + 1, data.id1, data.id2, data.id3);
                 ok = false;
             }
         }
@@ -2103,32 +2103,32 @@ void ObjectMgr::LoadCreatures()
         // -1 random, 0 no equipment,
         if (data.equipmentId != 0)
         {
-            if (!GetEquipmentInfo(data.id, data.equipmentId))
+            if ((!GetEquipmentInfo(data.id1, data.equipmentId)) || (!GetEquipmentInfo(data.id2, data.equipmentId))  || (!GetEquipmentInfo(data.id3, data.equipmentId)))
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
-                    data.id, data.equipmentId);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (Entry: %u, %u, %u) one or more with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
+                    data.id1, data.id2, data.id3, data.equipmentId);
                 data.equipmentId = 0;
             }
         }
 
-        if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
+        if ((cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (cInfo2->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (cInfo3->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND))
         {
             if (!mapEntry->IsDungeon())
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
-                    spawnId, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with a `creature_template`.`flags_extra` in one or more entries including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
+                    spawnId, data.id1, data.id2, data.id3);
         }
 
         if (data.wander_distance < 0.0f)
         {
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `wander_distance`< 0, set to 0.", spawnId, data.id);
+            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with `wander_distance`< 0, set to 0.", spawnId, data.id1, data.id2, data.id3);
             data.wander_distance = 0.0f;
         }
         else if (data.movementType == RANDOM_MOTION_TYPE)
         {
             if (data.wander_distance == 0.0f)
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
-                    spawnId, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
+                    spawnId, data.id1, data.id2, data.id3);
                 data.movementType = IDLE_MOTION_TYPE;
             }
         }
@@ -2136,14 +2136,14 @@ void ObjectMgr::LoadCreatures()
         {
             if (data.wander_distance != 0.0f)
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", spawnId, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u, %u, %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", spawnId, data.id1, data.id2, data.id3);
                 data.wander_distance = 0.0f;
             }
         }
 
         if (data.phaseMask == 0)
         {
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, data.id);
+            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, data.id1, data.id2, data.id3);
             data.phaseMask = 1;
         }
 
@@ -2266,7 +2266,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     ObjectGuid::LowType spawnId = GenerateCreatureSpawnId();
     CreatureData& data = NewOrExistCreatureData(spawnId);
     data.spawnMask = spawnId;
-    data.id = entry;
+    data.id1 = entry;
     data.id2 = 0;
     data.id3 = 0;
     data.mapid = mapId;
