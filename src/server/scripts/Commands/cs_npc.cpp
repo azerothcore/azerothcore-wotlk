@@ -595,14 +595,14 @@ public:
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 entry = target->GetEntry();
-        uint32 creature_id1 = 0;
-        uint32 creature_id2 = 0;
-        float chance_id1 = 0.0f;
+        uint32 id = 0;
+        uint32 id2 = 0;
+        uint32 id3 = 0;
         if (CreatureData const* cData = target->GetCreatureData())
         {
-            creature_id1 = cData->id;
-            creature_id2 = cData->id2;
-            chance_id1 = cData->chance_id1;
+            id = cData->id;
+            id2 = cData->id2;
+            id3 = cData->id3;
         }
 
         int64 curRespawnDelay = target->GetRespawnTimeEx() - time(nullptr);
@@ -611,7 +611,7 @@ public:
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
 
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetSpawnId(), target->GetGUID().GetCounter(), entry, creature_id1, creature_id2, chance_id1, displayid, nativeid, faction, npcflags);
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetSpawnId(), target->GetGUID().GetCounter(), entry, id, id2, id3, displayid, nativeid, faction, npcflags);
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->getLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
         handler->PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());

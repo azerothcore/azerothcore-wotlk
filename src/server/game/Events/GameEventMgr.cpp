@@ -230,7 +230,7 @@ void GameEventMgr::LoadFromDB()
 {
     {
         uint32 oldMSTime = getMSTime();
-        //       1           2                           3                         4          5       6        7             8            9            10
+        //                                                    1                 2                           3                  4        5        6          7             8            9          10
         QueryResult result = WorldDatabase.Query("SELECT eventEntry, UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time), occurence, length, holiday, holidayStage, description, world_event, announce FROM game_event");
         if (!result)
         {
@@ -490,8 +490,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                     0                1                       2                              3                                 4                               5
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.creature_id1, creature.creature_id2, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
+        //                                                     0              1             2            3                         4                               5                                 6
+        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.id1, creature.id2, creature.id3, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
                              "FROM creature JOIN game_event_model_equip ON creature.guid=game_event_model_equip.guid");
 
         if (!result)
@@ -508,8 +508,9 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
-                //uint32 entry2 = fields[2].GetUInt32();
-                uint16 event_id = fields[3].GetUInt8();
+                uint32 entry2 = fields[2].GetUInt32();
+                uint32 entry3 = fields[3].GetUInt32();
+                uint16 event_id = fields[4].GetUInt8();
 
                 if (event_id >= mGameEventModelEquip.size())
                 {
@@ -519,8 +520,8 @@ void GameEventMgr::LoadFromDB()
 
                 ModelEquipList& equiplist = mGameEventModelEquip[event_id];
                 ModelEquip newModelEquipSet;
-                newModelEquipSet.modelid = fields[4].GetUInt32();
-                newModelEquipSet.equipment_id = fields[5].GetUInt8();
+                newModelEquipSet.modelid = fields[5].GetUInt32();
+                newModelEquipSet.equipment_id = fields[6].GetUInt8();
                 newModelEquipSet.equipement_id_prev = 0;
                 newModelEquipSet.modelid_prev = 0;
 
@@ -531,6 +532,18 @@ void GameEventMgr::LoadFromDB()
                     {
                         LOG_ERROR("sql.sql", "Table `game_event_model_equip` have creature (Guid: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
                                          guid, newModelEquipSet.equipment_id);
+                        continue;
+                    }
+                    if (entry2 && !sObjectMgr->GetEquipmentInfo(entry2, equipId))
+                    {
+                        LOG_ERROR("sql.sql", "Table `game_event_model_equip` have creature (Guid: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
+                            guid, newModelEquipSet.equipment_id);
+                        continue;
+                    }
+                    if (entry3 && !sObjectMgr->GetEquipmentInfo(entry3, equipId))
+                    {
+                        LOG_ERROR("sql.sql", "Table `game_event_model_equip` have creature (Guid: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
+                            guid, newModelEquipSet.equipment_id);
                         continue;
                     }
                 }
