@@ -21,7 +21,6 @@
 #include "ChannelMgr.h"
 #include "Formulas.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Guild.h"
 #include "InstanceScript.h"
@@ -29,7 +28,6 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
@@ -37,6 +35,13 @@
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
 #include "WeatherMgr.h"
+#include "WorldStatePackets.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 // Zone Interval should be 1 second
 constexpr auto ZONE_UPDATE_INTERVAL = 1000;
@@ -311,35 +316,18 @@ void Player::Update(uint32 p_time)
     if (m_deathState == JUST_DIED)
         KillPlayer();
 
-    if (m_nextSave <= SavingSystemMgr::GetSavingCurrentValue() &&
-        !GetSession()->isLogingOut())
-        SaveToDB(false, false);
-    else if (m_additionalSaveTimer && !GetSession()->isLogingOut()) // pussywizard:
+    if (m_nextSave)
     {
-        if (m_additionalSaveTimer <= p_time)
+        if (p_time >= m_nextSave)
         {
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-            if (m_additionalSaveMask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
-                SaveInventoryAndGoldToDB(trans);
-            if (m_additionalSaveMask & ADDITIONAL_SAVING_QUEST_STATUS)
-            {
-                _SaveQuestStatus(trans);
-
-                // xinef: if nothing changed, nothing will happen
-                _SaveDailyQuestStatus(trans);
-                _SaveWeeklyQuestStatus(trans);
-                _SaveSeasonalQuestStatus(trans);
-                _SaveMonthlyQuestStatus(trans);
-            }
-
-            CharacterDatabase.CommitTransaction(trans);
-
-            m_additionalSaveTimer = 0;
-            m_additionalSaveMask  = 0;
+            // m_nextSave reset in SaveToDB call
+            SaveToDB(false, false);
+            FMT_LOG_DEBUG("entities.player", "Player::Update: Player '{}' ({}) saved", GetName(), GetGUID().ToString());
         }
         else
-            m_additionalSaveTimer -= p_time;
+        {
+            m_nextSave -= p_time;
+        }
     }
 
     // Handle Water/drowning
@@ -2275,12 +2263,12 @@ void Player::UpdateSpecCount(uint8 count)
     SendTalentsInfoData(false);
 }
 
-void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
+void Player::SendUpdateWorldState(uint32 variable, uint32 value) const
 {
-    WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-    data << Field;
-    data << Value;
-    GetSession()->SendPacket(&data);
+    WorldPackets::WorldState::UpdateWorldState worldstate;
+    worldstate.VariableID = variable;
+    worldstate.Value = value;
+    SendDirectMessage(worldstate.Write());
 }
 
 void Player::ProcessTerrainStatusUpdate()

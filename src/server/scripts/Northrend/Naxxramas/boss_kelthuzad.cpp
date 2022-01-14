@@ -156,7 +156,7 @@ public:
 
         float NormalizeOrientation(float o)
         {
-            return fmod(o, 2.0f * static_cast<float>(M_PI)); // Only positive values will be passed
+            return std::fmod(o, 2.0f * static_cast<float>(M_PI)); // Only positive values will be passed
         }
 
         void SpawnHelpers()
@@ -179,7 +179,7 @@ public:
                 for (uint8 j = 0; j < 8; ++j)
                 {
                     float angle = M_PI * 2 / 8 * j;
-                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * std::sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             }
             for (uint8 i = 6; i < 12; ++i)
@@ -188,7 +188,7 @@ public:
                 {
                     float dist = j == 2 ? 0.0f : 8.0f; // second in middle
                     float angle = SummonGroups[i].GetOrientation() + M_PI * 2 / 4 * j;
-                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonGroups[i].GetPositionX() + dist * cos(angle), SummonGroups[i].GetPositionY() + dist * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonGroups[i].GetPositionX() + dist * cos(angle), SummonGroups[i].GetPositionY() + dist * std::sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             }
             for (uint8 i = 6; i < 12; ++i)
@@ -196,7 +196,7 @@ public:
                 for (uint8 j = 0; j < 1; ++j)
                 {
                     float angle = SummonGroups[i].GetOrientation() + M_PI;
-                    me->SummonCreature(NPC_SOUL_WEAVER, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ() + 0.5f, SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOUL_WEAVER, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * std::sin(angle), SummonGroups[i].GetPositionZ() + 0.5f, SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             }
         }
@@ -410,14 +410,14 @@ public:
                     events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SHADOW_FISSURE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         me->CastSpell(target, SPELL_SHADOW_FISURE, false);
                     }
                     events.RepeatEvent(25000);
                     break;
                 case EVENT_FROST_BLAST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, RAID_MODE(1, 0), 0, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, RAID_MODE(1, 0), 0, true))
                     {
                         me->CastSpell(target, SPELL_FROST_BLAST, false);
                     }
@@ -427,7 +427,7 @@ public:
                 case EVENT_CHAINS:
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
                         {
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
                         }
@@ -570,7 +570,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION && me->GetInstanceScript())
             {

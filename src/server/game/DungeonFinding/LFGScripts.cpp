@@ -26,7 +26,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "WorldSession.h"
 
 namespace lfg
 {

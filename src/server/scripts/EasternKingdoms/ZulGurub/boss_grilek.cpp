@@ -86,7 +86,7 @@ public:
                                 DoModifyThreatPercent(victim, -50);
                         }
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                             AttackStart(target);
                         events.ScheduleEvent(EVENT_AVATAR, urand(25000, 35000));
                         break;
