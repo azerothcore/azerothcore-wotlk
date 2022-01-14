@@ -71,6 +71,11 @@ namespace lfg
 
 namespace WorldPackets
 {
+    namespace Chat
+    {
+        class EmoteClient;
+    }
+
     namespace Character
     {
         class LogoutCancel;
@@ -583,7 +588,7 @@ public:                                                 // opcodes handlers
     void HandleZoneUpdateOpcode(WorldPacket& recvPacket);
     void HandleSetSelectionOpcode(WorldPacket& recvPacket);
     void HandleStandStateChangeOpcode(WorldPacket& recvPacket);
-    void HandleEmoteOpcode(WorldPacket& recvPacket);
+    void HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet);
     void HandleContactListOpcode(WorldPacket& recvPacket);
     void HandleAddFriendOpcode(WorldPacket& recvPacket);
     void HandleDelFriendOpcode(WorldPacket& recvPacket);
