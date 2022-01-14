@@ -122,8 +122,6 @@ bool Player::UpdateStats(Stats stat)
     if (stat == STAT_STRENGTH)
     {
         UpdateAttackPowerAndDamage(false);
-        if (HasAuraTypeWithMiscvalue(SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT, stat))
-            UpdateAttackPowerAndDamage(true);
     }
     else if (stat == STAT_AGILITY)
     {
