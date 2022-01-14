@@ -309,7 +309,7 @@ public:
                             return;
 
                         Map::PlayerList const& PlayerList = map->GetPlayers();
-                        if (PlayerList.isEmpty())
+                        if (PlayerList.IsEmpty())
                             return;
 
                         RaidWiped = true;

@@ -228,7 +228,10 @@ enum AcoreStrings
     LANG_CMD_AMBIGUOUS                  = 194,
     LANG_CMD_HELP_GENERIC               = 195,
     LANG_CMD_NO_HELP_AVAILABLE          = 196,
-    // Room for more level 1                197-199 not used
+
+    LANG_ITEM_RESTORE_LIST              = 197,
+    LANG_ITEM_RESTORE_LIST_EMPTY        = 198,
+    LANG_ITEM_RESTORE_MISSING           = 199,
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -1230,7 +1233,22 @@ enum AcoreStrings
     LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG = 5068,
     LANG_COMMAND_QUEST_NOT_COMPLETE     = 5069,
 
-    // Room for more strings    5070-9999
+    LANG_COMMAND_DISABLED               = 5070,
+
+    LANG_CMD_ITEM_REFUND_BAD_EXTENDED_COST = 5071,
+    LANG_CMD_ITEM_REFUND_MAX_HONOR         = 5072,
+    LANG_CMD_ITEM_REFUND_HONOR_FAILED      = 5073,
+    LANG_CMD_ITEM_REFUNDED_HONOR           = 5074,
+    LANG_CMD_ITEM_REFUND_MAX_AP            = 5075,
+    LANG_CMD_ITEM_REFUND_AP_FAILED         = 5076,
+    LANG_CMD_ITEM_REFUNDED_AP              = 5077,
+    LANG_CMD_ITEM_REFUND_NOT_FOUND         = 5078,
+
+    LANG_CMD_AUTOBROADCAST_LVL_ERROR    = 5079,
+    LANG_CMD_SETTINGS_ANNOUNCER_ON      = 5080,
+    LANG_CMD_SETTINGS_ANNOUNCER_OFF     = 5081,
+
+    // Room for more strings    5082-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1377,7 +1395,7 @@ enum AcoreStrings
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
     LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
 
-    LANG_NPCINFO_INHABIT_TYPE                     = 11008,
+    LANG_NPCINFO_MOVEMENT_DATA                    = 11008,
     LANG_NPCINFO_FLAGS_EXTRA                      = 11009,
     LANG_INSTANCE_LOGIN_GAMEMASTER_EXCEPTION      = 11010,
 

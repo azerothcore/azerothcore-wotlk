@@ -121,6 +121,16 @@ Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f };
 Position const MajordomoMoveRagPos = { 830.9636f, -814.7055f, -228.9733f, 0.0f };   // Position used at Ragnaros summoning event
 Position const RagnarosSummonPos = { 838.3082f, -831.4665f, -232.1853f, 2.199115f };
 
+struct MajordomoAddData
+{
+    ObjectGuid guid;
+    uint32 creatureEntry;
+    Position spawnPos;
+
+    MajordomoAddData() { }
+    MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
+};
+
 class boss_majordomo : public CreatureScript
 {
 public:
@@ -128,7 +138,7 @@ public:
 
     struct boss_majordomoAI : public BossAI
     {
-        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
+        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS) {}
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -163,11 +173,10 @@ public:
                         if (summon)
                         {
                             static_minionsGUIDS.insert(summon->GetGUID());
+                            majordomoSummonsData[summon->GetGUID().GetCounter()] = MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition());
                         }
                     }
                 }
-
-                spawnInTextTimer = 10000;
             }
             else
             {
@@ -188,10 +197,27 @@ public:
             {
                 events.SetPhase(PHASE_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
+
+                for (auto const& summon : majordomoSummonsData)
+                {
+                    if (ObjectAccessor::GetCreature(*me, summon.second.guid))
+                    {
+                        continue;
+                    }
+
+                    if (Creature* spawn = me->SummonCreature(summon.second.creatureEntry, summon.second.spawnPos))
+                    {
+                        static_minionsGUIDS.erase(summon.second.guid); // Erase the guid from the previous, no longer existing, spawn.
+                        static_minionsGUIDS.insert(spawn->GetGUID());
+                        majordomoSummonsData.erase(summon.second.guid.GetCounter());
+                        majordomoSummonsData[spawn->GetGUID().GetCounter()] = MajordomoAddData(spawn->GetGUID(), spawn->GetEntry(), spawn->GetPosition());
+                    }
+                }
             }
             else
             {
                 static_minionsGUIDS.clear();
+                majordomoSummonsData.clear();
                 summons.DespawnAll();
             }
         }
@@ -218,7 +244,6 @@ public:
 
             _EnterCombat();
             DoCastAOE(SPELL_SEPARATION_ANXIETY);
-            spawnInTextTimer = 0;
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
@@ -290,18 +315,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (spawnInTextTimer)
-            {
-                if (spawnInTextTimer <= diff)
-                {
-                    spawnInTextTimer = 0;
-                    Talk(SAY_SPAWN);
-                }
-                else
-                {
-                    spawnInTextTimer -= diff;
-                }
-            }
 
             switch (events.GetPhaseMask())
             {
@@ -337,7 +350,7 @@ public:
                             }
                             case EVENT_TELEPORT_RANDOM:
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                                 {
                                     DoCastSelf(SPELL_HATE_TO_ZERO, true);
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
@@ -510,7 +523,7 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
-        uint32 spawnInTextTimer;
+        std::unordered_map<uint32, MajordomoAddData> majordomoSummonsData;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override

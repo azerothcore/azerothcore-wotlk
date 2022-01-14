@@ -27,7 +27,6 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
-#include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
 {
@@ -58,6 +57,11 @@ bool PetAI::_needToStop()
             return true;
 
     return !me->CanCreatureAttack(me->GetVictim());
+}
+
+void PetAI::PetStopAttack()
+{
+    _stopAttack();
 }
 
 void PetAI::_stopAttack()
@@ -174,7 +178,7 @@ void PetAI::UpdateAI(uint32 diff)
         else
             _doMeleeAttack();
     }
-    else if (!me->GetCharmInfo() || (!me->GetCharmInfo()->GetForcedSpell() && !me->HasUnitState(UNIT_STATE_CASTING)))
+    else if (!me->GetCharmInfo() || (!me->GetCharmInfo()->GetForcedSpell() && !(me->IsPet() && me->ToPet()->HasTempSpell()) && !me->HasUnitState(UNIT_STATE_CASTING)))
     {
         if (me->HasReactState(REACT_AGGRESSIVE) || me->GetCharmInfo()->IsAtStay())
         {
@@ -203,7 +207,7 @@ void PetAI::UpdateAI(uint32 diff)
     {
         if (owner && owner->GetTypeId() == TYPEID_PLAYER && me->GetCharmInfo()->GetForcedSpell() && me->GetCharmInfo()->GetForcedTarget())
         {
-            owner->ToPlayer()->GetSession()->HandlePetActionHelper(me, me->GetGUID(), abs(me->GetCharmInfo()->GetForcedSpell()), ACT_ENABLED, me->GetCharmInfo()->GetForcedTarget());
+            owner->ToPlayer()->GetSession()->HandlePetActionHelper(me, me->GetGUID(), std::abs(me->GetCharmInfo()->GetForcedSpell()), ACT_ENABLED, me->GetCharmInfo()->GetForcedTarget());
 
             // xinef: if spell was casted properly and we are in passive mode, handle return
             if (!me->GetCharmInfo()->GetForcedSpell() && me->HasReactState(REACT_PASSIVE))
