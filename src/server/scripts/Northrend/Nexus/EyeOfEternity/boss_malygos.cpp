@@ -494,7 +494,7 @@ public:
                             vp->SetDisableGravity(true);
 
                             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* pPlayer = i->GetSource())
                                     {
@@ -714,7 +714,7 @@ public:
 
                         // mount players:
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
@@ -1196,7 +1196,7 @@ public:
                     {
                         GuidVector guids;
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
