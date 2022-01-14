@@ -1356,6 +1356,8 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE);
     stmt->setUInt32(index++, m_spawnId);
     stmt->setUInt32(index++, GetEntry());
+    stmt->setUInt32(index++, 0);
+    stmt->setFloat(index++, 100.0f);
     stmt->setUInt16(index++, uint16(mapid));
     stmt->setUInt8(index++, spawnMask);
     stmt->setUInt32(index++, GetPhaseMask());
@@ -3025,10 +3027,10 @@ bool Creature::SetSwim(bool enable)
  */
 bool Creature::CanSwim() const
 {
-    if (Unit::CanSwim())
+    if (Unit::CanSwim() || (!Unit::CanSwim() && !CanFly()))
         return true;
 
-    if (IsPet() || GetOwnerGUID().IsPlayer())
+    if (IsPet())
         return true;
 
     return false;
