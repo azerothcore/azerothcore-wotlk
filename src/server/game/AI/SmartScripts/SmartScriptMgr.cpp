@@ -300,6 +300,54 @@ void SmartAIMgr::LoadSmartAIFromDB()
     LOG_INFO("server.loading", " ");
 }
 
+/*static*/ bool SmartAIMgr::EventHasInvoker(SMART_EVENT event)
+{
+    switch (event)
+    { // white list of events that actually have an invoker passed to them
+        case SMART_EVENT_AGGRO:
+        case SMART_EVENT_DEATH:
+        case SMART_EVENT_KILL:
+        case SMART_EVENT_SUMMONED_UNIT:
+        case SMART_EVENT_SPELLHIT:
+        case SMART_EVENT_SPELLHIT_TARGET:
+        case SMART_EVENT_DAMAGED:
+        case SMART_EVENT_RECEIVE_HEAL:
+        case SMART_EVENT_RECEIVE_EMOTE:
+        case SMART_EVENT_JUST_SUMMONED:
+        case SMART_EVENT_DAMAGED_TARGET:
+        case SMART_EVENT_SUMMON_DESPAWNED:
+        case SMART_EVENT_PASSENGER_BOARDED:
+        case SMART_EVENT_PASSENGER_REMOVED:
+        case SMART_EVENT_GOSSIP_HELLO:
+        case SMART_EVENT_GOSSIP_SELECT:
+        case SMART_EVENT_ACCEPTED_QUEST:
+        case SMART_EVENT_REWARD_QUEST:
+        case SMART_EVENT_FOLLOW_COMPLETED:
+        case SMART_EVENT_ON_SPELLCLICK:
+        case SMART_EVENT_GO_STATE_CHANGED:
+        case SMART_EVENT_AREATRIGGER_ONTRIGGER:
+        case SMART_EVENT_IC_LOS:
+        case SMART_EVENT_OOC_LOS:
+        case SMART_EVENT_DISTANCE_CREATURE:
+        case SMART_EVENT_FRIENDLY_HEALTH:
+        case SMART_EVENT_FRIENDLY_HEALTH_PCT:
+        case SMART_EVENT_FRIENDLY_IS_CC:
+        case SMART_EVENT_FRIENDLY_MISSING_BUFF:
+        case SMART_EVENT_ACTION_DONE:
+        case SMART_EVENT_TARGET_HEALTH_PCT:
+        case SMART_EVENT_TARGET_MANA_PCT:
+        case SMART_EVENT_RANGE:
+        case SMART_EVENT_VICTIM_CASTING:
+        case SMART_EVENT_TARGET_BUFFED:
+        case SMART_EVENT_IS_BEHIND_TARGET:
+        case SMART_EVENT_INSTANCE_PLAYER_ENTER:
+        case SMART_EVENT_TRANSPORT_ADDCREATURE:
+            return true;
+        default:
+            return false;
+    }
+}
+
 bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
 {
     if (e.GetActionType() == SMART_ACTION_INSTALL_AI_TEMPLATE)
@@ -348,6 +396,15 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
                 }
                 break;
             }
+        case SMART_TARGET_ACTION_INVOKER:
+        case SMART_TARGET_ACTION_INVOKER_VEHICLE:
+        case SMART_TARGET_INVOKER_PARTY:
+            if (e.GetScriptType() != SMART_SCRIPT_TYPE_TIMED_ACTIONLIST && e.GetEventType() != SMART_EVENT_LINK && !EventHasInvoker(e.event.type))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has invoker target, but action does not provide any invoker!", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType());
+                 return false;
+            }
+            break;
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
@@ -371,9 +428,6 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_OWNER_OR_SUMMONER:
             AC_SAI_IS_BOOLEAN_VALID(e, e.target.owner.useCharmerOrOwner);
             break;
-        case SMART_TARGET_ACTION_INVOKER:
-        case SMART_TARGET_INVOKER_PARTY:
-        case SMART_TARGET_ACTION_INVOKER_VEHICLE:
         case SMART_TARGET_STORED:
         case SMART_TARGET_PLAYER_WITH_AURA:
         case SMART_TARGET_RANDOM_POINT:
