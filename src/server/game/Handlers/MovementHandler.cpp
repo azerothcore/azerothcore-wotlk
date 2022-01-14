@@ -403,7 +403,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-                //TC_LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
+                //LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
             }
             recvData.rfinish();                 // prevent warnings spam
             return;
@@ -489,6 +489,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             sScriptMgr->AnticheatSetJumpingbyOpcode(plrMover, false);
         }
+    }
+
+    if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
+    {
+        // now client not include swimming flag in case jumping under water
+        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseMask(), movementInfo.pos.GetPositionX(),
+            movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ(), plrMover->GetCollisionHeight()));
     }
 
     bool jumpopcode = false;

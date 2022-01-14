@@ -130,7 +130,7 @@ public:
                     if (Creature* boss = instance->GetCreature(NPC_DevourerGUID))
                     {
                         float angle = boss->GetAngle(leader);
-                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * sin(angle), boss->GetPositionZ());
+                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * std::sin(angle), boss->GetPositionZ());
                     }
 
             for (int8 i = 0; outroPositions[i].entry[teamIdInInstance] != 0; ++i)

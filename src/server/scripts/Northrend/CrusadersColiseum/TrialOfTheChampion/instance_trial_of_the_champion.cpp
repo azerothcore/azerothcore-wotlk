@@ -824,7 +824,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_1_ATTACK, 3000);
@@ -850,7 +850,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_2_ATTACK, 3000);
@@ -875,7 +875,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_3_ATTACK, 3000);
@@ -900,7 +900,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(4, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(4, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK, 3000);

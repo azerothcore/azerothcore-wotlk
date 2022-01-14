@@ -198,9 +198,9 @@ public:
                             float angle = rand_norm() * 2 * M_PI;
                             Position p1(SpawnLoc[i]), p2(SpawnLoc[i]);
                             p1.m_positionX += 2.5f * cos(angle);
-                            p1.m_positionY += 2.5f * sin(angle);
+                            p1.m_positionY += 2.5f * std::sin(angle);
                             p2.m_positionX -= 2.5f * cos(angle);
-                            p2.m_positionY -= 2.5f * sin(angle);
+                            p2.m_positionY -= 2.5f * std::sin(angle);
                             DoSummon(NPC_ICHOR_GLOBULE, p1, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                             DoSummon(NPC_ICHOR_GLOBULE, p2, 60000, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                         }

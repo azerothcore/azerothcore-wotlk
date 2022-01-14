@@ -26,6 +26,8 @@
 #include "SpellMgr.h"
 #include "Unit.h"
 
+typedef uint32 SAIBool;
+
 struct WayPoint
 {
     WayPoint(uint32 _id, float _x, float _y, float _z, float _o, uint32 _delay)
@@ -112,7 +114,7 @@ enum SMART_EVENT
     SMART_EVENT_EVADE                    = 7,       // NONE
     SMART_EVENT_SPELLHIT                 = 8,       // SpellID, School, CooldownMin, CooldownMax
     SMART_EVENT_RANGE                    = 9,       // MinDist, MaxDist, RepeatMin, RepeatMax
-    SMART_EVENT_OOC_LOS                  = 10,      // NoHostile, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
+    SMART_EVENT_OOC_LOS                  = 10,      // HostilityMode, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_RESPAWN                  = 11,      // type, MapId, ZoneId
     SMART_EVENT_TARGET_HEALTH_PCT        = 12,      // HPMin%, HPMax%, RepeatMin, RepeatMax
     SMART_EVENT_VICTIM_CASTING           = 13,      // RepeatMin, RepeatMax, spellid
@@ -128,7 +130,7 @@ enum SMART_EVENT
     SMART_EVENT_HAS_AURA                 = 23,      // Param1 = SpellID, Param2 = Stack amount, Param3/4 RepeatMin, RepeatMax
     SMART_EVENT_TARGET_BUFFED            = 24,      // Param1 = SpellID, Param2 = Stack amount, Param3/4 RepeatMin, RepeatMax
     SMART_EVENT_RESET                    = 25,      // Called after combat, when the creature respawn and spawn.
-    SMART_EVENT_IC_LOS                   = 26,      // NoHostile, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
+    SMART_EVENT_IC_LOS                   = 26,      // HostilityMode, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_PASSENGER_BOARDED        = 27,      // CooldownMin, CooldownMax
     SMART_EVENT_PASSENGER_REMOVED        = 28,      // CooldownMin, CooldownMax
     SMART_EVENT_CHARMED                  = 29,      // NONE
@@ -214,7 +216,7 @@ struct SmartEvent
         {
             uint32 cooldownMin;
             uint32 cooldownMax;
-            uint32 playerOnly;
+            SAIBool playerOnly;
             uint32 creature;
         } kill;
 
@@ -228,11 +230,14 @@ struct SmartEvent
 
         struct
         {
-            uint32 noHostile;
+            /// <summary>
+            /// Hostility mode of the event. 0: hostile, 1: not hostile, 2: any
+            /// </summary>
+            uint32 hostilityMode;
             uint32 maxDist;
             uint32 cooldownMin;
             uint32 cooldownMax;
-            uint32 playerOnly;
+            SAIBool playerOnly;
         } los;
 
         struct
@@ -458,6 +463,14 @@ struct SmartEvent
             uint32 param5;
         } raw;
     };
+
+    enum class LOSHostilityMode : uint32
+    {
+        Hostile = 0,
+        NotHostile = 1,
+        Any = 2,
+        End
+    };
 };
 
 enum SMART_SCRIPT_RESPAWN_CONDITION
@@ -607,6 +620,9 @@ enum SMART_ACTION
     // SMART_ACTION_INVOKER_CAST                    = 134,    // TODO: solve name conflicts
 
     SMART_ACTION_TC_END                             = 135,    // placeholder
+    SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
+
+    SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
 
     // AC-only SmartActions:
 
@@ -636,8 +652,9 @@ enum SMART_ACTION
     SMART_ACTION_VORTEX_SUMMON                      = 221,    // entry, duration (0 = perm), spiral scaling, spiral appearance, range max, phi_delta     <-- yes confusing math, try it ingame and see, my lovely AC boys!
     SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
+    SMART_ACTION_ATTACK_STOP                        = 224,    //
 
-    SMART_ACTION_AC_END                             = 224,    // placeholder
+    SMART_ACTION_AC_END                             = 225,    // placeholder
 };
 
 struct SmartAction
@@ -650,7 +667,7 @@ struct SmartAction
         {
             uint32 textGroupID;
             uint32 duration;
-            uint32 useTalkTarget;
+            SAIBool useTalkTarget;
         } talk;
 
         struct
@@ -667,7 +684,7 @@ struct SmartAction
         struct
         {
             uint32 sound;
-            uint32 onlySelf;
+            SAIBool onlySelf;
         } sound;
 
         struct
@@ -676,7 +693,7 @@ struct SmartAction
             uint32 sound2;
             uint32 sound3;
             uint32 sound4;
-            uint32 onlySelf;
+            SAIBool onlySelf;
         } randomSound;
 
         struct
@@ -709,7 +726,7 @@ struct SmartAction
         struct
         {
             uint32 questID;
-            uint32 directAdd;
+            SAIBool directAdd;
         } questOffer;
 
         struct
@@ -759,7 +776,7 @@ struct SmartAction
             uint32 creature;
             uint32 type;
             uint32 duration;
-            uint32 attackInvoker;
+            SAIBool attackInvoker;
             uint32 attackScriptOwner;
         } summonCreature;
 
@@ -791,12 +808,12 @@ struct SmartAction
 
         struct
         {
-            uint32 attack;
+            SAIBool attack;
         } autoAttack;
 
         struct
         {
-            uint32 move;
+            SAIBool move;
         } combatMove;
 
         struct
@@ -862,13 +879,13 @@ struct SmartAction
         struct
         {
             uint32 creature;
-            uint32 updateLevel;
+            SAIBool updateLevel;
         } updateTemplate;
 
         struct
         {
             uint32 range;
-            uint32 withEmote;
+            SAIBool withEmote;
         } callHelp;
 
         struct
@@ -906,7 +923,7 @@ struct SmartAction
 
         struct
         {
-            uint32 state;
+            SAIBool state;
         } visibility;
 
         struct
@@ -928,9 +945,9 @@ struct SmartAction
 
         struct
         {
-            uint32 run;
+            SAIBool run;
             uint32 pathID;
-            uint32 repeat;
+            SAIBool repeat;
             uint32 quest;
             uint32 despawnTime;
             uint32 reactState;
@@ -945,7 +962,7 @@ struct SmartAction
         {
             uint32 despawnTime;
             uint32 quest;
-            uint32 fail;
+            SAIBool fail;
         } wpStop;
 
         struct
@@ -966,19 +983,19 @@ struct SmartAction
 
         struct
         {
-            uint32 run;
+            SAIBool run;
         } setRun;
 
         struct
         {
-            uint32 fly;
+            SAIBool fly;
             uint32 speed;
             uint32 disableGravity;
         } setFly;
 
         struct
         {
-            uint32 swim;
+            SAIBool swim;
         } setSwim;
 
         struct
@@ -990,7 +1007,8 @@ struct SmartAction
         {
             uint32 counterId;
             uint32 value;
-            uint32 reset;
+            SAIBool reset;
+            uint32 subtract;
         } setCounter;
 
         struct
@@ -1063,9 +1081,9 @@ struct SmartAction
 
         struct
         {
-            uint32 withDelayed;
+            SAIBool withDelayed;
             uint32 spell_id;
-            uint32 withInstant;
+            SAIBool withInstant;
         } interruptSpellCasting;
 
         struct
@@ -1098,10 +1116,10 @@ struct SmartAction
         struct
         {
             uint32 pointId;
-            uint32 transport;
+            SAIBool transport;
             uint32 controlled;
             uint32 ContactDistance;
-        } MoveToPos;
+        } moveToPos;
 
         struct
         {
@@ -1132,7 +1150,7 @@ struct SmartAction
 
         struct
         {
-            uint32 root;
+            SAIBool root;
         } setRoot;
 
         struct
@@ -1202,7 +1220,7 @@ struct SmartAction
         struct
         {
             uint32 id;
-            uint32 force;
+            SAIBool force;
         } loadEquipment;
 
         struct
@@ -1279,13 +1297,25 @@ struct SmartAction
 
         struct
         {
-            uint32 disable;
+            SAIBool disable;
         } disableEvade;
 
         struct
         {
             uint32 timer;
         } corpseDelay;
+
+        struct
+        {
+            uint32 movementType;
+            uint32 speedInteger;
+            uint32 speedFraction;
+        } movementSpeed;
+
+        struct
+        {
+            uint32 percent;
+        } setHealthPct;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1314,7 +1344,7 @@ enum SMARTAI_TEMPLATE
 
 enum SMARTAI_TARGETS
 {
-    SMART_TARGET_NONE                           = 0,    // NONE, defaulting to invoket
+    SMART_TARGET_NONE                           = 0,    // NONE
     SMART_TARGET_SELF                           = 1,    // Self cast
     SMART_TARGET_VICTIM                         = 2,    // Our current target (ie: highest aggro)
     SMART_TARGET_HOSTILE_SECOND_AGGRO           = 3,    // Second highest aggro, maxdist, playerOnly, powerType + 1
@@ -1380,15 +1410,15 @@ struct SmartTarget
         struct
         {
             uint32 maxDist;
-            uint32 playerOnly;
+            SAIBool playerOnly;
             uint32 powerType;
         } hostilRandom;
 
         struct
         {
             uint32 maxDist;
-            uint32 playerOnly;
-            uint32 isInLos;
+            SAIBool playerOnly;
+            SAIBool isInLos;
         } farthest;
 
         struct
@@ -1462,14 +1492,14 @@ struct SmartTarget
 
         struct
         {
-            uint32 useCharmerOrOwner;
+            SAIBool useCharmerOrOwner;
         } owner;
 
         struct
         {
             uint32 entry;
             uint32 dist;
-            uint32 dead;
+            SAIBool dead;
         } closest;
 
         struct
@@ -1482,13 +1512,13 @@ struct SmartTarget
         struct
         {
             uint32 maxDist;
-            uint32 playerOnly;
+            SAIBool playerOnly;
         } closestAttackable;
 
         struct
         {
             uint32 maxDist;
-            uint32 playerOnly;
+            SAIBool playerOnly;
         } closestFriendly;
 
         struct
@@ -1779,7 +1809,7 @@ public:
                 if (WorldObject* obj = ObjectAccessor::GetWorldObject(*m_baseObject, *itr))
                     m_objectList->push_back(obj);
                 //else
-                //    TC_LOG_DEBUG("scripts.ai", "SmartScript::mTargetStorage stores a guid to an invalid object: %s", (*itr).ToString().c_str());
+                //    LOG_DEBUG("scripts.ai", "SmartScript::mTargetStorage stores a guid to an invalid object: %s", (*itr).ToString().c_str());
             }
         }
 
@@ -1854,6 +1884,8 @@ public:
 private:
     //event stores
     SmartAIEventMap mEventMap[SMART_SCRIPT_TYPE_MAX];
+
+    static bool EventHasInvoker(SMART_EVENT event);
 
     bool IsEventValid(SmartScriptHolder& e);
     bool IsTargetValid(SmartScriptHolder const& e);
