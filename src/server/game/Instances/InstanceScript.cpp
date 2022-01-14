@@ -412,7 +412,7 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
 
-    if (!lPlayers.isEmpty())
+    if (!lPlayers.IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
             if (Player* player = itr->GetSource())
@@ -429,7 +429,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 {
     InstanceMap::PlayerList const& players = instance->GetPlayers();
 
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         va_list ap;
         va_start(ap, format);
@@ -447,7 +447,7 @@ void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, 
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
@@ -458,7 +458,7 @@ void InstanceScript::DoStartTimedAchievement(AchievementCriteriaTimedTypes type,
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->StartTimedAchievement(type, entry);
@@ -469,7 +469,7 @@ void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, 
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->RemoveTimedAchievement(type, entry);
@@ -479,7 +479,7 @@ void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, 
 void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
         {
@@ -498,7 +498,7 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->CastSpell(player, spell, true);

@@ -126,7 +126,7 @@ void WorldSession::HandleMoveWorldportAck()
             _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
 
-    if (!_player->getHostileRefMgr().isEmpty())
+    if (!_player->getHostileRefMgr().IsEmpty())
         _player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
