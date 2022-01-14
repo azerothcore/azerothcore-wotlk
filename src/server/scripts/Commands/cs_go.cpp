@@ -94,7 +94,7 @@ public:
         CreatureData const* spawnpoint = nullptr;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id != *cId)
+            if (pair.second.id1 != *cId)
                 continue;
 
             if (!spawnpoint)
