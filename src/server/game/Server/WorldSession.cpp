@@ -657,7 +657,7 @@ void WorldSession::LogoutPlayer(bool save)
             Map::PlayerList const& playerList = _player->GetMap()->GetPlayers();
 
             if (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon())
-                if (playerList.isEmpty())
+                if (playerList.IsEmpty())
                     _player->TeleportToEntryPoint();
         }
 
