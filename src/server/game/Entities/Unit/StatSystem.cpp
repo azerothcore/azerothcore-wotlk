@@ -449,7 +449,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             case CLASS_MAGE:
             case CLASS_PRIEST:
             case CLASS_WARLOCK:
-                val2 = GetStat(STAT_STRENGTH) - 10.0f;
+                val2 = (GetStat(STAT_STRENGTH) * 2.0f) - 20.0f;
                 break;
         }
     }
