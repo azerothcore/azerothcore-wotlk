@@ -1613,25 +1613,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     m_spawnId = spawnId;
 
     // Add to world
-    uint32 entry = data->id;
-    uint8 ids = 0;
-    if (data->id2) ++ids;
-    if (data->id3) ++ids;
-
-    if (ids)
-    {
-        uint8 idNumber = urand(0, ids);
-        switch (idNumber) {
-            case 0:
-                break;
-            case 1:
-                entry = data->id2;
-                break;
-            case 2:
-                entry = data->id3;
-                break;
-        }
-    }
+    uint32 entry = GetRandomId(data->id, data->id2, data->id3);
 
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, entry, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
@@ -1929,26 +1911,7 @@ void Creature::Respawn(bool force)
             // Respawn check if spawn has 2 entries
             if (data->id2)
             {
-                // Add to world
-                uint32 entry = data->id;
-                uint8 ids = 1;
-                if (data->id3) ++ids;
-
-                if (ids)
-                {
-                    uint8 idNumber = urand(0, ids);
-                    switch (idNumber) {
-                        case 0:
-                            break;
-                        case 1:
-                            entry = data->id2;
-                            break;
-                        case 2:
-                            entry = data->id3;
-                            break;
-                    }
-                }
-
+                uint32 entry = GetRandomId(data->id, data->id2, data->id3);
                 UpdateEntry(entry, data, true);  // Select Random Entry
                 m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
                 LoadEquipment(data->equipmentId);                                                     // Reload Equipment
@@ -3492,4 +3455,34 @@ bool Creature::CanPeriodicallyCallForAssistance() const
         return false;
 
     return true;
+}
+
+uint32 Creature::GetRandomId(uint32 Id1, uint32 Id2, uint32 Id3)
+{
+    uint32 id = Id1;
+    uint8 ids = 0;
+
+    if (Id2)
+    {
+        ++ids;
+        if (Id3) ++ids;
+    }
+
+    if (ids)
+    {
+        uint8 idNumber = urand(0, ids);
+        switch (idNumber)
+        {
+            case 0:
+                id = Id1;
+                break;
+            case 1:
+                id = Id2;
+                break;
+            case 2:
+                id = Id3;
+                break;
+        }
+    }
+    return id;
 }
