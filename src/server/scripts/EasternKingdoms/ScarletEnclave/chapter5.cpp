@@ -432,7 +432,7 @@ public:
         void SendUpdateWorldState(uint32 id, uint32 state)
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     if (Player* player = itr->GetSource())
                         if (player->GetPhaseMask() & 128) // Xinef: client skips players without chapter 5 aura anyway, speedup
@@ -1125,7 +1125,7 @@ public:
                 case EVENT_OUTRO_SCENE_60:
                     {
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                         {
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))
