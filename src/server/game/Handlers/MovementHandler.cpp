@@ -126,7 +126,7 @@ void WorldSession::HandleMoveWorldportAck()
             _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
 
-    if (!_player->getHostileRefMgr().isEmpty())
+    if (!_player->getHostileRefMgr().IsEmpty())
         _player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
@@ -193,7 +193,7 @@ void WorldSession::HandleMoveWorldportAck()
     {
         if (mEntry->IsDungeon())
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->SpawnCorpseBones();
         }
     }
@@ -203,7 +203,7 @@ void WorldSession::HandleMoveWorldportAck()
         // resurrect character upon entering instance when the corpse is not available anymore
         if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
         {
-            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->ResurrectPlayer(0.5f);
             GetPlayer()->RemoveCorpse();
         }
     }
@@ -403,7 +403,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-                //TC_LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
+                //LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
             }
             recvData.rfinish();                 // prevent warnings spam
             return;
@@ -672,7 +672,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
             return;
     }
 
-    if (!_player->GetTransport() && fabs(_player->GetSpeed(move_type) - newspeed) > 0.01f)
+    if (!_player->GetTransport() && std::fabs(_player->GetSpeed(move_type) - newspeed) > 0.01f)
     {
         if (_player->GetSpeed(move_type) > newspeed)         // must be greater - just correct
         {
@@ -995,6 +995,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     else
     {
         movementInfo.time = (uint32)movementTime;
+    }
+
+    if (G3D::fuzzyEq(movementInfo.fallTime, 0.f))
+    {
+        movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FALLING);
     }
 
     movementInfo.guid = mover->GetGUID();

@@ -124,7 +124,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             uint32 despawnTime = 0;
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 60.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
             {
                 summon->CastSpell(target, SPELL_STAMPEDE_DMG, true);
                 despawnTime = (summon->GetDistance(target) / 40.0f * 1000) + 500;
@@ -190,7 +190,7 @@ public:
                     events.ScheduleEvent(EVENT_ENRAGE, 20000);
                     break;
                 case EVENT_STOMP:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_STOMP, false);
                     events.ScheduleEvent(EVENT_STOMP, 20000);
                     break;
@@ -204,7 +204,7 @@ public:
                         return;
                     }
                     events.ScheduleEvent(EVENT_IMPALING_CHARGE, 21000);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                     {
                         me->CastSpell(target, SPELL_IMPALING_CHARGE, false);
                         impaledList.insert(target->GetGUID());

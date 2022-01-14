@@ -442,15 +442,15 @@ struct BroadcastText
     uint32 LanguageID{0};
     std::vector<std::string> MaleText;
     std::vector<std::string> FemaleText;
-    uint32 EmoteId0{0};
     uint32 EmoteId1{0};
     uint32 EmoteId2{0};
-    uint32 EmoteDelay0{0};
+    uint32 EmoteId3{0};
     uint32 EmoteDelay1{0};
     uint32 EmoteDelay2{0};
-    uint32 SoundId{0};
-    uint32 Unk1{0};
-    uint32 Unk2{0};
+    uint32 EmoteDelay3{0};
+    uint32 SoundEntriesId{0};
+    uint32 EmotesID{0};
+    uint32 Flags{0};
     // uint32 VerifiedBuild;
 
     [[nodiscard]] std::string const& GetText(LocaleConstant locale = DEFAULT_LOCALE, uint8 gender = GENDER_MALE, bool forceGender = false) const
@@ -740,7 +740,7 @@ public:
 
     CreatureTemplate const* GetCreatureTemplate(uint32 entry);
     [[nodiscard]] CreatureTemplateContainer const* GetCreatureTemplates() const { return &_creatureTemplateStore; }
-    CreatureModelInfo const* GetCreatureModelInfo(uint32 modelId);
+    CreatureModelInfo const* GetCreatureModelInfo(uint32 modelId) const;
     CreatureModelInfo const* GetCreatureModelRandomGender(uint32* displayID);
     static uint32 ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = nullptr);
     static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = nullptr);
@@ -749,6 +749,7 @@ public:
     GameObjectAddon const* GetGameObjectAddon(ObjectGuid::LowType lowguid);
     [[nodiscard]] GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
     CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
+    CreatureMovementData const* GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const;
     ItemTemplate const* GetItemTemplate(uint32 entry);
     [[nodiscard]] ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
     [[nodiscard]] std::vector<ItemTemplate*> const* GetItemTemplateStoreFast() const { return &_itemTemplateStoreFast; }
@@ -989,6 +990,7 @@ public:
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
+    void CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement);
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();
     void LoadTempSummons();
@@ -999,6 +1001,7 @@ public:
     void LoadGameObjectAddons();
     void LoadCreatureModelInfo();
     void LoadEquipmentTemplates();
+    void LoadCreatureMovementOverrides();
     void LoadGameObjectLocales();
     void LoadGameobjects();
     void LoadItemTemplates();
@@ -1055,7 +1058,7 @@ public:
 
     void LoadVendors();
     void LoadTrainerSpell();
-    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel);
+    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
     uint32 GetBaseXP(uint8 level);
@@ -1266,13 +1269,13 @@ public:
 
     // reserved names
     void LoadReservedPlayersNames();
-    [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
-    static uint8 CheckPlayerName(std::string const& name, bool create = false);
-    static PetNameInvalidReason CheckPetName(std::string const& name);
-    static bool IsValidCharterName(std::string const& name);
+    static uint8 CheckPlayerName(std::string_view name, bool create = false);
+    static PetNameInvalidReason CheckPetName(std::string_view name);
+    static bool IsValidCharterName(std::string_view name);
     static bool IsValidChannelName(std::string const& name);
 
     static bool CheckDeclinedNames(std::wstring w_ownname, DeclinedName const& names);
@@ -1491,6 +1494,7 @@ private:
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;
     CreatureAddonContainer _creatureTemplateAddonStore;
+    std::unordered_map<ObjectGuid::LowType, CreatureMovementData> _creatureMovementOverrides;
     GameObjectAddonContainer _gameObjectAddonStore;
     GameObjectQuestItemMap _gameObjectQuestItemStore;
     CreatureQuestItemMap _creatureQuestItemStore;

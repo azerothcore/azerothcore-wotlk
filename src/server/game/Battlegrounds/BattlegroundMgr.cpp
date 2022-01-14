@@ -37,7 +37,6 @@
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "Map.h"
-#include "MapInstanced.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -45,12 +44,7 @@
 #include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include <random>
 #include <unordered_map>
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 
 /*********************************************************/
 /***            BATTLEGROUND MANAGER                   ***/
@@ -388,13 +382,6 @@ void BattlegroundMgr::BuildGroupJoinedBattlegroundPacket(WorldPacket* data, Grou
     *data << int32(result);
     if (result == ERR_BATTLEGROUND_JOIN_TIMED_OUT || result == ERR_BATTLEGROUND_JOIN_FAILED)
         *data << uint64(0);                                 // player guid
-}
-
-void BattlegroundMgr::BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value)
-{
-    data->Initialize(SMSG_UPDATE_WORLD_STATE, 4 + 4);
-    *data << uint32(field);
-    *data << uint32(value);
 }
 
 void BattlegroundMgr::BuildPlaySoundPacket(WorldPacket* data, uint32 soundid)
@@ -994,9 +981,8 @@ void BattlegroundMgr::AddBattleground(Battleground* bg)
         m_BattlegroundTemplates[bg->GetBgTypeID()] = bg;
     else
         m_Battlegrounds[bg->GetInstanceID()] = bg;
-#ifdef ELUNA
-    sEluna->OnBGCreate(bg, bg->GetBgTypeID(), bg->GetInstanceID());
-#endif
+
+    sScriptMgr->OnBattlegroundCreate(bg);
 }
 
 void BattlegroundMgr::RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 instanceId)

@@ -31,15 +31,16 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
-
 void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
     uint32 questStatus = DIALOG_STATUS_NONE;
+
+    GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
+    // Did we already get get a gossip menu? if so no need to status query
+    if (!gossipMenu.Empty())
+        return;
 
     Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
     if (!questGiver)
@@ -89,14 +90,11 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
-    // Stop the npc if moving
-    //if (!creature->GetTransport()) // pussywizard: reverted with new spline (old: without this check, npc would stay in place and the transport would continue moving, so the npc falls off. NPCs on transports don't have waypoints, so stopmoving is not needed)
-    creature->StopMoving();
 
-#ifdef ELUNA
-    if (sEluna->OnGossipHello(_player, creature))
-        return;
-#endif
+    // Stop the npc if moving
+    if (uint32 pause = creature->GetMovementTemplate().GetInteractionPauseTimer())
+        creature->PauseMovement(pause);
+    creature->SetHomePosition(creature->GetPosition());
 
     if (sScriptMgr->OnGossipHello(_player, creature))
         return;
@@ -425,9 +423,9 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
             _player->AbandonQuest(questId); // remove all quest items player received before abandoning quest.
             _player->RemoveActiveQuest(questId);
             _player->RemoveTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, questId);
-#ifdef ELUNA
-            sEluna->OnQuestAbandon(_player, questId);
-#endif
+
+            sScriptMgr->OnQuestAbandon(_player, questId);
+
             LOG_DEBUG("network.opcode", "Player %s abandoned quest %u", _player->GetGUID().ToString().c_str(), questId);
             // check if Quest Tracker is enabled
             if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))

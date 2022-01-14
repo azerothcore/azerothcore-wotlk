@@ -17,7 +17,6 @@
 
 #include "DatabaseWorkerPool.h"
 #include "AdhocStatement.h"
-#include "Common.h"
 #include "Errors.h"
 #include "Implementation/CharacterDatabase.h"
 #include "Implementation/LoginDatabase.h"
@@ -40,7 +39,7 @@
 #endif
 
 #if MARIADB_VERSION_ID >= 100600
-#define MIN_MYSQL_SERVER_VERSION 100200u
+#define MIN_MYSQL_SERVER_VERSION 100500u
 #define MIN_MYSQL_CLIENT_VERSION 30203u
 #else
 #define MIN_MYSQL_SERVER_VERSION 50700u
@@ -72,7 +71,7 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool()
     bool isSameClientDB    = true; // Client version 3.2.3?
 #endif
 
-    WPFatal(isSupportClientDB, "AzerothCore does not support MySQL versions below 5.7 and MariaDB 10.2\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors).");
+    WPFatal(isSupportClientDB, "AzerothCore does not support MySQL versions below 5.7 and MariaDB 10.5\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors).");
     WPFatal(isSameClientDB, "Used MySQL library version (%s id %lu) does not match the version id used to compile AzerothCore (id %u).\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors).",
         mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
 }
@@ -175,7 +174,7 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
                     uint32 const paramCount = stmt->GetParameterCount();
 
                     // TC only supports uint8 indices.
-                    ASSERT(paramCount < std::numeric_limits<uint8>::max());
+                    ASSERT(paramCount < (std::numeric_limits<uint8>::max)());
 
                     _preparedStatementSize[i] = static_cast<uint8>(paramCount);
                 }
@@ -402,7 +401,7 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
         }
         else if (connection->GetServerVersion() < MIN_MYSQL_SERVER_VERSION)
         {
-            LOG_ERROR("sql.driver", "AzerothCore does not support MySQL versions below 5.7");
+            LOG_ERROR("sql.driver", "AzerothCore does not support MySQL versions below 5.7 or MariaDB versions below 10.5");
             return 1;
         }
         else
