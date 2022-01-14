@@ -973,7 +973,7 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
     std::set<uint32> deletedPools;
     for (PoolGroupQuestMap::iterator itr = mPoolQuestGroups.begin(); itr != mPoolQuestGroups.end(); ++itr)
     {
-        if (itr->second.isEmpty())
+        if (itr->second.IsEmpty())
             continue;
         if (Quest const* quest = sObjectMgr->GetQuestTemplate(itr->second.GetFirstEqualChancedObjectId()))
         {
@@ -1041,7 +1041,7 @@ template<>
 void PoolMgr::SpawnPool<Creature>(uint32 pool_id, uint32 db_guid)
 {
     auto it = mPoolCreatureGroups.find(pool_id);
-    if (it != mPoolCreatureGroups.end() && !it->second.isEmpty())
+    if (it != mPoolCreatureGroups.end() && !it->second.IsEmpty())
         it->second.SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, db_guid);
 }
 
@@ -1051,7 +1051,7 @@ template<>
 void PoolMgr::SpawnPool<GameObject>(uint32 pool_id, uint32 db_guid)
 {
     auto it = mPoolGameobjectGroups.find(pool_id);
-    if (it != mPoolGameobjectGroups.end() && !it->second.isEmpty())
+    if (it != mPoolGameobjectGroups.end() && !it->second.IsEmpty())
         it->second.SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, db_guid);
 }
 
@@ -1061,7 +1061,7 @@ template<>
 void PoolMgr::SpawnPool<Pool>(uint32 pool_id, uint32 sub_pool_id)
 {
     auto it = mPoolPoolGroups.find(pool_id);
-    if (it != mPoolPoolGroups.end() && !it->second.isEmpty())
+    if (it != mPoolPoolGroups.end() && !it->second.IsEmpty())
         it->second.SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, sub_pool_id);
 }
 
@@ -1070,7 +1070,7 @@ template<>
 void PoolMgr::SpawnPool<Quest>(uint32 pool_id, uint32 quest_id)
 {
     auto it = mPoolQuestGroups.find(pool_id);
-    if (it != mPoolQuestGroups.end() && !it->second.isEmpty())
+    if (it != mPoolQuestGroups.end() && !it->second.IsEmpty())
         it->second.SpawnObject(mSpawnedData, mPoolTemplate[pool_id].MaxLimit, quest_id);
 }
 
@@ -1087,22 +1087,22 @@ void PoolMgr::DespawnPool(uint32 pool_id)
 {
     {
         auto it = mPoolCreatureGroups.find(pool_id);
-        if (it != mPoolCreatureGroups.end() && !it->second.isEmpty())
+        if (it != mPoolCreatureGroups.end() && !it->second.IsEmpty())
             it->second.DespawnObject(mSpawnedData);
     }
     {
         auto it = mPoolGameobjectGroups.find(pool_id);
-        if (it != mPoolGameobjectGroups.end() && !it->second.isEmpty())
+        if (it != mPoolGameobjectGroups.end() && !it->second.IsEmpty())
             it->second.DespawnObject(mSpawnedData);
     }
     {
         auto it = mPoolPoolGroups.find(pool_id);
-        if (it != mPoolPoolGroups.end() && !it->second.isEmpty())
+        if (it != mPoolPoolGroups.end() && !it->second.IsEmpty())
             it->second.DespawnObject(mSpawnedData);
     }
     {
         auto it = mPoolQuestGroups.find(pool_id);
-        if (it != mPoolQuestGroups.end() && !it->second.isEmpty())
+        if (it != mPoolQuestGroups.end() && !it->second.IsEmpty())
             it->second.DespawnObject(mSpawnedData);
     }
 }
