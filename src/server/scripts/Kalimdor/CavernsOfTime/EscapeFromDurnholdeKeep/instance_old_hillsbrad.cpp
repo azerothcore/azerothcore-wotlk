@@ -221,7 +221,7 @@ public:
                         if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
                         {
                             Map::PlayerList const& players = instance->GetPlayers();
-                            if (!players.isEmpty())
+                            if (!players.IsEmpty())
                                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                     if (Player* player = itr->GetSource())
                                         player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER);
