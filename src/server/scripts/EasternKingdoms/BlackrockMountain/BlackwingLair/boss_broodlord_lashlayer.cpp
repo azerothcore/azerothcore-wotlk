@@ -148,6 +148,7 @@ class go_suppression_device : public GameObjectScript
 
                 case GO_JUST_DEACTIVATED: // This case prevents the Gameobject despawn by Disarm Trap
                     go->SetLootState(GO_READY);
+                    [[fallthrough]];
                 case GO_ACTIVATED:
                     go->AI()->DoAction(ACTION_DISARMED);
                     break;
