@@ -175,7 +175,7 @@ public:
                 _initialSelection = false;
                 // Find victim of Summon Gargoyle spell
                 std::list<Unit*> targets;
-                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
+                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50.0f);
                 Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
                 Cell::VisitAllObjects(me, searcher, 50.0f);
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
