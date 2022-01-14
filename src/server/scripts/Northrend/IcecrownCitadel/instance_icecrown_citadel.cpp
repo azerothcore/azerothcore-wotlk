@@ -490,7 +490,7 @@ public:
                         TeamIdInInstance = player->GetTeamId();
             }
 
-            uint32 entry = data->id;
+            uint32 entry = data->id1;
             switch (entry)
             {
                 case NPC_HORDE_GUNSHIP_CANNON:
