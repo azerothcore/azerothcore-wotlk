@@ -1356,6 +1356,8 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE);
     stmt->setUInt32(index++, m_spawnId);
     stmt->setUInt32(index++, GetEntry());
+    stmt->setUInt32(index++, 0);
+    stmt->setFloat(index++, 100.0f);
     stmt->setUInt16(index++, uint16(mapid));
     stmt->setUInt8(index++, spawnMask);
     stmt->setUInt32(index++, GetPhaseMask());
@@ -1613,7 +1615,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     // Add to world
     uint32 entry = data->id;
     if(data->id2)
-        entry = (rand() % 100 <= data->chance_id1) ? data->id : data->id2;
+        entry = (roll_chance_f(data->chance_id1)) ? data->id : data->id2;
 
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, entry, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
@@ -1911,7 +1913,7 @@ void Creature::Respawn(bool force)
             // Respawn check if spawn has 2 entries
             if (data->id2)
             {
-                uint32 entry = (rand() % 100 <= data->chance_id1) ? data->id : data->id2;
+                uint32 entry = (roll_chance_f(data->chance_id1)) ? data->id : data->id2;
                 UpdateEntry(entry, data, true);  // Select Random Entry
                 m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
                 LoadEquipment(data->equipmentId);                                                     // Reload Equipment
@@ -3025,10 +3027,10 @@ bool Creature::SetSwim(bool enable)
  */
 bool Creature::CanSwim() const
 {
-    if (Unit::CanSwim())
+    if (Unit::CanSwim() || (!Unit::CanSwim() && !CanFly()))
         return true;
 
-    if (IsPet() || GetOwnerGUID().IsPlayer())
+    if (IsPet())
         return true;
 
     return false;
