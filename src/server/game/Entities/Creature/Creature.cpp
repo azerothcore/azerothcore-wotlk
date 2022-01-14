@@ -3457,15 +3457,15 @@ bool Creature::CanPeriodicallyCallForAssistance() const
     return true;
 }
 
-uint32 Creature::GetRandomId(uint32 Id1, uint32 Id2, uint32 Id3)
+uint32 Creature::GetRandomId(uint32 id1, uint32 id2, uint32 id3)
 {
-    uint32 id = Id1;
+    uint32 id = id1;
     uint8 ids = 0;
 
-    if (Id2)
+    if (id2)
     {
         ++ids;
-        if (Id3) ++ids;
+        if (id3) ++ids;
     }
 
     if (ids)
@@ -3474,13 +3474,13 @@ uint32 Creature::GetRandomId(uint32 Id1, uint32 Id2, uint32 Id3)
         switch (idNumber)
         {
             case 0:
-                id = Id1;
+                id = id1;
                 break;
             case 1:
-                id = Id2;
+                id = id2;
                 break;
             case 2:
-                id = Id3;
+                id = id3;
                 break;
         }
     }
