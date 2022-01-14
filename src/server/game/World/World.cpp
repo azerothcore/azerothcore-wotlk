@@ -1535,11 +1535,11 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Game Graveyard...");
     sGraveyard->LoadGraveyardFromDB();
 
+    LOG_INFO("server.loading", "Loading SpellInfo store..."); // Must be loaded before spell stuff.
+    sSpellMgr->LoadSpellInfoStore();
+
     LOG_INFO("server.loading", "Loading spell dbc data corrections...");
     sSpellMgr->LoadDbcDataCorrections();
-
-    LOG_INFO("server.loading", "Loading SpellInfo store...");
-    sSpellMgr->LoadSpellInfoStore();
 
     LOG_INFO("server.loading", "Loading Spell Rank Data...");
     sSpellMgr->LoadSpellRanks();
