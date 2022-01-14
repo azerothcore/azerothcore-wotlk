@@ -185,6 +185,7 @@ public:
                             me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                             if (PlayerGUID && ObjectAccessor::GetUnit(*me, PlayerGUID))
                                 AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));
+                            me->SetReactState(REACT_AGGRESSIVE);
                             break;
                     }
                 }
