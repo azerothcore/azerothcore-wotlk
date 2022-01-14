@@ -13,8 +13,8 @@ UPDATE `creature` SET `position_x` = -22.6325, `position_y` = -486.186, `positio
 
 -- Spirestone Warlord
 -- Health modifier is 1.35 which according to video, health should be 14355 maximum (these values are on vmangos db too)
-DELETE FROM `creature` WHERE `id` IN (@SPIRESTONE_WARLORD);
-INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`) VALUES 
+DELETE FROM `creature` WHERE `creature_id1` IN (@SPIRESTONE_WARLORD);
+INSERT INTO `creature` (`guid`, `creature_id1`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`) VALUES 
 (24181, @SPIRESTONE_WARLORD, 229, -79.4547, -523.615, 82.6267, 0.80285, 7200, 0, 10633),
 (24182, @SPIRESTONE_WARLORD, 229, -56.9907, -427.546, 77.8323, 1.44862, 7200, 0, 8883),
 (24183, @SPIRESTONE_WARLORD, 229, -20.5394, -390.931, 48.5351, 3.01552, 10800, 0, 10633),
@@ -25,8 +25,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 (24188, @SPIRESTONE_WARLORD, 229, -34.5044, -370.328, 50.3211, 3.8986, 10800, 0, 10633);
 
 -- Smolderthorn Berserker
-DELETE FROM `creature` WHERE `id` IN (@SMOLDERTHORN_BERSERKER);
-INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`) VALUES 
+DELETE FROM `creature` WHERE `creature_id1` IN (@SMOLDERTHORN_BERSERKER);
+INSERT INTO `creature` (`guid`, `creature_id1`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`) VALUES 
 (42188, @SMOLDERTHORN_BERSERKER, 229, -77.5619, -516.932, 81.4632, 4.5204, 7200, 0, 8613),
 (42189, @SMOLDERTHORN_BERSERKER, 229, -63.3201, -485.629, 77.9991, 0.85521, 7200, 0, 8613),
 (42190, @SMOLDERTHORN_BERSERKER, 229, -49.6838, -514.303, 88.396, 5.44524, 7200, 0, 8613),
@@ -43,8 +43,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 (43101, @SMOLDERTHORN_BERSERKER, 229, -53.6383, -442.827, 78.2854, 4.70957, 7200, 0, 8883);
 
 -- Bloodaxe Veteran
-DELETE FROM `creature` WHERE `id` IN (@BLOODAXE_VETERAN);
-INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`) VALUES 
+DELETE FROM `creature` WHERE `creature_id1` IN (@BLOODAXE_VETERAN);
+INSERT INTO `creature` (`guid`, `creature_id1`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`) VALUES 
 (43102, @BLOODAXE_VETERAN, 229, -58.8099, -481.005, 77.9991, 4.41568, 7200, 0, 8883),
 (43103, @BLOODAXE_VETERAN, 229, -43.5588, -515.171, 88.5866, 3.70166, 7200, 0, 8883),
 (43104, @BLOODAXE_VETERAN, 229, -55.6649, -344.772, 70.9419, 1.35292, 10800, 0, 8883),
@@ -61,8 +61,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 (43115, @BLOODAXE_VETERAN, 229, -138.983, -369.133, 58.079, 3.13493, 10800, 0, 8883);
 
 -- Bloodaxe Evoker
-DELETE FROM `creature` WHERE `id` IN (@BLOODAXE_EVOKER);
-INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`, `curmana`) VALUES 
+DELETE FROM `creature` WHERE `creature_id1` IN (@BLOODAXE_EVOKER);
+INSERT INTO `creature` (`guid`, `creature_id1`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `curhealth`, `curmana`) VALUES 
 (52124, @BLOODAXE_EVOKER, 229, -72.4302, -520.961, 82.3316, 3.40339, 7200, 0, 7107, 2369),
 (52125, @BLOODAXE_EVOKER, 229, -57.4802, -487.082, 77.9991, 3.22886, 7200, 0, 7107, 2369),
 (52126, @BLOODAXE_EVOKER, 229, -47.775, -520.564, 87.5643, 1.30227, 7200, 0, 7107, 2369),
