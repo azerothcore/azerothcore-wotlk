@@ -171,7 +171,7 @@ public:
         float z = player->GetPositionZ();
         float ang = player->GetOrientation();
 
-        float rot2 = sin(ang / 2);
+        float rot2 = std::sin(ang / 2);
         float rot3 = cos(ang / 2);
 
         player->SummonGameObject(objectId, x, y, z, ang, 0, 0, rot2, rot3, spawntm);

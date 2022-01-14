@@ -30,6 +30,7 @@ UPDATE `gossip_menu_option` SET `OptionBroadcastTextID` = 0 WHERE `MenuID` = 828
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID` = 0 WHERE `MenuID` = 10043 AND `OptionID` IN (1,7,10);
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID` = 0 WHERE `MenuID` = 10769 AND `OptionID` IN (0,4,5,8,10,11);
 
+-- Update creature_text a
 UPDATE `creature_text` SET `BroadcastTextId` = 0 WHERE `CreatureID` = 2307 AND `GroupID` = 0 AND `ID` = 0;
 UPDATE `creature_text` SET `BroadcastTextId` = 0 WHERE `CreatureID` = 10162 AND `GroupID` = 14 AND `ID` = 0;
 UPDATE `creature_text` SET `BroadcastTextId` = 0 WHERE `CreatureID` = 11940 AND `GroupID` = 0 AND `ID` = 0;

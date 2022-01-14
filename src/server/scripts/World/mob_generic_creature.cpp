@@ -214,7 +214,7 @@ public:
         trigger_deathAI(Creature* creature) : NullCreatureAI(creature) { }
         void JustDied(Unit* killer) override
         {
-            if (me->m_spells[0])
+            if (killer && me->m_spells[0])
                 me->CastSpell(killer, me->m_spells[0], true);
         }
     };
