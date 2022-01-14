@@ -1486,7 +1486,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
                                              "COALESCE(cmo.InteractionPauseTimer, ctm.InteractionPauseTimer) "
                                              "FROM creature_movement_override AS cmo "
                                              "LEFT JOIN creature AS c ON c.guid = cmo.SpawnId "
-                                             "LEFT JOIN creature_template_movement AS ctm ON ctm.CreatureId = c.id");
+                                             "LEFT JOIN creature_template_movement AS ctm ON ctm.CreatureId = c.creature_id1");
     if (!result)
     {
         LOG_INFO("server.loading", ">> Loaded 0 creature movement overrides. DB table `creature_movement_override` is empty!");
@@ -1545,7 +1545,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
     LOG_INFO("server.loading", ">> Loaded " SZFMTD " movement overrides in %u ms", _creatureMovementOverrides.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
-CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelId)
+CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelId) const
 {
     CreatureModelContainer::const_iterator itr = _creatureModelStore.find(modelId);
     if (itr != _creatureModelStore.end())
@@ -1984,11 +1984,11 @@ void ObjectMgr::LoadCreatures()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0              1   2    3        4             5           6           7           8            9              10
-    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
-                         //   11               12         13       14            15         16         17          18          19                20                   21
+    //                                                     0             1             2             3       4        5            6           7           8            9              10            11
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature_id1, creature_id2, chance_id1, map, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
+                         //      12            13       14          15           16         17         18          19             20                 21                    22
                          "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, "
-                         //   22
+                         //       23
                          "creature.ScriptName "
                          "FROM creature "
                          "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
@@ -2016,38 +2016,56 @@ void ObjectMgr::LoadCreatures()
         Field* fields = result->Fetch();
 
         ObjectGuid::LowType spawnId     = fields[0].GetUInt32();
-        uint32 entry                    = fields[1].GetUInt32();
+        uint32 id                       = fields[1].GetUInt32();
+        uint32 id2                      = fields[2].GetUInt32();
+        uint32 chance                   = fields[3].GetUInt32();
 
-        CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
+        CreatureTemplate const* cInfo = GetCreatureTemplate(id);
         if (!cInfo)
         {
-            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u, skipped.", spawnId, entry);
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in creature_id1 field, skipped.", spawnId, id);
             continue;
         }
-
+        CreatureTemplate const* cInfo2 = GetCreatureTemplate(id2);
+        if (!cInfo2 && id2)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in creature_id2 field, skipped.", spawnId, id2);
+            continue;
+        }
+        if (!chance || chance > 100)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` chance_id1 (Value: %u) must be greater than 0 and less than or equal to 100, skipped.", chance);
+            continue;
+        }
+        if (chance == 100 && id2)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has spawnid = %u chance = 100 even though creature_id2 has an entry. changed to 50.", spawnId);
+            chance = 50;
+        }
         CreatureData& data      = _creatureDataStore[spawnId];
-        data.id                 = entry;
-        data.mapid              = fields[2].GetUInt16();
-        data.displayid          = fields[3].GetUInt32();
-        data.equipmentId        = fields[4].GetInt8();
-        data.posX               = fields[5].GetFloat();
-        data.posY               = fields[6].GetFloat();
-        data.posZ               = fields[7].GetFloat();
-        data.orientation        = fields[8].GetFloat();
-        data.spawntimesecs      = fields[9].GetUInt32();
-        data.wander_distance    = fields[10].GetFloat();
-        data.currentwaypoint    = fields[11].GetUInt32();
-        data.curhealth          = fields[12].GetUInt32();
-        data.curmana            = fields[13].GetUInt32();
-        data.movementType       = fields[14].GetUInt8();
-        data.spawnMask          = fields[15].GetUInt8();
-        data.phaseMask          = fields[16].GetUInt32();
-        int16 gameEvent         = fields[17].GetInt8();
-        uint32 PoolId           = fields[18].GetUInt32();
-        data.npcflag            = fields[19].GetUInt32();
-        data.unit_flags         = fields[20].GetUInt32();
-        data.dynamicflags       = fields[21].GetUInt32();
-        data.ScriptId           = GetScriptId(fields[22].GetString());
+        data.id                 = id;
+        data.id2                = id2;
+        data.chance_id1         = chance;
+        data.mapid              = fields[4].GetUInt16();
+        data.equipmentId        = fields[5].GetInt8();
+        data.posX               = fields[6].GetFloat();
+        data.posY               = fields[7].GetFloat();
+        data.posZ               = fields[8].GetFloat();
+        data.orientation        = fields[9].GetFloat();
+        data.spawntimesecs      = fields[10].GetUInt32();
+        data.wander_distance    = fields[11].GetFloat();
+        data.currentwaypoint    = fields[12].GetUInt32();
+        data.curhealth          = fields[13].GetUInt32();
+        data.curmana            = fields[14].GetUInt32();
+        data.movementType       = fields[15].GetUInt8();
+        data.spawnMask          = fields[16].GetUInt8();
+        data.phaseMask          = fields[17].GetUInt32();
+        int16 gameEvent         = fields[18].GetInt8();
+        uint32 PoolId           = fields[19].GetUInt32();
+        data.npcflag            = fields[20].GetUInt32();
+        data.unit_flags         = fields[21].GetUInt32();
+        data.dynamicflags       = fields[22].GetUInt32();
+        data.ScriptId           = GetScriptId(fields[23].GetString());
 
         if (!data.ScriptId)
             data.ScriptId = cInfo->ScriptID;
@@ -8963,8 +8981,8 @@ void ObjectMgr::LoadBroadcastTexts()
 
     _broadcastTextStore.clear(); // for reload case
 
-    //                                               0   1         2         3           4         5         6         7            8            9            10       11    12
-    QueryResult result = WorldDatabase.Query("SELECT ID, Language, MaleText, FemaleText, EmoteID0, EmoteID1, EmoteID2, EmoteDelay0, EmoteDelay1, EmoteDelay2, SoundId, Unk1, Unk2 FROM broadcast_text");
+    //                                               0   1           2         3           4         5         6         7            8            9            10              11        12
+    QueryResult result = WorldDatabase.Query("SELECT ID, LanguageID, MaleText, FemaleText, EmoteID1, EmoteID2, EmoteID3, EmoteDelay1, EmoteDelay2, EmoteDelay3, SoundEntriesID, EmotesID, Flags FROM broadcast_text");
     if (!result)
     {
         LOG_INFO("server.loading", ">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
@@ -8984,22 +9002,22 @@ void ObjectMgr::LoadBroadcastTexts()
         bct.LanguageID = fields[1].GetUInt32();
         bct.MaleText[DEFAULT_LOCALE] = fields[2].GetString();
         bct.FemaleText[DEFAULT_LOCALE] = fields[3].GetString();
-        bct.EmoteId0 = fields[4].GetUInt32();
-        bct.EmoteId1 = fields[5].GetUInt32();
-        bct.EmoteId2 = fields[6].GetUInt32();
-        bct.EmoteDelay0 = fields[7].GetUInt32();
-        bct.EmoteDelay1 = fields[8].GetUInt32();
-        bct.EmoteDelay2 = fields[9].GetUInt32();
-        bct.SoundId = fields[10].GetUInt32();
-        bct.Unk1 = fields[11].GetUInt32();
-        bct.Unk2 = fields[12].GetUInt32();
+        bct.EmoteId1 = fields[4].GetUInt32();
+        bct.EmoteId2 = fields[5].GetUInt32();
+        bct.EmoteId3 = fields[6].GetUInt32();
+        bct.EmoteDelay1 = fields[7].GetUInt32();
+        bct.EmoteDelay2 = fields[8].GetUInt32();
+        bct.EmoteDelay3 = fields[9].GetUInt32();
+        bct.SoundEntriesId = fields[10].GetUInt32();
+        bct.EmotesID = fields[11].GetUInt32();
+        bct.Flags = fields[12].GetUInt32();
 
-        if (bct.SoundId)
+        if (bct.SoundEntriesId)
         {
-            if (!sSoundEntriesStore.LookupEntry(bct.SoundId))
+            if (!sSoundEntriesStore.LookupEntry(bct.SoundEntriesId))
             {
-                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has SoundId %u but sound does not exist.", bct.Id, bct.SoundId);
-                bct.SoundId = 0;
+                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has SoundEntriesId %u but sound does not exist.", bct.Id, bct.SoundEntriesId);
+                bct.SoundEntriesId = 0;
             }
         }
 
@@ -9007,15 +9025,6 @@ void ObjectMgr::LoadBroadcastTexts()
         {
             LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist.", bct.Id, bct.LanguageID);
             bct.LanguageID = LANG_UNIVERSAL;
-        }
-
-        if (bct.EmoteId0)
-        {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId0))
-            {
-                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist.", bct.Id, bct.EmoteId0);
-                bct.EmoteId0 = 0;
-            }
         }
 
         if (bct.EmoteId1)
@@ -9033,6 +9042,15 @@ void ObjectMgr::LoadBroadcastTexts()
             {
                 LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
                 bct.EmoteId2 = 0;
+            }
+        }
+
+        if (bct.EmoteId3)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId3))
+            {
+                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId3 %u but emote does not exist.", bct.Id, bct.EmoteId3);
+                bct.EmoteId3 = 0;
             }
         }
 

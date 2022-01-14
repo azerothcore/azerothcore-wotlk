@@ -334,7 +334,7 @@ struct npc_love_in_air_hummel : public ScriptedAI
     {
         me->AI()->Talk(SAY_HUMMEL_5);
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
-        if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
+        if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
             sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO, me->FindMap());
     }
 
