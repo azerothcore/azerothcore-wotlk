@@ -295,7 +295,7 @@ public:
             requireSummon = 0;
             int8 count = urand(1, 3);
             for (int8 i = 0; i < count; ++i)
-                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + std::sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
         void OnStateChanged(uint32 state, Unit*  /*unit*/) override
@@ -1928,6 +1928,30 @@ public:
     }
 };
 
+/*########
+#### go_duskwither_spire_power_source
+#####*/
+
+enum DuskwitherSpirePowersource
+{
+    NPC_POWER_SOURCE_INVISIBLE_BUNNY = 17984
+};
+
+class go_duskwither_spire_power_source : public GameObjectScript
+{
+public:
+    go_duskwither_spire_power_source() : GameObjectScript("go_duskwither_spire_power_source") {}
+
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    {
+        if (Creature* bunny = go->FindNearestCreature(NPC_POWER_SOURCE_INVISIBLE_BUNNY, 1.0f))
+        {
+            bunny->DespawnOrUnsummon(0ms, 10s);
+        }
+        return false;
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1943,6 +1967,7 @@ void AddSC_go_scripts()
     new go_flames();
     new go_heat();
     new go_bear_trap();
+    new go_duskwither_spire_power_source();
 
     // Theirs
     new go_brewfest_music();

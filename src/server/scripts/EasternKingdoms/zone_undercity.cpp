@@ -1146,7 +1146,7 @@ public:
         {
             Map::PlayerList const& players = map->GetPlayers();
 
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
@@ -2123,7 +2123,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_FIREBALL:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_FIREBALL);
                         _events.ScheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
                         break;
@@ -2194,7 +2194,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_INFEST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true))
                             DoCast(target, SPELL_INGEST);
                         _events.ScheduleEvent(EVENT_INFEST, 20 * IN_MILLISECONDS);
                         break;
@@ -2534,7 +2534,7 @@ public:
         {
             Map::PlayerList const& players = map->GetPlayers();
 
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {

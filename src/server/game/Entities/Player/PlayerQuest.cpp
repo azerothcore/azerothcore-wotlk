@@ -87,7 +87,9 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
         if (!CanTakeQuest(quest, false))
             continue;
 
-        if (quest->IsAutoComplete())
+        if (quest->IsAutoComplete() && (!quest->IsRepeatable() || quest->IsDaily() || quest->IsWeekly() || quest->IsMonthly()))
+            qm.AddMenuItem(quest_id, 0);
+        else if (quest->IsAutoComplete())
             qm.AddMenuItem(quest_id, 4);
         else if (GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
             qm.AddMenuItem(quest_id, 2);
@@ -657,14 +659,14 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     {
         if (sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
         {
-            DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
+            DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
         }
     }
     for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
         if (sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
         {
-            DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true);
+            DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true, true);
         }
     }
 
@@ -985,7 +987,7 @@ bool Player::SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const
 
     for (Quest::PrevQuests::const_iterator iter = qInfo->prevQuests.begin(); iter != qInfo->prevQuests.end(); ++iter)
     {
-        uint32 prevId = abs(*iter);
+        uint32 prevId = std::abs(*iter);
 
         Quest const* qPrevInfo = sObjectMgr->GetQuestTemplate(prevId);
 
@@ -1399,18 +1401,26 @@ QuestStatus Player::GetQuestStatus(uint32 quest_id) const
     if (quest_id)
     {
         QuestStatusMap::const_iterator itr = m_QuestStatus.find(quest_id);
+
         if (itr != m_QuestStatus.end())
+        {
             return itr->second.Status;
+        }
 
         if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id))
         {
             if (qInfo->IsSeasonal())
+            {
                 return SatisfyQuestSeasonal(qInfo, false) ? QUEST_STATUS_NONE : QUEST_STATUS_REWARDED;
+            }
 
             if (!qInfo->IsRepeatable() && IsQuestRewarded(quest_id))
+            {
                 return QUEST_STATUS_REWARDED;
+            }
         }
     }
+
     return QUEST_STATUS_NONE;
 }
 
@@ -1580,7 +1590,7 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         }
         default:
             // it's impossible, but check
-            //TC_LOG_ERROR("entities.player.quest", "GetQuestDialogStatus called for unexpected type %u", questgiver->GetTypeId());
+            //LOG_ERROR("entities.player.quest", "GetQuestDialogStatus called for unexpected type %u", questgiver->GetTypeId());
             return DIALOG_STATUS_NONE;
     }
 
@@ -1601,20 +1611,9 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         QuestStatus status = GetQuestStatus(questId);
         if ((status == QUEST_STATUS_COMPLETE && !GetQuestRewardStatus(questId)) || (quest->IsAutoComplete() && CanTakeQuest(quest, false)))
         {
-            if (quest->IsRepeatable() && quest->IsDailyOrWeekly())
+            if (quest->IsRepeatable() || quest->IsDailyOrWeekly())
             {
-                if (quest->IsAutoComplete())
-                {
-                    result2 = DIALOG_STATUS_AVAILABLE_REP;
-                }
-                else
-                {
-                    result2 = DIALOG_STATUS_REWARD_REP;
-                }
-            }
-            else if (quest->IsAutoComplete())
-            {
-                result2 = DIALOG_STATUS_AVAILABLE;
+                 result2 = DIALOG_STATUS_REWARD_REP;
             }
             else
             {
@@ -1649,35 +1648,64 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             {
                 if (SatisfyQuestLevel(quest, false))
                 {
-                    bool isLowLevel = (getLevel() > (GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)));
+                    bool isNotLowLevelQuest = getLevel() <= (GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF));
 
-                    if (quest->IsAutoComplete())
-                    {
-                        if (isLowLevel)
-                            result2 = DIALOG_STATUS_LOW_LEVEL_REWARD_REP;
-                        else
-                            result2 = DIALOG_STATUS_REWARD_REP;
-                    }
-                    else
+                    if (quest->IsRepeatable())
                     {
                         if (quest->IsDaily())
                         {
-                            if (isLowLevel)
-                                result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
-                            else
+                            if (isNotLowLevelQuest)
+                            {
                                 result2 = DIALOG_STATUS_AVAILABLE_REP;
+                            }
+                            else
+                            {
+                                result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
+                            }
+                        }
+                        else if (quest->IsWeekly() || quest->IsMonthly())
+                        {
+                            if (isNotLowLevelQuest)
+                            {
+                                result2 = DIALOG_STATUS_AVAILABLE;
+                            }
+                            else
+                            {
+                                result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
+                            }
+                        }
+                        else if (quest->IsAutoComplete())
+                        {
+                            if (isNotLowLevelQuest)
+                            {
+                                result2 = DIALOG_STATUS_REWARD_REP;
+                            }
+                            else
+                            {
+                                result2 = DIALOG_STATUS_LOW_LEVEL_REWARD_REP;
+                            }
                         }
                         else
                         {
-                            if (isLowLevel)
-                                result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
+                            if (isNotLowLevelQuest)
+                            {
+                                result2 = DIALOG_STATUS_REWARD_REP;
+                            }
                             else
-                                result2 = DIALOG_STATUS_AVAILABLE;
+                            {
+                                result2 = DIALOG_STATUS_LOW_LEVEL_REWARD_REP;
+                            }
                         }
+                    }
+                    else
+                    {
+                        result2 = isNotLowLevelQuest ? DIALOG_STATUS_AVAILABLE : DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
                     }
                 }
                 else
+                {
                     result2 = DIALOG_STATUS_UNAVAILABLE;
+                }
             }
         }
 

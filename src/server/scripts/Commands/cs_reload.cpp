@@ -89,7 +89,8 @@ public:
             { "creature_questender",           HandleReloadCreatureQuestEnderCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "creature_linked_respawn",       HandleReloadLinkedRespawnCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "creature_loot_template",        HandleReloadLootTemplatesCreatureCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "creature_onkill_reputation",    HandleReloadOnKillReputationCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_movement_override",     HandleReloadCreatureMovementOverrideCommand,    SEC_ADMINISTRATOR, Console::Yes},
+            { "creature_onkill_reputation",     HandleReloadOnKillReputationCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "creature_queststarter",         HandleReloadCreatureQuestStarterCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "creature_template",             HandleReloadCreatureTemplateCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "disables",                      HandleReloadDisablesCommand,                   SEC_ADMINISTRATOR, Console::Yes },
@@ -198,6 +199,7 @@ public:
         HandleReloadReservedNameCommand(handler);
         HandleReloadAcoreStringCommand(handler);
         HandleReloadGameTeleCommand(handler);
+        HandleReloadCreatureMovementOverrideCommand(handler);
 
         HandleReloadVehicleAccessoryCommand(handler);
         HandleReloadVehicleTemplateAccessoryCommand(handler);
@@ -547,6 +549,14 @@ public:
         LootTemplates_Creature.CheckLootRefs();
         handler->SendGlobalGMSysMessage("DB table `creature_loot_template` reloaded.");
         sConditionMgr->LoadConditions(true);
+        return true;
+    }
+
+    static bool HandleReloadCreatureMovementOverrideCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Creature movement overrides...");
+        sObjectMgr->LoadCreatureMovementOverrides();
+        handler->SendGlobalGMSysMessage("DB table `creature_movement_override` reloaded.");
         return true;
     }
 

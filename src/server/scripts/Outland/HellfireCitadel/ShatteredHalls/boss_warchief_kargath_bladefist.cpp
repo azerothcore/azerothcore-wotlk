@@ -98,7 +98,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() != NPC_SHATTERED_ASSASSIN)
-                summon->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
+                summon->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
 
             summons.Summon(summon);
         }

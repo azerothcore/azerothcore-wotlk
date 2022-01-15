@@ -488,10 +488,6 @@ namespace MMAP
                             minTLevel = h;
                     }
 
-                    // terrain under the liquid?
-                    if (minLLevel > maxTLevel)
-                        useTerrain = false;
-
                     //liquid under the terrain?
                     if (minTLevel > maxLLevel)
                         useLiquid = false;
