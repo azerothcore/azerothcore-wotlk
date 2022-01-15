@@ -338,7 +338,7 @@ public:
                                 Vortex->CastSpell(Vortex, SPELL_CYCLONE_VISUAL, true);
                                 Vortex->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 Vortex->SetSpeed(MOVE_RUN, 1.0f);
-                                Vortex->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
+                                Vortex->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
                                 DoZoneInCombat(Vortex);
                             }
                         }
@@ -399,7 +399,7 @@ public:
 
                     if (Grievous_Throw_Timer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             DoCast(target, SPELL_GRIEVOUS_THROW, false);
                         Grievous_Throw_Timer = 10000;
                     }
@@ -430,7 +430,7 @@ public:
                     {
                         if (!TankGUID)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             {
                                 TankGUID = me->GetVictim()->GetGUID();
                                 me->SetSpeed(MOVE_RUN, 5.0f);
@@ -446,7 +446,7 @@ public:
                             {
                                 Unit* target = me->GetVictim();
                                 if (!target || !target->isTargetableForAttack()) target = ObjectAccessor::GetUnit(*me, TankGUID);
-                                if (!target || !target->isTargetableForAttack()) target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                                if (!target || !target->isTargetableForAttack()) target = SelectTarget(SelectTargetMethod::Random, 0);
                                 if (target)
                                 {
                                     AttackStart(target);
@@ -481,7 +481,7 @@ public:
                     {
                         if (!TankGUID)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             {
                                 TankGUID = me->GetVictim()->GetGUID();
                                 me->SetSpeed(MOVE_RUN, 5.0f);
@@ -495,7 +495,7 @@ public:
                             Unit* target = me->GetVictim();
                             if (!target || !target->isTargetableForAttack())
                             {
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                                target = SelectTarget(SelectTargetMethod::Random, 0);
                                 AttackStart(target);
                             }
                             if (target)
@@ -512,7 +512,7 @@ public:
                                         TankGUID.Clear();
                                     }
                                     else
-                                        AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
+                                        AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
                                 }
                             }
                             else
@@ -535,7 +535,7 @@ public:
 
                     if (Pillar_Of_Fire_Timer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             DoCast(target, SPELL_SUMMON_PILLAR);
                         Pillar_Of_Fire_Timer = 10000;
                     }
@@ -543,7 +543,7 @@ public:
 
                     if (Flame_Breath_Timer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                             me->SetInFront(target);
                         DoCast(me, SPELL_FLAME_BREATH);
                         Flame_Breath_Timer = 10000;
@@ -592,7 +592,7 @@ public:
         {
             //if the vortex reach the target, it change his target to another player
             if (me->IsWithinMeleeRange(me->GetVictim()))
-                AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));
+                AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
         }
     };
 
