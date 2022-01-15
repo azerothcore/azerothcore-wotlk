@@ -84,6 +84,9 @@ public:
                 case NPC_RAZORGORE:
                     razorgoreGUID = creature->GetGUID();
                     break;
+                case NPC_CHROMAGGUS:
+                    chromaggusGUID = creature->GetGUID();
+                    break;
                 case NPC_BLACKWING_DRAGON:
                 case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
@@ -91,6 +94,12 @@ public:
                     if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
+                    break;
+                case NPC_NEFARIAN:
+                    nefarianGUID = creature->GetGUID();
+                    break;
+                case NPC_VICTOR_NEFARIUS:
+                    victorNefariusGUID = creature->GetGUID();
                     break;
                 default:
                     break;
@@ -114,8 +123,11 @@ public:
                 case GO_PORTCULLIS_VAELASTRASZ:
                 case GO_PORTCULLIS_BROODLORD:
                 case GO_PORTCULLIS_THREEDRAGONS:
-                case GO_PORTCULLIS_CHROMAGGUS:
                 case GO_PORTCULLIS_NEFARIAN:
+                    AddDoor(go, true);
+                    break;
+                case GO_PORTCULLIS_CHROMAGGUS:
+                    chromaggusDoorGUID = go->GetGUID();
                     AddDoor(go, true);
                     break;
                 default:
@@ -186,7 +198,7 @@ public:
                     switch (state)
                     {
                         case NOT_STARTED:
-                            if (Creature* nefarian = instance->GetCreature(GetGuidData(DATA_NEFARIAN)))
+                            if (Creature* nefarian = instance->GetCreature(nefarianGUID))
                                 nefarian->DespawnOrUnsummon();
                             break;
                         case FAIL:
@@ -242,6 +254,10 @@ public:
             {
                 case DATA_RAZORGORE_THE_UNTAMED:
                     return razorgoreGUID;
+                case DATA_CHROMAGGUS:
+                    return chromaggusGUID;
+                case DATA_GO_CHROMAGGUS_DOOR:
+                    return chromaggusDoorGUID;
                 default:
                     break;
             }
@@ -279,7 +295,7 @@ public:
                             razor->AI()->DoAction(ACTION_PHASE_TWO);
                         break;
                     case EVENT_RESPAWN_NEFARIUS:
-                        if (Creature* nefarius = instance->GetCreature(GetGuidData(DATA_LORD_VICTOR_NEFARIUS)))
+                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
                         {
                             nefarius->SetPhaseMask(1, true);
                             nefarius->setActive(true);
@@ -292,14 +308,19 @@ public:
         }
 
     protected:
-        // Misc
-        EventMap _events;
+        ObjectGuid razorgoreGUID;
+        ObjectGuid chromaggusGUID;
+        ObjectGuid chromaggusDoorGUID;
+        ObjectGuid nefarianGUID;
+        ObjectGuid victorNefariusGUID;
 
         // Razorgore
-        ObjectGuid razorgoreGUID;
         uint8 EggCount;
         uint32 EggEvent;
         GuidList EggList;
+
+        // Misc
+        EventMap _events;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const
