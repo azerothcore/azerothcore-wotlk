@@ -97,6 +97,7 @@ public:
         void Reset() override
         {
             _Reset();
+            me->SetHealth(me->CountPctFromMaxHealth(30));
 
             if (!_introDone)
             {
@@ -116,7 +117,6 @@ public:
             BossAI::EnterCombat(victim);
 
             DoCast(me, SPELL_ESSENCEOFTHERED);
-            me->SetHealth(me->CountPctFromMaxHealth(30));
             // now drop damage requirement to be able to take loot
             me->ResetPlayerDamageReq();
 
