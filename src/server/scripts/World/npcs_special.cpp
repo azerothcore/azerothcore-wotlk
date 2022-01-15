@@ -234,7 +234,7 @@ public:
         {
             events.Reset();
             events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
-            finished = false;
+            finished = sWorld->getWorldState(GAME_EVENT_FISHING) == 1;
             startWarning = false;
             finishWarning = false;
         }
@@ -255,7 +255,10 @@ public:
         void DoAction(int32 param) override
         {
             if (param == DATA_ANGLER_FINISHED)
+            {
                 finished = true;
+                sWorld->setWorldState(GAME_EVENT_FISHING, 1);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -294,7 +297,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && !sWorld->getWorldState(GAME_EVENT_FISHING))
+        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED))
             player->PrepareQuestMenu(creature->GetGUID());
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());

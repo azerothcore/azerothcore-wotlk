@@ -1156,11 +1156,11 @@ uint32 GameEventMgr::Update()                               // return the next e
         }
         else
         {
+            // If event is inactive, periodically clean up its worldstate
+            sWorld->setWorldState(itr, 0);
+
             if (IsActiveEvent(itr))
             {
-                // If event is inactive, periodically clean up its worldstate
-                sWorld->setWorldState(itr, 0);
-
                 // Xinef: do not deactivate internal events on whim
                 if (mGameEvent[itr].state != GAMEEVENT_INTERNAL)
                     deactivate.insert(itr);
@@ -1216,13 +1216,6 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
     UpdateEventNPCVendor(event_id, false);
     // update bg holiday
     UpdateBattlegroundSettings();
-
-    // If event's worldstate is 0, it means the event hasn't been started yet. In that case, reset seasonal quests.
-    // When event ends (if it expires or if it's stopped via commands) worldstate will be set to 0 again, ready for another seasonal quest reset.
-    if (sWorld->getWorldState(event_id) == 0)
-    {
-        sWorld->ResetEventSeasonalQuests(event_id);
-    }
 }
 
 void GameEventMgr::ApplyNewEvent(uint16 event_id)
@@ -1252,6 +1245,13 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
     UpdateEventNPCVendor(event_id, true);
     // update bg holiday
     UpdateBattlegroundSettings();
+
+    // If event's worldstate is 0, it means the event hasn't been started yet. In that case, reset seasonal quests.
+    // When event ends (if it expires or if it's stopped via commands) worldstate will be set to 0 again, ready for another seasonal quest reset.
+    if (sWorld->getWorldState(event_id) == 0)
+    {
+        sWorld->ResetEventSeasonalQuests(event_id);
+    }
 }
 
 void GameEventMgr::UpdateEventNPCFlags(uint16 event_id)
