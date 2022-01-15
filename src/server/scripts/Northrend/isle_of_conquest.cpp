@@ -41,7 +41,7 @@ public:
         uint32 faction;
         EventMap events;
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_KEEP_CANNON)
             {
@@ -245,7 +245,7 @@ public:
             }
             else
             {
-                if (me->GetDistance(me->GetHomePosition()) < 40.0f && abs(me->GetPositionZ() - me->GetHomePosition().GetPositionZ()) < 5.0f)
+                if (me->GetDistance(me->GetHomePosition()) < 40.0f && std::abs(me->GetPositionZ() - me->GetHomePosition().GetPositionZ()) < 5.0f)
                 {
                     rage = false;
                     me->RemoveAurasDueToSpell(SPELL_IOCBOSS_RAGE);
@@ -285,7 +285,7 @@ public:
                     events.RepeatEvent(22000);
                     break;
                 case EVENT_DAGGER_THROW:
-                    if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* tgt = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(tgt, SPELL_IOCBOSS_DAGGER_THROW, false);
 
                     events.RepeatEvent(10000);
@@ -477,7 +477,7 @@ public:
 
                 float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
                 float elevation = GetSpell()->m_targets.GetElevation();
-                float speedZ = std::max(10.0f, float(50.0f * sin(elevation)));
+                float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
                 float speedXY = dist * 10.0f / speedZ;
 
                 player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);

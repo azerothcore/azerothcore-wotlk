@@ -111,7 +111,7 @@ public:
             { "showarea",          HandleShowAreaCommand,          SEC_GAMEMASTER,         Console::No  },
             { "hidearea",          HandleHideAreaCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::No  },
-            { "additemset",        HandleAddItemSetCommand,        SEC_GAMEMASTER,         Console::No  },
+            { "additem set",       HandleAddItemSetCommand,        SEC_GAMEMASTER,         Console::No  },
             { "wchange",           HandleChangeWeather,            SEC_ADMINISTRATOR,      Console::No  },
             { "maxskill",          HandleMaxSkillCommand,          SEC_GAMEMASTER,         Console::No  },
             { "setskill",          HandleSetSkillCommand,          SEC_GAMEMASTER,         Console::No  },
@@ -1621,7 +1621,7 @@ public:
             return false;
         }
 
-        uint32 itemId = 0;
+        uint32 itemId = itemTemplate->ItemId;
         int32 count = 1;
 
         if (_count)

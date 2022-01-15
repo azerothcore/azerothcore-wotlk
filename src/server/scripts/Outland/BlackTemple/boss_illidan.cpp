@@ -498,7 +498,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_DRAW_SOUL, 40000);
                     break;
                 case EVENT_SPELL_PARASITIC_SHADOWFIEND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_PARASITIC_SHADOWFIEND, false);
                     events.ScheduleEvent(EVENT_SPELL_PARASITIC_SHADOWFIEND, 30000);
                     break;
@@ -511,7 +511,7 @@ public:
                     me->CastSpell(me, SPELL_FRENZY, false);
                     break;
                 case EVENT_SPELL_AGONIZING_FLAMES:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_AGONIZING_FLAMES, false);
                     break;
                 case EVENT_PHASE_5_START:
@@ -606,12 +606,12 @@ public:
                     events2.ScheduleEvent(EVENT_PHASE_2_INTERRUPT, 20000);
                     break;
                 case EVENT_SPELL_FIREBALL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_FIREBALL, false);
                     events.ScheduleEvent(EVENT_SPELL_FIREBALL, 2200, GROUP_PHASE_2_ABILITY);
                     break;
                 case EVENT_SPELL_DARK_BARRAGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         me->CastSpell(target, SPELL_DARK_BARRAGE, false);
                     events.ScheduleEvent(EVENT_SPELL_DARK_BARRAGE, 30000, GROUP_PHASE_2_ABILITY);
                     break;
@@ -680,7 +680,7 @@ public:
                         if (events.GetNextEventTime(EVENT_REMOVE_DEMON_FORM) != 0)
                         {
                             maiev->AI()->DoAction(ACTION_MAIEV_SET_DIST30);
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, -25.0f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -25.0f, true))
                                 maiev->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 7.0f, 0);
                             else
                                 maiev->GetMotionMaster()->MoveCharge(678.04f, 378.34f, 353.0f, 7.0f, 0);
