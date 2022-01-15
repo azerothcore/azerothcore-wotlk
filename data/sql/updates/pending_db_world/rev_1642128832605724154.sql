@@ -19,7 +19,7 @@ DELETE FROM `pool_template` WHERE `entry` IN (@POOL);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL, 1, 'Un''Goro Develsaur East Pool');
 DELETE FROM `pool_creature` WHERE `guid` IN (24181, 24182);
-INSERT INTO pool_creature (guid, pool_entry, chance, description) VALUES
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (24181, @POOL, 0, 'Un''Goro Develsaur East Pool 1 of 2'),
 (24182, @POOL, 0, 'Un''Goro Develsaur East Pool 2 of 2');
 
@@ -28,7 +28,7 @@ DELETE FROM `pool_template` WHERE `entry` IN (@POOL);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL, 1, 'Un''Goro Develsaur Center Pool');
 DELETE FROM `pool_creature` WHERE `guid` IN (24183, 24184);
-INSERT INTO pool_creature (guid, pool_entry, chance, description) VALUES
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (24183, @POOL, 0, 'Un''Goro Develsaur Center Pool 1 of 2'),
 (24184, @POOL, 0, 'Un''Goro Develsaur Center Pool 2 of 2');
 
@@ -37,7 +37,7 @@ DELETE FROM `pool_template` WHERE `entry` IN (@POOL);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL, 1, 'Un''Goro Develsaur West Pool');
 DELETE FROM `pool_creature` WHERE `guid` IN (24185, 24186);
-INSERT INTO pool_creature (guid, pool_entry, chance, description) VALUES
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (24185, @POOL, 0, 'Un''Goro Develsaur West Pool 1 of 2'),
 (24186, @POOL, 0, 'Un''Goro Develsaur West Pool 2 of 2');
 
