@@ -983,7 +983,7 @@ struct boss_headless_horseman : public ScriptedAI
             (*itr)->ToCreature()->DespawnOrUnsummon(500);
 
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
-        if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
+        if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
             sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
     }
 
