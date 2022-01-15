@@ -83,7 +83,7 @@ public:
                         events.ScheduleEvent(EVENT_LIGHTNINGCLOUD, urand(15000, 20000));
                         break;
                     case EVENT_LIGHTNINGWAVE:
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), SPELL_LIGHTNINGWAVE);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), SPELL_LIGHTNINGWAVE);
                         events.ScheduleEvent(EVENT_LIGHTNINGWAVE, urand(12000, 16000));
                         break;
                     default:

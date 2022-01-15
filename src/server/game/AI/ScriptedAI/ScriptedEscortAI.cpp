@@ -620,7 +620,7 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
                 for (uint32 i = 1; i < pVector.size() - 1; ++i)
                 {
                     offset = middle - pVector[i];
-                    if (fabs(offset.x) >= 0xFF || fabs(offset.y) >= 0xFF || fabs(offset.z) >= 0x7F)
+                    if (std::fabs(offset.x) >= 0xFF || std::fabs(offset.y) >= 0xFF || std::fabs(offset.z) >= 0x7F)
                     {
                         // offset is too big, split points
                         continueLoop = true;

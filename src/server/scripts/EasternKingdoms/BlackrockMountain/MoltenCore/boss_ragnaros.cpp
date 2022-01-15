@@ -344,7 +344,7 @@ public:
 
                         if (!IsVictimWithinMeleeRange())
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
                             {
                                 me->AttackerStateUpdate(target);
                                 me->SetTarget(target->GetGUID());
@@ -380,7 +380,7 @@ public:
                     }
                     case EVENT_MIGHT_OF_RAGNAROS:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, [](Unit const* target)
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [](Unit const* target)
                         {
                             return target->IsPlayer() && target->getPowerType() == POWER_MANA;
                         }))
@@ -460,7 +460,7 @@ public:
 
             me->RemoveAurasDueToSpell(SPELL_RAGNA_SUBMERGE_VISUAL);
 
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 AttackStart(target);
             }
