@@ -219,6 +219,8 @@ enum riggleBassbait
     QUEST_MASTER_ANGLER                 = 8193,
 
     DATA_ANGLER_FINISHED                = 1,
+
+    GAME_EVENT_FISHING                  = 62
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -292,7 +294,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED))
+        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && !sWorld->getWorldState(GAME_EVENT_FISHING))
             player->PrepareQuestMenu(creature->GetGUID());
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
