@@ -1421,6 +1421,8 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                         int32 bp = aurEff->GetAmount();
                         target->CastCustomSpell(target, 48421, &bp, nullptr, nullptr, true);
                     }
+                    // Always cast Moonkin Aura
+                    target->CastSpell(target, 24907, true, nullptr, this, target->GetGUID());
                     break;
                 // Master Shapeshifter - Tree of Life
                 case FORM_TREE:
