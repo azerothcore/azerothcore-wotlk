@@ -85,25 +85,6 @@ private:
     uint32 _triggerSpellId;
 };
 
-class spell_mage_deep_freeze : public SpellScript
-{
-    PrepareSpellScript(spell_mage_deep_freeze)
-
-    void HandleOnHit()
-    {
-        if (Unit* caster = GetCaster())
-            if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : nullptr))
-                if (Creature* cTarget = target->ToCreature())
-                    if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
-                        caster->CastSpell(cTarget, 71757, true);
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_mage_deep_freeze::HandleOnHit);
-    }
-};
-
 class spell_mage_burning_determination : public AuraScript
 {
     PrepareAuraScript(spell_mage_burning_determination);
@@ -954,7 +935,6 @@ class spell_mage_summon_water_elemental : public SpellScript
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_arcane_blast);
-    RegisterSpellScript(spell_mage_deep_freeze);
     RegisterSpellScript(spell_mage_burning_determination);
     RegisterSpellScript(spell_mage_molten_armor);
     RegisterSpellScript(spell_mage_mirror_image);

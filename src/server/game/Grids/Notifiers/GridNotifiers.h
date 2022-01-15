@@ -96,13 +96,13 @@ namespace Acore
 
     struct MessageDistDeliverer
     {
-        WorldObject* i_source;
-        WorldPacket* i_message;
+        WorldObject const* i_source;
+        WorldPacket const* i_message;
         uint32 i_phaseMask;
         float i_distSq;
         TeamId teamId;
         Player const* skipped_receiver;
-        MessageDistDeliverer(WorldObject* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
+        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
             , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
             , skipped_receiver(skipped)
@@ -1213,7 +1213,7 @@ namespace Acore
 
         bool operator()(Creature* u)
         {
-            if (u->GetEntry() == i_entry && u->IsAlive() == i_alive && i_obj.IsWithinDistInMap(u, i_range))
+            if (u->GetEntry() == i_entry && u->IsAlive() == i_alive && i_obj.IsWithinDist(u, i_range) && i_obj.InSamePhase(u))
             {
                 i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
                 return true;

@@ -17,7 +17,6 @@
 
 #include "DatabaseWorkerPool.h"
 #include "AdhocStatement.h"
-#include "Common.h"
 #include "Errors.h"
 #include "Implementation/CharacterDatabase.h"
 #include "Implementation/LoginDatabase.h"
@@ -41,7 +40,7 @@
 
 #if MARIADB_VERSION_ID >= 100600
 #define MIN_MYSQL_SERVER_VERSION 100500u
-#define MIN_MYSQL_CLIENT_VERSION 30503u
+#define MIN_MYSQL_CLIENT_VERSION 30203u
 #else
 #define MIN_MYSQL_SERVER_VERSION 50700u
 #define MIN_MYSQL_CLIENT_VERSION 50700u
@@ -175,7 +174,7 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
                     uint32 const paramCount = stmt->GetParameterCount();
 
                     // TC only supports uint8 indices.
-                    ASSERT(paramCount < std::numeric_limits<uint8>::max());
+                    ASSERT(paramCount < (std::numeric_limits<uint8>::max)());
 
                     _preparedStatementSize[i] = static_cast<uint8>(paramCount);
                 }

@@ -359,7 +359,7 @@ public:
             }
             else if (ballLightningEnabled)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
                 {
                     me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
                 }
@@ -473,7 +473,7 @@ public:
             }
         }
 
-        void JustDied(Unit* ) override
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(me->GetEntry() == NPC_STALAGG ? SAY_STAL_DEATH : SAY_FEUG_DEATH);
             Talk(me->GetEntry() == NPC_STALAGG ? EMOTE_STAL_DEATH : EMOTE_FEUG_DEATH);
@@ -582,7 +582,7 @@ public:
                                 me->RemoveAurasDueToSpell(me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN);
                                 cr->InterruptNonMeleeSpells(true);
                             }
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.f, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 1000.f, true))
                             {
                                 cr->CastStop(SPELL_TESLA_SHOCK);
                                 cr->CastSpell(target, SPELL_TESLA_SHOCK, true);

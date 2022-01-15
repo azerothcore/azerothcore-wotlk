@@ -125,14 +125,14 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_SAW:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                         me->CastSpell(target, SPELL_SAW_BLADE, false);
                     else
                         me->CastSpell(me->GetVictim(), SPELL_SAW_BLADE, false);
                     events.RepeatEvent(15000);
                     break;
                 case EVENT_SPELL_NET:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_ELECTRIFIED_NET, false);
                     events.RepeatEvent(10000);
                     break;

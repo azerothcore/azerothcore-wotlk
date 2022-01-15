@@ -28,7 +28,6 @@
 #include "ScriptMgr.h"
 #include "Unit.h"
 #include "World.h"
-#include "WorldSession.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
@@ -103,6 +102,13 @@ void MailDraft::prepareItems(Player* receiver, CharacterDatabaseTransaction tran
         return;
 
     m_mailTemplateItemsNeed = false;
+
+    // The mail sent after turning in the quest The Wrath of Neptulon contains 100g
+    // Only quest in the game up to BFA which sends raw gold through mail. So would just be overkill to introduce a new column in the database.
+    if (m_mailTemplateId == 123)
+    {
+        m_money = 1000000;
+    }
 
     Loot mailLoot;
 

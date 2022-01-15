@@ -146,7 +146,7 @@ public:
                     events.ScheduleEvent(EVENT_ORMOROK_SPELL_REFLECTION, 30000);
                     break;
                 case EVENT_ORMOROK_SUMMON:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 50.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_SUMMON_CRYSTALLINE_TANGLER, true);
                     events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17000);
                     break;
@@ -164,7 +164,7 @@ public:
                     {
                         float o = rand_norm() * 2.0f * M_PI;
                         float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
-                        float y = me->GetPositionY() + 5.0f * _spikesCount * sin(o);
+                        float y = me->GetPositionY() + 5.0f * _spikesCount * std::sin(o);
                         float h = me->GetMapHeight(x, y, me->GetPositionZ());
 
                         if (h != INVALID_HEIGHT)

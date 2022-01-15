@@ -31,7 +31,7 @@
 #include "UnitAI.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WorldStatePackets.h"
 #include <time.h>
 
 GameEventMgr* GameEventMgr::instance()
@@ -230,7 +230,7 @@ void GameEventMgr::LoadFromDB()
 {
     {
         uint32 oldMSTime = getMSTime();
-        //       1           2                           3                         4          5       6        7             8            9            10
+        //                                                    1                 2                           3                  4        5        6          7             8            9          10
         QueryResult result = WorldDatabase.Query("SELECT eventEntry, UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time), occurence, length, holiday, holidayStage, description, world_event, announce FROM game_event");
         if (!result)
         {
@@ -394,9 +394,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                       1                2
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, game_event_creature.eventEntry FROM creature"
-                             " JOIN game_event_creature ON creature.guid = game_event_creature.guid");
+        //                                                 0        1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_creature");
 
         if (!result)
         {
@@ -412,6 +411,13 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 int16 event_id = fields[1].GetInt8();
+
+                CreatureData const* data = sObjectMgr->GetCreatureData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_creature` contains creature (GUID: %u) not found in `creature` table.", guid);
+                    continue;
+                }
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
@@ -436,9 +442,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                      0                1
-        QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, game_event_gameobject.eventEntry FROM gameobject"
-                             " JOIN game_event_gameobject ON gameobject.guid=game_event_gameobject.guid");
+        //                                                0         1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_gameobject");
 
         if (!result)
         {
@@ -456,6 +461,13 @@ void GameEventMgr::LoadFromDB()
                 int16 event_id = fields[1].GetInt8();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
+
+                GameObjectData const* data = sObjectMgr->GetGOData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: %u) not found in `gameobject` table.", guid);
+                    continue;
+                }
 
                 if (internal_event_id < 0 || internal_event_id >= int32(mGameEventGameobjectGuids.size()))
                 {
@@ -478,8 +490,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                       0           1                       2                                 3                                     4
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.id, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
+        //                                                     0              1             2            3                         4                               5                                 6
+        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.id1, creature.id2, creature.id3, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
                              "FROM creature JOIN game_event_model_equip ON creature.guid=game_event_model_equip.guid");
 
         if (!result)
@@ -496,7 +508,9 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
-                uint16 event_id = fields[2].GetUInt8();
+                uint32 entry2 = fields[2].GetUInt32();
+                uint32 entry3 = fields[3].GetUInt32();
+                uint16 event_id = fields[4].GetUInt8();
 
                 if (event_id >= mGameEventModelEquip.size())
                 {
@@ -506,15 +520,15 @@ void GameEventMgr::LoadFromDB()
 
                 ModelEquipList& equiplist = mGameEventModelEquip[event_id];
                 ModelEquip newModelEquipSet;
-                newModelEquipSet.modelid = fields[3].GetUInt32();
-                newModelEquipSet.equipment_id = fields[4].GetUInt8();
+                newModelEquipSet.modelid = fields[5].GetUInt32();
+                newModelEquipSet.equipment_id = fields[6].GetUInt8();
                 newModelEquipSet.equipement_id_prev = 0;
                 newModelEquipSet.modelid_prev = 0;
 
                 if (newModelEquipSet.equipment_id > 0)
                 {
                     int8 equipId = static_cast<int8>(newModelEquipSet.equipment_id);
-                    if (!sObjectMgr->GetEquipmentInfo(entry, equipId))
+                    if ((!sObjectMgr->GetEquipmentInfo(entry, equipId)) || (entry2 && !sObjectMgr->GetEquipmentInfo(entry2, equipId)) || (entry3 && !sObjectMgr->GetEquipmentInfo(entry3, equipId)))
                     {
                         LOG_ERROR("sql.sql", "Table `game_event_model_equip` have creature (Guid: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
                                          guid, newModelEquipSet.equipment_id);
@@ -875,7 +889,7 @@ void GameEventMgr::LoadFromDB()
                 newEntry.entry = 0;
 
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
-                    newEntry.entry = data->id;
+                    newEntry.entry = data->id1;
 
                 // check validity with event's npcflag
                 if (!sObjectMgr->IsVendorItemValid(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
@@ -1608,9 +1622,10 @@ void GameEventMgr::UpdateWorldStates(uint16 event_id, bool Activate)
             BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
             if (bl && bl->HolidayWorldStateId)
             {
-                WorldPacket data;
-                sBattlegroundMgr->BuildUpdateWorldStatePacket(&data, bl->HolidayWorldStateId, Activate ? 1 : 0);
-                sWorld->SendGlobalMessage(&data);
+                WorldPackets::WorldState::UpdateWorldState worldstate;
+                worldstate.VariableID = bl->HolidayWorldStateId;
+                worldstate.Value = Activate ? 1 : 0;
+                sWorld->SendGlobalMessage(worldstate.Write());
             }
         }
     }

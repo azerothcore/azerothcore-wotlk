@@ -23,7 +23,6 @@
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "SpellMgr.h"
 #include "Vehicle.h"
 
 class PhasedRespawn : public BasicEvent
@@ -107,7 +106,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     }
 
     Map::PlayerList const& playerList = map->GetPlayers();
-    if (playerList.isEmpty())
+    if (playerList.IsEmpty())
     {
         return;
     }
