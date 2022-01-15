@@ -34,6 +34,7 @@
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 enum HunterSpells
@@ -947,7 +948,20 @@ class spell_hun_tame_beast : public SpellScript
                 return SPELL_FAILED_DONT_REPORT;
             }
 
-            if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->IsPetDismissed() || player->GetCharmGUID())
+            PetStable const* petStable = player->GetPetStable();
+            if (petStable)
+            {
+                if (petStable->CurrentPet)
+                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+
+                if (petStable->GetUnslottedHunterPet())
+                {
+                    caster->SendTameFailure(PET_TAME_TOO_MANY);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+            }
+
+            if (player->GetCharmGUID())
             {
                 player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                 return SPELL_FAILED_DONT_REPORT;

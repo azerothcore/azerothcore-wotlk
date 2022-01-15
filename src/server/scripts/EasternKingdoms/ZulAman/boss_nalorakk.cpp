@@ -425,7 +425,7 @@ public:
                 if (Surge_Timer <= diff)
                 {
                     Talk(SAY_SURGE);
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 45, true);
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45, true);
                     if (target)
                         DoCast(target, SPELL_SURGE);
                     Surge_Timer = urand(15000, 20000);

@@ -16,7 +16,6 @@
  */
 
 #include "ModuleMgr.h"
-#include "Log.h"
 #include "Tokenize.h"
 
 namespace

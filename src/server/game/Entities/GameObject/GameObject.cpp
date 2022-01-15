@@ -400,6 +400,12 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         SetVisibilityDistanceOverride(VisibilityDistanceType::Large);
     }
 
+    // Check if GameObject is Infinite
+    if (goinfo->IsInfiniteGameObject())
+    {
+        SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+    }
+
     return true;
 }
 
@@ -556,8 +562,6 @@ void GameObject::Update(uint32 diff)
                         m_lootState = GO_READY;                         // for other GOis same switched without delay to GO_READY
                         break;
                 }
-
-                // NO BREAK for switch (m_lootState)
                 [[fallthrough]];
             }
         case GO_READY:
@@ -675,7 +679,7 @@ void GameObject::Update(uint32 diff)
 
                         // Note: this hack with search required until GO casting not implemented
                         // search unfriendly creature
-                        if (owner)                    // hunter trap
+                        if (owner && goInfo->trap.autoCloseTime != -1) // hunter trap
                         {
                             Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
                             Acore::UnitSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
@@ -1510,7 +1514,7 @@ void GameObject::Use(Unit* user)
                     float relativeDistance = (info->size * itr->first) - (info->size * (info->chair.slots - 1) / 2.0f);
 
                     float x_i = GetPositionX() + relativeDistance * cos(orthogonalOrientation);
-                    float y_i = GetPositionY() + relativeDistance * sin(orthogonalOrientation);
+                    float y_i = GetPositionY() + relativeDistance * std::sin(orthogonalOrientation);
 
                     if (itr->second)
                     {
@@ -2078,7 +2082,7 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
     if (!info)
         return IsWithinDist3d(x, y, z, radius);
 
-    float sinA = sin(GetOrientation());
+    float sinA = std::sin(GetOrientation());
     float cosA = cos(GetOrientation());
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
@@ -2099,8 +2103,7 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
            && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
 }
 
-// pussywizard!
-void GameObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr)
+void GameObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
 {
     dist += GetObjectSize();
     if (includeMargin)

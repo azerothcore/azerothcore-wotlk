@@ -804,10 +804,10 @@ public:
             }
         }
 
-        void JustDied(Unit* who) override
+        void JustDied(Unit* killer) override
         {
-            if (Player* killer = who->ToPlayer())
-                killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+            if (Player* player = killer->ToPlayer())
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
 
             if (Vehicle* vehicle = me->GetVehicle())
                 if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
