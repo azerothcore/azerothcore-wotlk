@@ -56,7 +56,7 @@ public:
         {
             Map::PlayerList const& players = instance->GetPlayers();
 
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
@@ -66,7 +66,7 @@ public:
                 }
             }
             //else
-            //    TC_LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
+            //    LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
 
             return nullptr;
         }
