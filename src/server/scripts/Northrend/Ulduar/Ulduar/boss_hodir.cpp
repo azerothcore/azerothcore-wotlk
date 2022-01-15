@@ -477,7 +477,7 @@ public:
                     {
                         me->CastSpell(plr, SPELL_FREEZE, false);
                     }
-                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                     {
                         me->CastSpell(target, SPELL_FREEZE, false);
                     }

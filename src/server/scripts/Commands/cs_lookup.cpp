@@ -57,7 +57,7 @@ public:
             { "event",    HandleLookupEventCommand,        SEC_MODERATOR, Console::Yes  },
             { "faction",  HandleLookupFactionCommand,      SEC_MODERATOR, Console::Yes  },
             { "item",     HandleLookupItemCommand,         SEC_MODERATOR, Console::Yes  },
-            { "itemset",  HandleLookupItemSetCommand,      SEC_MODERATOR, Console::Yes  },
+            { "item set", HandleLookupItemSetCommand,      SEC_MODERATOR, Console::Yes  },
             { "map",      HandleLookupMapCommand,          SEC_MODERATOR, Console::Yes  },
             { "object",   HandleLookupObjectCommand,       SEC_MODERATOR, Console::Yes  },
             { "gobject",  HandleLookupObjectCommand,       SEC_MODERATOR, Console::Yes  },
