@@ -106,7 +106,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     }
 
     Map::PlayerList const& playerList = map->GetPlayers();
-    if (playerList.isEmpty())
+    if (playerList.IsEmpty())
     {
         return;
     }

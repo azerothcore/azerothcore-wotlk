@@ -138,7 +138,7 @@ public:
         void EnterCombatSelfFunction()
         {
             Map::PlayerList const& PlList = me->GetMap()->GetPlayers();
-            if (PlList.isEmpty())
+            if (PlList.IsEmpty())
                 return;
 
             for (const auto& i : PlList)
