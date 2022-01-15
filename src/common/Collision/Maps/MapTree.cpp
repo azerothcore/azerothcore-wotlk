@@ -322,7 +322,7 @@ namespace VMAP
         // only non-tiled maps have them, and if so exactly one (so far at least...)
         ModelSpawn spawn;
 #ifdef VMAP_DEBUG
-        //TC_LOG_DEBUG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : map isTiled: %u", static_cast<uint32>(iIsTiled));
+        //LOG_DEBUG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : map isTiled: %u", static_cast<uint32>(iIsTiled));
 #endif
         if (!iIsTiled && ModelSpawn::readFromFile(rf, spawn))
         {
