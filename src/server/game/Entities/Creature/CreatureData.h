@@ -359,9 +359,9 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 struct CreatureData
 {
     CreatureData()  { }
-    uint32 id{0};                                              // entry in creature_template
+    uint32 id1{0};                                              // entry in creature_template
     uint32 id2{0};                                             // entry in creature_template
-    float chance_id1{0};                                       // Chance for first id to spawn
+    uint32 id3{0};                                             // entry in creature_template
     uint16 mapid{0};
     uint32 phaseMask{0};
     uint32 displayid{0};
