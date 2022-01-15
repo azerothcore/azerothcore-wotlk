@@ -154,7 +154,11 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
             sScriptMgr->OnGameEventStart(event_id);
 
         // When event is started, set its worldstate to current time
-        sWorld->setWorldState(event_id, sWorld->GetGameTime());
+        auto itr = _gameEventSeasonalQuestsMap.find(event_id);
+        if (itr != _gameEventSeasonalQuestsMap.end() && !itr->second.empty())
+        {
+            sWorld->setWorldState(event_id, sWorld->GetGameTime());
+        }
 
         return false;
     }
@@ -838,6 +842,7 @@ void GameEventMgr::LoadFromDB()
                 }
 
                 questTemplate->SetEventIdForQuest((uint16)eventEntry);
+                _gameEventSeasonalQuestsMap[eventEntry].push_back(questId);
                 ++count;
             } while (result->NextRow());
 
