@@ -200,7 +200,7 @@ void ObjectGridLoader::LoadN(void)
 template<class T>
 void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
 {
-    while (!m.isEmpty())
+    while (!m.IsEmpty())
     {
         T* obj = m.getFirst()->GetSource();
         // if option set then object already saved at this moment

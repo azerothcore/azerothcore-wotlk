@@ -493,7 +493,7 @@ public:
                 actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5 + 1, 22000);
                 me->SetFacingTo(1.84f);
 
-                if (!me->GetMap()->GetPlayers().isEmpty())
+                if (!me->GetMap()->GetPlayers().IsEmpty())
                     if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                         player->RewardPlayerAndGroupAtEvent(31006, player); // Malganis quest entry required
             }
@@ -1153,7 +1153,7 @@ public:
                             if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_EXIT_GATE)))
                                 go->SetGoState(GO_STATE_ACTIVE);
 
-                            if (!me->GetMap()->GetPlayers().isEmpty())
+                            if (!me->GetMap()->GetPlayers().IsEmpty())
                                 if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                                     player->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 0);
                         }
@@ -1219,7 +1219,7 @@ void npc_arthas::npc_arthasAI::ScheduleNextEvent(uint32 currentEvent, uint32 tim
 void npc_arthas::npc_arthasAI::SummonNextWave()
 {
     Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             i->GetSource()->PlayerTalkClass->SendPointOfInterest(1000 + waveGroupId);
 

@@ -63,7 +63,7 @@ void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* membe
     LOG_DEBUG("entities.unit", "Deleting member pointer to spawnId: %u from group %u", member->GetSpawnId(), group->GetId());
     group->RemoveMember(member);
 
-    if (group->isEmpty())
+    if (group->IsEmpty())
     {
         Map* map = member->FindMap();
         if (!map)
