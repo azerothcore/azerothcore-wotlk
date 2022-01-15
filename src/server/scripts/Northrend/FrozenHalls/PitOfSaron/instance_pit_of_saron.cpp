@@ -88,7 +88,7 @@ public:
                         teamIdInInstance = player->GetTeamId();
             }
 
-            uint32 entry = data->id;
+            uint32 entry = data->id1;
             switch (entry)
             {
                 case NPC_RESCUED_ALLIANCE_SLAVE:
