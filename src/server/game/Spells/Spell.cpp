@@ -1160,7 +1160,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
     CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
     if (!target)
     {
-        //TC_LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set nullptr target, effect %u", m_spellInfo->Id, effIndex);
+        //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set nullptr target, effect %u", m_spellInfo->Id, effIndex);
         return;
     }
 
@@ -1181,7 +1181,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
                 }
                 else
                 {
-                    //TC_LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected unit, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                    //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected unit, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
                     return;
                 }
                 break;
@@ -1191,7 +1191,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
                 AddGOTarget(gobjTarget, effMask);
             else
             {
-                //TC_LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected gameobject, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected gameobject, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
                 return;
             }
             break;
@@ -5931,17 +5931,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                     Creature* pet = unitCaster->GetGuardianPet();
                     if (pet && pet->IsAlive())
                         return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-
-                    Player* player = unitCaster->ToPlayer();
-                    if (player)
-                    {
-                        // Check pet before resurrect
-                        auto [petStable, petSlot] = Pet::GetLoadPetInfo(*player->GetPetStable(), 0, 0, false);
-                        if (!petStable)
-                        {
-                            return SPELL_FAILED_NO_PET;
-                        }
-                    }
 
                     break;
                 }

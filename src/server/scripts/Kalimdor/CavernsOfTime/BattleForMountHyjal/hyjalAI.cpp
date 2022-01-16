@@ -556,7 +556,7 @@ void hyjalAI::SummonNextWave(const Wave wave[18], uint32 Count, float Base[4][3]
         else
         {
             NextWaveTimer = 15000;
-            //TC_LOG_DEBUG("scripts", "HyjalAI: debug mode is enabled. Next Wave in 15 seconds");
+            //LOG_DEBUG("scripts", "HyjalAI: debug mode is enabled. Next Wave in 15 seconds");
         }
     }
     else

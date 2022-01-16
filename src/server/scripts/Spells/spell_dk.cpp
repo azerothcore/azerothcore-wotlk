@@ -693,7 +693,7 @@ class spell_dk_scent_of_blood_trigger : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return (eventInfo.GetHitMask() & (PROC_EX_DODGE | PROC_EX_PARRY)) || eventInfo.GetDamageInfo()->GetDamage();
+        return (eventInfo.GetHitMask() & (PROC_EX_DODGE | PROC_EX_PARRY)) || (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage());
     }
 
     void Register() override
