@@ -931,7 +931,7 @@ void ConditionMgr::LoadConditions(bool isReload)
                 delete cond;
                 continue;
             }
-            cond->ReferenceId = uint32(abs(iConditionTypeOrReference));
+            cond->ReferenceId = uint32(std::abs(iConditionTypeOrReference));
 
             const char* rowType = "reference template";
             if (iSourceTypeOrReferenceId >= 0)
@@ -960,7 +960,7 @@ void ConditionMgr::LoadConditions(bool isReload)
 
         if (iSourceTypeOrReferenceId < 0) // it is a reference template
         {
-            uint32 uRefId = abs(iSourceTypeOrReferenceId);
+            uint32 uRefId = std::abs(iSourceTypeOrReferenceId);
             if (ConditionReferenceStore.find(uRefId) == ConditionReferenceStore.end()) // make sure we have a list for our conditions, based on reference id
             {
                 ConditionList mCondList;
@@ -1984,7 +1984,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             {
                 if (CreatureData const* creatureData = sObjectMgr->GetCreatureData(cond->ConditionValue3))
                 {
-                    if (cond->ConditionValue2 && creatureData->id != cond->ConditionValue2)
+                    if (cond->ConditionValue2 && creatureData->id1 != cond->ConditionValue2)
                     {
                         LOG_ERROR("sql.sql", "ObjectEntryGuid condition has guid %u set but does not match creature entry (%u), skipped", cond->ConditionValue3, cond->ConditionValue2);
                         return false;

@@ -463,7 +463,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 }
                 case EVENT_JEDOGA_LIGHTNING_BOLT:
                 {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(pTarget, DUNGEON_MODE(SPELL_LIGHTNING_BOLT, SPELL_LIGHTNING_BOLT_H), false);
                     }
@@ -472,7 +472,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 }
                 case EVENT_JEDOGA_THUNDERSHOCK:
                 {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(pTarget, DUNGEON_MODE(SPELL_THUNDERSHOCK, SPELL_THUNDERSHOCK_H), false);
                     }

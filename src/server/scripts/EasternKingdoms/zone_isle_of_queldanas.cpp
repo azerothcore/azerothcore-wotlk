@@ -321,12 +321,12 @@ public:
                                     Position spawnPos = c->GetPosition();
                                     spawnPos.m_orientation = 5.80f;
                                     spawnPos.m_positionX += 5.0f * cos(4.5f);
-                                    spawnPos.m_positionY += 5.0f * sin(4.5f);
+                                    spawnPos.m_positionY += 5.0f * std::sin(4.5f);
                                     for (uint8 i = 0; i < 5; ++i)
                                         if (me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             spawnPos.m_positionX += 2.5f * cos(4.5f);
-                                            spawnPos.m_positionY += 2.5f * sin(4.5f);
+                                            spawnPos.m_positionY += 2.5f * std::sin(4.5f);
                                         }
                                 }
                                 break;
@@ -335,13 +335,13 @@ public:
                                     Position spawnPos = c->GetPosition();
                                     spawnPos.m_orientation = 5.80f;
                                     spawnPos.m_positionX += 7.0f * cos(4.0f);
-                                    spawnPos.m_positionY += 7.0f * sin(4.0f);
+                                    spawnPos.m_positionY += 7.0f * std::sin(4.0f);
                                     for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_GHOUL_INVADER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
                                             spawnPos.m_positionX += 4.0f * cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
+                                            spawnPos.m_positionY += 4.0f * std::sin(4.5f);
                                         }
                                 }
                                 break;
@@ -350,13 +350,13 @@ public:
                                     Position spawnPos = c->GetPosition();
                                     spawnPos.m_orientation = 5.80f;
                                     spawnPos.m_positionX += 8.0f * cos(4.0f);
-                                    spawnPos.m_positionY += 8.0f * sin(4.0f);
+                                    spawnPos.m_positionY += 8.0f * std::sin(4.0f);
                                     for (uint8 i = 0; i < 3; ++i)
                                         if (Creature* s = me->SummonCreature(NPC_CRYPT_RAIDER, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             s->CastSpell(s, 66947, false); // emerge effect
                                             spawnPos.m_positionX += 4.0f * cos(4.5f);
-                                            spawnPos.m_positionY += 4.0f * sin(4.5f);
+                                            spawnPos.m_positionY += 4.0f * std::sin(4.5f);
                                         }
                                 }
                                 break;

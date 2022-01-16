@@ -79,7 +79,7 @@ public:
                         if (bf->GetTimer() <= (16 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() >= (15 * MINUTE * IN_MILLISECONDS))
                         {
                             Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
                                         player->TextEmote("This instance will reset in 15 minutes.", nullptr, true);
@@ -103,7 +103,7 @@ public:
                         else if (bf->GetTimer() <= (2 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() > (MINUTE * IN_MILLISECONDS))
                         {
                             Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
                                         player->TextEmote("This instance is about to reset. Prepare to be removed.", nullptr, true);
@@ -116,7 +116,7 @@ public:
                                         cr->AI()->EnterEvadeMode();
 
                             Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
                                         player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
@@ -217,10 +217,10 @@ public:
                     if (ArchavonDeath && EmalonDeath && KoralonDeath)
                     {
                         // instance difficulty check is already done in db (achievement_criteria_data)
-                        // int() for Visual Studio, compile errors with abs(time_t)
-                        return (abs(int(ArchavonDeath - EmalonDeath)) < MINUTE && \
-                                abs(int(EmalonDeath - KoralonDeath)) < MINUTE && \
-                                abs(int(KoralonDeath - ArchavonDeath)) < MINUTE);
+                        // int() for Visual Studio, compile errors with std::abs(time_t)
+                        return (std::abs(int(ArchavonDeath - EmalonDeath)) < MINUTE && \
+                                std::abs(int(EmalonDeath - KoralonDeath)) < MINUTE && \
+                                std::abs(int(KoralonDeath - ArchavonDeath)) < MINUTE);
                     }
                     break;
                 default:

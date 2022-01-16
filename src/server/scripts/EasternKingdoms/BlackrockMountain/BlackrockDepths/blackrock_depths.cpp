@@ -399,8 +399,12 @@ public:
                         case 9:
                             if (theldrenEvent)
                             {
-                                if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+                                // All objects are removed from world once tempsummons despawn, so have a player spawn it instead.
+                                Player* player = me->SelectNearestPlayer(100.0f);
+                                if (GameObject* go = player->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+                                {
                                     go->SetOwnerGUID(ObjectGuid::Empty);
+                                }
 
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
