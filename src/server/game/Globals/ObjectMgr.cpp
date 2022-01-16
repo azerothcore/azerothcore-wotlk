@@ -1486,7 +1486,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
                                              "COALESCE(cmo.InteractionPauseTimer, ctm.InteractionPauseTimer) "
                                              "FROM creature_movement_override AS cmo "
                                              "LEFT JOIN creature AS c ON c.guid = cmo.SpawnId "
-                                             "LEFT JOIN creature_template_movement AS ctm ON ctm.CreatureId = c.creature_id1");
+                                             "LEFT JOIN creature_template_movement AS ctm ON ctm.CreatureId = c.id1");
     if (!result)
     {
         LOG_INFO("server.loading", ">> Loaded 0 creature movement overrides. DB table `creature_movement_override` is empty!");
@@ -1722,8 +1722,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id, linkedGuidLow);
+                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, guidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
                     break;
                 }
             case CREATURE_TO_GO:
@@ -1759,7 +1759,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id, guidLow);
+                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, guidLow);
                     linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
                     break;
                 }
@@ -1834,7 +1834,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     }
 
                     guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id, linkedGuidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
                     break;
                 }
         }
@@ -1853,7 +1853,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(ObjectGuid::LowType guidLow, ObjectGuid
         return false;
 
     CreatureData const* master = GetCreatureData(guidLow);
-    ObjectGuid guid = ObjectGuid::Create<HighGuid::Unit>(master->id, guidLow);
+    ObjectGuid guid = ObjectGuid::Create<HighGuid::Unit>(master->id1, guidLow);
 
     if (!linkedGuidLow) // we're removing the linking
     {
@@ -1884,7 +1884,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(ObjectGuid::LowType guidLow, ObjectGuid
         return false;
     }
 
-    ObjectGuid linkedGuid = ObjectGuid::Create<HighGuid::Unit>(slave->id, linkedGuidLow);
+    ObjectGuid linkedGuid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, linkedGuidLow);
 
     _linkedRespawnStore[guid] = linkedGuid;
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_REP_CREATURE_LINKED_RESPAWN);
@@ -1898,7 +1898,7 @@ void ObjectMgr::LoadTempSummons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0           1             2        3      4           5           6           7            8           9
+    //                                                    0           1             2        3      4           5           6           7            8           9
     QueryResult result = WorldDatabase.Query("SELECT summonerId, summonerType, groupId, entry, position_x, position_y, position_z, orientation, summonType, summonTime FROM creature_summon_groups");
 
     if (!result)
@@ -1984,8 +1984,8 @@ void ObjectMgr::LoadCreatures()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                     0             1             2             3       4        5            6           7           8            9              10            11
-    QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature_id1, creature_id2, chance_id1, map, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
+    //                                                     0         1    2    3    4        5            6           7           8            9              10            11
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id1, id2, id3, map, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
                          //      12            13       14          15           16         17         18          19             20                 21                    22
                          "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, "
                          //       23
@@ -2016,36 +2016,37 @@ void ObjectMgr::LoadCreatures()
         Field* fields = result->Fetch();
 
         ObjectGuid::LowType spawnId     = fields[0].GetUInt32();
-        uint32 id                       = fields[1].GetUInt32();
+        uint32 id1                      = fields[1].GetUInt32();
         uint32 id2                      = fields[2].GetUInt32();
-        uint32 chance                   = fields[3].GetUInt32();
+        uint32 id3                      = fields[3].GetUInt32();
 
-        CreatureTemplate const* cInfo = GetCreatureTemplate(id);
+        CreatureTemplate const* cInfo = GetCreatureTemplate(id1);
         if (!cInfo)
         {
-            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in creature_id1 field, skipped.", spawnId, id);
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in id1 field, skipped.", spawnId, id1);
             continue;
         }
         CreatureTemplate const* cInfo2 = GetCreatureTemplate(id2);
         if (!cInfo2 && id2)
         {
-            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in creature_id2 field, skipped.", spawnId, id2);
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in id2 field, skipped.", spawnId, id2);
             continue;
         }
-        if (!chance || chance > 100)
+        CreatureTemplate const* cInfo3 = GetCreatureTemplate(id3);
+        if (!cInfo3 && id3)
         {
-            LOG_ERROR("sql.sql", "Table `creature` chance_id1 (Value: %u) must be greater than 0 and less than or equal to 100, skipped.", chance);
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with non existing creature entry %u in id3 field, skipped.", spawnId, id3);
             continue;
         }
-        if (chance == 100 && id2)
+        if (!id2 && id3)
         {
-            LOG_ERROR("sql.sql", "Table `creature` has spawnid = %u chance = 100 even though creature_id2 has an entry. changed to 50.", spawnId);
-            chance = 50;
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: %u) with creature entry %u in id3 field but no entry in id2 field, skipped.", spawnId, id3);
+            continue;
         }
         CreatureData& data      = _creatureDataStore[spawnId];
-        data.id                 = id;
+        data.id1                = id1;
         data.id2                = id2;
-        data.chance_id1         = chance;
+        data.id3                = id3;
         data.mapid              = fields[4].GetUInt16();
         data.equipmentId        = fields[5].GetInt8();
         data.posX               = fields[6].GetFloat();
@@ -2089,10 +2090,10 @@ void ObjectMgr::LoadCreatures()
         bool ok = true;
         for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
         {
-            if (_difficultyEntries[diff].find(data.id) != _difficultyEntries[diff].end())
+            if ((_difficultyEntries[diff].find(data.id1) != _difficultyEntries[diff].end()) || (_difficultyEntries[diff].find(data.id2) != _difficultyEntries[diff].end()) || (_difficultyEntries[diff].find(data.id3) != _difficultyEntries[diff].end()))
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u) that listed as difficulty %u template (entry: %u) in `creature_template`, skipped.",
-                                 spawnId, diff + 1, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u) that listed as difficulty %u template (Entries: %u, %u, %u) in `creature_template`, skipped.",
+                                 spawnId, diff + 1, data.id1, data.id2, data.id3);
                 ok = false;
             }
         }
@@ -2102,32 +2103,30 @@ void ObjectMgr::LoadCreatures()
         // -1 random, 0 no equipment,
         if (data.equipmentId != 0)
         {
-            if (!GetEquipmentInfo(data.id, data.equipmentId))
+            if ((!GetEquipmentInfo(data.id1, data.equipmentId)) || (data.id2 && !GetEquipmentInfo(data.id2, data.equipmentId))  || (data.id3 && !GetEquipmentInfo(data.id3, data.equipmentId)))
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
-                    data.id, data.equipmentId);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (Entries: %u, %u, %u) one or more with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
+                    data.id1, data.id2, data.id3, data.equipmentId);
                 data.equipmentId = 0;
             }
         }
-
-        if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
+        if ((cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id2 && cInfo2->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id3 && cInfo3->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND))
         {
             if (!mapEntry->IsDungeon())
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
-                    spawnId, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with a `creature_template`.`flags_extra` in one or more entries including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
+                    spawnId, data.id1, data.id2, data.id3);
         }
-
         if (data.wander_distance < 0.0f)
         {
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `wander_distance`< 0, set to 0.", spawnId, data.id);
+            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `wander_distance`< 0, set to 0.", spawnId, data.id1, data.id2, data.id3);
             data.wander_distance = 0.0f;
         }
         else if (data.movementType == RANDOM_MOTION_TYPE)
         {
             if (data.wander_distance == 0.0f)
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
-                    spawnId, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
+                    spawnId, data.id1, data.id2, data.id3);
                 data.movementType = IDLE_MOTION_TYPE;
             }
         }
@@ -2135,14 +2134,14 @@ void ObjectMgr::LoadCreatures()
         {
             if (data.wander_distance != 0.0f)
             {
-                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", spawnId, data.id);
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", spawnId, data.id1, data.id2, data.id3);
                 data.wander_distance = 0.0f;
             }
         }
 
         if (data.phaseMask == 0)
         {
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, data.id);
+            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: %u Entries: %u, %u, %u) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, data.id1, data.id2, data.id3);
             data.phaseMask = 1;
         }
 
@@ -2265,7 +2264,9 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     ObjectGuid::LowType spawnId = GenerateCreatureSpawnId();
     CreatureData& data = NewOrExistCreatureData(spawnId);
     data.spawnMask = spawnId;
-    data.id = entry;
+    data.id1 = entry;
+    data.id2 = 0;
+    data.id3 = 0;
     data.mapid = mapId;
     data.displayid = 0;
     data.equipmentId = 0;
@@ -8981,8 +8982,8 @@ void ObjectMgr::LoadBroadcastTexts()
 
     _broadcastTextStore.clear(); // for reload case
 
-    //                                               0   1         2         3           4         5         6         7            8            9            10       11    12
-    QueryResult result = WorldDatabase.Query("SELECT ID, Language, MaleText, FemaleText, EmoteID0, EmoteID1, EmoteID2, EmoteDelay0, EmoteDelay1, EmoteDelay2, SoundId, Unk1, Unk2 FROM broadcast_text");
+    //                                               0   1           2         3           4         5         6         7            8            9            10              11        12
+    QueryResult result = WorldDatabase.Query("SELECT ID, LanguageID, MaleText, FemaleText, EmoteID1, EmoteID2, EmoteID3, EmoteDelay1, EmoteDelay2, EmoteDelay3, SoundEntriesID, EmotesID, Flags FROM broadcast_text");
     if (!result)
     {
         LOG_INFO("server.loading", ">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
@@ -9002,22 +9003,22 @@ void ObjectMgr::LoadBroadcastTexts()
         bct.LanguageID = fields[1].GetUInt32();
         bct.MaleText[DEFAULT_LOCALE] = fields[2].GetString();
         bct.FemaleText[DEFAULT_LOCALE] = fields[3].GetString();
-        bct.EmoteId0 = fields[4].GetUInt32();
-        bct.EmoteId1 = fields[5].GetUInt32();
-        bct.EmoteId2 = fields[6].GetUInt32();
-        bct.EmoteDelay0 = fields[7].GetUInt32();
-        bct.EmoteDelay1 = fields[8].GetUInt32();
-        bct.EmoteDelay2 = fields[9].GetUInt32();
-        bct.SoundId = fields[10].GetUInt32();
-        bct.Unk1 = fields[11].GetUInt32();
-        bct.Unk2 = fields[12].GetUInt32();
+        bct.EmoteId1 = fields[4].GetUInt32();
+        bct.EmoteId2 = fields[5].GetUInt32();
+        bct.EmoteId3 = fields[6].GetUInt32();
+        bct.EmoteDelay1 = fields[7].GetUInt32();
+        bct.EmoteDelay2 = fields[8].GetUInt32();
+        bct.EmoteDelay3 = fields[9].GetUInt32();
+        bct.SoundEntriesId = fields[10].GetUInt32();
+        bct.EmotesID = fields[11].GetUInt32();
+        bct.Flags = fields[12].GetUInt32();
 
-        if (bct.SoundId)
+        if (bct.SoundEntriesId)
         {
-            if (!sSoundEntriesStore.LookupEntry(bct.SoundId))
+            if (!sSoundEntriesStore.LookupEntry(bct.SoundEntriesId))
             {
-                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has SoundId %u but sound does not exist.", bct.Id, bct.SoundId);
-                bct.SoundId = 0;
+                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has SoundEntriesId %u but sound does not exist.", bct.Id, bct.SoundEntriesId);
+                bct.SoundEntriesId = 0;
             }
         }
 
@@ -9025,15 +9026,6 @@ void ObjectMgr::LoadBroadcastTexts()
         {
             LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist.", bct.Id, bct.LanguageID);
             bct.LanguageID = LANG_UNIVERSAL;
-        }
-
-        if (bct.EmoteId0)
-        {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId0))
-            {
-                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist.", bct.Id, bct.EmoteId0);
-                bct.EmoteId0 = 0;
-            }
         }
 
         if (bct.EmoteId1)
@@ -9051,6 +9043,15 @@ void ObjectMgr::LoadBroadcastTexts()
             {
                 LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
                 bct.EmoteId2 = 0;
+            }
+        }
+
+        if (bct.EmoteId3)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId3))
+            {
+                LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId3 %u but emote does not exist.", bct.Id, bct.EmoteId3);
+                bct.EmoteId3 = 0;
             }
         }
 
