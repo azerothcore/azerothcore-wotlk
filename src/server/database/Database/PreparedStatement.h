@@ -101,33 +101,33 @@ public:
 
     // Set numerlic and default binary
     template<typename T>
-    Acore::Types::is_default<T> SetData(const uint8 index, T value)
+    inline Acore::Types::is_default<T> SetData(const uint8 index, T value)
     {
         SetValidData(index, value);
     }
 
     // Set enums
     template<typename T>
-    Acore::Types::is_enum_v<T> SetData(const uint8 index, T value)
+    inline Acore::Types::is_enum_v<T> SetData(const uint8 index, T value)
     {
         SetValidData(index, std::underlying_type_t<T>(value));
     }
 
     // Set string_view
-    void SetData(const uint8 index, std::string_view value)
+    inline void SetData(const uint8 index, std::string_view value)
     {
         SetValidData(index, value);
     }
 
     // Set nullptr
-    void SetData(const uint8 index, std::nullptr_t = nullptr)
+    inline void SetData(const uint8 index, std::nullptr_t = nullptr)
     {
         SetValidData(index);
     }
 
     // Set non default binary
     template<std::size_t Size>
-    void SetData(const uint8 index, std::array<uint8, Size> const& value)
+    inline void SetData(const uint8 index, std::array<uint8, Size> const& value)
     {
         std::vector<uint8> vec(value.begin(), value.end());
         SetValidData(index, vec);
@@ -142,7 +142,7 @@ public:
 
     // Set all
     template <typename... Args>
-    void SetArguments(Args&&... args)
+    inline void SetArguments(Args&&... args)
     {
         SetDataTuple(std::make_tuple(std::forward<Args>(args)...));
     }
@@ -158,7 +158,7 @@ protected:
     void SetValidData(const uint8 index, std::string_view value);
 
     template<typename... Ts>
-    void SetDataTuple(std::tuple<Ts...> const& argsList)
+    inline void SetDataTuple(std::tuple<Ts...> const& argsList)
     {
         std::apply
         (
