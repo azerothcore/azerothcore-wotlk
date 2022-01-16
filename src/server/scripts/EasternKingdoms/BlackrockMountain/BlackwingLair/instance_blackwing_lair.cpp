@@ -28,15 +28,16 @@
 
 DoorData const doorData[] =
 {
-    { GO_PORTCULLIS_RAZORGORE,    DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175946 || GUID 7230
-    { GO_PORTCULLIS_VAELASTRASZ,  DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175185 || GUID 7229
-    { GO_PORTCULLIS_BROODLORD,    DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179365 || GUID 75159
-    { GO_PORTCULLIS_THREEDRAGONS, DATA_FIREMAW,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS, DATA_EBONROC,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS, DATA_FLAMEGOR,               DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_CHROMAGGUS,   DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179116 || GUID 75161
-    { GO_PORTCULLIS_NEFARIAN,     DATA_NEFARIAN,               DOOR_TYPE_ROOM, BOUNDARY_NONE},    // ID 179117 || GUID 75164
-    { 0,                         0,                            DOOR_TYPE_ROOM, BOUNDARY_NONE}     // END
+    { GO_PORTCULLIS_RAZORGORE,      DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175946 || GUID 7230
+    { GO_PORTCULLIS_RAZORGORE_ROOM, DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_ROOM,    BOUNDARY_NONE}, // ID 176964 || GUID 75158
+    { GO_PORTCULLIS_VAELASTRASZ,    DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175185 || GUID 7229
+    { GO_PORTCULLIS_BROODLORD,      DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179365 || GUID 75159
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FIREMAW,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_EBONROC,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FLAMEGOR,               DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_CHROMAGGUS,     DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179116 || GUID 75161
+    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM,    BOUNDARY_NONE}, // ID 179117 || GUID 75164
+    { 0,                            0,                           DOOR_TYPE_ROOM,    BOUNDARY_NONE}  // END
 };
 
 Position const SummonPosition[8] =
@@ -88,6 +89,7 @@ public:
                 case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_WARLOCK:
+                case NPC_BLACKWING_MAGE:
                     if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
@@ -101,7 +103,7 @@ public:
         {
             InstanceScript::OnGameObjectCreate(go);
 
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_BLACK_DRAGON_EGG:
                     if (GetBossState(DATA_FIREMAW) == DONE)
@@ -132,16 +134,16 @@ public:
 
             switch (go->GetEntry())
             {
-            case GO_PORTCULLIS_RAZORGORE:
-            case GO_PORTCULLIS_VAELASTRASZ:
-            case GO_PORTCULLIS_BROODLORD:
-            case GO_PORTCULLIS_THREEDRAGONS:
-            case GO_PORTCULLIS_CHROMAGGUS:
-            case GO_PORTCULLIS_NEFARIAN:
-                AddDoor(go, false);
-                break;
-            default:
-                break;
+                case GO_PORTCULLIS_RAZORGORE:
+                case GO_PORTCULLIS_VAELASTRASZ:
+                case GO_PORTCULLIS_BROODLORD:
+                case GO_PORTCULLIS_THREEDRAGONS:
+                case GO_PORTCULLIS_CHROMAGGUS:
+                case GO_PORTCULLIS_NEFARIAN:
+                    AddDoor(go, false);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -216,6 +218,13 @@ public:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
                         EggEvent = data;
                         EggCount = 0;
+                        for (ObjectGuid const& guid : EggList)
+                        {
+                            if (GameObject* egg = instance->GetGameObject(guid))
+                            {
+                                egg->Respawn();
+                            }
+                        }
                         break;
                     case SPECIAL:
                         if (++EggCount == 15)
