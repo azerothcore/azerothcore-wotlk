@@ -517,4 +517,3 @@ void AddSC_elwynn_forest()
     RegisterCreatureAI(npc_supervisor_raelen);
     RegisterCreatureAI(npc_eastvale_peasent);
 }
-
