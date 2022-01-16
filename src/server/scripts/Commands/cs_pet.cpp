@@ -66,44 +66,24 @@ public:
         // Creatures with family 0 crashes the server
         if (!creatrueTemplate->family)
         {
-            handler->PSendSysMessage("This creature cannot be tamed. (family id: 0).");
+            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        PetStable const* petStable = player->GetPetStable();
-
-        if (petStable && (petStable->CurrentPet || petStable->GetUnslottedHunterPet()))
+        if (player->IsExistPet())
         {
-            handler->PSendSysMessage("You already have a pet");
+            handler->SendSysMessage(LANG_YOU_ALREADY_HAVE_PET);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // Everything looks OK, create new pet
-        Pet* pet = player->CreateTamedPetFrom(creatureTarget);
-
-        // "kill" original creature
-        creatureTarget->DespawnOrUnsummon();
-
-        uint8 level = (creatureTarget->getLevel() < (player->getLevel() - 5)) ? (player->getLevel() - 5) : player->getLevel();
-
-        // prepare visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
-
-        // add to world
-        pet->GetMap()->AddToMap(pet->ToCreature());
-
-        // visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
-
-        // caster have pet now
-        player->SetMinion(pet, true);
-
-        pet->InitTalentForLevel();
-
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-        player->PetSpellInitialize();
+        if (!player->CreatePet(creatureTarget))
+        {
+            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         return true;
     }
