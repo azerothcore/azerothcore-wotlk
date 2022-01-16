@@ -475,7 +475,6 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     char buf[32000] = "";
 
     typedef std::map<uint32, uint32> PetIds;                // old->new petid relation
-    typedef PetIds::value_type PetIdsPair;
     PetIds petids;
 
     uint8 gender = GENDER_NONE;
