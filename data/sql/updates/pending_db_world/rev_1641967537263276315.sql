@@ -43,7 +43,7 @@ UPDATE `smart_scripts` SET `action_param6`=0 WHERE `entryorguid`=412 AND `source
 UPDATE `smart_scripts` SET `target_param3`=0 WHERE `entryorguid`=412 AND `source_type`=0 AND `id` IN(6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29,30,31,34,35,36,37,38,39,40,41,42,43) AND `link`=0;
 UPDATE `smart_scripts` SET `event_param1`=0 WHERE `entryorguid`=12277 AND `source_type`=0 AND `id` IN(1,4,5,6,8,12) AND `link`=0;
 UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=12277 AND `source_type`=0 AND `id` IN(1,5,6,8) AND `link`=0;
-UPDATE `smart_scripts` SET `target_param3`=0 WHERE `entryorguid`=12339 AND `source_type`=0 AND `id` IN(13,14,,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61) AND `link`=0;
+UPDATE `smart_scripts` SET `target_param3`=0 WHERE `entryorguid`=12339 AND `source_type`=0 AND `id` IN(13,14,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61) AND `link`=0;
 UPDATE `smart_scripts` SET `event_param1`=0 WHERE `entryorguid`=19937 AND `source_type`=0 AND `id` IN(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18) AND `link`=0;
 UPDATE `smart_scripts` SET `action_param3`=0 WHERE `entryorguid`=29261 AND `source_type`=0 AND `id` IN(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15) AND `link`=0;
 UPDATE `smart_scripts` SET `event_param1`=0 WHERE `entryorguid`=30313 AND `source_type`=0 AND `id` IN(35,37,39,41) AND `link`=0;
