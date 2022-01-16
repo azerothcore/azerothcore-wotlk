@@ -238,7 +238,7 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         TeamIdInInstance = player->GetTeamId();
             }
@@ -485,12 +485,12 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         TeamIdInInstance = player->GetTeamId();
             }
 
-            uint32 entry = data->id;
+            uint32 entry = data->id1;
             switch (entry)
             {
                 case NPC_HORDE_GUNSHIP_CANNON:
@@ -530,7 +530,7 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         TeamIdInInstance = player->GetTeamId();
             }
@@ -634,7 +634,7 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         TeamIdInInstance = player->GetTeamId();
             }
@@ -1632,7 +1632,7 @@ public:
             {
                 LichKingRandomWhisperTimer = urand(100, 300) * IN_MILLISECONDS;
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         if (player->GetQuestStatus(QUEST_A_FEAST_OF_SOULS) == QUEST_STATUS_INCOMPLETE)
                         {
