@@ -1344,7 +1344,7 @@ enum SMARTAI_TEMPLATE
 
 enum SMARTAI_TARGETS
 {
-    SMART_TARGET_NONE                           = 0,    // NONE, defaulting to invoket
+    SMART_TARGET_NONE                           = 0,    // NONE
     SMART_TARGET_SELF                           = 1,    // Self cast
     SMART_TARGET_VICTIM                         = 2,    // Our current target (ie: highest aggro)
     SMART_TARGET_HOSTILE_SECOND_AGGRO           = 3,    // Second highest aggro, maxdist, playerOnly, powerType + 1
@@ -1809,7 +1809,7 @@ public:
                 if (WorldObject* obj = ObjectAccessor::GetWorldObject(*m_baseObject, *itr))
                     m_objectList->push_back(obj);
                 //else
-                //    TC_LOG_DEBUG("scripts.ai", "SmartScript::mTargetStorage stores a guid to an invalid object: %s", (*itr).ToString().c_str());
+                //    LOG_DEBUG("scripts.ai", "SmartScript::mTargetStorage stores a guid to an invalid object: %s", (*itr).ToString().c_str());
             }
         }
 
@@ -1884,6 +1884,8 @@ public:
 private:
     //event stores
     SmartAIEventMap mEventMap[SMART_SCRIPT_TYPE_MAX];
+
+    static bool EventHasInvoker(SMART_EVENT event);
 
     bool IsEventValid(SmartScriptHolder& e);
     bool IsTargetValid(SmartScriptHolder const& e);
