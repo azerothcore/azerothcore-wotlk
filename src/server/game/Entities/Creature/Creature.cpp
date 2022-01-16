@@ -610,7 +610,7 @@ void Creature::Update(uint32 diff)
                     if (!sConditionMgr->IsObjectMeetToConditions(this, conditions))
                     {
                         // Creature should not respawn, reset respawn timer. Conditions will be checked again the next time it tries to respawn.
-                        m_respawnTime = time(nullptr) + m_respawnDelay;
+                        m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelay;
                         break;
                     }
 
