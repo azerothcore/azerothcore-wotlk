@@ -15225,7 +15225,6 @@ void CharmInfo::LoadPetActionBar(const std::string& data)
     if (tokens.size() != (ACTION_BAR_INDEX_END - ACTION_BAR_INDEX_START) * 2)
         return;                                             // non critical, will reset to default
 
-    uint8 index = ACTION_BAR_INDEX_START;
     auto iter = tokens.begin();
     for (uint8 index = ACTION_BAR_INDEX_START; index < ACTION_BAR_INDEX_END; ++index)
     {
