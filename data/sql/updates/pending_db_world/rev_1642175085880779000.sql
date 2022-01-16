@@ -11,3 +11,13 @@ UPDATE `creature` SET `position_x` = -7491.17, `position_y` = -1035.6, `position
 UPDATE `creature` SET `position_x` = -7494.95, `position_y` = -1022.22, `position_z` = 408.73, `orientation` = 2.19 WHERE `guid` = 84615;
 
 DELETE FROM `creature` WHERE `guid` IN (84513, 84514, 84515, 84516, 84517, 84518);
+
+DELETE FROM `linked_respawn` WHERE `guid` IN (84513, 84514, 84515, 84516, 84517, 84518, 84603, 84605, 84606, 84614, 84615, 84616);
+
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
+(84603, 84512, 0),
+(84605, 84512, 0),
+(84606, 84512, 0),
+(84614, 84512, 0),
+(84615, 84512, 0),
+(84616, 84512, 0);
