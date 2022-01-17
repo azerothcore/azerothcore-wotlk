@@ -516,7 +516,39 @@ public:
 
                             if (handler->GetSession())
                             {
-                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, itemTemplate.ItemId, name.c_str());
+                                std::string quality;
+                                switch (itemTemplate.Quality)
+                                {
+                                case ITEM_QUALITY_POOR:
+                                    quality = "ff98979c";
+                                    break;
+                                case ITEM_QUALITY_NORMAL:
+                                    quality = "ffffffff";
+                                    break;
+                                case ITEM_QUALITY_UNCOMMON:
+                                    quality = "ff1eff00";
+                                    break;
+                                case ITEM_QUALITY_RARE:
+                                    quality = "ff0070dd";
+                                    break;
+                                case ITEM_QUALITY_EPIC:
+                                    quality = "ffa335ee";
+                                    break;
+                                case ITEM_QUALITY_LEGENDARY:
+                                    quality = "ffff8000";
+                                    break;
+                                case ITEM_QUALITY_ARTIFACT:
+                                    quality = "ffe6cc80";
+                                    break;
+                                case ITEM_QUALITY_HEIRLOOM:
+                                    quality = "ffe6cc80";
+                                    break;
+                                default:
+                                    quality = "ffffffff";
+                                    break;
+                                }
+                                //UPDATE `wotlk_string` SET `content_default`='%d - |c%s|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r' WHERE `entry`=512;
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, quality.c_str(), itemTemplate.ItemId, name.c_str());
                             }
                             else
                             {
