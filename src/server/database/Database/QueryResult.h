@@ -29,11 +29,11 @@ public:
     ~ResultSet();
 
     bool NextRow();
-    uint64 GetRowCount() const { return _rowCount; }
-    uint32 GetFieldCount() const { return _fieldCount; }
-    std::string GetFieldName(uint32 index) const;
+    [[nodiscard]] uint64 GetRowCount() const { return _rowCount; }
+    [[nodiscard]] uint32 GetFieldCount() const { return _fieldCount; }
+    [[nodiscard]] std::string GetFieldName(uint32 index) const;
 
-    Field* Fetch() const { return _currentRow; }
+    [[nodiscard]] Field* Fetch() const { return _currentRow; }
     Field const& operator[](std::size_t index) const;
 
 protected:
@@ -58,10 +58,10 @@ public:
     ~PreparedResultSet();
 
     bool NextRow();
-    uint64 GetRowCount() const { return m_rowCount; }
-    uint32 GetFieldCount() const { return m_fieldCount; }
+    [[nodiscard]] uint64 GetRowCount() const { return m_rowCount; }
+    [[nodiscard]] uint32 GetFieldCount() const { return m_fieldCount; }
 
-    Field* Fetch() const;
+    [[nodiscard]] Field* Fetch() const;
     Field const& operator[](std::size_t index) const;
 
 protected:
