@@ -808,29 +808,39 @@ class spell_pri_vampiric_touch : public AuraScript
 };
 
 // 605 - Mind Control
-class spell_pri_mind_control : public SpellScript
+class spell_pri_mind_control : public AuraScript
 {
-    PrepareSpellScript(spell_pri_mind_control);
+    PrepareAuraScript(spell_pri_mind_control);
 
-    void OnHit()
+    void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Aura const* aura = GetHitAura())
+        if (Unit* caster = GetCaster())
         {
-            if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
             {
-                if (Unit* target = GetHitUnit())
-                {
-                    uint32 duration = static_cast<uint32>(aura->GetMaxDuration());
-                    caster->SetInCombatWith(target, duration);
-                    target->SetInCombatWith(caster, duration);
-                }
+                uint32 duration = static_cast<uint32>(GetDuration());
+                caster->SetInCombatWith(target, duration);
+                target->SetInCombatWith(caster, duration);
+            }
+        }
+    }
+
+    void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Unit* target = GetTarget())
+            {
+                caster->SetCombatTimer(0);
+                target->SetCombatTimer(0);
             }
         }
     }
 
     void Register() override
     {
-        AfterHit += SpellHitFn(spell_pri_mind_control::OnHit);
+        AfterEffectApply += AuraEffectApplyFn(spell_pri_mind_control::HandleApplyEffect, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_pri_mind_control::HandleRemoveEffect, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
