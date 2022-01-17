@@ -161,6 +161,7 @@ private:
     typedef std::list<GuidNPCFlagPair> NPCFlagList;
     typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
     typedef std::vector<uint32> GameEventBitmask;
+    typedef std::unordered_map<uint32, std::vector<uint32>> GameEventSeasonalQuestsMap;
     GameEventQuestMap mGameEventCreatureQuests;
     GameEventQuestMap mGameEventGameObjectQuests;
     GameEventNPCVendorMap mGameEventVendors;
@@ -174,6 +175,7 @@ private:
     GameEventNPCFlagMap mGameEventNPCFlags;
     ActiveEvents m_ActiveEvents;
     bool isSystemInit;
+    GameEventSeasonalQuestsMap _gameEventSeasonalQuestsMap;
 public:
     GameEventGuidMap  mGameEventCreatureGuids;
     GameEventGuidMap  mGameEventGameobjectGuids;

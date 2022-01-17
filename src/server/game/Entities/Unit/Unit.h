@@ -1613,6 +1613,7 @@ public:
     void ClearInCombat();
     void ClearInPetCombat();
     [[nodiscard]] uint32 GetCombatTimer() const { return m_CombatTimer; }
+    void SetCombatTimer(uint32 timer) { m_CombatTimer = timer; }
 
     [[nodiscard]] bool HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint32 familyFlags) const;
     [[nodiscard]] bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
