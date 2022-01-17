@@ -547,7 +547,6 @@ public:
                                     quality = "ffffffff";
                                     break;
                                 }
-                                //UPDATE `wotlk_string` SET `content_default`='%d - |c%s|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r' WHERE `entry`=512;
                                 handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itemTemplate.ItemId, quality.c_str(), itemTemplate.ItemId, name.c_str());
                             }
                             else
