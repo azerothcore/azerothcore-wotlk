@@ -22,6 +22,7 @@
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include <map>
+#include <unordered_map>
 
 #define max_ge_check_delay DAY  // 1 day in seconds
 
