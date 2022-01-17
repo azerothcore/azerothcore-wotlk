@@ -50,9 +50,9 @@ namespace MMAP
 
         ~MMapData()
         {
-            for (NavMeshQuerySet::iterator i = navMeshQueries.begin(); i != navMeshQueries.end(); ++i)
+            for (auto& navMeshQuerie : navMeshQueries)
             {
-                dtFreeNavMeshQuery(i->second);
+                dtFreeNavMeshQuery(navMeshQuerie.second);
             }
 
             if (navMesh)
@@ -74,7 +74,7 @@ namespace MMAP
     class MMapMgr
     {
     public:
-        MMapMgr() : loadedTiles(0), thread_safe_environment(true) { }
+        MMapMgr()  = default;
         ~MMapMgr();
 
         void InitializeThreadUnsafe(const std::vector<uint32>& mapIds);
@@ -87,17 +87,17 @@ namespace MMAP
         dtNavMeshQuery const* GetNavMeshQuery(uint32 mapId, uint32 instanceId);
         dtNavMesh const* GetNavMesh(uint32 mapId);
 
-        uint32 getLoadedTilesCount() const { return loadedTiles; }
-        uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
+        [[nodiscard]] uint32 getLoadedTilesCount() const { return loadedTiles; }
+        [[nodiscard]] uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
 
     private:
         bool loadMapData(uint32 mapId);
         uint32 packTileID(int32 x, int32 y);
-        MMapDataSet::const_iterator GetMMapData(uint32 mapId) const;
+        [[nodiscard]] MMapDataSet::const_iterator GetMMapData(uint32 mapId) const;
 
         MMapDataSet loadedMMaps;
-        uint32 loadedTiles;
-        bool thread_safe_environment;
+        uint32 loadedTiles{0};
+        bool thread_safe_environment{true};
     };
 }
 
