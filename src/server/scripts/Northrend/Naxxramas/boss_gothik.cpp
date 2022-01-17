@@ -353,7 +353,7 @@ public:
         bool CheckGroupSplitted()
         {
             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-            if (!PlayerList.isEmpty())
+            if (!PlayerList.IsEmpty())
             {
                 bool checklife = false;
                 bool checkdead = false;

@@ -17,7 +17,6 @@
 
 #include "Pet.h"
 #include "ArenaSpectator.h"
-#include "Battleground.h"
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
@@ -343,24 +342,6 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     SetReactState(petInfo->ReactState);
     SetCanModifyStats(true);
 
-    if (getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
-    {
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-        //SetHealth(GetMaxHealth());
-    }
-    else
-    {
-        uint32 savedhealth = petInfo->Health;
-        uint32 savedmana = petInfo->Mana;
-        if (!savedhealth && getPetType() == HUNTER_PET)
-            setDeathState(JUST_DIED);
-        else
-        {
-            SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-            SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
-        }
-    }
-
     // set current pet as current
     // 0=current
     // 1..MAX_PET_STABLES in stable slot
@@ -427,7 +408,8 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         owner->ToPlayer()->SetLastPetNumber(petInfo->PetNumber);
 
     owner->GetSession()->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(std::make_shared<PetLoadQueryHolder>(ownerid, petInfo->PetNumber)))
-        .AfterComplete([this, owner, session = owner->GetSession(), isTemporarySummon, current, lastSaveTime = petInfo->LastSaveTime](SQLQueryHolderBase const& holder)
+        .AfterComplete([this, owner, session = owner->GetSession(), isTemporarySummon, current, lastSaveTime = petInfo->LastSaveTime, savedhealth = petInfo->Health, savedmana = petInfo->Mana]
+        (SQLQueryHolderBase const& holder)
     {
         if (session->GetPlayer() != owner || owner->GetPet() != this)
             return;
@@ -473,6 +455,22 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
                 Field* fields = result->Fetch();
                 for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
                     m_declinedname->name[i] = fields[i].GetString();
+            }
+        }
+
+        if (getPetType() == SUMMON_PET && !current) //all (?) summon pets come with full health when called, but not when they are current
+        {
+            SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+            SetFullHealth();
+        }
+        else
+        {
+            if (!savedhealth && getPetType() == HUNTER_PET)
+                setDeathState(JUST_DIED);
+            else
+            {
+                SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
+                SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
             }
         }
 
@@ -729,12 +727,16 @@ void Pet::Update(uint32 diff)
                                 GetMotionMaster()->Clear(false);
                                 GetMotionMaster()->MoveIdle();
 
+                                bool oldCmdAttack = GetCharmInfo()->IsCommandAttack();
+
                                 GetCharmInfo()->SetIsCommandAttack(false);
                                 GetCharmInfo()->SetIsAtStay(true);
                                 GetCharmInfo()->SetIsCommandFollow(false);
                                 GetCharmInfo()->SetIsFollowing(false);
                                 GetCharmInfo()->SetIsReturning(false);
                                 GetCharmInfo()->SaveStayPosition(true);
+
+                                GetCharmInfo()->SetIsCommandAttack(oldCmdAttack);
 
                                 AddSpellCooldown(tempspell, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
 
@@ -2253,6 +2255,8 @@ bool Pet::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32
     if (!InitEntry(Entry))
         return false;
 
+    // Force regen flag for player pets, just like we do for players themselves
+    SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
     SetSheath(SHEATH_STATE_MELEE);
 
     return true;
