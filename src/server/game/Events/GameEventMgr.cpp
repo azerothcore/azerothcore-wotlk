@@ -1830,7 +1830,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
         tm timeInfo;
         if (singleDate)
         {
-            localtime_r(&curTime, &timeInfo);
+            timeInfo = Acore::Time::TimeBreakdown(curTime);
             timeInfo.tm_year -= 1; // First try last year (event active through New Year)
         }
         else
@@ -1854,8 +1854,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
         }
         else if (singleDate)
         {
-            tm tmCopy;
-            localtime_r(&curTime, &tmCopy);
+            tm tmCopy = Acore::Time::TimeBreakdown(curTime);
             int year = tmCopy.tm_year; // This year
             tmCopy = timeInfo;
             tmCopy.tm_year = year;

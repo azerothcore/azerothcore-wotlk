@@ -365,9 +365,6 @@ public:
     void   SetCleaningFlags(uint32 flags) { m_CleaningFlags = flags; }
     void   ResetEventSeasonalQuests(uint16 event_id);
 
-    time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour); // pussywizard
-    time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour); // pussywizard
-
     std::string const& GetRealmName() const { return _realmName; } // pussywizard
     void SetRealmName(std::string name) { _realmName = name; } // pussywizard
 

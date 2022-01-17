@@ -275,10 +275,7 @@ Logger const* Log::GetLoggerByType(std::string const& type) const
 
 std::string Log::GetTimestampStr()
 {
-    time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-
-    std::tm aTm;
-    localtime_r(&tt, &aTm);
+    using namespace Acore::Time;
 
     //       YYYY   year
     //       MM     month (2 digits 01-12)
@@ -287,7 +284,7 @@ std::string Log::GetTimestampStr()
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
     return Acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d",
-        aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
+        GetYear() + 1900, GetMonth() + 1, GetDayInMonth(), GetHours(), GetMinutes(), GetSeconds());
 }
 
 bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /* = true */)

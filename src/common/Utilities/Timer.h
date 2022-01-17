@@ -53,9 +53,21 @@ namespace Acore::Time
 
     AC_COMMON_API time_t LocalTimeToUTCTime(time_t time);
     AC_COMMON_API time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime = true);
-    AC_COMMON_API tm TimeBreakdown(time_t t);
+    AC_COMMON_API std::tm TimeBreakdown(time_t t = 0);
     AC_COMMON_API std::string TimeToTimestampStr(time_t t);
     AC_COMMON_API std::string TimeToHumanReadable(time_t t);
+
+    AC_COMMON_API time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour); // int8 dayOfWeek: 0 (sunday) to 6 (saturday)
+    AC_COMMON_API time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour); // int8 month: 0 (january) to 11 (december)
+
+    AC_COMMON_API uint32 GetSeconds(Seconds seconds = 0s);      // seconds after the minute - [0, 60]
+    AC_COMMON_API uint32 GetMinutes(Seconds seconds = 0s);      // minutes after the hour - [0, 59]
+    AC_COMMON_API uint32 GetHours(Seconds seconds = 0s);        // hours since midnight - [0, 23]
+    AC_COMMON_API uint32 GetDayInWeek(Seconds seconds = 0s);    // days since Sunday - [0, 6]
+    AC_COMMON_API uint32 GetDayInMonth(Seconds seconds = 0s);   // day of the month - [1, 31]
+    AC_COMMON_API uint32 GetDayInYear(Seconds seconds = 0s);    // days since January 1 - [0, 365]
+    AC_COMMON_API uint32 GetMonth(Seconds seconds = 0s);        // months since January - [0, 11]
+    AC_COMMON_API uint32 GetYear(Seconds seconds = 0s);         // years since 1900
 }
 
 AC_COMMON_API struct tm* localtime_r(time_t const* time, struct tm* result);

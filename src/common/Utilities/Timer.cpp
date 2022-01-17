@@ -20,7 +20,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace Acore::TimeDiff
+namespace Acore::TimeDiff // in us
 {
     constexpr uint64 MILLISECONDS = 1000;
     constexpr uint64 SECONDS = 1000 * MILLISECONDS;
@@ -230,9 +230,14 @@ struct tm* localtime_r(time_t const* time, struct tm* result)
 }
 #endif
 
-tm Acore::Time::TimeBreakdown(time_t time)
+std::tm Acore::Time::TimeBreakdown(time_t time /*= 0*/)
 {
-    tm timeLocal;
+    if (!time)
+    {
+        time = GetEpochTime().count();
+    }
+
+    std::tm timeLocal;
     localtime_r(&time, &timeLocal);
     return timeLocal;
 }
@@ -276,4 +281,146 @@ std::string Acore::Time::TimeToHumanReadable(time_t t)
     std::stringstream ss;
     ss << std::put_time(std::localtime(&t), "%a %b %d %Y %X");
     return ss.str();
+}
+
+time_t Acore::Time::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
+{
+    if (hour < 0 || hour > 23)
+    {
+        hour = 0;
+    }
+
+    tm localTm = TimeBreakdown();
+    localTm.tm_hour = hour;
+    localTm.tm_min = 0;
+    localTm.tm_sec = 0;
+
+    if (dayOfWeek < 0 || dayOfWeek > 6)
+    {
+        dayOfWeek = (localTm.tm_wday + 1) % 7;
+    }
+
+    uint32 add;
+
+    if (localTm.tm_wday >= dayOfWeek)
+    {
+        add = (7 - (localTm.tm_wday - dayOfWeek)) * DAY;
+    }
+    else
+    {
+        add = (dayOfWeek - localTm.tm_wday) * DAY;
+    }
+
+    return mktime(&localTm) + add;
+}
+
+time_t Acore::Time::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
+{
+    if (hour < 0 || hour > 23)
+    {
+        hour = 0;
+    }
+
+    tm localTm = TimeBreakdown();
+    localTm.tm_mday = 1;
+    localTm.tm_hour = hour;
+    localTm.tm_min = 0;
+    localTm.tm_sec = 0;
+
+    if (month < 0 || month > 11)
+    {
+        month = (localTm.tm_mon + 1) % 12;
+
+        if (!month)
+        {
+            localTm.tm_year += 1;
+        }
+    }
+    else if (localTm.tm_mon >= month)
+    {
+        localTm.tm_year += 1;
+    }
+
+    localTm.tm_mon = month;
+    return mktime(&localTm);
+}
+
+uint32 Acore::Time::GetSeconds(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_sec;
+}
+
+uint32 Acore::Time::GetMinutes(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_min;
+}
+
+uint32 Acore::Time::GetHours(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_hour;
+}
+
+uint32 Acore::Time::GetDayInWeek(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_wday;
+}
+
+uint32 Acore::Time::GetDayInMonth(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_mday;
+}
+
+uint32 Acore::Time::GetDayInYear(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_yday;
+}
+
+uint32 Acore::Time::GetMonth(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_mon;
+}
+
+uint32 Acore::Time::GetYear(Seconds seconds /*= 0s*/)
+{
+    if (seconds == 0s)
+    {
+        seconds = GetEpochTime();
+    }
+
+    return TimeBreakdown(seconds.count()).tm_year;
 }
