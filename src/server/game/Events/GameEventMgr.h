@@ -22,6 +22,7 @@
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include <map>
+#include <unordered_map>
 
 #define max_ge_check_delay DAY  // 1 day in seconds
 
@@ -54,7 +55,7 @@ typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventCon
 
 struct GameEventData
 {
-    GameEventData()  { }
+    GameEventData()  = default;
     uint32 eventId;
     time_t start{1};           // occurs after this time
     time_t end{0};             // occurs before this time
