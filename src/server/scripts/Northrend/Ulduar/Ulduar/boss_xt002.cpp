@@ -782,7 +782,7 @@ public:
             me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit* /*killer*/) override
         {
             me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
         }

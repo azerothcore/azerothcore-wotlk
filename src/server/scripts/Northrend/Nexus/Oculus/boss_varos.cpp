@@ -173,7 +173,7 @@ public:
                     break;
                 case EVENT_AMPLIFY_MAGIC:
                     {
-                        if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                        if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                             me->CastSpell(target, SPELL_AMPLIFY_MAGIC, false);
                         events.RepeatEvent(urand(17500, 22500));
                     }
@@ -204,7 +204,7 @@ public:
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16000);
                                 break;
                         }
-                        if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                        if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
                         {
                             if( Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000) )
                             {
