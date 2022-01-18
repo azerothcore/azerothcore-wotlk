@@ -98,9 +98,9 @@ struct ChaseAngle
     float RelativeAngle; // we want to be at this angle relative to the target (0 = front, M_PI = back)
     float Tolerance;     // but we'll tolerate anything within +- this much
 
-    float UpperBound() const;
-    float LowerBound() const;
-    bool IsAngleOkay(float relativeAngle) const;
+    [[nodiscard]] float UpperBound() const;
+    [[nodiscard]] float LowerBound() const;
+    [[nodiscard]] bool IsAngleOkay(float relativeAngle) const;
 };
 
 // assume it is 25 yard per 0.6 second
