@@ -89,25 +89,25 @@ public:
     Field();
     ~Field();
 
-    bool GetBool() const // Wrapper, actually gets integer
+    [[nodiscard]] bool GetBool() const // Wrapper, actually gets integer
     {
         return GetUInt8() == 1 ? true : false;
     }
 
-    uint8 GetUInt8() const;
-    int8 GetInt8() const;
-    uint16 GetUInt16() const;
-    int16 GetInt16() const;
-    uint32 GetUInt32() const;
-    int32 GetInt32() const;
-    uint64 GetUInt64() const;
-    int64 GetInt64() const;
-    float GetFloat() const;
-    double GetDouble() const;
-    char const* GetCString() const;
-    std::string GetString() const;
-    std::string_view GetStringView() const;
-    std::vector<uint8> GetBinary() const;
+    [[nodiscard]] uint8 GetUInt8() const;
+    [[nodiscard]] int8 GetInt8() const;
+    [[nodiscard]] uint16 GetUInt16() const;
+    [[nodiscard]] int16 GetInt16() const;
+    [[nodiscard]] uint32 GetUInt32() const;
+    [[nodiscard]] int32 GetInt32() const;
+    [[nodiscard]] uint64 GetUInt64() const;
+    [[nodiscard]] int64 GetInt64() const;
+    [[nodiscard]] float GetFloat() const;
+    [[nodiscard]] double GetDouble() const;
+    [[nodiscard]] char const* GetCString() const;
+    [[nodiscard]] std::string GetString() const;
+    [[nodiscard]] std::string_view GetStringView() const;
+    [[nodiscard]] std::vector<uint8> GetBinary() const;
 
     template <size_t S>
     std::array<uint8, S> GetBinary() const
@@ -117,7 +117,7 @@ public:
         return buf;
     }
 
-    bool IsNull() const
+    [[nodiscard]] bool IsNull() const
     {
         return data.value == nullptr;
     }
@@ -134,8 +134,8 @@ protected:
 
     void SetByteValue(char const* newValue, uint32 length);
     void SetStructuredValue(char const* newValue, uint32 length);
-    bool IsType(DatabaseFieldTypes type) const;
-    bool IsNumeric() const;
+    [[nodiscard]] bool IsType(DatabaseFieldTypes type) const;
+    [[nodiscard]] bool IsNumeric() const;
 
 private:
     QueryResultFieldMetadata const* meta;
