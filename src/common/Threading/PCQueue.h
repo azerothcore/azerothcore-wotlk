@@ -51,7 +51,7 @@ public:
         return _queue.empty();
     }
 
-    size_t Size() const
+    [[nodiscard]] size_t Size() const
     {
         return _queue.size();
     }

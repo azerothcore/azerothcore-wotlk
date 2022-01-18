@@ -416,7 +416,7 @@ void Unit::Update(uint32 p_time)
         // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
         // These flags are reset after target dies or another command is given.
-        if (m_HostileRefMgr.isEmpty())
+        if (m_HostileRefMgr.IsEmpty())
         {
             // m_CombatTimer set at aura start and it will be freeze until aura removing
             if (m_CombatTimer <= p_time)
@@ -1841,7 +1841,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
     return (newdamage > 1) ? newdamage : 1;
 }
 
-float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo)
+float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim)
 {
     float victimResistance = float(victim->GetResistance(schoolMask));
     if (owner)
@@ -1857,10 +1857,6 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
         else
             victimResistance += float(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
     }
-
-    // Chaos Bolt exception, ignore all target resistances (unknown attribute?)
-    if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && spellInfo->SpellIconID == 3178)
-        victimResistance = 0;
 
     victimResistance = std::max(victimResistance, 0.0f);
     if (owner)
@@ -1895,7 +1891,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
     // Xinef: holy resistance exists for npcs
     if (!(schoolMask & SPELL_SCHOOL_MASK_NORMAL) && (!(schoolMask & SPELL_SCHOOL_MASK_HOLY) || victim->GetTypeId() == TYPEID_UNIT) && (!spellInfo || (!spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) && !spellInfo->HasAttribute(SPELL_ATTR4_NO_CAST_LOG))))
     {
-        float averageResist = Unit::GetEffectiveResistChance(attacker, schoolMask, victim, spellInfo);
+        float averageResist = Unit::GetEffectiveResistChance(attacker, schoolMask, victim);
 
         float discreteResistProbability[11];
         for (uint32 i = 0; i < 11; ++i)
@@ -3091,7 +3087,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
         // Players resistance for binary spells
         if (spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) && (spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_HOLY)) == 0)
-            tmp += int32(Unit::GetEffectiveResistChance(this, spellInfo->GetSchoolMask(), victim, spellInfo) * 10000.0f); // 100 for spell calculations, and 100 for return value percentage
+            tmp += int32(Unit::GetEffectiveResistChance(this, spellInfo->GetSchoolMask(), victim) * 10000.0f); // 100 for spell calculations, and 100 for return value percentage
     }
 
     // Roll chance
@@ -19656,7 +19652,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
                 {
                     AttackStop();
                     charmInfo->SetIsAtStay(false);
-                    charmInfo->SetIsCommandAttack(!ToCreature()->HasReactState(REACT_PASSIVE));
+                    charmInfo->SetIsCommandAttack(true);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SetIsFollowing(false);
 
@@ -19666,7 +19662,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
                 {
                     AttackStop();
                     charmInfo->SetIsAtStay(false);
-                    charmInfo->SetIsCommandAttack(!ToCreature()->HasReactState(REACT_PASSIVE));
+                    charmInfo->SetIsCommandAttack(true);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SetIsFollowing(false);
 
