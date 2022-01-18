@@ -16,7 +16,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
 
 bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo)
 {

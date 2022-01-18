@@ -122,7 +122,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_NEEDLE, 15000);
                     break;
                 case EVENT_SPELL_SPINE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                     {
                         me->CastSpell(target, SPELL_IMPALING_SPINE, false);
                         target->CastSpell(target, SPELL_SUMMON_IMPALING_SPINE, true);

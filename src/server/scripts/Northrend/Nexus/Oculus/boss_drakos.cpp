@@ -162,7 +162,7 @@ public:
                         for( uint8 i = 0; i < 2; ++i )
                         {
                             float angle = rand_norm() * 2 * M_PI;
-                            me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
+                            me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * std::sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
                         }
                         events.RepeatEvent(2000);
                     }
@@ -171,7 +171,7 @@ public:
                     for( uint8 i = 0; i < 4; ++i )
                     {
                         float angle = rand_norm() * 2 * M_PI;
-                        me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
+                        me->SummonCreature(NPC_UNSTABLE_SPHERE, me->GetPositionX() + 5.0f * cos(angle), me->GetPositionY() + 5.0f * std::sin(angle), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 18000);
                     }
 
                     break;
@@ -201,7 +201,7 @@ public:
         {
             float dist = rand_norm() * 40.0f;
             float angle = rand_norm() * 2 * M_PI;
-            me->GetMotionMaster()->MovePoint(1, 961.29f + dist * cos(angle), 1049.0f + dist * sin(angle), 360.0f);
+            me->GetMotionMaster()->MovePoint(1, 961.29f + dist * cos(angle), 1049.0f + dist * std::sin(angle), 360.0f);
         }
 
         void MovementInform(uint32 type, uint32 id) override

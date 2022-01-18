@@ -27,7 +27,6 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
-#include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
 {
@@ -208,7 +207,7 @@ void PetAI::UpdateAI(uint32 diff)
     {
         if (owner && owner->GetTypeId() == TYPEID_PLAYER && me->GetCharmInfo()->GetForcedSpell() && me->GetCharmInfo()->GetForcedTarget())
         {
-            owner->ToPlayer()->GetSession()->HandlePetActionHelper(me, me->GetGUID(), abs(me->GetCharmInfo()->GetForcedSpell()), ACT_ENABLED, me->GetCharmInfo()->GetForcedTarget());
+            owner->ToPlayer()->GetSession()->HandlePetActionHelper(me, me->GetGUID(), std::abs(me->GetCharmInfo()->GetForcedSpell()), ACT_ENABLED, me->GetCharmInfo()->GetForcedTarget());
 
             // xinef: if spell was casted properly and we are in passive mode, handle return
             if (!me->GetCharmInfo()->GetForcedSpell() && me->HasReactState(REACT_PASSIVE))
@@ -594,16 +593,12 @@ void PetAI::DoAttack(Unit* target, bool chase)
         if (me->HasReactState(REACT_AGGRESSIVE) && !me->GetCharmInfo()->IsCommandAttack())
             me->SendPetAIReaction(me->GetGUID());
 
-        if (CharmInfo* ci = me->GetCharmInfo())
-        {
-            ci->SetIsAtStay(false);
-            ci->SetIsCommandFollow(false);
-            ci->SetIsFollowing(false);
-            ci->SetIsReturning(false);
-        }
-
         if (chase)
         {
+            bool oldCmdAttack = me->GetCharmInfo()->IsCommandAttack(); // This needs to be reset after other flags are cleared
+            ClearCharmInfoFlags();
+            me->GetCharmInfo()->SetIsCommandAttack(oldCmdAttack); // For passive pets commanded to attack so they will use spells
+
             if (_canMeleeAttack())
             {
                 float angle = combatRange == 0.f && target->GetTypeId() != TYPEID_PLAYER && !target->IsPet() ? float(M_PI) : 0.f;
@@ -613,6 +608,8 @@ void PetAI::DoAttack(Unit* target, bool chase)
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
+            ClearCharmInfoFlags();
+
             me->GetCharmInfo()->SetIsAtStay(true);
             me->GetMotionMaster()->MovementExpiredOnSlot(MOTION_SLOT_ACTIVE, false);
             me->GetMotionMaster()->MoveIdle();

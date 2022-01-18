@@ -36,7 +36,6 @@ npc_locksmith            75%    list of keys needs to be confirmed
 npc_firework            100%    NPC's summoned by rockets and rocket clusters, for making them cast visual
 EndContentData */
 
-#include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
@@ -44,8 +43,6 @@ EndContentData */
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
@@ -57,6 +54,12 @@ EndContentData */
 #include "SpellAuras.h"
 #include "WaypointMgr.h"
 #include "World.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 enum elderClearwater
 {
@@ -216,6 +219,8 @@ enum riggleBassbait
     QUEST_MASTER_ANGLER                 = 8193,
 
     DATA_ANGLER_FINISHED                = 1,
+
+    GAME_EVENT_FISHING                  = 62
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -229,7 +234,7 @@ public:
         {
             events.Reset();
             events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
-            finished = false;
+            finished = sWorld->getWorldState(GAME_EVENT_FISHING) == 1;
             startWarning = false;
             finishWarning = false;
         }
@@ -250,7 +255,10 @@ public:
         void DoAction(int32 param) override
         {
             if (param == DATA_ANGLER_FINISHED)
+            {
                 finished = true;
+                sWorld->setWorldState(GAME_EVENT_FISHING, 1);
+            }
         }
 
         void UpdateAI(uint32 diff) override

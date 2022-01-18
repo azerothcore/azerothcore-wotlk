@@ -19,7 +19,6 @@
 #include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
@@ -28,6 +27,12 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "TaskScheduler.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 ///////////////////////////////////////
 ////// ITEMS FIXES, BASIC STUFF
@@ -566,7 +571,7 @@ struct npc_hallows_end_soh : public ScriptedAI
     {
         scheduler.Schedule(6s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.f, true))
             {
                 me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                 target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
@@ -978,7 +983,7 @@ struct boss_headless_horseman : public ScriptedAI
             (*itr)->ToCreature()->DespawnOrUnsummon(500);
 
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
-        if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
+        if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
             sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
     }
 
@@ -1180,7 +1185,7 @@ struct boss_headless_horseman : public ScriptedAI
                 }
             case EVENT_HORSEMAN_CONFLAGRATION:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                         target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);

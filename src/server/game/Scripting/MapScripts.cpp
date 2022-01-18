@@ -693,7 +693,7 @@ void Map::ScriptsProcess()
                             break;
                         case SF_CASTSPELL_SEARCH_CREATURE: // source -> creature with entry
                             uSource = source ? source->ToUnit() : nullptr;
-                            uTarget = uSource ? GetClosestCreatureWithEntry(uSource, abs(step.script->CastSpell.CreatureEntry), step.script->CastSpell.SearchRadius) : nullptr;
+                            uTarget = uSource ? GetClosestCreatureWithEntry(uSource, std::abs(step.script->CastSpell.CreatureEntry), step.script->CastSpell.SearchRadius) : nullptr;
                             break;
                     }
 

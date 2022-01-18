@@ -82,6 +82,7 @@ struct GroupQueueInfo;
 struct ItemTemplate;
 struct OutdoorPvPData;
 struct TargetInfo;
+struct SpellModifier;
 
 namespace Acore::ChatCommands
 {
@@ -443,6 +444,8 @@ public:
     [[nodiscard]] virtual bool CanSetPhaseMask(Unit const* /*unit*/, uint32 /*newPhaseMask*/, bool /*update*/) { return true; }
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
+
+    [[nodiscard]] virtual bool OnBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player* /*target*/, uint16 /*index*/) { return false; }
 
     /**
      * @brief This hook runs in Unit::Update
@@ -1517,6 +1520,9 @@ public:
 
     // Called before the phase for a WorldObject is set
     virtual void OnBeforeWorldObjectSetPhaseMask(WorldObject const* /*worldObject*/, uint32& /*oldPhaseMask*/, uint32& /*newPhaseMask*/, bool& /*useCombinedPhases*/, bool& /*update*/) { }
+
+    // Called when checking if a spell is affected by a mod
+    virtual bool OnIsAffectedBySpellModCheck(SpellInfo const* /*affectSpell*/, SpellInfo const* /*checkSpell*/, SpellModifier const* /*mod*/) { return true; };
 };
 
 class BGScript : public ScriptObject
@@ -1720,7 +1726,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // After complete global acvievement
     virtual void SetRealmCompleted(AchievementEntry const* /*achievement*/) { }
@@ -1742,7 +1748,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnInitStatsForLevel(Guardian* /*guardian*/, uint8 /*petlevel*/) { }
 
@@ -1770,7 +1776,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
 
@@ -1787,7 +1793,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnConstructObject(Object* /*origin*/) { }
 
@@ -1840,9 +1846,9 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+    virtual void OnHandleDevCommand(Player* /*player*/, bool& /*enable*/) { }
 
     /**
      * @brief This hook runs execute chat command
@@ -1861,7 +1867,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
 };
@@ -1874,7 +1880,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before destroy world object
@@ -1921,7 +1927,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before money loot
@@ -2333,6 +2339,7 @@ public: /* GlobalScript */
     void OnAfterInitializeLockedDungeons(Player* player);
     void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
     void OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update);
+    bool OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
@@ -2356,6 +2363,7 @@ public: /* UnitScript */
     bool IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
     bool CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update);
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
+    bool OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index);
     void OnUnitUpdate(Unit* unit, uint32 diff);
 
 public: /* MovementHandlerScript */
@@ -2464,7 +2472,7 @@ public: /* MiscScript */
 
 public: /* CommandSC */
 
-    void OnHandleDevCommand(Player* player, std::string& argstr);
+    void OnHandleDevCommand(Player* player, bool& enable);
     bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
 
 public: /* DatabaseScript */
@@ -2517,7 +2525,7 @@ public:
     GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
 
 private:
-    SpellScript* GetSpellScript() const override
+    [[nodiscard]] SpellScript* GetSpellScript() const override
     {
         if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
         {
@@ -2529,7 +2537,7 @@ private:
         }
     }
 
-    AuraScript* GetAuraScript() const override
+    [[nodiscard]] AuraScript* GetAuraScript() const override
     {
         if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
         {
