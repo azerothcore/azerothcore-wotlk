@@ -1162,15 +1162,19 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 
     // Hack for modules
-    std::array<uint32, 1> exceptionCreatures = { 190010 };
-
-    if (cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP) && !(cInfo->Entry == exceptionCreatures))
+    switch (cInfo->Entry)
     {
-        LOG_ERROR("sql.sql", "Creature (Entry: %u) has assigned gossip menu %u, but npcflag does not include UNIT_NPC_FLAG_GOSSIP (1).", cInfo->Entry, cInfo->GossipMenuId);
-    }
-    else if (!cInfo->GossipMenuId && cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP && !(cInfo->Entry == exceptionCreatures))
-    {
-        LOG_ERROR("sql.sql", "Creature (Entry: %u) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
+    case 190010: // Transmog Module
+        break;
+    default:
+        if (cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+        {
+            LOG_ERROR("sql.sql", "Creature (Entry: %u) has assigned gossip menu %u, but npcflag does not include UNIT_NPC_FLAG_GOSSIP (1).", cInfo->Entry, cInfo->GossipMenuId);
+        }
+        else if (!cInfo->GossipMenuId && cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP)
+        {
+            LOG_ERROR("sql.sql", "Creature (Entry: %u) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
+        }
     }
 }
 
