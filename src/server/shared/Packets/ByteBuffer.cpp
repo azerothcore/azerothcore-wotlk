@@ -19,8 +19,8 @@
 #include "Errors.h"
 #include "Log.h"
 #include "MessageBuffer.h"
-#include "Util.h"
 #include "Timer.h"
+#include "Util.h"
 #include <ctime>
 #include <sstream>
 #include <utf8.h>

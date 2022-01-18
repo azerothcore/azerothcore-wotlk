@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Define.h"
 #include "StringFormat.h"
+#include "Define.h"
 #include <locale>
 
 template<class Str>

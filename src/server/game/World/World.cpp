@@ -75,6 +75,7 @@
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
+#include "TaskScheduler.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -89,7 +90,6 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "TaskScheduler.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
