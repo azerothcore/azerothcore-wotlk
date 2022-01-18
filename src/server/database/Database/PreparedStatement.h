@@ -147,8 +147,8 @@ public:
         SetDataTuple(std::make_tuple(std::forward<Args>(args)...));
     }
 
-    uint32 GetIndex() const { return m_index; }
-    std::vector<PreparedStatementData> const& GetParameters() const { return statement_data; }
+    [[nodiscard]] uint32 GetIndex() const { return m_index; }
+    [[nodiscard]] std::vector<PreparedStatementData> const& GetParameters() const { return statement_data; }
 
 protected:
     template<typename T>
@@ -197,7 +197,7 @@ class AC_DATABASE_API PreparedStatementTask : public SQLOperation
 {
 public:
     PreparedStatementTask(PreparedStatementBase* stmt, bool async = false);
-    ~PreparedStatementTask();
+    ~PreparedStatementTask() override;
 
     bool Execute() override;
     PreparedQueryResultFuture GetFuture() { return m_result->get_future(); }
