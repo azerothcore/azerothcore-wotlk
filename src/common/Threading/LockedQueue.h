@@ -31,20 +31,15 @@ class LockedQueue
     StorageType _queue;
 
     //! Cancellation flag.
-    volatile bool _canceled;
+    volatile bool _canceled{false};
 
 public:
 
     //! Create a LockedQueue.
-    LockedQueue()
-        : _canceled(false)
-    {
-    }
+    LockedQueue() = default;
 
     //! Destroy a LockedQueue.
-    virtual ~LockedQueue()
-    {
-    }
+    virtual ~LockedQueue() = default;
 
     //! Adds an item to the queue.
     void add(const T& item)
