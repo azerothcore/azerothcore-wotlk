@@ -710,7 +710,7 @@ public:
                 case EVENT_THRALL_FACE_TARETHA:
                     {
                         Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                        if (!players.isEmpty())
+                        if (!players.IsEmpty())
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                 if (Player* player = itr->GetSource())
                                     player->KilledMonsterCredit(20156);
