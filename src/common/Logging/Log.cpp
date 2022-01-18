@@ -275,16 +275,7 @@ Logger const* Log::GetLoggerByType(std::string const& type) const
 
 std::string Log::GetTimestampStr()
 {
-    using namespace Acore::Time;
-
-    //       YYYY   year
-    //       MM     month (2 digits 01-12)
-    //       DD     day (2 digits 01-31)
-    //       HH     hour (2 digits 00-23)
-    //       MM     minutes (2 digits 00-59)
-    //       SS     seconds (2 digits 00-59)
-    return Acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d",
-        GetYear() + 1900, GetMonth() + 1, GetDayInMonth(), GetHours(), GetMinutes(), GetSeconds());
+    return Acore::Time::TimeToTimestampStr(GetEpochTime(), "%Y-%m-%d_%H_%M_%S");
 }
 
 bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /* = true */)

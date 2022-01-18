@@ -183,7 +183,7 @@ public:
 
         for (DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
         {
-            std::string dateStr = Acore::Time::TimeToTimestampStr(itr->deleteDate);
+            std::string dateStr = Acore::Time::TimeToTimestampStr(Seconds(itr->deleteDate));
 
             if (!handler->GetSession())
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,

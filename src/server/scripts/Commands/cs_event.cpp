@@ -112,12 +112,12 @@ public:
         bool active = activeEvents.find(eventId) != activeEvents.end();
         char const* activeStr = active ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
-        std::string startTimeStr = Acore::Time::TimeToTimestampStr(eventData.start);
-        std::string endTimeStr = Acore::Time::TimeToTimestampStr(eventData.end);
+        std::string startTimeStr = Acore::Time::TimeToTimestampStr(Seconds(eventData.start));
+        std::string endTimeStr = Acore::Time::TimeToTimestampStr(Seconds(eventData.end));
 
         uint32 delay = sGameEventMgr->NextCheck(eventId);
         time_t nextTime = time(nullptr) + delay;
-        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? Acore::Time::TimeToTimestampStr(time(nullptr) + delay) : "-";
+        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? Acore::Time::TimeToTimestampStr(Seconds(time(nullptr) + delay)) : "-";
 
         std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE, true);
         std::string lengthStr = secsToTimeString(eventData.length * MINUTE, true);

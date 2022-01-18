@@ -269,17 +269,33 @@ time_t Acore::Time::GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfte
     return hourLocal;
 }
 
-std::string Acore::Time::TimeToTimestampStr(time_t t)
+std::string Acore::Time::TimeToTimestampStr(Seconds time /*= 0s*/, std::string_view fmt /*= {}*/)
 {
     std::stringstream ss;
-    ss << std::put_time(std::localtime(&t), "%Y-%m-%d %X");
+    std::string format{ fmt };
+    time_t t = time.count();
+
+    if (format.empty())
+    {
+        format = "%Y-%m-%d %X";
+    }
+
+    ss << std::put_time(std::localtime(&t), format.c_str());
     return ss.str();
 }
 
-std::string Acore::Time::TimeToHumanReadable(time_t t)
+std::string Acore::Time::TimeToHumanReadable(Seconds time /*= 0s*/, std::string_view fmt /*= {}*/)
 {
     std::stringstream ss;
-    ss << std::put_time(std::localtime(&t), "%a %b %d %Y %X");
+    std::string format{ fmt };
+    time_t t = time.count();
+
+    if (format.empty())
+    {
+        format = "%a %b %d %Y %X";
+    }
+
+    ss << std::put_time(std::localtime(&t), format.c_str());
     return ss.str();
 }
 
@@ -345,82 +361,82 @@ time_t Acore::Time::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
     return mktime(&localTm);
 }
 
-uint32 Acore::Time::GetSeconds(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetSeconds(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_sec;
+    return TimeBreakdown(time.count()).tm_sec;
 }
 
-uint32 Acore::Time::GetMinutes(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetMinutes(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_min;
+    return TimeBreakdown(time.count()).tm_min;
 }
 
-uint32 Acore::Time::GetHours(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetHours(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_hour;
+    return TimeBreakdown(time.count()).tm_hour;
 }
 
-uint32 Acore::Time::GetDayInWeek(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetDayInWeek(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_wday;
+    return TimeBreakdown(time.count()).tm_wday;
 }
 
-uint32 Acore::Time::GetDayInMonth(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetDayInMonth(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_mday;
+    return TimeBreakdown(time.count()).tm_mday;
 }
 
-uint32 Acore::Time::GetDayInYear(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetDayInYear(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_yday;
+    return TimeBreakdown(time.count()).tm_yday;
 }
 
-uint32 Acore::Time::GetMonth(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetMonth(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_mon;
+    return TimeBreakdown(time.count()).tm_mon;
 }
 
-uint32 Acore::Time::GetYear(Seconds seconds /*= 0s*/)
+uint32 Acore::Time::GetYear(Seconds time /*= 0s*/)
 {
-    if (seconds == 0s)
+    if (time == 0s)
     {
-        seconds = GetEpochTime();
+        time = GetEpochTime();
     }
 
-    return TimeBreakdown(seconds.count()).tm_year;
+    return TimeBreakdown(time.count()).tm_year;
 }
