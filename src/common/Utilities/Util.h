@@ -653,7 +653,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap()  { }
+    EventMap()  = default;
 
     /**
     * @name Reset
