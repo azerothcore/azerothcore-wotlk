@@ -1,3 +1,19 @@
+-- DB update 2022_01_18_02 -> 2022_01_18_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_18_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_18_02 2022_01_18_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1642319541117378200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642319541117378200');
 DELETE FROM `creature` WHERE `guid` IN (49566, 46923, 49610, 46929, 46930, 49565, 46925, 49620, 49628, 49648, 46945, 49633, 46952, 49636, 49646, 49626, 46953, 49640, 46954, 49643, 46946, 49639, 49645, 46951, 46950);
 INSERT INTO `creature` (`guid`,`id1`,`id2`,`id3`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
@@ -28,3 +44,13 @@ INSERT INTO `creature` (`guid`,`id1`,`id2`,`id3`,`map`,`zoneId`,`areaId`,`spawnM
 (49645, 1985, 2032, 0, 1, 0, 0, 1, 1, 0, 10666.881, 733.63776, 1323.4856, 3.787364482879638671, 180, 14, 0, 1, 0, 1, 0, 0, 0, '', 0), -- .go xyz 10666.881 733.63776 1323.4856
 (46951, 1985, 2032, 0, 1, 0, 0, 1, 1, 0, 10677.708, 749.8698, 1322.5094, 2.251474618911743164, 180, 14, 0, 1, 0, 1, 0, 0, 0, '', 0), -- .go xyz 10677.708 749.8698 1322.5094
 (46950, 1985, 2032, 0, 1, 0, 0, 1, 1, 0, 10682.271, 718.951, 1326.6854, 5.98647928237915039, 180, 14, 0, 1, 0, 1, 0, 0, 0, '', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_18_03' WHERE sql_rev = '1642319541117378200';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
