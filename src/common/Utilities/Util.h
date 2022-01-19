@@ -40,10 +40,6 @@ template<typename T, class S> struct Finder
     bool operator()(const std::pair<int, S>& obj) { return obj.second.*idMember_ == val_; }
 };
 
-struct tm* localtime_r(time_t const* time, struct tm* result);
-time_t LocalTimeToUTCTime(time_t time);
-time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime = true);
-tm TimeBreakdown(time_t t);
 
 void stripLineInvisibleChars(std::string& src);
 
@@ -51,8 +47,6 @@ AC_COMMON_API Optional<int32> MoneyStringToMoney(std::string_view moneyString);
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
 uint32 TimeStringToSecs(const std::string& timestring);
-std::string TimeToTimestampStr(time_t t);
-std::string TimeToHumanReadable(time_t t);
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {

@@ -365,9 +365,6 @@ public:
     void   SetCleaningFlags(uint32 flags) override { m_CleaningFlags = flags; }
     void   ResetEventSeasonalQuests(uint16 event_id) override;
 
-    time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour) override; // pussywizard
-    time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) override; // pussywizard
-
     [[nodiscard]] std::string const& GetRealmName() const override { return _realmName; } // pussywizard
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard
 

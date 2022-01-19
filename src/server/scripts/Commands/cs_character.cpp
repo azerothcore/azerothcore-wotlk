@@ -33,6 +33,7 @@ EndScriptData */
 #include "PlayerDump.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "Timer.h"
 #include "World.h"
 #include "WorldSession.h"
 
@@ -182,7 +183,7 @@ public:
 
         for (DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
         {
-            std::string dateStr = TimeToTimestampStr(itr->deleteDate);
+            std::string dateStr = Acore::Time::TimeToTimestampStr(Seconds(itr->deleteDate));
 
             if (!handler->GetSession())
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
