@@ -8038,7 +8038,10 @@ void Spell::CallScriptBeforeCastTimeHandlers()
     {
         (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_CAST_TIME);
         std::list<SpellScript::CastHandler>::iterator hookItrEnd = (*scritr)->BeforeCastTime.end(), hookItr = (*scritr)->BeforeCastTime.begin();
-        for (; hookItr != hookItrEnd; ++hookItr) (*hookItr).Call(*scritr);
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
 
         (*scritr)->_FinishScriptCall();
     }
@@ -8061,7 +8064,10 @@ void Spell::CallScriptWhileCastHandlers()
     {
         (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_WHILE_CAST);
         std::list<SpellScript::CastHandler>::iterator hookItrEnd = (*scritr)->WhileCast.end(), hookItr = (*scritr)->WhileCast.begin();
-        for (; hookItr != hookItrEnd; ++hookItr) (*hookItr).Call(*scritr);
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
 
         (*scritr)->_FinishScriptCall();
     }
