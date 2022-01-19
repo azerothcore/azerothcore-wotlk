@@ -42,11 +42,11 @@ class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
-enum class MapDummy
+enum class MapDummy : uint8
 {
-    TRIGGERING_SPELL,
-    STRIKE,
-    WAS_IN_AIR,
+    TriggeringSpell,
+    Strike,
+    WasInAir,
 };
 
 enum SpellCastFlags
