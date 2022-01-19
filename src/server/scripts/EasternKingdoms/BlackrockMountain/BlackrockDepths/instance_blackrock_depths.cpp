@@ -181,7 +181,7 @@ public:
 
             // check if all players saved her.
             Map::PlayerList const& lPlayers = instance->GetPlayers();
-            if (!lPlayers.isEmpty())
+            if (!lPlayers.IsEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
                 {
