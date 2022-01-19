@@ -720,7 +720,7 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData()  { }
+    explicit GameObjectData()  = default;
     uint32 id{0};                                              // entry in gamobject_template
     uint16 mapid{0};
     uint32 phaseMask{0};

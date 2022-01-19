@@ -1726,7 +1726,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // After complete global acvievement
     virtual void SetRealmCompleted(AchievementEntry const* /*achievement*/) { }
@@ -1748,7 +1748,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnInitStatsForLevel(Guardian* /*guardian*/, uint8 /*petlevel*/) { }
 
@@ -1776,7 +1776,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
 
@@ -1793,7 +1793,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnConstructObject(Object* /*origin*/) { }
 
@@ -1846,7 +1846,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnHandleDevCommand(Player* /*player*/, bool& /*enable*/) { }
 
@@ -1867,7 +1867,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
 };
@@ -1880,7 +1880,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before destroy world object
@@ -1927,7 +1927,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before money loot
@@ -2525,7 +2525,7 @@ public:
     GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
 
 private:
-    SpellScript* GetSpellScript() const override
+    [[nodiscard]] SpellScript* GetSpellScript() const override
     {
         if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
         {
@@ -2537,7 +2537,7 @@ private:
         }
     }
 
-    AuraScript* GetAuraScript() const override
+    [[nodiscard]] AuraScript* GetAuraScript() const override
     {
         if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
         {

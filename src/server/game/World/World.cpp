@@ -75,6 +75,7 @@
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
+#include "TaskScheduler.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -90,7 +91,6 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "TaskScheduler.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
@@ -3026,100 +3026,43 @@ void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
     }
 }
 
-// int8 dayOfWeek: 0 (sunday) to 6 (saturday)
-time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
-{
-    if (hour < 0 || hour > 23)
-        hour = 0;
-    time_t curr = GameTime::GetGameTime().count();
-    tm localTm;
-    localtime_r(&curr, &localTm);
-    localTm.tm_hour = hour;
-    localTm.tm_min  = 0;
-    localTm.tm_sec  = 0;
-    uint32 add;
-    if (dayOfWeek < 0 || dayOfWeek > 6)
-        dayOfWeek = (localTm.tm_wday + 1) % 7;
-    if (localTm.tm_wday >= dayOfWeek)
-        add = (7 - (localTm.tm_wday - dayOfWeek)) * DAY;
-    else
-        add = (dayOfWeek - localTm.tm_wday) * DAY;
-    return mktime(&localTm) + add;
-}
-
-// int8 month: 0 (january) to 11 (december)
-time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
-{
-    if (hour < 0 || hour > 23)
-        hour = 0;
-    time_t curr = GameTime::GetGameTime().count();
-    tm localTm;
-    localtime_r(&curr, &localTm);
-    localTm.tm_mday = 1;
-    localTm.tm_hour = hour;
-    localTm.tm_min  = 0;
-    localTm.tm_sec  = 0;
-    if (month < 0 || month > 11)
-    {
-        month = (localTm.tm_mon + 1) % 12;
-        if (month == 0)
-            localTm.tm_year += 1;
-    }
-    else if (localTm.tm_mon >= month)
-        localTm.tm_year += 1;
-    localTm.tm_mon = month;
-    return mktime(&localTm);
-}
-
 void World::InitWeeklyQuestResetTime()
 {
-    Seconds wstime = sWorld->getWorldState(WS_WEEKLY_QUEST_RESET_TIME);
-    m_NextWeeklyQuestReset = wstime > 0s ? wstime : Seconds(GetNextTimeWithDayAndHour(4, 6));
-
-    if (wstime == 0s)
-    {
-        sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, m_NextWeeklyQuestReset);
-    }
+    time_t wstime = time_t(sWorld->getWorldState(WS_WEEKLY_QUEST_RESET_TIME));
+    m_NextWeeklyQuestReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(4, 6);
+    if (!wstime)
+        sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, uint64(m_NextWeeklyQuestReset));
 }
 
 void World::InitDailyQuestResetTime()
 {
-    Seconds wstime = sWorld->getWorldState(WS_DAILY_QUEST_RESET_TIME);
-    m_NextDailyQuestReset = wstime > 0s ? wstime : Seconds(GetNextTimeWithDayAndHour(-1, 6));
-
-    if (wstime == 0s)
-    {
-        sWorld->setWorldState(WS_DAILY_QUEST_RESET_TIME, m_NextDailyQuestReset);
-    }
+    time_t wstime = time_t(sWorld->getWorldState(WS_DAILY_QUEST_RESET_TIME));
+    m_NextDailyQuestReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
+    if (!wstime)
+        sWorld->setWorldState(WS_DAILY_QUEST_RESET_TIME, uint64(m_NextDailyQuestReset));
 }
 
 void World::InitMonthlyQuestResetTime()
 {
-    Seconds wstime = sWorld->getWorldState(WS_MONTHLY_QUEST_RESET_TIME);
-    m_NextMonthlyQuestReset = wstime > 0s ? wstime : Seconds(GetNextTimeWithMonthAndHour(-1, 6));
-
-    if (wstime == 0s)
-    {
-        sWorld->setWorldState(WS_MONTHLY_QUEST_RESET_TIME, m_NextMonthlyQuestReset);
-    }
+    time_t wstime = time_t(sWorld->getWorldState(WS_MONTHLY_QUEST_RESET_TIME));
+    m_NextMonthlyQuestReset = wstime ? wstime : Acore::Time::GetNextTimeWithMonthAndHour(-1, 6);
+    if (!wstime)
+        sWorld->setWorldState(WS_MONTHLY_QUEST_RESET_TIME, uint64(m_NextMonthlyQuestReset));
 }
 
 void World::InitRandomBGResetTime()
 {
-    Seconds wstime = sWorld->getWorldState(WS_BG_DAILY_RESET_TIME);
-    m_NextRandomBGReset = wstime > 0s ? wstime : Seconds(GetNextTimeWithDayAndHour(-1, 6));
-
-    if (wstime == 0s)
-    {
-        sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, m_NextRandomBGReset);
-    }
+    time_t wstime = time_t(sWorld->getWorldState(WS_BG_DAILY_RESET_TIME));
+    m_NextRandomBGReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
+    if (!wstime)
+        sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, uint64(m_NextRandomBGReset));
 }
 
 void World::InitCalendarOldEventsDeletionTime()
 {
-    Seconds now = GameTime::GetGameTime();
-    Seconds currentDeletionTime = getWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME);
-    Seconds nextDeletionTime = currentDeletionTime > 0s ? currentDeletionTime : Seconds(GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR)));
+    time_t now = time(nullptr);
+    time_t currentDeletionTime = getWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME);
+    time_t nextDeletionTime = currentDeletionTime ? currentDeletionTime : Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR));
 
     // If the reset time saved in the worldstate is before now it means the server was offline when the reset was supposed to occur.
     // In this case we set the reset time in the past and next world update will do the reset and schedule next one in the future.
@@ -3134,11 +3077,10 @@ void World::InitCalendarOldEventsDeletionTime()
 
 void World::InitGuildResetTime()
 {
-    Seconds wstime = getWorldState(WS_GUILD_DAILY_RESET_TIME);
-    m_NextGuildReset = wstime > 0s ? wstime : Seconds(GetNextTimeWithDayAndHour(-1, 6));
-
-    if (wstime == 0s)
-        sWorld->setWorldState(WS_GUILD_DAILY_RESET_TIME, m_NextGuildReset);
+    time_t wstime = time_t(getWorldState(WS_GUILD_DAILY_RESET_TIME));
+    m_NextGuildReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
+    if (!wstime)
+        sWorld->setWorldState(WS_GUILD_DAILY_RESET_TIME, uint64(m_NextGuildReset));
 }
 
 void World::ResetDailyQuests()
@@ -3150,8 +3092,8 @@ void World::ResetDailyQuests()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetDailyQuestStatus();
 
-    m_NextDailyQuestReset = Seconds(GetNextTimeWithDayAndHour(-1, 6));
-    sWorld->setWorldState(WS_DAILY_QUEST_RESET_TIME, m_NextDailyQuestReset);
+    m_NextDailyQuestReset = Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
+    sWorld->setWorldState(WS_DAILY_QUEST_RESET_TIME, uint64(m_NextDailyQuestReset));
 
     // change available dailies
     sPoolMgr->ChangeDailyQuests();
@@ -3185,8 +3127,8 @@ void World::ResetWeeklyQuests()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetWeeklyQuestStatus();
 
-    m_NextWeeklyQuestReset = Seconds(GetNextTimeWithDayAndHour(4, 6));
-    sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, m_NextWeeklyQuestReset);
+    m_NextWeeklyQuestReset = Acore::Time::GetNextTimeWithDayAndHour(4, 6);
+    sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, uint64(m_NextWeeklyQuestReset));
 
     // change available weeklies
     sPoolMgr->ChangeWeeklyQuests();
@@ -3203,8 +3145,8 @@ void World::ResetMonthlyQuests()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetMonthlyQuestStatus();
 
-    m_NextMonthlyQuestReset = Seconds(GetNextTimeWithMonthAndHour(-1, 6));
-    sWorld->setWorldState(WS_MONTHLY_QUEST_RESET_TIME, m_NextMonthlyQuestReset);
+    m_NextMonthlyQuestReset = Acore::Time::GetNextTimeWithMonthAndHour(-1, 6);
+    sWorld->setWorldState(WS_MONTHLY_QUEST_RESET_TIME, uint64(m_NextMonthlyQuestReset));
 }
 
 void World::ResetEventSeasonalQuests(uint16 event_id)
@@ -3229,8 +3171,8 @@ void World::ResetRandomBG()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->SetRandomWinner(false);
 
-    m_NextRandomBGReset = Seconds(GetNextTimeWithDayAndHour(-1, 6));
-    sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, m_NextRandomBGReset);
+    m_NextRandomBGReset = Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
+    sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, uint64(m_NextRandomBGReset));
 }
 
 void World::CalendarDeleteOldEvents()
@@ -3246,8 +3188,8 @@ void World::ResetGuildCap()
 {
     LOG_INFO("server.worldserver", "Guild Daily Cap reset.");
 
-    m_NextGuildReset = Seconds(GetNextTimeWithDayAndHour(-1, 6));
-    sWorld->setWorldState(WS_GUILD_DAILY_RESET_TIME, m_NextGuildReset);
+    m_NextGuildReset = Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
+    sWorld->setWorldState(WS_GUILD_DAILY_RESET_TIME, uint64(m_NextGuildReset));
 
     sGuildMgr->ResetTimes();
 }

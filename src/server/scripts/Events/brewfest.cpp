@@ -533,11 +533,9 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
     bool AllowStart()
     {
-        time_t curtime = GameTime::GetGameTime().count();
-        tm strDate;
-        localtime_r(&curtime, &strDate);
+        auto minutes = Acore::Time::GetMinutes();
 
-        if (strDate.tm_min == 0 || strDate.tm_min == 30)
+        if (!minutes || minutes == 30)
             return true;
 
         return false;

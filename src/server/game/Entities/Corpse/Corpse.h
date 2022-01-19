@@ -69,7 +69,7 @@ public:
     void ResetGhostTime();
     [[nodiscard]] CorpseType GetType() const { return m_type; }
 
-    CellCoord const& GetCellCoord() const { return _cellCoord; }
+    [[nodiscard]] CellCoord const& GetCellCoord() const { return _cellCoord; }
     void SetCellCoord(CellCoord const& cellCoord) { _cellCoord = cellCoord; }
 
     Loot loot;                                          // remove insignia ONLY at BG
