@@ -18,6 +18,10 @@
 #ifndef __SPELL_H
 #define __SPELL_H
 
+#include <any>
+#include <map>
+#include <optional>
+
 #include "GridDefines.h"
 #include "ObjectMgr.h"
 #include "PathGenerator.h"
@@ -37,6 +41,13 @@ class ByteBuffer;
 class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
+
+enum class MapDummy
+{
+    TRIGGERING_SPELL,
+    STRIKE,
+    WAS_IN_AIR,
+};
 
 enum SpellCastFlags
 {
@@ -559,6 +570,7 @@ public:
     Unit* GetCaster() const { return m_caster; }
     Unit* GetOriginalCaster() const { return m_originalCaster; }
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
+
     void SetSpellInfo(SpellInfo const* info) { m_spellInfo = info; }
     int32 GetPowerCost() const { return m_powerCost; }
 
@@ -566,7 +578,8 @@ public:
 
     void CleanupTargetList();
 
-    void SetSpellValue(SpellValueMod mod, int32 value);
+    void              SetSpellValue(SpellValueMod mod, int32 value);
+    void              ModifySpellValue(SpellValueMod mod, int32 value);
     SpellValue const* GetSpellValue() { return m_spellValue; }
 
     // xinef: moved to public
@@ -706,7 +719,9 @@ public:
     // Scripting system
     bool _scriptsLoaded;
     //void LoadScripts();
-    void CallScriptBeforeCastHandlers();
+    void                    CallScriptBeforeCastTimeHandlers();
+    void                    CallScriptBeforeCastHandlers();
+    void                    CallScriptWhileCastHandlers();
     void CallScriptOnCastHandlers();
     void CallScriptAfterCastHandlers();
     SpellCastResult CallScriptCheckCastHandlers();
@@ -767,6 +782,30 @@ public:
     double rand_norm()                      { return m_caster->GetMap()->mtRand.randExc(); }
     double rand_chance()                    { return m_caster->GetMap()->mtRand.randExc(100.0); }
 #endif
+
+    /// <summary>
+    /// A collection of random stuff to be read by a single spell.
+    /// includes "which spell issued the cast of this spell" so I can tell from the finishing of basic attack if it was cast by undead strike or crusader strike etc.
+    /// </summary>
+
+public:
+    int32 GetSpellTimer()
+    {
+        return m_timer;
+    };
+    void ModifySpellTimer(int32 amount)
+    {
+        m_timer += amount;
+    };
+    void SetSpellTimer(int32 amount)
+    {
+        m_timer = amount;
+    };
+    std::map<MapDummy, std::optional<std::any>> triggerDummy = {};
+    std::map<MapDummy, std::optional<std::any>>& GetTriggerDummy()
+    {
+        return triggerDummy;
+    }
 };
 
 namespace Acore

@@ -3463,7 +3463,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_GCD))
             TriggerGlobalCooldown();
     }
-
+    CallScriptBeforeCastTimeHandlers();
     return SPELL_CAST_OK;
 }
 
@@ -4040,13 +4040,16 @@ void Spell::update(uint32 difftime)
     switch (m_spellState)
     {
         case SPELL_STATE_PREPARING:
-            {
+             {
                 if (m_timer > 0)
                 {
-                    if (difftime >= (uint32)m_timer)
+                    if (difftime >= (uint32) m_timer)
                         m_timer = 0;
                     else
-                        m_timer -= difftime;
+                    {
+                    m_timer -= difftime;
+                    CallScriptWhileCastHandlers();
+                    }
                 }
 
                 if (m_timer == 0 && !IsNextMeleeSwingSpell() && !IsAutoRepeat())
@@ -4063,7 +4066,10 @@ void Spell::update(uint32 difftime)
                         if (difftime >= (uint32)m_timer)
                             m_timer = 0;
                         else
+                        {
                             m_timer -= difftime;
+                            CallScriptWhileCastHandlers();
+                        }
                     }
                 }
 
@@ -7915,30 +7921,60 @@ void Spell::SetSpellValue(SpellValueMod mod, int32 value)
 {
     switch (mod)
     {
-        case SPELLVALUE_BASE_POINT0:
-            m_spellValue->EffectBasePoints[0] = m_spellInfo->Effects[EFFECT_0].CalcBaseValue(value);
-            break;
-        case SPELLVALUE_BASE_POINT1:
-            m_spellValue->EffectBasePoints[1] = m_spellInfo->Effects[EFFECT_1].CalcBaseValue(value);
-            break;
-        case SPELLVALUE_BASE_POINT2:
-            m_spellValue->EffectBasePoints[2] = m_spellInfo->Effects[EFFECT_2].CalcBaseValue(value);
-            break;
-        case SPELLVALUE_RADIUS_MOD:
-            m_spellValue->RadiusMod = (float)value / 10000;
-            break;
-        case SPELLVALUE_MAX_TARGETS:
-            m_spellValue->MaxAffectedTargets = (uint32)value;
-            break;
-        case SPELLVALUE_AURA_STACK:
-            m_spellValue->AuraStackAmount = uint8(value);
-            break;
-        case SPELLVALUE_AURA_DURATION:
-            m_spellValue->AuraDuration = value;
-            break;
-        case SPELLVALUE_FORCED_CRIT_RESULT:
-            m_spellValue->ForcedCritResult = (bool)value;
-            break;
+    case SPELLVALUE_BASE_POINT0:
+        m_spellValue->EffectBasePoints[0] = m_spellInfo->Effects[EFFECT_0].CalcBaseValue(value);
+        break;
+    case SPELLVALUE_BASE_POINT1:
+        m_spellValue->EffectBasePoints[1] = m_spellInfo->Effects[EFFECT_1].CalcBaseValue(value);
+        break;
+    case SPELLVALUE_BASE_POINT2:
+        m_spellValue->EffectBasePoints[2] = m_spellInfo->Effects[EFFECT_2].CalcBaseValue(value);
+        break;
+    case SPELLVALUE_RADIUS_MOD:
+        m_spellValue->RadiusMod = (float) value / 10000;
+        break;
+    case SPELLVALUE_MAX_TARGETS:
+        m_spellValue->MaxAffectedTargets = (uint32) value;
+        break;
+    case SPELLVALUE_AURA_STACK:
+        m_spellValue->AuraStackAmount = uint8(value);
+        break;
+    case SPELLVALUE_AURA_DURATION:
+        m_spellValue->AuraDuration = value;
+        break;
+    case SPELLVALUE_FORCED_CRIT_RESULT:
+        m_spellValue->ForcedCritResult = (bool) value;
+        break;
+    }
+}
+void Spell::ModifySpellValue(SpellValueMod mod, int32 value)
+{
+    switch (mod)
+    {
+    case SPELLVALUE_BASE_POINT0:
+        m_spellValue->EffectBasePoints[0] += value;
+        break;
+    case SPELLVALUE_BASE_POINT1:
+        m_spellValue->EffectBasePoints[1] += value;
+        break;
+    case SPELLVALUE_BASE_POINT2:
+        m_spellValue->EffectBasePoints[2] += value;
+        break;
+    case SPELLVALUE_RADIUS_MOD:
+        m_spellValue->RadiusMod += (float) value / 10000;
+        break;
+    case SPELLVALUE_MAX_TARGETS:
+        m_spellValue->MaxAffectedTargets += (uint32) value;
+        break;
+    case SPELLVALUE_AURA_STACK:
+        m_spellValue->AuraStackAmount += uint8(value);
+        break;
+    case SPELLVALUE_AURA_DURATION:
+        m_spellValue->AuraDuration += value;
+        break;
+    case SPELLVALUE_FORCED_CRIT_RESULT:
+        m_spellValue->ForcedCritResult += (bool) value;
+        break;
     }
 }
 
@@ -7996,6 +8032,17 @@ void Spell::LoadScripts()
         ++itr;
     }
 }
+void Spell::CallScriptBeforeCastTimeHandlers()
+{
+    for (std::list<SpellScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_CAST);
+        std::list<SpellScript::CastHandler>::iterator hookItrEnd = (*scritr)->BeforeCastTime.end(), hookItr = (*scritr)->BeforeCastTime.begin();
+        for (; hookItr != hookItrEnd; ++hookItr) (*hookItr).Call(*scritr);
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
 
 void Spell::CallScriptBeforeCastHandlers()
 {
@@ -8003,8 +8050,18 @@ void Spell::CallScriptBeforeCastHandlers()
     {
         (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_CAST);
         std::list<SpellScript::CastHandler>::iterator hookItrEnd = (*scritr)->BeforeCast.end(), hookItr = (*scritr)->BeforeCast.begin();
-        for (; hookItr != hookItrEnd; ++hookItr)
-            (*hookItr).Call(*scritr);
+        for (; hookItr != hookItrEnd; ++hookItr) (*hookItr).Call(*scritr);
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+void Spell::CallScriptWhileCastHandlers()
+{
+    for (std::list<SpellScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_WHILE_CAST);
+        std::list<SpellScript::CastHandler>::iterator hookItrEnd = (*scritr)->WhileCast.end(), hookItr = (*scritr)->WhileCast.begin();
+        for (; hookItr != hookItrEnd; ++hookItr) (*hookItr).Call(*scritr);
 
         (*scritr)->_FinishScriptCall();
     }
