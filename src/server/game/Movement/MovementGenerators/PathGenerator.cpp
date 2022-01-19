@@ -576,41 +576,10 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     }
 
     _pathPoints.resize(pointCount);
-    uint32 newPointCount = 0;
-    for (uint32 i = 0; i < pointCount; ++i) {
-        G3D::Vector3 vector = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
-        LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), vector.x, vector.y, vector.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
-        // One of the points is not in the water
-        if (liquidData.Status == LIQUID_MAP_UNDER_WATER)
-        {
-            // if the first point is under water
-            // then set a proper z for it
-            if (i == 0)
-            {
-                vector.z = std::fmaxf(vector.z, _source->GetPositionZ());
-                _pathPoints[newPointCount] = vector;
-            }
-            // if the last point is under water
-            // then set the desired end position instead
-            else if (i == pointCount - 1)
-            {
-                _pathPoints[newPointCount] = GetActualEndPosition();
-            }
-            // if one of the mid-points of the path is underwater
-            // then we can create a shortcut between the previous one
-            // and the next one by not including it inside the list
-            else
-                continue;
-        }
-        else
-        {
-            _pathPoints[newPointCount] = vector;
-        }
+    for (uint32 i = 0; i < pointCount; ++i)
+        _pathPoints[i] = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
 
-        newPointCount++;
-    }
-
-    _pathPoints.resize(newPointCount);
+    _pathPoints.resize(pointCount);
 
     NormalizePath();
 
