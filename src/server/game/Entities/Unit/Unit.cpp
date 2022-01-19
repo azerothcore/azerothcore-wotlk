@@ -40,9 +40,9 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "MapMgr.h"
-#include "MovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -19652,7 +19652,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
                 {
                     AttackStop();
                     charmInfo->SetIsAtStay(false);
-                    charmInfo->SetIsCommandAttack(!ToCreature()->HasReactState(REACT_PASSIVE));
+                    charmInfo->SetIsCommandAttack(true);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SetIsFollowing(false);
 
@@ -19662,7 +19662,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
                 {
                     AttackStop();
                     charmInfo->SetIsAtStay(false);
-                    charmInfo->SetIsCommandAttack(!ToCreature()->HasReactState(REACT_PASSIVE));
+                    charmInfo->SetIsCommandAttack(true);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SetIsFollowing(false);
 

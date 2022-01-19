@@ -221,7 +221,7 @@ public:
     uint32 MaxStabledPets = 0;
     std::vector<PetInfo> UnslottedPets;                             // PET_SAVE_NOT_IN_SLOT
 
-    PetInfo const* GetUnslottedHunterPet() const
+    [[nodiscard]] PetInfo const* GetUnslottedHunterPet() const
     {
         return UnslottedPets.size() == 1 && UnslottedPets[0].Type == HUNTER_PET ? &UnslottedPets[0] : nullptr;
     }
