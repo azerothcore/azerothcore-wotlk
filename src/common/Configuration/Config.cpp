@@ -19,8 +19,8 @@
 #include "Log.h"
 #include "StringConvert.h"
 #include "StringFormat.h"
-#include "Util.h"
 #include "Tokenize.h"
+#include "Util.h"
 #include <fstream>
 #include <mutex>
 #include <unordered_map>
