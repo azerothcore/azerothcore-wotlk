@@ -587,8 +587,6 @@ public:
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;
     virtual void   ResetEventSeasonalQuests(uint16 event_id) = 0;
-    virtual time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour) = 0;
-    virtual time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) = 0;
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
