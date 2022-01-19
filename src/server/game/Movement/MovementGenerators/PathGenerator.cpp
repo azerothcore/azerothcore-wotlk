@@ -579,12 +579,10 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     for (uint32 i = 0; i < pointCount; ++i)
         _pathPoints[i] = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
 
-    _pathPoints.resize(pointCount);
-
     NormalizePath();
 
     // first point is always our current location - we need the next one
-    SetActualEndPosition(_pathPoints[newPointCount - 1]);
+    SetActualEndPosition(_pathPoints[pointCount - 1]);
 
     // force the given destination, if needed
     if (_forceDestination &&
