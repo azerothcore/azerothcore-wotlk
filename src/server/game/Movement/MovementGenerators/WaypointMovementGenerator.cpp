@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WaypointMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
@@ -25,7 +26,6 @@
 #include "Player.h"
 #include "Spell.h"
 #include "Transport.h"
-#include "WaypointMovementGenerator.h"
 #include "World.h"
 
 void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
@@ -137,6 +137,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         // Xinef: moved the upper IF here
         if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
         {
+            creature->AI()->PathEndReached(path_id);
             creature->GetMotionMaster()->Initialize();
             return false;
         }
@@ -190,6 +191,8 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             break;
         case WAYPOINT_MOVE_TYPE_WALK:
             init.SetWalk(true);
+            break;
+        default:
             break;
     }
 

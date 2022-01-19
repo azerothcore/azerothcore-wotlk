@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PathGenerator.h"
 #include "Creature.h"
 #include "DetourCommon.h"
 #include "Geometry.h"
 #include "Log.h"
-#include "Map.h"
-#include "Metric.h"
 #include "MMapFactory.h"
 #include "MMapMgr.h"
-#include "PathGenerator.h"
+#include "Map.h"
+#include "Metric.h"
 
  ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :
@@ -1004,7 +1004,7 @@ bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, floa
  */
 bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight)
 {
-    float diffHeight = abs(destZ - z);
+    float diffHeight = std::abs(destZ - z);
     float reqHeight = GetRequiredHeightToClimb(x, y, z, destX, destY, destZ, sourceHeight);
     // check walkable slopes, based on unit height
     return diffHeight <= reqHeight;

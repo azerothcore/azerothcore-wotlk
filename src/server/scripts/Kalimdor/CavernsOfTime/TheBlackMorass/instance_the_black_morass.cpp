@@ -17,8 +17,8 @@
 
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
 #include "the_black_morass.h"
@@ -157,7 +157,7 @@ public:
                             medivh->AI()->DoAction(ACTION_OUTRO);
 
                         Map::PlayerList const& players = instance->GetPlayers();
-                        if (!players.isEmpty())
+                        if (!players.IsEmpty())
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                 if (Player* player = itr->GetSource())
                                 {
@@ -270,7 +270,7 @@ public:
 
             Position pos = rift->GetNearPosition(10.0f, 2 * M_PI * rand_norm());
 
-            if (TempSummon* summon = instance->SummonCreature(abs(entry), pos))
+            if (TempSummon* summon = instance->SummonCreature(std::abs(entry), pos))
             {
                 summon->SetTempSummonType(TEMPSUMMON_CORPSE_TIMED_DESPAWN);
                 summon->SetTimer(3 * MINUTE * IN_MILLISECONDS);

@@ -34,6 +34,7 @@
 #include "ChannelMgr.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
+#include "ChatPackets.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Config.h"
@@ -68,13 +69,13 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "Realm.h"
-#include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
+#include "TaskScheduler.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -92,9 +93,10 @@
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+namespace
+{
+    TaskScheduler playersSaveScheduler;
+}
 
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -444,15 +446,6 @@ void World::LoadConfigSettings(bool reload)
     // Set realm id and enable db logging
     sLog->SetRealmId(realm.Id.Realm);
 
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    if (!reload)
-    {
-        LOG_INFO("eluna", "Initialize Eluna Lua Engine...");
-        Eluna::Initialize();
-    }
-#endif
-
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     ///- Read the player limit and the Message of the day from the config file
@@ -519,6 +512,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_KILL]                     = sConfigMgr->GetOption<float>("Rate.XP.Kill", 1.0f);
     rate_values[RATE_XP_BG_KILL]                  = sConfigMgr->GetOption<float>("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]                    = sConfigMgr->GetOption<float>("Rate.XP.Quest", 1.0f);
+    rate_values[RATE_XP_QUEST_DF]                 = sConfigMgr->GetOption<float>("Rate.XP.Quest.DF", 1.0f);
     rate_values[RATE_XP_EXPLORE]                  = sConfigMgr->GetOption<float>("Rate.XP.Explore", 1.0f);
     rate_values[RATE_XP_PET]                      = sConfigMgr->GetOption<float>("Rate.XP.Pet", 1.0f);
     rate_values[RATE_XP_PET_NEXT_LEVEL]           = sConfigMgr->GetOption<float>("Rate.Pet.LevelXP", 0.05f);
@@ -1174,6 +1168,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY]          = sConfigMgr->GetOption<bool> ("Arena.QueueAnnouncer.PlayerOnly", false);
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetOption<bool>("OffhandCheckAtSpellUnlearn", true);
+    m_int_configs[CONFIG_CREATURE_STOP_FOR_PLAYER]                   = sConfigMgr->GetOption<int32>("Creature.MovingStopTimeForPlayer", 3 * MINUTE * IN_MILLISECONDS);
 
     if (int32 clientCacheId = sConfigMgr->GetOption<int32>("ClientCacheVersion", 0))
     {
@@ -1249,6 +1244,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
     m_int_configs[CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION] = sConfigMgr->GetOption<int32>("LootNeedBeforeGreedILvlRestriction", 70);
+
+    m_bool_configs[CONFIG_PLAYER_SETTINGS_ENABLED] = sConfigMgr->GetOption<bool>("EnablePlayerSettings", 0);
 
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
@@ -1331,6 +1328,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_AUTOBROADCAST]         = sConfigMgr->GetOption<bool>("AutoBroadcast.On", false);
     m_int_configs[CONFIG_AUTOBROADCAST_CENTER]   = sConfigMgr->GetOption<int32>("AutoBroadcast.Center", 0);
     m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL] = sConfigMgr->GetOption<int32>("AutoBroadcast.Timer", 60000);
+    m_int_configs[CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE] = sConfigMgr->GetOption<int32>("AutoBroadcast.MinDisableLevel", 0);
     if (reload)
     {
         m_timers[WUPDATE_AUTOBROADCAST].SetInterval(m_int_configs[CONFIG_AUTOBROADCAST_INTERVAL]);
@@ -1564,9 +1562,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Instance Template...");
     sObjectMgr->LoadInstanceTemplate();
 
-    // xinef: Global Storage, should be loaded asap
-    LOG_INFO("server.loading", "Load Global Player Data...");
-    sWorld->LoadGlobalPlayerDataStore();
+    LOG_INFO("server.loading", "Load Character Cache...");
+    sCharacterCache->LoadCharacterCacheStorage();
 
     // Must be called before `creature_respawn`/`gameobject_respawn` tables
     LOG_INFO("server.loading", "Loading instances...");
@@ -1692,6 +1689,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Creature Addon Data...");
     sObjectMgr->LoadCreatureAddons();                            // must be after LoadCreatureTemplates() and LoadCreatures()
+
+    LOG_INFO("server.loading", "Loading Creature Movement Overrides...");
+    sObjectMgr->LoadCreatureMovementOverrides(); // must be after LoadCreatures()
 
     LOG_INFO("server.loading", "Loading Gameobject Data...");
     sObjectMgr->LoadGameobjects();
@@ -2082,12 +2082,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
 
-#ifdef ELUNA
-    ///- Run eluna scripts.
-    // in multithread foreach: run scripts
-    sEluna->RunScripts();
-    sEluna->OnConfigLoad(false, false); // Must be done after Eluna is initialized and scripts have run.
-#endif
+    sScriptMgr->OnBeforeWorldInitialized();
 
     if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
     {
@@ -2120,6 +2115,7 @@ void World::SetInitialWorldSettings()
 
     if (sConfigMgr->isDryRun())
     {
+        sMapMgr->UnloadAll();
         LOG_INFO("server.loading", "AzerothCore dry run completed, terminating.");
         exit(0);
     }
@@ -2470,8 +2466,8 @@ void World::Update(uint32 diff)
     }
 
     {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update saving system"));
-        SavingSystemMgr::Update(diff);
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
+        playersSaveScheduler.Update(diff);
     }
 
     {
@@ -2491,7 +2487,7 @@ void World::ForceGameEventUpdate()
 }
 
 /// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     SessionMap::const_iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -2508,7 +2504,7 @@ void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, TeamId te
 }
 
 /// Send a packet to all GMs (except self if mentioned)
-void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId teamId)
+void World::SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     SessionMap::iterator itr;
     for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -2588,6 +2584,34 @@ void World::SendWorldText(uint32 string_id, ...)
     va_end(ap);
 }
 
+void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
+{
+    va_list ap;
+    va_start(ap, flag);
+
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (auto const& itr : m_sessions)
+    {
+        if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
+        {
+            continue;
+        }
+
+        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+        {
+            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+            {
+                continue;
+            }
+        }
+
+        wt_do(itr.second->GetPlayer());
+    }
+
+    va_end(ap);
+}
+
 /// Send a System Message to all GMs (except self if mentioned)
 void World::SendGMText(uint32 string_id, ...)
 {
@@ -2629,7 +2653,7 @@ void World::SendGlobalText(const char* text, WorldSession* self)
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-bool World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self, TeamId teamId)
+bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId)
 {
     bool foundPlayerToSend = false;
     SessionMap::const_iterator itr;
@@ -2713,7 +2737,7 @@ void World::_UpdateGameTime()
 }
 
 /// Shutdown the server
-void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
+void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason)
 {
     // ignore if server shutdown at next tick
     if (IsStopped())
@@ -2721,6 +2745,33 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
 
     m_ShutdownMask = options;
     m_ExitCode = exitcode;
+
+    auto const& playersOnline = GetActiveSessionCount();
+
+    if (time < 5 && playersOnline)
+    {
+        // Set time to 5s for save all players
+        time = 5;
+    }
+
+    playersSaveScheduler.CancelAll();
+
+    if (time >= 5)
+    {
+        playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
+        {
+            if (!GetActiveSessionCount())
+            {
+                LOG_INFO("server", "> No players online. Skip save before shutdown");
+                return;
+            }
+
+            LOG_INFO("server", "> Save players before shutdown server");
+            ObjectAccessor::SaveAllPlayers();
+        });
+    }
+
+    FMT_LOG_WARN("server", "Time left until shutdown/restart: {}", time);
 
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
     if (time == 0)
@@ -2734,14 +2785,14 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
     else
     {
         m_ShutdownTimer = time;
-        ShutdownMsg(true);
+        ShutdownMsg(true, nullptr, reason);
     }
 
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
 /// Display a shutdown message to the user(s)
-void World::ShutdownMsg(bool show, Player* player)
+void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
 {
     // not show messages for idle shutdown mode
     if (m_ShutdownMask & SHUTDOWN_MASK_IDLE)
@@ -2757,9 +2808,14 @@ void World::ShutdownMsg(bool show, Player* player)
     {
         std::string str = secsToTimeString(m_ShutdownTimer).append(".");
 
+        if (!reason.empty())
+        {
+            str += " - " + reason;
+        }
+
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
-        SendServerMessage(msgid, str.c_str(), player);
+        SendServerMessage(msgid, str, player);
         LOG_DEBUG("server.worldserver", "Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
     }
 }
@@ -2784,17 +2840,17 @@ void World::ShutdownCancel()
 }
 
 /// Send a server message to the user(s)
-void World::SendServerMessage(ServerMessageType type, const char* text, Player* player)
+void World::SendServerMessage(ServerMessageType messageID, std::string stringParam /*= ""*/, Player* player /*= nullptr*/)
 {
-    WorldPacket data(SMSG_SERVER_MESSAGE, 50);              // guess size
-    data << uint32(type);
-    if (type <= SERVER_MSG_STRING)
-        data << text;
+    WorldPackets::Chat::ChatServerMessage chatServerMessage;
+    chatServerMessage.MessageID = int32(messageID);
+    if (messageID <= SERVER_MSG_STRING)
+        chatServerMessage.StringParam = stringParam;
 
     if (player)
-        player->GetSession()->SendPacket(&data);
+        player->SendDirectMessage(chatServerMessage.Write());
     else
-        SendGlobalMessage(&data);
+        SendGlobalMessage(chatServerMessage.Write());
 }
 
 void World::UpdateSessions(uint32 diff)
@@ -2933,7 +2989,9 @@ void World::SendAutoBroadcast()
     uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
 
     if (abcenter == 0)
-        sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+    {
+        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
+    }
 
     else if (abcenter == 1)
     {
@@ -2944,7 +3002,7 @@ void World::SendAutoBroadcast()
 
     else if (abcenter == 2)
     {
-        sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+        sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.c_str());
 
         WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
         data << msg;
@@ -2986,55 +3044,10 @@ void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
     }
 }
 
-// int8 dayOfWeek: 0 (sunday) to 6 (saturday)
-time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
-{
-    if (hour < 0 || hour > 23)
-        hour = 0;
-    time_t curr = time(nullptr);
-    tm localTm;
-    localtime_r(&curr, &localTm);
-    localTm.tm_hour = hour;
-    localTm.tm_min  = 0;
-    localTm.tm_sec  = 0;
-    uint32 add;
-    if (dayOfWeek < 0 || dayOfWeek > 6)
-        dayOfWeek = (localTm.tm_wday + 1) % 7;
-    if (localTm.tm_wday >= dayOfWeek)
-        add = (7 - (localTm.tm_wday - dayOfWeek)) * DAY;
-    else
-        add = (dayOfWeek - localTm.tm_wday) * DAY;
-    return mktime(&localTm) + add;
-}
-
-// int8 month: 0 (january) to 11 (december)
-time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
-{
-    if (hour < 0 || hour > 23)
-        hour = 0;
-    time_t curr = time(nullptr);
-    tm localTm;
-    localtime_r(&curr, &localTm);
-    localTm.tm_mday = 1;
-    localTm.tm_hour = hour;
-    localTm.tm_min  = 0;
-    localTm.tm_sec  = 0;
-    if (month < 0 || month > 11)
-    {
-        month = (localTm.tm_mon + 1) % 12;
-        if (month == 0)
-            localTm.tm_year += 1;
-    }
-    else if (localTm.tm_mon >= month)
-        localTm.tm_year += 1;
-    localTm.tm_mon = month;
-    return mktime(&localTm);
-}
-
 void World::InitWeeklyQuestResetTime()
 {
     time_t wstime = time_t(sWorld->getWorldState(WS_WEEKLY_QUEST_RESET_TIME));
-    m_NextWeeklyQuestReset = wstime ? wstime : GetNextTimeWithDayAndHour(4, 6);
+    m_NextWeeklyQuestReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(4, 6);
     if (!wstime)
         sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, uint64(m_NextWeeklyQuestReset));
 }
@@ -3042,7 +3055,7 @@ void World::InitWeeklyQuestResetTime()
 void World::InitDailyQuestResetTime()
 {
     time_t wstime = time_t(sWorld->getWorldState(WS_DAILY_QUEST_RESET_TIME));
-    m_NextDailyQuestReset = wstime ? wstime : GetNextTimeWithDayAndHour(-1, 6);
+    m_NextDailyQuestReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
     if (!wstime)
         sWorld->setWorldState(WS_DAILY_QUEST_RESET_TIME, uint64(m_NextDailyQuestReset));
 }
@@ -3050,7 +3063,7 @@ void World::InitDailyQuestResetTime()
 void World::InitMonthlyQuestResetTime()
 {
     time_t wstime = time_t(sWorld->getWorldState(WS_MONTHLY_QUEST_RESET_TIME));
-    m_NextMonthlyQuestReset = wstime ? wstime : GetNextTimeWithMonthAndHour(-1, 6);
+    m_NextMonthlyQuestReset = wstime ? wstime : Acore::Time::GetNextTimeWithMonthAndHour(-1, 6);
     if (!wstime)
         sWorld->setWorldState(WS_MONTHLY_QUEST_RESET_TIME, uint64(m_NextMonthlyQuestReset));
 }
@@ -3058,7 +3071,7 @@ void World::InitMonthlyQuestResetTime()
 void World::InitRandomBGResetTime()
 {
     time_t wstime = time_t(sWorld->getWorldState(WS_BG_DAILY_RESET_TIME));
-    m_NextRandomBGReset = wstime ? wstime : GetNextTimeWithDayAndHour(-1, 6);
+    m_NextRandomBGReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
     if (!wstime)
         sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, uint64(m_NextRandomBGReset));
 }
@@ -3067,7 +3080,7 @@ void World::InitCalendarOldEventsDeletionTime()
 {
     time_t now = time(nullptr);
     time_t currentDeletionTime = getWorldState(WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME);
-    time_t nextDeletionTime = currentDeletionTime ? currentDeletionTime : GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR));
+    time_t nextDeletionTime = currentDeletionTime ? currentDeletionTime : Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR));
 
     // If the reset time saved in the worldstate is before now it means the server was offline when the reset was supposed to occur.
     // In this case we set the reset time in the past and next world update will do the reset and schedule next one in the future.
@@ -3083,7 +3096,7 @@ void World::InitCalendarOldEventsDeletionTime()
 void World::InitGuildResetTime()
 {
     time_t wstime = time_t(getWorldState(WS_GUILD_DAILY_RESET_TIME));
-    m_NextGuildReset = wstime ? wstime : GetNextTimeWithDayAndHour(-1, 6);
+    m_NextGuildReset = wstime ? wstime : Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
     if (!wstime)
         sWorld->setWorldState(WS_GUILD_DAILY_RESET_TIME, uint64(m_NextGuildReset));
 }
@@ -3097,7 +3110,7 @@ void World::ResetDailyQuests()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetDailyQuestStatus();
 
-    m_NextDailyQuestReset = GetNextTimeWithDayAndHour(-1, 6);
+    m_NextDailyQuestReset = Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
     sWorld->setWorldState(WS_DAILY_QUEST_RESET_TIME, uint64(m_NextDailyQuestReset));
 
     // change available dailies
@@ -3132,7 +3145,7 @@ void World::ResetWeeklyQuests()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetWeeklyQuestStatus();
 
-    m_NextWeeklyQuestReset = GetNextTimeWithDayAndHour(4, 6);
+    m_NextWeeklyQuestReset = Acore::Time::GetNextTimeWithDayAndHour(4, 6);
     sWorld->setWorldState(WS_WEEKLY_QUEST_RESET_TIME, uint64(m_NextWeeklyQuestReset));
 
     // change available weeklies
@@ -3150,7 +3163,7 @@ void World::ResetMonthlyQuests()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetMonthlyQuestStatus();
 
-    m_NextMonthlyQuestReset = GetNextTimeWithMonthAndHour(-1, 6);
+    m_NextMonthlyQuestReset = Acore::Time::GetNextTimeWithMonthAndHour(-1, 6);
     sWorld->setWorldState(WS_MONTHLY_QUEST_RESET_TIME, uint64(m_NextMonthlyQuestReset));
 }
 
@@ -3176,7 +3189,7 @@ void World::ResetRandomBG()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->SetRandomWinner(false);
 
-    m_NextRandomBGReset = GetNextTimeWithDayAndHour(-1, 6);
+    m_NextRandomBGReset = Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
     sWorld->setWorldState(WS_BG_DAILY_RESET_TIME, uint64(m_NextRandomBGReset));
 }
 
@@ -3193,7 +3206,7 @@ void World::ResetGuildCap()
 {
     LOG_INFO("server.worldserver", "Guild Daily Cap reset.");
 
-    m_NextGuildReset = GetNextTimeWithDayAndHour(-1, 6);
+    m_NextGuildReset = Acore::Time::GetNextTimeWithDayAndHour(-1, 6);
     sWorld->setWorldState(WS_GUILD_DAILY_RESET_TIME, uint64(m_NextGuildReset));
 
     sGuildMgr->ResetTimes();
@@ -3334,260 +3347,6 @@ void World::ProcessQueryCallbacks()
     _queryProcessor.ProcessReadyCallbacks();
 }
 
-void World::LoadGlobalPlayerDataStore()
-{
-    uint32 oldMSTime = getMSTime();
-
-    _globalPlayerDataStore.clear();
-    QueryResult result = CharacterDatabase.Query("SELECT guid, account, name, gender, race, class, level FROM characters WHERE deleteDate IS NULL");
-    if (!result)
-    {
-        LOG_INFO("server.loading", ">> Loaded 0 Players data.");
-        return;
-    }
-
-    uint32 count = 0;
-
-    // query to load number of mails by receiver
-    std::map<uint32, uint16> _mailCountMap;
-    QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail GROUP BY receiver");
-    if (mailCountResult)
-    {
-        do
-        {
-            Field* fields = mailCountResult->Fetch();
-            _mailCountMap[fields[0].GetUInt32()] = uint16(fields[1].GetUInt64());
-        } while (mailCountResult->NextRow());
-    }
-
-    do
-    {
-        Field* fields = result->Fetch();
-        ObjectGuid::LowType guidLow = fields[0].GetUInt32();
-
-        // count mails
-        uint16 mailCount = 0;
-        std::map<uint32, uint16>::const_iterator itr = _mailCountMap.find(guidLow);
-        if (itr != _mailCountMap.end())
-            mailCount = itr->second;
-
-        AddGlobalPlayerData(
-            guidLow,               /*guid*/
-            fields[1].GetUInt32(), /*accountId*/
-            fields[2].GetString(), /*name*/
-            fields[3].GetUInt8(),  /*gender*/
-            fields[4].GetUInt8(),  /*race*/
-            fields[5].GetUInt8(),  /*class*/
-            fields[6].GetUInt8(),  /*level*/
-            mailCount,             /*mail count*/
-            0                      /*guild id*/);
-
-        ++count;
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded %d Players data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
-}
-
-void World::AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)
-{
-    GlobalPlayerData data;
-
-    data.guidLow = guid;
-    data.accountId = accountId;
-    data.name = name;
-    data.level = level;
-    data.race = race;
-    data.playerClass = playerClass;
-    data.gender = gender;
-    data.mailCount = mailCount;
-    data.guildId = guildId;
-    data.groupId = 0;
-    data.arenaTeamId[0] = 0;
-    data.arenaTeamId[1] = 0;
-    data.arenaTeamId[2] = 0;
-
-    _globalPlayerDataStore[guid] = data;
-    _globalPlayerNameStore[name] = guid;
-}
-
-void World::UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    if (mask & PLAYER_UPDATE_DATA_LEVEL)
-        itr->second.level = level;
-    if (mask & PLAYER_UPDATE_DATA_RACE)
-        itr->second.race = race;
-    if (mask & PLAYER_UPDATE_DATA_CLASS)
-        itr->second.playerClass = playerClass;
-    if (mask & PLAYER_UPDATE_DATA_GENDER)
-        itr->second.gender = gender;
-    if (mask & PLAYER_UPDATE_DATA_NAME)
-        itr->second.name = name;
-
-    WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
-    data << guid;
-    SendGlobalMessage(&data);
-}
-
-void World::UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    if (!add)
-    {
-        itr->second.mailCount = count;
-        return;
-    }
-
-    int16 icount = (int16)itr->second.mailCount;
-    if (count < 0 && abs(count) > icount)
-        count = -icount;
-    itr->second.mailCount = uint16(icount + count); // addition or subtraction
-}
-
-void World::UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    itr->second.guildId = guildId;
-}
-void World::UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    itr->second.groupId = groupId;
-}
-
-void World::UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId)
-{
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr == _globalPlayerDataStore.end())
-        return;
-
-    itr->second.arenaTeamId[slot] = arenaTeamId;
-}
-
-void World::UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName)
-{
-    _globalPlayerNameStore.erase(oldName);
-    _globalPlayerNameStore[newName] = guidLow;
-}
-
-void World::DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name)
-{
-    if (guid)
-        _globalPlayerDataStore.erase(guid);
-    if (!name.empty())
-        _globalPlayerNameStore.erase(name);
-}
-
-GlobalPlayerData const* World::GetGlobalPlayerData(ObjectGuid::LowType guid) const
-{
-    // Get data from global storage
-    GlobalPlayerDataMap::const_iterator itr = _globalPlayerDataStore.find(guid);
-    if (itr != _globalPlayerDataStore.end())
-        return &itr->second;
-
-    // Player is not in the global storage, try to get it from the Database
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_GUID);
-
-    stmt->setUInt32(0, guid);
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-    if (result)
-    {
-        // Player was not in the global storage, but it was found in the database
-        // Let's add it to the global storage
-        Field* fields = result->Fetch();
-
-        std::string name = fields[2].GetString();
-
-        LOG_INFO("server.worldserver", "Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guid);
-
-        sWorld->AddGlobalPlayerData(
-            fields[0].GetUInt32(), /*guid*/
-            fields[1].GetUInt32(), /*accountId*/
-            fields[2].GetString(), /*name*/
-            fields[3].GetUInt8(),  /*gender*/
-            fields[4].GetUInt8(),  /*race*/
-            fields[5].GetUInt8(),  /*class*/
-            fields[6].GetUInt8(),  /*level*/
-            0,                     /*mail count*/
-            0                      /*guild id*/
-        );
-
-        itr = _globalPlayerDataStore.find(guid);
-        if (itr != _globalPlayerDataStore.end())
-        {
-            LOG_INFO("server.worldserver", "Player %s [GUID: %u] added to the global storage.", name.c_str(), guid);
-            return &itr->second;
-        }
-    }
-
-    // Player not found
-    return nullptr;
-}
-
-ObjectGuid World::GetGlobalPlayerGUID(std::string const& name) const
-{
-    // Get data from global storage
-    GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
-    if (itr != _globalPlayerNameStore.end())
-        return ObjectGuid::Create<HighGuid::Player>(itr->second);
-
-    // Player is not in the global storage, try to get it from the Database
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_NAME);
-
-    stmt->setString(0, name);
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-    if (result)
-    {
-        // Player was not in the global storage, but it was found in the database
-        // Let's add it to the global storage
-        Field* fields = result->Fetch();
-
-        ObjectGuid::LowType guidLow = fields[0].GetUInt32();
-
-        LOG_INFO("server.worldserver", "Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guidLow);
-
-        sWorld->AddGlobalPlayerData(
-            guidLow,               /*guid*/
-            fields[1].GetUInt32(), /*accountId*/
-            fields[2].GetString(), /*name*/
-            fields[3].GetUInt8(),  /*gender*/
-            fields[4].GetUInt8(),  /*race*/
-            fields[5].GetUInt8(),  /*class*/
-            fields[6].GetUInt8(),  /*level*/
-            0,                     /*mail count*/
-            0                      /*guild id*/
-        );
-
-        itr = _globalPlayerNameStore.find(name);
-        if (itr != _globalPlayerNameStore.end())
-        {
-            LOG_INFO("server.worldserver", "Player %s [GUID: %u] added to the global storage.", name.c_str(), guidLow);
-
-            return ObjectGuid::Create<HighGuid::Player>(guidLow);
-        }
-    }
-
-    // Player not found
-    return ObjectGuid::Empty;
-}
-
 void World::RemoveOldCorpses()
 {
     m_timers[WUPDATE_CORPSES].SetCurrent(m_timers[WUPDATE_CORPSES].GetInterval());
@@ -3611,7 +3370,7 @@ uint32 World::GetNextWhoListUpdateDelaySecs()
     uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
     t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
 
-    return uint32(ceil(t / 1000.0f));
+    return uint32(std::ceil(t / 1000.0f));
 }
 
 void World::FinalizePlayerWorldSession(WorldSession* session)

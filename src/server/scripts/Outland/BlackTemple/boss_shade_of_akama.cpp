@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -341,7 +341,7 @@ public:
         {
             float dist = frand(30.0f, 32.0f);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(POINT_START, summon->GetPositionX() + dist * cos(summon->GetOrientation()), summon->GetPositionY() + dist * sin(summon->GetOrientation()), summon->GetPositionZ(), false);
+            summon->GetMotionMaster()->MovePoint(POINT_START, summon->GetPositionX() + dist * cos(summon->GetOrientation()), summon->GetPositionY() + dist * std::sin(summon->GetOrientation()), summon->GetPositionZ(), false);
             summons.Summon(summon);
         }
 

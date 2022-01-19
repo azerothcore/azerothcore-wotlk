@@ -35,8 +35,8 @@ at_area_52_entrance
 EndContentData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellMgr.h"
 
 // Ours

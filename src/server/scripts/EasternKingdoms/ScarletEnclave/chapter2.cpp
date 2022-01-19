@@ -18,9 +18,9 @@
 #include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 
@@ -569,7 +569,11 @@ public:
         void JustDied(Unit* killer) override
         {
             Talk(SAY_VALROTH_DEATH);
-            killer->CastSpell(me, SPELL_SUMMON_VALROTH_REMAINS, true);
+
+            if (killer)
+            {
+                killer->CastSpell(me, SPELL_SUMMON_VALROTH_REMAINS, true);
+            }
         }
     };
 };

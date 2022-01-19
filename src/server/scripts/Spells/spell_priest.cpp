@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 enum PriestSpells
@@ -241,7 +242,7 @@ class spell_pri_glyph_of_prayer_of_healing : public AuraScript
         PreventDefaultAction();
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
-        if (!healInfo || healInfo->GetHeal())
+        if (!healInfo || !healInfo->GetHeal())
         {
             return;
         }
@@ -806,6 +807,43 @@ class spell_pri_vampiric_touch : public AuraScript
     }
 };
 
+// 605 - Mind Control
+class spell_pri_mind_control : public AuraScript
+{
+    PrepareAuraScript(spell_pri_mind_control);
+
+    void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Unit* target = GetTarget())
+            {
+                uint32 duration = static_cast<uint32>(GetDuration());
+                caster->SetInCombatWith(target, duration);
+                target->SetInCombatWith(caster, duration);
+            }
+        }
+    }
+
+    void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Unit* target = GetTarget())
+            {
+                caster->SetCombatTimer(0);
+                target->SetCombatTimer(0);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_pri_mind_control::HandleApplyEffect, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_pri_mind_control::HandleRemoveEffect, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
@@ -827,4 +865,5 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_renew);
     RegisterSpellScript(spell_pri_shadow_word_death);
     RegisterSpellScript(spell_pri_vampiric_touch);
+    RegisterSpellScript(spell_pri_mind_control);
 }

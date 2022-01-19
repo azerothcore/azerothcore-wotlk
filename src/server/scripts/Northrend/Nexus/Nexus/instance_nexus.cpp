@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "nexus.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "nexus.h"
 
 DoorData const doorData[] =
 {
@@ -51,7 +51,7 @@ public:
         {
             Map::PlayerList const& players = instance->GetPlayers();
             TeamId TeamIdInInstance = TEAM_NEUTRAL;
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
                 if (Player* pPlayer = players.begin()->GetSource())
                     TeamIdInInstance = pPlayer->GetTeamId();
 

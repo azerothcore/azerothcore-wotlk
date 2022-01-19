@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Mail.h"
 #include "AuctionHouseMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
+#include "CharacterCache.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Log.h"
-#include "Mail.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -102,6 +103,13 @@ void MailDraft::prepareItems(Player* receiver, CharacterDatabaseTransaction tran
 
     m_mailTemplateItemsNeed = false;
 
+    // The mail sent after turning in the quest The Wrath of Neptulon contains 100g
+    // Only quest in the game up to BFA which sends raw gold through mail. So would just be overkill to introduce a new column in the database.
+    if (m_mailTemplateId == 123)
+    {
+        m_money = 1000000;
+    }
+
     Loot mailLoot;
 
     // can be empty
@@ -146,7 +154,9 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
 
     uint32 rc_account = 0;
     if (!receiver)
-        rc_account = sObjectMgr->GetPlayerAccountIdByGUID(receiver_guid);
+    {
+        rc_account = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver_guid));
+    }
 
     if (!receiver && !rc_account)                            // sender not exist
     {
@@ -250,8 +260,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         trans->Append(stmt);
     }
 
-    // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(receiver.GetPlayerGUIDLow(), 1);
+    sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver.GetPlayerGUIDLow()));
 
     // For online receiver update in game mail status and data
     if (pReceiver)

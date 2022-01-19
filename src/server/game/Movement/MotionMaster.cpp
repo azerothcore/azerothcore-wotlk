@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MotionMaster.h"
 #include "ConfusedMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAISelector.h"
@@ -22,7 +23,7 @@
 #include "FleeingMovementGenerator.h"
 #include "HomeMovementGenerator.h"
 #include "IdleMovementGenerator.h"
-#include "MotionMaster.h"
+#include "Log.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "PointMovementGenerator.h"
@@ -561,7 +562,7 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     }
 
     // Abort too if the ground is very near
-    if (fabs(_owner->GetPositionZ() - tz) < 0.1f)
+    if (std::fabs(_owner->GetPositionZ() - tz) < 0.1f)
         return;
 
     if (_owner->GetTypeId() == TYPEID_PLAYER)

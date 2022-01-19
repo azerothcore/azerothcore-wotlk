@@ -24,8 +24,8 @@
 #include "LogOperation.h"
 #include "Logger.h"
 #include "StringConvert.h"
+#include "Timer.h"
 #include "Tokenize.h"
-#include "Util.h"
 #include <chrono>
 #include <sstream>
 
@@ -67,7 +67,7 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
     // Format = type, level, flags, optional1, optional2
     // if type = File. optional1 = file and option2 = mode
     // if type = Console. optional1 = Color
-    std::string options = sConfigMgr->GetStringDefault(appenderName, "");
+    std::string options = sConfigMgr->GetOption<std::string>(appenderName, "");
 
     std::vector<std::string_view> tokens = Acore::Tokenize(options, ',', true);
 
@@ -130,7 +130,7 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
 
     LogLevel level = LOG_LEVEL_DISABLED;
 
-    std::string options = sConfigMgr->GetStringDefault(appenderName, "");
+    std::string options = sConfigMgr->GetOption<std::string>(appenderName, "");
     std::string name = appenderName.substr(7);
 
     if (options.empty())
@@ -275,19 +275,7 @@ Logger const* Log::GetLoggerByType(std::string const& type) const
 
 std::string Log::GetTimestampStr()
 {
-    time_t tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-
-    std::tm aTm;
-    localtime_r(&tt, &aTm);
-
-    //       YYYY   year
-    //       MM     month (2 digits 01-12)
-    //       DD     day (2 digits 01-31)
-    //       HH     hour (2 digits 00-23)
-    //       MM     minutes (2 digits 00-59)
-    //       SS     seconds (2 digits 00-59)
-    return Acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d",
-        aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
+    return Acore::Time::TimeToTimestampStr(GetEpochTime(), "%Y-%m-%d_%H_%M_%S");
 }
 
 bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /* = true */)

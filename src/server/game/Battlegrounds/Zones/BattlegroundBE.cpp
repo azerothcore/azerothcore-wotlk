@@ -17,11 +17,9 @@
 
 #include "BattlegroundBE.h"
 #include "Language.h"
-#include "Object.h"
-#include "ObjectMgr.h"
+#include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 BattlegroundBE::BattlegroundBE()
 {

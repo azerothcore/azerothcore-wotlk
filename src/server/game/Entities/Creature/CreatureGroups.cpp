@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "CreatureGroups.h"
+#include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
-#include "Log.h"
 
 FormationMgr::~FormationMgr()
 {
@@ -63,7 +63,7 @@ void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* membe
     LOG_DEBUG("entities.unit", "Deleting member pointer to spawnId: %u from group %u", member->GetSpawnId(), group->GetId());
     group->RemoveMember(member);
 
-    if (group->isEmpty())
+    if (group->IsEmpty())
     {
         Map* map = member->FindMap();
         if (!map)
@@ -226,6 +226,39 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     }
 }
 
+void CreatureGroup::MemberEvaded(Creature* member)
+{
+    uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()].groupAI;
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+    {
+        return;
+    }
+
+    for (auto const& itr : m_members)
+    {
+        Creature* pMember = itr.first;
+        // This should never happen
+        if (!pMember)
+        {
+            continue;
+        }
+
+        if (pMember == member || pMember->isDead() || pMember->IsInEvadeMode() || !pMember->IsInCombat() ||
+                !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+        {
+            continue;
+        }
+
+        if (pMember->IsAIEnabled)
+        {
+            if (CreatureAI* pMemberAI = pMember->AI())
+            {
+                pMemberAI->EnterEvadeMode();
+            }
+        }
+    }
+}
+
 void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
     if (m_members.size() && !(m_members.begin()->second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))))
@@ -284,7 +317,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
         float followAngle = pFormationInfo.follow_angle;
-        if (static_cast<float>(M_PI) - fabs(fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.5f)
+        if (static_cast<float>(M_PI) - std::fabs(std::fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.5f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle
             // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1

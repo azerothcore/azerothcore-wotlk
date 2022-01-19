@@ -171,7 +171,7 @@ public:
         float z = player->GetPositionZ();
         float ang = player->GetOrientation();
 
-        float rot2 = sin(ang / 2);
+        float rot2 = std::sin(ang / 2);
         float rot3 = cos(ang / 2);
 
         player->SummonGameObject(objectId, x, y, z, ang, 0, 0, rot2, rot3, spawntm);
@@ -580,10 +580,7 @@ public:
             object->SetByteValue(GAMEOBJECT_BYTES_1, objectType, *objectState);
         else if (objectType == 4)
         {
-            WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8+4);
-            data << object->GetGUID();
-            data << static_cast<uint32>(*objectState);
-            object->SendMessageToSet(&data, true);
+            object->SendCustomAnim(*objectState);
         }
         handler->PSendSysMessage("Set gobject type %d state %u", objectType, *objectState);
         return true;

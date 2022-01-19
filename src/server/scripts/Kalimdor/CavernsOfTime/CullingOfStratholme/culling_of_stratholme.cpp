@@ -18,10 +18,10 @@
 #include "culling_of_stratholme.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum Says
@@ -493,7 +493,7 @@ public:
                 actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5 + 1, 22000);
                 me->SetFacingTo(1.84f);
 
-                if (!me->GetMap()->GetPlayers().isEmpty())
+                if (!me->GetMap()->GetPlayers().IsEmpty())
                     if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                         player->RewardPlayerAndGroupAtEvent(31006, player); // Malganis quest entry required
             }
@@ -1153,7 +1153,7 @@ public:
                             if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_EXIT_GATE)))
                                 go->SetGoState(GO_STATE_ACTIVE);
 
-                            if (!me->GetMap()->GetPlayers().isEmpty())
+                            if (!me->GetMap()->GetPlayers().IsEmpty())
                                 if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                                     player->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 0);
                         }
@@ -1177,7 +1177,7 @@ public:
             switch (combatEvents.ExecuteEvent())
             {
                 case EVENT_COMBAT_EXORCISM:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_ARTHAS_EXORCISM_N, SPELL_ARTHAS_EXORCISM_H), false);
 
                     combatEvents.RepeatEvent(7300);
@@ -1219,7 +1219,7 @@ void npc_arthas::npc_arthasAI::ScheduleNextEvent(uint32 currentEvent, uint32 tim
 void npc_arthas::npc_arthasAI::SummonNextWave()
 {
     Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             i->GetSource()->PlayerTalkClass->SendPointOfInterest(1000 + waveGroupId);
 
@@ -1404,6 +1404,7 @@ enum chromie
     ITEM_ARCANE_DISRUPTOR               = 37888,
     QUEST_DISPELLING_ILLUSIONS          = 13149,
     QUEST_A_ROYAL_ESCORT                = 13151,
+    SPELL_SUMMON_ARCANE_DISRUPTOR       = 49591
 };
 
 class npc_cos_chromie_start : public CreatureScript
@@ -1411,26 +1412,36 @@ class npc_cos_chromie_start : public CreatureScript
 public:
     npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest) override
+    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
+        {
             if (InstanceScript* pInstance = creature->GetInstanceScript())
+            {
                 pInstance->SetData(DATA_SHOW_CRATES, 1);
+            }
+        }
 
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
     {
         // final menu id, show crates if hidden and add item if missing
         if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
         {
             if (InstanceScript* pInstance = creature->GetInstanceScript())
+            {
                 if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                {
                     pInstance->SetData(DATA_SHOW_CRATES, 1);
+                }
+            }
 
             if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
-                player->AddItem(ITEM_ARCANE_DISRUPTOR, 1);
+            {
+                creature->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+            }
         }
         // Skip Event
         else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
@@ -1441,7 +1452,9 @@ public:
                 {
                     pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
                     if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetGuidData(DATA_ARTHAS)))
+                    {
                         arthas->AI()->Reset();
+                    }
                 }
                 player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
             }

@@ -20,21 +20,20 @@
 
 #include "Common.h"
 #include "DataMap.h"
+#include "G3D/Vector3.h"
 #include "GridDefines.h"
 #include "GridReference.h"
 #include "Map.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
+#include "Optional.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include <set>
-#include <string>
 #include <sstream>
-#include "G3D/Vector3.h"
+#include <string>
 
-#ifdef ELUNA
 class ElunaEventProcessor;
-#endif
 
 enum TempSummonType
 {
@@ -47,6 +46,7 @@ enum TempSummonType
     TEMPSUMMON_DEAD_DESPAWN                = 7,             // despawns when the creature disappears
     TEMPSUMMON_MANUAL_DESPAWN              = 8,             // despawns when UnSummon() is called
     TEMPSUMMON_DESPAWNED                   = 9,             // xinef: DONT USE, INTERNAL USE ONLY
+    TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE     = 10,            // despawns after a specified time after the creature is out of combat and alive
 };
 
 enum PhaseMasks
@@ -101,7 +101,7 @@ public:
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
-    float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
+    [[nodiscard]] float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
     virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
 
     [[nodiscard]] TypeID GetTypeId() const { return m_objectTypeId; }
@@ -375,26 +375,26 @@ struct Position
         return dx*dx + dy*dy;
     }
 
-    float GetExactDist2dSq(Position const& pos) const { return GetExactDist2dSq(pos.m_positionX, pos.m_positionY); }
+    [[nodiscard]] float GetExactDist2dSq(Position const& pos) const { return GetExactDist2dSq(pos.m_positionX, pos.m_positionY); }
     float GetExactDist2dSq(Position const* pos) const { return GetExactDist2dSq(*pos); }
-    float GetExactDist2d(const float x, const float y) const { return std::sqrt(GetExactDist2dSq(x, y)); }
-    float GetExactDist2d(Position const& pos) const { return GetExactDist2d(pos.m_positionX, pos.m_positionY); }
+    [[nodiscard]] float GetExactDist2d(const float x, const float y) const { return std::sqrt(GetExactDist2dSq(x, y)); }
+    [[nodiscard]] float GetExactDist2d(Position const& pos) const { return GetExactDist2d(pos.m_positionX, pos.m_positionY); }
     float GetExactDist2d(Position const* pos) const { return GetExactDist2d(*pos); }
 
-    float GetExactDistSq(float x, float y, float z) const
+    [[nodiscard]] float GetExactDistSq(float x, float y, float z) const
     {
         float dz = z - m_positionZ;
         return GetExactDist2dSq(x, y) + dz*dz;
     }
 
-    float GetExactDistSq(Position const& pos) const { return GetExactDistSq(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    [[nodiscard]] float GetExactDistSq(Position const& pos) const { return GetExactDistSq(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
     float GetExactDistSq(Position const* pos) const { return GetExactDistSq(*pos); }
-    float GetExactDist(float x, float y, float z) const { return std::sqrt(GetExactDistSq(x, y, z)); }
-    float GetExactDist(Position const& pos) const { return GetExactDist(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    [[nodiscard]] float GetExactDist(float x, float y, float z) const { return std::sqrt(GetExactDistSq(x, y, z)); }
+    [[nodiscard]] float GetExactDist(Position const& pos) const { return GetExactDist(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
     float GetExactDist(Position const* pos) const { return GetExactDist(*pos); }
 
     void GetPositionOffsetTo(const Position& endPos, Position& retOffset) const;
-    Position GetPositionWithOffset(Position const& offset) const;
+    [[nodiscard]] Position GetPositionWithOffset(Position const& offset) const;
 
     float GetAngle(const Position* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
@@ -413,7 +413,7 @@ struct Position
         return GetAngle(pos) - m_orientation;
     }
     [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
-    float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
+    [[nodiscard]] float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
 
     void GetSinCos(float x, float y, float& vsin, float& vcos) const;
 
@@ -447,11 +447,11 @@ struct Position
         if (o < 0)
         {
             float mod = o * -1;
-            mod = fmod(mod, 2.0f * static_cast<float>(M_PI));
+            mod = std::fmod(mod, 2.0f * static_cast<float>(M_PI));
             mod = -mod + 2.0f * static_cast<float>(M_PI);
             return mod;
         }
-        return fmod(o, 2.0f * static_cast<float>(M_PI));
+        return std::fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 };
 
@@ -655,7 +655,7 @@ class MovableMapObject
     template<class T> friend class RandomMovementGenerator;
 
 protected:
-    MovableMapObject()  {}
+    MovableMapObject()  = default;
 
 private:
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
@@ -672,19 +672,12 @@ protected:
 public:
     ~WorldObject() override;
 
-#ifdef ELUNA
     virtual void Update(uint32 /*time_diff*/);
-#else
-    virtual void Update(uint32 /*time_diff*/) { };
-#endif
+
     void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
-
-#ifdef ELUNA
-    ElunaEventProcessor* elunaEvents;
-#endif
 
     void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
     void GetNearPoint2D(float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
@@ -709,7 +702,7 @@ public:
     void UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ = nullptr) const;
 
     void GetRandomPoint(const Position& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
-    Position GetRandomPoint(const Position& srcPos, float distance) const;
+    [[nodiscard]] Position GetRandomPoint(const Position& srcPos, float distance) const;
 
     [[nodiscard]] uint32 GetInstanceId() const { return m_InstanceId; }
 
@@ -722,9 +715,9 @@ public:
     [[nodiscard]] uint32 GetAreaId() const;
     void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
     [[nodiscard]] bool IsOutdoors() const;
-    LiquidData const& GetLiquidData() const;
+    [[nodiscard]] LiquidData const& GetLiquidData() const;
 
-    InstanceScript* GetInstanceScript() const;
+    [[nodiscard]] InstanceScript* GetInstanceScript() const;
 
     [[nodiscard]] std::string const& GetName() const { return m_name; }
     void SetName(std::string const& newname) { m_name = newname; }
@@ -762,9 +755,9 @@ public:
 
     virtual void CleanupsBeforeDelete(bool finalCleanup = true);  // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
-    virtual void SendMessageToSet(WorldPacket* data, bool self) { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
-    virtual void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr); // pussywizard!
-    virtual void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), false, true, skipped_rcvr); } // pussywizard!
+    virtual void SendMessageToSet(WorldPacket const* data, bool self) const { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
+    virtual void SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const; // pussywizard!
+    virtual void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), false, true, skipped_rcvr); } // pussywizard!
 
     virtual uint8 getLevelForTarget(WorldObject const* /*target*/) const { return 1; }
 
@@ -842,8 +835,9 @@ public:
 
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
-    [[nodiscard]] bool IsVisibilityOverridden() const { return m_isVisibilityDistanceOverride; }
-    void SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride);
+    [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
+    [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
+    void SetVisibilityDistanceOverride(VisibilityDistanceType type);
     void SetWorldObject(bool apply);
     [[nodiscard]] bool IsPermanentWorldObject() const { return m_isWorldObject; }
     [[nodiscard]] bool IsWorldObject() const;
@@ -897,10 +891,13 @@ public:
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
 
+    ElunaEventProcessor* elunaEvents;
+
 protected:
     std::string m_name;
     bool m_isActive;
-    bool m_isVisibilityDistanceOverride;
+    bool m_isFarVisible;
+    Optional<float> m_visibilityDistanceOverride;
     const bool m_isWorldObject;
     ZoneScript* m_zoneScript;
 

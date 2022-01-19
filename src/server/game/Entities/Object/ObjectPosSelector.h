@@ -19,8 +19,9 @@
 #define _OBJECT_POS_SELECTOR_H
 
 #include "Define.h"
-#include <math.h>
+#include <cmath>
 #include <map>
+#include <math.h>
 
 enum UsedPosType { USED_POS_PLUS, USED_POS_MINUS };
 
@@ -41,7 +42,7 @@ struct ObjectPosSelector
         float dist;                                         // dist to central point (including central point size)
     };
 
-    typedef std::multimap<float, UsedPos> UsedPosList;       // abs(angle)->Node
+    typedef std::multimap<float, UsedPos> UsedPosList;       // std::abs(angle)->Node
 
     ObjectPosSelector(float x, float y, float size, float dist);
 
@@ -62,7 +63,7 @@ struct ObjectPosSelector
         if (nextUsedPos.second.sign * sign < 0)              // last node from diff. list (-pi+alpha)
             next_angle = 2 * M_PI - next_angle;             // move to positive
 
-        return fabs(angle) + angle_step2 <= next_angle;
+        return std::fabs(angle) + angle_step2 <= next_angle;
     }
 
     bool CheckOriginal() const
@@ -104,7 +105,7 @@ struct ObjectPosSelector
         // next possible angle
         angle  = m_smallStepAngle[uptype] + m_anglestep * sign;
 
-        if (fabs(angle) > M_PI)
+        if (std::fabs(angle) > M_PI)
         {
             m_smallStepOk[uptype] = false;
             return false;
@@ -112,7 +113,7 @@ struct ObjectPosSelector
 
         if (m_smallStepNextUsedPos[uptype])
         {
-            if (fabs(angle) >= m_smallStepNextUsedPos[uptype]->first)
+            if (std::fabs(angle) >= m_smallStepNextUsedPos[uptype]->first)
             {
                 m_smallStepOk[uptype] = false;
                 return false;

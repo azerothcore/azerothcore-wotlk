@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "molten_core.h"
-#include "Player.h"
 
 enum Spells
 {
@@ -71,7 +71,7 @@ public:
                 }
                 case EVENT_SHAZZRAH_CURSE:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
                     {
                         DoCast(target, SPELL_SHAZZRAH_CURSE);
                     }
@@ -165,8 +165,8 @@ public:
 
             if (caster && target)
             {
-                caster->CastSpell(target, SPELL_SHAZZRAH_GATE, true);
-                caster->CastSpell(caster, SPELL_ARCANE_EXPLOSION);
+                target->CastSpell(caster, SPELL_SHAZZRAH_GATE, true);
+                caster->CastSpell(nullptr, SPELL_ARCANE_EXPLOSION);
 
                 if (Creature* creatureCaster = caster->ToCreature())
                 {

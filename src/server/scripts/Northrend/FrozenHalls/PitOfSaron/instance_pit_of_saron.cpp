@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "pit_of_saron.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "pit_of_saron.h"
 
 class instance_pit_of_saron : public InstanceMapScript
 {
@@ -83,12 +83,12 @@ public:
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
             }
 
-            uint32 entry = data->id;
+            uint32 entry = data->id1;
             switch (entry)
             {
                 case NPC_RESCUED_ALLIANCE_SLAVE:
@@ -109,7 +109,7 @@ public:
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
             }

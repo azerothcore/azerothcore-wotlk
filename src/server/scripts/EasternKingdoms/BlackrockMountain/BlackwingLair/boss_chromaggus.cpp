@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackwing_lair.h"
 
 enum Emotes
 {
@@ -305,21 +305,24 @@ class go_chromaggus_lever : public GameObjectScript
         {
             go_chromaggus_leverAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
 
-            bool OnGossipHello(Player* player)
+            bool GossipHello(Player* player, bool reportUse) override
             {
-                if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
+                if (reportUse)
                 {
-                    _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
+                    if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
+                    {
+                        _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
 
-                    if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
-                        creature->AI()->AttackStart(player);
+                        if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
+                            creature->AI()->AttackStart(player);
 
-                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
-                        _instance->HandleGameObject(ObjectGuid::Empty, true, go);
+                        if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
+                            _instance->HandleGameObject(ObjectGuid::Empty, true, go);
+                    }
+
+                    me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
+                    me->SetGoState(GO_STATE_ACTIVE);
                 }
-
-                me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
-                me->SetGoState(GO_STATE_ACTIVE);
 
                 return true;
             }

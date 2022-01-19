@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PointMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Errors.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "ObjectAccessor.h"
 #include "Player.h"
-#include "PointMovementGenerator.h"
 #include "World.h"
 
 //----- Point Movement Generator
@@ -64,7 +65,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
             if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
             {
                 i_x += 0.2f * cos(unit->GetOrientation());
-                i_y += 0.2f * sin(unit->GetOrientation());
+                i_y += 0.2f * std::sin(unit->GetOrientation());
             }
 
             init.MoveTo(i_x, i_y, i_z, true);
@@ -76,7 +77,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
         {
             i_x += 0.2f * cos(unit->GetOrientation());
-            i_y += 0.2f * sin(unit->GetOrientation());
+            i_y += 0.2f * std::sin(unit->GetOrientation());
         }
 
         init.MoveTo(i_x, i_y, i_z, true);
@@ -98,9 +99,19 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
     if (!unit)
         return false;
 
-    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || unit->IsMovementPreventedByCasting())
+    if (unit->IsMovementPreventedByCasting())
     {
         unit->StopMoving();
+        return true;
+    }
+
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE))
+    {
+        if (!unit->HasUnitState(UNIT_STATE_CHARGING))
+        {
+            unit->StopMoving();
+        }
+
         return true;
     }
 

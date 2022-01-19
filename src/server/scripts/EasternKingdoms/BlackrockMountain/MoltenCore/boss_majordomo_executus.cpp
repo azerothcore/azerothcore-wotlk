@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectAccessor.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "molten_core.h"
-#include "Player.h"
 #include "ScriptedGossip.h"
-#include "ObjectAccessor.h"
 #include "SpellScript.h"
+#include "molten_core.h"
 
 enum Texts
 {
@@ -40,6 +40,7 @@ enum Texts
     // Majordomo
     SAY_RAG_SUM_1                           = 9,
     SAY_RAG_SUM_2                           = 10,
+    SAY_DEATH                               = 11,
 
     // Ragnaros
     SAY_ARRIVAL1_RAG                        = 1,
@@ -74,7 +75,6 @@ enum Events
 {
     EVENT_MAGIC_REFLECTION                  = 1,
     EVENT_DAMAGE_REFLECTION,
-    EVENT_BLAST_WAVE,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -121,6 +121,16 @@ Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f };
 Position const MajordomoMoveRagPos = { 830.9636f, -814.7055f, -228.9733f, 0.0f };   // Position used at Ragnaros summoning event
 Position const RagnarosSummonPos = { 838.3082f, -831.4665f, -232.1853f, 2.199115f };
 
+struct MajordomoAddData
+{
+    ObjectGuid guid;
+    uint32 creatureEntry;
+    Position spawnPos;
+
+    MajordomoAddData() { }
+    MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
+};
+
 class boss_majordomo : public CreatureScript
 {
 public:
@@ -128,10 +138,13 @@ public:
 
     struct boss_majordomoAI : public BossAI
     {
-        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS), spawnInTextTimer(0) {}
+        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS) {}
 
-        // Disabled events
-        void JustDied(Unit* /*killer*/) override {}
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_DEATH);
+            me->DespawnOrUnsummon(10s, 0s);
+        }
 
         void JustSummoned(Creature* summon) override
         {
@@ -160,11 +173,10 @@ public:
                         if (summon)
                         {
                             static_minionsGUIDS.insert(summon->GetGUID());
+                            majordomoSummonsData[summon->GetGUID().GetCounter()] = MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition());
                         }
                     }
                 }
-
-                spawnInTextTimer = 10000;
             }
             else
             {
@@ -185,10 +197,27 @@ public:
             {
                 events.SetPhase(PHASE_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
+
+                for (auto const& summon : majordomoSummonsData)
+                {
+                    if (ObjectAccessor::GetCreature(*me, summon.second.guid))
+                    {
+                        continue;
+                    }
+
+                    if (Creature* spawn = me->SummonCreature(summon.second.creatureEntry, summon.second.spawnPos))
+                    {
+                        static_minionsGUIDS.erase(summon.second.guid); // Erase the guid from the previous, no longer existing, spawn.
+                        static_minionsGUIDS.insert(spawn->GetGUID());
+                        majordomoSummonsData.erase(summon.second.guid.GetCounter());
+                        majordomoSummonsData[spawn->GetGUID().GetCounter()] = MajordomoAddData(spawn->GetGUID(), spawn->GetEntry(), spawn->GetPosition());
+                    }
+                }
             }
             else
             {
                 static_minionsGUIDS.clear();
+                majordomoSummonsData.clear();
                 summons.DespawnAll();
             }
         }
@@ -215,13 +244,11 @@ public:
 
             _EnterCombat();
             DoCastAOE(SPELL_SEPARATION_ANXIETY);
-            spawnInTextTimer = 0;
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
             events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 10000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
 
@@ -252,18 +279,7 @@ public:
                 }
                 else if (!remainingAdds)
                 {
-                    if (!static_minionsGUIDS.empty())
-                    {
-                        for (ObjectGuid const& guid : static_minionsGUIDS)
-                        {
-                            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
-                            {
-                                minion->DespawnOrUnsummon();
-                            }
-                        }
-
-                        static_minionsGUIDS.clear();
-                    }
+                    static_minionsGUIDS.clear();
 
                     instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, DONE);
                     events.CancelEventGroup(PHASE_COMBAT);
@@ -299,18 +315,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (spawnInTextTimer)
-            {
-                if (spawnInTextTimer <= diff)
-                {
-                    spawnInTextTimer = 0;
-                    Talk(SAY_SPAWN);
-                }
-                else
-                {
-                    spawnInTextTimer -= diff;
-                }
-            }
 
             switch (events.GetPhaseMask())
             {
@@ -344,15 +348,9 @@ public:
                                 events.RepeatEvent(30000);
                                 break;
                             }
-                            case EVENT_BLAST_WAVE:
-                            {
-                                DoCastVictim(SPELL_BLAST_WAVE);
-                                events.RepeatEvent(10000);
-                                break;
-                            }
                             case EVENT_TELEPORT_RANDOM:
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
                                 {
                                     DoCastSelf(SPELL_HATE_TO_ZERO, true);
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
@@ -525,7 +523,7 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
-        uint32 spawnInTextTimer;
+        std::unordered_map<uint32, MajordomoAddData> majordomoSummonsData;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override

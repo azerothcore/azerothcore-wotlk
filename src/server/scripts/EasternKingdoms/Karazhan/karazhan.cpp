@@ -30,10 +30,10 @@ EndContentData */
 
 #include "karazhan.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -309,7 +309,7 @@ public:
                             return;
 
                         Map::PlayerList const& PlayerList = map->GetPlayers();
-                        if (PlayerList.isEmpty())
+                        if (PlayerList.IsEmpty())
                             return;
 
                         RaidWiped = true;

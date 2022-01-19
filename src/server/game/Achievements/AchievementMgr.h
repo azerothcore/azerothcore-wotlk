@@ -18,15 +18,14 @@
 #ifndef __ACORE_ACHIEVEMENTMGR_H
 #define __ACORE_ACHIEVEMENTMGR_H
 
-#include <map>
-#include <string>
-#include <chrono>
-
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include <chrono>
+#include <map>
+#include <string>
 
 typedef std::list<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
 typedef std::list<AchievementEntry const*>         AchievementEntryList;
@@ -226,7 +225,7 @@ struct AchievementCriteriaData
 
 struct AchievementCriteriaDataSet
 {
-    AchievementCriteriaDataSet()  {}
+    AchievementCriteriaDataSet()  = default;
     typedef std::vector<AchievementCriteriaData> Storage;
     void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
     bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;

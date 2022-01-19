@@ -20,8 +20,9 @@
 
 #include "ArenaTeam.h"
 #include "Battleground.h"
-#include "DatabaseEnvFwd.h"
+#include "CharacterCache.h"
 #include "DBCStores.h"
+#include "DatabaseEnvFwd.h"
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
 #include "Item.h"
@@ -30,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "Optional.h"
 #include "PetDefines.h"
+#include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
@@ -246,7 +248,7 @@ enum ReputationSource
 
 struct ActionButton
 {
-    ActionButton()  {}
+    ActionButton()  = default;
 
     uint32 packedData{0};
     ActionButtonUpdateState uState{ACTIONBUTTON_NEW};
@@ -282,14 +284,14 @@ typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
 
 struct PlayerClassLevelInfo
 {
-    PlayerClassLevelInfo()  {}
+    PlayerClassLevelInfo()  = default;
     uint16 basehealth{0};
     uint16 basemana{0};
 };
 
 struct PlayerClassInfo
 {
-    PlayerClassInfo()  { }
+    PlayerClassInfo()  = default;
 
     PlayerClassLevelInfo* levelInfo{nullptr};                        //[level-1] 0..MaxPlayerLevel-1
 };
@@ -305,7 +307,7 @@ typedef std::list<uint32> PlayerCreateInfoSpells;
 
 struct PlayerCreateInfoAction
 {
-    PlayerCreateInfoAction()  {}
+    PlayerCreateInfoAction()  = default;
     PlayerCreateInfoAction(uint8 _button, uint32 _action, uint8 _type) : button(_button), type(_type), action(_action) {}
 
     uint8 button{0};
@@ -326,7 +328,7 @@ typedef std::list<PlayerCreateInfoSkill> PlayerCreateInfoSkills;
 struct PlayerInfo
 {
     // existence checked by displayId != 0
-    PlayerInfo()  { }
+    PlayerInfo()  = default;
 
     uint32 mapId{0};
     uint32 areaId{0};
@@ -338,6 +340,7 @@ struct PlayerInfo
     uint16 displayId_f{0};
     PlayerCreateInfoItems item;
     PlayerCreateInfoSpells customSpells;
+    PlayerCreateInfoSpells  castSpells;
     PlayerCreateInfoActions action;
     PlayerCreateInfoSkills skills;
 
@@ -346,7 +349,7 @@ struct PlayerInfo
 
 struct PvPInfo
 {
-    PvPInfo()  {}
+    PvPInfo()  = default;
 
     bool IsHostile{false};
     bool IsInHostileArea{false};               ///> Marks if player is in an area which forces PvP flag
@@ -356,16 +359,24 @@ struct PvPInfo
     time_t FFAPvPEndTimer{0};                  ///> Time when player unflags himself for FFA PvP (flag removed after 30 sec)
 };
 
+enum DuelState
+{
+    DUEL_STATE_CHALLENGED,
+    DUEL_STATE_COUNTDOWN,
+    DUEL_STATE_IN_PROGRESS,
+    DUEL_STATE_COMPLETED
+};
+
 struct DuelInfo
 {
-    DuelInfo()  {}
+    DuelInfo(Player* opponent, Player* initiator, bool isMounted) : Opponent(opponent), Initiator(initiator), IsMounted(isMounted) {}
 
-    Player* initiator{nullptr};
-    Player* opponent{nullptr};
-    time_t startTimer{0};
-    time_t startTime{0};
-    time_t outOfBound{0};
-    bool isMounted{false};
+    Player* const Opponent;
+    Player* const Initiator;
+    bool const IsMounted;
+    DuelState State = DUEL_STATE_CHALLENGED;
+    time_t StartTime = 0;
+    time_t OutOfBoundsTime = 0;
 };
 
 struct Areas
@@ -422,7 +433,7 @@ struct Runes
 
 struct EnchantDuration
 {
-    EnchantDuration()  {};
+    EnchantDuration()  = default;;
     EnchantDuration(Item* _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot),
         leftduration(_leftduration) { ASSERT(item); };
 
@@ -728,7 +739,7 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet() { }
+    EquipmentSet() = default;
 
     uint64 Guid;
     std::string Name;
@@ -865,6 +876,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
+    PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS      = 36,
+    PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 37,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -990,7 +1003,7 @@ class Player;
 // holder for Battleground data (pussywizard: not stored in db)
 struct BGData
 {
-    BGData()  {}
+    BGData()  = default;
 
     uint32 bgInstanceID{0};
     BattlegroundTypeId bgTypeID{BATTLEGROUND_TYPE_NONE};
@@ -1123,7 +1136,7 @@ public:
     void SetHas310Flyer(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_HAS_310_FLYER; else m_ExtraFlags &= ~PLAYER_EXTRA_HAS_310_FLYER; }
     void SetPvPDeath(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_PVP_DEATH; else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH; }
 
-    void GiveXP(uint32 xp, Unit* victim, float group_rate = 1.0f);
+    void GiveXP(uint32 xp, Unit* victim, float group_rate = 1.0f, bool isLFGReward = false);
     void GiveLevel(uint8 level);
 
     void InitStatsForLevel(bool reapplyMods = false);
@@ -1148,15 +1161,23 @@ public:
     [[nodiscard]] float GetRestBonus() const { return _restBonus; }
     void SetRestBonus(float rest_bonus_new);
 
-    bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
+    [[nodiscard]] bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
     void SetRestFlag(RestFlag restFlag, uint32 triggerId = 0);
     void RemoveRestFlag(RestFlag restFlag);
     [[nodiscard]] uint32 GetInnTriggerId() const { return _innTriggerId; }
 
+    PetStable* GetPetStable() { return m_petStable.get(); }
+    PetStable& GetOrInitPetStable();
+    [[nodiscard]] PetStable const* GetPetStable() const { return m_petStable.get(); }
+
     [[nodiscard]] Pet* GetPet() const;
-    bool IsPetDismissed();
-    void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType);
+    Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0s);
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
+    bool CanPetResurrect();
+    bool IsExistPet();
+    Pet* CreatePet(Creature* creatureTarget, uint32 spellID = 0);
+    Pet* CreatePet(uint32 creatureEntry, uint32 spellID = 0);
+
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
     /// Handles said message in regular chat based on declared language and in config pre-defined Range.
@@ -1336,8 +1357,6 @@ public:
 
     bool AddItem(uint32 itemId, uint32 count);
 
-    uint32 m_stableSlots;
-
     /*********************************************************/
     /***                    GOSSIP SYSTEM                  ***/
     /*********************************************************/
@@ -1374,7 +1393,7 @@ public:
     void AbandonQuest(uint32 quest_id);
     void CompleteQuest(uint32 quest_id);
     void IncompleteQuest(uint32 quest_id);
-    void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true);
+    void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true, bool isLFGReward = false);
     void FailQuest(uint32 quest_id);
     bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLevel(Quest const* qInfo, bool msg) const;
@@ -1402,7 +1421,7 @@ public:
     void RemoveRewardedQuest(uint32 questId, bool update = true);
     void SendQuestUpdate(uint32 questId);
     QuestGiverStatus GetQuestDialogStatus(Object* questGiver);
-    float GetQuestRate();
+    float GetQuestRate(bool isDFQuest = false);
     void SetDailyQuestStatus(uint32 quest_id);
     bool IsDailyQuestDone(uint32 quest_id);
     void SetWeeklyQuestStatus(uint32 quest_id);
@@ -1500,7 +1519,6 @@ public:
     static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
     static float  GetFloatValueFromArray(Tokenizer const& data, uint16 index);
     static uint32 GetZoneIdFromDB(ObjectGuid guid);
-    static uint32 GetLevelFromStorage(ObjectGuid::LowType guid);
     static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
 
     static bool IsValidGender(uint8 Gender) { return Gender <= GENDER_FEMALE; }
@@ -1569,13 +1587,6 @@ public:
     void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
     void SetSelection(ObjectGuid guid);
 
-    [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
-    [[nodiscard]] ObjectGuid GetComboTarget() const { return m_comboTarget; }
-
-    void AddComboPoints(Unit* target, int8 count);
-    void ClearComboPoints();
-    void SendComboPoints();
-
     void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0);
     void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
@@ -1587,7 +1598,7 @@ public:
     uint32 GetMailSize() { return m_mail.size();}
     Mail* GetMail(uint32 id);
 
-    PlayerMails const& GetMails() const { return m_mail; }
+    [[nodiscard]] PlayerMails const& GetMails() const { return m_mail; }
     void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
     void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
 
@@ -1797,6 +1808,7 @@ public:
     void UpdatePvP(bool state, bool _override = false);
     void UpdateZone(uint32 newZone, uint32 newArea);
     void UpdateArea(uint32 newArea);
+    void SetNeedZoneUpdate(bool needUpdate) { m_needZoneUpdate = needUpdate; }
 
     void UpdateZoneDependentAuras(uint32 zone_id);    // zones
     void UpdateAreaDependentAuras(uint32 area_id);    // subzones
@@ -1814,7 +1826,7 @@ public:
     }
 
     /** todo: -maybe move UpdateDuelFlag+DuelComplete to independent DuelHandler.. **/
-    DuelInfo* duel;
+    std::unique_ptr<DuelInfo> duel;
     void UpdateDuelFlag(time_t currTime);
     void CheckDuelDistance(time_t currTime);
     void DuelComplete(DuelCompleteType type);
@@ -1832,16 +1844,13 @@ public:
     {
         SetUInt32Value(PLAYER_GUILDID, GuildId);
         // xinef: update global storage
-        sWorld->UpdateGlobalPlayerGuild(GetGUID().GetCounter(), GuildId);
+        sCharacterCache->UpdateCharacterGuildId(GetGUID(), GetGuildId());
     }
     void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
     [[nodiscard]] uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }
     void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
     [[nodiscard]] uint32 GetGuildId() const { return GetUInt32Value(PLAYER_GUILDID);  }
     [[nodiscard]] Guild* GetGuild() const;
-    static uint32 GetGuildIdFromStorage(ObjectGuid::LowType guid);
-    static uint32 GetGroupIdFromStorage(ObjectGuid::LowType guid);
-    static uint32 GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot);
     uint32 GetGuildIdInvited() { return m_GuildIdInvited; }
     static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
 
@@ -1852,7 +1861,7 @@ public:
         SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, type);
     }
     void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value);
-    uint32 GetArenaPersonalRating(uint8 slot) const;
+    [[nodiscard]] uint32 GetArenaPersonalRating(uint8 slot) const;
     static uint32 GetArenaTeamIdFromDB(ObjectGuid guid, uint8 slot);
     static void LeaveAllArenaTeams(ObjectGuid guid);
     [[nodiscard]] uint32 GetArenaTeamId(uint8 slot) const;
@@ -1965,10 +1974,10 @@ public:
 
     void ProcessTerrainStatusUpdate() override;
 
-    void SendMessageToSet(WorldPacket* data, bool self) override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
-    void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
-    void SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self); // pussywizard! param includeMargin not needed here
-    void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
+    void SendMessageToSet(WorldPacket const* data, bool self) const override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
+    void SendMessageToSetInRange_OwnTeam(WorldPacket const* data, float dist, bool self) const; // pussywizard! param includeMargin not needed here
+    void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
 
     void SendTeleportAckPacket();
 
@@ -1978,8 +1987,8 @@ public:
     void RemoveCorpse();
     void KillPlayer();
     static void OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans);
-    bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
-    WorldLocation GetCorpseLocation() const { return _corpseLocation; }
+    [[nodiscard]] bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
+    [[nodiscard]] WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
     void ResurrectPlayer(float restore_percent, bool applySickness = false);
     void BuildPlayerRepop();
@@ -2167,8 +2176,8 @@ public:
     void DeleteEquipmentSet(uint64 setGuid);
 
     void SendInitWorldStates(uint32 zone, uint32 area);
-    void SendUpdateWorldState(uint32 Field, uint32 Value);
-    void SendDirectMessage(WorldPacket* data);
+    void SendUpdateWorldState(uint32 variable, uint32 value) const;
+    void SendDirectMessage(WorldPacket const* data) const;
     void SendBGWeekendWorldStates();
     void SendBattlefieldWorldStates();
 
@@ -2385,7 +2394,7 @@ public:
     void SendCinematicStart(uint32 CinematicSequenceId);
     void SendMovieStart(uint32 MovieId);
 
-    uint16 GetMaxSkillValueForLevel() const;
+    [[nodiscard]] uint16 GetMaxSkillValueForLevel() const;
     bool IsFFAPvP();
     bool IsPvP();
 
@@ -2551,9 +2560,6 @@ public:
     void PrepareCharmAISpells();
     uint32 m_charmUpdateTimer;
 
-    int8 GetComboPointGain() { return m_comboPointGain; }
-    void SetComboPointGain(int8 combo) { m_comboPointGain = combo; }
-
     bool NeedToSaveGlyphs() { return m_NeedToSaveGlyphs; }
     void SetNeedToSaveGlyphs(bool val) { m_NeedToSaveGlyphs = val; }
 
@@ -2585,18 +2591,20 @@ public:
 
     void SetFarSightDistance(float radius);
     void ResetFarSightDistance();
-    Optional<float> GetFarSightDistance() const;
+    [[nodiscard]] Optional<float> GetFarSightDistance() const;
 
     float GetSightRange(const WorldObject* target = nullptr) const override;
 
     std::string GetPlayerName();
 
+    // Settings
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
+    void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
+
  protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
-    // Combo Points
-    int8 m_comboPointGain;
     // Performance Varibales
     bool m_NeedToSaveGlyphs;
     // Mount block bug
@@ -2673,6 +2681,8 @@ public:
     void _LoadTalents(PreparedQueryResult result);
     void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
     void _LoadBrewOfTheMonth(PreparedQueryResult result);
+    void _LoadCharacterSettings(PreparedQueryResult result);
+    void _LoadPetStable(uint8 petStableSlots, PreparedQueryResult result);
 
     /*********************************************************/
     /***                   SAVE SYSTEM                     ***/
@@ -2696,6 +2706,7 @@ public:
     void _SaveStats(CharacterDatabaseTransaction trans);
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
+    void _SavePlayerSettings(CharacterDatabaseTransaction trans);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -2734,9 +2745,6 @@ public:
     bool m_itemUpdateQueueBlocked;
 
     uint32 m_ExtraFlags;
-
-    ObjectGuid m_comboTarget;
-    int8 m_comboPoints;
 
     QuestStatusMap m_QuestStatus;
     QuestStatusSaveMap m_QuestStatusSave;
@@ -2863,6 +2871,8 @@ public:
 
     uint8 m_grantableLevels;
 
+    bool m_needZoneUpdate;
+
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 
 private:
@@ -2910,6 +2920,8 @@ private:
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
 
+    std::unique_ptr<PetStable> m_petStable;
+
     // Temporary removed pet cache
     uint32 m_temporaryUnsummonedPetNumber;
     uint32 m_oldpetspell;
@@ -2946,6 +2958,8 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    PlayerSettingMap m_charSettingsMap;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

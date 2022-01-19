@@ -24,61 +24,11 @@
 #include "Group.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-
-enum Mojo
-{
-    SAY_MOJO                = 0,
-
-    SPELL_FEELING_FROGGY    = 43906,
-    SPELL_SEDUCTION_VISUAL  = 43919
-};
-
-struct npc_pet_gen_mojo : public ScriptedAI
-{
-    npc_pet_gen_mojo(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        _victimGUID.Clear();
-
-        if (Unit* owner = me->GetOwner())
-            me->GetMotionMaster()->MoveFollow(owner, 0.0f, 0.0f);
-    }
-
-    void EnterCombat(Unit* /*who*/) override { }
-    void UpdateAI(uint32 /*diff*/) override { }
-
-    void ReceiveEmote(Player* player, uint32 emote) override
-    {
-        me->HandleEmoteCommand(emote);
-        Unit* owner = me->GetOwner();
-        if (emote != TEXT_EMOTE_KISS || !owner || owner->GetTypeId() != TYPEID_PLAYER ||
-                owner->ToPlayer()->GetTeamId(true) != player->GetTeamId(true))
-        {
-            return;
-        }
-
-        Talk(SAY_MOJO, player);
-
-        if (_victimGUID)
-            if (Player* victim = ObjectAccessor::GetPlayer(*me, _victimGUID))
-                victim->RemoveAura(SPELL_FEELING_FROGGY);
-
-        _victimGUID = player->GetGUID();
-
-        DoCast(player, SPELL_FEELING_FROGGY, true);
-        DoCast(me, SPELL_SEDUCTION_VISUAL, true);
-        me->GetMotionMaster()->MoveFollow(player, 0.0f, 0.0f);
-    }
-
-private:
-    ObjectGuid _victimGUID;
-};
 
 enum soulTrader
 {
@@ -828,7 +778,6 @@ struct npc_pet_gen_moth : public NullCreatureAI
 
 void AddSC_generic_pet_scripts()
 {
-    RegisterCreatureAI(npc_pet_gen_mojo);
     RegisterCreatureAI(npc_pet_gen_soul_trader_beacon);
     RegisterCreatureAI(npc_pet_gen_argent_pony_bridle);
     RegisterCreatureAI(npc_pet_gen_target_following_bomb);

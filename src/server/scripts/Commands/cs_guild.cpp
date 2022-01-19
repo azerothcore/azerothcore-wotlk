@@ -26,7 +26,6 @@ EndScriptData */
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
-#include "ObjectAccessor.h"
 #include "ScriptMgr.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
@@ -176,7 +175,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
+        uint32 guildId = target ? target->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(targetGuid);
         if (!guildId)
             return false;
 
@@ -196,7 +195,7 @@ public:
         if (!player)
             return false;
 
-        uint32 guildId = player->IsConnected() ? player->GetConnectedPlayer()->GetGuildId() : Player::GetGuildIdFromStorage(player->GetGUID().GetCounter());
+        uint32 guildId = player->IsConnected() ? player->GetConnectedPlayer()->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(player->GetGUID());
         if (!guildId)
             return false;
 
@@ -227,17 +226,12 @@ public:
         // Display Guild Information
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
         std::string guildMasterName;
-        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID().GetCounter(), guildMasterName))
+        if (sCharacterCache->GetCharacterNameByGuid(guild->GetLeaderGUID(), guildMasterName))
+        {
             handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
+        }
 
-        // Format creation date
-        char createdDateStr[20];
-        time_t createdDate = guild->GetCreatedDate();
-        tm localTm;
-        localtime_r(&createdDate, &localTm);
-        strftime(createdDateStr, 20, "%Y-%m-%d %H:%M:%S", &localTm);
-
-        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, createdDateStr); // Creation Date
+        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, Acore::Time::TimeToHumanReadable(Seconds(guild->GetCreatedDate())).c_str()); // Creation Date
         handler->PSendSysMessage(LANG_GUILD_INFO_MEMBER_COUNT, guild->GetMemberCount()); // Number of Members
         handler->PSendSysMessage(LANG_GUILD_INFO_BANK_GOLD, guild->GetTotalBankMoney() / 100 / 100); // Bank Gold (in gold coins)
         handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the day

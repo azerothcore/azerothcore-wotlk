@@ -18,12 +18,12 @@
 #ifndef ACORE_DBCSTRUCTURE_H
 #define ACORE_DBCSTRUCTURE_H
 
-#include "Define.h"
 #include "DBCEnums.h"
+#include "Define.h"
 #include "SharedDefines.h"
 #include "Util.h"
-#include <set>
 #include <map>
+#include <set>
 #include <unordered_map>
 
 // Structures using to access raw DBC data and required packing to portability
@@ -2157,7 +2157,7 @@ struct WorldStateUI
 // Structures not used for casting to loaded DBC data and not required then packing
 struct MapDifficulty
 {
-    MapDifficulty()  {}
+    MapDifficulty()  = default;
     MapDifficulty(uint32 _resetTime, uint32 _maxPlayers, bool _hasErrorMessage) : resetTime(_resetTime), maxPlayers(_maxPlayers), hasErrorMessage(_hasErrorMessage) {}
 
     uint32 resetTime{0};
@@ -2167,7 +2167,7 @@ struct MapDifficulty
 
 struct TalentSpellPos
 {
-    TalentSpellPos()  {}
+    TalentSpellPos()  = default;
     TalentSpellPos(uint16 _talent_id, uint8 _rank) : talent_id(_talent_id), rank(_rank) {}
 
     uint16 talent_id{0};
@@ -2178,7 +2178,7 @@ typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
 struct TaxiPathBySourceAndDestination
 {
-    TaxiPathBySourceAndDestination()  {}
+    TaxiPathBySourceAndDestination()  = default;
     TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
 
     uint32    ID{0};

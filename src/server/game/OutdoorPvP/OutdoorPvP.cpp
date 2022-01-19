@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvP.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -23,7 +24,6 @@
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "OutdoorPvP.h"
 #include "OutdoorPvPMgr.h"
 #include "WorldPacket.h"
 
@@ -84,7 +84,7 @@ void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entr
         const CreatureData* data = sObjectMgr->GetCreatureData(guid);
         if (!data)
             return;
-        entry = data->id;
+        entry = data->id1;
     }
     m_Creatures[type] = guid;
     m_CreatureTypes[m_Creatures[type]] = type;

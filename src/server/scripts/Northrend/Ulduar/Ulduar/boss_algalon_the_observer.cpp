@@ -21,8 +21,8 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 
@@ -567,7 +567,7 @@ public:
                         break;
                     }
                 case NPC_UNLEASHED_DARK_MATTER:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         if (summon->Attack(target, true))
                             summon->GetMotionMaster()->MoveChase(target);
                     break;

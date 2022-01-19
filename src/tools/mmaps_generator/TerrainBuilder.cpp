@@ -16,12 +16,12 @@
  */
 
 #include "TerrainBuilder.h"
-#include "PathCommon.h"
 #include "MapBuilder.h"
 #include "MapDefines.h"
-#include "VMapMgr2.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
+#include "PathCommon.h"
+#include "VMapMgr2.h"
 #include <vector>
 
 // ******************************************
@@ -487,10 +487,6 @@ namespace MMAP
                         if (minTLevel > h)
                             minTLevel = h;
                     }
-
-                    // terrain under the liquid?
-                    if (minLLevel > maxTLevel)
-                        useTerrain = false;
 
                     //liquid under the terrain?
                     if (minTLevel > maxLLevel)

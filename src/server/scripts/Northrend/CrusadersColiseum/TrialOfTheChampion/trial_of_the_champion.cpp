@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "trial_of_the_champion.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "trial_of_the_champion.h"
 
 #define GOSSIP_START_EVENT1a "I am ready."
 #define GOSSIP_START_EVENT1b "I am ready. However I'd like to skip the pageantry."

@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "halls_of_reflection.h"
 #include "MapMgr.h"
 #include "Transport.h"
+#include "halls_of_reflection.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -204,7 +204,7 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* p = itr->GetSource())
                             if (!p->IsGameMaster())

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellMgr.h"
 #include "BattlefieldMgr.h"
-#include "BattlefieldWG.h"
 #include "BattlegroundIC.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
@@ -31,7 +31,6 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -1473,20 +1472,35 @@ void SpellMgr::LoadSpellLearnSkills()
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (entry->Effects[i].Effect == SPELL_EFFECT_SKILL)
+            SpellLearnSkillNode dbc_node;
+            switch (entry->Effects[i].Effect)
             {
-                SpellLearnSkillNode dbc_node;
-                dbc_node.skill = entry->Effects[i].MiscValue;
-                dbc_node.step  = entry->Effects[i].CalcValue();
-                if (dbc_node.skill != SKILL_RIDING)
+                case SPELL_EFFECT_SKILL:
+                    dbc_node.skill = entry->Effects[i].MiscValue;
+                    dbc_node.step  = entry->Effects[i].CalcValue();
+                    if (dbc_node.skill != SKILL_RIDING)
+                    {
+                        dbc_node.value = 1;
+                    }
+                    else
+                    {
+                        dbc_node.value = dbc_node.step * 75;
+                    }
+                    dbc_node.maxvalue = dbc_node.step * 75;
+                    break;
+                case SPELL_EFFECT_DUAL_WIELD:
+                    dbc_node.skill = SKILL_DUAL_WIELD;
+                    dbc_node.step = 1;
                     dbc_node.value = 1;
-                else
-                    dbc_node.value = dbc_node.step * 75;
-                dbc_node.maxvalue = dbc_node.step * 75;
-                mSpellLearnSkills[spell] = dbc_node;
-                ++dbc_count;
-                break;
+                    dbc_node.maxvalue = 1;
+                    break;
+                default:
+                    continue;
             }
+
+            mSpellLearnSkills[spell] = dbc_node;
+            ++dbc_count;
+            break;
         }
     }
 
@@ -2247,16 +2261,16 @@ void SpellMgr::LoadSpellLinked()
         int32 effect = fields[1].GetInt32();
         int32 type = fields[2].GetUInt8();
 
-        SpellInfo const* spellInfo = GetSpellInfo(abs(trigger));
+        SpellInfo const* spellInfo = GetSpellInfo(std::abs(trigger));
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", abs(trigger));
+            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", std::abs(trigger));
             continue;
         }
-        spellInfo = GetSpellInfo(abs(effect));
+        spellInfo = GetSpellInfo(std::abs(effect));
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", abs(effect));
+            LOG_ERROR("sql.sql", "Spell %u listed in `spell_linked_spell` does not exist", std::abs(effect));
             continue;
         }
 
@@ -2562,16 +2576,16 @@ void SpellMgr::LoadSpellAreas()
 
         if (spellArea.auraSpell)
         {
-            SpellInfo const* spellInfo = GetSpellInfo(abs(spellArea.auraSpell));
+            SpellInfo const* spellInfo = GetSpellInfo(std::abs(spellArea.auraSpell));
             if (!spellInfo)
             {
-                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have wrong aura spell (%u) requirement", spell, abs(spellArea.auraSpell));
+                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have wrong aura spell (%u) requirement", spell, std::abs(spellArea.auraSpell));
                 continue;
             }
 
-            if (uint32(abs(spellArea.auraSpell)) == spellArea.spellId)
+            if (uint32(std::abs(spellArea.auraSpell)) == spellArea.spellId)
             {
-                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have aura spell (%u) requirement for itself", spell, abs(spellArea.auraSpell));
+                LOG_ERROR("sql.sql", "Spell %u listed in `spell_area` have aura spell (%u) requirement for itself", spell, std::abs(spellArea.auraSpell));
                 continue;
             }
 
@@ -2641,7 +2655,7 @@ void SpellMgr::LoadSpellAreas()
 
         // for search at aura apply
         if (spellArea.auraSpell)
-            mSpellAreaForAuraMap.insert(SpellAreaForAuraMap::value_type(abs(spellArea.auraSpell), sa));
+            mSpellAreaForAuraMap.insert(SpellAreaForAuraMap::value_type(std::abs(spellArea.auraSpell), sa));
 
         ++count;
     } while (result->NextRow());
@@ -2791,10 +2805,10 @@ void SpellMgr::LoadSpellCustomAttr()
                 }
             }
 
-            if ((attributes & SPELL_ATTR0_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_REJECT_AURA_SAVING))
+            if ((attributes & SPELL_ATTR0_CU_FORCE_AURA_SAVING) && (attributes & SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED))
             {
-                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u. Both attributes will get applied", spellId);
-                attributes &= ~(SPELL_ATTR0_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_REJECT_AURA_SAVING);
+                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED which cannot stack for spell %u. Both attributes will be ignored.", spellId);
+                attributes &= ~(SPELL_ATTR0_CU_FORCE_AURA_SAVING | SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED);
             }
 
             spellInfo->AttributesCu |= attributes;
@@ -2860,6 +2874,23 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_MOD_INVISIBILITY_DETECT:
                 case SPELL_AURA_WATER_BREATHING:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                    break;
+            }
+
+            switch (spellInfo->Effects[j].ApplyAuraName)
+            {
+                case SPELL_AURA_CONVERT_RUNE:   // Can't be saved - aura handler relies on calculated amount and changes it
+                case SPELL_AURA_OPEN_STABLE:    // No point in saving this, since the stable dialog can't be open on aura load anyway.
+                // Auras that require both caster & target to be in world cannot be saved
+                case SPELL_AURA_CONTROL_VEHICLE:
+                case SPELL_AURA_BIND_SIGHT:
+                case SPELL_AURA_MOD_POSSESS:
+                case SPELL_AURA_MOD_POSSESS_PET:
+                case SPELL_AURA_MOD_CHARM:
+                case SPELL_AURA_AOE_CHARM:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED;
+                    break;
+                default:
                     break;
             }
 
@@ -3027,7 +3058,14 @@ void SpellMgr::LoadSpellCustomAttr()
             case SPELLFAMILY_HUNTER:
                 // Aspects
                 if (spellInfo->GetCategory() == 47)
+                {
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                }
+                // Aimed Shot
+                if (spellInfo->SpellFamilyFlags[0] & 0x00020000)
+                {
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_FORCE_SEND_CATEGORY_COOLDOWNS;
+                }
                 break;
             default:
                 break;
@@ -3282,6 +3320,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
             case 63978: // Ulduar(Rubble): Stone Nova
+            case 15502: // Sunder Armor
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
@@ -3370,6 +3409,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 switch(spellInfo->Effects[j].ApplyAuraName)
                 {
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
                         if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
                         {
@@ -5510,7 +5550,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 17731, 69294 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-        spellInfo->CastingTimeIndex = 3;
+        spellInfo->CastingTimeIndex = 3; // 500ms
         spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
     });
 
@@ -6147,6 +6187,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 69768 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
     });
 
     ApplySpellFix({ 69767 }, [](SpellEntry* spellInfo)
@@ -7394,7 +7435,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Shadow Hunter Vosh'gajin - Hex
     ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->CastingTimeIndex = 16;
+        spellInfo->CastingTimeIndex = 16; // 1500ms
     });
 
     // Sacred Cleansing
@@ -7435,11 +7476,80 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Serverside - Summon Arcane Disruptor
+    ApplySpellFix({ 49591 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 37889;
+    });
+
+    // Serverside - Create Rocket Pack
+    ApplySpellFix({ 70055 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ProcChance = 101;
+        spellInfo->Effect[1] = 24;
+        spellInfo->EffectImplicitTargetA[1] = 25;
+        spellInfo->EffectItemType[1] = 49278;
+    });
+
     // Ashenvale Outrunner Sneak
     // Stealth
     ApplySpellFix({ 20540, 32199 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= (AURA_INTERRUPT_FLAG_MELEE_ATTACK | AURA_INTERRUPT_FLAG_CAST);
+    });
+
+     // Arcane Bolt
+    ApplySpellFix({ 15979 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 3; // 20y
+    });
+
+    // Mortal Shots
+    ApplySpellFix({ 19485, 19487, 19488, 19489, 19490 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectSpellClassMask[EFFECT_0][EFFECT_0] |= 0x00004000;
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
+
+    // Item - Death Knight T9 Melee 4P Bonus
+    // Item - Hunter T9 2P Bonus
+    // Item - Paladin T9 Retribution 2P Bonus (Righteous Vengeance)
+    ApplySpellFix({ 67118, 67150, 67188 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = 0;
+    });
+
+    // Green Beam
+    ApplySpellFix({31628, 31630, 31631}, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    // Judgement of Light
+    // Judgement of Command
+    // Judgement of Blood
+    // Judgement of Justice
+    // Judgement of Wisdom
+    // Judgement of the Martyr
+    // Judgement of Light
+    ApplySpellFix({ 20271, 20425, 32220, 53407, 53408, 53725, 57774 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+     // Chaos Bolt Passive
+    ApplySpellFix({ 58284 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->EffectApplyAuraName[EFFECT_1] = SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST;
+        spellInfo->EffectBasePoints[EFFECT_1] = 100;
+        spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_CASTER;
+        spellInfo->EffectMiscValue[EFFECT_1] = 127;
+        spellInfo->EffectSpellClassMask[EFFECT_1][1] = 0x00020000;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
@@ -7501,6 +7611,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 // Icy Touch - extend FamilyFlags (unused value) for Sigil of the Frozen Conscience to use
                 if (spellInfo->SpellIconID == 2721 && spellInfo->SpellFamilyFlags[0] & 0x2)
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
+                break;
+            case SPELLFAMILY_HUNTER:
+                // Aimed Shot not affected by category cooldown modifiers
+                if (spellInfo->SpellFamilyFlags[0] & 0x00020000)
+                {
+                    spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
+                    spellInfo->RecoveryTime = 10 * IN_MILLISECONDS;
+                }
                 break;
         }
 

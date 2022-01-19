@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_depths.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "blackrock_depths.h"
 
 enum Spells
 {
@@ -227,7 +227,7 @@ public:
                     _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 12000);
                     break;
                 case EVENT_SPELL_IMMOLATE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(target, SPELL_IMMOLATE);
                         _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 25000);

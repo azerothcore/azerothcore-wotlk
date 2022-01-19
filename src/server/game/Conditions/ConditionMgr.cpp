@@ -763,7 +763,7 @@ bool ConditionMgr::CanHaveSourceGroupSet(ConditionSourceType sourceType) const
 {
     return (sourceType == CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_DISENCHANT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_FISHING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GAMEOBJECT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_ITEM_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MAIL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MILLING_LOOT_TEMPLATE ||
             sourceType == CONDITION_SOURCE_TYPE_PICKPOCKETING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_PROSPECTING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_REFERENCE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SKINNING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SPELL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION || sourceType == CONDITION_SOURCE_TYPE_VEHICLE_SPELL ||
-            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR);
+            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR || sourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE);
 }
 
 bool ConditionMgr::CanHaveSourceIdSet(ConditionSourceType sourceType) const
@@ -876,6 +876,7 @@ void ConditionMgr::LoadConditions(bool isReload)
         LootTemplates_Disenchant.ResetConditions();
         LootTemplates_Prospecting.ResetConditions();
         LootTemplates_Spell.ResetConditions();
+        LootTemplates_Player.ResetConditions();
 
         LOG_INFO("server.loading", "Re-Loading `gossip_menu` Table for Conditions!");
         sObjectMgr->LoadGossipMenu();
@@ -930,7 +931,7 @@ void ConditionMgr::LoadConditions(bool isReload)
                 delete cond;
                 continue;
             }
-            cond->ReferenceId = uint32(abs(iConditionTypeOrReference));
+            cond->ReferenceId = uint32(std::abs(iConditionTypeOrReference));
 
             const char* rowType = "reference template";
             if (iSourceTypeOrReferenceId >= 0)
@@ -959,7 +960,7 @@ void ConditionMgr::LoadConditions(bool isReload)
 
         if (iSourceTypeOrReferenceId < 0) // it is a reference template
         {
-            uint32 uRefId = abs(iSourceTypeOrReferenceId);
+            uint32 uRefId = std::abs(iSourceTypeOrReferenceId);
             if (ConditionReferenceStore.find(uRefId) == ConditionReferenceStore.end()) // make sure we have a list for our conditions, based on reference id
             {
                 ConditionList mCondList;
@@ -1003,7 +1004,7 @@ void ConditionMgr::LoadConditions(bool isReload)
             cond->ErrorTextId = 0;
         }
 
-        if (cond->SourceGroup)
+        if (cond->SourceGroup || cond->SourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE)
         {
             bool valid = false;
             // handle grouped conditions
@@ -1083,6 +1084,11 @@ void ConditionMgr::LoadConditions(bool isReload)
                 valid = true;
                 ++count;
                 continue;
+            }
+            case CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE:
+            {
+                valid = addToLootTemplate(cond, LootTemplates_Player.GetLootForConditionFill(cond->SourceGroup));
+                break;
             }
             default:
                 break;
@@ -1615,6 +1621,23 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
         }
         break;
     }
+    case CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE:
+    {
+        if (!LootTemplates_Player.HaveLootFor(cond->SourceGroup))
+        {
+            LOG_ERROR("sql.sql", "SourceGroup %u in `condition` table, does not exist in `player_loot_template`, ignoring.", cond->SourceGroup);
+            return false;
+        }
+
+        LootTemplate* loot = LootTemplates_Player.GetLootForConditionFill(cond->SourceGroup);
+        ItemTemplate const* pItemProto = sObjectMgr->GetItemTemplate(cond->SourceEntry);
+        if (!pItemProto && !loot->isReference(cond->SourceEntry))
+        {
+            LOG_ERROR("sql.sql", "SourceType %u, SourceEntry %u in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceType, cond->SourceEntry);
+            return false;
+        }
+        break;
+    }
     case CONDITION_SOURCE_TYPE_GOSSIP_MENU:
     case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
     case CONDITION_SOURCE_TYPE_SMART_EVENT:
@@ -1961,7 +1984,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             {
                 if (CreatureData const* creatureData = sObjectMgr->GetCreatureData(cond->ConditionValue3))
                 {
-                    if (cond->ConditionValue2 && creatureData->id != cond->ConditionValue2)
+                    if (cond->ConditionValue2 && creatureData->id1 != cond->ConditionValue2)
                     {
                         LOG_ERROR("sql.sql", "ObjectEntryGuid condition has guid %u set but does not match creature entry (%u), skipped", cond->ConditionValue3, cond->ConditionValue2);
                         return false;

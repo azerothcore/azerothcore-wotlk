@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WaypointMgr.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "Log.h"
-#include "WaypointMgr.h"
 
 WaypointMgr::WaypointMgr()
 {
@@ -84,7 +84,7 @@ void WaypointMgr::Load()
 
         if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
-            //TC_LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", wp->id);
+            //LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", wp->id);
             delete wp;
             continue;
         }
@@ -145,7 +145,7 @@ void WaypointMgr::ReloadPath(uint32 id)
 
         if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
-            //TC_LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", wp->id);
+            //LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", wp->id);
             delete wp;
             continue;
         }

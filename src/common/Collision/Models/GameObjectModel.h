@@ -39,18 +39,18 @@ class GameObjectModelOwnerBase
 public:
     virtual ~GameObjectModelOwnerBase() = default;
 
-    virtual bool IsSpawned() const = 0;
-    virtual uint32 GetDisplayId() const = 0;
-    virtual uint32 GetPhaseMask() const = 0;
-    virtual G3D::Vector3 GetPosition() const = 0;
-    virtual float GetOrientation() const = 0;
-    virtual float GetScale() const = 0;
+    [[nodiscard]] virtual bool IsSpawned() const = 0;
+    [[nodiscard]] virtual uint32 GetDisplayId() const = 0;
+    [[nodiscard]] virtual uint32 GetPhaseMask() const = 0;
+    [[nodiscard]] virtual G3D::Vector3 GetPosition() const = 0;
+    [[nodiscard]] virtual float GetOrientation() const = 0;
+    [[nodiscard]] virtual float GetScale() const = 0;
     virtual void DebugVisualizeCorner(G3D::Vector3 const& /*corner*/) const = 0;
 };
 
 class GameObjectModel
 {
-    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(nullptr), isWmo(false) { }
+    GameObjectModel()  = default;
 
 public:
     std::string name;
@@ -80,15 +80,15 @@ public:
 private:
     bool initialize(std::unique_ptr<GameObjectModelOwnerBase> modelOwner, std::string const& dataPath);
 
-    uint32 phasemask;
+    uint32 phasemask{0};
     G3D::AABox iBound;
     G3D::Matrix3 iInvRot;
     G3D::Vector3 iPos;
-    float iInvScale;
-    float iScale;
-    VMAP::WorldModel* iModel;
+    float iInvScale{0};
+    float iScale{0};
+    VMAP::WorldModel* iModel{nullptr};
     std::unique_ptr<GameObjectModelOwnerBase> owner;
-    bool isWmo;
+    bool isWmo{false};
 };
 
 void LoadGameObjectModelList(std::string const& dataPath);

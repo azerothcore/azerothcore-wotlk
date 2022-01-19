@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackrock_spire.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
+#include "blackrock_spire.h"
 
 enum Text
 {
@@ -427,7 +427,7 @@ public:
                         _events.ScheduleEvent(EVENT_STRIKE, urand(14000, 23000));
                         break;
                     case EVENT_ENCAGE:
-                        DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), EVENT_ENCAGE, true);
+                        DoCast(SelectTarget(SelectTargetMethod::Random, 0, 100, true), EVENT_ENCAGE, true);
                         _events.ScheduleEvent(EVENT_ENCAGE, urand(6000, 12000));
                         break;
                     default:

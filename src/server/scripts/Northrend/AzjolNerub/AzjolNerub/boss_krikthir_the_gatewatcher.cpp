@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "azjol_nerub.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "azjol_nerub.h"
 
 enum Spells
 {
@@ -209,7 +209,7 @@ public:
                     events.ScheduleEvent(EVENT_KRIK_MIND_FLAY, 15000);
                     break;
                 case EVENT_KRIK_CURSE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         me->CastSpell(target, SPELL_CURSE_OF_FATIGUE, true);
                     events.ScheduleEvent(EVENT_KRIK_CURSE, 10000);
                     break;

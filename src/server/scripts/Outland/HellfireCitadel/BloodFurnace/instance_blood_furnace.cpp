@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blood_furnace.h"
 #include "CreatureAI.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "blood_furnace.h"
 
 class instance_blood_furnace : public InstanceMapScript
 {

@@ -17,10 +17,10 @@
 
 #include "CombatAI.h"
 #include "GridNotifiers.h"
-#include "naxxramas.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "naxxramas.h"
 
 enum Yells
 {
@@ -173,15 +173,18 @@ const Position PosSummonDead[5] =
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
-struct NotOnSameSide : public Acore::unary_function<Unit*, bool>
+struct NotOnSameSide
 {
-    bool m_inLiveSide;
-    explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) {}
+public:
+    explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) { }
 
     bool operator() (const Unit* pTarget)
     {
         return (m_inLiveSide != IN_LIVE_SIDE(pTarget));
     }
+
+private:
+    bool m_inLiveSide;
 };
 
 class boss_gothik : public CreatureScript
@@ -350,7 +353,7 @@ public:
         bool CheckGroupSplitted()
         {
             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-            if (!PlayerList.isEmpty())
+            if (!PlayerList.IsEmpty())
             {
                 bool checklife = false;
                 bool checkdead = false;
@@ -450,7 +453,7 @@ public:
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                     }
                     me->getThreatMgr().resetAggro(NotOnSameSide(me));
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
                     {
                         me->getThreatMgr().addThreat(pTarget, 100.0f);
                         AttackStart(pTarget);

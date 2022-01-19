@@ -132,6 +132,9 @@ public:
     // Called at waypoint reached or point movement finished
     virtual void MovementInform(uint32 /*type*/, uint32 /*id*/) {}
 
+    // Called at MovePath End
+    virtual void PathEndReached(uint32 /*pathId*/) {}
+
     void OnCharmed(bool apply) override;
 
     // Called at reaching home after evade
@@ -176,6 +179,8 @@ public:
     virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }
 
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
+
+    virtual void PetStopAttack() { }
 
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);

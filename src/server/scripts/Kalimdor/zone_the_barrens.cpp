@@ -32,10 +32,10 @@ npc_wizzlecrank_shredder
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######
@@ -590,7 +590,10 @@ public:
         void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == NPC_PILOT_WIZZ)
+            {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
+                me->RestoreFaction();
+            }
 
             if (summoned->GetEntry() == NPC_MERCENARY)
                 summoned->AI()->AttackStart(me);

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectGridLoader.h"
 #include "CellImpl.h"
 #include "Corpse.h"
 #include "Creature.h"
@@ -22,7 +23,6 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "ObjectAccessor.h"
-#include "ObjectGridLoader.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
@@ -200,7 +200,7 @@ void ObjectGridLoader::LoadN(void)
 template<class T>
 void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
 {
-    while (!m.isEmpty())
+    while (!m.IsEmpty())
     {
         T* obj = m.getFirst()->GetSource();
         // if option set then object already saved at this moment

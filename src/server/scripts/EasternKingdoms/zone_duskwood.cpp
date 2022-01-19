@@ -23,8 +23,8 @@ SDCategory: Duskwood
 EndScriptData */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum TwilightCorrupter
 {
@@ -126,7 +126,7 @@ public:
                         _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, rand() % 4000 + 15000);
                         break;
                     case EVENT_CREATURE_OF_NIGHTMARE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
                             DoCast(target, SPELL_CREATURE_OF_NIGHTMARE);
                         _events.ScheduleEvent(EVENT_CREATURE_OF_NIGHTMARE, 45000);
                         break;

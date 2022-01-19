@@ -17,9 +17,9 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "molten_core.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "molten_core.h"
 
 enum Emotes
 {
@@ -95,7 +95,7 @@ public:
                 }
                 case EVENT_IGNITE_MANA:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_IGNITE_MANA))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, -SPELL_IGNITE_MANA))
                     {
                         DoCast(target, SPELL_IGNITE_MANA);
                     }
@@ -105,7 +105,7 @@ public:
                 }
                 case EVENT_LIVING_BOMB:
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         DoCast(target, SPELL_LIVING_BOMB);
                     }
