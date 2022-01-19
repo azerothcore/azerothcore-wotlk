@@ -42,7 +42,7 @@ struct SecretInfo
     int bits;
     ServerProcessTypes owner;
     uint64 _flags;
-    uint16 flags() const { return static_cast<uint16>(_flags >> (16*THIS_SERVER_PROCESS)); }
+    [[nodiscard]] uint16 flags() const { return static_cast<uint16>(_flags >> (16*THIS_SERVER_PROCESS)); }
 };
 
 static constexpr SecretInfo secret_info[NUM_SECRETS] =

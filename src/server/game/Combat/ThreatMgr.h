@@ -139,7 +139,7 @@ class ThreatContainer
 public:
     typedef std::list<HostileReference*> StorageType;
 
-    ThreatContainer() { }
+    ThreatContainer() = default;
 
     ~ThreatContainer() { clearReferences(); }
 

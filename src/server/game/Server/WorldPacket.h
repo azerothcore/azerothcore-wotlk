@@ -27,7 +27,7 @@ class WorldPacket : public ByteBuffer
 {
 public:
     // just container for later use
-    WorldPacket() : ByteBuffer(0), m_opcode(NULL_OPCODE) { }
+    WorldPacket() : ByteBuffer(0) { }
 
     explicit WorldPacket(uint16 opcode, size_t res = 200) :
         ByteBuffer(res), m_opcode(opcode) { }
@@ -79,7 +79,7 @@ public:
     [[nodiscard]] TimePoint GetReceivedTime() const { return m_receivedTime; }
 
 protected:
-    uint16 m_opcode;
+    uint16 m_opcode{NULL_OPCODE};
     TimePoint m_receivedTime; // only set for a specific set of opcodes, for performance reasons.
 };
 
