@@ -133,7 +133,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     if (Unit* tempInvoker = GetLastInvoker())
         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: Invoker: %s (%s)", tempInvoker->GetName().c_str(), tempInvoker->GetGUID().ToString().c_str());
 
-    bool isControlled = e.action.MoveToPos.controlled > 0;
+    bool isControlled = e.action.moveToPos.controlled > 0;
 
     switch (e.GetActionType())
     {
@@ -301,7 +301,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         Map::PlayerList const& players = me->GetMap()->GetPlayers();
                         targets = new ObjectList();
 
-                        if (!players.isEmpty())
+                        if (!players.IsEmpty())
                         {
                             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                                 if (Player* player = i->GetSource())
@@ -350,7 +350,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         Map::PlayerList const& players = me->GetMap()->GetPlayers();
                         targets = new ObjectList();
 
-                        if (!players.isEmpty())
+                        if (!players.IsEmpty())
                         {
                             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                                 if (Player* player = i->GetSource())
@@ -1475,6 +1475,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 delete targets;
                 break;
             }
+        case SMART_ACTION_ATTACK_STOP:
+            {
+                ObjectList* targets = GetTargets(e, unit);
+                if (!targets)
+                {
+                    break;
+                }
+
+                for (auto const& target : *targets)
+                {
+                    if (Unit* unitTarget = target->ToUnit())
+                    {
+                        unitTarget->AttackStop();
+                    }
+                }
+                break;
+            }
         case SMART_ACTION_SUMMON_CREATURE:
             {
                 ObjectList* targets = GetTargets(e, unit);
@@ -1705,24 +1722,24 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (IsCreature(*itr))
                         {
                             if (SmartAI* ai = CAST_AI(SmartAI, (*itr)->ToCreature()->AI()))
-                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
+                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
                             else
                                 LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartAI, skipping");
                         }
                         else if (IsGameObject(*itr))
                         {
                             if (SmartGameObjectAI* ai = CAST_AI(SmartGameObjectAI, (*itr)->ToGameObject()->AI()))
-                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
+                                ai->GetScript()->StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
                             else
                                 LOG_ERROR("scripts.ai.sai", "SmartScript: Action target for SMART_ACTION_SET_COUNTER is not using SmartGameObjectAI, skipping");
                         }
                     }
-
                     delete targets;
                 }
                 else
-                    StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset);
-
+                {
+                    StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
+                }
                 break;
             }
         case SMART_ACTION_WP_START:
@@ -1863,7 +1880,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
                         Position randomPoint = me->GetRandomPoint(srcPos, range);
                         me->GetMotionMaster()->MovePoint(
-                            e.action.MoveToPos.pointId,
+                            e.action.moveToPos.pointId,
                             randomPoint.m_positionX,
                             randomPoint.m_positionY,
                             randomPoint.m_positionZ,
@@ -1895,20 +1912,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!target)
                 {
                     G3D::Vector3 dest(e.target.x, e.target.y, e.target.z);
-                    if (e.action.MoveToPos.transport)
+                    if (e.action.moveToPos.transport)
                         if (TransportBase* trans = me->GetDirectTransport())
                             trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
 
-                    me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true,
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, true,
                         isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
                 }
                 else // Xinef: we can use dest.x, dest.y, dest.z to make offset
                 {
                     float x, y, z;
                     target->GetPosition(x, y, z);
-                    if (e.action.MoveToPos.ContactDistance > 0)
-                        target->GetContactPoint(me, x, y, z, e.action.MoveToPos.ContactDistance);
-                    me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    if (e.action.moveToPos.ContactDistance > 0)
+                        target->GetContactPoint(me, x, y, z, e.action.moveToPos.ContactDistance);
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
                 }
                 break;
             }
@@ -1923,7 +1940,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsCreature(*itr))
                     {
                         Creature* target = (*itr)->ToCreature();
-                        target->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, e.target.x, e.target.y, e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                        target->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, e.target.x, e.target.y, e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
                     }
                 }
 
@@ -3792,29 +3809,39 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 break;
             }
         case SMART_TARGET_OWNER_OR_SUMMONER:
+            /*
+             * Owners/Summoners should be WorldObjects. This allows to have other objects
+             * such as gameobjects to execute SmartScripts using this type of target.
+             * Otherwise, only Units like creatures can summon other creatures.
+             */
             {
                 if (me)
                 {
-                    if (Unit* owner = ObjectAccessor::GetUnit(*me, me->GetCharmerOrOwnerGUID()))
+                    if (WorldObject* owner = ObjectAccessor::GetWorldObject(*me, me->GetCharmerOrOwnerGUID()))
+                    {
                         l->push_back(owner);
-                    // Xinef: dont add same unit twice
-                    else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit())
-                        l->push_back(me->ToTempSummon()->GetSummonerUnit());
+                    }
                 }
                 else if (go)
                 {
-                    if (Unit* owner = ObjectAccessor::GetUnit(*go, go->GetOwnerGUID()))
+                    if (WorldObject* owner = ObjectAccessor::GetWorldObject(*go, go->GetOwnerGUID()))
+                    {
                         l->push_back(owner);
+                    }
                 }
 
                 // xinef: Get owner of owner
                 if (e.target.owner.useCharmerOrOwner && !l->empty())
                 {
-                    Unit* owner = l->front()->ToUnit();
-                    l->clear();
+                    if (Unit* owner = l->front()->ToUnit())
+                    {
+                        l->clear();
 
-                    if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->GetCharmerOrOwnerGUID()))
-                        l->push_back(base);
+                        if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->GetCharmerOrOwnerGUID()))
+                        {
+                            l->push_back(base);
+                        }
+                    }
                 }
                 break;
             }
@@ -4121,7 +4148,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 uint32 count = me->GetVictim()->GetAuraCount(e.event.aura.spell);
                 if (count < e.event.aura.count)
                     return;
-                ProcessTimedAction(e, e.event.aura.repeatMin, e.event.aura.repeatMax);
+                ProcessTimedAction(e, e.event.aura.repeatMin, e.event.aura.repeatMax, me->GetVictim());
                 break;
             }
         //no params
