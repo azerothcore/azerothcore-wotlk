@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Tokenize.h"
-#include "StringConvert.h"
 #include "Player.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 
 /*********************************************************/
 /***              PLAYER SETTINGS SYSTEM               ***/
