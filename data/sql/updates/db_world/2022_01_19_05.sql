@@ -1,3 +1,19 @@
+-- DB update 2022_01_19_04 -> 2022_01_19_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_19_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_19_04 2022_01_19_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1639532770750121300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1639532770750121300');
 
 -- Senetil Selarin spawn after completition of quest=995 or quest=994
@@ -158,3 +174,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (14, 3692, 3214, 0, 1, 47, 0, 995, 64, 0, 1, 0, 0, '', 'When player has not finished quest \'Escape Through Stealth\'');
 
 UPDATE `creature_template` SET `npcflag`= 2 WHERE `entry`= 3694;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_19_05' WHERE sql_rev = '1639532770750121300';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
