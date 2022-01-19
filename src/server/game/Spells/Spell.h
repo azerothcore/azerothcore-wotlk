@@ -578,8 +578,8 @@ public:
 
     void CleanupTargetList();
 
-    void              SetSpellValue(SpellValueMod mod, int32 value);
-    void              ModifySpellValue(SpellValueMod mod, int32 value);
+    void SetSpellValue(SpellValueMod mod, int32 value);
+    void ModifySpellValue(SpellValueMod mod, int32 value);
     SpellValue const* GetSpellValue() { return m_spellValue; }
 
     // xinef: moved to public
@@ -719,9 +719,9 @@ public:
     // Scripting system
     bool _scriptsLoaded;
     //void LoadScripts();
-    void                    CallScriptBeforeCastTimeHandlers();
-    void                    CallScriptBeforeCastHandlers();
-    void                    CallScriptWhileCastHandlers();
+    void CallScriptBeforeCastTimeHandlers();
+    void CallScriptBeforeCastHandlers();
+    void CallScriptWhileCastHandlers();
     void CallScriptOnCastHandlers();
     void CallScriptAfterCastHandlers();
     SpellCastResult CallScriptCheckCastHandlers();
