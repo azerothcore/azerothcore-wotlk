@@ -225,6 +225,8 @@ public:
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
 
+    virtual void OnAfterUnloadAllMaps() { }
+
     /**
      * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
      *
@@ -2025,6 +2027,7 @@ public: /* WorldScript */
     void OnStartup();
     void OnShutdown();
     void OnBeforeWorldInitialized();
+    void OnAfterUnloadAllMaps();
 
 public: /* FormulaScript */
     void OnHonorCalculation(float& honor, uint8 level, float multiplier);
