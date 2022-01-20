@@ -16,11 +16,11 @@
  */
 
 #include "ScriptMgr.h"
+#include "InstanceScript.h"
+#include "ScriptSystem.h"
+#include "SmartAI.h"
 #include "SpellMgr.h"
 #include "UnitAI.h"
-#include "SmartAI.h"
-#include "ScriptSystem.h"
-#include "InstanceScript.h"
 
 namespace
 {
