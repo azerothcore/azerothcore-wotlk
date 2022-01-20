@@ -62,22 +62,22 @@ class AC_GAME_API CharacterCache
         void DecreaseCharacterMailCount(ObjectGuid const& guid) { UpdateCharacterMailCount(guid, -1); };
         void IncreaseCharacterMailCount(ObjectGuid const& guid) { UpdateCharacterMailCount(guid, 1); };
 
-        bool HasCharacterCacheEntry(ObjectGuid const& guid) const;
-        CharacterCacheEntry const* GetCharacterCacheByGuid(ObjectGuid const& guid) const;
-        CharacterCacheEntry const* GetCharacterCacheByName(std::string const& name) const;
+        [[nodiscard]] bool HasCharacterCacheEntry(ObjectGuid const& guid) const;
+        [[nodiscard]] CharacterCacheEntry const* GetCharacterCacheByGuid(ObjectGuid const& guid) const;
+        [[nodiscard]] CharacterCacheEntry const* GetCharacterCacheByName(std::string const& name) const;
 
         void UpdateCharacterGroup(ObjectGuid const& guid, ObjectGuid groupGUID);
         void ClearCharacterGroup(ObjectGuid const& guid) { UpdateCharacterGroup(guid, ObjectGuid::Empty); };
 
-        ObjectGuid GetCharacterGuidByName(std::string const& name) const;
+        [[nodiscard]] ObjectGuid GetCharacterGuidByName(std::string const& name) const;
         bool GetCharacterNameByGuid(ObjectGuid guid, std::string& name) const;
-        uint32 GetCharacterTeamByGuid(ObjectGuid guid) const;
-        uint32 GetCharacterAccountIdByGuid(ObjectGuid guid) const;
-        uint32 GetCharacterAccountIdByName(std::string const& name) const;
-        uint8 GetCharacterLevelByGuid(ObjectGuid guid) const;
-        ObjectGuid::LowType GetCharacterGuildIdByGuid(ObjectGuid guid) const;
-        uint32 GetCharacterArenaTeamIdByGuid(ObjectGuid guid, uint8 type) const;
-        ObjectGuid GetCharacterGroupGuidByGuid(ObjectGuid guid) const;
+        [[nodiscard]] uint32 GetCharacterTeamByGuid(ObjectGuid guid) const;
+        [[nodiscard]] uint32 GetCharacterAccountIdByGuid(ObjectGuid guid) const;
+        [[nodiscard]] uint32 GetCharacterAccountIdByName(std::string const& name) const;
+        [[nodiscard]] uint8 GetCharacterLevelByGuid(ObjectGuid guid) const;
+        [[nodiscard]] ObjectGuid::LowType GetCharacterGuildIdByGuid(ObjectGuid guid) const;
+        [[nodiscard]] uint32 GetCharacterArenaTeamIdByGuid(ObjectGuid guid, uint8 type) const;
+        [[nodiscard]] ObjectGuid GetCharacterGroupGuidByGuid(ObjectGuid guid) const;
 };
 
 #define sCharacterCache CharacterCache::instance()
