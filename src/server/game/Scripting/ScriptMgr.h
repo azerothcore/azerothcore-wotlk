@@ -225,6 +225,9 @@ public:
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
 
+    /**
+     * @brief Called after all maps are unloaded from core
+     */
     virtual void OnAfterUnloadAllMaps() { }
 
     /**
