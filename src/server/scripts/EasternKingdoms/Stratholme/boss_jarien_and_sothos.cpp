@@ -110,6 +110,7 @@ struct boss_jarien : public BossAI
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
 
+        me->SetReactState(REACT_PASSIVE);
         _talked = false;
         _phase = PHASE_TALK;
     }
@@ -131,7 +132,6 @@ struct boss_jarien : public BossAI
 
     void IsSummonedBy(Unit* /*summoner*/) override
     {
-        me->SetReactState(REACT_PASSIVE);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         Talk(SAY_JARIEN_ON_SUMMON_0);
 
@@ -171,7 +171,10 @@ struct boss_jarien : public BossAI
         {
             me->SetFullHealth();
             DoCastSelf(SPELL_VENGEANCE);
-            Talk(EMOTE_JARIEN_VENGEANCE);
+            if (Creature* sothos = me->FindNearestCreature(NPC_SOTHOS, 200.f, false))
+            {
+                Talk(EMOTE_JARIEN_VENGEANCE, sothos);
+            }
             _sothosDied = true;
         }
     }
@@ -230,6 +233,7 @@ struct boss_sothos : public BossAI
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
 
+        me->SetReactState(REACT_PASSIVE);
         _talked = false;
         _phase = PHASE_TALK;
     }
@@ -251,7 +255,6 @@ struct boss_sothos : public BossAI
 
     void IsSummonedBy(Unit* /*summoner*/) override
     {
-        me->SetReactState(REACT_PASSIVE);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
         _scheduler.Schedule(12s, [this](TaskContext /*context*/)
@@ -293,7 +296,10 @@ struct boss_sothos : public BossAI
         {
             me->SetFullHealth();
             DoCastSelf(SPELL_VENGEANCE);
-            Talk(EMOTE_SOTHOS_VENGEANCE);
+            if (Creature* jarien = me->FindNearestCreature(NPC_JARIEN, 200.f, false))
+            {
+                Talk(EMOTE_SOTHOS_VENGEANCE, jarien);
+            }
             _jarienDied = true;
         }
     }
