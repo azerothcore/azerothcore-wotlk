@@ -712,12 +712,11 @@ void PathGenerator::UpdateFilter()
 
 NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
-    LiquidData data;
     LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
     if (liquidData.Status == LIQUID_MAP_NO_WATER)
         return NAV_GROUND;
 
-    switch (data.Flags)
+    switch (liquidData.Flags)
     {
         case MAP_LIQUID_TYPE_WATER:
         case MAP_LIQUID_TYPE_OCEAN:
