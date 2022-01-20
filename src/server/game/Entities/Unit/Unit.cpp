@@ -17485,7 +17485,7 @@ void Unit::SetStunned(bool apply)
             SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        SetRooted(true);
+        SetRooted(true, true);
 
         CastStop();
     }
@@ -17511,12 +17511,12 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            SetRooted(false);
+            SetRooted(false, true);
         }
     }
 }
 
-void Unit::SetRooted(bool apply)
+void Unit::SetRooted(bool apply, bool isStun)
 {
     if (apply)
     {
@@ -17540,7 +17540,14 @@ void Unit::SetRooted(bool apply)
          // Creature specific
         if (GetTypeId() != TYPEID_PLAYER)
         {
-            StopMoving();
+            if (isStun && movespline->Finalized())
+            {
+                StopMovingOnCurrentPos();
+            }
+            else
+            {
+                StopMoving();
+            }
         }
 
         if (m_movedByPlayer)
