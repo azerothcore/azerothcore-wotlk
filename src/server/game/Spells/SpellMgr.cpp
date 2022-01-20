@@ -7541,6 +7541,17 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
 
+     // Chaos Bolt Passive
+    ApplySpellFix({ 58284 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->EffectApplyAuraName[EFFECT_1] = SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST;
+        spellInfo->EffectBasePoints[EFFECT_1] = 100;
+        spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_CASTER;
+        spellInfo->EffectMiscValue[EFFECT_1] = 127;
+        spellInfo->EffectSpellClassMask[EFFECT_1][1] = 0x00020000;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);

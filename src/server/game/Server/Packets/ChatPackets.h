@@ -18,8 +18,8 @@
 #ifndef ChatPackets_h__
 #define ChatPackets_h__
 
-#include "Packet.h"
 #include "ObjectGuid.h"
+#include "Packet.h"
 
 namespace WorldPackets
 {
