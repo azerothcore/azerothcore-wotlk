@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaSpectator.h"
@@ -31,11 +32,11 @@
 #include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
-#include "Config.h"
+#include "CombatLogPackets.h"
 #include "Common.h"
 #include "ConditionMgr.h"
+#include "Config.h"
 #include "CreatureAI.h"
-#include "CombatLogPackets.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "Formulas.h"
@@ -50,8 +51,8 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapMgr.h"
@@ -62,11 +63,10 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "PetitionMgr.h"
-#include "Player.h"
-#include "QuestDef.h"
 #include "QueryHolder.h"
-#include "ReputationMgr.h"
+#include "QuestDef.h"
 #include "Realm.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
@@ -15172,11 +15172,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
         lastEventId = fields[0].GetUInt32();
     }
 
-    time_t curtime = time(nullptr);
-    tm localTime;
-    localtime_r(&curtime, &localTime);
-
-    uint16 month = uint16(localTime.tm_mon);
+    uint16 month = static_cast<uint16>(Acore::Time::GetMonth());
     uint16 eventId = month;
     if (eventId < 9)
         eventId += 3;
