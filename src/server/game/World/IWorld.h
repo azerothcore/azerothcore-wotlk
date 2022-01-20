@@ -23,7 +23,7 @@
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
-#include "Timer.h"
+#include "Duration.h"
 #include <atomic>
 #include <list>
 #include <map>
@@ -526,9 +526,9 @@ public:
     [[nodiscard]] virtual std::string const& GetNewCharString() const = 0;
     [[nodiscard]] virtual LocaleConstant GetDefaultDbcLocale() const = 0;
     [[nodiscard]] virtual std::string const& GetDataPath() const = 0;
-    [[nodiscard]] virtual time_t GetNextDailyQuestsResetTime() const = 0;
-    [[nodiscard]] virtual time_t GetNextWeeklyQuestsResetTime() const = 0;
-    [[nodiscard]] virtual time_t GetNextRandomBGResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextDailyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextWeeklyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextRandomBGResetTime() const = 0;
     [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;

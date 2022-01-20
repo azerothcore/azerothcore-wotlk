@@ -158,7 +158,7 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
         auto itr = _gameEventSeasonalQuestsMap.find(event_id);
         if (itr != _gameEventSeasonalQuestsMap.end() && !itr->second.empty())
         {
-            sWorld->setWorldState(event_id, sWorld->GetGameTime());
+            sWorld->setWorldState(event_id, GameTime::GetGameTime().count());
         }
 
         return false;
@@ -1891,7 +1891,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
 
 uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
 {
-    auto const events = sGameEventMgr->GetEventMap();
+    auto const& events = sGameEventMgr->GetEventMap();
 
     for (auto const& eventEntry : events)
     {

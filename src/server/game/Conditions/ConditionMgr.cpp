@@ -335,7 +335,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_WORLD_STATE:
     {
-        condMeets = ConditionValue2 == sWorld->getWorldState(ConditionValue1).count();
+        condMeets = ConditionValue2 == sWorld->getWorldState(ConditionValue1);
         break;
     }
     case CONDITION_PHASEMASK:
@@ -2147,7 +2147,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         break;
     case CONDITION_WORLD_STATE:
     {
-        if (sWorld->getWorldState(cond->ConditionValue1) == 0s)
+        if (!sWorld->getWorldState(cond->ConditionValue1))
         {
             LOG_ERROR("sql.sql", "World state condition has non existing world state in value1 (%u), skipped", cond->ConditionValue1);
             return false;

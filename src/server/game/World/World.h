@@ -228,9 +228,9 @@ public:
 
 
     /// Next daily quests and random bg reset time
-    [[nodiscard]] time_t GetNextDailyQuestsResetTime() const override { return m_NextDailyQuestReset; }
-    [[nodiscard]] time_t GetNextWeeklyQuestsResetTime() const override { return m_NextWeeklyQuestReset; }
-    [[nodiscard]] time_t GetNextRandomBGResetTime() const override { return m_NextRandomBGReset; }
+    [[nodiscard]] Seconds GetNextDailyQuestsResetTime() const override { return m_NextDailyQuestReset; }
+    [[nodiscard]] Seconds GetNextWeeklyQuestsResetTime() const override { return m_NextWeeklyQuestReset; }
+    [[nodiscard]] Seconds GetNextRandomBGResetTime() const override { return m_NextRandomBGReset; }
 
     /// Get the maximum skill level a player can reach
     [[nodiscard]] uint16 GetConfigMaxSkillValue() const override
@@ -404,7 +404,7 @@ private:
     uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
     bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
     float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
-    typedef std::map<uint32, Seconds> WorldStatesMap;
+    typedef std::map<uint32, uint64> WorldStatesMap;
     WorldStatesMap m_worldstates;
     uint32 m_playerLimit;
     AccountTypes m_allowedSecurityLevel;

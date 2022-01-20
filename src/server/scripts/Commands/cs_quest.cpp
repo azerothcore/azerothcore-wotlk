@@ -27,6 +27,7 @@ EndScriptData */
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "GameTime.h"
 
 using namespace Acore::ChatCommands;
 
@@ -370,7 +371,7 @@ public:
                 // fill mail
                 MailDraft draft(quest->GetTitle(), std::string());
 
-                for (auto itr : questItems)
+                for (auto const& itr : questItems)
                 {
                     if (Item* item = Item::CreateItem(itr.first, itr.second))
                     {
@@ -606,7 +607,7 @@ public:
                 // fill mail
                 MailDraft draft(quest->GetTitle(), "This quest has been manually rewarded to you. This mail contains your quest rewards.");
 
-                for (auto itr : questRewardItems)
+                for (auto const& itr : questRewardItems)
                 {
                     if (!itr.first || !itr.second)
                     {

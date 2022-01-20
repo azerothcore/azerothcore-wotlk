@@ -22,6 +22,7 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "WorldSession.h"
+#include "GameTime.h"
 
 enum IronhandData
 {

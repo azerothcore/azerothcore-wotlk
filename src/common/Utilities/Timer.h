@@ -107,31 +107,12 @@ inline uint32 getMSTime()
     return uint32(duration_cast<milliseconds>(steady_clock::now() - GetApplicationStartTime()).count());
 }
 
-inline Milliseconds GetTimeMS()
-{
-    using namespace std::chrono;
-
-    return duration_cast<milliseconds>(steady_clock::now() - GetApplicationStartTime());
-}
-
 inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
 {
     // getMSTime() have limited data range and this is case when it overflow in this tick
     if (oldMSTime > newMSTime)
     {
         return (0xFFFFFFFF - oldMSTime) + newMSTime;
-    }
-    else
-    {
-        return newMSTime - oldMSTime;
-    }
-}
-
-inline Milliseconds GetMSTimeDiff(Milliseconds oldMSTime, Milliseconds newMSTime)
-{
-    if (oldMSTime > newMSTime)
-    {
-        return oldMSTime - newMSTime;
     }
     else
     {
