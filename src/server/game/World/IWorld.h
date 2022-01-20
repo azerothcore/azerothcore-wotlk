@@ -20,10 +20,10 @@
 
 #include "AsyncCallbackProcessor.h"
 #include "Common.h"
+#include "Duration.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
-#include "Duration.h"
 #include <atomic>
 #include <list>
 #include <map>
