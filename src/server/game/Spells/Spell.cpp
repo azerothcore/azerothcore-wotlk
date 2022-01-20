@@ -7931,10 +7931,10 @@ void Spell::SetSpellValue(SpellValueMod mod, int32 value)
             m_spellValue->EffectBasePoints[2] = m_spellInfo->Effects[EFFECT_2].CalcBaseValue(value);
             break;
         case SPELLVALUE_RADIUS_MOD:
-            m_spellValue->RadiusMod = (float) value / 10000;
+            m_spellValue->RadiusMod = (float)value / 10000;
             break;
         case SPELLVALUE_MAX_TARGETS:
-            m_spellValue->MaxAffectedTargets = (uint32) value;
+            m_spellValue->MaxAffectedTargets = (uint32)value;
             break;
         case SPELLVALUE_AURA_STACK:
             m_spellValue->AuraStackAmount = uint8(value);
@@ -7943,7 +7943,7 @@ void Spell::SetSpellValue(SpellValueMod mod, int32 value)
             m_spellValue->AuraDuration = value;
             break;
         case SPELLVALUE_FORCED_CRIT_RESULT:
-            m_spellValue->ForcedCritResult = (bool) value;
+            m_spellValue->ForcedCritResult = (bool)value;
             break;
     }
 }
@@ -7961,10 +7961,10 @@ void Spell::ModifySpellValue(SpellValueMod mod, int32 value)
             m_spellValue->EffectBasePoints[2] += value;
             break;
         case SPELLVALUE_RADIUS_MOD:
-            m_spellValue->RadiusMod += (float) value / 10000;
+            m_spellValue->RadiusMod += (float)value / 10000;
             break;
         case SPELLVALUE_MAX_TARGETS:
-            m_spellValue->MaxAffectedTargets += (uint32) value;
+            m_spellValue->MaxAffectedTargets += (uint32)value;
             break;
         case SPELLVALUE_AURA_STACK:
             m_spellValue->AuraStackAmount += uint8(value);
@@ -7973,7 +7973,7 @@ void Spell::ModifySpellValue(SpellValueMod mod, int32 value)
             m_spellValue->AuraDuration += value;
             break;
         case SPELLVALUE_FORCED_CRIT_RESULT:
-            m_spellValue->ForcedCritResult += (bool) value;
+            m_spellValue->ForcedCritResult += (bool)value;
             break;
     }
 }
