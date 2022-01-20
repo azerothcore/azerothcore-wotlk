@@ -936,6 +936,7 @@ struct SmartAction
             uint32 entry;
             uint32 despawnTime;
             uint32 targetsummon;
+            uint32 summonType;
         } summonGO;
 
         struct
