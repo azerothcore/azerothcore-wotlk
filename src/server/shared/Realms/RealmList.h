@@ -52,10 +52,10 @@ public:
     void Initialize(Acore::Asio::IoContext& ioContext, uint32 updateInterval);
     void Close();
 
-    RealmMap const& GetRealms() const { return _realms; }
-    Realm const* GetRealm(RealmHandle const& id) const;
+    [[nodiscard]] RealmMap const& GetRealms() const { return _realms; }
+    [[nodiscard]] Realm const* GetRealm(RealmHandle const& id) const;
 
-    RealmBuildInfo const* GetBuildInfo(uint32 build) const;
+    [[nodiscard]] RealmBuildInfo const* GetBuildInfo(uint32 build) const;
 
 private:
     RealmList();
@@ -69,7 +69,7 @@ private:
 
     std::vector<RealmBuildInfo> _builds;
     RealmMap _realms;
-    uint32 _updateInterval;
+    uint32 _updateInterval{0};
     std::unique_ptr<Acore::Asio::DeadlineTimer> _updateTimer;
     std::unique_ptr<Acore::Asio::Resolver> _resolver;
 };
