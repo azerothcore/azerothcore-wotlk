@@ -128,7 +128,7 @@ public:
     //- Constructors for sync and async connections
     LoginDatabaseConnection(MySQLConnectionInfo& connInfo);
     LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
-    ~LoginDatabaseConnection();
+    ~LoginDatabaseConnection() override;
 
     //- Loads database type specific prepared statements
     void DoPrepareStatements() override;
