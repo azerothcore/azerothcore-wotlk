@@ -22,11 +22,6 @@ namespace GameTime
 {
     using namespace std::chrono;
 
-    inline Seconds GetEpochTime()
-    {
-        return duration_cast<Seconds>(system_clock::now().time_since_epoch());
-    }
-
     Seconds const StartTime = GetEpochTime();
 
     Seconds GameTime = GetEpochTime();
@@ -69,7 +64,7 @@ namespace GameTime
     {
         GameTime = GetEpochTime();
         GameMSTime = GetTimeMS();
-        GameTimeSystemPoint = std::chrono::system_clock::now();
-        GameTimeSteadyPoint = std::chrono::steady_clock::now();
+        GameTimeSystemPoint = system_clock::now();
+        GameTimeSteadyPoint = steady_clock::now();
     }
 }

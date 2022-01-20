@@ -226,7 +226,6 @@ public:
     /// Get the path where data (dbc, maps) are stored on disk
     [[nodiscard]] std::string const& GetDataPath() const override { return m_dataPath; }
 
-
     /// Next daily quests and random bg reset time
     [[nodiscard]] Seconds GetNextDailyQuestsResetTime() const override { return m_NextDailyQuestReset; }
     [[nodiscard]] Seconds GetNextWeeklyQuestsResetTime() const override { return m_NextWeeklyQuestReset; }

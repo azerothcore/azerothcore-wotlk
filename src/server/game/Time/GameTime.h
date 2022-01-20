@@ -26,7 +26,7 @@ namespace GameTime
     // Server start time
     AC_GAME_API Seconds GetStartTime();
 
-    // Current server time (unix) in seconds
+    // Current server time (unix)
     AC_GAME_API Seconds GetGameTime();
 
     // Milliseconds since server start
@@ -38,9 +38,10 @@ namespace GameTime
     /// Current chrono steady_clock time point
     AC_GAME_API TimePoint Now();
 
-    /// Uptime (in secs)
+    /// Uptime
     AC_GAME_API Seconds GetUptime();
 
+    /// Update all timers
     void UpdateGameTimers();
 }
 
