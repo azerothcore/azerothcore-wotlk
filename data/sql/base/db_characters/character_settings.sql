@@ -12,19 +12,19 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица acore_characters.character_queststatus_weekly
-DROP TABLE IF EXISTS `character_queststatus_weekly`;
-CREATE TABLE IF NOT EXISTS `character_queststatus_weekly` (
-  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `quest` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
-  PRIMARY KEY (`guid`,`quest`),
-  KEY `idx_guid` (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
+-- Дамп структуры для таблица acore_characters.character_settings
+DROP TABLE IF EXISTS `character_settings`;
+CREATE TABLE IF NOT EXISTS `character_settings` (
+  `guid` INT unsigned NOT NULL,
+  `source` varchar(40) NOT NULL,
+  `data` text DEFAULT NULL,
+  PRIMARY KEY (`guid`,`source`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Player Settings';
 
--- Дамп данных таблицы acore_characters.character_queststatus_weekly: ~0 rows (приблизительно)
-DELETE FROM `character_queststatus_weekly`;
-/*!40000 ALTER TABLE `character_queststatus_weekly` DISABLE KEYS */;
-/*!40000 ALTER TABLE `character_queststatus_weekly` ENABLE KEYS */;
+-- Дамп данных таблицы acore_characters.character_settings: 0 rows
+DELETE FROM `character_settings`;
+/*!40000 ALTER TABLE `character_settings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_settings` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;

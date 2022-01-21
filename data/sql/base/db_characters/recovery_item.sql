@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.recovery_item
+-- Дамп структуры для таблица acore_characters.recovery_item
 DROP TABLE IF EXISTS `recovery_item`;
 CREATE TABLE IF NOT EXISTS `recovery_item` (
   `Id` INT unsigned NOT NULL AUTO_INCREMENT,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `recovery_item` (
   KEY `idx_guid` (`Guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Дамп данных таблицы _acore_characters.recovery_item: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.recovery_item: ~0 rows (приблизительно)
 DELETE FROM `recovery_item`;
 /*!40000 ALTER TABLE `recovery_item` DISABLE KEYS */;
 /*!40000 ALTER TABLE `recovery_item` ENABLE KEYS */;

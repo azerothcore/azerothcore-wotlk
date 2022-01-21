@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_queststatus_seasonal
+-- Дамп структуры для таблица acore_characters.character_queststatus_seasonal
 DROP TABLE IF EXISTS `character_queststatus_seasonal`;
 CREATE TABLE IF NOT EXISTS `character_queststatus_seasonal` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `character_queststatus_seasonal` (
   KEY `idx_guid` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.character_queststatus_seasonal: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_queststatus_seasonal: ~0 rows (приблизительно)
 DELETE FROM `character_queststatus_seasonal`;
 /*!40000 ALTER TABLE `character_queststatus_seasonal` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_queststatus_seasonal` ENABLE KEYS */;
