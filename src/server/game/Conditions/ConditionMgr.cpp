@@ -2284,7 +2284,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         if (!valid)
         {
-            LOG_ERROR("sql.sql", "%s has non-existing stand state (%u,%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue1, cond->ConditionValue2);
+            LOG_ERROR("sql.sql", "CONDITION_STAND_STATE has non-existing stand state (%u,%u), skipped.", cond->ConditionValue1, cond->ConditionValue2);
             return false;
         }
         break;
