@@ -87,7 +87,8 @@ enum ConditionTypes
     CONDITION_AC_START                 = 100,
     CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,                // quest_id         0              0                  true if satisfied exclusive group
     CONDITION_HAS_AURA_TYPE            = 102,                // aura_type        0              0                  true if has aura type
-    CONDITION_AC_END                   = 103                 // placeholder
+    CONDITION_AC_END                   = 103,                 // placeholder
+    CONDITION_MAX
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
@@ -231,6 +232,8 @@ struct Condition
     uint32 GetSearcherTypeMaskForCondition();
     [[nodiscard]] bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
     uint32 GetMaxAvailableConditionTargets();
+
+    std::string ToString(bool ext = false) const; /// For logging purpose
 };
 
 typedef std::list<Condition*> ConditionList;
@@ -259,13 +262,23 @@ public:
     bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
     bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
     bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
-    [[nodiscard]] bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
-    [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
+    [[nodiscard]] static bool CanHaveSourceGroupSet(ConditionSourceType sourceType);
+    [[nodiscard]] static bool CanHaveSourceIdSet(ConditionSourceType sourceType);
     ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
     ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+
+    struct ConditionTypeInfo
+    {
+        char const* Name;
+        bool HasConditionValue1;
+        bool HasConditionValue2;
+        bool HasConditionValue3;
+    };
+    static char const* StaticSourceTypeData[CONDITION_SOURCE_TYPE_MAX];
+    static ConditionTypeInfo const StaticConditionTypeData[CONDITION_MAX];
 
 private:
     bool isSourceTypeValid(Condition* cond);
@@ -274,6 +287,7 @@ private:
     bool addToGossipMenuItems(Condition* cond);
     bool addToSpellImplicitTargetConditions(Condition* cond);
     bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    static void LogUselessConditionValue(Condition* cond, uint8 index, uint32 value);
 
     void Clean(); // free up resources
     std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
