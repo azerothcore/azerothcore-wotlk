@@ -7947,6 +7947,7 @@ void Spell::SetSpellValue(SpellValueMod mod, int32 value)
             break;
     }
 }
+
 void Spell::ModifySpellValue(SpellValueMod mod, int32 value)
 {
     switch (mod)
