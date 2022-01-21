@@ -31,7 +31,6 @@
 #include <string>
 #include <utf8.h>
 
-
 void stripLineInvisibleChars(std::string& str)
 {
     static std::string const invChars = " \t\7\n";

@@ -40,7 +40,6 @@ template<typename T, class S> struct Finder
     bool operator()(const std::pair<int, S>& obj) { return obj.second.*idMember_ == val_; }
 };
 
-
 void stripLineInvisibleChars(std::string& src);
 
 AC_COMMON_API Optional<int32> MoneyStringToMoney(std::string_view moneyString);
