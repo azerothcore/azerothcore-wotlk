@@ -153,9 +153,9 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         i_path->Clear();
 
     float x, y, z;
-    bool shortenPath;
+    /*bool shortenPath;
     // if we want to move toward the target and there's no fixed angle...
-    /*if (moveToward && !angle)
+    if (moveToward && !angle)
     {
         // ...we'll pathfind to the center, then shorten the path
         target->GetPosition(x, y, z);
@@ -170,19 +170,17 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     
     if (moveToward && !angle)
     {
-        shortenPath = true;
         target->GetRandomContactPoint(owner, x, y, z);
     }
     else
     {
-        shortenPath = false;
         bool isPlayerPet = owner->IsPet() && IS_PLAYER_GUID(owner->GetOwnerGUID());
         bool isBoss = owner->GetTypeId() == TYPEID_UNIT && (owner->ToCreature()->isWorldBoss() || owner->ToCreature()->IsDungeonBoss());
         target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - hitboxSum, 0.0f, !isPlayerPet && !isBoss && angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
     }
 
-    if (owner->IsHovering())
-        owner->UpdateAllowedPositionZ(x, y, z);
+    /*if (owner->IsHovering())
+        owner->UpdateAllowedPositionZ(x, y, z);*/
 
     i_recalculateTravel = true;
 
@@ -194,8 +192,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         return true;
     }
 
-    if (shortenPath)
-        i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);*
+    /*if (shortenPath)
+        i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);*/
 
     if (cOwner)
         cOwner->SetCannotReachTarget(false);
