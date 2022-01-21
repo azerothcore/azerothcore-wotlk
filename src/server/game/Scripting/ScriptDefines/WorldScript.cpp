@@ -116,7 +116,7 @@ void ScriptMgr::OnBeforeWorldInitialized()
 
 void ScriptMgr::OnAfterUnloadAllMaps()
 {
-    ExecuteScript<WorldScript>([&](WorldScript* script)
+    ExecuteScript<WorldScript>([](WorldScript* script)
     {
         script->OnAfterUnloadAllMaps();
     });
