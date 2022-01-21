@@ -972,7 +972,7 @@ private:
     GlobalCooldownList m_GlobalCooldowns;
 };
 
-enum ActiveStates
+enum ActiveStates : uint8
 {
     ACT_PASSIVE  = 0x01,                                    // 0x01 - passive
     ACT_DISABLED = 0x81,                                    // 0x80 - castable
@@ -2480,7 +2480,7 @@ protected:
     void SetFeared(bool apply);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
-    void SetRooted(bool apply);
+    void SetRooted(bool apply, bool isStun = false);
 
     uint32 m_rootTimes;
 
