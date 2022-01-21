@@ -40,47 +40,12 @@ template<typename T, class S> struct Finder
     bool operator()(const std::pair<int, S>& obj) { return obj.second.*idMember_ == val_; }
 };
 
-class Tokenizer
-{
-public:
-    typedef std::vector<char const*> StorageType;
-
-    typedef StorageType::size_type size_type;
-
-    typedef StorageType::const_iterator const_iterator;
-    typedef StorageType::reference reference;
-    typedef StorageType::const_reference const_reference;
-
-public:
-    Tokenizer(const std::string& src, char const sep, uint32 vectorReserve = 0);
-    ~Tokenizer() { delete[] m_str; }
-
-    [[nodiscard]] const_iterator begin() const { return m_storage.begin(); }
-    [[nodiscard]] const_iterator end() const { return m_storage.end(); }
-
-    [[nodiscard]] size_type size() const { return m_storage.size(); }
-
-    reference operator [] (size_type i) { return m_storage[i]; }
-    const_reference operator [] (size_type i) const { return m_storage[i]; }
-
-private:
-    char* m_str;
-    StorageType m_storage;
-};
-
-struct tm* localtime_r(time_t const* time, struct tm* result);
-time_t LocalTimeToUTCTime(time_t time);
-time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime = true);
-tm TimeBreakdown(time_t t);
-
 void stripLineInvisibleChars(std::string& src);
 
 AC_COMMON_API Optional<int32> MoneyStringToMoney(std::string_view moneyString);
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
 uint32 TimeStringToSecs(const std::string& timestring);
-std::string TimeToTimestampStr(time_t t);
-std::string TimeToHumanReadable(time_t t);
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
@@ -653,7 +618,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap()  { }
+    EventMap()  = default;
 
     /**
     * @name Reset

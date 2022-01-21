@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
+#include "ScriptMgr.h"
 
 Acore::ChatCommands::ChatCommandTable ScriptMgr::GetChatCommands()
 {

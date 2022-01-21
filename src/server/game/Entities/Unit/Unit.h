@@ -28,6 +28,7 @@
 #include "SpellDefines.h"
 #include "ThreatMgr.h"
 #include <functional>
+#include <utility>
 
 #define WORLD_TRIGGER   12999
 
@@ -909,7 +910,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 
 struct RedirectThreatInfo
 {
-    RedirectThreatInfo()  { }
+    RedirectThreatInfo()  = default;
     ObjectGuid _targetGUID;
     uint32 _threatPct{0};
 
@@ -971,7 +972,7 @@ private:
     GlobalCooldownList m_GlobalCooldowns;
 };
 
-enum ActiveStates
+enum ActiveStates : uint8
 {
     ACT_PASSIVE  = 0x01,                                    // 0x01 - passive
     ACT_DISABLED = 0x81,                                    // 0x80 - castable
@@ -1138,7 +1139,7 @@ private:
 };
 
 struct AttackPosition {
-    AttackPosition(Position pos) : _pos(pos), _taken(false) {}
+    AttackPosition(Position pos) : _pos(std::move(pos)), _taken(false) {}
     bool operator==(const int val)
     {
         return !val;
@@ -1982,7 +1983,7 @@ public:
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     [[nodiscard]] int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
-    virtual bool IsMovementPreventedByCasting() const;
+    [[nodiscard]] virtual bool IsMovementPreventedByCasting() const;
 
     ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
     ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
@@ -2479,7 +2480,7 @@ protected:
     void SetFeared(bool apply);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
-    void SetRooted(bool apply);
+    void SetRooted(bool apply, bool isStun = false);
 
     uint32 m_rootTimes;
 
@@ -2506,7 +2507,7 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
 
-    float processDummyAuras(float TakenTotalMod) const;
+    [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 };
 
 namespace Acore
