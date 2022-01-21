@@ -57,7 +57,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     Creature* cOwner = owner->ToCreature();
 
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || /*HasLostTarget(owner)*/ || (cOwner && cOwner->IsMovementPreventedByCasting()))
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
@@ -72,7 +72,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     bool forceDest =
         //(cOwner && (cOwner->isWorldBoss() || cOwner->IsDungeonBoss())) || // force for all bosses, even not in instances
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
-        (owner->CanFly())
+        (owner->CanFly()) ||
+        (cOwner && cOwner->isSwimming())
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     Unit* target = i_target.getTarget();
@@ -154,7 +155,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     float x, y, z;
     bool shortenPath;
     // if we want to move toward the target and there's no fixed angle...
-    if (moveToward && !angle)
+    /*if (moveToward && !angle)
     {
         // ...we'll pathfind to the center, then shorten the path
         target->GetPosition(x, y, z);
@@ -165,6 +166,19 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         // otherwise, we fall back to nearpoint finding
         target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - hitboxSum, 0, angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
         shortenPath = false;
+    }*/
+    
+    if (moveToward && !angle)
+    {
+        shortenPath = true;
+        target->GetRandomContactPoint(owner, x, y, z);
+    }
+    else
+    {
+        shortenPath = false;
+        bool isPlayerPet = owner->IsPet() && IS_PLAYER_GUID(owner->GetOwnerGUID());
+        bool isBoss = owner->GetTypeId() == TYPEID_UNIT && (owner->ToCreature()->isWorldBoss() || owner->ToCreature()->IsDungeonBoss());
+        target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - hitboxSum, 0.0f, !isPlayerPet && !isBoss && angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
     }
 
     if (owner->IsHovering())
@@ -181,7 +195,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     if (shortenPath)
-        i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);
+        i_path->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), maxTarget);*
 
     if (cOwner)
         cOwner->SetCannotReachTarget(false);
