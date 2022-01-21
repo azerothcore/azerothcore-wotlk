@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.version_db_auth
+-- Дамп структуры для таблица acore_auth.version_db_auth
 DROP TABLE IF EXISTS `version_db_auth`;
 CREATE TABLE IF NOT EXISTS `version_db_auth` (
   `sql_rev` varchar(100) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `version_db_auth` (
   CONSTRAINT `required` FOREIGN KEY (`required_rev`) REFERENCES `version_db_auth` (`sql_rev`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
 
--- Дамп данных таблицы _acore_auth.version_db_auth: ~3 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.version_db_auth: ~9 rows (приблизительно)
 DELETE FROM `version_db_auth`;
 /*!40000 ALTER TABLE `version_db_auth` DISABLE KEYS */;
 INSERT INTO `version_db_auth` (`sql_rev`, `required_rev`, `date`, `2021_10_14_00`) VALUES
