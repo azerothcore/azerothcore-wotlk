@@ -174,7 +174,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
     else
     {
-        bool isPlayerPet = owner->IsPet() && IS_PLAYER_GUID(owner->GetOwnerGUID());
+        bool isPlayerPet = owner->IsPet() && owner->GetOwnerGUID().IsPlayer();
         bool isBoss = owner->GetTypeId() == TYPEID_UNIT && (owner->ToCreature()->isWorldBoss() || owner->ToCreature()->IsDungeonBoss());
         target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - hitboxSum, 0.0f, !isPlayerPet && !isBoss && angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
     }
