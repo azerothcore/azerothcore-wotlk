@@ -101,7 +101,7 @@ public:
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
-    float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
+    [[nodiscard]] float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
     virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
 
     [[nodiscard]] TypeID GetTypeId() const { return m_objectTypeId; }
@@ -202,7 +202,7 @@ protected:
     void _InitValues();
     void _Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh);
     [[nodiscard]] std::string _ConcatFields(uint16 startIndex, uint16 size) const;
-    void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
+    bool _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
     uint32 GetUpdateFieldData(Player const* target, uint32*& flags) const;
 
@@ -375,26 +375,26 @@ struct Position
         return dx*dx + dy*dy;
     }
 
-    float GetExactDist2dSq(Position const& pos) const { return GetExactDist2dSq(pos.m_positionX, pos.m_positionY); }
+    [[nodiscard]] float GetExactDist2dSq(Position const& pos) const { return GetExactDist2dSq(pos.m_positionX, pos.m_positionY); }
     float GetExactDist2dSq(Position const* pos) const { return GetExactDist2dSq(*pos); }
-    float GetExactDist2d(const float x, const float y) const { return std::sqrt(GetExactDist2dSq(x, y)); }
-    float GetExactDist2d(Position const& pos) const { return GetExactDist2d(pos.m_positionX, pos.m_positionY); }
+    [[nodiscard]] float GetExactDist2d(const float x, const float y) const { return std::sqrt(GetExactDist2dSq(x, y)); }
+    [[nodiscard]] float GetExactDist2d(Position const& pos) const { return GetExactDist2d(pos.m_positionX, pos.m_positionY); }
     float GetExactDist2d(Position const* pos) const { return GetExactDist2d(*pos); }
 
-    float GetExactDistSq(float x, float y, float z) const
+    [[nodiscard]] float GetExactDistSq(float x, float y, float z) const
     {
         float dz = z - m_positionZ;
         return GetExactDist2dSq(x, y) + dz*dz;
     }
 
-    float GetExactDistSq(Position const& pos) const { return GetExactDistSq(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    [[nodiscard]] float GetExactDistSq(Position const& pos) const { return GetExactDistSq(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
     float GetExactDistSq(Position const* pos) const { return GetExactDistSq(*pos); }
-    float GetExactDist(float x, float y, float z) const { return std::sqrt(GetExactDistSq(x, y, z)); }
-    float GetExactDist(Position const& pos) const { return GetExactDist(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    [[nodiscard]] float GetExactDist(float x, float y, float z) const { return std::sqrt(GetExactDistSq(x, y, z)); }
+    [[nodiscard]] float GetExactDist(Position const& pos) const { return GetExactDist(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
     float GetExactDist(Position const* pos) const { return GetExactDist(*pos); }
 
     void GetPositionOffsetTo(const Position& endPos, Position& retOffset) const;
-    Position GetPositionWithOffset(Position const& offset) const;
+    [[nodiscard]] Position GetPositionWithOffset(Position const& offset) const;
 
     float GetAngle(const Position* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
@@ -413,7 +413,7 @@ struct Position
         return GetAngle(pos) - m_orientation;
     }
     [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
-    float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
+    [[nodiscard]] float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
 
     void GetSinCos(float x, float y, float& vsin, float& vcos) const;
 
@@ -655,7 +655,7 @@ class MovableMapObject
     template<class T> friend class RandomMovementGenerator;
 
 protected:
-    MovableMapObject()  {}
+    MovableMapObject()  = default;
 
 private:
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
@@ -702,7 +702,7 @@ public:
     void UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ = nullptr) const;
 
     void GetRandomPoint(const Position& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
-    Position GetRandomPoint(const Position& srcPos, float distance) const;
+    [[nodiscard]] Position GetRandomPoint(const Position& srcPos, float distance) const;
 
     [[nodiscard]] uint32 GetInstanceId() const { return m_InstanceId; }
 
@@ -715,9 +715,9 @@ public:
     [[nodiscard]] uint32 GetAreaId() const;
     void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
     [[nodiscard]] bool IsOutdoors() const;
-    LiquidData const& GetLiquidData() const;
+    [[nodiscard]] LiquidData const& GetLiquidData() const;
 
-    InstanceScript* GetInstanceScript() const;
+    [[nodiscard]] InstanceScript* GetInstanceScript() const;
 
     [[nodiscard]] std::string const& GetName() const { return m_name; }
     void SetName(std::string const& newname) { m_name = newname; }

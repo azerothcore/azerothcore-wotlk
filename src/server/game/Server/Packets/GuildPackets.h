@@ -17,12 +17,12 @@
 #ifndef GuildPackets_h__
 #define GuildPackets_h__
 
-#include "Packet.h"
 #include "Guild.h"
 #include "ObjectGuid.h"
+#include "Packet.h"
 #include "PacketUtilities.h"
-#include <boost/container/static_vector.hpp>
 #include <array>
+#include <boost/container/static_vector.hpp>
 
 namespace WorldPackets
 {

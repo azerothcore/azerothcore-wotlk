@@ -57,7 +57,7 @@ public:
     //! Prepares all prepared statements
     bool PrepareStatements();
 
-    inline MySQLConnectionInfo const* GetConnectionInfo() const
+    [[nodiscard]] inline MySQLConnectionInfo const* GetConnectionInfo() const
     {
         return _connectionInfo.get();
     }
@@ -213,7 +213,7 @@ public:
 #endif
     }
 
-    size_t QueueSize() const;
+    [[nodiscard]] size_t QueueSize() const;
 
 private:
     uint32 OpenConnections(InternalIndex type, uint8 numConnections);
@@ -226,7 +226,7 @@ private:
     //! Caller MUST call t->Unlock() after touching the MySQL context to prevent deadlocks.
     T* GetFreeConnection();
 
-    char const* GetDatabaseName() const;
+    [[nodiscard]] char const* GetDatabaseName() const;
 
     //! Queue shared by async worker threads.
     std::unique_ptr<ProducerConsumerQueue<SQLOperation*>> _queue;
