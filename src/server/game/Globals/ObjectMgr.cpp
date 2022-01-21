@@ -48,6 +48,8 @@
 #include "Vehicle.h"
 #include "WaypointMgr.h"
 #include "World.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
@@ -779,25 +781,34 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.emote   = fields[5].GetUInt32();
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
-        Tokenizer tokens(fields[7].GetString(), ' ');
-
-        creatureAddon.auras.reserve(tokens.size());
-        for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
+        for (std::string_view aura : Acore::Tokenize(fields[7].GetStringView(), ' ', false))
         {
-            SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
-            if (!AdditionalSpellInfo)
+            SpellInfo const* spellInfo = nullptr;
+
+            if (Optional<uint32> spellId = Acore::StringTo<uint32>(aura))
             {
-                LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong spell %u defined in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
+                spellInfo = sSpellMgr->GetSpellInfo(*spellId);
+            }
+
+            if (!spellInfo)
+            {
+                FMT_LOG_ERROR("sql.sql", "Creature (Entry: {}) has wrong spell '{}' defined in `auras` field in `creature_template_addon`.", entry, aura);
                 continue;
             }
 
-            if (AdditionalSpellInfo->GetDuration() > 0)
+            if (std::find(creatureAddon.auras.begin(), creatureAddon.auras.end(), spellInfo->Id) != creatureAddon.auras.end())
             {
-                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, uint32(atol(*itr)));
+                FMT_LOG_ERROR("sql.sql", "Creature (Entry: %u) has duplicate aura (spell %u) in `auras` field in `creature_template_addon`.", entry, spellInfo->Id);
+                continue;
+            }
+
+            if (spellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", entry, spellInfo->Id);
                 // continue;
             }
 
-            creatureAddon.auras.push_back(atol(*itr));
+            creatureAddon.auras.push_back(spellInfo->Id);
         }
 
         if (creatureAddon.mount)
@@ -1161,6 +1172,21 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     }
 
     const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
+
+    // Hack for modules
+    switch (cInfo->Entry)
+    {
+        case 190010: // Transmog Module
+          return;
+    }
+    if (cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+    {
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) has assigned gossip menu %u, but npcflag does not include UNIT_NPC_FLAG_GOSSIP (1).", cInfo->Entry, cInfo->GossipMenuId);
+    }
+    else if (!cInfo->GossipMenuId && (cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
+    {
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) has npcflag UNIT_NPC_FLAG_GOSSIP (1), but gossip menu is unassigned.", cInfo->Entry);
+    }
 }
 
 void ObjectMgr::CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement)
@@ -1233,25 +1259,34 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.emote   = fields[5].GetUInt32();
         creatureAddon.visibilityDistanceType = VisibilityDistanceType(fields[6].GetUInt8());
 
-        Tokenizer tokens(fields[7].GetString(), ' ');
-
-        creatureAddon.auras.reserve(tokens.size());
-        for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
+        for (std::string_view aura : Acore::Tokenize(fields[7].GetStringView(), ' ', false))
         {
-            SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
-            if (!AdditionalSpellInfo)
+            SpellInfo const* spellInfo = nullptr;
+
+            if (Optional<uint32> spellId = Acore::StringTo<uint32>(aura))
             {
-                LOG_ERROR("sql.sql", "Creature (GUID: %u) has wrong spell %u defined in `auras` field in `creature_addon`.", guid, uint32(atol(*itr)));
+                spellInfo = sSpellMgr->GetSpellInfo(*spellId);
+            }
+
+            if (!spellInfo)
+            {
+                FMT_LOG_ERROR("sql.sql", "Creature (GUID: {}) has wrong spell '{}' defined in `auras` field in `creature_addon`.", guid, aura);
                 continue;
             }
 
-            if (AdditionalSpellInfo->GetDuration() > 0)
+            if (std::find(creatureAddon.auras.begin(), creatureAddon.auras.end(), spellInfo->Id) != creatureAddon.auras.end())
             {
-                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, uint32(atol(*itr)));
+                FMT_LOG_ERROR("sql.sql", "Creature (GUID: {}) has duplicate aura (spell {}) in `auras` field in `creature_addon`.", guid, spellInfo->Id);
+                continue;
+            }
+
+            if (spellInfo->GetDuration() > 0)
+            {
+                LOG_DEBUG/*ERROR*/("sql.sql", "Creature (Entry: %u) has temporary aura (spell %u) in `auras` field in `creature_template_addon`.", guid, spellInfo->Id);
                 // continue;
             }
 
-            creatureAddon.auras.push_back(atol(*itr));
+            creatureAddon.auras.push_back(spellInfo->Id);
         }
 
         if (creatureAddon.mount)
