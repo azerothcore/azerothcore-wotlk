@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.playercreateinfo_spell_custom
+-- Дамп структуры для таблица acore_world.playercreateinfo_spell_custom
 DROP TABLE IF EXISTS `playercreateinfo_spell_custom`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_spell_custom` (
   `racemask` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_spell_custom` (
   PRIMARY KEY (`racemask`,`classmask`,`Spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.playercreateinfo_spell_custom: 460 rows
+-- Дамп данных таблицы acore_world.playercreateinfo_spell_custom: 460 rows
 DELETE FROM `playercreateinfo_spell_custom`;
 /*!40000 ALTER TABLE `playercreateinfo_spell_custom` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_spell_custom` (`racemask`, `classmask`, `Spell`, `Note`) VALUES

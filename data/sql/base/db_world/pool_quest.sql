@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.pool_quest
+-- Дамп структуры для таблица acore_world.pool_quest
 DROP TABLE IF EXISTS `pool_quest`;
 CREATE TABLE IF NOT EXISTS `pool_quest` (
   `entry` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `pool_quest` (
   KEY `idx_guid` (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.pool_quest: 162 rows
+-- Дамп данных таблицы acore_world.pool_quest: 162 rows
 DELETE FROM `pool_quest`;
 /*!40000 ALTER TABLE `pool_quest` DISABLE KEYS */;
 INSERT INTO `pool_quest` (`entry`, `pool_entry`, `description`) VALUES

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.pickpocketing_loot_template
+-- Дамп структуры для таблица acore_world.pickpocketing_loot_template
 DROP TABLE IF EXISTS `pickpocketing_loot_template`;
 CREATE TABLE IF NOT EXISTS `pickpocketing_loot_template` (
   `Entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `pickpocketing_loot_template` (
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Дамп данных таблицы _acore_world.pickpocketing_loot_template: 10 996 rows
+-- Дамп данных таблицы acore_world.pickpocketing_loot_template: 10 996 rows
 DELETE FROM `pickpocketing_loot_template`;
 /*!40000 ALTER TABLE `pickpocketing_loot_template` DISABLE KEYS */;
 INSERT INTO `pickpocketing_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.achievement_criteria_data
+-- Дамп структуры для таблица acore_world.achievement_criteria_data
 DROP TABLE IF EXISTS `achievement_criteria_data`;
 CREATE TABLE IF NOT EXISTS `achievement_criteria_data` (
   `criteria_id` mediumint(9) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `achievement_criteria_data` (
   PRIMARY KEY (`criteria_id`,`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Achievment system';
 
--- Дамп данных таблицы _acore_world.achievement_criteria_data: 2 767 rows
+-- Дамп данных таблицы acore_world.achievement_criteria_data: 2 767 rows
 DELETE FROM `achievement_criteria_data`;
 /*!40000 ALTER TABLE `achievement_criteria_data` DISABLE KEYS */;
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES

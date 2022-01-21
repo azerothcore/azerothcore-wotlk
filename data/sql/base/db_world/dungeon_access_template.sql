@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.dungeon_access_template
+-- Дамп структуры для таблица acore_world.dungeon_access_template
 DROP TABLE IF EXISTS `dungeon_access_template`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT COMMENT 'The dungeon template ID',
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
   KEY `FK_dungeon_access_template__instance_template` (`map_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Dungeon/raid access template and single requirements';
 
--- Дамп данных таблицы _acore_world.dungeon_access_template: 121 rows
+-- Дамп данных таблицы acore_world.dungeon_access_template: 121 rows
 DELETE FROM `dungeon_access_template`;
 /*!40000 ALTER TABLE `dungeon_access_template` DISABLE KEYS */;
 INSERT INTO `dungeon_access_template` (`id`, `map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES

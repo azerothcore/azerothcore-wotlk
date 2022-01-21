@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_pool
+-- Дамп структуры для таблица acore_world.game_event_pool
 DROP TABLE IF EXISTS `game_event_pool`;
 CREATE TABLE IF NOT EXISTS `game_event_pool` (
   `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `game_event_pool` (
   PRIMARY KEY (`pool_entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_pool: 8 rows
+-- Дамп данных таблицы acore_world.game_event_pool: 8 rows
 DELETE FROM `game_event_pool`;
 /*!40000 ALTER TABLE `game_event_pool` DISABLE KEYS */;
 INSERT INTO `game_event_pool` (`eventEntry`, `pool_entry`) VALUES

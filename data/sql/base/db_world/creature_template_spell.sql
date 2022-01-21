@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_template_spell
+-- Дамп структуры для таблица acore_world.creature_template_spell
 DROP TABLE IF EXISTS `creature_template_spell`;
 CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   `CreatureID` mediumint(8) unsigned NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   CHECK (`Index` >= 0 and `Index` <= 7)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.creature_template_spell: ~9 509 rows (приблизительно)
+-- Дамп данных таблицы acore_world.creature_template_spell: ~9 509 rows (приблизительно)
 DELETE FROM `creature_template_spell`;
 /*!40000 ALTER TABLE `creature_template_spell` DISABLE KEYS */;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_npc_vendor
+-- Дамп структуры для таблица acore_world.game_event_npc_vendor
 DROP TABLE IF EXISTS `game_event_npc_vendor`;
 CREATE TABLE IF NOT EXISTS `game_event_npc_vendor` (
   `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `game_event_npc_vendor` (
   KEY `slot` (`slot`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_npc_vendor: 14 rows
+-- Дамп данных таблицы acore_world.game_event_npc_vendor: 14 rows
 DELETE FROM `game_event_npc_vendor`;
 /*!40000 ALTER TABLE `game_event_npc_vendor` DISABLE KEYS */;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
