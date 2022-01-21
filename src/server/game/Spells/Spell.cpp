@@ -8033,6 +8033,7 @@ void Spell::LoadScripts()
         ++itr;
     }
 }
+
 void Spell::CallScriptBeforeCastTimeHandlers()
 {
     for (std::list<SpellScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
