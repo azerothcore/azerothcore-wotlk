@@ -111,6 +111,8 @@ struct boss_jarien : public BossAI
             });
 
         me->SetReactState(REACT_PASSIVE);
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         _talked = false;
         _phase = PHASE_TALK;
     }
@@ -132,7 +134,6 @@ struct boss_jarien : public BossAI
 
     void IsSummonedBy(Unit* /*summoner*/) override
     {
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         Talk(SAY_JARIEN_ON_SUMMON_0);
 
         _scheduler.Schedule(6s, [this](TaskContext /*context*/)
@@ -146,6 +147,7 @@ struct boss_jarien : public BossAI
                 _phase = PHASE_FIGHT;
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             });
     }
 
@@ -234,6 +236,8 @@ struct boss_sothos : public BossAI
             });
 
         me->SetReactState(REACT_PASSIVE);
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         _talked = false;
         _phase = PHASE_TALK;
     }
@@ -255,14 +259,13 @@ struct boss_sothos : public BossAI
 
     void IsSummonedBy(Unit* /*summoner*/) override
     {
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
         _scheduler.Schedule(12s, [this](TaskContext /*context*/)
             {
                 _talked = true;
                 _phase = PHASE_FIGHT;
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             })
         .Schedule(3s, [this](TaskContext /*context*/)
             {
