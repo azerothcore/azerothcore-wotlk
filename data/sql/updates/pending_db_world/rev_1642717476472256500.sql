@@ -1,3 +1,0 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642717476472256500');
-
-DELETE FROM `creature_loot_template` WHERE `Entry` = 11663 AND `Item` IN (18646, 18703, 18803, 18805, 18806, 18808, 18809, 18810, 18811, 18812, 19139, 19140);
