@@ -22,8 +22,10 @@
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "World.h"
+#include "StringConvert.h"
 
-#define DUMP_TABLE_COUNT 27
+constexpr auto DUMP_TABLE_COUNT = 27;
+
 struct DumpTable
 {
     char const* name;
@@ -172,10 +174,12 @@ uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32>& guidMap, uint32
 bool changeGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
-    uint32 oldGuid = atoi(getnth(str, n).c_str());
-    if (nonzero && oldGuid == 0)
-        return true;                                        // not an error
 
+    auto _oldGuid = Acore::StringTo<uint32>(getnth(str, n));
+    if (nonzero && (!_oldGuid || !*_oldGuid))
+        return true; // not an error
+
+    uint32 oldGuid = *_oldGuid;
     uint32 newGuid = registerNewGuid(oldGuid, guidMap, hiGuid);
     snprintf(chritem, 20, "%u", newGuid);
 
@@ -185,10 +189,11 @@ bool changeGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint
 bool changetokGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
-    uint32 oldGuid = atoi(gettoknth(str, n).c_str());
-    if (nonzero && oldGuid == 0)
-        return true;                                        // not an error
+    auto _oldGuid = Acore::StringTo<uint32>(getnth(str, n));
+    if (nonzero && (!_oldGuid || !*_oldGuid))
+        return true; // not an error
 
+    uint32 oldGuid = *_oldGuid;
     uint32 newGuid = registerNewGuid(oldGuid, guidMap, hiGuid);
     snprintf(chritem, 20, "%u", newGuid);
 
@@ -257,9 +262,11 @@ void StoreGUID(QueryResult result, uint32 data, uint32 field, std::set<uint32>& 
 {
     Field* fields = result->Fetch();
     std::string dataStr = fields[data].GetString();
-    uint32 guid = atoi(gettoknth(dataStr, field).c_str());
-    if (guid)
-        guids.insert(guid);
+
+    if (auto guid = Acore::StringTo<uint32>(gettoknth(dataStr, field)))
+    {
+        guids.insert(*guid);
+    }
 }
 
 // Writing - High-level functions
@@ -468,7 +475,6 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     char buf[32000] = "";
 
     typedef std::map<uint32, uint32> PetIds;                // old->new petid relation
-    typedef PetIds::value_type PetIdsPair;
     PetIds petids;
 
     uint8 gender = GENDER_NONE;
@@ -651,11 +657,11 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                         snprintf(lastpetid, 20, "%s", currpetid);
                     }
 
-                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
+                    auto const& petids_iter = petids.find(Acore::StringTo<uint32>(currpetid).value_or(0));
 
                     if (petids_iter == petids.end())
                     {
-                        petids.insert(PetIdsPair(atoi(currpetid), atoi(newpetid)));
+                        petids.emplace(Acore::StringTo<uint32>(currpetid).value_or(0), Acore::StringTo<uint32>(newpetid).value_or(0));
                     }
 
                     if (!changenth(line, 1, newpetid))          // character_pet.id update
@@ -670,7 +676,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
 
                     // lookup currpetid and match to new inserted pet id
-                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
+                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(Acore::StringTo<uint32>(currpetid).value_or(0));
                     if (petids_iter == petids.end())             // couldn't find new inserted id
                         ROLLBACK(DUMP_FILE_BROKEN);
 
