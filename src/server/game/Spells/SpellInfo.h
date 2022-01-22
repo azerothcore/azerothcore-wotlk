@@ -527,6 +527,8 @@ public:
     SpellSpecificType LoadSpellSpecific() const;
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
+
+    bool CheckElixirStacking(Unit const* caster) const;
 };
 
 #endif // _SPELLINFO_H

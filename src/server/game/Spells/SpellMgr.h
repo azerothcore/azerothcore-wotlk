@@ -338,7 +338,9 @@ enum SpellGroupSpecialFlags
     SPELL_GROUP_SPECIAL_FLAG_PRIORITY3              = 0x400,
     SPELL_GROUP_SPECIAL_FLAG_PRIORITY4              = 0x800,
     SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK       = 0x1000,
-    SPELL_GROUP_SPECIAL_FLAG_MAX                    = 0x2000
+    SPELL_GROUP_SPECIAL_FLAG_MAX                    = 0x2000,
+
+    SPELL_GROUP_SPECIAL_FLAG_FLASK                  = SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE | SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN
 };
 
 enum SpellGroupStackFlags
@@ -354,6 +356,11 @@ enum SpellGroupStackFlags
     // Internal use
     SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST     = 0x100,
     SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST       = 0x200,
+};
+
+enum SpellGroupIDs
+{
+    SPELl_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS     = 1
 };
 
 struct SpellStackInfo
