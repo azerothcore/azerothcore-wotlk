@@ -24,6 +24,7 @@
 #include "WorldModel.h"
 #include <G3D/Vector3.h>
 #include <iomanip>
+#include <sstream>
 #include <string>
 
 using G3D::Vector3;
