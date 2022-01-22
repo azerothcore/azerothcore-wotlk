@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaSpectator.h"
@@ -31,11 +32,11 @@
 #include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
-#include "Config.h"
+#include "CombatLogPackets.h"
 #include "Common.h"
 #include "ConditionMgr.h"
+#include "Config.h"
 #include "CreatureAI.h"
-#include "CombatLogPackets.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "Formulas.h"
@@ -50,8 +51,8 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapMgr.h"
@@ -62,11 +63,10 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "PetitionMgr.h"
-#include "Player.h"
-#include "QuestDef.h"
 #include "QueryHolder.h"
-#include "ReputationMgr.h"
+#include "QuestDef.h"
 #include "Realm.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
@@ -84,6 +84,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1204,33 +1206,68 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     *data << uint32(petLevel);
     *data << uint32(petFamily);
 
-    Tokenizer equipment(fields[22].GetString(), ' ');
+    std::vector<std::string_view> equipment = Acore::Tokenize(fields[22].GetStringView(), ' ', false);
     for (uint8 slot = 0; slot < INVENTORY_SLOT_BAG_END; ++slot)
     {
-        uint32 visualBase = slot * 2;
-        uint32 itemId = GetUInt32ValueFromArray(equipment, visualBase);
-        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+        uint32 const visualBase = slot * 2;
+        Optional<uint32> itemId;
+
+        if (visualBase < equipment.size())
+        {
+            itemId = Acore::StringTo<uint32>(equipment[visualBase]);
+        }
+
+        ItemTemplate const* proto = nullptr;
+        if (itemId)
+        {
+            proto = sObjectMgr->GetItemTemplate(*itemId);
+        }
+
         if (!proto)
         {
+            if (!itemId || *itemId)
+            {
+                FMT_LOG_WARN("entities.player.loading", "Player {} has invalid equipment '{}' in `equipmentcache` at index {}. Skipped.",
+                    guid.ToString(), (visualBase < equipment.size()) ? equipment[visualBase] : "<none>", visualBase);
+            }
+
             *data << uint32(0);
             *data << uint8(0);
             *data << uint32(0);
+
             continue;
         }
 
         SpellItemEnchantmentEntry const* enchant = nullptr;
 
-        uint32 enchants = GetUInt32ValueFromArray(equipment, visualBase + 1);
+        Optional<uint32> enchants = {};
+        if ((visualBase + 1) < equipment.size())
+        {
+            enchants = Acore::StringTo<uint32>(equipment[visualBase + 1]);
+        }
+
+        if (!enchants)
+        {
+            FMT_LOG_WARN("entities.player.loading", "Player {} has invalid enchantment info '{}' in `equipmentcache` at index {}. Skipped.",
+                guid.ToString(), ((visualBase + 1) < equipment.size()) ? equipment[visualBase + 1] : "<none>", visualBase + 1);
+
+            enchants = 0;
+        }
+
         for (uint8 enchantSlot = PERM_ENCHANTMENT_SLOT; enchantSlot <= TEMP_ENCHANTMENT_SLOT; ++enchantSlot)
         {
             // values stored in 2 uint16
-            uint32 enchantId = 0x0000FFFF & (enchants >> enchantSlot * 16);
+            uint32 enchantId = 0x0000FFFF & ((*enchants) >> enchantSlot * 16);
             if (!enchantId)
+            {
                 continue;
+            }
 
             enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
             if (enchant)
+            {
                 break;
+            }
         }
 
         *data << uint32(proto->DisplayInfoID);
@@ -8667,6 +8704,136 @@ Pet* Player::GetPet() const
     return nullptr;
 }
 
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/)
+{
+    PetStable& petStable = GetOrInitPetStable();
+
+    Pet* pet = new Pet(this, petType);
+
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false))
+    {
+        // Remove Demonic Sacrifice auras (known pet)
+        Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+        for (Unit::AuraEffectList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
+        {
+            if ((*itr)->GetMiscValue() == 2228)
+            {
+                RemoveAurasDueToSpell((*itr)->GetId());
+                itr = auraClassScripts.begin();
+            }
+            else
+                ++itr;
+        }
+
+        if (duration > 0s)
+            pet->SetDuration(duration);
+
+        // Generate a new name for the newly summoned ghoul
+        if (pet->IsPetGhoul())
+        {
+            std::string new_name = sObjectMgr->GeneratePetName(entry);
+            if (!new_name.empty())
+                pet->SetName(new_name);
+        }
+
+        return nullptr;
+    }
+
+    // petentry == 0 for hunter "call pet" (current pet summoned if any)
+    if (!entry)
+    {
+        delete pet;
+        return nullptr;
+    }
+
+    pet->Relocate(x, y, z, ang);
+    if (!pet->IsPositionValid())
+    {
+        LOG_ERROR("misc", "Player::SummonPet: Pet (%s, Entry: %d) not summoned. Suggested coordinates aren't valid (X: %f Y: %f)", pet->GetGUID().ToString().c_str(), pet->GetEntry(), pet->GetPositionX(), pet->GetPositionY());
+        delete pet;
+        return nullptr;
+    }
+
+    Map* map = GetMap();
+    uint32 pet_number = sObjectMgr->GeneratePetNumber();
+    if (!pet->Create(map->GenerateLowGuid<HighGuid::Pet>(), map, GetPhaseMask(), entry, pet_number))
+    {
+        LOG_ERROR("misc", "Player::SummonPet: No such creature entry %u", entry);
+        delete pet;
+        return nullptr;
+    }
+
+    if (petType == SUMMON_PET && petStable.CurrentPet)
+        RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+
+    pet->SetCreatorGUID(GetGUID());
+    pet->SetFaction(GetFaction());
+    pet->setPowerType(POWER_MANA);
+    pet->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+    pet->InitStatsForLevel(getLevel());
+
+    SetMinion(pet, true);
+
+    switch (petType)
+    {
+    case SUMMON_PET:
+    {
+        if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
+            pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
+        else
+            pet->GetCharmInfo()->SetPetNumber(pet_number, false);
+
+        pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+        pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+        pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+        pet->SetFullHealth();
+        pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
+        pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped in this case
+        break;
+    }
+    default:
+        break;
+    }
+
+    map->AddToMap(pet->ToCreature(), true);
+
+    ASSERT(!petStable.CurrentPet && (petType != HUNTER_PET || !petStable.GetUnslottedHunterPet()));
+    pet->FillPetInfo(&petStable.CurrentPet.emplace());
+
+    if (petType == SUMMON_PET)
+    {
+        pet->InitPetCreateSpells();
+        pet->InitTalentForLevel();
+        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+        PetSpellInitialize();
+
+        // Remove Demonic Sacrifice auras (known pet)
+        Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+        for (Unit::AuraEffectList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
+        {
+            if ((*itr)->GetMiscValue() == 2228)
+            {
+                RemoveAurasDueToSpell((*itr)->GetId());
+                itr = auraClassScripts.begin();
+            }
+            else
+                ++itr;
+        }
+    }
+
+    if (duration > 0s)
+        pet->SetDuration(duration);
+
+    if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
+    {
+        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", (uint32)pet->GetHealthPct());
+        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", pet->GetCreatureTemplate()->family);
+    }
+
+    return pet;
+}
+
 void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 {
     if (!pet)
@@ -8780,6 +8947,138 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", 0);
         ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", 0);
     }
+}
+
+bool Player::CanPetResurrect()
+{
+    PetStable* const petStable = GetPetStable();
+    if (!petStable)
+    {
+        // No pets
+        return false;
+    }
+
+    auto const& currectPet = petStable->CurrentPet;
+    auto const& unslottedHunterPet = petStable->GetUnslottedHunterPet();
+
+    if (!currectPet && !unslottedHunterPet)
+    {
+        // No pets
+        return false;
+    }
+
+    // Check current pet
+    if (currectPet && !currectPet->Health)
+    {
+        return true;
+    }
+
+    // Check dismiss/unslotted hunter pet
+    if (unslottedHunterPet && !unslottedHunterPet->Health)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool Player::IsExistPet()
+{
+    PetStable* const petStable = GetPetStable();
+    return petStable && (petStable->CurrentPet || petStable->GetUnslottedHunterPet());
+}
+
+Pet* Player::CreatePet(Creature* creatureTarget, uint32 spellID /*= 0*/)
+{
+    if (IsExistPet())
+    {
+        return nullptr;
+    }
+
+    if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
+    {
+        return nullptr;
+    }
+
+    CreatureTemplate const* creatrueTemplate = sObjectMgr->GetCreatureTemplate(creatureTarget->GetEntry());
+    if (!creatrueTemplate->family)
+    {
+        // Creatures with family 0 crashes the server
+        return nullptr;
+    }
+
+    // Everything looks OK, create new pet
+    Pet* pet = CreateTamedPetFrom(creatureTarget, spellID);
+    if (!pet)
+    {
+        return nullptr;
+    }
+
+    // "kill" original creature
+    creatureTarget->DespawnOrUnsummon();
+
+    // calculate proper level
+    uint8 level = (creatureTarget->getLevel() < (getLevel() - 5)) ? (getLevel() - 5) : getLevel();
+
+    // prepare visual effect for levelup
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
+
+    // add to world
+    pet->GetMap()->AddToMap(pet->ToCreature());
+
+    // visual effect for levelup
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
+
+    // caster have pet now
+    SetMinion(pet, true);
+
+    pet->InitTalentForLevel();
+
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+    PetSpellInitialize();
+
+    return pet;
+}
+
+Pet* Player::CreatePet(uint32 creatureEntry, uint32 spellID /*= 0*/)
+{
+    if (IsExistPet())
+    {
+        return nullptr;
+    }
+
+    CreatureTemplate const* creatrueTemplate = sObjectMgr->GetCreatureTemplate(creatureEntry);
+    if (!creatrueTemplate->family)
+    {
+        // Creatures with family 0 crashes the server
+        return nullptr;
+    }
+
+    // Everything looks OK, create new pet
+    Pet* pet = CreateTamedPetFrom(creatureEntry, spellID);
+    if (!pet)
+    {
+        return nullptr;
+    }
+
+    // prepare visual effect for levelup
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, getLevel() - 1);
+
+    // add to world
+    pet->GetMap()->AddToMap(pet->ToCreature());
+
+    // visual effect for levelup
+    pet->SetUInt32Value(UNIT_FIELD_LEVEL, getLevel());
+
+    // caster have pet now
+    SetMinion(pet, true);
+
+    pet->InitTalentForLevel();
+
+    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+    PetSpellInitialize();
+
+    return pet;
 }
 
 void Player::StopCastingCharm()
@@ -14910,11 +15209,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
         lastEventId = fields[0].GetUInt32();
     }
 
-    time_t curtime = time(nullptr);
-    tm localTime;
-    localtime_r(&curtime, &localTime);
-
-    uint16 month = uint16(localTime.tm_mon);
+    uint16 month = static_cast<uint16>(Acore::Time::GetMonth());
     uint16 eventId = month;
     if (eventId < 9)
         eventId += 3;
@@ -15178,136 +15473,6 @@ Guild* Player::GetGuild() const
 {
     uint32 guildId = GetGuildId();
     return guildId ? sGuildMgr->GetGuildById(guildId) : nullptr;
-}
-
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/)
-{
-    PetStable& petStable = GetOrInitPetStable();
-
-    Pet* pet = new Pet(this, petType);
-
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false))
-    {
-        // Remove Demonic Sacrifice auras (known pet)
-        Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-        for (Unit::AuraEffectList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
-        {
-            if ((*itr)->GetMiscValue() == 2228)
-            {
-                RemoveAurasDueToSpell((*itr)->GetId());
-                itr = auraClassScripts.begin();
-            }
-            else
-                ++itr;
-        }
-
-        if (duration > 0s)
-            pet->SetDuration(duration);
-
-        // Generate a new name for the newly summoned ghoul
-        if (pet->IsPetGhoul())
-        {
-            std::string new_name = sObjectMgr->GeneratePetName(entry);
-            if (!new_name.empty())
-                pet->SetName(new_name);
-        }
-
-        return nullptr;
-    }
-
-    // petentry == 0 for hunter "call pet" (current pet summoned if any)
-    if (!entry)
-    {
-        delete pet;
-        return nullptr;
-    }
-
-    pet->Relocate(x, y, z, ang);
-    if (!pet->IsPositionValid())
-    {
-        LOG_ERROR("misc", "Player::SummonPet: Pet (%s, Entry: %d) not summoned. Suggested coordinates aren't valid (X: %f Y: %f)", pet->GetGUID().ToString().c_str(), pet->GetEntry(), pet->GetPositionX(), pet->GetPositionY());
-        delete pet;
-        return nullptr;
-    }
-
-    Map* map = GetMap();
-    uint32 pet_number = sObjectMgr->GeneratePetNumber();
-    if (!pet->Create(map->GenerateLowGuid<HighGuid::Pet>(), map, GetPhaseMask(), entry, pet_number))
-    {
-        LOG_ERROR("misc", "Player::SummonPet: No such creature entry %u", entry);
-        delete pet;
-        return nullptr;
-    }
-
-    if (petType == SUMMON_PET && petStable.CurrentPet)
-        RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
-
-    pet->SetCreatorGUID(GetGUID());
-    pet->SetFaction(GetFaction());
-    pet->setPowerType(POWER_MANA);
-    pet->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-    pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-    pet->InitStatsForLevel(getLevel());
-
-    SetMinion(pet, true);
-
-    switch (petType)
-    {
-        case SUMMON_PET:
-        {
-            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
-                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
-            else
-                pet->GetCharmInfo()->SetPetNumber(pet_number, false);
-
-            pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
-            pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-            pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
-            pet->SetFullHealth();
-            pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
-            pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped in this case
-            break;
-        }
-        default:
-            break;
-    }
-
-    map->AddToMap(pet->ToCreature(), true);
-
-    ASSERT(!petStable.CurrentPet && (petType != HUNTER_PET || !petStable.GetUnslottedHunterPet()));
-    pet->FillPetInfo(&petStable.CurrentPet.emplace());
-
-    if (petType == SUMMON_PET)
-    {
-        pet->InitPetCreateSpells();
-        pet->InitTalentForLevel();
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-        PetSpellInitialize();
-
-        // Remove Demonic Sacrifice auras (known pet)
-        Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-        for (Unit::AuraEffectList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
-        {
-            if ((*itr)->GetMiscValue() == 2228)
-            {
-                RemoveAurasDueToSpell((*itr)->GetId());
-                itr = auraClassScripts.begin();
-            }
-            else
-                ++itr;
-        }
-    }
-
-    if (duration > 0s)
-        pet->SetDuration(duration);
-
-    if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
-    {
-        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PHP", (uint32)pet->GetHealthPct());
-        ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PET", pet->GetCreatureTemplate()->family);
-    }
-
-    return pet;
 }
 
 uint32 Player::GetSpec(int8 spec)

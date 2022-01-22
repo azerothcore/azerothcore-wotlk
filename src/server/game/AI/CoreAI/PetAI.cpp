@@ -252,8 +252,10 @@ void PetAI::UpdateAI(uint32 diff)
                 if (spellInfo->CanBeUsedInCombat())
                 {
                     // Check if we're in combat or commanded to attack (exlude auras with infinity duration)
-                    if (!me->IsInCombat() && !me->GetCharmInfo()->IsCommandAttack() && spellInfo->GetMaxDuration() != -1)
+                    if (!me->IsInCombat() && spellInfo->GetMaxDuration() != -1 && !me->IsPetInCombat())
+                    {
                         continue;
+                    }
                 }
 
                 Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE);
@@ -593,16 +595,12 @@ void PetAI::DoAttack(Unit* target, bool chase)
         if (me->HasReactState(REACT_AGGRESSIVE) && !me->GetCharmInfo()->IsCommandAttack())
             me->SendPetAIReaction(me->GetGUID());
 
-        if (CharmInfo* ci = me->GetCharmInfo())
-        {
-            ci->SetIsAtStay(false);
-            ci->SetIsCommandFollow(false);
-            ci->SetIsFollowing(false);
-            ci->SetIsReturning(false);
-        }
-
         if (chase)
         {
+            bool oldCmdAttack = me->GetCharmInfo()->IsCommandAttack(); // This needs to be reset after other flags are cleared
+            ClearCharmInfoFlags();
+            me->GetCharmInfo()->SetIsCommandAttack(oldCmdAttack); // For passive pets commanded to attack so they will use spells
+
             if (_canMeleeAttack())
             {
                 float angle = combatRange == 0.f && target->GetTypeId() != TYPEID_PLAYER && !target->IsPet() ? float(M_PI) : 0.f;
@@ -612,6 +610,8 @@ void PetAI::DoAttack(Unit* target, bool chase)
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
+            ClearCharmInfoFlags();
+
             me->GetCharmInfo()->SetIsAtStay(true);
             me->GetMotionMaster()->MovementExpiredOnSlot(MOTION_SLOT_ACTIVE, false);
             me->GetMotionMaster()->MoveIdle();
