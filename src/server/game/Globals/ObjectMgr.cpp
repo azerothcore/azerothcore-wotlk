@@ -9119,7 +9119,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
         BroadcastTextContainer::iterator bct = _broadcastTextStore.find(id);
         if (bct == _broadcastTextStore.end())
         {
-            LOG_ERROR("sql.sql", "BroadcastText (Id: %u) found in table `broadcast_text_locale` but does not exist in `broadcast_text`. Skipped!", id);
+            LOG_ERROR("sql.sql", "BroadcastText (Id: %u) in table `broadcast_text_locale` does not exist. Skipped!", id);
             continue;
         }
 
