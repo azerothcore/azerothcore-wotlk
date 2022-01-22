@@ -21,6 +21,7 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -419,6 +420,13 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             condMeets = unit->HasAuraType(AuraType(ConditionValue1));
         break;
     }
+    case CONDITION_PET_TYPE:
+    {
+        if (Player* player = object->ToPlayer())
+            if (Pet* pet = player->GetPet())
+                condMeets = (((1 << pet->getPetType()) & ConditionValue1) != 0);
+        break;
+    }
     default:
         condMeets = false;
         break;
@@ -603,6 +611,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_HAS_AURA_TYPE:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_PET_TYPE:
+        mask |= GRID_MAP_TYPE_MASK_PLAYER;
         break;
     default:
         ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
@@ -1663,7 +1674,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         return false;
     case CONDITION_STAND_STATE:
     case CONDITION_CHARMED:
-    case CONDITION_PET_TYPE:
     case CONDITION_TAXI:
         LOG_ERROR("sql.sql", "SourceEntry %u in `condition` table has a ConditionType that is not yet supported on AzerothCore (%u), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
@@ -2252,6 +2262,13 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         break;
     }
+    case CONDITION_PET_TYPE:
+        if (cond->ConditionValue1 >= (1 << MAX_PET_TYPE))
+        {
+            LOG_ERROR("sql.sql", "CONDITION_PET_TYPE has non-existing pet type %u, skipped.", cond->ConditionValue1);
+            return false;
+        }
+        break;
     default:
         break;
     }
