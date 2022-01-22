@@ -80,11 +80,11 @@ public:
     void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) override {}
     MOCK_METHOD(void, SendGlobalText, (const char* text, WorldSession* self), ());
     void SendGMText(uint32 string_id, ...) override {}
-    MOCK_METHOD(void, SendGlobalMessage, (WorldPacket* packet, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(void, SendGlobalGMMessage, (WorldPacket* packet, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(bool, SendZoneMessage, (uint32 zone, WorldPacket* packet, WorldSession* self, TeamId teamId), ());
+    MOCK_METHOD(void, SendGlobalMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
+    MOCK_METHOD(void, SendGlobalGMMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
+    MOCK_METHOD(bool, SendZoneMessage, (uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
     MOCK_METHOD(void, SendZoneText, (uint32 zone, const char* text, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(void, SendServerMessage, (ServerMessageType type, const char* text, Player* player));
+    MOCK_METHOD(void, SendServerMessage, (ServerMessageType messageID, std::string stringParam, Player* player));
     MOCK_METHOD(bool, IsShuttingDown, (), (const));
     MOCK_METHOD(uint32, GetShutDownTimeLeft, (), (const));
     MOCK_METHOD(void, ShutdownServ, (uint32 time, uint32 options, uint8 exitcode, const std::string& reason), ());

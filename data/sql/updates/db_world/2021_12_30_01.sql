@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164012629028258852
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1640126290282588522');
 
--- Pathing for Ghostlands Guardians Entry: 16541
+-- Pathing for Ghostlands Guardians Entry: 16541.
 SET @NPC := 81745;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2,`position_x`=7494.6353,`position_y`=-6887.5347,`position_z`=93.34903 WHERE `guid`=@NPC;

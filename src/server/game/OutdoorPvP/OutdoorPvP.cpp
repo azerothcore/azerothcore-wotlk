@@ -84,7 +84,7 @@ void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entr
         const CreatureData* data = sObjectMgr->GetCreatureData(guid);
         if (!data)
             return;
-        entry = data->id;
+        entry = data->id1;
     }
     m_Creatures[type] = guid;
     m_CreatureTypes[m_Creatures[type]] = type;

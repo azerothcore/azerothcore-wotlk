@@ -91,6 +91,9 @@ public:
     // Called when the creature summon successfully other creature
     void JustSummoned(Creature* creature) override;
 
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
+
     // Tell creature to attack and follow the victim
     void AttackStart(Unit* who) override;
 
@@ -269,6 +272,9 @@ public:
     void OnStateChanged(uint32 state, Unit* unit) override;
     void EventInform(uint32 eventId) override;
     void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
 
 protected:
     SmartScript mScript;

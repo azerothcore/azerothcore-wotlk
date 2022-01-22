@@ -363,7 +363,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
 {
     // Send packet to all players in The Frozen Throne
     Map::PlayerList const& players = source->GetMap()->GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
                 if (player->GetAreaId() == AREA_THE_FROZEN_THRONE)
@@ -973,7 +973,7 @@ public:
             {
                 _positionCheckTimer = 5000;
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty())
+                if (!players.IsEmpty())
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (Player* player = itr->GetSource())
                             if (player->GetPositionZ() < 700.0f)
@@ -2541,7 +2541,7 @@ public:
             me->CastSpell((Unit*)nullptr, SPELL_EJECT_ALL_PASSENGERS, false);
             float dist = rand_norm() * 10.0f + 5.0f;
             float angle = CenterPosition.GetAngle(me);
-            _destPoint.Relocate(CenterPosition.GetPositionX() + dist * cos(angle), CenterPosition.GetPositionY() + dist * sin(angle), 855.0f + frand(0.0f, 4.0f), 0.0f);
+            _destPoint.Relocate(CenterPosition.GetPositionX() + dist * cos(angle), CenterPosition.GetPositionY() + dist * std::sin(angle), 855.0f + frand(0.0f, 4.0f), 0.0f);
             me->SetHomePosition(_destPoint);
             _events.Reset();
             _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0);
@@ -2773,7 +2773,7 @@ public:
         {
             float dist = 2.0f + rand_norm() * 18.0f;
             float angle = rand_norm() * 2 * M_PI;
-            Position const offset = {dist * cos(angle), dist * sin(angle), 0.0f, 0.0f};
+            Position const offset = {dist * cos(angle), dist * std::sin(angle), 0.0f, 0.0f};
             WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
             dest->RelocateOffset(offset);
             GetHitDest()->RelocateOffset(offset);
@@ -3232,7 +3232,7 @@ public:
                             float angle = lichKing->GetAngle(me);
                             Movement::PointsArray path;
                             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                            path.push_back(G3D::Vector3(lichKing->GetPositionX() + dist * cos(angle), lichKing->GetPositionY() + dist * sin(angle), 843.0f));
+                            path.push_back(G3D::Vector3(lichKing->GetPositionX() + dist * cos(angle), lichKing->GetPositionY() + dist * std::sin(angle), 843.0f));
                             me->GetMotionMaster()->MoveSplinePath(&path);
                         }
                     break;

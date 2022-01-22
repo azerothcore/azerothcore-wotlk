@@ -226,6 +226,11 @@ public:
     virtual void OnShutdown() { }
 
     /**
+     * @brief Called after all maps are unloaded from core
+     */
+    virtual void OnAfterUnloadAllMaps() { }
+
+    /**
      * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
      *
      * @param version The cache version that we will be sending to the Client.
@@ -444,6 +449,8 @@ public:
     [[nodiscard]] virtual bool CanSetPhaseMask(Unit const* /*unit*/, uint32 /*newPhaseMask*/, bool /*update*/) { return true; }
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
+
+    [[nodiscard]] virtual bool OnBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player* /*target*/, uint16 /*index*/) { return false; }
 
     /**
      * @brief This hook runs in Unit::Update
@@ -1724,7 +1731,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // After complete global acvievement
     virtual void SetRealmCompleted(AchievementEntry const* /*achievement*/) { }
@@ -1746,7 +1753,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnInitStatsForLevel(Guardian* /*guardian*/, uint8 /*petlevel*/) { }
 
@@ -1774,7 +1781,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
 
@@ -1791,7 +1798,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnConstructObject(Object* /*origin*/) { }
 
@@ -1844,7 +1851,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnHandleDevCommand(Player* /*player*/, bool& /*enable*/) { }
 
@@ -1865,7 +1872,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
 };
@@ -1878,7 +1885,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before destroy world object
@@ -1925,7 +1932,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before money loot
@@ -2023,6 +2030,7 @@ public: /* WorldScript */
     void OnStartup();
     void OnShutdown();
     void OnBeforeWorldInitialized();
+    void OnAfterUnloadAllMaps();
 
 public: /* FormulaScript */
     void OnHonorCalculation(float& honor, uint8 level, float multiplier);
@@ -2361,6 +2369,7 @@ public: /* UnitScript */
     bool IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
     bool CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update);
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
+    bool OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index);
     void OnUnitUpdate(Unit* unit, uint32 diff);
 
 public: /* MovementHandlerScript */
@@ -2522,7 +2531,7 @@ public:
     GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
 
 private:
-    SpellScript* GetSpellScript() const override
+    [[nodiscard]] SpellScript* GetSpellScript() const override
     {
         if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
         {
@@ -2534,7 +2543,7 @@ private:
         }
     }
 
-    AuraScript* GetAuraScript() const override
+    [[nodiscard]] AuraScript* GetAuraScript() const override
     {
         if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
         {

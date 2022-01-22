@@ -19,6 +19,12 @@
 #define AllPackets_h__
 
 #include "BankPackets.h"
+#include "CharacterPackets.h"
+#include "ChatPackets.h"
+#include "CombatLogPackets.h"
 #include "GuildPackets.h"
+#include "MiscPackets.h"
+#include "TotemPackets.h"
+#include "WorldStatePackets.h"
 
 #endif // AllPackets_h__

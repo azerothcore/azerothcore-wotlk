@@ -23,7 +23,7 @@ SET @TIRION := 12126;
 SET @CRIMSON := 12128;
 SET @DEATHSPELL := 18969;
 
--- Questender
+-- Quest ender
 DELETE FROM `creature_questender` WHERE `id`=@TIRION;
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (@TIRION, 5944);

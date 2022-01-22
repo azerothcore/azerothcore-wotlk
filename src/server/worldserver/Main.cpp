@@ -329,6 +329,8 @@ int main(int argc, char** argv)
 
         sOutdoorPvPMgr->Die();                     // unload it before MapMgr
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
+
+        sScriptMgr->OnAfterUnloadAllMaps();
     });
 
     // Start the Remote Access port (acceptor) if enabled

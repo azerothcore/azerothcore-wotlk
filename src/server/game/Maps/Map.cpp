@@ -29,6 +29,7 @@
 #include "LFGMgr.h"
 #include "MapInstanced.h"
 #include "Metric.h"
+#include "MiscPackets.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectGridLoader.h"
@@ -39,6 +40,7 @@
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
 #include "Vehicle.h"
+#include "Weather.h"
 
 union u_map_magic
 {
@@ -54,6 +56,9 @@ u_map_magic MapLiquidMagic  = { {'M', 'L', 'I', 'Q'} };
 
 static uint16 const holetab_h[4] = { 0x1111, 0x2222, 0x4444, 0x8888 };
 static uint16 const holetab_v[4] = { 0x000F, 0x00F0, 0x0F00, 0xF000 };
+
+ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
+                                     WeatherGrade(0.0f), OverrideLightId(0), LightFadeInTime(0) { }
 
 Map::~Map()
 {
@@ -381,7 +386,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
     if (!IsGridLoaded(GridCoord(cell.data.Part.grid_x, cell.data.Part.grid_y)))
         return;
 
-    //TC_LOG_DEBUG(LOG_FILTER_MAPS, "Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
+    //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(ngrid != nullptr);
 
@@ -623,7 +628,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     _transports.insert(obj);
 
     // Broadcast creation to players
-    if (!GetPlayers().isEmpty())
+    if (!GetPlayers().IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         {
@@ -952,7 +957,7 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
         RemoveFromActive(obj);
 
     Map::PlayerList const& players = GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         UpdateData data;
         obj->BuildOutOfRangeUpdateBlock(&data);
@@ -2053,7 +2058,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
 
             // we are already under the surface or vmap height above map heigt
             // or if the distance of the vmap height is less the land height distance
-            if (vmapHeight > mapHeight || fabs(mapHeight - z) > fabs(vmapHeight - z))
+            if (vmapHeight > mapHeight || std::fabs(mapHeight - z) > std::fabs(vmapHeight - z))
                 return vmapHeight;
             else
                 return mapHeight;                           // better use .map surface height
@@ -2868,7 +2873,7 @@ Map::EnterState InstanceMap::CannotEnter(Player* player, bool loginCheck)
 
     // cannot enter if instance is in use by another party/soloer that have a permanent save in the same instance id
     PlayerList const& playerList = GetPlayers();
-    if (!playerList.isEmpty())
+    if (!playerList.IsEmpty())
         for (PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
             if (Player* iPlayer = i->GetSource())
             {
@@ -3061,7 +3066,7 @@ bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
             m_resetAfterUnload = true;
         }
 
-        return m_mapRefMgr.isEmpty();
+        return m_mapRefMgr.IsEmpty();
     }
 
     if (HavePlayers())
@@ -3078,7 +3083,7 @@ bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
         m_resetAfterUnload = true;
     }
 
-    return m_mapRefMgr.isEmpty();
+    return m_mapRefMgr.IsEmpty();
 }
 
 std::string const& InstanceMap::GetScriptName() const
@@ -3655,13 +3660,10 @@ void Map::SendZoneDynamicInfo(Player* player)
         player->SendDirectMessage(&data);
     }
 
-    if (uint32 weather = itr->second.WeatherId)
+    if (WeatherState weatherId = itr->second.WeatherId)
     {
-        WorldPacket data(SMSG_WEATHER, 4 + 4 + 1);
-        data << uint32(weather);
-        data << float(itr->second.WeatherGrade);
-        data << uint8(0);
-        player->SendDirectMessage(&data);
+        WorldPackets::Misc::Weather weather(weatherId, itr->second.WeatherGrade);
+        player->SendDirectMessage(weather.Write());
     }
 
     if (uint32 overrideLight = itr->second.OverrideLightId)
@@ -3677,7 +3679,7 @@ void Map::SendZoneDynamicInfo(Player* player)
 void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId)
 {
     Map::PlayerList const& players = GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         WorldPacket data(SMSG_PLAY_SOUND, 4);
         data << uint32(soundId);
@@ -3697,7 +3699,7 @@ void Map::SetZoneMusic(uint32 zoneId, uint32 musicId)
     _zoneDynamicInfo[zoneId].MusicId = musicId;
 
     Map::PlayerList const& players = GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         WorldPacket data(SMSG_PLAY_MUSIC, 4);
         data << uint32(musicId);
@@ -3709,7 +3711,7 @@ void Map::SetZoneMusic(uint32 zoneId, uint32 musicId)
     }
 }
 
-void Map::SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade)
+void Map::SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade)
 {
     if (_zoneDynamicInfo.find(zoneId) == _zoneDynamicInfo.end())
         _zoneDynamicInfo.insert(ZoneDynamicInfoMap::value_type(zoneId, ZoneDynamicInfo()));
@@ -3719,17 +3721,14 @@ void Map::SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade)
     info.WeatherGrade = weatherGrade;
     Map::PlayerList const& players = GetPlayers();
 
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
-        WorldPacket data(SMSG_WEATHER, 4 + 4 + 1);
-        data << uint32(weatherId);
-        data << float(weatherGrade);
-        data << uint8(0);
+        WorldPackets::Misc::Weather weather(weatherId, weatherGrade);
 
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
                 if (player->GetZoneId() == zoneId)
-                    player->SendDirectMessage(&data);
+                    player->SendDirectMessage(weather.Write());
     }
 }
 
@@ -3743,7 +3742,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeI
     info.LightFadeInTime = static_cast<uint32>(fadeInTime.count());
     Map::PlayerList const& players = GetPlayers();
 
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
         data << uint32(_defaultLight);
