@@ -31,6 +31,7 @@
 #include "TOTP.h"
 #include "Timer.h"
 #include "Util.h"
+#include "StringConvert.h"
 #include <boost/lexical_cast.hpp>
 #include <openssl/crypto.h>
 
@@ -484,7 +485,7 @@ bool AuthSession::HandleLogonProof()
             std::string token(reinterpret_cast<char*>(GetReadBuffer().GetReadPointer() + sizeof(sAuthLogonProof_C) + sizeof(size)), size);
             GetReadBuffer().ReadCompleted(sizeof(size) + size);
 
-            uint32 incomingToken = atoi(token.c_str());
+            uint32 incomingToken = *Acore::StringTo<uint32>(token);
             tokenSuccess = Acore::Crypto::TOTP::ValidateToken(*_totpSecret, incomingToken);
             memset(_totpSecret->data(), 0, _totpSecret->size());
         }

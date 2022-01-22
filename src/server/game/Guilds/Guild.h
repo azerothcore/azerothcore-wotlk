@@ -20,8 +20,8 @@
 
 #include "Item.h"
 #include "ObjectMgr.h"
-#include "Player.h"
 #include "Optional.h"
+#include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include <set>
