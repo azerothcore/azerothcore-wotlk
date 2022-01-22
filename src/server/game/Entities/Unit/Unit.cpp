@@ -15576,14 +15576,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         StartReactiveTimer(REACTIVE_OVERPOWER);
                     }
                 }
+
                 // Wolverine Bite
-                if (procExtra & PROC_EX_CRITICAL_HIT)
+                if ((procExtra & PROC_HIT_CRITICAL) && IsHunterPet())
                 {
-                    if (GetTypeId() == TYPEID_UNIT && IsPet())
-                    {
-                        ModifyAuraState(AURA_STATE_DEFENSE, true);
-                        StartReactiveTimer( REACTIVE_DEFENSE );
-                    }
+                    AddComboPoints(target, 1);
+                    StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
                 }
             }
         }
@@ -16355,6 +16353,10 @@ void Unit::UpdateReactives(uint32 p_time)
                     break;
                 case REACTIVE_OVERPOWER:
                     if (getClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
+                        ClearComboPoints();
+                    break;
+                case REACTIVE_WOLVERINE_BITE:
+                    if (IsHunterPet())
                         ClearComboPoints();
                     break;
                 default:
