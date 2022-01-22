@@ -30,7 +30,6 @@
 #include "RandomMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
 #include "WaypointMovementGenerator.h"
-#include <cassert>
 
  // ---- ChaseRange ---- //
 
