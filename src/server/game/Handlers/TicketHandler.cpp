@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Chat.h"
@@ -50,6 +61,11 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
         recvData >> x >> y >> z;
         recvData >> message;
 
+        if (!ValidateHyperlinksAndMaybeKick(message))
+        {
+            return;
+        }
+
         recvData >> needResponse;
         recvData >> needMoreHelp;
 
@@ -85,6 +101,11 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
             recvData.rfinish(); // Will still have compressed data in buffer.
         }
 
+        if (!chatLog.empty() && !ValidateHyperlinksAndMaybeKick(chatLog))
+        {
+            return;
+        }
+
         ticket = new GmTicket(GetPlayer());
         ticket->SetPosition(mapId, x, y, z);
         ticket->SetMessage(message);
@@ -110,6 +131,11 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
 {
     std::string message;
     recv_data >> message;
+
+    if (!ValidateHyperlinksAndMaybeKick(message))
+    {
+        return;
+    }
 
     GMTicketResponse response = GMTICKET_RESPONSE_UPDATE_ERROR;
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
@@ -176,6 +202,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
 
     std::unordered_set<uint32> surveyIds;
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
     // sub_survey1, r1, comment1, sub_survey2, r2, comment2, sub_survey3, r3, comment3, sub_survey4, r4, comment4, sub_survey5, r5, comment5, sub_survey6, r6, comment6, sub_survey7, r7, comment7, sub_survey8, r8, comment8, sub_survey9, r9, comment9, sub_survey10, r10, comment10,
     for (uint8 i = 0; i < 10; i++)
     {
@@ -188,6 +215,11 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
         recv_data >> rank;
         std::string comment; // comment ("Usage: GMSurveyAnswerSubmit(question, rank, comment)")
         recv_data >> comment;
+
+        if (!ValidateHyperlinksAndMaybeKick(comment))
+        {
+            return;
+        }
 
         // make sure the same sub survey is not added to DB twice
         if (!surveyIds.insert(subSurveyId).second)
@@ -203,6 +235,11 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
 
     std::string comment; // just a guess
     recv_data >> comment;
+
+    if (!ValidateHyperlinksAndMaybeKick(comment))
+    {
+        return;
+    }
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SURVEY);
     stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());

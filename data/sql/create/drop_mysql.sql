@@ -8,9 +8,9 @@ REVOKE ALL PRIVILEGES ON `acore_characters` . * FROM 'acore'@'localhost';
 
 REVOKE GRANT OPTION ON `acore_characters` . * FROM 'acore'@'localhost';
 
-REVOKE ALL PRIVILEGES ON `auth` . * FROM 'acore'@'localhost';
+REVOKE ALL PRIVILEGES ON `acore_auth` . * FROM 'acore'@'localhost';
 
-REVOKE GRANT OPTION ON `auth` . * FROM 'acore'@'localhost';
+REVOKE GRANT OPTION ON `acore_auth` . * FROM 'acore'@'localhost';
 
 DROP USER 'acore'@'localhost';
 

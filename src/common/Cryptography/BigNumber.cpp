@@ -6,7 +6,6 @@
 #include "Cryptography/BigNumber.h"
 #include "Errors.h"
 #include <algorithm>
-#include <cstring>
 #include <memory>
 #include <openssl/bn.h>
 
@@ -25,7 +24,7 @@ BigNumber::~BigNumber()
 
 void BigNumber::SetDword(int32 val)
 {
-    SetDword(uint32(abs(val)));
+    SetDword(uint32(std::abs(val)));
     if (val < 0)
     {
         BN_set_negative(_bn, 1);

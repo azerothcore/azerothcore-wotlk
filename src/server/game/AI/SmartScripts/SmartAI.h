@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_SMARTAI_H
@@ -79,6 +90,9 @@ public:
 
     // Called when the creature summon successfully other creature
     void JustSummoned(Creature* creature) override;
+
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
 
     // Tell creature to attack and follow the victim
     void AttackStart(Unit* who) override;
@@ -162,6 +176,8 @@ public:
 
     void SetSwim(bool swim = true);
 
+    void SetEvadeDisabled(bool disable = true);
+
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
 
     void sGossipHello(Player* player) override;
@@ -212,6 +228,7 @@ private:
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
     bool mCanRepeatPath;
     bool mRun;
+    bool mEvadeDisabled;
     bool mCanAutoAttack;
     bool mCanCombatMove;
     bool mForcedPaused;
@@ -255,6 +272,9 @@ public:
     void OnStateChanged(uint32 state, Unit* unit) override;
     void EventInform(uint32 eventId) override;
     void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+
+    // Called when a summoned unit dies
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override;
 
 protected:
     SmartScript mScript;

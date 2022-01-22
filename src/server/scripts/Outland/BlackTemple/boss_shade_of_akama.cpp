@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Says
 {
@@ -328,7 +341,7 @@ public:
         {
             float dist = frand(30.0f, 32.0f);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(POINT_START, summon->GetPositionX() + dist * cos(summon->GetOrientation()), summon->GetPositionY() + dist * sin(summon->GetOrientation()), summon->GetPositionZ(), false);
+            summon->GetMotionMaster()->MovePoint(POINT_START, summon->GetPositionX() + dist * cos(summon->GetOrientation()), summon->GetPositionY() + dist * std::sin(summon->GetOrientation()), summon->GetPositionZ(), false);
             summons.Summon(summon);
         }
 

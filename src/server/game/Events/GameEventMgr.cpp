@@ -1,16 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "BattlegroundMgr.h"
 #include "GameEventMgr.h"
+#include "BattlegroundMgr.h"
+#include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "Language.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
@@ -19,12 +31,8 @@
 #include "UnitAI.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WorldStatePackets.h"
 #include <time.h>
-
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
 
 GameEventMgr* GameEventMgr::instance()
 {
@@ -125,6 +133,11 @@ void GameEventMgr::StartInternalEvent(uint16 event_id)
 
 bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
 {
+    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, event_id, nullptr) && !overwrite)
+    {
+        return false;
+    }
+
     GameEventData& data = mGameEvent[event_id];
     if (data.state == GAMEEVENT_NORMAL || data.state == GAMEEVENT_INTERNAL)
     {
@@ -139,6 +152,13 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
 
         if (IsActiveEvent(event_id))
             sScriptMgr->OnGameEventStart(event_id);
+
+        // When event is started, set its worldstate to current time
+        auto itr = _gameEventSeasonalQuestsMap.find(event_id);
+        if (itr != _gameEventSeasonalQuestsMap.end() && !itr->second.empty())
+        {
+            sWorld->setWorldState(event_id, sWorld->GetGameTime());
+        }
 
         return false;
     }
@@ -177,6 +197,9 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
 
     RemoveActiveEvent(event_id);
     UnApplyEvent(event_id);
+
+     // When event is stopped, clean up its worldstate
+    sWorld->setWorldState(event_id, 0);
 
     if (overwrite && !serverwide_evt)
     {
@@ -217,7 +240,7 @@ void GameEventMgr::LoadFromDB()
 {
     {
         uint32 oldMSTime = getMSTime();
-        //       1           2                           3                         4          5       6        7             8            9            10
+        //                                                    1                 2                           3                  4        5        6          7             8            9          10
         QueryResult result = WorldDatabase.Query("SELECT eventEntry, UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time), occurence, length, holiday, holidayStage, description, world_event, announce FROM game_event");
         if (!result)
         {
@@ -240,6 +263,7 @@ void GameEventMgr::LoadFromDB()
             }
 
             GameEventData& pGameEvent = mGameEvent[event_id];
+            pGameEvent.eventId      = fields[0].GetUInt32();
             uint64 starttime        = fields[1].GetUInt64();
             pGameEvent.start        = time_t(starttime);
             uint64 endtime          = fields[2].GetUInt64();
@@ -380,9 +404,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                       1                2
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, game_event_creature.eventEntry FROM creature"
-                             " JOIN game_event_creature ON creature.guid = game_event_creature.guid");
+        //                                                 0        1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_creature");
 
         if (!result)
         {
@@ -398,6 +421,13 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 int16 event_id = fields[1].GetInt8();
+
+                CreatureData const* data = sObjectMgr->GetCreatureData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_creature` contains creature (GUID: %u) not found in `creature` table.", guid);
+                    continue;
+                }
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
@@ -422,9 +452,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                      0                1
-        QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, game_event_gameobject.eventEntry FROM gameobject"
-                             " JOIN game_event_gameobject ON gameobject.guid=game_event_gameobject.guid");
+        //                                                0         1
+        QueryResult result = WorldDatabase.Query("SELECT guid, eventEntry FROM game_event_gameobject");
 
         if (!result)
         {
@@ -442,6 +471,13 @@ void GameEventMgr::LoadFromDB()
                 int16 event_id = fields[1].GetInt8();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
+
+                GameObjectData const* data = sObjectMgr->GetGOData(guid);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: %u) not found in `gameobject` table.", guid);
+                    continue;
+                }
 
                 if (internal_event_id < 0 || internal_event_id >= int32(mGameEventGameobjectGuids.size()))
                 {
@@ -464,8 +500,8 @@ void GameEventMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        //                                                       0           1                       2                                 3                                     4
-        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.id, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
+        //                                                     0              1             2            3                         4                               5                                 6
+        QueryResult result = WorldDatabase.Query("SELECT creature.guid, creature.id1, creature.id2, creature.id3, game_event_model_equip.eventEntry, game_event_model_equip.modelid, game_event_model_equip.equipment_id "
                              "FROM creature JOIN game_event_model_equip ON creature.guid=game_event_model_equip.guid");
 
         if (!result)
@@ -482,7 +518,9 @@ void GameEventMgr::LoadFromDB()
 
                 ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
-                uint16 event_id = fields[2].GetUInt8();
+                uint32 entry2 = fields[2].GetUInt32();
+                uint32 entry3 = fields[3].GetUInt32();
+                uint16 event_id = fields[4].GetUInt8();
 
                 if (event_id >= mGameEventModelEquip.size())
                 {
@@ -492,15 +530,15 @@ void GameEventMgr::LoadFromDB()
 
                 ModelEquipList& equiplist = mGameEventModelEquip[event_id];
                 ModelEquip newModelEquipSet;
-                newModelEquipSet.modelid = fields[3].GetUInt32();
-                newModelEquipSet.equipment_id = fields[4].GetUInt8();
+                newModelEquipSet.modelid = fields[5].GetUInt32();
+                newModelEquipSet.equipment_id = fields[6].GetUInt8();
                 newModelEquipSet.equipement_id_prev = 0;
                 newModelEquipSet.modelid_prev = 0;
 
                 if (newModelEquipSet.equipment_id > 0)
                 {
                     int8 equipId = static_cast<int8>(newModelEquipSet.equipment_id);
-                    if (!sObjectMgr->GetEquipmentInfo(entry, equipId))
+                    if ((!sObjectMgr->GetEquipmentInfo(entry, equipId)) || (entry2 && !sObjectMgr->GetEquipmentInfo(entry2, equipId)) || (entry3 && !sObjectMgr->GetEquipmentInfo(entry3, equipId)))
                     {
                         LOG_ERROR("sql.sql", "Table `game_event_model_equip` have creature (Guid: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
                                          guid, newModelEquipSet.equipment_id);
@@ -804,6 +842,7 @@ void GameEventMgr::LoadFromDB()
                 }
 
                 questTemplate->SetEventIdForQuest((uint16)eventEntry);
+                _gameEventSeasonalQuestsMap[eventEntry].push_back(questId);
                 ++count;
             } while (result->NextRow());
 
@@ -861,7 +900,7 @@ void GameEventMgr::LoadFromDB()
                 newEntry.entry = 0;
 
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
-                    newEntry.entry = data->id;
+                    newEntry.entry = data->id1;
 
                 // check validity with event's npcflag
                 if (!sObjectMgr->IsVendorItemValid(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
@@ -1122,6 +1161,9 @@ uint32 GameEventMgr::Update()                               // return the next e
         }
         else
         {
+            // If event is inactive, periodically clean up its worldstate
+            sWorld->setWorldState(itr, 0);
+
             if (IsActiveEvent(itr))
             {
                 // Xinef: do not deactivate internal events on whim
@@ -1179,8 +1221,6 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
     UpdateEventNPCVendor(event_id, false);
     // update bg holiday
     UpdateBattlegroundSettings();
-    // check for seasonal quest reset.
-    sWorld->ResetEventSeasonalQuests(event_id);
 }
 
 void GameEventMgr::ApplyNewEvent(uint16 event_id)
@@ -1210,6 +1250,13 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
     UpdateEventNPCVendor(event_id, true);
     // update bg holiday
     UpdateBattlegroundSettings();
+
+    // If event's worldstate is 0, it means the event hasn't been started yet. In that case, reset seasonal quests.
+    // When event ends (if it expires or if it's stopped via commands) worldstate will be set to 0 again, ready for another seasonal quest reset.
+    if (sWorld->getWorldState(event_id) == 0)
+    {
+        sWorld->ResetEventSeasonalQuests(event_id);
+    }
 }
 
 void GameEventMgr::UpdateEventNPCFlags(uint16 event_id)
@@ -1594,9 +1641,10 @@ void GameEventMgr::UpdateWorldStates(uint16 event_id, bool Activate)
             BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
             if (bl && bl->HolidayWorldStateId)
             {
-                WorldPacket data;
-                sBattlegroundMgr->BuildUpdateWorldStatePacket(&data, bl->HolidayWorldStateId, Activate ? 1 : 0);
-                sWorld->SendGlobalMessage(&data);
+                WorldPackets::WorldState::UpdateWorldState worldstate;
+                worldstate.VariableID = bl->HolidayWorldStateId;
+                worldstate.Value = Activate ? 1 : 0;
+                sWorld->SendGlobalMessage(worldstate.Write());
             }
         }
     }
@@ -1801,7 +1849,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
         tm timeInfo;
         if (singleDate)
         {
-            localtime_r(&curTime, &timeInfo);
+            timeInfo = Acore::Time::TimeBreakdown(curTime);
             timeInfo.tm_year -= 1; // First try last year (event active through New Year)
         }
         else
@@ -1825,8 +1873,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
         }
         else if (singleDate)
         {
-            tm tmCopy;
-            localtime_r(&curTime, &tmCopy);
+            tm tmCopy = Acore::Time::TimeBreakdown(curTime);
             int year = tmCopy.tm_year; // This year
             tmCopy = timeInfo;
             tmCopy.tm_year = year;
@@ -1839,6 +1886,21 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
             // if none is found we don't modify start date and use the one in game_event
         }
     }
+}
+
+uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
+{
+    auto const events = sGameEventMgr->GetEventMap();
+
+    for (auto const& eventEntry : events)
+    {
+        if (eventEntry.holiday_id == holidayId)
+        {
+            return eventEntry.eventId;
+        }
+    }
+
+    return 0;
 }
 
 bool IsHolidayActive(HolidayIds id)

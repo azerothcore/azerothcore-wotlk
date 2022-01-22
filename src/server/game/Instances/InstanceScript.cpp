@@ -1,15 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceScript.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "GameObject.h"
 #include "Group.h"
-#include "InstanceScript.h"
+#include "InstanceSaveMgr.h"
 #include "LFGMgr.h"
 #include "Log.h"
 #include "Map.h"
@@ -17,6 +29,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "Spell.h"
+#include "WorldSession.h"
 
 void InstanceScript::SaveToDB()
 {
@@ -35,6 +48,57 @@ void InstanceScript::SaveToDB()
     CharacterDatabase.Execute(stmt);
 }
 
+void InstanceScript::OnCreatureCreate(Creature* creature)
+{
+    AddObject(creature, true);
+    AddMinion(creature, true);
+}
+
+void InstanceScript::OnCreatureRemove(Creature* creature)
+{
+    AddObject(creature, false);
+    AddMinion(creature, false);
+}
+
+void InstanceScript::OnGameObjectCreate(GameObject* go)
+{
+    AddObject(go, true);
+    AddDoor(go, true);
+}
+
+void InstanceScript::OnGameObjectRemove(GameObject* go)
+{
+    AddObject(go, false);
+    AddDoor(go, false);
+}
+
+ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
+{
+    ObjectGuidMap::const_iterator i = _objectGuids.find(type);
+
+    if (i != _objectGuids.end())
+    {
+        return i->second;
+    }
+
+    return ObjectGuid::Empty;
+}
+
+ObjectGuid InstanceScript::GetGuidData(uint32 type) const
+{
+    return GetObjectGuid(type);
+}
+
+Creature* InstanceScript::GetCreature(uint32 type)
+{
+    return instance->GetCreature(GetObjectGuid(type));
+}
+
+GameObject* InstanceScript::GetGameObject(uint32 type)
+{
+    return instance->GetGameObject(GetObjectGuid(type));
+}
+
 void InstanceScript::HandleGameObject(ObjectGuid GUID, bool open, GameObject* go)
 {
     if (!go)
@@ -43,7 +107,7 @@ void InstanceScript::HandleGameObject(ObjectGuid GUID, bool open, GameObject* go
         go->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
     else
     {
-        LOG_DEBUG("scripts.ai", "TSCR: InstanceScript: HandleGameObject failed");
+        LOG_DEBUG("scripts.ai", "InstanceScript: HandleGameObject failed");
     }
 }
 
@@ -80,6 +144,30 @@ void InstanceScript::LoadDoorData(const DoorData* data)
     LOG_DEBUG("scripts.ai", "InstanceScript::LoadDoorData: " UI64FMTD " doors loaded.", uint64(doors.size()));
 }
 
+void InstanceScript::LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData)
+{
+    if (creatureData)
+    {
+        LoadObjectData(creatureData, _creatureInfo);
+    }
+
+    if (gameObjectData)
+    {
+        LoadObjectData(gameObjectData, _gameObjectInfo);
+    }
+
+    LOG_DEBUG("scripts", "InstanceScript::LoadObjectData: " SZFMTD " objects loaded.", _creatureInfo.size() + _gameObjectInfo.size());
+}
+
+void InstanceScript::LoadObjectData(ObjectData const* data, ObjectInfoMap& objectInfo)
+{
+    while (data->entry)
+    {
+        objectInfo[data->entry] = data->type;
+        ++data;
+    }
+}
+
 void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
 {
     switch (state)
@@ -93,8 +181,10 @@ void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
         case IN_PROGRESS:
             if (!minion->IsAlive())
                 minion->Respawn();
-            else if (!minion->GetVictim())
+            else
+            {
                 minion->AI()->DoZoneInCombat(nullptr, 100.0f);
+            }
             break;
         default:
             break;
@@ -129,6 +219,40 @@ void InstanceScript::UpdateDoorState(GameObject* door)
     }
 
     door->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
+}
+
+void InstanceScript::AddObject(Creature* obj, bool add)
+{
+    ObjectInfoMap::const_iterator j = _creatureInfo.find(obj->GetEntry());
+    if (j != _creatureInfo.end())
+    {
+        AddObject(obj, j->second, add);
+    }
+}
+
+void InstanceScript::AddObject(GameObject* obj, bool add)
+{
+    ObjectInfoMap::const_iterator j = _gameObjectInfo.find(obj->GetEntry());
+    if (j != _gameObjectInfo.end())
+    {
+        AddObject(obj, j->second, add);
+    }
+}
+
+void InstanceScript::AddObject(WorldObject* obj, uint32 type, bool add)
+{
+    if (add)
+    {
+        _objectGuids[type] = obj->GetGUID();
+    }
+    else
+    {
+        ObjectGuidMap::iterator i = _objectGuids.find(type);
+        if (i != _objectGuids.end() && i->second == obj->GetGUID())
+        {
+            _objectGuids.erase(i);
+        }
+    }
 }
 
 void InstanceScript::AddDoor(GameObject* door, bool add)
@@ -288,7 +412,7 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
 
-    if (!lPlayers.isEmpty())
+    if (!lPlayers.IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
             if (Player* player = itr->GetSource())
@@ -296,7 +420,7 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
     }
     else
     {
-        LOG_DEBUG("scripts.ai", "TSCR: DoUpdateWorldState attempt send data but no players in map.");
+        LOG_DEBUG("scripts.ai", "DoUpdateWorldState attempt send data but no players in map.");
     }
 }
 
@@ -305,7 +429,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 {
     InstanceMap::PlayerList const& players = instance->GetPlayers();
 
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         va_list ap;
         va_start(ap, format);
@@ -323,7 +447,7 @@ void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, 
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
@@ -334,7 +458,7 @@ void InstanceScript::DoStartTimedAchievement(AchievementCriteriaTimedTypes type,
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->StartTimedAchievement(type, entry);
@@ -345,7 +469,7 @@ void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, 
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->RemoveTimedAchievement(type, entry);
@@ -355,7 +479,7 @@ void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, 
 void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
         {
@@ -374,7 +498,7 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 {
     Map::PlayerList const& PlayerList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
+    if (!PlayerList.IsEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->GetSource())
                 player->CastSpell(player, spell, true);

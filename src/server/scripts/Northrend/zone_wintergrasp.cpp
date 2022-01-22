@@ -1,16 +1,18 @@
-/* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version. This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battlefield.h"
@@ -22,14 +24,12 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "ScriptSystem.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include "World.h"
-#include "WorldSession.h"
 
 #define GOSSIP_HELLO_DEMO1  "Build catapult."
 #define GOSSIP_HELLO_DEMO2  "Build demolisher."
@@ -755,8 +755,8 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((go->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
-                    (go->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
+            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
+                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
         }
 
         Creature* IsValidVehicle(Creature* cVeh)
@@ -765,7 +765,7 @@ public:
                 if (Vehicle* vehicle = cVeh->GetVehicleKit())
                     if (Unit* passenger = vehicle->GetPassenger(0))
                         if (IsFriendly(passenger))
-                            if (Creature* teleportTrigger = passenger->SummonTrigger(go->GetPositionX() - 60.0f, go->GetPositionY(), go->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1000))
+                            if (Creature* teleportTrigger = passenger->SummonTrigger(me->GetPositionX() - 60.0f, me->GetPositionY(), me->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1000))
                                 return teleportTrigger;
 
             return nullptr;
@@ -777,7 +777,7 @@ public:
             if (_checkTimer >= 1000)
             {
                 for (uint8 i = 0; i < MAX_WINTERGRASP_VEHICLES; i++)
-                    if (Creature* vehicleCreature = go->FindNearestCreature(vehiclesList[i], 3.0f, true))
+                    if (Creature* vehicleCreature = me->FindNearestCreature(vehiclesList[i], 3.0f, true))
                         if (Creature* teleportTrigger = IsValidVehicle(vehicleCreature))
                             teleportTrigger->CastSpell(vehicleCreature, SPELL_VEHICLE_TELEPORT, true);
 
@@ -798,6 +798,9 @@ public:
 /////// SPELLs
 ////////////////////////////////////////////////
 
+/* 56662, 61409 - Build Siege Vehicle (Force)
+   56664 - Build Catapult (Force)
+   56659 - Build Demolisher (Force) */
 class spell_wintergrasp_force_building : public SpellScriptLoader
 {
 public:
@@ -837,6 +840,9 @@ public:
     }
 };
 
+/* 56661, 61408 - Build Siege Engine
+   56663 - Build Catapult
+   56575 - Build Demolisher */
 class spell_wintergrasp_create_vehicle : public SpellScriptLoader
 {
 public:
@@ -875,6 +881,7 @@ public:
     }
 };
 
+// 49761 - Rocket-Propelled Goblin Grenade
 class spell_wintergrasp_rp_gg : public SpellScriptLoader
 {
 public:
@@ -911,6 +918,7 @@ public:
     }
 };
 
+// 58622 - Teleport to Lake Wintergrasp
 class spell_wintergrasp_portal : public SpellScriptLoader
 {
 public:
@@ -943,6 +951,7 @@ public:
     }
 };
 
+// 36444 - Wintergrasp Water
 class spell_wintergrasp_water : public SpellScriptLoader
 {
 public:
@@ -973,6 +982,7 @@ public:
     }
 };
 
+// 52107 - (Spell not exist in DBC)
 class spell_wintergrasp_hide_small_elementals : public SpellScriptLoader
 {
 public:
@@ -1003,6 +1013,9 @@ public:
     }
 };
 
+/* 57610, 51422 - Cannon
+   50999 - Boulder
+   57607 - Plague Slime */
 class spell_wg_reduce_damage_by_distance : public SpellScriptLoader
 {
 public:

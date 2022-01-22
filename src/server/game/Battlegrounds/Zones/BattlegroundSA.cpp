@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlegroundSA.h"
@@ -12,6 +23,10 @@
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+
+constexpr Milliseconds BG_SA_BOAT_START    = 1min;
+constexpr Milliseconds BG_SA_WARMUPLENGTH  = 2min;
+constexpr Milliseconds BG_SA_ROUNDLENGTH   = 10min;
 
 BattlegroundSA::BattlegroundSA()
 {
@@ -27,8 +42,8 @@ BattlegroundSA::BattlegroundSA()
     SignaledRoundTwoHalfMin = false;
     InitSecondRound = false;
     Attackers = TEAM_ALLIANCE;
-    TotalTime = 0;
-    EndRoundTimer = 0;
+    TotalTime = 0s;
+    EndRoundTimer = 0s;
     ShipsStarted = false;
     Status = BG_SA_NOTSTARTED;
 
@@ -38,7 +53,7 @@ BattlegroundSA::BattlegroundSA()
     for (uint8 i = 0; i < 2; i++)
     {
         RoundScores[i].winner = TEAM_ALLIANCE;
-        RoundScores[i].time = 0;
+        RoundScores[i].time = 0s;
     }
 
     //! This is here to prevent an uninitialised variable warning
@@ -55,7 +70,7 @@ void BattlegroundSA::Init()
 {
     Battleground::Init();
 
-    TotalTime = 0;
+    TotalTime = 0s;
     Attackers = ((urand(0, 1)) ? TEAM_ALLIANCE : TEAM_HORDE);
     for (uint8 i = 0; i <= 5; i++)
         GateStatus[i] = BG_SA_GATE_OK;
@@ -158,7 +173,7 @@ bool BattlegroundSA::ResetObjs()
     GetBGObject(BG_SA_TITAN_RELIC)->SetUInt32Value(GAMEOBJECT_FACTION, atF);
     GetBGObject(BG_SA_TITAN_RELIC)->Refresh();
 
-    TotalTime = 0;
+    TotalTime = 0s;
     ShipsStarted = false;
 
     //Graveyards!
@@ -311,14 +326,14 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
             return;
         }
     }
-    TotalTime += diff;
+    TotalTime += Milliseconds(diff);
 
     if (Status == BG_SA_WARMUP)
     {
         EndRoundTimer = BG_SA_ROUNDLENGTH;
         if (TotalTime >= BG_SA_WARMUPLENGTH)
         {
-            TotalTime = 0;
+            TotalTime = 0s;
             ToggleTimer();
             DemolisherStartState(false);
             Status = BG_SA_ROUND_ONE;
@@ -335,10 +350,10 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
         else
             EndRoundTimer = BG_SA_ROUNDLENGTH;
 
-        if (TotalTime >= 60000)
+        if (TotalTime >= 1min)
         {
             SendWarningToAll(LANG_BG_SA_HAS_BEGUN);
-            TotalTime = 0;
+            TotalTime = 0s;
             ToggleTimer();
             DemolisherStartState(false);
             Status = BG_SA_ROUND_TWO;
@@ -349,7 +364,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
                 itr->second->RemoveAurasDueToSpell(SPELL_PREPARATION);
         }
-        if (TotalTime >= 30000)
+        if (TotalTime >= 30s)
         {
             if (!SignaledRoundTwoHalfMin)
             {
@@ -389,7 +404,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
                 _relicClicked = false;
                 Attackers = (Attackers == TEAM_ALLIANCE) ? TEAM_HORDE : TEAM_ALLIANCE;
                 Status = BG_SA_SECOND_WARMUP;
-                TotalTime = 0;
+                TotalTime = 0s;
                 ToggleTimer();
                 SendWarningToAll(LANG_BG_SA_ROUND_ONE_END);
                 UpdateWaitTimer = 5000;
@@ -665,7 +680,7 @@ void BattlegroundSA::HandleKillUnit(Creature* creature, Player* killer)
 }
 
 /*
-  You may ask what the fuck does it do?
+  You may ask what does it do?
   Prevents owner overwriting guns faction with own.
  */
 void BattlegroundSA::OverrideGunFaction()
@@ -676,13 +691,13 @@ void BattlegroundSA::OverrideGunFaction()
     for (uint8 i = BG_SA_GUN_1; i <= BG_SA_GUN_10; i++)
     {
         if (Creature* gun = GetBGCreature(i))
-            gun->setFaction(BG_SA_Factions[Attackers ? TEAM_ALLIANCE : TEAM_HORDE]);
+            gun->SetFaction(BG_SA_Factions[Attackers ? TEAM_ALLIANCE : TEAM_HORDE]);
     }
 
     for (uint8 i = BG_SA_DEMOLISHER_1; i <= BG_SA_DEMOLISHER_4; i++)
     {
         if (Creature* dem = GetBGCreature(i))
-            dem->setFaction(BG_SA_Factions[Attackers]);
+            dem->SetFaction(BG_SA_Factions[Attackers]);
     }
 }
 
@@ -807,10 +822,10 @@ GraveyardStruct const* BattlegroundSA::GetClosestGraveyard(Player* player)
 
 void BattlegroundSA::SendTime()
 {
-    uint32 end_of_round = (EndRoundTimer - TotalTime);
-    UpdateWorldState(BG_SA_TIMER_MINS, end_of_round / 60000);
-    UpdateWorldState(BG_SA_TIMER_SEC_TENS, (end_of_round % 60000) / 10000);
-    UpdateWorldState(BG_SA_TIMER_SEC_DECS, ((end_of_round % 60000) % 10000) / 1000);
+    Milliseconds end_of_round = (EndRoundTimer - TotalTime);
+    UpdateWorldState(BG_SA_TIMER_MINS, end_of_round / 1min);
+    UpdateWorldState(BG_SA_TIMER_SEC_TENS, (end_of_round % 1min) / 10s);
+    UpdateWorldState(BG_SA_TIMER_SEC_DECS, ((end_of_round % 1min) % 10s) / 1s);
 }
 
 bool BattlegroundSA::CanInteractWithObject(uint32 objectId)
@@ -948,7 +963,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
                             BG_SA_NpcSpawnlocs[j][2], BG_SA_NpcSpawnlocs[j][3], 600);
 
                 if (Creature* dem = GetBGCreature(j))
-                    dem->setFaction(BG_SA_Factions[Attackers]);
+                    dem->SetFaction(BG_SA_Factions[Attackers]);
             }
 
             UpdateWorldState(BG_SA_LEFT_GY_ALLIANCE, (GraveyardStatus[i] == TEAM_ALLIANCE ? 1 : 0));
@@ -976,7 +991,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
                             BG_SA_NpcSpawnlocs[j][2], BG_SA_NpcSpawnlocs[j][3], 600);
 
                 if (Creature* dem = GetBGCreature(j))
-                    dem->setFaction(BG_SA_Factions[Attackers]);
+                    dem->SetFaction(BG_SA_Factions[Attackers]);
             }
 
             UpdateWorldState(BG_SA_RIGHT_GY_ALLIANCE, (GraveyardStatus[i] == TEAM_ALLIANCE ? 1 : 0));

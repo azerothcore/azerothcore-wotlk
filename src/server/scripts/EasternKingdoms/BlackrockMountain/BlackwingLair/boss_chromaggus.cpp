@@ -1,17 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackwing_lair.h"
 
 enum Emotes
 {
@@ -294,21 +305,24 @@ class go_chromaggus_lever : public GameObjectScript
         {
             go_chromaggus_leverAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
 
-            bool OnGossipHello(Player* player)
+            bool GossipHello(Player* player, bool reportUse) override
             {
-                if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
+                if (reportUse)
                 {
-                    _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
+                    if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
+                    {
+                        _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
 
-                    if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
-                        creature->AI()->AttackStart(player);
+                        if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
+                            creature->AI()->AttackStart(player);
 
-                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
-                        _instance->HandleGameObject(ObjectGuid::Empty, true, go);
+                        if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
+                            _instance->HandleGameObject(ObjectGuid::Empty, true, go);
+                    }
+
+                    me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
+                    me->SetGoState(GO_STATE_ACTIVE);
                 }
-
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
-                go->SetGoState(GO_STATE_ACTIVE);
 
                 return true;
             }

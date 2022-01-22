@@ -4,7 +4,6 @@
  */
 
 #include "TOTP.h"
-#include <cstring>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 

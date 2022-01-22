@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "serpent_shrine.h"
 
 enum Talk
@@ -141,7 +154,7 @@ public:
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
                 case EVENT_SPELL_CATACLYSMIC_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 50.0f, true)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 50.0f, true)))
                         me->CastSpell(target, SPELL_CATACLYSMIC_BOLT, false);
                     events.ScheduleEvent(EVENT_SPELL_CATACLYSMIC_BOLT, 6000);
                     break;

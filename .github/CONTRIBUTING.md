@@ -13,7 +13,7 @@ AzerothCore is a learning project, and there are lots of different ways to contr
 
 If you want to contribute to the project, you will find a lot of resources that will guide you in our wiki.
 
-Feel free to join us on [our Discord chat server](https://discord.gg/gkt4y2x) where we taught a lot of new people how to get started and who are now important contributors!
+Feel free to join our [Discord](https://discord.gg/gkt4y2x) server where we are happy to help new people to get started!
 
 ## AUTHORS & CONTRIBUTORS
 
@@ -24,19 +24,24 @@ This project exists thanks to:
 - All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/AUTHORS)
 - All the [MaNGOS, ScriptDev2 and UDB developers and contributors](https://github.com/cmangos/mangos-wotlk/blob/master/AUTHORS.md)
 
+Check [AUTHORS](https://github.com/azerothcore/azerothcore-wotlk/blob/master/AUTHORS) for more details.
+
 ## IMPORTANT LINKS
 
-<!-- Remove if the PR 3210 is accepted
-- [Code of Conduct](https://github.com/azerothcore-wotlk/.github/code_of_conduct.md
--->
+- [Installation Guide](https://www.azerothcore.org/wiki/installation)
+- [Code of Conduct](https://github.com/azerothcore-wotlk/.github/code_of_conduct.md)
+- [FAQ](https://www.azerothcore.org/wiki/faq)
+- [Common Errors](https://www.azerothcore.org/wiki/common-errors)
+
 - [Website](http://www.azerothcore.org/)
+- [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
 - [AzerothCore catalogue](http://www.azerothcore.org/catalogue/  "Modules, tools, and other things for AzerothCore") (modules, tools etc...)
 - [Module template / Module skeleton](https://github.com/azerothcore/skeleton-module/)
-- [Our community hub (Discord)](https://discord.gg/gkt4y2x)
-- [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
+- [Discord](https://discord.gg/gkt4y2x)
 - [Our Facebook page](https://www.facebook.com/AzerothCore/)
 - [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
 
+All contributions, big or small, are appreciated <3
 
 The AzerothCore Staff appreciate all the help and contribution that *you* put your time into.
 

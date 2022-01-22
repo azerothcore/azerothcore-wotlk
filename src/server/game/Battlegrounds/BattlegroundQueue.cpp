@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlegroundQueue.h"
@@ -34,6 +45,9 @@ BattlegroundQueue::BattlegroundQueue() : m_bgTypeId(BATTLEGROUND_TYPE_NONE), m_a
                 m_WaitTimes[i][j][k] = 0;
         }
     }
+
+    _queueAnnouncementTimer.fill(-1);
+    _queueAnnouncementCrossfactioned = false;
 }
 
 BattlegroundQueue::~BattlegroundQueue()
@@ -75,7 +89,7 @@ bool BattlegroundQueue::SelectionPool::KickGroup(const uint32 size)
     for (auto itr = groupToKick; itr != SelectedGroups.end(); ++itr)
     {
         // if proper size - overwrite to kick last one
-        if (abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
+        if (std::abs(int32((*itr)->Players.size()) - (int32)size) <= 1)
         {
             groupToKick = itr;
             foundProper = true;
@@ -407,7 +421,7 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
     }
 
     // balance the teams based on the difference allowed
-    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (std::abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -490,7 +504,7 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
     }
 
     // if free space differs too much, ballance
-    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (std::abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -596,7 +610,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
             return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
         case BG_QUEUE_INVITATION_TYPE_BALANCED: // check difference between selection pools - if = 1 or less start.
-            return abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+            return std::abs(static_cast<int32>(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - static_cast<int32>(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
 
         case BG_QUEUE_INVITATION_TYPE_EVEN: // if both counts are same then it's an even match
             return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() == m_SelectionPools[TEAM_HORDE].GetPlayerCount()) && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
@@ -664,7 +678,7 @@ void BattlegroundQueue::UpdateEvents(uint32 diff)
 struct BgEmptinessComp { bool operator()(Battleground* const& bg1, Battleground* const& bg2) const { return ((float)bg1->GetMaxFreeSlots() / (float)bg1->GetMaxPlayersPerTeam()) > ((float)bg2->GetMaxFreeSlots() / (float)bg2->GetMaxPlayersPerTeam()); } };
 typedef std::set<Battleground*, BgEmptinessComp> BattlegroundNeedSet;
 
-void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
+void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
 {
     // if no players in queue - do nothing
     if (IsAllQueuesEmpty(bracket_id))
@@ -939,6 +953,45 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
             }
         }
     }
+
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED))
+    {
+        uint32 qPlayers = 0;
+
+        if (_queueAnnouncementCrossfactioned)
+        {
+            qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_CFBG);
+        }
+        else
+        {
+            qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_HORDE) + GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_ALLIANCE);
+        }
+
+        if (!qPlayers)
+        {
+            _queueAnnouncementTimer[bracket_id] = -1;
+            return;
+        }
+
+        if (_queueAnnouncementTimer[bracket_id] >= 0)
+        {
+            if (_queueAnnouncementTimer[bracket_id] <= static_cast<int32>(diff))
+            {
+                _queueAnnouncementTimer[bracket_id] = -1;
+
+                char const* bgName = bg_template->GetName();
+                uint32 MaxPlayers = bg_template->GetMinPlayersPerTeam() * 2;
+                uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
+                uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
+
+                sWorld->SendWorldTextOptional(LANG_BG_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_BG_QUEUE, bgName, q_min_level, q_max_level, qPlayers, MaxPlayers);
+            }
+            else
+            {
+                _queueAnnouncementTimer[bracket_id] -= static_cast<int32>(diff);
+            }
+        }
+    }
 }
 
 uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue)
@@ -1001,12 +1054,22 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
     }
     else // Show queue status to server (when joining battleground queue)
     {
-        if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+        if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED))
         {
-            return;
+            if (_queueAnnouncementTimer[bracketId] < 0)
+            {
+                _queueAnnouncementTimer[bracketId] = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER);
+            }
         }
+        else
+        {
+            if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+            {
+                return;
+            }
 
-        sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+            sWorld->SendWorldTextOptional(LANG_BG_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_BG_QUEUE, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+        }
     }
 }
 
@@ -1056,7 +1119,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
                 return;
             }
 
-            sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD, bgName, arenatype.c_str(), q_min_level, q_max_level, qPlayers, playersNeed);
+            sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, bgName, arenatype.c_str(), q_min_level, q_max_level, qPlayers, playersNeed);
         }
     }
     else
@@ -1071,7 +1134,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
         uint32 ArenaTeamRating = ginfo->ArenaTeamRating;
         std::string TeamName = team->GetName();
 
-        sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+        sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
     }
 }
 
@@ -1095,7 +1158,20 @@ void BattlegroundQueue::SendExitMessageArenaQueue(GroupQueueInfo* ginfo)
     std::string TeamName = team->GetName();
 
     if (ArenaType && ginfo->Players.empty())
-        sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+    {
+        sWorld->SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+    }
+}
+
+void BattlegroundQueue::SetQueueAnnouncementTimer(uint32 bracketId, int32 timer, bool isCrossFactionBG /*= true*/)
+{
+    _queueAnnouncementTimer[bracketId] = timer;
+    _queueAnnouncementCrossfactioned = isCrossFactionBG;
+}
+
+int32 BattlegroundQueue::GetQueueAnnouncementTimer(uint32 bracketId) const
+{
+    return _queueAnnouncementTimer[bracketId];
 }
 
 /*********************************************************/

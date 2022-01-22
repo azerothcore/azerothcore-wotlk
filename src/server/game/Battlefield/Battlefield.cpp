@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battlefield.h"
@@ -14,7 +25,7 @@
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Map.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
@@ -803,7 +814,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         return nullptr;
     }
 
-    creature->setFaction(BattlefieldFactions[teamId]);
+    creature->SetFaction(BattlefieldFactions[teamId]);
     creature->SetHomePosition(x, y, z, o);
 
     // force using DB speeds -- do we really need this?
@@ -880,7 +891,7 @@ bool BfCapturePoint::HandlePlayerEnter(Player* player)
     if (GameObject* go = GetCapturePointGo(player))
     {
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldState1, 1);
-        player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldstate2, uint32(ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f)));
+        player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldstate2, uint32(std::ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f)));
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
     }
     return m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second;
@@ -913,7 +924,7 @@ void BfCapturePoint::SendChangePhase()
                 // send this too, sometimes the slider disappears, dunno why :(
                 player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
                 // send these updates to only the ones in this objective
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
+                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) std::ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
                 // send this too, sometimes it resets :S
                 player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
             }

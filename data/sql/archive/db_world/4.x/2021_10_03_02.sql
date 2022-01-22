@@ -1,0 +1,31 @@
+-- DB update 2021_10_03_01 -> 2021_10_03_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_03_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_03_01 2021_10_03_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1632544235994510638'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1632544235994510638');
+
+-- Remove various high-level consumeables from Scorpid Reaver
+DELETE FROM `creature_loot_template` WHERE `Entry` = 4140 AND `Item` IN (4425, 8766, 8932, 8950, 8953, 13443, 13446);
+
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_03_02' WHERE sql_rev = '1632544235994510638';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

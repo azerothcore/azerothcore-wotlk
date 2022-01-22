@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,8 +22,8 @@ Comment: All account related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AccountMgr.h"
 #include "AES.h"
+#include "AccountMgr.h"
 #include "Base32.h"
 #include "Chat.h"
 #include "CryptoGenerics.h"
@@ -27,14 +38,20 @@ EndScriptData */
 #include <openssl/rand.h>
 #include <unordered_map>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class account_commandscript : public CommandScript
 {
 public:
     account_commandscript() : CommandScript("account_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> accountSetCommandTable =
+        static ChatCommandTable accountSetCommandTable =
         {
             { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
             { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
@@ -42,24 +59,24 @@ public:
             { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
         };
 
-        static std::vector<ChatCommand> accountLockCommandTable
+        static ChatCommandTable accountLockCommandTable
         {
             { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
             { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
         };
 
-        static std::vector<ChatCommand> account2faCommandTable
+        static ChatCommandTable account2faCommandTable
         {
             { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
             { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
         };
 
-        static std::vector<ChatCommand> accountRemoveCommandTable
+        static ChatCommandTable accountRemoveCommandTable
         {
             { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
 
-        static std::vector<ChatCommand> accountCommandTable =
+        static ChatCommandTable accountCommandTable =
         {
             { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
             { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
@@ -73,7 +90,7 @@ public:
             { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
         };
@@ -246,8 +263,8 @@ public:
 
         uint32 accountId = handler->GetSession()->GetAccountId();
 
-        int expansion = atoi(exp); //get int anyway (0 if error)
-        if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
+        auto expansion = Acore::StringTo<uint8>(exp); //get int anyway (0 if error)
+        if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
         {
             handler->SendSysMessage(LANG_IMPROPER_VALUE);
             handler->SetSentErrorMessage(true);
@@ -256,12 +273,12 @@ public:
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
-        stmt->setUInt8(0, uint8(expansion));
+        stmt->setUInt8(0, *expansion);
         stmt->setUInt32(1, accountId);
 
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_ACCOUNT_ADDON, expansion);
+        handler->PSendSysMessage(LANG_ACCOUNT_ADDON, *expansion);
         return true;
     }
 
@@ -739,18 +756,18 @@ public:
                 handler->HasLowerSecurityAccount(nullptr, accountId, true))
             return false;
 
-        int expansion = atoi(exp); //get int anyway (0 if error)
-        if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
+        auto expansion = Acore::StringTo<uint8>(exp); //get int anyway (0 if error)
+        if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
             return false;
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
-        stmt->setUInt8(0, expansion);
+        stmt->setUInt8(0, *expansion);
         stmt->setUInt32(1, accountId);
 
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName.c_str(), accountId, expansion);
+        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName.c_str(), accountId, *expansion);
         return true;
     }
 
@@ -792,7 +809,7 @@ public:
         }
 
         // Check for invalid specified GM level.
-        gm = (isAccountNameGiven) ? atoi(arg2) : atoi(arg1);
+        gm = (isAccountNameGiven) ? Acore::StringTo<int32>(arg2).value_or(0) : Acore::StringTo<int32>(arg1).value_or(0);
         if (gm > SEC_CONSOLE)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -802,7 +819,7 @@ public:
 
         // handler->getSession() == nullptr only for console
         targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->getSelectedPlayer()->GetSession()->GetAccountId();
-        int32 gmRealmID = (isAccountNameGiven) ? atoi(arg3) : atoi(arg2);
+        int32 gmRealmID = (isAccountNameGiven) ? Acore::StringTo<int32>(arg3).value_or(0) : Acore::StringTo<int32>(arg2).value_or(0);
         uint32 playerSecurity;
         if (handler->GetSession())
             playerSecurity = AccountMgr::GetSecurity(handler->GetSession()->GetAccountId(), gmRealmID);

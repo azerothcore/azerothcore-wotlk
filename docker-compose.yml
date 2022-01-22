@@ -32,7 +32,7 @@ services:
   abstract-bind:
     image: local/azerothcore/abstract-bind
     volumes:
-      - .:/azerothcore/
+      - .:/azerothcore
       # expose some dist folder outside allowing the host to use them
       - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
       - ${DOCKER_VOL_BIN:-ac-bin}:/azerothcore/env/dist/bin
@@ -45,7 +45,7 @@ services:
   abstract-no-bind:
     image: local/azerothcore/abstract-no-bind
     volumes:
-      - ac-proj:/azerothcore/
+      - ac-proj:/azerothcore
     profiles: [abstract-service] # do not run this
 
 #=======================

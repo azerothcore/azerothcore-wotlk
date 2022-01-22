@@ -1,8 +1,24 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 PlayerTaxi::PlayerTaxi() : _taxiSegment(0)
 {
@@ -75,18 +91,31 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level
         SetTaximaskNode(213);                               //Shattered Sun Staging Area
 }
 
-void PlayerTaxi::LoadTaxiMask(std::string const& data)
+bool PlayerTaxi::LoadTaxiMask(std::string_view data)
 {
-    Tokenizer tokens(data, ' ');
+    bool warn = false;
+    std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
-    uint8 index;
-    Tokenizer::const_iterator iter;
-    for (iter = tokens.begin(), index = 0;
-         (index < TaxiMaskSize) && (iter != tokens.end()); ++iter, ++index)
+    for (uint8 index = 0; (index < TaxiMaskSize) && (index < tokens.size()); ++index)
     {
-        // load and set bits only for existed taxi nodes
-        m_taximask[index] = sTaxiNodesMask[index] & uint32(atol(*iter));
+        if (Optional<uint32> mask = Acore::StringTo<uint32>(tokens[index]))
+        {
+            // load and set bits only for existing taxi nodes
+            m_taximask[index] = sTaxiNodesMask[index] & *mask;
+
+            if (m_taximask[index] != *mask)
+            {
+                warn = true;
+            }
+        }
+        else
+        {
+            m_taximask[index] = 0;
+            warn = true;
+        }
     }
+
+    return !warn;
 }
 
 void PlayerTaxi::AppendTaximaskTo(ByteBuffer& data, bool all)
@@ -107,12 +136,16 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, TeamI
 {
     ClearTaxiDestinations();
 
-    Tokenizer tokens(values, ' ');
-
-    for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
+    for (auto const& itr : Acore::Tokenize(values, ' ', false))
     {
-        uint32 node = uint32(atol(*iter));
-        AddTaxiDestination(node);
+        if (Optional<uint32> node = Acore::StringTo<uint32>(itr))
+        {
+            AddTaxiDestination(*node);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     // Check integrity

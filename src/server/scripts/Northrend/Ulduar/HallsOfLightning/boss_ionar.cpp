@@ -1,12 +1,25 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "halls_of_lightning.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "halls_of_lightning.h"
 
 enum IonarSpells
 {
@@ -174,13 +187,13 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_BALL_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
 
                     events.RepeatEvent(10000 + rand() % 1000);
                     break;
                 case EVENT_STATIC_OVERLOAD:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
 
                     events.RepeatEvent(5000 + rand() % 1000);

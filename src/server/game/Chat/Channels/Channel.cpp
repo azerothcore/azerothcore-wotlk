@@ -1,11 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
 #include "ChannelMgr.h"
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
@@ -345,14 +357,15 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (ban && (AccountMgr::IsGMAccount(sec) || isGoodConstantModerator))
         {
-            if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
-                if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid.GetCounter()))
+            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+            {
+                if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(guid))
                 {
-                    if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->getRace()))
+                    if (Player::TeamIdForRace(gpd->Race) == Player::TeamIdForRace(player->getRace()))
                     {
                         banOffline = true;
-                        victim = guid;
-                        badAccId = gpd->accountId;
+                        victim     = guid;
+                        badAccId   = gpd->AccountId;
                     }
                     else
                     {
@@ -360,6 +373,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
                         return;
                     }
                 }
+            }
 
             if (!banOffline)
             {
@@ -482,8 +496,10 @@ void Channel::UnBan(Player const* player, std::string const& badname)
     }
 
     ObjectGuid victim;
-    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
+    if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+    {
         victim = guid;
+    }
 
     if (!victim || !IsBanned(victim))
     {
@@ -1031,7 +1047,7 @@ void Channel::MakeChannelOwner(WorldPacket* data)
 {
     std::string name = "";
 
-    if (!sObjectMgr->GetPlayerNameByGUID(_ownerGUID.GetCounter(), name) || name.empty())
+    if (!sCharacterCache->GetCharacterNameByGuid(_ownerGUID, name) || name.empty())
         name = "PLAYER_NOT_FOUND";
 
     MakeNotifyPacket(data, CHAT_CHANNEL_OWNER_NOTICE);

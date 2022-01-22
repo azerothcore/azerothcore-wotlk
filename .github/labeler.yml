@@ -1,3 +1,9 @@
+file-cpp:
+  - src/**/*.cpp
+  - src/**/*.h
+  - deps/**/*.cpp
+  - deps/**/*.h
+
 DB:
   - data/**/*.sql
 
@@ -21,8 +27,11 @@ Bash:
   - deps/**/*.sh
   - modules/**/*.sh
 
-Cmake:
+CMake:
   - ./*.cmake
 
 Workflow:
   - .github/workflows/*
+
+Batch:
+  - apps/**/*.bat

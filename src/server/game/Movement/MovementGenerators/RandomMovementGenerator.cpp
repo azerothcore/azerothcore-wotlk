@@ -1,15 +1,28 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "RandomMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureGroups.h"
 #include "Map.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
-#include "RandomMovementGenerator.h"
 #include "Spell.h"
 #include "Util.h"
 
@@ -141,7 +154,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
                 for (; itrNext != finalPath.end(); ++itr, ++itrNext)
                 {
                     distDiff = sqrt(((*itr).x - (*itrNext).x) * ((*itr).x - (*itrNext).x) + ((*itr).y - (*itrNext).y) * ((*itr).y - (*itrNext).y));
-                    zDiff = fabs((*itr).z - (*itrNext).z);
+                    zDiff = std::fabs((*itr).z - (*itrNext).z);
 
                     // Xinef: tree climbing, cut as much as we can
                     if (zDiff > 2.0f ||
@@ -182,18 +195,30 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     _currDestPosition.Relocate(finalPoint.x, finalPoint.y, finalPoint.z);
 
     creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
-    ++_moveCount;
-    if (roll_chance_i((int32)_moveCount * 25 + 10))
+    bool walk = true;
+    switch (creature->GetMovementTemplate().GetRandom())
     {
-        _moveCount = 0;
-        _nextMoveTime.Reset(urand(4000, 8000));
+    case CreatureRandomMovementType::CanRun:
+        walk = creature->IsWalking();
+        break;
+    case CreatureRandomMovementType::AlwaysRun:
+        walk = false;
+        break;
+    default:
+        break;
     }
 
     Movement::MoveSplineInit init(creature);
     init.MovebyPath(finalPath);
-    init.SetWalk(true);
+    init.SetWalk(walk);
     init.Launch();
 
+    ++_moveCount;
+    if (roll_chance_i((int32) _moveCount * 25 + 10))
+    {
+        _moveCount = 0;
+        _nextMoveTime.Reset(urand(4000, 8000));
+    }
     if (sWorld->getBoolConfig(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS))
         _preComputedPaths.erase(pathIdx);
 
@@ -222,7 +247,7 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
         {
             float angle = (M_PI * 2.0f / (float)RANDOM_POINTS_NUMBER) * i;
             float factor = 0.5f + rand_norm() * 0.5f;
-            _destinationPoints.push_back(G3D::Vector3(_initialPosition.GetPositionX() + _wanderDistance * cos(angle)*factor, _initialPosition.GetPositionY() + _wanderDistance * sin(angle)*factor, _initialPosition.GetPositionZ()));
+            _destinationPoints.push_back(G3D::Vector3(_initialPosition.GetPositionX() + _wanderDistance * cos(angle)*factor, _initialPosition.GetPositionY() + _wanderDistance * std::sin(angle)*factor, _initialPosition.GetPositionZ()));
         }
     }
 
@@ -247,10 +272,10 @@ void RandomMovementGenerator<Creature>::DoFinalize(Creature* creature)
 template<>
 bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint32 diff)
 {
-    if (creature->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
+    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
     {
         _nextMoveTime.Reset(0);  // Expire the timer
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        creature->StopMoving();
         return true;
     }
 
@@ -260,23 +285,6 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
         _nextMoveTime.Reset(0);  // Expire the timer
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
         return true;
-    }
-
-    // prevent movement while casting spells with cast time or channel time
-    if (creature->HasUnitState(UNIT_STATE_CASTING))
-    {
-        bool stop = true;
-        if (Spell* spell = creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (!(spell->GetSpellInfo()->ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING)) && !(spell->GetSpellInfo()->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
-                stop = false;
-
-        if (stop)
-        {
-            if (!creature->IsStopped())
-                creature->StopMoving();
-
-            return true;
-        }
     }
 
     if (creature->movespline->Finalized())

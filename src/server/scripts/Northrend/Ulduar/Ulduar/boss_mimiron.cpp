@@ -1,17 +1,30 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 enum SpellData
 {
@@ -368,7 +381,7 @@ public:
 
             if (!hardmode)
             {
-                me->MonsterYell(TEXT_LMK2_ACTIVATE, LANG_UNIVERSAL, 0);
+                me->Yell(TEXT_LMK2_ACTIVATE, LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_TANK_ACTIVE);
                 events.ScheduleEvent(EVENT_SIT_LMK2, 6000);
                 events.ScheduleEvent(EVENT_BERSERK, 900000);
@@ -434,7 +447,7 @@ public:
                         computer->AI()->Talk(minutesTalkNum++);
                     break;
                 case EVENT_MIMIRON_SAY_HARDMODE:
-                    me->MonsterYell(TEXT_HARDMODE, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_HARDMODE, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_TANK_HARD_INTRO);
                     events.ScheduleEvent(EVENT_SPAWN_FLAMES_INITIAL, 0);
                     events.ScheduleEvent(EVENT_SIT_LMK2, 4000);
@@ -455,12 +468,14 @@ public:
                             if( !pg.empty() )
                             {
                                 uint8 index = urand(0, pg.size() - 1);
-                                Player* p = pg[index];
+                                Player* player = pg[index];
                                 float angle = rand_norm() * 2 * M_PI;
                                 float z = 364.35f;
-                                if (!p->IsWithinLOS(p->GetPositionX() + cos(angle) * 5.0f, p->GetPositionY() + sin(angle) * 5.0f, z))
-                                    angle = p->GetAngle(2744.65f, 2569.46f);
-                                me->CastSpell(p->GetPositionX() + cos(angle) * 5.0f, p->GetPositionY() + sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
+                                if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z))
+                                {
+                                    angle = player->GetAngle(2744.65f, 2569.46f);
+                                }
+                                me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
                                 pg.erase(pg.begin() + index);
                             }
 
@@ -469,7 +484,7 @@ public:
                     break;
                 case EVENT_BERSERK:
                     berserk = true;
-                    me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_BERSERK, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_BERSERK);
                     if( hardmode )
                         me->SummonCreature(33576, 2744.78f, 2569.47f, 364.32f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000);
@@ -517,7 +532,7 @@ public:
                     if (Creature* LMK2 = GetLMK2())
                     {
                         me->EnterVehicle(LMK2, 1);
-                        me->MonsterYell(TEXT_LMK2_DEATH, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_LMK2_DEATH, LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_TANK_DEATH);
                         LMK2->SetFacingTo(3.58f);
                         events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_0, 6000);
@@ -558,7 +573,7 @@ public:
                     EnterEvadeMode();
                     break;
                 case EVENT_SITTING_ON_VX001:
-                    me->MonsterYell(TEXT_VX001_ACTIVATE, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_VX001_ACTIVATE, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_TORSO_ACTIVE);
                     events.ScheduleEvent(EVENT_ENTER_VX001, 5000);
                     break;
@@ -616,7 +631,7 @@ public:
                     break;
                 case EVENT_SAY_VX001_DEAD:
                     changeAllowedFlameSpreadTime = true;
-                    me->MonsterYell(TEXT_VX001_DEATH, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_VX001_DEATH, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_TORSO_DEATH);
                     events.ScheduleEvent(EVENT_ENTER_ACU, 7000);
                     break;
@@ -630,7 +645,7 @@ public:
                     EnterEvadeMode();
                     break;
                 case EVENT_SAY_ACU_ACTIVATE:
-                    me->MonsterYell(TEXT_ACU_ACTIVATE, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_ACU_ACTIVATE, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_HEAD_ACTIVE);
                     events.ScheduleEvent(EVENT_ACU_START_ATTACK, 4000);
                     break;
@@ -646,7 +661,7 @@ public:
                     EnterEvadeMode();
                     break;
                 case EVENT_SAY_ACU_DEAD:
-                    me->MonsterYell(TEXT_ACU_DEATH, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_ACU_DEATH, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_HEAD_DEATH);
                     events.ScheduleEvent(EVENT_LEVIATHAN_COME_CLOSER, 5000);
                     break;
@@ -705,7 +720,7 @@ public:
                         ACU->SetDisableGravity(false);
                         ACU->EnterVehicle(VX001, 3);
                         me->EnterVehicle(VX001, 1);
-                        me->MonsterYell(TEXT_VOLTRON_ACTIVATE, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_VOLTRON_ACTIVATE, LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_VOLTRON_ACTIVE);
                         events.ScheduleEvent(EVENT_START_PHASE4, 10000);
                     }
@@ -763,8 +778,7 @@ public:
                         ACU->DespawnOrUnsummon(7000);
                         ACU->SetReactState(REACT_PASSIVE);
 
-                        Position exitPos;
-                        me->GetPosition(&exitPos);
+                        Position exitPos = me->GetPosition();
                         me->_ExitVehicle(&exitPos);
                         me->AttackStop();
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
@@ -775,7 +789,7 @@ public:
 
                         float angle = VX001->GetOrientation();
                         float v_x = me->GetPositionX() + cos(angle) * 10.0f;
-                        float v_y = me->GetPositionY() + sin(angle) * 10.0f;
+                        float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
                         me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
 
                         if( pInstance )
@@ -800,7 +814,7 @@ public:
                     }
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
-                    me->MonsterYell(TEXT_VOLTRON_DEATH, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_VOLTRON_DEATH, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_VOLTRON_DEATH);
                     // spawn chest
                     if( uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)) )
@@ -1137,7 +1151,7 @@ public:
                         if (!pList.empty())
                             pTarget = pList[urand(0, pList.size() - 1)];
                         else
-                            pTarget = (Player*)SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
+                            pTarget = (Player*)SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
 
                         if( pTarget )
                             cannon->CastSpell(pTarget, SPELL_NAPALM_SHELL, false);
@@ -1148,7 +1162,7 @@ public:
                 case EVENT_SPELL_PLASMA_BLAST:
                     if (Unit* victim = me->GetVictim())
                     {
-                        me->MonsterTextEmote("Leviathan Mk II begins to cast Plasma Blast!", 0, true);
+                        me->TextEmote("Leviathan Mk II begins to cast Plasma Blast!", nullptr, true);
                         cannon->CastSpell(victim, SPELL_PLASMA_BLAST, false);
                     }
                     events.RepeatEvent(22000);
@@ -1181,12 +1195,12 @@ public:
                     {
                         if( rand() % 2 )
                         {
-                            c->MonsterYell(TEXT_LMK2_SLAIN_1, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_LMK2_SLAIN_1, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_TANK_SLAY_1);
                         }
                         else
                         {
-                            c->MonsterYell(TEXT_LMK2_SLAIN_2, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_LMK2_SLAIN_2, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_TANK_SLAY_2);
                         }
                     }
@@ -1194,12 +1208,12 @@ public:
                     {
                         if( rand() % 2 )
                         {
-                            c->MonsterYell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
                         }
                         else
                         {
-                            c->MonsterYell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
                         }
                     }
@@ -1438,10 +1452,9 @@ public:
                                 {
                                     if( Creature* trigger = me->SummonCreature(NPC_ROCKET_STRIKE_N, temp->GetPositionX(), temp->GetPositionY(), temp->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 6000) )
                                         trigger->CastSpell(trigger, SPELL_ROCKET_STRIKE_AURA, true);
-                                    Position exitPos;
-                                    r->GetPosition(&exitPos);
+                                    Position exitPos = r->GetPosition();
                                     exitPos.m_positionX += cos(me->GetOrientation()) * 2.35f;
-                                    exitPos.m_positionY += sin(me->GetOrientation()) * 2.35f;
+                                    exitPos.m_positionY += std::sin(me->GetOrientation()) * 2.35f;
                                     exitPos.m_positionZ += 2.0f * Phase;
                                     r->_ExitVehicle(&exitPos);
                                     me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, r->GetGUID());
@@ -1502,17 +1515,15 @@ public:
                     {
                         float angle = me->GetAngle(p);
 
-                        if (Unit* vehicle = me->GetVehicleBase())
-                        {
-                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                            vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
-                            angle -= vehicle->GetOrientation();
-                        }
-
                         spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
                         spinningUpTimer = 1500;
                         me->SetFacingTo(angle);
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
+                        if (Unit* vehicle = me->GetVehicleBase())
+                        {
+                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                            vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                        }
                         events.RescheduleEvent((Phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14500);
                     }
                     break;
@@ -1538,12 +1549,12 @@ public:
                     {
                         if( rand() % 2 )
                         {
-                            c->MonsterYell(TEXT_VX001_SLAIN_1, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VX001_SLAIN_1, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_TORSO_SLAY_1);
                         }
                         else
                         {
-                            c->MonsterYell(TEXT_VX001_SLAIN_2, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VX001_SLAIN_2, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_TORSO_SLAY_2);
                         }
                     }
@@ -1551,12 +1562,12 @@ public:
                     {
                         if( rand() % 2 )
                         {
-                            c->MonsterYell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
                         }
                         else
                         {
-                            c->MonsterYell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
                         }
                     }
@@ -1749,7 +1760,7 @@ public:
                         float angle = victim->GetAngle(me->GetPositionX(), me->GetPositionY());
                         me->SetOrientation( me->GetAngle(victim->GetPositionX(), victim->GetPositionY()) );
                         float x = victim->GetPositionX() + 15.0f * cos(angle);
-                        float y = victim->GetPositionY() + 15.0f * sin(angle);
+                        float y = victim->GetPositionY() + 15.0f * std::sin(angle);
 
                         // check if there's magnetic core in line of movement
                         Creature* mc = nullptr;
@@ -1795,7 +1806,7 @@ public:
                         }
                         else
                         {
-                            if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 27.5f, true))
+                            if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 27.5f, true))
                             {
                                 me->SetFacingToObject(victim);
                                 me->CastSpell(victim, SPELL_PLASMA_BALL, false);
@@ -1861,12 +1872,12 @@ public:
                     {
                         if( rand() % 2 )
                         {
-                            c->MonsterYell(TEXT_ACU_SLAIN_1, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_ACU_SLAIN_1, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_HEAD_SLAY_1);
                         }
                         else
                         {
-                            c->MonsterYell(TEXT_ACU_SLAIN_2, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_ACU_SLAIN_2, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_HEAD_SLAY_2);
                         }
                     }
@@ -1874,12 +1885,12 @@ public:
                     {
                         if( rand() % 2 )
                         {
-                            c->MonsterYell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VOLTRON_SLAIN_1, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_VOLTRON_SLAY_1);
                         }
                         else
                         {
-                            c->MonsterYell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL, 0);
+                            c->Yell(TEXT_VOLTRON_SLAIN_2, LANG_UNIVERSAL);
                             c->PlayDirectSound(SOUND_VOLTRON_SLAY_2);
                         }
                     }
@@ -2366,7 +2377,7 @@ public:
                             if (target && prevdist >= 4.0f) // no need to spread when player is standing in fire, check distance
                             {
                                 float angle = last->GetAngle(target->GetPositionX(), target->GetPositionY()) - M_PI / 8 + rand_norm() * 2 * M_PI / 8;
-                                SpreadFlame(last->GetPositionX() + 7.0f * cos(angle), last->GetPositionY() + 7.0f * sin(angle));
+                                SpreadFlame(last->GetPositionX() + 7.0f * cos(angle), last->GetPositionY() + 7.0f * std::sin(angle));
                             }
                         }
 
@@ -2403,7 +2414,7 @@ public:
                 case SPELL_WATER_SPRAY:
                     {
                         if (me->IsSummon())
-                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                                 if (Creature* c = summoner->ToCreature())
                                     if (c->AI())
                                         CAST_AI(npc_ulduar_flames_initial::npc_ulduar_flames_initialAI, c->AI())->RemoveFlame(me->GetGUID());

@@ -1,12 +1,25 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "trial_of_the_crusader.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
+#include "trial_of_the_crusader.h"
 
 /***********
 ** GORMOK
@@ -576,9 +589,9 @@ struct boss_jormungarAI : public ScriptedAI
                         c->SetSpeed(MOVE_RUN, 2.5f);
                         c->CastSpell(c, SPELL_CHURNING_GROUND, true);
                         c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ());
+                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ());
                     }
-                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
+                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
                     DoResetThreat();
 
@@ -610,7 +623,7 @@ struct boss_jormungarAI : public ScriptedAI
                 }
                 break;
             case EVENT_SPELL_SPRAY:
-                if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
+                if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
                     me->CastSpell(target, _SPELL_SPRAY, false);
                 events.RepeatEvent(20000);
                 break;
@@ -871,7 +884,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true) )
                         me->CastSpell(target, SPELL_ARCTIC_BREATH, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
@@ -893,7 +906,7 @@ public:
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 500.0f, true) )
                     {
                         TargetGUID = target->GetGUID();
                         me->SetGuidValue(UNIT_FIELD_TARGET, TargetGUID);
@@ -926,10 +939,10 @@ public:
                         if( angle > 1.0f && angle < 2.0f ) // near main gate
                             dist = 46.0f;
                         destX = Locs[LOC_CENTER].GetPositionX() + cos(angle) * dist;
-                        destY = Locs[LOC_CENTER].GetPositionY() + sin(angle) * dist;
+                        destY = Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * dist;
                         destZ = Locs[LOC_CENTER].GetPositionZ() + 1.0f;
                         me->StopMoving();
-                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
+                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
 
                         events.RescheduleEvent(EVENT_TRAMPLE, 1500);
 
@@ -1001,23 +1014,6 @@ public:
                 return;
 
             pInstance->SetData(TYPE_ICEHOWL, DONE);
-
-            Player* plr = nullptr;
-            if( !pInstance->instance->GetPlayers().isEmpty() )
-                plr = pInstance->instance->GetPlayers().begin()->GetSource();
-
-            if( !plr )
-                return;
-
-            // remove loot for the other faction (items are invisible for players, done in conditions), so corpse can be skinned
-            for( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
-                if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                    if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        --me->loot.unlootedCount;
-                    }
         }
     };
 };

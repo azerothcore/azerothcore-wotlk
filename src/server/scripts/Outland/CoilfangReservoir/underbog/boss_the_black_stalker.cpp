@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -11,8 +22,8 @@ SDComment: Timers may be incorrect
 SDCategory: Coilfang Resevoir, Underbog
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "the_underbog.h"
 
@@ -77,7 +88,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                 summon->AI()->AttackStart(target);
             else if (me->GetVictim())
                 summon->AI()->AttackStart(me->GetVictim());
@@ -118,19 +129,19 @@ public:
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_CHAIN:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.DelayEvents(3000);
                     events.RepeatEvent(9000);
                     break;
                 case EVENT_SPELL_STATIC:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30, true))
                         me->CastSpell(target, SPELL_STATIC_CHARGE, false);
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_LEVITATE:
                     events.RepeatEvent(15000);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
                     {
                         me->CastSpell(target, SPELL_LEVITATE, false);
                         lTarget = target->GetGUID();

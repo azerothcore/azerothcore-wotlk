@@ -1,5 +1,5 @@
-# Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,11 +8,12 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND NOT NOJEM)
   # We need to generate the jemalloc_def.h header based on platform-specific settings
   CHECK_SYMBOL_EXISTS(MADV_FREE "sys/mman.h" HAVE_MADV_FREE)
-  
+
   if (PLATFORM EQUAL 32)
     set(JEM_SIZEDEF 2)
     set(JEM_TLSMODEL)

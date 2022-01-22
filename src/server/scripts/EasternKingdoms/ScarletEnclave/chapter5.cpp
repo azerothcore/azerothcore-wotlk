@@ -1,14 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellScript.h"
 
 enum LightOfDawnSays
@@ -422,7 +432,7 @@ public:
         void SendUpdateWorldState(uint32 id, uint32 state)
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty())
+            if (!players.IsEmpty())
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     if (Player* player = itr->GetSource())
                         if (player->GetPhaseMask() & 128) // Xinef: client skips players without chapter 5 aura anyway, speedup
@@ -933,7 +943,7 @@ public:
                                 if (summon->GetEntry() <= NPC_RIMBLAT_EARTHSHATTER && summon->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING)
                                 {
                                     float o = lk->GetAngle(summon);
-                                    summon->GetMotionMaster()->MovePoint(3, lk->GetPositionX() + 2.0f * cos(o), lk->GetPositionY() + 2.0f * sin(o), lk->GetPositionZ());
+                                    summon->GetMotionMaster()->MovePoint(3, lk->GetPositionX() + 2.0f * cos(o), lk->GetPositionY() + 2.0f * std::sin(o), lk->GetPositionZ());
                                     summon->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
                                 }
                     }
@@ -1042,9 +1052,9 @@ public:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     {
                         float o = me->GetAngle(tirion);
-                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * sin(o), me->GetPositionZ(), false);
+                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * std::sin(o), me->GetPositionZ(), false);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                        tirion->setFaction(35);
+                        tirion->SetFaction(FACTION_FRIENDLY);
                     }
                     break;
                 case EVENT_OUTRO_SCENE_48:
@@ -1115,7 +1125,7 @@ public:
                 case EVENT_OUTRO_SCENE_60:
                     {
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                         {
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (i->GetSource()->IsAlive() && me->IsWithinDistInMap(i->GetSource(), 100))

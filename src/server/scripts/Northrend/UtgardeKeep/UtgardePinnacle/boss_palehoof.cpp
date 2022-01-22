@@ -1,9 +1,22 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "utgarde_pinnacle.h"
 
 enum Misc
@@ -288,7 +301,7 @@ public:
                     }
                 case EVENT_PALEHOOF_IMPALE:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_IMPALE_H : SPELL_IMPALE_N, false);
 
                         events.RepeatEvent(8000 + rand() % 4000);
@@ -307,7 +320,7 @@ public:
 
         void JustDied(Unit*  /*pKiller*/) override
         {
-            me->SendPlaySound(SOUND_DEATH, false);
+            me->PlayDirectSound(SOUND_DEATH);
             if(m_pInstance)
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, DONE);
         }
@@ -402,7 +415,7 @@ public:
             {
                 case EVENT_JORMUNGAR_ACID_SPIT:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, SPELL_ACID_SPIT, false);
 
                         events.RepeatEvent(2000 + rand() % 2000);
@@ -428,7 +441,7 @@ public:
                     }
                 case EVENT_JORMUNGAR_POISON_BREATH:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_POISON_BREATH_H : SPELL_POISON_BREATH_N, false);
 
                         events.RepeatEvent(8000 + rand() % 4000);
@@ -538,7 +551,7 @@ public:
                     }
                 case EVENT_RHINO_WOUND:
                     {
-                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
                             me->CastSpell(tgt, IsHeroic() ? SPELL_GRIEVOUS_WOUND_H : SPELL_GRIEVOUS_WOUND_N, false);
 
                         events.RepeatEvent(18000 + rand() % 4000);

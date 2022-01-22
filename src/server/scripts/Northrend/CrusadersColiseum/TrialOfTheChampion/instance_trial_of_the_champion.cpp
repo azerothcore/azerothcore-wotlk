@@ -1,13 +1,26 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Group.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "trial_of_the_champion.h"
+#include "ScriptedCreature.h"
 #include "Vehicle.h"
+#include "trial_of_the_champion.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -84,7 +97,7 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if( !players.isEmpty() )
+                if( !players.IsEmpty() )
                     if( Player* pPlayer = players.begin()->GetSource() )
                         TeamIdInInstance = pPlayer->GetTeamId();
             }
@@ -811,7 +824,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_1_ATTACK, 3000);
@@ -837,7 +850,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_2_ATTACK, 3000);
@@ -862,7 +875,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_3_ATTACK, 3000);
@@ -887,7 +900,7 @@ public:
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MovePoint(4, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
+                                c->GetMotionMaster()->MovePoint(4, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK, 3000);

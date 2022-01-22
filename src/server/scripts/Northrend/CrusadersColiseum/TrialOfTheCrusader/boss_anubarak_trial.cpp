@@ -1,11 +1,24 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "trial_of_the_crusader.h"
 
@@ -169,9 +182,9 @@ public:
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist = rand_norm() * 40.0f;
-                if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
+                if( Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + std::sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
                 {
-                    c->setFaction(31);
+                    c->SetFaction(FACTION_PREY);
                     c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     c->GetMotionMaster()->MoveRandom(15.0f);
                 }
@@ -368,23 +381,6 @@ public:
             Talk(SAY_DEATH);
             if( pInstance )
                 pInstance->SetData(TYPE_ANUBARAK, DONE);
-
-            Player* plr = nullptr;
-            if( !pInstance->instance->GetPlayers().isEmpty() )
-                plr = pInstance->instance->GetPlayers().begin()->GetSource();
-
-            if( !plr )
-                return;
-
-            // remove loot for the other faction (items are invisible for players, done in conditions), so corpse can be skinned
-            for( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
-                if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                    if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        --me->loot.unlootedCount;
-                    }
         }
 
         void KilledUnit(Unit* who) override
@@ -456,12 +452,12 @@ public:
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
             determinationTimer = urand(10000, 50000);
             despawnTimer = 0;
-            if( me->getFaction() == 16 ) // hostile - it's phase 2
+            if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
                 if( Unit* target = me->SelectNearestTarget(250.0f) )
                 {
                     AttackStart(target);
                     DoZoneInCombat();
-                    if( Unit* t = SelectTarget(SELECT_TARGET_RANDOM, 0, 250.0f, true) )
+                    if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
                     {
                         me->AddThreat(t, 20000.0f);
                         AttackStart(t);
@@ -656,7 +652,7 @@ public:
                     o -= M_PI;
                 else
                     o += M_PI;
-                me->NearTeleportTo(target->GetPositionX() + cos(o) * 5.0f, target->GetPositionY() + sin(o) * 5.0f, target->GetPositionZ() + 0.6f, target->GetOrientation());
+                me->NearTeleportTo(target->GetPositionX() + cos(o) * 5.0f, target->GetPositionY() + std::sin(o) * 5.0f, target->GetPositionZ() + 0.6f, target->GetOrientation());
                 AttackStart(target);
                 me->GetMotionMaster()->MoveChase(target);
                 events.DelayEvents(3000);
@@ -678,7 +674,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SHADOW_STRIKE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
                         me->CastSpell(target, SPELL_SHADOW_STRIKE, false);
                     events.RepeatEvent(urand(30000, 45000));
                     break;
@@ -772,7 +768,7 @@ public:
             }
             DoZoneInCombat();
             DoResetThreat();
-            if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250.0f, true) )
+            if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
             {
                 if (!next)
                 {

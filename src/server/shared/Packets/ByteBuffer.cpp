@@ -1,16 +1,29 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ByteBuffer.h"
 #include "Errors.h"
-#include "MessageBuffer.h"
 #include "Log.h"
+#include "MessageBuffer.h"
+#include "Timer.h"
 #include "Util.h"
-#include <utf8.h>
-#include <sstream>
 #include <ctime>
+#include <sstream>
+#include <utf8.h>
 
 ByteBuffer::ByteBuffer(MessageBuffer&& buffer) :
     _rpos(0), _wpos(0), _storage(buffer.Move()) { }
@@ -124,8 +137,7 @@ void ByteBuffer::append(uint8 const* src, size_t cnt)
 
 void ByteBuffer::AppendPackedTime(time_t time)
 {
-    tm lt;
-    localtime_r(&time, &lt);
+    tm lt = Acore::Time::TimeBreakdown(time);
     append<uint32>((lt.tm_year - 100) << 24 | lt.tm_mon << 20 | (lt.tm_mday - 1) << 14 | lt.tm_wday << 11 | lt.tm_hour << 6 | lt.tm_min);
 }
 

@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /// \addtogroup u2w
@@ -523,7 +535,7 @@ enum Opcodes : uint16
     CMSG_GM_SET_SECURITY_GROUP                      = 0x1F9,
     CMSG_GM_NUKE                                    = 0x1FA,
     MSG_RANDOM_ROLL                                 = 0x1FB,
-    SMSG_ENVIRONMENTALDAMAGELOG                     = 0x1FC,
+    SMSG_ENVIRONMENTAL_DAMAGE_LOG                   = 0x1FC,
     CMSG_CHANGEPLAYER_DIFFICULTY                    = 0x1FD,
     SMSG_RWHOIS                                     = 0x1FE,
     SMSG_LFG_PLAYER_REWARD                          = 0x1FF, // uint32, uint8, uint32, uint32, uint32, uint32, uint32, uint8, for (uint8) {uint32, uint32, uint32}
@@ -672,7 +684,7 @@ enum Opcodes : uint16
     CMSG_GROUP_RAID_CONVERT                         = 0x28E,
     CMSG_GROUP_ASSISTANT_LEADER                     = 0x28F,
     CMSG_BUYBACK_ITEM                               = 0x290,
-    SMSG_SERVER_MESSAGE                             = 0x291,
+    SMSG_CHAT_SERVER_MESSAGE                        = 0x291,
     CMSG_SET_SAVED_INSTANCE_EXTEND                  = 0x292,
     SMSG_LFG_OFFER_CONTINUE                         = 0x293,
     CMSG_TEST_DROP_RATE                             = 0x294,
@@ -1362,7 +1374,7 @@ class OpcodeHandler
 {
 public:
     OpcodeHandler(char const* name, SessionStatus status) : Name(name), Status(status) { }
-    virtual ~OpcodeHandler() { }
+    virtual ~OpcodeHandler() = default;
 
     char const* Name;
     SessionStatus Status;

@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "FleeingMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "FleeingMovementGenerator.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -22,8 +33,10 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
     if (!owner)
         return;
 
-    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
+    {
         return;
+    }
 
     if (!_setMoveData(owner))
         return;
@@ -48,7 +61,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
     if (!owner)
         return false;
 
-    const Map* _map = owner->GetBaseMap();
+    const Map* _map = owner->GetMap();
 
     x = owner->GetPositionX();
     y = owner->GetPositionY();
@@ -139,7 +152,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
         }
 
         temp_x = x + distance * cos(angle);
-        temp_y = y + distance * sin(angle);
+        temp_y = y + distance * std::sin(angle);
         float temp_z = z;
 
         if (!_map->CanReachPositionAndGetValidCoords(owner, temp_x, temp_y, temp_z, true, true))
@@ -147,11 +160,11 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
             break;
         }
 
-        if (!(temp_z - z) || distance / fabs(temp_z - z) > 1.0f)
+        if (!(temp_z - z) || distance / std::fabs(temp_z - z) > 1.0f)
         {
-            float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), z, true);
-            float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), z, true);
-            if (fabs(temp_z_left - temp_z) < 1.2f && fabs(temp_z_right - temp_z) < 1.2f)
+            float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * std::sin(angle + static_cast<float>(M_PI / 2)), z, true);
+            float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * std::sin(angle - static_cast<float>(M_PI / 2)), z, true);
+            if (std::fabs(temp_z_left - temp_z) < 1.2f && std::fabs(temp_z_right - temp_z) < 1.2f)
             {
                 // use new values
                 x = temp_x;
@@ -335,9 +348,9 @@ bool FleeingMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (!owner || !owner->IsAlive())
         return false;
 
-    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
-        owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
+        owner->StopMoving();
         return true;
     }
 
@@ -374,9 +387,9 @@ bool TimedFleeingMovementGenerator::Update(Unit* owner, uint32 time_diff)
     if (!owner->IsAlive())
         return false;
 
-    if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->IsMovementPreventedByCasting())
     {
-        owner->ClearUnitState(UNIT_STATE_FLEEING_MOVE);
+        owner->StopMoving();
         return true;
     }
 

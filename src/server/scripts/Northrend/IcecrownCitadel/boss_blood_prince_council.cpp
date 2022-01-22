@@ -1,13 +1,26 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -570,9 +583,9 @@ public:
         {
             summons.Summon(summon);
 
-            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, -10.0f, true);
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -10.0f, true);
             if (!target)
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
             if (target)
             {
                 if (summon->GetEntry() == NPC_BALL_OF_INFERNO_FLAME)
@@ -1002,7 +1015,7 @@ public:
                     Talk(SAY_VALANAR_BERSERK);
                     break;
                 case EVENT_KINETIC_BOMB:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         me->CastSpell(target, SPELL_KINETIC_BOMB_TARGET, false);
                         Talk(SAY_VALANAR_SPECIAL);
@@ -1018,7 +1031,7 @@ public:
                     }
                     else
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                             me->CastSpell(target, SPELL_SHOCK_VORTEX, false);
                         events.ScheduleEvent(EVENT_SHOCK_VORTEX, urand(18000, 23000));
                     }
@@ -1672,15 +1685,20 @@ public:
     {
         PrepareSpellScript(spell_valanar_kinetic_bomb_knockback_SpellScript);
 
-        void KnockIntoAir()
+        void KnockIntoAir(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Creature* target = GetHitCreature())
                 target->AI()->DoAction(ACTION_KINETIC_BOMB_JUMP);
         }
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_valanar_kinetic_bomb_knockback_SpellScript::KnockIntoAir);
+            BeforeHit += BeforeSpellHitFn(spell_valanar_kinetic_bomb_knockback_SpellScript::KnockIntoAir);
         }
     };
 
@@ -1704,7 +1722,7 @@ public:
             if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
             {
                 float angle = dest->GetAngle(GetCaster());
-                Position offset = {6.0f * cos(angle), 6.0f * sin(angle), 10.0f, 0.0f};
+                Position offset = {6.0f * cos(angle), 6.0f * std::sin(angle), 10.0f, 0.0f};
                 dest->RelocateOffset(offset);
                 GetCaster()->UpdateAllowedPositionZ(dest->GetPositionX(), dest->GetPositionY(), dest->m_positionZ);
             }
@@ -1744,11 +1762,11 @@ public:
                 for (uint8 i = 6; i > 0; --i)
                 {
                     float destX = summoner->GetPositionX() + cos(angle + a * M_PI) * i * 10.0f;
-                    float destY = summoner->GetPositionY() + sin(angle + a * M_PI) * i * 10.0f;
+                    float destY = summoner->GetPositionY() + std::sin(angle + a * M_PI) * i * 10.0f;
                     if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY, summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                     {
                         float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
-                        if (fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
+                        if (std::fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
                         {
                             dest._position.Relocate(destX, destY, destZ);
                             return;

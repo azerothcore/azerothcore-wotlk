@@ -1,7 +1,21 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "KillRewarder.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "Pet.h"
@@ -64,7 +78,7 @@ KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
     _InitGroupData();
 }
 
-inline void KillRewarder::_InitGroupData()
+void KillRewarder::_InitGroupData()
 {
     if (_group)
     {
@@ -104,7 +118,7 @@ inline void KillRewarder::_InitGroupData()
         _count = 1;
 }
 
-inline void KillRewarder::_InitXP(Player* player)
+void KillRewarder::_InitXP(Player* player)
 {
     // Get initial value of XP for kill.
     // XP is given:
@@ -121,14 +135,14 @@ inline void KillRewarder::_InitXP(Player* player)
                     _xp = uint32(_xp * ct->ModHealth);
 }
 
-inline void KillRewarder::_RewardHonor(Player* player)
+void KillRewarder::_RewardHonor(Player* player)
 {
     // Rewarded player must be alive.
     if (player->IsAlive())
         player->RewardHonor(_victim, _count, -1);
 }
 
-inline void KillRewarder::_RewardXP(Player* player, float rate)
+void KillRewarder::_RewardXP(Player* player, float rate)
 {
     uint32 xp(_xp);
     if (_group)
@@ -159,14 +173,14 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
     }
 }
 
-inline void KillRewarder::_RewardReputation(Player* player, float rate)
+void KillRewarder::_RewardReputation(Player* player, float rate)
 {
     // 4.3. Give reputation (player must not be on BG).
     // Even dead players and corpses are rewarded.
     player->RewardReputation(_victim, rate);
 }
 
-inline void KillRewarder::_RewardKillCredit(Player* player)
+void KillRewarder::_RewardKillCredit(Player* player)
 {
     // 4.4. Give kill credit (player must not be in group, or he must be alive or without corpse).
     if (!_group || player->IsAlive() || !player->GetCorpse())

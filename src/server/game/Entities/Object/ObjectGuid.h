@@ -1,8 +1,18 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ObjectGuid_h__
@@ -16,8 +26,8 @@
 #include <memory>
 #include <set>
 #include <type_traits>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 enum TypeID
 {
@@ -119,7 +129,7 @@ class ObjectGuid
         template<HighGuid type>
         static typename std::enable_if<ObjectGuidTraits<type>::MapSpecific, ObjectGuid>::type Create(uint32 entry, LowType counter) { return MapSpecific(type, entry, counter); }
 
-        ObjectGuid() : _guid(0) { }
+        ObjectGuid()  = default;
         explicit ObjectGuid(uint64 guid) : _guid(guid) { }
         ObjectGuid(HighGuid hi, uint32 entry, LowType counter) : _guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) { }
         ObjectGuid(HighGuid hi, LowType counter) : _guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) { }
@@ -129,12 +139,12 @@ class ObjectGuid
         void Set(uint64 guid) { _guid = guid; }
         void Clear() { _guid = 0; }
 
-        PackedGuid WriteAsPacked() const;
+        [[nodiscard]] PackedGuid WriteAsPacked() const;
 
-        uint64   GetRawValue() const { return _guid; }
-        HighGuid GetHigh() const { return HighGuid((_guid >> 48) & 0x0000FFFF); }
-        uint32   GetEntry() const { return HasEntry() ? uint32((_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
-        LowType  GetCounter()  const
+        [[nodiscard]] uint64   GetRawValue() const { return _guid; }
+        [[nodiscard]] HighGuid GetHigh() const { return HighGuid((_guid >> 48) & 0x0000FFFF); }
+        [[nodiscard]] uint32   GetEntry() const { return HasEntry() ? uint32((_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
+        [[nodiscard]] LowType  GetCounter()  const
         {
             return HasEntry()
                    ? LowType(_guid & UI64LIT(0x0000000000FFFFFF))
@@ -148,26 +158,26 @@ class ObjectGuid
                    : LowType(0xFFFFFFFF);
         }
 
-        ObjectGuid::LowType GetMaxCounter() const { return GetMaxCounter(GetHigh()); }
+        [[nodiscard]] ObjectGuid::LowType GetMaxCounter() const { return GetMaxCounter(GetHigh()); }
 
-        bool IsEmpty()             const { return _guid == 0; }
-        bool IsCreature()          const { return GetHigh() == HighGuid::Unit; }
-        bool IsPet()               const { return GetHigh() == HighGuid::Pet; }
-        bool IsVehicle()           const { return GetHigh() == HighGuid::Vehicle; }
-        bool IsCreatureOrPet()     const { return IsCreature() || IsPet(); }
-        bool IsCreatureOrVehicle() const { return IsCreature() || IsVehicle(); }
-        bool IsAnyTypeCreature()   const { return IsCreature() || IsPet() || IsVehicle(); }
-        bool IsPlayer()            const { return !IsEmpty() && GetHigh() == HighGuid::Player; }
-        bool IsUnit()              const { return IsAnyTypeCreature() || IsPlayer(); }
-        bool IsItem()              const { return GetHigh() == HighGuid::Item; }
-        bool IsGameObject()        const { return GetHigh() == HighGuid::GameObject; }
-        bool IsDynamicObject()     const { return GetHigh() == HighGuid::DynamicObject; }
-        bool IsCorpse()            const { return GetHigh() == HighGuid::Corpse; }
-        bool IsTransport()         const { return GetHigh() == HighGuid::Transport; }
-        bool IsMOTransport()       const { return GetHigh() == HighGuid::Mo_Transport; }
-        bool IsAnyTypeGameObject() const { return IsGameObject() || IsTransport() || IsMOTransport(); }
-        bool IsInstance()          const { return GetHigh() == HighGuid::Instance; }
-        bool IsGroup()             const { return GetHigh() == HighGuid::Group; }
+        [[nodiscard]] bool IsEmpty()             const { return _guid == 0; }
+        [[nodiscard]] bool IsCreature()          const { return GetHigh() == HighGuid::Unit; }
+        [[nodiscard]] bool IsPet()               const { return GetHigh() == HighGuid::Pet; }
+        [[nodiscard]] bool IsVehicle()           const { return GetHigh() == HighGuid::Vehicle; }
+        [[nodiscard]] bool IsCreatureOrPet()     const { return IsCreature() || IsPet(); }
+        [[nodiscard]] bool IsCreatureOrVehicle() const { return IsCreature() || IsVehicle(); }
+        [[nodiscard]] bool IsAnyTypeCreature()   const { return IsCreature() || IsPet() || IsVehicle(); }
+        [[nodiscard]] bool IsPlayer()            const { return !IsEmpty() && GetHigh() == HighGuid::Player; }
+        [[nodiscard]] bool IsUnit()              const { return IsAnyTypeCreature() || IsPlayer(); }
+        [[nodiscard]] bool IsItem()              const { return GetHigh() == HighGuid::Item; }
+        [[nodiscard]] bool IsGameObject()        const { return GetHigh() == HighGuid::GameObject; }
+        [[nodiscard]] bool IsDynamicObject()     const { return GetHigh() == HighGuid::DynamicObject; }
+        [[nodiscard]] bool IsCorpse()            const { return GetHigh() == HighGuid::Corpse; }
+        [[nodiscard]] bool IsTransport()         const { return GetHigh() == HighGuid::Transport; }
+        [[nodiscard]] bool IsMOTransport()       const { return GetHigh() == HighGuid::Mo_Transport; }
+        [[nodiscard]] bool IsAnyTypeGameObject() const { return IsGameObject() || IsTransport() || IsMOTransport(); }
+        [[nodiscard]] bool IsInstance()          const { return GetHigh() == HighGuid::Instance; }
+        [[nodiscard]] bool IsGroup()             const { return GetHigh() == HighGuid::Group; }
 
         static TypeID GetTypeId(HighGuid high)
         {
@@ -190,7 +200,7 @@ class ObjectGuid
             }
         }
 
-        TypeID GetTypeId() const { return GetTypeId(GetHigh()); }
+        [[nodiscard]] TypeID GetTypeId() const { return GetTypeId(GetHigh()); }
 
         operator bool() const { return !IsEmpty(); }
         bool operator!() const { return !(bool(*this)); }
@@ -200,8 +210,8 @@ class ObjectGuid
         bool operator<= (ObjectGuid const& guid) const { return GetRawValue() <= guid.GetRawValue(); }
 
         static char const* GetTypeName(HighGuid high);
-        char const* GetTypeName() const { return !IsEmpty() ? GetTypeName(GetHigh()) : "None"; }
-        std::string ToString() const;
+        [[nodiscard]] char const* GetTypeName() const { return !IsEmpty() ? GetTypeName(GetHigh()) : "None"; }
+        [[nodiscard]] std::string ToString() const;
 
     private:
         static bool HasEntry(HighGuid high)
@@ -226,7 +236,7 @@ class ObjectGuid
             }
         }
 
-        bool HasEntry() const { return HasEntry(GetHigh()); }
+        [[nodiscard]] bool HasEntry() const { return HasEntry(GetHigh()); }
 
         static ObjectGuid Global(HighGuid type, LowType counter);
         static ObjectGuid MapSpecific(HighGuid type, uint32 entry, LowType counter);
@@ -238,7 +248,7 @@ class ObjectGuid
         // used to catch wrong type assignment
         operator int64() const = delete;
 
-        uint64 _guid;
+        uint64 _guid{0};
 };
 
 // Some Shared defines
@@ -263,7 +273,7 @@ class PackedGuid
         void Set(uint64 guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid); }
         void Set(ObjectGuid guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid.GetRawValue()); }
 
-        std::size_t size() const { return _packedGuid.size(); }
+        [[nodiscard]] std::size_t size() const { return _packedGuid.size(); }
 
     private:
         ByteBuffer _packedGuid;
@@ -276,8 +286,8 @@ public:
 
     virtual void Set(ObjectGuid::LowType val) { _nextGuid = val; }
     virtual ObjectGuid::LowType Generate() = 0;
-    ObjectGuid::LowType GetNextAfterMaxUsed() const { return _nextGuid; }
-    virtual ~ObjectGuidGeneratorBase() { }
+    [[nodiscard]] ObjectGuid::LowType GetNextAfterMaxUsed() const { return _nextGuid; }
+    virtual ~ObjectGuidGeneratorBase() = default;
 
 protected:
     static void HandleCounterOverflow(HighGuid high);

@@ -1,13 +1,26 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "forge_of_souls.h"
 #include "PassiveAI.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "forge_of_souls.h"
 
 enum Yells
 {
@@ -138,7 +151,7 @@ public:
                     events.RepeatEvent(2000);
                     break;
                 case EVENT_SPELL_FEAR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
                         me->CastCustomSpell(SPELL_FEAR, SPELLVALUE_MAX_TARGETS, 1, target, false);
                     events.RepeatEvent(urand(8000, 12000));
                     break;
@@ -147,7 +160,7 @@ public:
                     events.RepeatEvent(urand(10000, 15000));
                     break;
                 case EVENT_SPELL_CORRUPT_SOUL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     {
                         Talk(SAY_CORRUPT_SOUL);
                         me->CastSpell(target, SPELL_CORRUPT_SOUL, false);

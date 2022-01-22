@@ -1,15 +1,28 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "violet_hold.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "violet_hold.h"
 
 /***********
 ** DEFENSE SYSTEM CRYSTAL
@@ -512,7 +525,7 @@ public:
 
                 if (uiImpaleTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 5.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 5.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_IMPALE);
                     uiImpaleTimer = 4000;
@@ -587,7 +600,7 @@ public:
 
                 if (uiArcainBarrageTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_ARCANE_BARRAGE);
                     uiArcainBarrageTimer = 6000;
@@ -606,7 +619,7 @@ public:
 
                 if (uiFrostboltTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_FROSTBOLT);
                     uiFrostboltTimer = 6000;
@@ -663,7 +676,7 @@ public:
             {
                 if (uiSpellLockTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_SPELL_LOCK);
                     uiSpellLockTimer = 9000;
@@ -761,7 +774,7 @@ public:
             {
                 if (uiTacticalBlinkTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_TACTICAL_BLINK);
                     uiTacticalBlinkTimer = 10000;
@@ -773,7 +786,7 @@ public:
             {
                 if (uiBackstabTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0, 5.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0, 5.0f, true);
                     if (pTarget && !pTarget->HasInArc(M_PI, me))
                         DoCast(pTarget, SPELL_BACKSTAB);
                     TacticalBlinkCasted = false;
@@ -825,7 +838,7 @@ public:
             {
                 if (uiArcaneBlastTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_ARCANE_BLAST);
                     uiArcaneBlastTimer = 6000;
@@ -834,7 +847,7 @@ public:
 
                 if (uiSlowTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_SLOW);
                     uiSlowTimer = 5000;
@@ -846,7 +859,7 @@ public:
             {
                 if (uiChainsOfIceTimer <= diff)
                 {
-                    Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true);
+                    Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true);
                     if (pTarget)
                         DoCast(pTarget, SPELL_CHAINS_OF_ICE);
                     uiChainsOfIceTimer = 7000;
@@ -949,7 +962,7 @@ public:
 
             if (uiArcaneStreamTimer <= diff)
             {
-                Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 35.0f, true);
+                Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true);
                 if (pTarget)
                     DoCast(pTarget, SPELL_ARCANE_STREAM);
                 uiArcaneStreamTimer = urand(0, 5000) + 5000;

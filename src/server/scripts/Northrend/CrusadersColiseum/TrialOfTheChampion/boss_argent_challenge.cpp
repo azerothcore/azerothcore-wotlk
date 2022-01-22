@@ -1,10 +1,23 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "trial_of_the_champion.h"
 
@@ -135,14 +148,14 @@ public:
             if( damage >= me->GetHealth() )
             {
                 damage = me->GetHealth() - 1;
-                if( me->getFaction() != 35 )
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(TEXT_EADRIC_DEATH);
-                    me->getThreatManager().clearReferences();
+                    me->getThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -168,15 +181,15 @@ public:
                     break;
                 case EVENT_SPELL_RADIANCE:
                     me->CastSpell((Unit*)nullptr, SPELL_RADIANCE, false);
-                    me->MonsterTextEmote(TEXT_RADIATE, 0, true);
+                    me->TextEmote(TEXT_RADIATE, nullptr, true);
                     events.RepeatEvent(16000);
                     break;
                 case EVENT_SPELL_HAMMER_RIGHTEOUS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 55.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 55.0f, true) )
                     {
                         char buffer[100];
                         sprintf(buffer, "Eadric the Pure targets %s with the Hammer of the Righteous!", target->GetName().c_str());
-                        me->MonsterTextEmote(buffer, 0, true);
+                        me->TextEmote(buffer, nullptr, true);
                         Talk(TEXT_EADRIC_HAMMER);
                         me->CastSpell(target, SPELL_HAMMER_JUSTICE, true);
                         me->CastSpell(target, SPELL_HAMMER_RIGHTEOUS, false);
@@ -283,13 +296,13 @@ public:
             {
                 damage = me->GetHealth() - 1;
 
-                if( me->getFaction() != 35 )
+                if (me->GetFaction() != FACTION_FRIENDLY)
                 {
                     me->CastSpell((Unit*)nullptr, 68574, true); // achievements
-                    me->setFaction(35);
+                    me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(TEXT_PALETRESS_DEATH);
-                    me->getThreatManager().clearReferences();
+                    me->getThreatMgr().clearReferences();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -345,12 +358,12 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SMITE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
                         me->CastSpell(target, SPELL_SMITE, false);
                     events.RepeatEvent(urand(3000, 4000));
                     break;
                 case EVENT_SPELL_HOLY_FIRE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_HOLY_FIRE, false);
                     events.RepeatEvent(urand(9000, 12000));
                     break;
@@ -438,12 +451,12 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WAKING_NIGHTMARE, urand(20000, 30000));
                     break;
                 case EVENT_SPELL_OLD_WOUNDS:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true) )
                         me->CastSpell(target, SPELL_OLD_WOUNDS, true);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_SHADOWS_PAST:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true) )
                         me->CastSpell(target, SPELL_SHADOWS_PAST, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
@@ -682,7 +695,7 @@ public:
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true) )
+                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
                         me->CastSpell(target, SPELL_MIND_CONTROL_H, false);
                     events.RepeatEvent(urand(22000, 30000));
                     break;

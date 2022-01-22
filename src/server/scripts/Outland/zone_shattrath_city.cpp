@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -21,11 +32,10 @@ npc_ishanah
 EndContentData */
 
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "WorldSession.h"
 
 /*######
 ## npc_raliq_the_drunk
@@ -36,8 +46,7 @@ EndContentData */
 enum Raliq
 {
     SPELL_UPPERCUT          = 10966,
-    QUEST_CRACK_SKULLS      = 10009,
-    FACTION_HOSTILE_RD      = 45
+    QUEST_CRACK_SKULLS      = 10009
 };
 
 class npc_raliq_the_drunk : public CreatureScript
@@ -51,7 +60,7 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            creature->setFaction(FACTION_HOSTILE_RD);
+            creature->SetFaction(FACTION_OGRE);
             creature->AI()->AttackStart(player);
         }
         return true;
@@ -75,7 +84,7 @@ public:
     {
         npc_raliq_the_drunkAI(Creature* creature) : ScriptedAI(creature)
         {
-            m_uiNormFaction = creature->getFaction();
+            m_uiNormFaction = creature->GetFaction();
         }
 
         uint32 m_uiNormFaction;
@@ -110,10 +119,6 @@ public:
 
 enum Salsalabim
 {
-    // Factions
-    FACTION_HOSTILE_SA             = 90,
-    FACTION_FRIENDLY_SA            = 35,
-
     // Quests
     QUEST_10004                    = 10004,
 
@@ -130,7 +135,7 @@ public:
     {
         if (player->GetQuestStatus(QUEST_10004) == QUEST_STATUS_INCOMPLETE)
         {
-            creature->setFaction(FACTION_HOSTILE_SA);
+            creature->SetFaction(FACTION_DEMON);
             creature->AI()->AttackStart(player);
         }
         else

@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "BattlegroundAB.h"
 #include "BattlegroundMgr.h"
@@ -258,7 +271,7 @@ void BattlegroundAB::NodeOccupied(uint8 node)
 
     if (trigger)
     {
-        trigger->setFaction(_capturePointInfo[node]._ownerTeamId == TEAM_ALLIANCE ? 84 : 83);
+        trigger->SetFaction(_capturePointInfo[node]._ownerTeamId == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
         trigger->CastSpell(trigger, SPELL_HONORABLE_DEFENDER_25Y, false);
     }
 }
@@ -268,9 +281,13 @@ void BattlegroundAB::NodeDeoccupied(uint8 node)
     --_controlledPoints[_capturePointInfo[node]._ownerTeamId];
 
     _capturePointInfo[node]._ownerTeamId = TEAM_NEUTRAL;
-    RelocateDeadPlayers(BgCreatures[node]);
 
-    DelCreature(node); // Delete spirit healer
+    _reviveEvents.AddEventAtOffset([this, node]()
+    {
+        RelocateDeadPlayers(BgCreatures[node]);
+        DelCreature(node); // Delete spirit healer
+    }, 500ms);
+
     DelCreature(BG_AB_ALL_NODES_COUNT + node); // Delete aura trigger
 }
 
@@ -360,14 +377,14 @@ bool BattlegroundAB::SetupBattleground()
 {
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
     {
-        AddObject(BG_AB_OBJECT_BANNER_NEUTRAL + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_NODE_BANNER_0 + i, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_BANNER_ALLY + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_A, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_BANNER_HORDE + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_H, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_BANNER_CONT_A + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_CONT_A, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_BANNER_CONT_H + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_CONT_H, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_AURA_ALLY + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_AURA_A, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_AURA_HORDE + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_AURA_H, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_AURA_CONTESTED + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_AURA_C, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_BANNER_NEUTRAL + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_NODE_BANNER_0 + i, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_BANNER_ALLY + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_A, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_BANNER_HORDE + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_H, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_BANNER_CONT_A + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_CONT_A, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_BANNER_CONT_H + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_BANNER_CONT_H, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_AURA_ALLY + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_AURA_A, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_AURA_HORDE + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_AURA_H, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_AURA_CONTESTED + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_AURA_C, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
     }
 
     AddObject(BG_AB_OBJECT_GATE_A, BG_AB_OBJECTID_GATE_A, BG_AB_DoorPositions[0][0], BG_AB_DoorPositions[0][1], BG_AB_DoorPositions[0][2], BG_AB_DoorPositions[0][3], BG_AB_DoorPositions[0][4], BG_AB_DoorPositions[0][5], BG_AB_DoorPositions[0][6], BG_AB_DoorPositions[0][7], RESPAWN_IMMEDIATELY);
@@ -375,9 +392,9 @@ bool BattlegroundAB::SetupBattleground()
 
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
     {
-        AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i, Buff_Entries[0], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 1, Buff_Entries[1], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY);
-        AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 2, Buff_Entries[2], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i, Buff_Entries[0], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, std::sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 1, Buff_Entries[1], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, std::sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY);
+        AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 2, Buff_Entries[2], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, std::sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY);
     }
 
     AddSpiritGuide(BG_AB_SPIRIT_ALIANCE, BG_AB_SpiritGuidePos[BG_AB_SPIRIT_ALIANCE][0], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_ALIANCE][1], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_ALIANCE][2], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_ALIANCE][3], TEAM_ALLIANCE);

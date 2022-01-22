@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -21,19 +32,25 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "TicketMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class ticket_commandscript : public CommandScript
 {
 public:
     ticket_commandscript() : CommandScript("ticket_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> ticketResponseCommandTable =
+        static ChatCommandTable ticketResponseCommandTable =
         {
             { "append",         SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendCommand,    "" },
             { "appendln",       SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendLnCommand,  "" }
         };
-        static std::vector<ChatCommand> ticketCommandTable =
+        static ChatCommandTable ticketCommandTable =
         {
             { "assign",         SEC_GAMEMASTER,      true,  &HandleGMTicketAssignToCommand,          "" },
             { "close",          SEC_GAMEMASTER,      true,  &HandleGMTicketCloseByIdCommand,         "" },
@@ -52,7 +69,7 @@ public:
             { "viewid",         SEC_GAMEMASTER,      true,  &HandleGMTicketGetByIdCommand,           "" },
             { "viewname",       SEC_GAMEMASTER,      true,  &HandleGMTicketGetByNameCommand,         "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "ticket",         SEC_GAMEMASTER,      false, nullptr,                                 "", ticketCommandTable }
         };
@@ -83,8 +100,8 @@ public:
         }
 
         // Get target information
-        ObjectGuid targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
-        uint32 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
+        ObjectGuid targetGuid = sCharacterCache->GetCharacterGuidByName(target);
+        uint32 targetAccountId = sCharacterCache->GetCharacterAccountIdByGuid(targetGuid);
         uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realm.Id.Realm);
 
         // Target must exist and have administrative rights
@@ -235,10 +252,10 @@ public:
         if (response)
             ticket->AppendResponse(response);
 
-        if (Player* player = ticket->GetPlayer())
+        if (Player* player2 = ticket->GetPlayer())
         {
-            ticket->SendResponse(player->GetSession());
-            ChatHandler(player->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
+            ticket->SendResponse(player2->GetSession());
+            ChatHandler(player2->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
         }
 
         Player* gm = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
@@ -382,7 +399,7 @@ public:
         else
         {
             ObjectGuid guid = ticket->GetAssignedToGUID();
-            uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
+            uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
             security = AccountMgr::GetSecurity(accountId, realm.Id.Realm);
         }
 
@@ -441,9 +458,13 @@ public:
         // Detect target's GUID
         ObjectGuid guid;
         if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
+        {
             guid = player->GetGUID();
+        }
         else
-            guid = sObjectMgr->GetPlayerGUIDByName(name);
+        {
+            guid = sCharacterCache->GetCharacterGuidByName(name);
+        }
 
         // Target must exist
         if (!guid)

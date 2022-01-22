@@ -1,4 +1,16 @@
 #
+# This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+
+#
 # AC_ADD_SCRIPT
 #
 MACRO(AC_ADD_SCRIPT path)
@@ -12,7 +24,6 @@ ENDMACRO()
 # from a specified folder, instead of manually list them within the cmake
 # NOTE: you must still manually specify the script loader header
 #
-
 MACRO(AC_ADD_SCRIPTS path)
 CU_SUBDIRLIST(sub_DIRS ${path} TRUE TRUE)
 FOREACH(subdir ${sub_DIRS})
@@ -54,7 +65,7 @@ MACRO(AC_ADD_SCRIPT_LOADER script_dec include)
 ENDMACRO()
 
 #
-#AC_ADD_CONFIG_FILE
+# AC_ADD_CONFIG_FILE
 #
 MACRO(AC_ADD_CONFIG_FILE configFilePath)
     message("> Warning: module using deprecated add config file api")

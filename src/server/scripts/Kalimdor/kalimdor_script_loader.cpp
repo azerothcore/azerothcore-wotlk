@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 // This is where scripts' loading functions should be declared:
@@ -30,6 +42,7 @@ void AddSC_boss_mal_ganis();
 void AddSC_boss_meathook();
 void AddSC_culling_of_stratholme();
 void AddSC_instance_culling_of_stratholme();
+void AddSC_boss_isalien();
 void AddSC_instance_dire_maul();             //Dire Maul
 void AddSC_instance_maraudon();              //Maraudon
 void AddSC_boss_onyxia();                    //Onyxia's Lair
@@ -57,6 +70,7 @@ void AddSC_boss_ouro();
 void AddSC_npc_anubisath_sentinel();
 void AddSC_instance_temple_of_ahnqiraj();
 void AddSC_instance_wailing_caverns();       //Wailing caverns
+void AddSC_zulfarrak();
 void AddSC_instance_zulfarrak();             //Zul'Farrak instance script
 void AddSC_ashenvale();
 void AddSC_azshara();
@@ -70,12 +84,10 @@ void AddSC_dustwallow_marsh();
 void AddSC_felwood();
 void AddSC_feralas();
 void AddSC_moonglade();
-void AddSC_mulgore();
 void AddSC_orgrimmar();
 void AddSC_silithus();
 void AddSC_stonetalon_mountains();
 void AddSC_tanaris();
-void AddSC_teldrassil();
 void AddSC_the_barrens();
 void AddSC_thousand_needles();
 void AddSC_thunder_bluff();
@@ -112,6 +124,7 @@ void AddKalimdorScripts()
     AddSC_boss_meathook();
     AddSC_culling_of_stratholme();
     AddSC_instance_culling_of_stratholme();
+    AddSC_boss_isalien();
     AddSC_instance_dire_maul();             //Dire Maul
     AddSC_instance_maraudon();              //Maraudon
     AddSC_boss_onyxia();                    //Onyxia's Lair
@@ -139,6 +152,7 @@ void AddKalimdorScripts()
     AddSC_npc_anubisath_sentinel();
     AddSC_instance_temple_of_ahnqiraj();
     AddSC_instance_wailing_caverns();       //Wailing caverns
+    AddSC_zulfarrak();
     AddSC_instance_zulfarrak();             //Zul'Farrak instance script
     AddSC_ashenvale();
     AddSC_azshara();
@@ -152,12 +166,10 @@ void AddKalimdorScripts()
     AddSC_felwood();
     AddSC_feralas();
     AddSC_moonglade();
-    AddSC_mulgore();
     AddSC_orgrimmar();
     AddSC_silithus();
     AddSC_stonetalon_mountains();
     AddSC_tanaris();
-    AddSC_teldrassil();
     AddSC_the_barrens();
     AddSC_thousand_needles();
     AddSC_thunder_bluff();

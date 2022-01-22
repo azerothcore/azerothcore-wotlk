@@ -1,21 +1,33 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _WORLDPACKET_H_
 #define _WORLDPACKET_H_
 
-#include "Common.h"
-#include "Opcodes.h"
 #include "ByteBuffer.h"
+#include "Common.h"
 #include "Duration.h"
+#include "Opcodes.h"
 
 class WorldPacket : public ByteBuffer
 {
 public:
     // just container for later use
-    WorldPacket() : ByteBuffer(0), m_opcode(NULL_OPCODE) { }
+    WorldPacket() : ByteBuffer(0) { }
 
     explicit WorldPacket(uint16 opcode, size_t res = 200) :
         ByteBuffer(res), m_opcode(opcode) { }
@@ -67,7 +79,7 @@ public:
     [[nodiscard]] TimePoint GetReceivedTime() const { return m_receivedTime; }
 
 protected:
-    uint16 m_opcode;
+    uint16 m_opcode{NULL_OPCODE};
     TimePoint m_receivedTime; // only set for a specific set of opcodes, for performance reasons.
 };
 

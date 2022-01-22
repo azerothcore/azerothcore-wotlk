@@ -1,22 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Cell.h"
+#include "SmartAI.h"
 #include "CellImpl.h"
-#include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
-#include "InstanceScript.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "SmartAI.h"
+#include "ScriptedCreature.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
@@ -36,8 +44,9 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mCanRepeatPath = false;
 
     // spawn in run mode
-    // Xinef: spawn in run mode and set mRun to run... this overrides SetWalk EVERYWHERE, RETARDS
+    // Xinef: spawn in run mode and set mRun to run... this overrides SetWalk EVERYWHERE
     mRun = true;
+    mEvadeDisabled = false;
 
     mCanAutoAttack = true;
     mCanCombatMove = true;
@@ -151,7 +160,7 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
                 for (uint32 i = 1; i < pVector.size() - 1; ++i)
                 {
                     offset = middle - pVector[i];
-                    if (fabs(offset.x) >= 0xFF || fabs(offset.y) >= 0xFF || fabs(offset.z) >= 0x7F)
+                    if (std::fabs(offset.x) >= 0xFF || std::fabs(offset.y) >= 0xFF || std::fabs(offset.z) >= 0x7F)
                     {
                         // offset is too big, split points
                         continueLoop = true;
@@ -246,6 +255,12 @@ void SmartAI::PausePath(uint32 delay, bool forced)
 
         me->StopMoving();
         me->GetMotionMaster()->MoveIdle();//force stop
+
+        auto waypoint = mWayPoints->find(mCurrentWPID);
+        if (float orientation = waypoint->second->o)
+        {
+            me->SetFacingTo(orientation);
+        }
     }
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_PAUSED, nullptr, mCurrentWPID, GetScript()->GetPathId());
 }
@@ -326,7 +341,7 @@ void SmartAI::EndPath(bool fail)
         }
     }
 
-    // Xinef: if the escort failed - DO NOT PROCESS ANYTHING, ITS RETARDED
+    // Xinef: if the escort failed - DO NOT PROCESS ANYTHING
     // Xinef: End Path events should be only processed if it was SUCCESSFUL stop or stop called by SMART_ACTION_WAYPOINT_STOP
     if (fail)
     {
@@ -615,6 +630,12 @@ void SmartAI::EnterEvadeMode()
     if (!me->IsAlive() || me->IsInEvadeMode())
         return;
 
+    if (mEvadeDisabled)
+    {
+        GetScript()->ProcessEventsFor(SMART_EVENT_EVADE);
+        return;
+    }
+
     if (me->GetCharmerGUID().IsPlayer() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
     {
         me->AttackStop();
@@ -718,7 +739,7 @@ void SmartAI::JustRespawned()
     mDespawnState = 0;
     mEscortState = SMART_ESCORT_NONE;
     me->SetVisible(true);
-    if (me->getFaction() != me->GetCreatureTemplate()->faction)
+    if (me->GetFaction() != me->GetCreatureTemplate()->faction)
         me->RestoreFaction();
     mJustReset = true;
     JustReachedHome();
@@ -779,6 +800,11 @@ void SmartAI::JustSummoned(Creature* creature)
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT, creature);
 }
 
+void SmartAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
+{
+    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
+}
+
 void SmartAI::AttackStart(Unit* who)
 {
     // xinef: dont allow charmed npcs to act on their own
@@ -800,7 +826,8 @@ void SmartAI::AttackStart(Unit* who)
                 me->GetMotionMaster()->MovementExpired();
                 me->StopMoving();
             }
-            me->GetMotionMaster()->MoveChase(who, GetScript()->GetCasterActualDist() ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist());
+            float range = GetScript()->GetCasterActualDist() > 0.f ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist();
+            me->GetMotionMaster()->MoveChase(who, range > 0.f ? ChaseRange(range) : std::optional<ChaseRange>());
         }
     }
 }
@@ -926,6 +953,11 @@ void SmartAI::SetSwim(bool swim)
     me->SetSwim(swim);
 }
 
+void SmartAI::SetEvadeDisabled(bool disable)
+{
+    mEvadeDisabled = disable;
+}
+
 void SmartAI::sGossipHello(Player* player)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player);
@@ -1028,7 +1060,8 @@ void SmartAI::StopFollow(bool complete)
     if (!complete)
         return;
 
-    if (Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid))
+    Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
+    if (player)
     {
         if (!mFollowCreditType)
             player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
@@ -1039,7 +1072,7 @@ void SmartAI::StopFollow(bool complete)
     SetDespawnTime(5000);
     StartDespawn();
 
-    GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED);
+    GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker)
@@ -1063,6 +1096,11 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELLCLICK, clicker);
 }
 
+void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
+{
+    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
+}
+
 int SmartGameObjectAI::Permissible(const GameObject* g)
 {
     if (g->GetAIName() == "SmartGameObjectAI")
@@ -1077,10 +1115,10 @@ void SmartGameObjectAI::UpdateAI(uint32 diff)
 
 void SmartGameObjectAI::InitializeAI()
 {
-    GetScript()->OnInitialize(go);
+    GetScript()->OnInitialize(me);
 
     // Xinef: do not call respawn event if go is not spawned
-    if (go->isSpawned())
+    if (me->isSpawned())
         GetScript()->ProcessEventsFor(SMART_EVENT_RESPAWN);
     //Reset();
 }
@@ -1097,14 +1135,14 @@ void SmartGameObjectAI::Reset()
 bool SmartGameObjectAI::GossipHello(Player* player, bool reportUse)
 {
     LOG_DEBUG("sql.sql", "SmartGameObjectAI::GossipHello");
-    GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player, (uint32)reportUse, 0, false, nullptr, go);
+    GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player, (uint32)reportUse, 0, false, nullptr, me);
     return false;
 }
 
 // Called when a player selects a gossip item in the gameobject's gossip menu.
 bool SmartGameObjectAI::GossipSelect(Player* player, uint32 sender, uint32 action)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_SELECT, player, sender, action, false, nullptr, go);
+    GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_SELECT, player, sender, action, false, nullptr, me);
     return false;
 }
 
@@ -1117,21 +1155,21 @@ bool SmartGameObjectAI::GossipSelectCode(Player* /*player*/, uint32 /*sender*/, 
 // Called when a player accepts a quest from the gameobject.
 bool SmartGameObjectAI::QuestAccept(Player* player, Quest const* quest)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_ACCEPTED_QUEST, player, quest->GetQuestId(), 0, false, nullptr, go);
+    GetScript()->ProcessEventsFor(SMART_EVENT_ACCEPTED_QUEST, player, quest->GetQuestId(), 0, false, nullptr, me);
     return false;
 }
 
 // Called when a player selects a quest reward.
 bool SmartGameObjectAI::QuestReward(Player* player, Quest const* quest, uint32 opt)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_REWARD_QUEST, player, quest->GetQuestId(), opt, false, nullptr, go);
+    GetScript()->ProcessEventsFor(SMART_EVENT_REWARD_QUEST, player, quest->GetQuestId(), opt, false, nullptr, me);
     return false;
 }
 
 // Called when the gameobject is destroyed (destructible buildings only).
 void SmartGameObjectAI::Destroyed(Player* player, uint32 eventId)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_DEATH, player, eventId, 0, false, nullptr, go);
+    GetScript()->ProcessEventsFor(SMART_EVENT_DEATH, player, eventId, 0, false, nullptr, me);
 }
 
 void SmartGameObjectAI::SetData(uint32 id, uint32 value)

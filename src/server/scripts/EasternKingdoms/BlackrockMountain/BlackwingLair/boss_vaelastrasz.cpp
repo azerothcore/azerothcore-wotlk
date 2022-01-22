@@ -1,17 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "blackwing_lair.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "blackwing_lair.h"
 
 constexpr float aNefariusSpawnLoc[4] = { -7466.16f, -1040.80f, 412.053f, 2.14675f };
 
@@ -76,19 +87,29 @@ public:
         {
             PlayerGUID.Clear();
             HasYelled = false;
+            _introDone = false;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            me->setFaction(35);
+            me->SetFaction(FACTION_FRIENDLY);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void Reset() override
         {
             _Reset();
+            me->SetHealth(me->CountPctFromMaxHealth(30));
 
-            me->SetStandState(UNIT_STAND_STATE_DEAD);
-            me->SetReactState(REACT_PASSIVE);
-            Initialize();
+            if (!_introDone)
+            {
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+                me->SetReactState(REACT_PASSIVE);
+                Initialize();
+                _eventsIntro.Reset();
+            }
+            else
+            {
+                HasYelled = false;
+            }
         }
 
         void EnterCombat(Unit* victim) override
@@ -96,7 +117,6 @@ public:
             BossAI::EnterCombat(victim);
 
             DoCast(me, SPELL_ESSENCEOFTHERED);
-            me->SetHealth(me->CountPctFromMaxHealth(30));
             // now drop damage requirement to be able to take loot
             me->ResetPlayerDamageReq();
 
@@ -112,7 +132,7 @@ public:
         {
             PlayerGUID = target->GetGUID();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            events.ScheduleEvent(EVENT_SPEECH_1, 1000);
+            _eventsIntro.ScheduleEvent(EVENT_SPEECH_1, 1000);
         }
 
         void KilledUnit(Unit* victim) override
@@ -126,61 +146,63 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
+            _eventsIntro.Update(diff);
 
             // Speech
-            if (!UpdateVictim())
+            if (!_introDone)
             {
-                while (uint32 eventId = events.ExecuteEvent())
+                while (uint32 eventId = _eventsIntro.ExecuteEvent())
                 {
                     switch (eventId)
                     {
                         case EVENT_SPEECH_1:
                             me->SummonCreature(NPC_VICTOR_NEFARIUS, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 26000);
-                            events.ScheduleEvent(EVENT_SPEECH_2, 1000);
+                            _eventsIntro.ScheduleEvent(EVENT_SPEECH_2, 1000);
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_SPEECH_2:
                             if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
                             {
                                 nefarius->CastSpell(me, SPELL_NEFARIUS_CORRUPTION, TRIGGERED_CAST_DIRECTLY);
-                                nefarius->MonsterYell(SAY_NEFARIAN_VAEL_INTRO, LANG_UNIVERSAL, 0);
+                                nefarius->Yell(SAY_NEFARIAN_VAEL_INTRO);
                                 nefarius->SetStandState(UNIT_STAND_STATE_STAND);
                             }
-                            events.ScheduleEvent(EVENT_SPEECH_3, 18000);
+                            _eventsIntro.ScheduleEvent(EVENT_SPEECH_3, 18000);
                             break;
                         case EVENT_SPEECH_3:
                             if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
                                 nefarius->CastSpell(me, SPELL_RED_LIGHTNING, TRIGGERED_NONE);
-                            events.ScheduleEvent(EVENT_SPEECH_4, 2000);
+                            _eventsIntro.ScheduleEvent(EVENT_SPEECH_4, 2000);
                             break;
                         case EVENT_SPEECH_4:
                             Talk(SAY_LINE1);
                             me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            events.ScheduleEvent(EVENT_SPEECH_5, 12000);
+                            _eventsIntro.ScheduleEvent(EVENT_SPEECH_5, 12000);
                             break;
                         case EVENT_SPEECH_5:
                             Talk(SAY_LINE2);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            events.ScheduleEvent(EVENT_SPEECH_6, 12000);
+                            _eventsIntro.ScheduleEvent(EVENT_SPEECH_6, 12000);
                             break;
                         case EVENT_SPEECH_6:
                             Talk(SAY_LINE3);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            events.ScheduleEvent(EVENT_SPEECH_7, 17000);
+                            _eventsIntro.ScheduleEvent(EVENT_SPEECH_7, 17000);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_SPEECH_7:
-                            me->setFaction(103);
+                            me->SetFaction(FACTION_DRAGONFLIGHT_BLACK);
                             if (PlayerGUID && ObjectAccessor::GetUnit(*me, PlayerGUID))
                                 AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            _introDone = true;
                             break;
                     }
                 }
-                return;
             }
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             while (uint32 eventId = events.ExecuteEvent())
@@ -211,7 +233,7 @@ public:
                         {
                             //selects a random target that isn't the current victim and is a mana user (selects mana users) but not pets
                             //it also ignores targets who have the aura. We don't want to place the debuff on the same target twice.
-                            if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && !u->HasAura(SPELL_BURNINGADRENALINE); }))
+                            if (Unit *target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && !u->HasAura(SPELL_BURNINGADRENALINE); }))
                             {
                                 me->CastSpell(target, SPELL_BURNINGADRENALINE, true);
                             }
@@ -225,9 +247,6 @@ public:
                         events.ScheduleEvent(EVENT_BURNINGADRENALINE_TANK, 45000);
                         break;
                 }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
             }
 
             // Yell if hp lower than 15%
@@ -263,6 +282,8 @@ public:
             ObjectGuid PlayerGUID;
             ObjectGuid m_nefariusGuid;
             bool HasYelled;
+            bool _introDone;
+            EventMap _eventsIntro;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

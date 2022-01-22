@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CalendarMgr.h"
@@ -67,7 +78,9 @@ void CalendarMgr::LoadFromDB()
             uint32 guildId = 0;
 
             if (flags & CALENDAR_FLAG_GUILD_EVENT || flags & CALENDAR_FLAG_WITHOUT_INVITES)
-                guildId = Player::GetGuildIdFromStorage(creatorGUID.GetCounter());
+            {
+                guildId = sCharacterCache->GetCharacterGuildIdByGuid(creatorGUID);
+            }
 
             CalendarEvent* calendarEvent = new CalendarEvent(eventId, creatorGUID, guildId, type, dungeonId, time_t(eventTime), flags, time_t(timezoneTime), title, description);
             _events.insert(calendarEvent);
@@ -468,7 +481,7 @@ void CalendarMgr::SendCalendarEventInvite(CalendarInvite const& invite)
     ObjectGuid invitee = invite.GetInviteeGUID();
     Player* player = ObjectAccessor::FindConnectedPlayer(invitee);
 
-    uint8 level = player ? player->getLevel() : Player::GetLevelFromStorage(invitee.GetCounter());
+    uint8 level = player ? player->getLevel() : sCharacterCache->GetCharacterLevelByGuid(invitee);
 
     WorldPacket data(SMSG_CALENDAR_EVENT_INVITE, 8 + 8 + 8 + 1 + 1 + 1 + (statusTime ? 4 : 0) + 1);
     data << invitee.WriteAsPacked();
@@ -613,8 +626,8 @@ void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calend
         ObjectGuid inviteeGuid = calendarInvite->GetInviteeGUID();
         Player* invitee = ObjectAccessor::FindConnectedPlayer(inviteeGuid);
 
-        uint8 inviteeLevel = invitee ? invitee->getLevel() : Player::GetLevelFromStorage(inviteeGuid.GetCounter());
-        uint32 inviteeGuildId = invitee ? invitee->GetGuildId() : Player::GetGuildIdFromStorage(inviteeGuid.GetCounter());
+        uint8 inviteeLevel = invitee ? invitee->getLevel() : sCharacterCache->GetCharacterLevelByGuid(inviteeGuid);
+        uint32 inviteeGuildId = invitee ? invitee->GetGuildId() : sCharacterCache->GetCharacterGuildIdByGuid(inviteeGuid);
 
         data << inviteeGuid.WriteAsPacked();
         data << uint8(inviteeLevel);

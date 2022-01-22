@@ -1,17 +1,31 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PlayerDump.h"
 #include "AccountMgr.h"
+#include "CharacterCache.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
-#include "PlayerDump.h"
 #include "World.h"
+#include "StringConvert.h"
 
-#define DUMP_TABLE_COUNT 27
+constexpr auto DUMP_TABLE_COUNT = 27;
+
 struct DumpTable
 {
     char const* name;
@@ -160,10 +174,12 @@ uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32>& guidMap, uint32
 bool changeGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
-    uint32 oldGuid = atoi(getnth(str, n).c_str());
-    if (nonzero && oldGuid == 0)
-        return true;                                        // not an error
 
+    auto _oldGuid = Acore::StringTo<uint32>(getnth(str, n));
+    if (nonzero && (!_oldGuid || !*_oldGuid))
+        return true; // not an error
+
+    uint32 oldGuid = *_oldGuid;
     uint32 newGuid = registerNewGuid(oldGuid, guidMap, hiGuid);
     snprintf(chritem, 20, "%u", newGuid);
 
@@ -173,10 +189,11 @@ bool changeGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint
 bool changetokGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
-    uint32 oldGuid = atoi(gettoknth(str, n).c_str());
-    if (nonzero && oldGuid == 0)
-        return true;                                        // not an error
+    auto _oldGuid = Acore::StringTo<uint32>(getnth(str, n));
+    if (nonzero && (!_oldGuid || !*_oldGuid))
+        return true; // not an error
 
+    uint32 oldGuid = *_oldGuid;
     uint32 newGuid = registerNewGuid(oldGuid, guidMap, hiGuid);
     snprintf(chritem, 20, "%u", newGuid);
 
@@ -245,9 +262,11 @@ void StoreGUID(QueryResult result, uint32 data, uint32 field, std::set<uint32>& 
 {
     Field* fields = result->Fetch();
     std::string dataStr = fields[data].GetString();
-    uint32 guid = atoi(gettoknth(dataStr, field).c_str());
-    if (guid)
-        guids.insert(guid);
+
+    if (auto guid = Acore::StringTo<uint32>(gettoknth(dataStr, field)))
+    {
+        guids.insert(*guid);
+    }
 }
 
 // Writing - High-level functions
@@ -456,7 +475,6 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     char buf[32000] = "";
 
     typedef std::map<uint32, uint32> PetIds;                // old->new petid relation
-    typedef PetIds::value_type PetIdsPair;
     PetIds petids;
 
     uint8 gender = GENDER_NONE;
@@ -539,7 +557,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     playerClass = uint8(atol(getnth(line, 5).c_str()));
                     gender = uint8(atol(getnth(line, 6).c_str()));
                     level = uint8(atol(getnth(line, 7).c_str()));
-                    if (name == "")
+                    if (name.empty())
                     {
                         // check if the original name already exists
                         name = getnth(line, 3);
@@ -639,11 +657,11 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                         snprintf(lastpetid, 20, "%s", currpetid);
                     }
 
-                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
+                    auto const& petids_iter = petids.find(Acore::StringTo<uint32>(currpetid).value_or(0));
 
                     if (petids_iter == petids.end())
                     {
-                        petids.insert(PetIdsPair(atoi(currpetid), atoi(newpetid)));
+                        petids.emplace(Acore::StringTo<uint32>(currpetid).value_or(0), Acore::StringTo<uint32>(newpetid).value_or(0));
                     }
 
                     if (!changenth(line, 1, newpetid))          // character_pet.id update
@@ -658,7 +676,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
 
                     // lookup currpetid and match to new inserted pet id
-                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
+                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(Acore::StringTo<uint32>(currpetid).value_or(0));
                     if (petids_iter == petids.end())             // couldn't find new inserted id
                         ROLLBACK(DUMP_FILE_BROKEN);
 
@@ -682,7 +700,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     CharacterDatabase.CommitTransaction(trans);
 
     // in case of name conflict player has to rename at login anyway
-    sWorld->AddGlobalPlayerData(guid, account, name, gender, race, playerClass, level, mails.size(), 0);
+    sCharacterCache->AddCharacterCacheEntry(ObjectGuid(HighGuid::Player, guid), account, name, gender, race, playerClass, level);
 
     sObjectMgr->GetGenerator<HighGuid::Item>().Set(sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed() + items.size());
     sObjectMgr->_mailId     += mails.size();

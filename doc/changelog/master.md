@@ -1,3 +1,108 @@
+## 5.0.0-dev.0 | Commit: [2fd8b00d7bac1f9c9b565916453cf490fb069df0
+](https://github.com/azerothcore/azerothcore-wotlk/commit/2fd8b00d7bac1f9c9b565916453cf490fb069df0
+
+
+We suggest that you always use the latest version of our master branch.
+https://github.com/azerothcore/azerothcore-wotlk/tree/master
+
+### How to upgrade
+
+For server administrators: instructions about how to upgrade existing servers are available [here](http://www.azerothcore.org/wiki/Upgrade-from-pre-2.0.0-to-latest-master).
+
+## Release notes
+
+This PR removes the modelId column from creature table to allow us to move to a dual entry spawn system.
+
+If this causes an issue for in game or custom spawns the following line of SAI can update the modelId.
+
+(#entryorguid,0,0,0,11,0,100,0,0,0,0,0,0,3,0,#modelId,0,0,0,0,1,0,0,0,0,0,0,0,0,"Creature Name - On Spawn - Change Model to #modelId"),
+
+Special thanks to @Shin @Kitzunu @M'Dic for assistance.
+
+## 4.0.0-dev.13 | Commit: [bc82f36f1ff46bb21d32e1cfdaec8271dde08af1
+](https://github.com/azerothcore/azerothcore-wotlk/commit/bc82f36f1ff46bb21d32e1cfdaec8271dde08af1
+
+
+### Added
+
+```cpp
+// Unit.cpp
+    virtual void Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target);
+    virtual void Say(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void Yell(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void TextEmote(std::string_view text, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(std::string_view text, Language language, Player* target, bool isBossWhisper = false);
+    virtual void Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target);
+    virtual void Say(uint32 textId, WorldObject const* target = nullptr);
+    virtual void Yell(uint32 textId, WorldObject const* target = nullptr);
+    virtual void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(uint32 textId, Player* target, bool isBossWhisper = false);
+```
+
+### Removed
+
+```cpp
+// Object.cpp
+    void MonsterSay(const char* text, uint32 language, WorldObject const* target);
+    void MonsterYell(const char* text, uint32 language, WorldObject const* target);
+    void MonsterTextEmote(const char* text, WorldObject const* target, bool IsBossEmote = false);
+    void MonsterWhisper(const char* text, Player const* target, bool IsBossWhisper = false);
+    void MonsterSay(int32 textId, uint32 language, WorldObject const* target);
+    void MonsterYell(int32 textId, uint32 language, WorldObject const* target);
+    void MonsterTextEmote(int32 textId, WorldObject const* target, bool IsBossEmote = false);
+    void MonsterWhisper(int32 textId, Player const* target, bool IsBossWhisper = false);
+
+    void SendPlaySound(uint32 Sound, bool OnlySelf);
+```
+
+### How to upgrade
+
+```diff
+- creature->MonsterSay(text, LANG_XXX, nullptr);
++ creature->Say(text, LANG_XXX);
+
+- creature->MonsterTextEmote(text, 0);
++ creature->TextEmote(text);
+
+- creature->MonsterWhisper(text, receiver);
++ creature->Whisper(text, LANG_XXX, receiver);
+
+- creature->MonsterYell(text, LANG_XXX, NULL);
++ creature->Yell(text, LANG_XXX);
+
+- creature->MonsterWhisper(text, target, isBossWhisper);
++ creature->Whisper(text, LANG_XXX, target, isBossWhisper);
+
+- SendPlaySound(uint32 Sound, bool OnlySelf);
+ PlayDirectSound(uint32 sound_id, Player* target = nullptr);
+```
+
+## 4.0.0-dev.12 | Commit: [bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1
+](https://github.com/azerothcore/azerothcore-wotlk/commit/bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1
+
+
+
+### Added
+
+- Added `OnPlayerPVPFlagChange` hook, it will be executed after the pvp flag from a player gets changed.
+
+
+
+## 4.0.0-dev.11 | Commit: [d18545263fda54e19c875d22adfb28ae4072ec01
+](https://github.com/azerothcore/azerothcore-wotlk/commit/d18545263fda54e19c875d22adfb28ae4072ec01
+
+
+### Added
+
+- Added `OnBeforeFinalizePlayerWorldSession ` that can be used to modify the cache version that is sent to the client via modules.
+## 4.0.0-dev.10 | Commit: [0897705a6814fc19007e5f88fbcb98b3689880c9
+](https://github.com/azerothcore/azerothcore-wotlk/commit/0897705a6814fc19007e5f88fbcb98b3689880c9
+
+
+### How to upgrade
+
+Upgrade your Boost version to 1.74 or higher.
+
 ## 4.0.0-dev.9 | Commit: [edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23
 

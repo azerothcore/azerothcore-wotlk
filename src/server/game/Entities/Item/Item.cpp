@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Item.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DatabaseEnv.h"
-#include "Item.h"
 #include "ItemEnchantmentMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -15,6 +26,9 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "WorldPacket.h"
+#include "WorldSession.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 void AddItemsSetItem(Player* player, Item* item)
 {
@@ -398,7 +412,10 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
 
     ItemTemplate const* proto = GetTemplate();
     if (!proto)
+    {
+        FMT_LOG_ERROR("entities.item", "Invalid entry {} for item {}. Refusing to load.", GetEntry(), GetGUID().ToString());
         return false;
+    }
 
     // set owner (not if item is only loaded for gbank/auction/mail
     if (owner_guid)
@@ -418,10 +435,17 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
         need_save = true;
     }
 
-    Tokenizer tokens(fields[4].GetString(), ' ', MAX_ITEM_PROTO_SPELLS);
+    std::vector<std::string_view> tokens = Acore::Tokenize(fields[4].GetStringView(), ' ', false);
     if (tokens.size() == MAX_ITEM_PROTO_SPELLS)
+    {
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-            SetSpellCharges(i, atoi(tokens[i]));
+        {
+            if (Optional<int32> charges = Acore::StringTo<int32>(tokens[i]))
+                SetSpellCharges(i, *charges);
+            else
+                FMT_LOG_ERROR("entities.item", "Invalid charge info '{}' for item {}, charge data not loaded.", tokens.at(i), GetGUID().ToString());
+        }
+    }
 
     SetUInt32Value(ITEM_FIELD_FLAGS, fields[5].GetUInt32());
     // Remove bind flag for items vs NO_BIND set
@@ -432,7 +456,12 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     }
 
     std::string enchants = fields[6].GetString();
-    _LoadIntoDataField(enchants.c_str(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
+
+    if (!_LoadIntoDataField(fields[6].GetString(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET))
+    {
+        FMT_LOG_WARN("entities.item", "Invalid enchantment data '{}' for item {}. Forcing partial load.", fields[6].GetString(), GetGUID().ToString());
+    }
+
     SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetInt16());
     // recalculate suffix factor
     if (GetItemRandomPropertyId() < 0)
@@ -633,7 +662,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
                 SetState(ITEM_CHANGED, GetOwner());
             }
             for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
-                SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
+                SetEnchantment(EnchantmentSlot(i), item_rand->Enchantment[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
         }
     }
     else
@@ -650,7 +679,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
             }
 
             for (uint32 i = PROP_ENCHANTMENT_SLOT_0; i < MAX_ENCHANTMENT_SLOT; ++i)
-                SetEnchantment(EnchantmentSlot(i), item_rand->enchant_id[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
+                SetEnchantment(EnchantmentSlot(i), item_rand->Enchantment[i - PROP_ENCHANTMENT_SLOT_0], 0, 0);
         }
     }
 }
@@ -745,10 +774,6 @@ bool Item::IsEquipped() const
 
 bool Item::CanBeTraded(bool mail, bool trade) const
 {
-    // Xinef: little protection
-    if (m_lootGenerated)
-        return false;
-
     if ((!mail || !IsBoundAccountWide()) && (IsSoulBound() && (!HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) || !trade)))
         return false;
 

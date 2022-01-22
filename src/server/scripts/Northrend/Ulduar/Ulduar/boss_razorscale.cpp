@@ -1,17 +1,29 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "WaypointMgr.h"
 #include "ulduar.h"
-#include "WaypointManager.h"
 
 #define SPELL_FLAMEBUFFET_10                64016
 #define SPELL_FLAMEBUFFET_25                64023
@@ -30,15 +42,15 @@
 #define SPELL_CHAIN_3                       49683
 #define SPELL_CHAIN_4                       49684
 #define SPELL_LAUNCH_CHAIN                  62505
-#define SPELL_HARPOON_SHOT_BUFF             62509
-#define SPELL_HARPOON_FIRE_STATE            62696
+//#define SPELL_HARPOON_SHOT_BUFF             62509
+//#define SPELL_HARPOON_FIRE_STATE            62696
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
 #define SPELL_DEVOURINGFLAME_SUMMON         63308
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
-#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
-#define NPC_DEVOURINGFLAME                  34188
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
+//#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
+//#define NPC_DEVOURINGFLAME                  34188
 #define SPELL_STORMSTRIKE                   51876
 #define SPELL_WHIRLWIND                     63808
 #define SPELL_LIGHTINGBOLT                  63809
@@ -49,10 +61,10 @@
 #define NPC_DARK_RUNE_WATCHER               33453
 #define NPC_EXPEDITION_ENGINEER             33287
 #define NPC_EXPEDITION_COMMANDER            33210
-#define NPC_EXPEDITION_DEFENDER             33816
-#define NPC_EXPEDITION_TRAPPER              33259
+//#define NPC_EXPEDITION_DEFENDER             33816
+//#define NPC_EXPEDITION_TRAPPER              33259
 #define NPC_RAZORSCALE                      33186
-#define NPC_HARPOON_FIRE_STATE              33282
+//#define NPC_HARPOON_FIRE_STATE              33282
 
 #define GO_DRILL                            195305
 #define GO_HARPOON_GUN_1                    194519
@@ -134,6 +146,13 @@ public:
         bool startPath;
         uint8 flyTimes;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->setActive(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -145,11 +164,6 @@ public:
             CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
-
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
-            me->setActive(true);
 
             if( pInstance )
                 pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
@@ -181,7 +195,7 @@ public:
                     break;
                 ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
                 if (!i)
-                    (*itr)->MonsterYell(TEXT_EE_AGGRO, LANG_UNIVERSAL, 0);
+                    (*itr)->Yell(TEXT_EE_AGGRO, LANG_UNIVERSAL);
                 ++i;
             }
             if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
@@ -208,16 +222,22 @@ public:
             {
                 case SPELL_LAUNCH_CHAIN:
                     {
-                        uint32 spell = 0;
-                        if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
-                            spell = SPELL_CHAIN_1;
-                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
-                            spell = SPELL_CHAIN_2;
-                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
-                            spell = SPELL_CHAIN_3;
-                        else
-                            spell = SPELL_CHAIN_4;
-                        caster->CastSpell(me, spell, true);
+                        uint32 spellId = SPELL_CHAIN_4;
+
+                        if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
+                        {
+                            spellId = SPELL_CHAIN_1;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
+                        {
+                            spellId = SPELL_CHAIN_2;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
+                        {
+                            spellId = SPELL_CHAIN_3;
+                        }
+
+                        caster->CastSpell(me, spellId, true);
                     }
                     break;
                 case SPELL_CHAIN_1:
@@ -284,7 +304,6 @@ public:
                 me->DisableRotate(true);
                 me->SetOrientation((float)(M_PI + 0.01) / 2);
                 me->SetFacingTo(M_PI / 2);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->CastSpell(me, 62794, true);
                 events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
@@ -341,17 +360,17 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
                 case EVENT_SPELL_FIREBALL:
-                    if( Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true) )
+                    if( Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
                         me->CastSpell(pTarget, SPELL_FIREBALL, false);
                     events.RepeatEvent(4000);
                     break;
                 case EVENT_SPELL_DEVOURING_FLAME:
-                    if( Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true) )
+                    if( Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
                         me->CastSpell(pTarget, SPELL_DEVOURINGFLAME, false);
                     events.RepeatEvent(13000);
                     break;
@@ -393,7 +412,7 @@ public:
                         for( int j = 0; j < 4; ++j )
                         {
                             float x = cords[i][0] + 4.0f * cos(j * M_PI / 2);
-                            float y = cords[i][1] + 4.0f * sin(j * M_PI / 2);
+                            float y = cords[i][1] + 4.0f * std::sin(j * M_PI / 2);
 
                             uint32 npc_entry = 0;
                             switch( opt )
@@ -435,7 +454,7 @@ public:
                     }
                     break;
                 case EVENT_WARN_DEEP_BREATH:
-                    me->MonsterTextEmote(TEXT_DEEP_BREATH, 0, true);
+                    me->TextEmote(TEXT_DEEP_BREATH, nullptr, true);
                     me->RemoveAura(62794);
                     events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
                     break;
@@ -469,7 +488,7 @@ public:
                         me->SetControlled(false, UNIT_STATE_ROOT);
                         me->DisableRotate(false);
                         DoResetThreat();
-                        Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0, true);
+                        Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0, true);
                         if (!target)
                             target = me->SelectNearestPlayer(200.0f);
                         if (target)
@@ -497,9 +516,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
                     }
@@ -510,7 +527,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -573,6 +590,7 @@ public:
 
         void EnterEvadeMode() override
         {
+            me->SetDisableGravity(true);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
@@ -740,7 +758,7 @@ public:
                             if( GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
                             {
                                 me->RemoveGameObject(wh, false);
-                                me->MonsterTextEmote(TEXT_TURRET_READY, 0, true);
+                                me->TextEmote(TEXT_TURRET_READY, nullptr, true);
                             }
                         }
                     }
@@ -832,7 +850,7 @@ public:
                                 if( me->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_STATE_WORK )
                                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_WORK);
 
-                                if (fabs(me->GetOrientation() - me->GetAngle(c)) > M_PI / 4)
+                                if (std::fabs(me->GetOrientation() - me->GetAngle(c)) > M_PI / 4)
                                     me->SetFacingToObject(c);
 
                                 c->AI()->SetData(2, 0);
@@ -860,7 +878,7 @@ public:
                                     if (!fs->AI()->GetData(2))
                                     {
                                         float a = rand_norm() * M_PI;
-                                        me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * sin(a), fs->GetPositionZ());
+                                        me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * std::sin(a), fs->GetPositionZ());
                                         fixingGUID = fs->GetGUID();
                                         return;
                                     }

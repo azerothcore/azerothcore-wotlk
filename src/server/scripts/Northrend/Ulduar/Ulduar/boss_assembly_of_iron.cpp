@@ -1,10 +1,23 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
@@ -331,7 +344,7 @@ public:
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_STATIC_DISRUPTION:
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true))
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true))
                         me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
 
                     events.RepeatEvent(urand(20000, 40000));
@@ -510,7 +523,7 @@ public:
                     events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, urand(27000, 34000));
                     break;
                 case EVENT_RUNE_OF_DEATH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                         me->CastSpell(target, SPELL_RUNE_OF_DEATH, true);
 
                     Talk(SAY_MOLGEIM_RUNE_DEATH);
@@ -518,7 +531,7 @@ public:
                     break;
                 case EVENT_RUNE_OF_SUMMONING:
                     Talk(SAY_MOLGEIM_SUMMON);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_RUNE_OF_SUMMONING);
                     events.RepeatEvent(urand(30000, 45000));
                     break;
@@ -734,7 +747,7 @@ public:
                     _channelTimer = 0;
                     float o = urand(0, 5) * M_PI / 3.0f;
                     me->InterruptNonMeleeSpells(false);
-                    me->GetMotionMaster()->MovePoint(POINT_CHANNEL_STEELBREAKER, 1587.18f + 10.0f * cos(o), 121.02f + 10.0f * sin(o), 427.3f);
+                    me->GetMotionMaster()->MovePoint(POINT_CHANNEL_STEELBREAKER, 1587.18f + 10.0f * cos(o), 121.02f + 10.0f * std::sin(o), 427.3f);
                 }
             }
 
@@ -758,7 +771,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
 
                     events.RepeatEvent(urand(9000, 17000));

@@ -1,19 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CombatAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "WorldSession.h"
 
 // Ours
@@ -42,7 +53,7 @@ public:
             {
                 if (apply)
                 {
-                    me->setFaction(who->getFaction());
+                    me->SetFaction(who->GetFaction());
                     me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
                     Start(false, true, who->GetGUID());
                 }
@@ -74,11 +85,11 @@ public:
             switch (waypointId)
             {
                 case 0:
-                    me->MonsterTextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", 0, true);
+                    me->TextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", nullptr, true);
                     break;
                 case 19:
-                    me->MonsterTextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    me->TextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                         summoner->ToPlayer()->KilledMonsterCredit(29677);
                     break;
             }
@@ -472,7 +483,7 @@ public:
 
                 if (Player* charmer = GetValidPlayer())
                 {
-                    me->setFaction(16);
+                    me->SetFaction(FACTION_MONSTER_2);
                     charmer->SetClientControl(me, 0, true);
 
                     me->SetSpeed(MOVE_RUN, 2.0f, true);
@@ -960,7 +971,27 @@ public:
         void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
         {
             if (apply)
+            {
+                class DelayedTransportPositionOffsets : public BasicEvent
+                {
+                    public:
+                        DelayedTransportPositionOffsets(Unit* owner) : _owner(owner) { }
+
+                        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+                        {
+                            _owner->m_movementInfo.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
+                            return true;
+                        }
+
+                    private:
+                        Unit* _owner;
+                };
+
+                if (who->IsPlayer())
+                    who->m_Events.AddEvent(new DelayedTransportPositionOffsets(who), who->m_Events.CalculateTime(500));
+
                 return;
+            }
 
             if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
                 _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;

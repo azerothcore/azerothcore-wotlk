@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_SPELLAURAS_H
@@ -80,9 +91,9 @@ public:
 
     static uint8 BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 avalibleEffectMask, WorldObject* owner);
     static Aura* TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty, bool* refresh = nullptr, bool periodicReset = false);
-    static Aura* TryCreate(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty);
-    static Aura* Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID);
-    explicit Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, ObjectGuid casterGUID);
+    static Aura* TryCreate(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemGUID = ObjectGuid::Empty);
+    static Aura* Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
+    explicit Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
     void _InitEffects(uint8 effMask, Unit* caster, int32* baseAmount);
     virtual ~Aura();
 
@@ -121,7 +132,7 @@ public:
     int32 CalcMaxDuration(Unit* caster) const;
     int32 GetDuration() const { return m_duration; }
     void SetDuration(int32 duration, bool withMods = false);
-    void RefreshDuration();
+    void RefreshDuration(bool withMods = false);
     void RefreshTimers(bool periodicReset = false);
     void RefreshTimersWithMods();
     bool IsExpired() const { return !GetDuration();}
@@ -224,8 +235,13 @@ public:
     AuraScript* GetScriptByName(std::string const& scriptName) const;
 
     std::list<AuraScript*> m_loadedScripts;
+
+    void SetTriggeredByAuraSpellInfo(SpellInfo const* triggeredByAuraSpellInfo);
+    SpellInfo const* GetTriggeredByAuraSpellInfo() const;
+
 private:
     void _DeleteRemovedApplications();
+
 protected:
     SpellInfo const* const m_spellInfo;
     ObjectGuid const m_casterGuid;
@@ -252,13 +268,17 @@ protected:
 
 private:
     Unit::AuraApplicationList m_removedApplications;
+
+    SpellInfo const* m_triggeredByAuraSpellInfo;
 };
 
 class UnitAura : public Aura
 {
-    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID);
+    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID);
+
 protected:
-    explicit UnitAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID);
+    explicit UnitAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
+
 public:
     void _ApplyForTarget(Unit* target, Unit* caster, AuraApplication* aurApp) override;
     void _UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* aurApp) override;
@@ -277,9 +297,11 @@ private:
 
 class DynObjAura : public Aura
 {
-    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID);
+    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID);
+
 protected:
-    explicit DynObjAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID);
+    explicit DynObjAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
+
 public:
     void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) override;
 
