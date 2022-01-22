@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "stratholme.h"
 #include "TaskScheduler.h"
+#include "stratholme.h"
 
 enum Texts
 {
@@ -159,7 +159,7 @@ struct boss_jarien : public BossAI
 
         me->SummonCreature(NPC_SPIRIT_OF_JARIEN, me->GetPosition());
 
-        if (_sothosDied)
+        if (_sothosDied && killer)
         {
             HandleBothDead(me, true, killer);
         }
@@ -281,7 +281,7 @@ struct boss_sothos : public BossAI
 
         me->SummonCreature(NPC_SPIRIT_OF_SOTHOS, me->GetPosition());
 
-        if (_jarienDied)
+        if (_jarienDied && killer)
         {
             HandleBothDead(me, false, killer);
         }
