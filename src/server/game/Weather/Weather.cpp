@@ -24,7 +24,6 @@
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
 #include "MiscPackets.h"
 
 /// Create the Weather object

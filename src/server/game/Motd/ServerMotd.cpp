@@ -21,7 +21,6 @@
 #include "Util.h"
 #include "WorldPacket.h"
 #include <iterator>
-#include <sstream>
 
 namespace
 {
