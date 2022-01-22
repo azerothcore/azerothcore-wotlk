@@ -22,7 +22,6 @@
 #include "WorldPacket.h"
 #include "Tokenize.h"
 #include <iterator>
-#include <sstream>
 
 namespace
 {
