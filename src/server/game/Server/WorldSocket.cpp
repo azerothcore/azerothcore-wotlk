@@ -17,7 +17,6 @@
 
 #include "WorldSocket.h"
 #include "AccountMgr.h"
-#include "BigNumber.h"
 #include "Config.h"
 #include "CryptoHash.h"
 #include "CryptoRandom.h"
