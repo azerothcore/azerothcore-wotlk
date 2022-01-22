@@ -162,21 +162,21 @@ enum LiquidStatus
 
 struct LiquidData
 {
-    LiquidData() : Entry(0), Flags(0), Level(INVALID_HEIGHT), DepthLevel(INVALID_HEIGHT), Status(LIQUID_MAP_NO_WATER) { }
+    LiquidData()  = default;
 
-    uint32 Entry;
-    uint32 Flags;
-    float  Level;
-    float  DepthLevel;
-    LiquidStatus Status;
+    uint32 Entry{0};
+    uint32 Flags{0};
+    float  Level{INVALID_HEIGHT};
+    float  DepthLevel{INVALID_HEIGHT};
+    LiquidStatus Status{LIQUID_MAP_NO_WATER};
 };
 
 struct PositionFullTerrainStatus
 {
-    PositionFullTerrainStatus() : areaId(0), floorZ(INVALID_HEIGHT), outdoors(false) { }
-    uint32 areaId;
-    float floorZ;
-    bool outdoors;
+    PositionFullTerrainStatus()  = default;
+    uint32 areaId{0};
+    float floorZ{INVALID_HEIGHT};
+    bool outdoors{false};
     LiquidData liquidInfo;
 };
 
@@ -229,7 +229,7 @@ class GridMap
     bool loadHeightData(FILE* in, uint32 offset, uint32 size);
     bool loadLiquidData(FILE* in, uint32 offset, uint32 size);
     bool loadHolesData(FILE* in, uint32 offset, uint32 size);
-    bool isHole(int row, int col) const;
+    [[nodiscard]] bool isHole(int row, int col) const;
 
     // Get height functions and pointers
     typedef float (GridMap::*GetHeightPtr) (float x, float y) const;
@@ -249,7 +249,7 @@ public:
     [[nodiscard]] inline float getHeight(float x, float y) const {return (this->*_gridGetHeight)(x, y);}
     [[nodiscard]] float getMinHeight(float x, float y) const;
     [[nodiscard]] float getLiquidLevel(float x, float y) const;
-    LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
+    [[nodiscard]] LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
@@ -394,7 +394,7 @@ public:
     void GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, float x, float y, float z) const;
 
     [[nodiscard]] float GetWaterLevel(float x, float y) const;
-    bool IsInWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
+    [[nodiscard]] bool IsInWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
     [[nodiscard]] bool IsUnderWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
     [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const;
     [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData const& liquidData) const;
@@ -509,7 +509,7 @@ public:
     typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
     GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameobjectBySpawnIdStore; }
 
-    std::unordered_set<Corpse*> const* GetCorpsesInCell(uint32 cellId) const
+    [[nodiscard]] std::unordered_set<Corpse*> const* GetCorpsesInCell(uint32 cellId) const
     {
         auto itr = _corpsesByCell.find(cellId);
         if (itr != _corpsesByCell.end())
@@ -518,7 +518,7 @@ public:
         return nullptr;
     }
 
-    Corpse* GetCorpseByPlayer(ObjectGuid const& ownerGuid) const
+    [[nodiscard]] Corpse* GetCorpseByPlayer(ObjectGuid const& ownerGuid) const
     {
         auto itr = _corpsesByPlayer.find(ownerGuid);
         if (itr != _corpsesByPlayer.end())
