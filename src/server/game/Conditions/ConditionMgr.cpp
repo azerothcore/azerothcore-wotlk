@@ -419,6 +419,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             condMeets = unit->HasAuraType(AuraType(ConditionValue1));
         break;
     }
+    case CONDITION_CHARMED:
+    {
+        if (Unit* unit = object->ToUnit())
+            condMeets = unit->IsCharmed();
+        break;
+    }
     default:
         condMeets = false;
         break;
@@ -602,6 +608,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         mask |= GRID_MAP_TYPE_MASK_PLAYER;
         break;
     case CONDITION_HAS_AURA_TYPE:
+        mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_CHARMED:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
         break;
     default:
@@ -2211,10 +2220,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         break;
     }
-    case CONDITION_IN_WATER:
-    {
-        break;
-    }
     case CONDITION_QUEST_OBJECTIVE_PROGRESS:
     {
         const Quest* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
@@ -2252,6 +2257,8 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         break;
     }
+    case CONDITION_IN_WATER:
+    case CONDITION_CHARMED:
     default:
         break;
     }
