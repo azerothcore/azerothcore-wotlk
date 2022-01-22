@@ -2810,6 +2810,8 @@ void Guild::_SendBankList(WorldSession* session /* = nullptr*/, uint8 tabId /*= 
                     itemInfo.Charges = int32(std::abs(tabItem->GetSpellCharges()));
                     itemInfo.EnchantmentID = int32(tabItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
                     itemInfo.Flags = tabItem->GetInt32Value(ITEM_FIELD_FLAGS);
+                    itemInfo.RandomPropertiesID = tabItem->GetItemRandomPropertyId();
+                    itemInfo.RandomPropertiesSeed = int32(tabItem->GetItemSuffixFactor());
 
                     for (uint32 socketSlot = 0; socketSlot < MAX_GEM_SOCKETS; ++socketSlot)
                     {

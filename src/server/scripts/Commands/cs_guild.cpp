@@ -231,14 +231,7 @@ public:
             handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
         }
 
-        // Format creation date
-        char createdDateStr[20];
-        time_t createdDate = guild->GetCreatedDate();
-        tm localTm;
-        localtime_r(&createdDate, &localTm);
-        strftime(createdDateStr, 20, "%Y-%m-%d %H:%M:%S", &localTm);
-
-        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, createdDateStr); // Creation Date
+        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, Acore::Time::TimeToHumanReadable(Seconds(guild->GetCreatedDate())).c_str()); // Creation Date
         handler->PSendSysMessage(LANG_GUILD_INFO_MEMBER_COUNT, guild->GetMemberCount()); // Number of Members
         handler->PSendSysMessage(LANG_GUILD_INFO_BANK_GOLD, guild->GetTotalBankMoney() / 100 / 100); // Bank Gold (in gold coins)
         handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the day
