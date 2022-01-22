@@ -24,7 +24,6 @@
 #include "WorldModel.h"
 #include <G3D/Vector3.h>
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <string>
 
