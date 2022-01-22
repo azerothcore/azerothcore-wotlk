@@ -1647,7 +1647,7 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());
 
     if (amount > 10 * GOLD)     // receiver_acc = Guild id, receiver_name = Guild name
-        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"(guild members: %u, new amount: %u, leader guid low: %u, sender level: %u)\", NOW(), %u")",
+        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"(guild members: %u, new amount: %u, leader guid low: %u, sender level: %u)\", NOW(), %u)",
             session->GetAccountId(), player->GetGUID().GetCounter(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), GetId(), GetName().c_str(), amount, GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel(), 3);
 }
 
