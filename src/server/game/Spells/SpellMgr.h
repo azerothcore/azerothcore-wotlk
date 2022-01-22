@@ -360,7 +360,7 @@ enum SpellGroupStackFlags
 
 enum SpellGroupIDs
 {
-    SPELl_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS     = 1
+    SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS     = 1
 };
 
 struct SpellStackInfo

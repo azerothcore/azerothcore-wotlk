@@ -2847,7 +2847,7 @@ bool SpellInfo::CheckElixirStacking(Unit const* caster) const
 
     // xinef: check spell group
     uint32 groupId = sSpellMgr->GetSpellGroup(Id);
-    if (groupId != SPELl_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS)
+    if (groupId != SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS)
     {
         return true;
     }
