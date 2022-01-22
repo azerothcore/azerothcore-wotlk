@@ -22,7 +22,6 @@
 #include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
