@@ -22,7 +22,6 @@
 #include "ObjectMgr.h"
 #include "Util.h"
 #include <functional>
-#include <stdlib.h>
 #include <vector>
 
 struct EnchStoreItem
