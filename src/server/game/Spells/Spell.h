@@ -24,7 +24,6 @@
 #include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "SpellInfo.h"
-
 #include <any>
 #include <map>
 #include "Optional.h"
