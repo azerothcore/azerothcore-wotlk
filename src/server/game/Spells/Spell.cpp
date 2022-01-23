@@ -23,7 +23,6 @@
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"
-#include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicObject.h"
 #include "GameObjectAI.h"
@@ -34,8 +33,6 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MMapFactory.h"
-#include "MMapMgr.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -58,7 +55,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 

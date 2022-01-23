@@ -46,7 +46,6 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "WaypointMgr.h"
 #include "World.h"
 #include "StringConvert.h"
 #include "Tokenize.h"

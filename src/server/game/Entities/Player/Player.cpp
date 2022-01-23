@@ -408,6 +408,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_isInstantFlightOn = true;
 
+    _wasOutdoor = true;
     sScriptMgr->OnConstructPlayer(this);
 }
 
@@ -5594,8 +5595,40 @@ void Player::CheckAreaExploreAndOutdoor()
     uint32 areaId = GetAreaId();
     AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
-    if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && !isOutdoor)
-        RemoveAurasWithAttribute(SPELL_ATTR0_ONLY_OUTDOORS);
+    if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && _wasOutdoor != isOutdoor)
+    {
+        _wasOutdoor = isOutdoor;
+
+        SpellAttr0 attrToRemove = isOutdoor ? SPELL_ATTR0_ONLY_INDOORS : SPELL_ATTR0_ONLY_OUTDOORS;
+        SpellAttr0 attrToRecalculate = isOutdoor ? SPELL_ATTR0_ONLY_OUTDOORS : SPELL_ATTR0_ONLY_INDOORS;
+        for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
+        {
+            Aura* aura = iter->second->GetBase();
+            SpellInfo const* spell = aura->GetSpellInfo();
+            if (spell->Attributes & attrToRemove)
+            {
+                // if passive - do not remove and just turn off all effects
+                if (aura->IsPassive())
+                {
+                    aura->HandleAllEffects(iter->second, AURA_EFFECT_HANDLE_REAL, false);
+                    ++iter;
+                    continue;
+                }
+
+                RemoveAura(iter);
+            }
+            else if ((spell->Attributes & attrToRecalculate) && aura->IsPassive())
+            {
+                // if passive - turn on all effects
+                aura->HandleAllEffects(iter->second, AURA_EFFECT_HANDLE_REAL, true);
+                ++iter;
+            }
+            else
+            {
+                ++iter;
+            }
+        }
+    }
 
     if (!sScriptMgr->CanAreaExploreAndOutdoor(this))
         return;

@@ -2935,6 +2935,8 @@ private:
 
     Optional<float> _farSightDistance = { };
 
+    bool _wasOutdoor;
+
     PlayerSettingMap m_charSettingsMap;
 };
 

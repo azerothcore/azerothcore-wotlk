@@ -21,7 +21,6 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Creature.h"
-#include "DynamicTree.h"
 #include "DynamicVisibility.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
