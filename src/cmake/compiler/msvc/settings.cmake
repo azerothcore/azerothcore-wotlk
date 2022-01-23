@@ -120,6 +120,14 @@ if(NOT WITH_WARNINGS)
   message(STATUS "MSVC: Disabled generic compiletime warnings")
 endif()
 
+# Move some warnings that are enabled for other compilers from level 4 to level 3
+target_compile_options(acore-compile-option-interface
+  INTERFACE
+    /w34100  # C4100 'identifier' : unreferenced formal parameter
+    /w34101  # C4101: 'identifier' : unreferenced local variable
+    /w34189  # C4189: 'identifier' : local variable is initialized but not referenced
+    /w34389) # C4189: 'equality-operator' : signed/unsigned mismatch
+
 if(BUILD_SHARED_LIBS)
   target_compile_options(acore-compile-option-interface
     INTERFACE
