@@ -7538,14 +7538,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
-    // Judgement of Light
-    // Judgement of Command
-    // Judgement of Blood
-    // Judgement of Justice
-    // Judgement of Wisdom
-    // Judgement of the Martyr
-    // Judgement of Light
-    ApplySpellFix({ 20271, 20425, 32220, 53407, 53408, 53725, 57774 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({
+        20271, 57774,  // Judgement of Light
+        20425,         // Judgement of Command
+        32220,         // Judgement of Blood
+        53407,         // Judgement of Justice
+        53408,         // Judgement of Wisdom
+        53725          // Judgement of the Martyr
+        }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
