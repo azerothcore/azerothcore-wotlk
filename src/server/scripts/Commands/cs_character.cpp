@@ -120,7 +120,7 @@ public:
             if (isNumeric(searchString.c_str()))
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DEL_INFO_BY_GUID);
-                stmt->setUInt32(0, uint32(atoi(searchString.c_str())));
+                stmt->setUInt32(0, *Acore::StringTo<uint32>(searchString));
                 result = CharacterDatabase.Query(stmt);
             }
             // search by name
