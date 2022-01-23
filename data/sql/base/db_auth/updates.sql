@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `updates` (
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of all applied updates in this database.';
 
--- Дамп данных таблицы acore_auth.updates: 28 rows
+-- Дамп данных таблицы acore_auth.updates: 29 rows
 DELETE FROM `updates`;
 /*!40000 ALTER TABLE `updates` DISABLE KEYS */;
 INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
