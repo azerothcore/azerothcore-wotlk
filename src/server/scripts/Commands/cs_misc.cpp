@@ -39,8 +39,8 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
-#include "WeatherMgr.h"
 #include "Tokenize.h"
+#include "WeatherMgr.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2556,17 +2556,7 @@ public:
         do
         {
             Field* fields = result->Fetch();
-
-            // we have to manually set the string for mutedate
-            time_t sqlTime = fields[0].GetUInt32();
-            tm timeInfo;
-            char buffer[80];
-
-            // set it to string
-            localtime_r(&sqlTime, &timeInfo);
-            strftime(buffer, sizeof(buffer), "%Y-%m-%d %I:%M%p", &timeInfo);
-
-            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, buffer, fields[1].GetUInt32(), fields[2].GetCString(), fields[3].GetCString());
+            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, Acore::Time::TimeToHumanReadable(Seconds(fields[0].GetUInt32())).c_str(), fields[1].GetUInt32(), fields[2].GetCString(), fields[3].GetCString());
         } while (result->NextRow());
 
         return true;

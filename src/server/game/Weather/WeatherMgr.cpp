@@ -21,12 +21,12 @@
 
 #include "WeatherMgr.h"
 #include "Log.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Weather.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "MiscPackets.h"
 #include <memory>
 
 namespace WeatherMgr
