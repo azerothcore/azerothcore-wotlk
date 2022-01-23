@@ -23,7 +23,6 @@
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"
-#include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicObject.h"
 #include "GameObjectAI.h"
@@ -33,8 +32,6 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MMapFactory.h"
-#include "MMapMgr.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -57,7 +54,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
@@ -5931,17 +5927,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                     Creature* pet = unitCaster->GetGuardianPet();
                     if (pet && pet->IsAlive())
                         return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-
-                    Player* player = unitCaster->ToPlayer();
-                    if (player)
-                    {
-                        // Check pet before resurrect
-                        auto [petStable, petSlot] = Pet::GetLoadPetInfo(*player->GetPetStable(), 0, 0, false);
-                        if (!petStable)
-                        {
-                            return SPELL_FAILED_NO_PET;
-                        }
-                    }
 
                     break;
                 }

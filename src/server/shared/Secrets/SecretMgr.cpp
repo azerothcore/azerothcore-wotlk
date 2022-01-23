@@ -24,7 +24,6 @@
 #include "Errors.h"
 #include "Log.h"
 #include "SharedDefines.h"
-#include <functional>
 
 #define SECRET_FLAG_FOR(key, val, server) server ## _ ## key = (val ## ull << (16*SERVER_PROCESS_ ## server))
 #define SECRET_FLAG(key, val) SECRET_FLAG_ ## key = val, SECRET_FLAG_FOR(key, val, AUTHSERVER), SECRET_FLAG_FOR(key, val, WORLDSERVER)
@@ -42,7 +41,7 @@ struct SecretInfo
     int bits;
     ServerProcessTypes owner;
     uint64 _flags;
-    uint16 flags() const { return static_cast<uint16>(_flags >> (16*THIS_SERVER_PROCESS)); }
+    [[nodiscard]] uint16 flags() const { return static_cast<uint16>(_flags >> (16*THIS_SERVER_PROCESS)); }
 };
 
 static constexpr SecretInfo secret_info[NUM_SECRETS] =

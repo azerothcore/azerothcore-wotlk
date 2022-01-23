@@ -20,12 +20,11 @@
 */
 
 #include "Weather.h"
+#include "MiscPackets.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
-#include "MiscPackets.h"
 
 /// Create the Weather object
 Weather::Weather(uint32 zone, WeatherData const* weatherChances)
@@ -89,10 +88,7 @@ bool Weather::ReGenerate()
 
     //78 days between January 1st and March 20nd; 365/4=91 days by season
     // season source http://aa.usno.navy.mil/data/docs/EarthSeasons.html
-    time_t gtime = sWorld->GetGameTime();
-    struct tm ltime;
-    localtime_r(&gtime, &ltime);
-    uint32 season = ((ltime.tm_yday - 78 + 365) / 91) % 4;
+    uint32 season = ((Acore::Time::GetDayInYear() - 78 + 365) / 91) % 4;
 
     static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
     LOG_DEBUG("weather", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);

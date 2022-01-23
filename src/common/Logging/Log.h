@@ -57,7 +57,7 @@ public:
     void Initialize();
     void LoadFromConfig();
     void Close();
-    bool ShouldLog(std::string const& type, LogLevel level) const;
+    [[nodiscard]] bool ShouldLog(std::string const& type, LogLevel level) const;
     bool SetLogLevel(std::string const& name, int32 level, bool isLogger = true);
 
     template<typename Format, typename... Args>
@@ -93,8 +93,8 @@ public:
         RegisterAppender(AppenderImpl::type, &CreateAppender<AppenderImpl>);
     }
 
-    std::string const& GetLogsDir() const { return m_logsDir; }
-    std::string const& GetLogsTimestamp() const { return m_logsTimestamp; }
+    [[nodiscard]] std::string const& GetLogsDir() const { return m_logsDir; }
+    [[nodiscard]] std::string const& GetLogsTimestamp() const { return m_logsTimestamp; }
 
     // Deprecated functions
     template<typename Format, typename... Args>
@@ -185,7 +185,7 @@ private:
     static std::string GetTimestampStr();
     void write(std::unique_ptr<LogMessage>&& msg) const;
 
-    Logger const* GetLoggerByType(std::string const& type) const;
+    [[nodiscard]] Logger const* GetLoggerByType(std::string const& type) const;
     Appender* GetAppenderByName(std::string_view name);
     uint8 NextAppenderId();
     void CreateAppenderFromConfig(std::string const& name);
