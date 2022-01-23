@@ -17,8 +17,6 @@
 
 #ifndef __SPELL_H
 #define __SPELL_H
-
-
 #include "GridDefines.h"
 #include "ObjectMgr.h"
 #include "PathGenerator.h"
