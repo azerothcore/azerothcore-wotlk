@@ -19,6 +19,8 @@
 #include "Log.h"
 #include "Player.h"
 #include "World.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 ChannelMgr::~ChannelMgr()
 {
@@ -179,15 +181,18 @@ void ChannelMgr::LoadChannelRights()
     {
         Field* fields = result->Fetch();
         std::set<uint32> moderators;
-        const char* moderatorList = fields[5].GetCString();
-        if (moderatorList)
+        auto moderatorList = fields[5].GetStringView();
+
+        if (!moderatorList.empty())
         {
-            Tokenizer tokens(moderatorList, ' ');
-            for (Tokenizer::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
+            for (auto const& itr : Acore::Tokenize(moderatorList, ' ', false))
             {
-                uint64 moderator_acc = atol(*i);
+                uint64 moderator_acc = Acore::StringTo<uint64>(itr).value_or(0);
+
                 if (moderator_acc && ((uint32)moderator_acc) == moderator_acc)
+                {
                     moderators.insert((uint32)moderator_acc);
+                }
             }
         }
 

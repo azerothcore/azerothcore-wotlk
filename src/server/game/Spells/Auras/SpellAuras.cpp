@@ -189,7 +189,7 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
         {
             AuraApplication* strongestApp = apply ? this : nullptr;
             AuraEffect* strongestEff = apply ? aurEff : nullptr;
-            int32 amount = apply ? abs(aurEff->GetAmount()) : 0;
+            int32 amount = apply ? std::abs(aurEff->GetAmount()) : 0;
             Unit* target = GetTarget();
             Unit::AuraEffectList const& auraList = target->GetAuraEffectsByType(aurEff->GetAuraType());
             for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
@@ -207,7 +207,7 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
                 if (!aurApp)
                     continue;
 
-                if (amount < abs((*iter)->GetForcedAmount()))
+                if (amount < std::abs((*iter)->GetForcedAmount()))
                 {
                     // xinef: if we have strongest aura and it is active, turn it off
                     // xinef: otherwise just save new aura;
@@ -220,7 +220,7 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
                     }
                     strongestApp = aurApp;
                     strongestEff = (*iter);
-                    amount = abs((*iter)->GetAmount());
+                    amount = std::abs((*iter)->GetAmount());
                 }
                 // xinef: itered aura is weaker, deactivate if active
                 else if (aurApp->IsActive((*iter)->GetEffIndex()))
@@ -936,6 +936,28 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
         {
             aurEff->CalculatePeriodic(caster, periodicReset, false);
             aurEff->CalculatePeriodicData();
+        }
+    }
+}
+
+// xinef: dot's rolling function
+void Aura::RefreshTimersWithMods()
+{
+    Unit* caster = GetCaster();
+    m_maxDuration = CalcMaxDuration();
+    if ((caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo)) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
+    {
+        m_maxDuration = int32(m_maxDuration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+    }
+
+    // xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
+    RefreshDuration();
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (AuraEffect* aurEff = m_effects[i])
+        {
+            aurEff->CalculatePeriodic(caster, false, false);
         }
     }
 }
@@ -1930,11 +1952,11 @@ bool Aura::IsAuraStronger(Aura const* newAura) const
                 continue;
 
             // xinef: assume that all spells are either positive or negative, otherwise they should not be in one group
-            int32 curValue = abs(thisEffect->GetAmount());
-            if (curValue < abs(newEffect->GetAmount()))
+            int32 curValue = std::abs(thisEffect->GetAmount());
+            if (curValue < std::abs(newEffect->GetAmount()))
                 return true;
 
-            if (curValue == abs(newEffect->GetAmount()))
+            if (curValue == std::abs(newEffect->GetAmount()))
                 if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
                     return true;
         }

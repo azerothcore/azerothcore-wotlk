@@ -21,6 +21,7 @@
 
 #include "WeatherMgr.h"
 #include "Log.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Weather.h"
@@ -144,11 +145,8 @@ namespace WeatherMgr
 
     void SendFineWeatherUpdateToPlayer(Player* player)
     {
-        WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
-        data << (uint32)WEATHER_STATE_FINE;
-        data << (float)0.0f;
-        data << uint8(0);
-        player->GetSession()->SendPacket(&data);
+        WorldPackets::Misc::Weather weather(WEATHER_STATE_FINE);
+        player->SendDirectMessage(weather.Write());
     }
 
     void Update(uint32 diff)

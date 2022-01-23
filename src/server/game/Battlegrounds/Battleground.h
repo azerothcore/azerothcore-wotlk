@@ -187,7 +187,7 @@ enum BattlegroundTeams
 
 struct BattlegroundObjectInfo
 {
-    BattlegroundObjectInfo()  {}
+    BattlegroundObjectInfo()  = default;
 
     GameObject*  object{nullptr};
     int32       timer{0};
@@ -286,7 +286,7 @@ struct BattlegroundScore
 class ArenaLogEntryData
 {
 public:
-    ArenaLogEntryData()  {}
+    ArenaLogEntryData()  = default;
     void Fill(const char* name, ObjectGuid::LowType guid, uint32 acc, uint32 arenaTeamId, std::string ip)
     {
         Name = std::string(name);
@@ -477,8 +477,8 @@ public:
     // Packet Transfer
     // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
     virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
-    void SendPacketToTeam(TeamId teamId, WorldPacket* packet, Player* sender = nullptr, bool self = true);
-    void SendPacketToAll(WorldPacket* packet);
+    void SendPacketToTeam(TeamId teamId, WorldPacket const* packet, Player* sender = nullptr, bool self = true);
+    void SendPacketToAll(WorldPacket const* packet);
     void YellToAll(Creature* creature, const char* text, uint32 language);
 
     template<class Do>
@@ -491,8 +491,7 @@ public:
     void RewardReputationToTeam(uint32 factionId, uint32 reputation, TeamId teamId);
     uint32 GetRealRepFactionForPlayer(uint32 factionId, Player* player);
 
-    void UpdateWorldState(uint32 Field, uint32 Value);
-    void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* player);
+    void UpdateWorldState(uint32 variable, uint32 value);
 
     virtual void EndBattleground(TeamId winnerTeamId);
     void BlockMovement(Player* player);

@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "SpellMgr.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
@@ -66,56 +66,24 @@ public:
         // Creatures with family 0 crashes the server
         if (!creatrueTemplate->family)
         {
-            handler->PSendSysMessage("This creature cannot be tamed. (family id: 0).");
+            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (player->GetPetGUID())
+        if (player->IsExistPet())
         {
-            handler->PSendSysMessage("You already have a pet");
+            handler->SendSysMessage(LANG_YOU_ALREADY_HAVE_PET);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // Everything looks OK, create new pet
-        Pet* pet = new Pet(player, HUNTER_PET);
-        if (!pet->CreateBaseAtCreature(creatureTarget))
+        if (!player->CreatePet(creatureTarget))
         {
-            delete pet;
-            handler->PSendSysMessage("Error 1");
+            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
+            handler->SetSentErrorMessage(true);
             return false;
         }
-
-        creatureTarget->setDeathState(JUST_DIED);
-        creatureTarget->RemoveCorpse();
-        creatureTarget->SetHealth(0); // just for nice GM-mode view
-
-        pet->SetGuidValue(UNIT_FIELD_CREATEDBY, player->GetGUID());
-        pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->GetFaction());
-
-        if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
-        {
-            LOG_ERROR("misc", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
-            handler->PSendSysMessage("Error 2");
-            delete pet;
-            return false;
-        }
-
-        // prepare visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel() - 1);
-        pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
-
-        // this enables pet details window (Shift+P)
-        pet->InitPetCreateSpells();
-        pet->SetFullHealth();
-        pet->GetMap()->AddToMap(pet->ToCreature());
-
-        // visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel());
-        player->SetMinion(pet, true);
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
-        player->PetSpellInitialize();
 
         return true;
     }

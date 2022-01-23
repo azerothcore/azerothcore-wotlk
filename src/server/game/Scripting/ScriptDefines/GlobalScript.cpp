@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -121,4 +122,19 @@ void ScriptMgr::OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, 
     {
         script->OnBeforeWorldObjectSetPhaseMask(worldObject, oldPhaseMask, newPhaseMask, useCombinedPhases, update);
     });
+}
+
+bool ScriptMgr::OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod)
+{
+    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
+    {
+        return !script->OnIsAffectedBySpellModCheck(affectSpell, checkSpell, mod);
+    });
+
+    if (ret && *ret)
+    {
+        return false;
+    }
+
+    return true;
 }

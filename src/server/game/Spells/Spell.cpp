@@ -23,7 +23,6 @@
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"
-#include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicObject.h"
 #include "GameObjectAI.h"
@@ -33,8 +32,6 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MMapFactory.h"
-#include "MMapMgr.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -57,7 +54,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
@@ -572,6 +568,8 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     m_referencedFromCurrentSpell = false;
     m_executedCurrently = false;
     m_needComboPoints = m_spellInfo->NeedsComboPoints();
+    m_comboPointGain = 0;
+    m_comboTarget = nullptr;
     m_delayStart = 0;
     m_delayAtDamageCount = 0;
 
@@ -1158,7 +1156,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
     CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
     if (!target)
     {
-        //TC_LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set nullptr target, effect %u", m_spellInfo->Id, effIndex);
+        //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set nullptr target, effect %u", m_spellInfo->Id, effIndex);
         return;
     }
 
@@ -1179,7 +1177,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
                 }
                 else
                 {
-                    //TC_LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected unit, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                    //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected unit, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
                     return;
                 }
                 break;
@@ -1189,7 +1187,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
                 AddGOTarget(gobjTarget, effMask);
             else
             {
-                //TC_LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected gameobject, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id %u set object of wrong type, expected gameobject, got %s, effect %u", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
                 return;
             }
             break;
@@ -1695,8 +1693,8 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
         const float size = std::max((*itr)->GetObjectSize() * 0.7f, 1.0f); // 1/sqrt(3)
         // TODO: all calculation should be based on src instead of m_caster
-        const float objDist2d = fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
-        const float dz = fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
+        const float objDist2d = std::fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
+        const float dz = std::fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
 
         LOG_ERROR("spells", "Spell::SelectTrajTargets: check %u, dist between %f %f, height between %f %f.",
             (*itr)->GetEntry(), objDist2d - size, objDist2d + size, dz - size, dz + size);
@@ -1726,7 +1724,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         // RP-GG only, search in straight line, as item have no trajectory
         if (m_CastItem)
         {
-            if (dist < bestDist && fabs(dz) < 6.0f) // closes target, also check Z difference)
+            if (dist < bestDist && std::fabs(dz) < 6.0f) // closes target, also check Z difference)
             {
                 bestDist = dist;
                 break;
@@ -1781,7 +1779,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     if (m_targets.GetSrcPos()->GetExactDist2d(m_targets.GetDstPos()) > bestDist)
     {
         float x = m_targets.GetSrcPos()->m_positionX + cos(m_caster->GetOrientation()) * bestDist;
-        float y = m_targets.GetSrcPos()->m_positionY + sin(m_caster->GetOrientation()) * bestDist;
+        float y = m_targets.GetSrcPos()->m_positionY + std::sin(m_caster->GetOrientation()) * bestDist;
         float z = m_targets.GetSrcPos()->m_positionZ + bestDist * (a * bestDist + b);
 
         if (itr != targets.end())
@@ -3315,7 +3313,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     m_powerCost = m_CastItem ? 0 : m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask, this);
 
     // Set combo point requirement
-    if ((_triggeredCastFlags & TRIGGERED_IGNORE_COMBO_POINTS) || m_CastItem || !m_caster->m_movedByPlayer)
+    if ((_triggeredCastFlags & TRIGGERED_IGNORE_COMBO_POINTS) || m_CastItem)
         m_needComboPoints = false;
 
     SpellCastResult result = CheckCast(true);
@@ -3946,16 +3944,16 @@ void Spell::_handle_immediate_phase()
 
 void Spell::_handle_finish_phase()
 {
-    if (m_caster->m_movedByPlayer && m_needComboPoints)
+    // Take for real after all targets are processed
+    if (m_needComboPoints)
     {
-        // Take for real after all targets are processed
-        m_caster->m_movedByPlayer->ToPlayer()->ClearComboPoints();
+        m_caster->ClearComboPoints();
+    }
 
-        // Real add combo points from effects
-        if( m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsInWorld() && m_targets.GetUnitTarget()->IsAlive() )
-            m_caster->m_movedByPlayer->ToPlayer()->AddComboPoints(m_targets.GetUnitTarget(), m_caster->m_movedByPlayer->ToPlayer()->GetComboPointGain());
-
-        m_caster->m_movedByPlayer->ToPlayer()->SetComboPointGain(0);
+    // Real add combo points from effects
+    if (m_comboTarget && m_comboPointGain)
+    {
+        m_caster->AddComboPoints(m_comboTarget, m_comboPointGain);
     }
 
     if (m_caster->m_extraAttacks && GetSpellInfo()->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
@@ -4873,7 +4871,7 @@ void Spell::TakeCastItem()
                 // item has charges left
                 if (charges)
                 {
-                    (charges > 0) ? --charges : ++charges;  // abs(charges) less at 1 after use
+                    (charges > 0) ? --charges : ++charges;  // std::abs(charges) less at 1 after use
                     if (proto->Stackable == 1)
                         m_CastItem->SetSpellCharges(i, charges);
                     m_CastItem->SetState(ITEM_CHANGED, m_caster->ToPlayer());
@@ -5143,7 +5141,7 @@ void Spell::TakeReagents()
             {
                 // CastItem will be used up and does not count as reagent
                 int32 charges = m_CastItem->GetSpellCharges(s);
-                if (castItemTemplate->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                if (castItemTemplate->Spells[s].SpellCharges < 0 && std::abs(charges) < 2)
                 {
                     ++itemcount;
                     break;
@@ -5922,21 +5920,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_RESURRECT_PET:
                 {
-                    if (Creature* pet = m_caster->GetGuardianPet())
-                    {
-                        if (pet->IsAlive())
-                        {
-                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-                        }
-                    }
-                    else if (Player* player = m_caster->ToPlayer())
-                    {
-                        SpellCastResult loadResult = Pet::TryLoadFromDB(player, false, MAX_PET_TYPE, true);
-                        if (loadResult != SPELL_CAST_OK)
-                        {
-                            return loadResult;
-                        }
-                    }
+                    Unit* unitCaster = m_caster->ToUnit();
+                    if (!unitCaster)
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    Creature* pet = unitCaster->GetGuardianPet();
+                    if (pet && pet->IsAlive())
+                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
                     break;
                 }
@@ -5972,6 +5962,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_SUMMON_PET:
                 {
+                    Unit* unitCaster = m_caster->ToUnit();
+                    if (!unitCaster)
+                        return SPELL_FAILED_BAD_TARGETS;
+
                     if (!m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET_FIRST))
                     {
                         if (m_caster->GetPetGUID())
@@ -5983,6 +5977,40 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK && strict)
                         if (Pet* pet = m_caster->ToPlayer()->GetPet())
                             pet->CastSpell(pet, 32752, true, nullptr, nullptr, pet->GetGUID()); //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
+
+                    Player* playerCaster = unitCaster->ToPlayer();
+                    if (playerCaster && playerCaster->GetPetStable())
+                    {
+                        std::pair<PetStable::PetInfo const*, PetSaveMode> info = Pet::GetLoadPetInfo(*playerCaster->GetPetStable(), m_spellInfo->Effects[i].MiscValue, 0, false);
+                        if (info.first)
+                        {
+                            if (info.first->Type == HUNTER_PET)
+                            {
+                                if (!info.first->Health)
+                                {
+                                    playerCaster->SendTameFailure(PET_TAME_DEAD);
+                                    return SPELL_FAILED_DONT_REPORT;
+                                }
+
+                                CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(info.first->CreatureId);
+                                if (!creatureInfo || !creatureInfo->IsTameable(playerCaster->CanTameExoticPets()))
+                                {
+                                    // if problem in exotic pet
+                                    if (creatureInfo && creatureInfo->IsTameable(true))
+                                        playerCaster->SendTameFailure(PET_TAME_CANT_CONTROL_EXOTIC);
+                                    else
+                                        playerCaster->SendTameFailure(PET_TAME_NOPET_AVAILABLE);
+
+                                    return SPELL_FAILED_DONT_REPORT;
+                                }
+                            }
+                        }
+                        else if (!m_spellInfo->Effects[i].MiscValue) // when miscvalue is present it is allowed to create new pets
+                        {
+                            playerCaster->SendTameFailure(PET_TAME_NOPET_AVAILABLE);
+                            return SPELL_FAILED_DONT_REPORT;
+                        }
+                    }
                     break;
                 }
             case SPELL_EFFECT_SUMMON_PLAYER:
@@ -6281,11 +6309,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_ITEM_ALREADY_ENCHANTED;
     }
 
-    // check if caster has at least 1 combo point for spells that require combo points
+    // check if caster has at least 1 combo point on target for spells that require combo points
     if (m_needComboPoints)
-        if (Player* plrCaster = m_caster->ToPlayer())
-            if (!plrCaster->GetComboPoints())
+    {
+        if (m_spellInfo->NeedsExplicitUnitTarget())
+        {
+            if (!m_caster->GetComboPoints(m_targets.GetUnitTarget()))
+            {
                 return SPELL_FAILED_NO_COMBO_POINTS;
+            }
+        }
+        else
+        {
+            if (!m_caster->GetComboPoints())
+            {
+                return SPELL_FAILED_NO_COMBO_POINTS;
+            }
+        }
+    }
 
     // xinef: check relic cooldown
     if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
@@ -6798,7 +6839,7 @@ SpellCastResult Spell::CheckItems()
                     {
                         // CastItem will be used up and does not count as reagent
                         int32 charges = m_CastItem->GetSpellCharges(s);
-                        if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2)
+                        if (proto->Spells[s].SpellCharges < 0 && std::abs(charges) < 2)
                         {
                             ++itemcount;
                             break;
@@ -7705,6 +7746,8 @@ void Spell::HandleLaunchPhase()
             usesAmmo = false;
     }
 
+    PrepareTargetProcessing();
+
     bool firstTarget = true;
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
@@ -7742,6 +7785,8 @@ void Spell::HandleLaunchPhase()
         DoAllEffectOnLaunchTarget(target, multiplier, firstTarget);
         firstTarget = false;
     }
+
+    FinishTargetProcessing();
 }
 
 void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier, bool firstTarget)

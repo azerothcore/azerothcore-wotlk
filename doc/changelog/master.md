@@ -1,3 +1,24 @@
+## 5.0.0-dev.0 | Commit: [2fd8b00d7bac1f9c9b565916453cf490fb069df0
+](https://github.com/azerothcore/azerothcore-wotlk/commit/2fd8b00d7bac1f9c9b565916453cf490fb069df0
+
+
+We suggest that you always use the latest version of our master branch.
+https://github.com/azerothcore/azerothcore-wotlk/tree/master
+
+### How to upgrade
+
+For server administrators: instructions about how to upgrade existing servers are available [here](http://www.azerothcore.org/wiki/Upgrade-from-pre-2.0.0-to-latest-master).
+
+## Release notes
+
+This PR removes the modelId column from creature table to allow us to move to a dual entry spawn system.
+
+If this causes an issue for in game or custom spawns the following line of SAI can update the modelId.
+
+(#entryorguid,0,0,0,11,0,100,0,0,0,0,0,0,3,0,#modelId,0,0,0,0,1,0,0,0,0,0,0,0,0,"Creature Name - On Spawn - Change Model to #modelId"),
+
+Special thanks to @Shin @Kitzunu @M'Dic for assistance.
+
 ## 4.0.0-dev.13 | Commit: [bc82f36f1ff46bb21d32e1cfdaec8271dde08af1
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/bc82f36f1ff46bb21d32e1cfdaec8271dde08af1
 

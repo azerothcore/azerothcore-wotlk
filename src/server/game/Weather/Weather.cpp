@@ -20,11 +20,11 @@
 */
 
 #include "Weather.h"
+#include "MiscPackets.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
 
 /// Create the Weather object
 Weather::Weather(uint32 zone, WeatherData const* weatherChances)
@@ -88,10 +88,7 @@ bool Weather::ReGenerate()
 
     //78 days between January 1st and March 20nd; 365/4=91 days by season
     // season source http://aa.usno.navy.mil/data/docs/EarthSeasons.html
-    time_t gtime = sWorld->GetGameTime();
-    struct tm ltime;
-    localtime_r(&gtime, &ltime);
-    uint32 season = ((ltime.tm_yday - 78 + 365) / 91) % 4;
+    uint32 season = ((Acore::Time::GetDayInYear() - 78 + 365) / 91) % 4;
 
     static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
     LOG_DEBUG("weather", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
@@ -186,12 +183,10 @@ bool Weather::ReGenerate()
     return m_type != old_type || m_grade != old_grade;
 }
 
-void Weather::SendWeatherUpdateToPlayer(Player*  /*player*/)
+void Weather::SendWeatherUpdateToPlayer(Player* player)
 {
-    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
-    data << uint32(GetWeatherState());
-    data << (float)m_grade;
-    data << uint8(0);
+    WorldPackets::Misc::Weather weather(GetWeatherState(), m_grade);
+    player->SendDirectMessage(weather.Write());
 }
 
 /// Send the new weather to all players in the zone
@@ -205,13 +200,10 @@ bool Weather::UpdateWeather()
 
     WeatherState state = GetWeatherState();
 
-    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
-    data << uint32(state);
-    data << (float)m_grade;
-    data << uint8(0);
+    WorldPackets::Misc::Weather weather(state, m_grade);
 
     //- Returns false if there were no players found to update
-    if (!sWorld->SendZoneMessage(m_zone, &data))
+    if (!sWorld->SendZoneMessage(m_zone, weather.Write()))
         return false;
 
     ///- Log the event

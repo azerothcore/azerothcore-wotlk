@@ -417,9 +417,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             return source->GetMapId() == map_id.mapId;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY:
         {
-            time_t birthday_start = time_t(sWorld->getIntConfig(CONFIG_BIRTHDAY_TIME));
-            tm birthday_tm;
-            localtime_r(&birthday_start, &birthday_tm);
+            tm birthday_tm = Acore::Time::TimeBreakdown(sWorld->getIntConfig(CONFIG_BIRTHDAY_TIME));
 
             // exactly N birthday
             birthday_tm.tm_year += birthday_login.nth_birthday;

@@ -720,7 +720,7 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData()  { }
+    explicit GameObjectData()  = default;
     uint32 id{0};                                              // entry in gamobject_template
     uint16 mapid{0};
     uint32 phaseMask{0};
@@ -928,7 +928,7 @@ public:
     void SendCustomAnim(uint32 anim);
     [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
 
-    void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
 
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }

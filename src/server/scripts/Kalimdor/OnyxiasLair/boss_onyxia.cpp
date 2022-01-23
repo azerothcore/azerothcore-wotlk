@@ -272,8 +272,8 @@ public:
                 {
                     float angle = rand_norm() * 2 * M_PI;
                     float dist  = rand_norm() * 4.0f;
-                    me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + sin(angle) * dist, -89.0f, 17646, true);
-                    me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + sin(angle) * dist, -89.0f, 17646, true);
+                    me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, 17646, true);
+                    me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, 17646, true);
                     whelpCount += 2;
                     whelpSpamTimer += 600;
                 }
@@ -502,8 +502,8 @@ public:
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist  = rand_norm() * 4.0f;
-                me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + sin(angle) * dist, -89.0f, 17646, true);
-                me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + sin(angle) * dist, -89.0f, 17646, true);
+                me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, 17646, true);
+                me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, 17646, true);
                 events.RepeatEvent(30000);
                 break;
             }
