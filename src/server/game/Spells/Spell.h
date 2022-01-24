@@ -803,7 +803,7 @@ public:
     }
 
     std::map<MapDummy, std::optional<std::any>> triggerDummy = {};
-    std::map<MapDummy, std::optional<std::any>>& GetTriggerDummy()
+    std::map<MapDummy, Optional<std::any>>& GetTriggerDummy()
     {
         return triggerDummy;
     }
