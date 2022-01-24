@@ -26,6 +26,7 @@
 #include "DisableMgr.h"
 #include "DynamicObject.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -2440,7 +2441,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     // Xinef: absorb delayed projectiles for 500ms
     if (getState() == SPELL_STATE_DELAYED && !m_spellInfo->IsTargetingArea() && !m_spellInfo->IsPositive() &&
-            (World::GetGameTimeMS() - target->timeDelay) <= effectUnit->m_lastSanctuaryTime && World::GetGameTimeMS() < (effectUnit->m_lastSanctuaryTime + 500) &&
+            (GameTime::GetGameTimeMS().count() - target->timeDelay) <= effectUnit->m_lastSanctuaryTime && GameTime::GetGameTimeMS().count() < (effectUnit->m_lastSanctuaryTime + 500) &&
             effectUnit->FindMap() && !effectUnit->FindMap()->IsDungeon()
        )
         return;                                             // No missinfo in that case
@@ -4461,7 +4462,7 @@ void Spell::SendSpellGo()
     data << uint8(m_cast_count);                            // pending spell cast?
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint32(castFlags);                              // cast flags
-    data << uint32(World::GetGameTimeMS());                 // timestamp
+    data << uint32(GameTime::GetGameTimeMS().count());                 // timestamp
 
     WriteSpellGoTargets(&data);
 
@@ -4961,7 +4962,7 @@ void Spell::TakePower()
 
     // Set the five second timer
     if (PowerType == POWER_MANA && m_powerCost > 0)
-        m_caster->SetLastManaUse(World::GetGameTimeMS());
+        m_caster->SetLastManaUse(GameTime::GetGameTimeMS().count());
 }
 
 void Spell::TakeAmmo()
@@ -6030,7 +6031,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_BAD_TARGETS;
 
                     // Xinef: Implement summon pending error
-                    if (target->GetSummonExpireTimer() > time(nullptr))
+                    if (target->GetSummonExpireTimer() > GameTime::GetGameTime().count())
                         return SPELL_FAILED_SUMMON_PENDING;
 
                     // check if our map is dungeon
@@ -6070,7 +6071,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_BAD_TARGETS;
 
                     // Xinef: Implement summon pending error
-                    if (target->GetSummonExpireTimer() > time(nullptr))
+                    if (target->GetSummonExpireTimer() > GameTime::GetGameTime().count())
                         return SPELL_FAILED_SUMMON_PENDING;
 
                     break;
