@@ -18,6 +18,7 @@
 #include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
 #include "Chat.h"
+#include "GameTime.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -299,7 +300,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->bidder = ObjectGuid::Empty;
             AH->bid = 0;
             AH->buyout = buyout;
-            AH->expire_time = time(nullptr) + auctionTime;
+            AH->expire_time = GameTime::GetGameTime().count() + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
 
@@ -340,7 +341,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->bidder = ObjectGuid::Empty;
             AH->bid = 0;
             AH->buyout = buyout;
-            AH->expire_time = time(nullptr) + auctionTime;
+            AH->expire_time = GameTime::GetGameTime().count() + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
 
@@ -661,7 +662,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
 
     // pussywizard:
     const uint32 delay = 4500;
-    const uint32 now = World::GetGameTimeMS();
+    const uint32 now = GameTime::GetGameTimeMS().count();
     if (_lastAuctionListOwnerItemsMSTime > now) // list is pending
         return;
     uint32 diff = getMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
@@ -676,7 +677,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
 
-    _lastAuctionListOwnerItemsMSTime = World::GetGameTimeMS(); // pussywizard
+    _lastAuctionListOwnerItemsMSTime = GameTime::GetGameTimeMS().count(); // pussywizard
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(creatureGuid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
@@ -750,7 +751,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
 
     // pussywizard:
     const uint32 delay = 2000;
-    const uint32 now = World::GetGameTimeMS();
+    const uint32 now = GameTime::GetGameTimeMS().count();
     uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
     if (diff > delay)
     {

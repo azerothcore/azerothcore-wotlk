@@ -17,12 +17,10 @@
 
 #include "Common.h"
 #include "CreatureGroups.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
-#include "MotionMaster.h"
-#include "ObjectAccessor.h"
 #include "GameEventMgr.h"
+#include "ObjectAccessor.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum COG_Paths
 {

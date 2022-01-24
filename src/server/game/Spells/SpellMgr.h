@@ -278,6 +278,7 @@ struct SpellProcEventEntry
     flag96      spellFamilyMask;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
     uint32      procFlags;                                  // bitmask for matching proc event
     uint32      procEx;                                     // proc Extend info (see ProcFlagsEx)
+    uint32      procPhase;                                  // proc phase (see ProcFlagsSpellPhase)
     float       ppmRate;                                    // for melee (ranged?) damage spells - proc rate per minute. if zero, falls back to flat chance from Spell.dbc
     float       customChance;                               // Owerride chance (in most cases for debug only)
     uint32      cooldown;                                   // hidden cooldown used for some spell proc events, applied to _triggered_spell_
@@ -699,7 +700,7 @@ public:
     // SpellInfo object management
     [[nodiscard]] SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
     // Use this only with 100% valid spellIds
-    SpellInfo const* AssertSpellInfo(uint32 spellId) const
+    [[nodiscard]] SpellInfo const* AssertSpellInfo(uint32 spellId) const
     {
         ASSERT(spellId < GetSpellInfoStoreSize());
         SpellInfo const* spellInfo = mSpellInfoMap[spellId];
@@ -707,7 +708,7 @@ public:
         return spellInfo;
     }
     // use this instead of AssertSpellInfo to have the problem logged instead of crashing the server
-    SpellInfo const* CheckSpellInfo(uint32 spellId) const
+    [[nodiscard]] SpellInfo const* CheckSpellInfo(uint32 spellId) const
     {
         if (spellId >= GetSpellInfoStoreSize())
         {

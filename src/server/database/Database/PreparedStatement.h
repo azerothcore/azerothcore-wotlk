@@ -19,10 +19,24 @@
 #define _PREPAREDSTATEMENT_H
 
 #include "Define.h"
+#include "Duration.h"
 #include "SQLOperation.h"
 #include <future>
+#include <tuple>
 #include <variant>
 #include <vector>
+
+namespace Acore::Types
+{
+    template <typename T>
+    using is_default = std::enable_if_t<std::is_arithmetic_v<T> || std::is_same_v<std::vector<uint8>, T>>;
+
+    template <typename T>
+    using is_enum_v = std::enable_if_t<std::is_enum_v<T>>;
+
+    template <typename T>
+    using is_non_string_view_v = std::enable_if_t<!std::is_base_of_v<std::string_view, T>>;
+}
 
 struct PreparedStatementData
 {
@@ -85,10 +99,77 @@ public:
         setBinary(index, vec);
     }
 
-    uint32 GetIndex() const { return m_index; }
-    std::vector<PreparedStatementData> const& GetParameters() const { return statement_data; }
+    // Set numerlic and default binary
+    template<typename T>
+    inline Acore::Types::is_default<T> SetData(const uint8 index, T value)
+    {
+        SetValidData(index, value);
+    }
+
+    // Set enums
+    template<typename T>
+    inline Acore::Types::is_enum_v<T> SetData(const uint8 index, T value)
+    {
+        SetValidData(index, std::underlying_type_t<T>(value));
+    }
+
+    // Set string_view
+    inline void SetData(const uint8 index, std::string_view value)
+    {
+        SetValidData(index, value);
+    }
+
+    // Set nullptr
+    inline void SetData(const uint8 index, std::nullptr_t = nullptr)
+    {
+        SetValidData(index);
+    }
+
+    // Set non default binary
+    template<std::size_t Size>
+    inline void SetData(const uint8 index, std::array<uint8, Size> const& value)
+    {
+        std::vector<uint8> vec(value.begin(), value.end());
+        SetValidData(index, vec);
+    }
+
+    // Set duration
+    template<class _Rep, class _Period>
+    inline void SetData(const uint8 index, std::chrono::duration<_Rep, _Period> const& value, bool convertToUin32 = true)
+    {
+        SetValidData(index, convertToUin32 ? static_cast<uint32>(value.count()) : value.count());
+    }
+
+    // Set all
+    template <typename... Args>
+    inline void SetArguments(Args&&... args)
+    {
+        SetDataTuple(std::make_tuple(std::forward<Args>(args)...));
+    }
+
+    [[nodiscard]] uint32 GetIndex() const { return m_index; }
+    [[nodiscard]] std::vector<PreparedStatementData> const& GetParameters() const { return statement_data; }
 
 protected:
+    template<typename T>
+    Acore::Types::is_non_string_view_v<T> SetValidData(const uint8 index, T const& value);
+
+    void SetValidData(const uint8 index);
+    void SetValidData(const uint8 index, std::string_view value);
+
+    template<typename... Ts>
+    inline void SetDataTuple(std::tuple<Ts...> const& argsList)
+    {
+        std::apply
+        (
+            [this](Ts const&... arguments)
+            {
+                uint8 index{ 0 };
+                ((SetData(index, arguments), index++), ...);
+            }, argsList
+        );
+    }
+
     uint32 m_index;
 
     //- Buffer of parameters, not tied to MySQL in any way yet
@@ -116,7 +197,7 @@ class AC_DATABASE_API PreparedStatementTask : public SQLOperation
 {
 public:
     PreparedStatementTask(PreparedStatementBase* stmt, bool async = false);
-    ~PreparedStatementTask();
+    ~PreparedStatementTask() override;
 
     bool Execute() override;
     PreparedQueryResultFuture GetFuture() { return m_result->get_future(); }
