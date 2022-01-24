@@ -7567,6 +7567,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectSpellClassMask[EFFECT_1][1] = 0x00020000;
     });
 
+    // Bestial Wrath
+    ApplySpellFix({ 19574 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);

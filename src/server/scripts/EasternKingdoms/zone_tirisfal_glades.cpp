@@ -110,7 +110,20 @@ public:
                 m_uiPhase = 1;
 
                 if (pDoneBy->GetTypeId() == TYPEID_PLAYER)
+                {
                     m_uiPlayerGUID = pDoneBy->GetGUID();
+                }
+                else if (pDoneBy->IsPet())
+                {
+                    if (Unit* owner = pDoneBy->GetOwner())
+                    {
+                        // not sure if this is needed.
+                        if (owner->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            m_uiPlayerGUID = owner->GetGUID();
+                        }
+                    }
+                }
             }
         }
 
