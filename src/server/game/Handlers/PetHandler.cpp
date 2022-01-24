@@ -18,6 +18,7 @@
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -923,7 +924,7 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
 
     CharacterDatabase.CommitTransaction(trans);
 
-    pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped
+    pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(GameTime::GetGameTime().count())); // cast can't be helped
 }
 
 void WorldSession::HandlePetAbandon(WorldPacket& recvData)
