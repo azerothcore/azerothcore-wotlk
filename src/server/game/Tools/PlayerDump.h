@@ -33,23 +33,23 @@ enum DumpTableType
                                                             // character_queststatus, character_queststatus_rewarded, character_reputation,
                                                             // character_spell, character_spell_cooldown, character_ticket, character_talent
 
-                                                            DTT_EQSET_TABLE,    // <- guid                          // character_equipmentsets
+    DTT_EQSET_TABLE,    // <- guid                          // character_equipmentsets
 
-                                                            DTT_INVENTORY,      //    -> item guids collection      // character_inventory
+    DTT_INVENTORY,      //    -> item guids collection      // character_inventory
 
-                                                            DTT_MAIL,           //    -> mail ids collection        // mail
-                                                                                //    -> item_text
+    DTT_MAIL,           //    -> mail ids collection        // mail
+                        //    -> item_text
 
-                                                                                DTT_MAIL_ITEM,      // <- mail ids                      // mail_items
-                                                                                                    //    -> item guids collection
+    DTT_MAIL_ITEM,      // <- mail ids                      // mail_items
+                        //    -> item guids collection
 
-                                                                                                    DTT_ITEM,           // <- item guids                    // item_instance
-                                                                                                                        //    -> item_text
+    DTT_ITEM,           // <- item guids                    // item_instance
+                        //    -> item_text
 
-                                                                                                                        DTT_ITEM_GIFT,      // <- item guids                    // character_gifts
+    DTT_ITEM_GIFT,      // <- item guids                    // character_gifts
 
-                                                                                                                        DTT_PET,            //    -> pet guids collection       // character_pet
-                                                                                                                        DTT_PET_TABLE       // <- pet guids                     // pet_aura, pet_spell, pet_spell_cooldown
+    DTT_PET,            //    -> pet guids collection       // character_pet
+    DTT_PET_TABLE       // <- pet guids                     // pet_aura, pet_spell, pet_spell_cooldown
 };
 
 enum DumpReturn
