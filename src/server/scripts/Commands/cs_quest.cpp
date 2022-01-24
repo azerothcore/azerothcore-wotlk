@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
@@ -379,7 +380,7 @@ public:
                 // fill mail
                 MailDraft draft(quest->GetTitle(), std::string());
 
-                for (auto itr : questItems)
+                for (auto const& itr : questItems)
                 {
                     if (Item* item = Item::CreateItem(itr.first, itr.second))
                     {
@@ -615,7 +616,7 @@ public:
                 // fill mail
                 MailDraft draft(quest->GetTitle(), "This quest has been manually rewarded to you. This mail contains your quest rewards.");
 
-                for (auto itr : questRewardItems)
+                for (auto const& itr : questRewardItems)
                 {
                     if (!itr.first || !itr.second)
                     {
@@ -652,7 +653,7 @@ public:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
                 stmt->setUInt32(0, guid);
                 stmt->setUInt32(1, entry);
-                stmt->setUInt64(2, time(nullptr));
+                stmt->setUInt64(2, GameTime::GetGameTime().count());
                 trans->Append(stmt);
             }
             else if (quest->IsWeekly())

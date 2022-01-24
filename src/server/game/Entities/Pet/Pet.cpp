@@ -20,6 +20,7 @@
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "Log.h"
@@ -320,7 +321,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             break;
     }
 
-    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped here
+    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(GameTime::GetGameTime().count())); // cast can't be helped here
     SetCreatorGUID(owner->GetGUID());
 
     InitStatsForLevel(petlevel);
@@ -420,7 +421,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
         InitTalentForLevel(); // set original talents points before spell loading
 
-        uint32 timediff = uint32(time(nullptr) - lastSaveTime);
+        uint32 timediff = uint32(GameTime::GetGameTime().count() - lastSaveTime);
         _LoadAuras(holder.GetPreparedResult(PetLoadQueryHolder::AURAS), timediff);
 
         // load action bar, if data broken will fill later by default spells.
@@ -570,7 +571,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         stmt->setUInt32(12, curhealth);
         stmt->setUInt32(13, curmana);
         stmt->setUInt32(14, GetPower(POWER_HAPPINESS));
-        stmt->setUInt32(15, time(nullptr));
+        stmt->setUInt32(15, GameTime::GetGameTime().count());
         stmt->setString(16, actionBar);
 
         trans->Append(stmt);
@@ -651,7 +652,7 @@ void Pet::Update(uint32 diff)
     {
         case CORPSE:
             {
-                if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(nullptr))
+                if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= GameTime::GetGameTime().count())
                 {
                     Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
                     return;
@@ -1421,7 +1422,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
 
     if (result)
     {
-        time_t curTime = time(nullptr);
+        time_t curTime = GameTime::GetGameTime().count();
 
         PacketCooldowns cooldowns;
         WorldPacket data;
@@ -1465,8 +1466,8 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
-    time_t curTime = time(nullptr);
-    uint32 curMSTime = World::GetGameTimeMS();
+    time_t curTime = GameTime::GetGameTime().count();
+    uint32 curMSTime = GameTime::GetGameTimeMS().count();
     uint32 infTime   = curMSTime + infinityCooldownDelayCheck;
 
     // remove oudated and save active
@@ -2418,7 +2419,7 @@ void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
     petInfo->Mana = GetPower(POWER_MANA);
     petInfo->Happiness = GetPower(POWER_HAPPINESS);
     petInfo->ActionBar = GenerateActionBarData();
-    petInfo->LastSaveTime = time(nullptr);
+    petInfo->LastSaveTime = GameTime::GetGameTime().count();
     petInfo->CreatedBySpellId = GetUInt32Value(UNIT_CREATED_BY_SPELL);
     petInfo->Type = getPetType();
 }
