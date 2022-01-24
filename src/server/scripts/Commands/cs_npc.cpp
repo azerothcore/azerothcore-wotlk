@@ -25,6 +25,7 @@ EndScriptData */
 #include "Chat.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
+#include "GameTime.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -605,7 +606,7 @@ public:
             id3 = cData->id3;
         }
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx() - time(nullptr);
+        int64 curRespawnDelay = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
