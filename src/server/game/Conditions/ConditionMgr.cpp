@@ -1666,7 +1666,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     switch (cond->ConditionType)
     {
     case CONDITION_TERRAIN_SWAP:
-    case CONDITION_DIFFICULTY_ID:
         LOG_ERROR("sql.sql", "SourceEntry %u in `condition` table has a ConditionType that is not supported on 3.3.5a (%u), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
     case CONDITION_STAND_STATE:
