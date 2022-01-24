@@ -225,7 +225,7 @@ struct AchievementCriteriaData
 
 struct AchievementCriteriaDataSet
 {
-    AchievementCriteriaDataSet()  {}
+    AchievementCriteriaDataSet()  = default;
     typedef std::vector<AchievementCriteriaData> Storage;
     void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
     bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;

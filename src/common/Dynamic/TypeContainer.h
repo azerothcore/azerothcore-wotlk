@@ -150,7 +150,7 @@ public:
     }
 
     template<class SPECIFIC_TYPE>
-    std::size_t Size() const
+    [[nodiscard]] std::size_t Size() const
     {
         std::size_t size = 0;
         Acore::Size(_elements, &size, (SPECIFIC_TYPE*)nullptr);
@@ -158,7 +158,7 @@ public:
     }
 
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }
-    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> const& GetElements() const { return _elements; }
+    [[nodiscard]] ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> const& GetElements() const { return _elements; }
 
 private:
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> _elements;

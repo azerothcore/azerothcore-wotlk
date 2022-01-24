@@ -91,7 +91,7 @@ protected:
     /// Called by parent databasepool. Will let other threads access this connection
     void Unlock();
 
-    uint32 GetServerVersion() const;
+    [[nodiscard]] uint32 GetServerVersion() const;
     MySQLPreparedStatement* GetPreparedStatement(uint32 index);
     void PrepareStatement(uint32 index, std::string const& sql, ConnectionFlags flags);
 

@@ -40,9 +40,9 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "MapMgr.h"
-#include "MovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -67,6 +67,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 #include <math.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -416,7 +418,7 @@ void Unit::Update(uint32 p_time)
         // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
         // These flags are reset after target dies or another command is given.
-        if (m_HostileRefMgr.isEmpty())
+        if (m_HostileRefMgr.IsEmpty())
         {
             // m_CombatTimer set at aura start and it will be freeze until aura removing
             if (m_CombatTimer <= p_time)
@@ -1841,7 +1843,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
     return (newdamage > 1) ? newdamage : 1;
 }
 
-float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo)
+float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim)
 {
     float victimResistance = float(victim->GetResistance(schoolMask));
     if (owner)
@@ -1857,10 +1859,6 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
         else
             victimResistance += float(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
     }
-
-    // Chaos Bolt exception, ignore all target resistances (unknown attribute?)
-    if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && spellInfo->SpellIconID == 3178)
-        victimResistance = 0;
 
     victimResistance = std::max(victimResistance, 0.0f);
     if (owner)
@@ -1895,7 +1893,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
     // Xinef: holy resistance exists for npcs
     if (!(schoolMask & SPELL_SCHOOL_MASK_NORMAL) && (!(schoolMask & SPELL_SCHOOL_MASK_HOLY) || victim->GetTypeId() == TYPEID_UNIT) && (!spellInfo || (!spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) && !spellInfo->HasAttribute(SPELL_ATTR4_NO_CAST_LOG))))
     {
-        float averageResist = Unit::GetEffectiveResistChance(attacker, schoolMask, victim, spellInfo);
+        float averageResist = Unit::GetEffectiveResistChance(attacker, schoolMask, victim);
 
         float discreteResistProbability[11];
         for (uint32 i = 0; i < 11; ++i)
@@ -3091,7 +3089,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
         // Players resistance for binary spells
         if (spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) && (spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_HOLY)) == 0)
-            tmp += int32(Unit::GetEffectiveResistChance(this, spellInfo->GetSchoolMask(), victim, spellInfo) * 10000.0f); // 100 for spell calculations, and 100 for return value percentage
+            tmp += int32(Unit::GetEffectiveResistChance(this, spellInfo->GetSchoolMask(), victim) * 10000.0f); // 100 for spell calculations, and 100 for return value percentage
     }
 
     // Roll chance
@@ -10168,10 +10166,15 @@ void Unit::SetMinion(Minion* minion, bool apply)
                 if (oldPet != minion && (oldPet->IsPet() || minion->IsPet() || oldPet->GetEntry() != minion->GetEntry()))
                 {
                     // remove existing minion pet
-                    if (oldPet->IsPet())
-                        ((Pet*)oldPet)->Remove(PET_SAVE_AS_CURRENT);
+                    if (Pet* oldPetAsPet = oldPet->ToPet())
+                    {
+                        oldPetAsPet->Remove(PET_SAVE_NOT_IN_SLOT);
+                    }
                     else
+                    {
                         oldPet->UnSummon();
+                    }
+
                     SetPetGUID(minion->GetGUID());
                     SetMinionGUID(ObjectGuid::Empty);
                 }
@@ -10239,6 +10242,7 @@ void Unit::SetMinion(Minion* minion, bool apply)
         {
             // All summoned by totem minions must disappear when it is removed.
             if (SpellInfo const* spInfo = sSpellMgr->GetSpellInfo(minion->ToTotem()->GetSpell()))
+            {
                 for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if (spInfo->Effects[i].Effect != SPELL_EFFECT_SUMMON)
@@ -10246,6 +10250,7 @@ void Unit::SetMinion(Minion* minion, bool apply)
 
                     RemoveAllMinionsByEntry(spInfo->Effects[i].MiscValue);
                 }
+            }
         }
 
         if (GetTypeId() == TYPEID_PLAYER)
@@ -11966,9 +11971,14 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
 uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint32 stack)
 {
     float TakenTotalMod = 1.0f;
-
+    float minval = 0.0f;
     // Healing taken percent
-    float minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+
+    if (!sScriptMgr->OnSpellHealingBonusTakenNegativeModifiers(this, caster, spellProto, minval))
+    {
+        minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+    }
+
     if (minval)
         AddPct(TakenTotalMod, minval);
 
@@ -15215,30 +15225,36 @@ void CharmInfo::SetPetNumber(uint32 petnumber, bool statwindow)
 
 void CharmInfo::LoadPetActionBar(const std::string& data)
 {
-    Tokenizer tokens(data, ' ');
+    std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
     if (tokens.size() != (ACTION_BAR_INDEX_END - ACTION_BAR_INDEX_START) * 2)
         return;                                             // non critical, will reset to default
 
-    uint8 index = ACTION_BAR_INDEX_START;
-    Tokenizer::const_iterator iter = tokens.begin();
-    for (; index < ACTION_BAR_INDEX_END; ++iter, ++index)
+    auto iter = tokens.begin();
+    for (uint8 index = ACTION_BAR_INDEX_START; index < ACTION_BAR_INDEX_END; ++index)
     {
-        // use unsigned cast to avoid sign negative format use at long-> ActiveStates (int) conversion
-        ActiveStates type  = ActiveStates(atol(*iter));
-        ++iter;
-        uint32 action = uint32(atol(*iter));
+        Optional<uint8> type = Acore::StringTo<uint8>(*(iter++));
+        Optional<uint32> action = Acore::StringTo<uint32>(*(iter++));
 
-        PetActionBar[index].SetActionAndType(action, type);
+        if (!type || !action)
+        {
+            continue;
+        }
+
+        PetActionBar[index].SetActionAndType(*action, static_cast<ActiveStates>(*type));
 
         // check correctness
         if (PetActionBar[index].IsActionBarForSpell())
         {
-            SpellInfo const* spelInfo = sSpellMgr->GetSpellInfo(PetActionBar[index].GetAction());
-            if (!spelInfo)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(PetActionBar[index].GetAction());
+            if (!spellInfo)
+            {
                 SetActionBar(index, 0, ACT_PASSIVE);
-            else if (!spelInfo->IsAutocastable())
+            }
+            else if (!spellInfo->IsAutocastable())
+            {
                 SetActionBar(index, PetActionBar[index].GetAction(), ACT_PASSIVE);
+            }
         }
     }
 }
@@ -17482,7 +17498,7 @@ void Unit::SetStunned(bool apply)
             SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        SetRooted(true);
+        SetRooted(true, true);
 
         CastStop();
     }
@@ -17508,12 +17524,12 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            SetRooted(false);
+            SetRooted(false, true);
         }
     }
 }
 
-void Unit::SetRooted(bool apply)
+void Unit::SetRooted(bool apply, bool isStun)
 {
     if (apply)
     {
@@ -17537,7 +17553,14 @@ void Unit::SetRooted(bool apply)
          // Creature specific
         if (GetTypeId() != TYPEID_PLAYER)
         {
-            StopMoving();
+            if (isStun && movespline->Finalized())
+            {
+                StopMovingOnCurrentPos();
+            }
+            else
+            {
+                StopMoving();
+            }
         }
 
         if (m_movedByPlayer)
@@ -19649,7 +19672,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
                 {
                     AttackStop();
                     charmInfo->SetIsAtStay(false);
-                    charmInfo->SetIsCommandAttack(!ToCreature()->HasReactState(REACT_PASSIVE));
+                    charmInfo->SetIsCommandAttack(true);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SetIsFollowing(false);
 
@@ -19659,7 +19682,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
                 {
                     AttackStop();
                     charmInfo->SetIsAtStay(false);
-                    charmInfo->SetIsCommandAttack(!ToCreature()->HasReactState(REACT_PASSIVE));
+                    charmInfo->SetIsCommandAttack(true);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SetIsFollowing(false);
 

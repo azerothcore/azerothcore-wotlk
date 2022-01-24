@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Chat.h"
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
@@ -369,7 +368,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 //  Clear the flags as if owner clicked 'attack'. AI will reset them
                 //  after AttackStart, even if spell failed
                 charmInfo->SetIsAtStay(false);
-                charmInfo->SetIsCommandAttack(!pet->ToCreature()->HasReactState(REACT_PASSIVE));
+                charmInfo->SetIsCommandAttack(true);
                 charmInfo->SetIsReturning(false);
                 charmInfo->SetIsFollowing(false);
 
@@ -948,7 +947,7 @@ void WorldSession::HandlePetAbandon(WorldPacket& recvData)
                 pet->SetPower(POWER_HAPPINESS, feelty > 50000 ? (feelty - 50000) : 0);
             }
 
-            _player->RemovePet((Pet*)pet, PET_SAVE_AS_DELETED);
+            _player->RemovePet(pet->ToPet(), PET_SAVE_AS_DELETED);
         }
         else if (pet->GetGUID() == _player->GetCharmGUID())
             _player->StopCastingCharm();
