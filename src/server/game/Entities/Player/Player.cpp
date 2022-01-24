@@ -8737,13 +8737,13 @@ Pet* Player::GetPet() const
     return nullptr;
 }
 
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/)
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/, uint32 healthPct /*= 0*/)
 {
     PetStable& petStable = GetOrInitPetStable();
 
     Pet* pet = new Pet(this, petType);
 
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false))
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false, healthPct))
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -8810,23 +8810,27 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     switch (petType)
     {
-    case SUMMON_PET:
-    {
-        if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
-            pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
-        else
-            pet->GetCharmInfo()->SetPetNumber(pet_number, false);
+        case SUMMON_PET:
+        {
+            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
+            {
+                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
+            }
+            else
+            {
+                pet->GetCharmInfo()->SetPetNumber(pet_number, false);
+            }
 
-        pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
-        pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-        pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
-        pet->SetFullHealth();
-        pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
-        pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped in this case
-        break;
-    }
-    default:
-        break;
+            pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+            pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+            pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+            pet->SetFullHealth();
+            pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
+            pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped in this case
+            break;
+        }
+        default:
+            break;
     }
 
     map->AddToMap(pet->ToCreature(), true);
