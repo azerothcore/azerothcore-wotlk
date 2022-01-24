@@ -1610,7 +1610,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
 
         if ((cond->SourceGroup > MAX_EFFECT_MASK) || !cond->SourceGroup)
         {
-            LOG_ERROR("sql.sql", "%s SourceEntry in `condition` table, has incorrect SourceGroup %u (spell effectMask) set, ignoring.", cond->ToString().c_str());
+            LOG_ERROR("sql.sql", "%s in `condition` table, has incorrect SourceGroup (spell effectMask) set, ignoring.", cond->ToString().c_str());
             return false;
         }
 
@@ -1692,12 +1692,12 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
     case CONDITION_SOURCE_TYPE_QUEST_AVAILABLE:
         if (!sObjectMgr->GetQuestTemplate(cond->SourceEntry))
         {
-            LOG_ERROR("sql.sql", "%s specifies non-existing quest (%u), skipped.", cond->ToString().c_str());
+            LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_QUEST_AVAILABLE specifies non-existing quest (%u), skipped", cond->SourceEntry);
             return false;
         }
         break;
     case CONDITION_SOURCE_TYPE_UNUSED_20:
-        LOG_ERROR("sql.sql", "%s is not in use. SourceEntry = (%u), skipped", cond->ToString().c_str());
+        LOG_ERROR("sql.sql", "%s SourceEntry is not in use, skipped", cond->ToString().c_str());
         break;
     case CONDITION_SOURCE_TYPE_VEHICLE_SPELL:
         if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
@@ -1744,7 +1744,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
     {
         if (!LootTemplates_Player.HaveLootFor(cond->SourceGroup))
         {
-            LOG_ERROR("sql.sql", "%u SourceGroup in `condition` table, does not exist in `player_loot_template`, ignoring.", cond->ToString().c_str());
+            LOG_ERROR("sql.sql", "SourceGroup %u in `condition` table, does not exist in `player_loot_template`, ignoring.", cond->SourceGroup);
             return false;
         }
 
@@ -1811,8 +1811,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "%s has non existing effect index (%u) (must be 0..2), skipped.", cond->ToString(true).c_str(), cond->ConditionValue2);
             return false;
         }
-        if (cond->ConditionValue3)
-            LOG_ERROR("sql.sql", "Aura condition has useless data in value3 (%u)!", cond->ConditionValue3);
         break;
     }
     case CONDITION_ITEM:
@@ -1820,13 +1818,13 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(cond->ConditionValue1);
         if (!proto)
         {
-            LOG_ERROR("sql.sql", "Item condition has non existing item (%u), skipped", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "%s Item (%u) does not exist, skipped.", cond->ToString(true).c_str(), cond->ConditionValue1);
             return false;
         }
 
         if (!cond->ConditionValue2)
         {
-            LOG_ERROR("sql.sql", "Item condition has 0 set for item count in value2 (%u), skipped", cond->ConditionValue2);
+            LOG_ERROR("sql.sql", "%s Zero item count in ConditionValue2, skipped.", cond->ToString(true).c_str());
             return false;
         }
         break;
@@ -1906,7 +1904,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     {
         if (!sObjectMgr->GetQuestTemplate(cond->ConditionValue1))
         {
-            LOG_ERROR("sql.sql", "Quest condition specifies non-existing quest (%u), skipped", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "%s points to non-existing quest (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue1);
             return false;
         }
 
@@ -1923,7 +1921,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     case CONDITION_QUESTSTATE:
         if (cond->ConditionValue2 >= (1 << MAX_QUEST_STATUS))
         {
-            LOG_ERROR("sql.sql", "ConditionType (%u) has invalid state mask (%u), skipped.", cond->ConditionType, cond->ConditionValue2);
+            LOG_ERROR("sql.sql", "%s has invalid state mask (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue2);
             return false;
         }
         break;
@@ -1932,14 +1930,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
         if (cond->ConditionValue1 >= events.size() || !events[cond->ConditionValue1].isValid())
         {
-            LOG_ERROR("sql.sql", "ActiveEvent condition has non existing event id (%u), skipped", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "%s has non existing event id (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue1);
             return false;
         }
-
-        if (cond->ConditionValue2)
-            LOG_ERROR("sql.sql", "ActiveEvent condition has useless data in value2 (%u)!", cond->ConditionValue2);
-        if (cond->ConditionValue3)
-            LOG_ERROR("sql.sql", "ActiveEvent condition has useless data in value3 (%u)!", cond->ConditionValue3);
         break;
     }
     case CONDITION_ACHIEVEMENT:
@@ -1947,28 +1940,18 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(cond->ConditionValue1);
         if (!achievement)
         {
-            LOG_ERROR("sql.sql", "Achivement condition has non existing achivement id (%u), skipped", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "%s has non existing achivement id (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue1);
             return false;
         }
-
-        if (cond->ConditionValue2)
-            LOG_ERROR("sql.sql", "Achivement condition has useless data in value2 (%u)!", cond->ConditionValue2);
-        if (cond->ConditionValue3)
-            LOG_ERROR("sql.sql", "Achivement condition has useless data in value3 (%u)!", cond->ConditionValue3);
         break;
     }
     case CONDITION_CLASS:
     {
         if (!(cond->ConditionValue1 & CLASSMASK_ALL_PLAYABLE))
         {
-            LOG_ERROR("sql.sql", "Class condition has non existing classmask (%u), skipped", cond->ConditionValue1 & ~CLASSMASK_ALL_PLAYABLE);
+            LOG_ERROR("sql.sql", "%s has non existing classmask (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue1 & ~CLASSMASK_ALL_PLAYABLE);
             return false;
         }
-
-        if (cond->ConditionValue2)
-            LOG_ERROR("sql.sql", "Class condition has useless data in value2 (%u)!", cond->ConditionValue2);
-        if (cond->ConditionValue3)
-            LOG_ERROR("sql.sql", "Class condition has useless data in value3 (%u)!", cond->ConditionValue3);
         break;
     }
     case CONDITION_RACE:
@@ -1978,7 +1961,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "%s has non existing racemask (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue1 & ~RACEMASK_ALL_PLAYABLE);
             return false;
         }
-
         break;
     }
     case CONDITION_GENDER:
@@ -2050,9 +2032,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         switch (cond->ConditionValue1)
         {
         case TYPEID_UNIT:
-            LOG_ERROR("sql.sql", "%s has non existing creature template entry (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue2);
+            if (cond->ConditionValue2 && !sObjectMgr->GetCreatureTemplate(cond->ConditionValue2))
             {
-                LOG_ERROR("sql.sql", "ObjectEntryGuid condition has non existing creature template entry (%u), skipped", cond->ConditionValue2);
+                LOG_ERROR("sql.sql", "%s has non existing creature template entry (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue2);
                 return false;
             }
             if (cond->ConditionValue3 > 1)
@@ -2268,25 +2250,25 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         const Quest* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
         if (!quest)
         {
-            LOG_ERROR("sql.sql", "CONDITION_QUEST_OBJECTIVE_PROGRESS points to non-existing quest (%u), skipped.", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "%s points to non-existing quest (%u), skipped.", cond->ToString(true).c_str(), cond->ConditionValue1);
             return false;
         }
 
         if (cond->ConditionValue2 > 3)
         {
-            LOG_ERROR("sql.sql", "CONDITION_QUEST_OBJECTIVE_PROGRESS has out-of-range quest objective index specified (%u), it must be a number between 0 and 3. skipped.", cond->ConditionValue2);
+            LOG_ERROR("sql.sql", "%s has out-of-range quest objective index specified (%u), it must be a number between 0 and 3. skipped.", cond->ToString(true).c_str(), cond->ConditionValue2);
             return false;
         }
 
         if (quest->RequiredNpcOrGo[cond->ConditionValue2] == 0)
         {
-            LOG_ERROR("sql.sql", "CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective %u for quest %u, but the field RequiredNPCOrGo%u is 0, skipped.", cond->ConditionValue2, cond->ConditionValue1, cond->ConditionValue2);
+            LOG_ERROR("sql.sql", "%s has quest objective %u for quest %u, but the field RequiredNPCOrGo%u is 0, skipped.", cond->ToString(true).c_str(), cond->ConditionValue2, cond->ConditionValue1, cond->ConditionValue2);
             return false;
         }
 
         if (cond->ConditionValue3 > quest->RequiredNpcOrGoCount[cond->ConditionValue2])
         {
-            LOG_ERROR("sql.sql", "CONDITION_QUEST_OBJECTIVE_PROGRESS has quest objective count %u in value3, but quest %u has a maximum objective count of %u in RequiredNPCOrGOCount%u, skipped.", cond->ConditionValue3, cond->ConditionValue2, quest->RequiredNpcOrGoCount[cond->ConditionValue2], cond->ConditionValue2);
+            LOG_ERROR("sql.sql", "%s has quest objective count %u in value3, but quest %u has a maximum objective count of %u in RequiredNPCOrGOCount%u, skipped.", cond->ToString(true).c_str(), cond->ConditionValue3, cond->ConditionValue2, quest->RequiredNpcOrGoCount[cond->ConditionValue2], cond->ConditionValue2);
             return false;
         }
         break;
