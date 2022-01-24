@@ -880,7 +880,8 @@ public:
             return false;
         }
 
-        // ToDo: use a new trinity_string for this commands
+        // Original TC Notes from Refactor vvv
+        //ToDo: use a new trinity_string for this commands
         handler->PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
 
         return true;
