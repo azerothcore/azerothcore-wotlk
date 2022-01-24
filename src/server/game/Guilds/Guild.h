@@ -686,7 +686,7 @@ public:
     std::string const& GetMOTD() const { return m_motd; }
     std::string const& GetInfo() const { return m_info; }
 
-    bool SetName(std::string const& name);
+    bool SetName(std::string_view const& name);
 
     // Handle client commands
     void HandleRoster(WorldSession* session);
