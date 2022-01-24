@@ -802,7 +802,7 @@ public:
         m_timer = amount;
     }
 
-    std::map<MapDummy, std::optional<std::any>> triggerDummy = {};
+    std::map<MapDummy, Optional<std::any>> triggerDummy = {};
     std::map<MapDummy, Optional<std::any>>& GetTriggerDummy()
     {
         return triggerDummy;
