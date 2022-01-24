@@ -1254,6 +1254,40 @@ class spell_hun_intimidation : public AuraScript
     }
 };
 
+// 19574 - Bestial Wrath
+class spell_hun_bestial_wrath : public SpellScript
+{
+    PrepareSpellScript(spell_hun_bestial_wrath);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        {
+            return SPELL_FAILED_NO_VALID_TARGETS;
+        }
+
+        Pet* pet = caster->ToPlayer()->GetPet();
+        if (!pet)
+        {
+            return SPELL_FAILED_NO_PET;
+        }
+
+        if (!pet->IsAlive())
+        {
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_PET_IS_DEAD);
+            return SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_hun_bestial_wrath::CheckCast);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1283,4 +1317,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);
     RegisterSpellScript(spell_hun_intimidation);
+    RegisterSpellScript(spell_hun_bestial_wrath);
 }
