@@ -795,7 +795,7 @@ public:
     void ModifySpellTimer(int32 amount)
     {
         m_timer += amount;
-    };
+    }
 
     void SetSpellTimer(int32 amount)
     {
