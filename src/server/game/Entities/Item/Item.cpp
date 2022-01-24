@@ -27,6 +27,8 @@
 #include "SpellMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 void AddItemsSetItem(Player* player, Item* item)
 {
@@ -410,7 +412,10 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
 
     ItemTemplate const* proto = GetTemplate();
     if (!proto)
+    {
+        FMT_LOG_ERROR("entities.item", "Invalid entry {} for item {}. Refusing to load.", GetEntry(), GetGUID().ToString());
         return false;
+    }
 
     // set owner (not if item is only loaded for gbank/auction/mail
     if (owner_guid)
@@ -430,10 +435,17 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
         need_save = true;
     }
 
-    Tokenizer tokens(fields[4].GetString(), ' ', MAX_ITEM_PROTO_SPELLS);
+    std::vector<std::string_view> tokens = Acore::Tokenize(fields[4].GetStringView(), ' ', false);
     if (tokens.size() == MAX_ITEM_PROTO_SPELLS)
+    {
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-            SetSpellCharges(i, atoi(tokens[i]));
+        {
+            if (Optional<int32> charges = Acore::StringTo<int32>(tokens[i]))
+                SetSpellCharges(i, *charges);
+            else
+                FMT_LOG_ERROR("entities.item", "Invalid charge info '{}' for item {}, charge data not loaded.", tokens.at(i), GetGUID().ToString());
+        }
+    }
 
     SetUInt32Value(ITEM_FIELD_FLAGS, fields[5].GetUInt32());
     // Remove bind flag for items vs NO_BIND set
@@ -444,7 +456,12 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     }
 
     std::string enchants = fields[6].GetString();
-    _LoadIntoDataField(enchants.c_str(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
+
+    if (!_LoadIntoDataField(fields[6].GetString(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET))
+    {
+        FMT_LOG_WARN("entities.item", "Invalid enchantment data '{}' for item {}. Forcing partial load.", fields[6].GetString(), GetGUID().ToString());
+    }
+
     SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetInt16());
     // recalculate suffix factor
     if (GetItemRandomPropertyId() < 0)

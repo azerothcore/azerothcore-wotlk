@@ -940,6 +940,28 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
     }
 }
 
+// xinef: dot's rolling function
+void Aura::RefreshTimersWithMods()
+{
+    Unit* caster = GetCaster();
+    m_maxDuration = CalcMaxDuration();
+    if ((caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo)) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
+    {
+        m_maxDuration = int32(m_maxDuration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+    }
+
+    // xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
+    RefreshDuration();
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (AuraEffect* aurEff = m_effects[i])
+        {
+            aurEff->CalculatePeriodic(caster, false, false);
+        }
+    }
+}
+
 void Aura::SetCharges(uint8 charges)
 {
     if (m_procCharges == charges)

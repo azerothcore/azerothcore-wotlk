@@ -24,6 +24,8 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "World.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 namespace DisableMgr
 {
@@ -111,16 +113,24 @@ namespace DisableMgr
 
                     if (flags & SPELL_DISABLE_MAP)
                     {
-                        Tokenizer tokens(params_0, ',');
-                        for (uint8 i = 0; i < tokens.size(); )
-                            data.params[0].insert(atoi(tokens[i++]));
+                        for (std::string_view mapStr : Acore::Tokenize(params_0, ',', true))
+                        {
+                            if (Optional<uint32> mapId = Acore::StringTo<uint32>(mapStr))
+                                data.params[0].insert(*mapId);
+                            else
+                                FMT_LOG_ERROR("sql.sql", "Disable map '{}' for spell {} is invalid, skipped.", mapStr, entry);
+                        }
                     }
 
                     if (flags & SPELL_DISABLE_AREA)
                     {
-                        Tokenizer tokens(params_1, ',');
-                        for (uint8 i = 0; i < tokens.size(); )
-                            data.params[1].insert(atoi(tokens[i++]));
+                        for (std::string_view areaStr : Acore::Tokenize(params_1, ',', true))
+                        {
+                            if (Optional<uint32> areaId = Acore::StringTo<uint32>(areaStr))
+                                data.params[1].insert(*areaId);
+                            else
+                                FMT_LOG_ERROR("sql.sql", "Disable area '{}' for spell {} is invalid, skipped.", areaStr, entry);
+                        }
                     }
 
                     // xinef: if spell has disabled los, add flag

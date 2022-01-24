@@ -1171,7 +1171,7 @@ public:
     [[nodiscard]] PetStable const* GetPetStable() const { return m_petStable.get(); }
 
     [[nodiscard]] Pet* GetPet() const;
-    Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0s);
+    Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0s, uint32 healthPct = 0);
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     bool CanPetResurrect();
     bool IsExistPet();
@@ -1516,8 +1516,6 @@ public:
     [[nodiscard]] bool isBeingLoaded() const override;
 
     void Initialize(ObjectGuid::LowType guid);
-    static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
-    static float  GetFloatValueFromArray(Tokenizer const& data, uint16 index);
     static uint32 GetZoneIdFromDB(ObjectGuid guid);
     static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
 
@@ -1532,8 +1530,6 @@ public:
     void SaveInventoryAndGoldToDB(CharacterDatabaseTransaction trans);                    // fast save function for item/money cheating preventing
     void SaveGoldToDB(CharacterDatabaseTransaction trans);
 
-    static void SetUInt32ValueInArray(Tokenizer& data, uint16 index, uint32 value);
-    static void SetFloatValueInArray(Tokenizer& data, uint16 index, float value);
     static void Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans);
     static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
     static void SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGuid guid, CharacterDatabaseTransaction trans);
@@ -2958,6 +2954,8 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    bool _wasOutdoor;
 
     PlayerSettingMap m_charSettingsMap;
 };
