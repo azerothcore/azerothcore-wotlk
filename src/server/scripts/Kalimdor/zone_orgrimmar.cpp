@@ -261,15 +261,15 @@ public:
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->GetMap()->LoadGrid(heraldOfThrallPos.GetPositionX(), heraldOfThrallPos.GetPositionY());
                 me->SummonCreature(NPC_HERALD_OF_THRALL, heraldOfThrallPos, TEMPSUMMON_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
-                _scheduler.Schedule(2s, [this](TaskContext context)
+                _scheduler.Schedule(2s, [this](TaskContext /*context*/)
                     {
                         Talk(SAY_THRALL_ON_QUEST_REWARD_0);
                     })
-                .Schedule(13s, [this](TaskContext context)
+                .Schedule(13s, [this](TaskContext /*context*/)
                     {
                         Talk(SAY_THRALL_ON_QUEST_REWARD_1);
                     })
-                .Schedule(15s, [this](TaskContext context)
+                .Schedule(15s, [this](TaskContext /*context*/)
                     {
                         DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
