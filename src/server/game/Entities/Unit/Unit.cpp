@@ -11972,9 +11972,14 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
 uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint32 stack)
 {
     float TakenTotalMod = 1.0f;
-
+    float minval = 0.0f;
     // Healing taken percent
-    float minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+
+    if (!sScriptMgr->OnSpellHealingBonusTakenNegativeModifiers(this, caster, spellProto, minval))
+    {
+        minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+    }
+
     if (minval)
         AddPct(TakenTotalMod, minval);
 
