@@ -407,6 +407,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_isInstantFlightOn = true;
 
+    _wasOutdoor = true;
     sScriptMgr->OnConstructPlayer(this);
 }
 
@@ -5593,8 +5594,40 @@ void Player::CheckAreaExploreAndOutdoor()
     uint32 areaId = GetAreaId();
     AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
-    if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && !isOutdoor)
-        RemoveAurasWithAttribute(SPELL_ATTR0_ONLY_OUTDOORS);
+    if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && _wasOutdoor != isOutdoor)
+    {
+        _wasOutdoor = isOutdoor;
+
+        SpellAttr0 attrToRemove = isOutdoor ? SPELL_ATTR0_ONLY_INDOORS : SPELL_ATTR0_ONLY_OUTDOORS;
+        SpellAttr0 attrToRecalculate = isOutdoor ? SPELL_ATTR0_ONLY_OUTDOORS : SPELL_ATTR0_ONLY_INDOORS;
+        for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
+        {
+            Aura* aura = iter->second->GetBase();
+            SpellInfo const* spell = aura->GetSpellInfo();
+            if (spell->Attributes & attrToRemove)
+            {
+                // if passive - do not remove and just turn off all effects
+                if (aura->IsPassive())
+                {
+                    aura->HandleAllEffects(iter->second, AURA_EFFECT_HANDLE_REAL, false);
+                    ++iter;
+                    continue;
+                }
+
+                RemoveAura(iter);
+            }
+            else if ((spell->Attributes & attrToRecalculate) && aura->IsPassive())
+            {
+                // if passive - turn on all effects
+                aura->HandleAllEffects(iter->second, AURA_EFFECT_HANDLE_REAL, true);
+                ++iter;
+            }
+            else
+            {
+                ++iter;
+            }
+        }
+    }
 
     if (!sScriptMgr->CanAreaExploreAndOutdoor(this))
         return;
@@ -8704,13 +8737,13 @@ Pet* Player::GetPet() const
     return nullptr;
 }
 
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/)
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/, uint32 healthPct /*= 0*/)
 {
     PetStable& petStable = GetOrInitPetStable();
 
     Pet* pet = new Pet(this, petType);
 
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false))
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false, healthPct))
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -8777,23 +8810,27 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     switch (petType)
     {
-    case SUMMON_PET:
-    {
-        if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
-            pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
-        else
-            pet->GetCharmInfo()->SetPetNumber(pet_number, false);
+        case SUMMON_PET:
+        {
+            if (pet->GetCreatureTemplate()->type == CREATURE_TYPE_DEMON || pet->GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD)
+            {
+                pet->GetCharmInfo()->SetPetNumber(pet_number, true); // Show pet details tab (Shift+P) only for demons & undead
+            }
+            else
+            {
+                pet->GetCharmInfo()->SetPetNumber(pet_number, false);
+            }
 
-        pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
-        pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-        pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
-        pet->SetFullHealth();
-        pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
-        pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped in this case
-        break;
-    }
-    default:
-        break;
+            pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+            pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+            pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+            pet->SetFullHealth();
+            pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
+            pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped in this case
+            break;
+        }
+        default:
+            break;
     }
 
     map->AddToMap(pet->ToCreature(), true);
