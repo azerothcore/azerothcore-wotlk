@@ -219,8 +219,8 @@ public:
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
-    [[nodiscard]] bool CanGeneratePickPocketLoot() const { return lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < time(nullptr); }
-    void SetPickPocketLootTime() { lootPickPocketRestoreTime = time(nullptr) + MINUTE + GetCorpseDelay() + GetRespawnTime(); }
+    [[nodiscard]] bool CanGeneratePickPocketLoot() const;
+    void SetPickPocketLootTime();
     void ResetPickPocketLootTime() { lootPickPocketRestoreTime = 0; }
 
     void SetLootRecipient (Unit* unit, bool withGroup = true);
@@ -274,7 +274,7 @@ public:
 
     [[nodiscard]] time_t const& GetRespawnTime() const { return m_respawnTime; }
     [[nodiscard]] time_t GetRespawnTimeEx() const;
-    void SetRespawnTime(uint32 respawn) { m_respawnTime = respawn ? time(nullptr) + respawn : 0; }
+    void SetRespawnTime(uint32 respawn);
     void Respawn(bool force = false);
     void SaveRespawnTime() override;
 

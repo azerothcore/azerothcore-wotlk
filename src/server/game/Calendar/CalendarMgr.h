@@ -147,8 +147,7 @@ public:
         _text = calendarInvite.GetText();
     }
 
-    CalendarInvite() : _inviteId(1), _eventId(0), _statusTime(time(nullptr)),
-        _status(CALENDAR_STATUS_INVITED), _rank(CALENDAR_RANK_PLAYER), _text("") { }
+    CalendarInvite();
 
     CalendarInvite(uint64 inviteId, uint64 eventId, ObjectGuid invitee, ObjectGuid senderGUID, time_t statusTime,
                    CalendarInviteStatus status, CalendarModerationRank rank, std::string text) :

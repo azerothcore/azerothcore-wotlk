@@ -23,14 +23,12 @@
 #include "AppenderDB.h"
 #include "AsyncAcceptor.h"
 #include "AsyncAuctionListing.h"
-#include "AvgDiffTracker.h"
 #include "Banner.h"
 #include "BattlegroundMgr.h"
 #include "BigNumber.h"
 #include "CliRunnable.h"
 #include "Common.h"
 #include "Config.h"
-#include "Configuration/Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "DeadlineTimer.h"
@@ -40,7 +38,6 @@
 #include "Metric.h"
 #include "ModulesScriptLoader.h"
 #include "MySQLThreading.h"
-#include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
 #include "OutdoorPvPMgr.h"
 #include "ProcessPriority.h"
@@ -55,10 +52,8 @@
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include <boost/asio/signal_set.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/program_options.hpp>
 #include <csignal>
-#include <iostream>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
@@ -329,6 +324,8 @@ int main(int argc, char** argv)
 
         sOutdoorPvPMgr->Die();                     // unload it before MapMgr
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
+
+        sScriptMgr->OnAfterUnloadAllMaps();
     });
 
     // Start the Remote Access port (acceptor) if enabled
@@ -592,8 +589,6 @@ void WorldUpdateLoop()
         realPrevTime = realCurrTime;
 
         uint32 executionTimeDiff = getMSTimeDiff(realCurrTime, getMSTime());
-        devDiffTracker.Update(executionTimeDiff);
-        avgDiffTracker.Update(executionTimeDiff > WORLD_SLEEP_CONST ? executionTimeDiff : WORLD_SLEEP_CONST);
 
         // we know exactly how long it took to update the world, if the update took less than WORLD_SLEEP_CONST, sleep for WORLD_SLEEP_CONST - world update time
         if (executionTimeDiff < WORLD_SLEEP_CONST)

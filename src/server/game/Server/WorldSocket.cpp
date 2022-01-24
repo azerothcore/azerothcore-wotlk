@@ -17,11 +17,11 @@
 
 #include "WorldSocket.h"
 #include "AccountMgr.h"
-#include "BigNumber.h"
 #include "Config.h"
 #include "CryptoHash.h"
 #include "CryptoRandom.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "IPLocation.h"
 #include "Opcodes.h"
 #include "PacketLog.h"
@@ -358,7 +358,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
                 _worldSession->ResetTimeOutTime(true);
             return ReadDataHandlerResult::Ok;
         case CMSG_TIME_SYNC_RESP:
-            packetToQueue = new WorldPacket(std::move(packet), std::chrono::steady_clock::now());
+            packetToQueue = new WorldPacket(std::move(packet), GameTime::Now());
             break;
         default:
             packetToQueue = new WorldPacket(std::move(packet));
@@ -557,7 +557,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     //! Negative mutetime indicates amount of minutes to be muted effective on next login - which is now.
     if (account.MuteTime < 0)
     {
-        account.MuteTime = time(nullptr) + llabs(account.MuteTime);
+        account.MuteTime = GameTime::GetGameTime().count() + llabs(account.MuteTime);
 
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
         stmt->setInt64(0, account.MuteTime);

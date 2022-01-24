@@ -20,6 +20,7 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Common.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "InstanceScript.h"
 #include "Log.h"
@@ -2946,7 +2947,7 @@ void AuraEffect::HandleAuraFeatherFall(AuraApplication const* aurApp, uint8 mode
 
     // start fall from current height
     if (!apply && target->GetTypeId() == TYPEID_PLAYER)
-        target->ToPlayer()->SetFallInformation(time(nullptr), target->GetPositionZ());
+        target->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), target->GetPositionZ());
 }
 
 void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool apply) const

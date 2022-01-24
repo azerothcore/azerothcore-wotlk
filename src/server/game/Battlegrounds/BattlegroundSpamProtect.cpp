@@ -17,6 +17,7 @@
 
 #include "BattlegroundSpamProtect.h"
 #include "Battleground.h"
+#include "GameTime.h"
 #include "ObjectGuid.h"
 #include "Player.h"
 #include "World.h"
@@ -27,7 +28,7 @@ namespace
 
     void AddTime(ObjectGuid guid)
     {
-        _players.insert_or_assign(guid, sWorld->GetGameTime());
+        _players.insert_or_assign(guid, GameTime::GetGameTime().count());
     }
 
     uint32 GetTime(ObjectGuid guid)
@@ -44,7 +45,7 @@ namespace
     bool IsCorrectDelay(ObjectGuid guid)
     {
         // Skip if spam time < 30 secs (default)
-        return sWorld->GetGameTime() - GetTime(guid) >= sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY);
+        return GameTime::GetGameTime().count() - GetTime(guid) >= sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY);
     }
 }
 
