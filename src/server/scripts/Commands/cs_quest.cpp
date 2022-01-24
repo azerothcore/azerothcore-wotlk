@@ -299,6 +299,15 @@ public:
                 }
             }
 
+            // player kills
+            if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL))
+            {
+                if (uint32 reqPlayers = quest->GetPlayersSlain())
+                {
+                    player->KilledPlayerCreditForQuest(reqPlayers, quest);
+                }
+            }
+
             // If the quest requires reputation to complete
             if (uint32 repFaction = quest->GetRepObjectiveFaction())
             {
