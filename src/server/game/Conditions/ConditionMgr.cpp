@@ -419,6 +419,11 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             condMeets = unit->HasAuraType(AuraType(ConditionValue1));
         break;
     }
+    case CONDITION_DIFFICULTY_ID:
+    {
+        condMeets = object->GetMap()->GetDifficulty() == ConditionValue1;
+        break;
+    }
     default:
         condMeets = false;
         break;
@@ -603,6 +608,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_HAS_AURA_TYPE:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_DIFFICULTY_ID:
+        mask |= GRID_MAP_TYPE_MASK_ALL;
         break;
     default:
         ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
@@ -2252,6 +2260,13 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         break;
     }
+    case CONDITION_DIFFICULTY_ID:
+        if (cond->ConditionValue1 >= MAX_DIFFICULTY)
+        {
+            LOG_ERROR("sql.sql", "CONDITION_DIFFICULTY_ID has non existing difficulty in value1 (%u), skipped.", cond->ConditionValue1);
+            return false;
+        }
+        break;
     default:
         break;
     }
