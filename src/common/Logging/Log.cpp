@@ -228,19 +228,14 @@ void Log::RegisterAppender(uint8 index, AppenderCreatorFn appenderCreateFn)
     appenderFactory[index] = appenderCreateFn;
 }
 
-void Log::outMessage(std::string const& filter, LogLevel level, std::string&& message)
+void Log::_outMessage(std::string const& filter, LogLevel level, std::string_view message)
 {
-    write(std::make_unique<LogMessage>(level, filter, std::move(message)));
+    write(std::make_unique<LogMessage>(level, filter, message));
 }
 
-void Log::_outMessageFmt(std::string const& filter, LogLevel level, std::string&& message)
+void Log::_outCommand(std::string_view message, std::string_view param1)
 {
-    write(std::make_unique<LogMessage>(level, filter, std::move(message)));
-}
-
-void Log::outCommand(std::string&& message, std::string&& param1)
-{
-    write(std::make_unique<LogMessage>(LOG_LEVEL_INFO, "commands.gm", std::move(message), std::move(param1)));
+    write(std::make_unique<LogMessage>(LOG_LEVEL_INFO, "commands.gm", message, param1));
 }
 
 void Log::write(std::unique_ptr<LogMessage>&& msg) const
@@ -321,22 +316,17 @@ bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /*
     return true;
 }
 
-void Log::outCharDump(char const* str, uint32 accountId, uint64 guid, char const* name)
+void Log::outCharDump(std::string_view str, uint32 accountId, uint64 guid, std::string_view name)
 {
-    if (!str || !ShouldLog("entities.player.dump", LOG_LEVEL_INFO))
+    if (str.empty() || !ShouldLog("entities.player.dump", LOG_LEVEL_INFO))
     {
         return;
     }
 
-    std::ostringstream ss;
-    ss << "== START DUMP == (account: " << accountId << " guid: " << guid << " name: " << name
-       << ")\n" << str << "\n== END DUMP ==\n";
+    std::string message = Acore::StringFormatFmt("== START DUMP == (account: {} guid: {} name: {})\n {} \n== END DUMP ==\n", accountId, guid, name, str);
 
-    std::unique_ptr<LogMessage> msg(new LogMessage(LOG_LEVEL_INFO, "entities.player.dump", ss.str()));
-    std::ostringstream param;
-    param << guid << '_' << name;
-
-    msg->param1 = param.str();
+    std::unique_ptr<LogMessage> msg(new LogMessage(LOG_LEVEL_INFO, "entities.player.dump", message));
+    msg->param1 = Acore::StringFormatFmt("{}_{}", guid, name);
 
     write(std::move(msg));
 }
