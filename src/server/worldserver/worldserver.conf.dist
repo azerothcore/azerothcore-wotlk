@@ -1796,6 +1796,16 @@ NpcRegenHPIfTargetIsUnreachable = 1
 
 NpcRegenHPTimeIfTargetIsUnreachable = 10
 
+#    Creatures.CustomIDs
+#        Description: The list of custom creatures with gossip dialogues hardcoded in core, 
+#                     divided by "," without spaces.
+#                     It is implied that you do not use for these NPC dialogs data from "gossip_menu" table.
+#                     Server will skip these IDs during the definitions validation process.
+#        Example:     Creatures.CustomIDs = "190010,55005,999991" - Npc for Transmog, Guild-zone and 1v1-arena modules
+#        Default:     ""
+
+Creatures.CustomIDs = ""
+
 #
 ###################################################################################################
 
