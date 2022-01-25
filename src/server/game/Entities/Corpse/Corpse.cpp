@@ -19,6 +19,7 @@
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -30,13 +31,9 @@ Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type
 {
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;
-
     m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_POSITION);
-
     m_valuesCount = CORPSE_END;
-
-    m_time = time(nullptr);
-
+    m_time = GameTime::GetGameTime().count();
     lootRecipient = nullptr;
 }
 
@@ -194,4 +191,9 @@ bool Corpse::IsExpired(time_t t) const
         return m_time < t - 60 * MINUTE;
     else
         return m_time < t - 3 * DAY;
+}
+
+void Corpse::ResetGhostTime()
+{
+    m_time = GameTime::GetGameTime().count();
 }
