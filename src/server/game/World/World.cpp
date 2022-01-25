@@ -1242,6 +1242,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_PLAYER_SETTINGS_ENABLED] = sConfigMgr->GetOption<bool>("EnablePlayerSettings", 0);
 
+    m_bool_configs[CONFIG_ALLOW_JOIN_BG_AND_LFG] = sConfigMgr->GetOption<bool>("JoinBGAndLFG.Enable", false);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))

@@ -1806,7 +1806,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Remove Vanish on stealth remove
                     if (GetId() == 1784)
+                    {
                         target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, ObjectGuid::Empty);
+                        target->RemoveAurasDueToSpell(18461);
+                    }
                     break;
                 }
 
