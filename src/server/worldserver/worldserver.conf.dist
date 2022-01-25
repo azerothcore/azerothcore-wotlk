@@ -1804,7 +1804,7 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #        Example:     Creatures.CustomIDs = "190010,55005,999991" - Npc for Transmog, Guild-zone and 1v1-arena modules
 #        Default:     ""
 
-Creatures.CustomIDs = ""
+Creatures.CustomIDs = "190010"
 
 #
 ###################################################################################################
