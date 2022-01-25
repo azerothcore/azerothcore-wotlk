@@ -19,8 +19,8 @@
 #define LogMessage_h__
 
 #include "Define.h"
+#include "Duration.h"
 #include "LogCommon.h"
-#include <ctime>
 #include <string>
 
 struct LogMessage
@@ -31,7 +31,7 @@ struct LogMessage
     LogMessage(LogMessage const& /*other*/) = delete;
     LogMessage& operator=(LogMessage const& /*other*/) = delete;
 
-    static std::string getTimeStr(time_t time);
+    static std::string getTimeStr(Seconds time);
     std::string getTimeStr() const;
 
     LogLevel const level;
@@ -39,7 +39,7 @@ struct LogMessage
     std::string const text;
     std::string prefix;
     std::string param1;
-    time_t mtime;
+    Seconds mtime;
 
     ///@ Returns size of the log message content in bytes
     uint32 Size() const
