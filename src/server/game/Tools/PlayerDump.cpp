@@ -915,10 +915,10 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
         {
         case DTT_CHARACTER:
         {
-            race = uint8(atoul(GetColumn(ts, line, "race").c_str()));
-            playerClass = uint8(atoul(GetColumn(ts, line, "class").c_str()));
-            gender = uint8(atoul(GetColumn(ts, line, "gender").c_str()));
-            level = uint8(atoul(GetColumn(ts, line, "level").c_str()));
+            race = *Acore::StringTo<uint32>(GetColumn(ts, line, "race"));
+            playerClass = *Acore::StringTo<uint32>(GetColumn(ts, line, "class"));
+            gender = *Acore::StringTo<uint32>(GetColumn(ts, line, "gender"));
+            level = *Acore::StringTo<uint32>(GetColumn(ts, line, "level"));
             if (name.empty())
             {
                 // generate a temporary name
