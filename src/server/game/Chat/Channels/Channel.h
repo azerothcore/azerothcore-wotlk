@@ -223,7 +223,6 @@ public:
     // pussywizard:
     void AddWatching(Player* p);
     void RemoveWatching(Player* p);
-    bool IsAllowedToSpeak(uint32 speakDelay); // pussywizard
 
 private:
     // initial packet data (notify type and channel name)
