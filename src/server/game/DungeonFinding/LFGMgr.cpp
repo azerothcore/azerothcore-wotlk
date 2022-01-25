@@ -605,11 +605,8 @@ namespace lfg
         if (!isRaid && joinData.result == LFG_JOIN_OK)
         {
             // Check player or group member restrictions
-            if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
-            {
-                if (player->InBattleground() || player->InArena() || player->InBattlegroundQueue())
-                    joinData.result = LFG_JOIN_USING_BG_SYSTEM;
-            }
+            if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG) && (player->InBattleground() || player->InArena() || player->InBattlegroundQueue()))
+                joinData.result = LFG_JOIN_USING_BG_SYSTEM;
             else if (player->HasAura(LFG_SPELL_DUNGEON_DESERTER))
                 joinData.result = LFG_JOIN_DESERTER;
             else if (dungeons.empty())
