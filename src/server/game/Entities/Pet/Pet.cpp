@@ -675,7 +675,7 @@ void Pet::Update(uint32 diff)
                     if (owner->GetPetGUID() != GetGUID())
                     {
                         LOG_ERROR("entities.pet", "Pet %u is not pet of owner %s, removed", GetEntry(), GetOwner()->GetName().c_str());
-                        ASSERT(getPetType() != HUNTER_PET, "Unexpected unlinked pet found for owner %s", owner->GetSession()->GetPlayerInfo().c_str());
+                        ASSERT(getPetType() != HUNTER_PET, "Unexpected unlinked pet found for owner {}", owner->GetSession()->GetPlayerInfo());
                         Remove(PET_SAVE_NOT_IN_SLOT);
                         return;
                     }
