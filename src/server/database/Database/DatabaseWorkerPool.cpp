@@ -97,8 +97,7 @@ uint32 DatabaseWorkerPool<T>::Open()
 {
     WPFatal(_connectionInfo.get(), "Connection info was not set!");
 
-    LOG_INFO("sql.driver", "Opening DatabasePool '{}'. "
-        "Asynchronous connections: {}, synchronous connections: {}.",
+    LOG_INFO("sql.driver", "Opening DatabasePool '{}'. Asynchronous connections: {}, synchronous connections: {}.",
         GetDatabaseName(), _async_threads, _synch_threads);
 
     uint32 error = OpenConnections(IDX_ASYNC, _async_threads);
@@ -110,9 +109,8 @@ uint32 DatabaseWorkerPool<T>::Open()
 
     if (!error)
     {
-        LOG_INFO("sql.driver", "DatabasePool '{}' opened successfully. " SZFMTD
-                    " total connections running.", GetDatabaseName(),
-                    (_connections[IDX_SYNCH].size() + _connections[IDX_ASYNC].size()));
+        LOG_INFO("sql.driver", "DatabasePool '{}' opened successfully. {} total connections running.",
+            GetDatabaseName(), (_connections[IDX_SYNCH].size() + _connections[IDX_ASYNC].size()));
     }
 
     LOG_INFO("sql.driver", " ");
@@ -128,8 +126,7 @@ void DatabaseWorkerPool<T>::Close()
     //! Closes the actualy MySQL connection.
     _connections[IDX_ASYNC].clear();
 
-    LOG_INFO("sql.driver", "Asynchronous connections on DatabasePool '{}' terminated. "
-                "Proceeding with synchronous connections.",
+    LOG_INFO("sql.driver", "Asynchronous connections on DatabasePool '{}' terminated. Proceeding with synchronous connections.",
         GetDatabaseName());
 
     //! Shut down the synchronous connections

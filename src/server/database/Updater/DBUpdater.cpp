@@ -232,7 +232,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '%s'", tableName.c_str()));
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormatFmt("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
             LOG_WARN("sql.updates", "> Table '{}' not exist! Try add based table", tableName);
@@ -276,8 +276,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
         return false;
     }
 
-    std::string const info = Acore::StringFormat("Containing " SZFMTD " new and " SZFMTD " archived updates.",
-                             result.recent, result.archived);
+    std::string const info = Acore::StringFormatFmt("Containing {} new and {} archived updates.", result.recent, result.archived);
 
     if (!result.updated)
         LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
@@ -305,7 +304,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '%s'", tableName.c_str()));
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormatFmt("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
             Path const temp(GetBaseFilesDirectory() + tableName + ".sql");

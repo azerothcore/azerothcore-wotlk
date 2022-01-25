@@ -123,7 +123,7 @@ public:
                 dbPort = (*res)[0].GetUInt16();
 
             if (dbPort)
-                dbPortOutput = Acore::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realm.Id.Realm, dbPort);
+                dbPortOutput = Acore::StringFormatFmt("Realmlist (Realm Id: {}) configured in port {}", realm.Id.Realm, dbPort);
             else
                 dbPortOutput = Acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
