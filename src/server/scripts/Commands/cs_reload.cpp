@@ -451,7 +451,7 @@ public:
                 continue;
             }
 
-            LOG_INFO("server.loading", "Reloading creature template entry %u", entry);
+            LOG_INFO("server.loading", "Reloading creature template entry {}", entry);
 
             Field* fields = result->Fetch();
 

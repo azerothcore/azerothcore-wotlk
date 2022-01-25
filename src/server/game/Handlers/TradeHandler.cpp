@@ -69,13 +69,13 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Ignore Trade %s", _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Ignore Trade {}", _player->GetGUID().ToString());
     // recvPacket.print_storage();
 }
 
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Busy Trade %s", _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Busy Trade {}", _player->GetGUID().ToString());
     // recvPacket.print_storage();
 }
 
@@ -150,7 +150,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 // logging
-                LOG_DEBUG("network", "partner storing: %s", myItems[i]->GetGUID().ToString().c_str());
+                LOG_DEBUG("network", "partner storing: {}", myItems[i]->GetGUID().ToString());
 
                 // adjust time (depends on /played)
                 if (myItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
@@ -161,7 +161,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (hisItems[i])
             {
                 // logging
-                LOG_DEBUG("network", "player storing: %s", hisItems[i]->GetGUID().ToString().c_str());
+                LOG_DEBUG("network", "player storing: {}", hisItems[i]->GetGUID().ToString());
 
                 // adjust time (depends on /played)
                 if (hisItems[i]->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
@@ -177,21 +177,21 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 if (!traderCanTrade)
-                    LOG_ERROR("network.opcode", "trader can't store item: %s", myItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "trader can't store item: {}", myItems[i]->GetGUID().ToString());
                 if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
                     _player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
-                    LOG_ERROR("network.opcode", "player can't take item back: %s", myItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "player can't take item back: {}", myItems[i]->GetGUID().ToString());
             }
             // return the already removed items to the original owner
             if (hisItems[i])
             {
                 if (!playerCanTrade)
-                    LOG_ERROR("network.opcode", "player can't store item: %s", hisItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "player can't store item: {}", hisItems[i]->GetGUID().ToString());
                 if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
-                    LOG_ERROR("network.opcode", "trader can't take item back: %s", hisItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("network.opcode", "trader can't take item back: {}", hisItems[i]->GetGUID().ToString());
             }
         }
     }
@@ -209,7 +209,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
     {
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
-            LOG_DEBUG("network.opcode", "player trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("network.opcode", "player trade item {} bag: {} slot: {}", item->GetGUID().ToString(), item->GetBagSlot(), item->GetSlot());
             //Can return nullptr
             myItems[i] = item;
             myItems[i]->SetInTrade();
@@ -217,7 +217,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
 
         if (Item* item = hisTrade->GetItem(TradeSlots(i)))
         {
-            LOG_DEBUG("network.opcode", "partner trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("network.opcode", "partner trade item {} bag: {} slot: {}", item->GetGUID().ToString(), item->GetBagSlot(), item->GetSlot());
             hisItems[i] = item;
             hisItems[i]->SetInTrade();
         }

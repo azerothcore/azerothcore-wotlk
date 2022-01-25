@@ -61,7 +61,7 @@ void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTi
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    LOG_INFO("server.authserver", "Usage: \n %s [<options>]\n"
+    LOG_INFO("server.authserver", "Usage: \n {} [<options>]\n"
         "    -c config_file           use config_file as configuration file\n\r", prog);
 }
 
@@ -117,10 +117,10 @@ int main(int argc, char** argv)
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            LOG_INFO("server.authserver", "Daemon PID: %u\n", pid); // outError for red color in console
+            LOG_INFO("server.authserver", "Daemon PID: {}\n", pid); // outError for red color in console
         else
         {
-            LOG_ERROR("server.authserver", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
+            LOG_ERROR("server.authserver", "Cannot create PID file {} (possible error: permission)\n", pidFile);
             return 1;
         }
     }

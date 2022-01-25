@@ -276,10 +276,10 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32
     uint32 timeHr = (((time / 60) / 60) / 12);
     uint32 deposit = uint32(((multiplier * MSV * count / 3) * timeHr * 3) * sWorld->getRate(RATE_AUCTION_DEPOSIT));
 
-    LOG_DEBUG("auctionHouse", "MSV:        %u", MSV);
-    LOG_DEBUG("auctionHouse", "Items:      %u", count);
-    LOG_DEBUG("auctionHouse", "Multiplier: %f", multiplier);
-    LOG_DEBUG("auctionHouse", "Deposit:    %u", deposit);
+    LOG_DEBUG("auctionHouse", "MSV:        {}", MSV);
+    LOG_DEBUG("auctionHouse", "Items:      {}", count);
+    LOG_DEBUG("auctionHouse", "Multiplier: {}", multiplier);
+    LOG_DEBUG("auctionHouse", "Deposit:    {}", deposit);
 
     if (deposit < AH_MINIMUM_DEPOSIT * sWorld->getRate(RATE_AUCTION_DEPOSIT))
         return AH_MINIMUM_DEPOSIT * sWorld->getRate(RATE_AUCTION_DEPOSIT);
@@ -510,7 +510,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item_template);
         if (!proto)
         {
-            LOG_ERROR("auctionHouse", "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid, item_template);
+            LOG_ERROR("auctionHouse", "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: {} id: #{}) in auction, skipped.", item_guid, item_template);
             continue;
         }
 
@@ -525,7 +525,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u auction items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} auction items in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -564,7 +564,7 @@ void AuctionHouseMgr::LoadAuctions()
 
     CharacterDatabase.CommitTransaction(trans);
 
-    LOG_INFO("server.loading", ">> Loaded %u auctions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} auctions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -926,7 +926,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     Item* item = sAuctionMgr->GetAItem(item_guid);
     if (!item)
     {
-        LOG_ERROR("auctionHouse", "AuctionEntry::BuildAuctionInfo: Auction %u has a non-existent item: %s", Id, item_guid.ToString().c_str());
+        LOG_ERROR("auctionHouse", "AuctionEntry::BuildAuctionInfo: Auction {} has a non-existent item: {}", Id, item_guid.ToString());
         return false;
     }
     data << uint32(Id);
@@ -1009,7 +1009,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
     auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntryFromHouse(houseId);
     if (!auctionHouseEntry)
     {
-        LOG_ERROR("auctionHouse", "Auction %u has invalid house id %u", Id, houseId);
+        LOG_ERROR("auctionHouse", "Auction {} has invalid house id {}", Id, houseId);
         return false;
     }
 
@@ -1017,7 +1017,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
     // and item_template in fact (GetAItem will fail if problematic in result check in AuctionHouseMgr::LoadAuctionItems)
     if (!sAuctionMgr->GetAItem(item_guid))
     {
-        LOG_ERROR("auctionHouse", "Auction %u has not a existing item : %s", Id, item_guid.ToString().c_str());
+        LOG_ERROR("auctionHouse", "Auction {} has not a existing item : {}", Id, item_guid.ToString());
         return false;
     }
     return true;

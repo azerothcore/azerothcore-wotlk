@@ -116,7 +116,7 @@ static ChatSubCommandMap COMMAND_MAP;
 
             if (cmd->_invoker && (cmd->_permission.RequiredLevel != secLevel))
             {
-                LOG_WARN("sql.sql", "Table `command` has permission %u for '" STRING_VIEW_FMT "' which does not match the core (%u). Overriding.",
+                LOG_WARN("sql.sql", "Table `command` has permission {} for '" STRING_VIEW_FMT "' which does not match the core ({}). Overriding.",
                     secLevel, STRING_VIEW_FMT_ARG(name), cmd->_permission.RequiredLevel);
 
                 cmd->_permission.RequiredLevel = secLevel;

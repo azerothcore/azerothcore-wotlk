@@ -39,7 +39,7 @@ bool WorldSession::CanOpenMailBox(ObjectGuid guid)
     {
         if (_player->GetSession()->GetSecurity() < SEC_MODERATOR)
         {
-            LOG_ERROR("network.opcode", "%s attempt open mailbox in cheating way.", _player->GetName().c_str());
+            LOG_ERROR("network.opcode", "{} attempt open mailbox in cheating way.", _player->GetName());
             return false;
         }
     }
@@ -129,14 +129,14 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (!receiverGuid)
     {
-        LOG_DEBUG("network.opcode", "Player %s is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
-            player->GetGUID().ToString().c_str(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+        LOG_DEBUG("network.opcode", "Player {} is sending mail to {} (GUID: not existed!) with subject {} and body {} includes {} items, {} copper and {} COD copper with unk1 = {}, unk2 = {}",
+            player->GetGUID().ToString(), receiver, subject, body, items_count, money, COD, unk1, unk2);
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
     }
 
-    LOG_DEBUG("network.opcode", "Player %s is sending mail to %s (%s) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
-        player->GetGUID().ToString().c_str(), receiver.c_str(), receiverGuid.ToString().c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+    LOG_DEBUG("network.opcode", "Player {} is sending mail to {} ({}) with subject {} and body {} includes {} items, {} copper and {} COD copper with unk1 = {}, unk2 = {}",
+        player->GetGUID().ToString(), receiver, receiverGuid.ToString(), subject, body, items_count, money, COD, unk1, unk2);
 
     if (player->GetGUID() == receiverGuid)
     {
@@ -146,7 +146,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (money && COD) // cannot send money in a COD mail
     {
-        LOG_ERROR("network.opcode", "%s attempt to dupe money!!!.", receiver.c_str());
+        LOG_ERROR("network.opcode", "{} attempt to dupe money!!!.", receiver);
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
@@ -772,7 +772,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
     bodyItem->SetUInt32Value(ITEM_FIELD_CREATOR, m->sender);
     bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_MAIL_TEXT_MASK);
 
-    LOG_DEBUG("network.opcode", "HandleMailCreateTextItem mailid=%u", mailId);
+    LOG_DEBUG("network.opcode", "HandleMailCreateTextItem mailid={}", mailId);
 
     ItemPosCountVec dest;
     uint8 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, bodyItem, false);
