@@ -183,7 +183,7 @@ public:
                 return val;
             });
 
-            handler->PSendSysMessage("%s directory located in %s. Total size: " SZFMTD " bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize);
+            handler->PSendSysMessage(Acore::StringFormatFmt("{} directory located in {}. Total size: {} bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize).c_str());
         }
 
         LocaleConstant defaultLocale = sWorld->GetDefaultDbcLocale();

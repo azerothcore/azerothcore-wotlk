@@ -56,7 +56,7 @@ void Acore::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuil
         else
         {
             std::vector<std::string_view> const tokens = Acore::Tokenize(builder._name, COMMAND_DELIMITER, false);
-            ASSERT(!tokens.empty(), "Invalid command name '" STRING_VIEW_FMT "'.", STRING_VIEW_FMT_ARG(builder._name));
+            ASSERT(!tokens.empty(), "Invalid command name '{}'.", builder._name);
             ChatSubCommandMap* subMap = &map;
             for (size_t i = 0, n = (tokens.size() - 1); i < n; ++i)
                 subMap = &((*subMap)[tokens[i]]._subCommands);
@@ -105,7 +105,7 @@ static ChatSubCommandMap COMMAND_MAP;
                 }
                 else
                 {
-                    LOG_ERROR("sql.sql", "Table `command` contains data for non-existant command '" STRING_VIEW_FMT "'. Skipped.", STRING_VIEW_FMT_ARG(name));
+                    LOG_ERROR("sql.sql", "Table `command` contains data for non-existant command '{}'. Skipped.", name);
                     cmd = nullptr;
                     break;
                 }
@@ -116,19 +116,19 @@ static ChatSubCommandMap COMMAND_MAP;
 
             if (cmd->_invoker && (cmd->_permission.RequiredLevel != secLevel))
             {
-                LOG_WARN("sql.sql", "Table `command` has permission {} for '" STRING_VIEW_FMT "' which does not match the core ({}). Overriding.",
-                    secLevel, STRING_VIEW_FMT_ARG(name), cmd->_permission.RequiredLevel);
+                LOG_WARN("sql.sql", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
+                    secLevel, name, cmd->_permission.RequiredLevel);
 
                 cmd->_permission.RequiredLevel = secLevel;
             }
 
             if (std::holds_alternative<std::string>(cmd->_help))
-                LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '" STRING_VIEW_FMT "'. Skipped.", STRING_VIEW_FMT_ARG(name));
+                LOG_ERROR("sql.sql", "Table `command` contains duplicate data for command '{}'. Skipped.", name);
 
             if (std::holds_alternative<std::monostate>(cmd->_help))
                 cmd->_help.emplace<std::string>(help);
             else
-                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '" STRING_VIEW_FMT "', which uses `trinity_string`. Skipped.", STRING_VIEW_FMT_ARG(name));
+                LOG_ERROR("sql.sql", "Table `command` contains legacy help text for command '{}', which uses `trinity_string`. Skipped.", name);
         } while (result->NextRow());
     }
 
@@ -139,7 +139,7 @@ static ChatSubCommandMap COMMAND_MAP;
 void Acore::Impl::ChatCommands::ChatCommandNode::ResolveNames(std::string name)
 {
     if (_invoker && std::holds_alternative<std::monostate>(_help))
-        LOG_WARN("sql.sql", "Table `command` is missing help text for command '" STRING_VIEW_FMT "'.", STRING_VIEW_FMT_ARG(name));
+        LOG_WARN("sql.sql", "Table `command` is missing help text for command '{}'.", name);
 
     _name = name;
 

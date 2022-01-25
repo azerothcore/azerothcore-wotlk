@@ -399,12 +399,9 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("network", "CMSG_CALENDAR_UPDATE_EVENT [{}] EventId [" UI64FMTD
-                   "], InviteId [{}] Title {}, Description {}, type {} "
-                   "Repeatable {}, MaxInvites {}, Dungeon ID {}, Time {} "
-                   "Time2 {}, Flags {}", guid.ToString(), eventId, inviteId, title,
-                   description, type, repetitionType, maxInvites, dungeonId,
-                   eventPackedTime, timeZoneTime, flags);
+    LOG_DEBUG("network", "CMSG_CALENDAR_UPDATE_EVENT [{}] EventId [{}], InviteId [{}] Title {}, Description {}, type {} "
+        "Repeatable {}, MaxInvites {}, Dungeon ID {}, Time {} Time2 {}, Flags {}",
+        guid.ToString(), eventId, inviteId, title, description, type, repetitionType, maxInvites, dungeonId, eventPackedTime, timeZoneTime, flags);
 
     if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(eventId))
     {
