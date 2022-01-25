@@ -1176,13 +1176,13 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     // Hack for modules
     std::vector<uint32> CustomCreatures;
     std::stringstream stringCreatureIds(sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", ""));
-
+    
     for (std::string id; std::getline(stringCreatureIds, id, ',');) // Process each Creature ID in the string, delimited by the comma - ","
     {
         CustomCreatures.push_back(stoul(id));
     }
-
-    for (int32 i = 0; i < CustomCreatures.size(); i++)
+    
+    for (long i = 0; i < CustomCreatures.size(); i++)
     {
         if (cInfo->Entry == CustomCreatures[i])
             return;
