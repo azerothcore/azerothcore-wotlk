@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `arena_team_member` (
   `weekWins` SMALLINT unsigned NOT NULL DEFAULT 0,
   `seasonGames` SMALLINT unsigned NOT NULL DEFAULT 0,
   `seasonWins` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `personalRating` smallint(6) NOT NULL DEFAULT 0,
+  `personalRating` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`arenaTeamId`,`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
