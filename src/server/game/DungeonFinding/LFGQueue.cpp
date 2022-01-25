@@ -18,6 +18,7 @@
 #include "LFGQueue.h"
 #include "Containers.h"
 #include "DBCStores.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
@@ -29,6 +30,10 @@
 
 namespace lfg
 {
+    LfgQueueData::LfgQueueData() :
+        joinTime(time_t(GameTime::GetGameTime().count())), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED),
+        healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED) { }
+
     void LFGQueue::AddToQueue(ObjectGuid guid, bool failedProposal)
     {
         LOG_DEBUG("lfg", "ADD AddToQueue: %s, failed proposal: %u", guid.ToString().c_str(), failedProposal ? 1 : 0);
@@ -408,7 +413,7 @@ namespace lfg
             return LFG_COMPATIBILITY_PENDING;
 
         // Create a new proposal
-        proposal.cancelTime = time(nullptr) + LFG_TIME_PROPOSAL;
+        proposal.cancelTime = GameTime::GetGameTime().count() + LFG_TIME_PROPOSAL;
         proposal.state = LFG_PROPOSAL_INITIATING;
         proposal.leader.Clear();
         proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(proposalDungeons);
@@ -464,7 +469,7 @@ namespace lfg
 
     void LFGQueue::UpdateQueueTimers(uint32 diff)
     {
-        time_t currTime = time(nullptr);
+        time_t currTime = GameTime::GetGameTime().count();
         bool sendQueueStatus = false;
 
         if (m_QueueStatusTimer > LFG_QUEUEUPDATE_INTERVAL)

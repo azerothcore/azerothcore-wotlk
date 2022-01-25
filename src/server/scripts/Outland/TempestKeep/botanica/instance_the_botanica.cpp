@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "the_botanica.h"
@@ -163,7 +164,7 @@ public:
         {
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
             {
-                if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > time(nullptr))
+                if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > GameTime::GetGameTime().count())
                     return false;
 
                 uint32 form = 0;
@@ -187,7 +188,7 @@ public:
 
                 if (form)
                 {
-                    _swapTime = time(nullptr) + 6;
+                    _swapTime = GameTime::GetGameTime().count() + 6;
                     _lastSchool = spellInfo->GetSchoolMask();
                     GetUnitOwner()->RemoveAurasDueToSpell(_lastForm);
                     _lastForm = form;

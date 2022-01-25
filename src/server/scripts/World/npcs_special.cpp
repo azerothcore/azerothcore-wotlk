@@ -42,6 +42,7 @@ EndContentData */
 #include "CreatureTextMgr.h"
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
@@ -119,9 +120,7 @@ public:
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
 
                         if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
                         {
@@ -268,14 +267,14 @@ public:
             {
                 case EVENT_RIGGLE_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
+
                         if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
                             startWarning = true;
                         }
+
                         if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);

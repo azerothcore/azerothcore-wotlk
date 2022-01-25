@@ -20,10 +20,10 @@
 
 #include "AsyncCallbackProcessor.h"
 #include "Common.h"
+#include "Duration.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
-#include "Timer.h"
 #include <atomic>
 #include <list>
 #include <map>
@@ -314,8 +314,6 @@ enum WorldIntConfigs
     CONFIG_PVP_TOKEN_MAP_TYPE,
     CONFIG_PVP_TOKEN_ID,
     CONFIG_PVP_TOKEN_COUNT,
-    CONFIG_INTERVAL_LOG_UPDATE,
-    CONFIG_MIN_LOG_UPDATE,
     CONFIG_ENABLE_SINFO_LOGIN,
     CONFIG_PLAYER_ALLOW_COMMANDS,
     CONFIG_NUMTHREADS,
@@ -528,14 +526,9 @@ public:
     [[nodiscard]] virtual std::string const& GetNewCharString() const = 0;
     [[nodiscard]] virtual LocaleConstant GetDefaultDbcLocale() const = 0;
     [[nodiscard]] virtual std::string const& GetDataPath() const = 0;
-    [[nodiscard]] virtual time_t const& GetStartTime() const = 0;
-    [[nodiscard]] virtual time_t const& GetGameTime() const = 0;
-    [[nodiscard]] virtual uint32 GetUptime() const = 0;
-    [[nodiscard]] virtual uint32 GetUpdateTime() const = 0;
-    virtual void SetRecordDiffInterval(int32 t)  = 0;
-    [[nodiscard]] virtual time_t GetNextDailyQuestsResetTime() const = 0;
-    [[nodiscard]] virtual time_t GetNextWeeklyQuestsResetTime() const = 0;
-    [[nodiscard]] virtual time_t GetNextRandomBGResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextDailyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextWeeklyQuestsResetTime() const = 0;
+    [[nodiscard]] virtual Seconds GetNextRandomBGResetTime() const = 0;
     [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
@@ -587,8 +580,6 @@ public:
     [[nodiscard]] virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;
     virtual void   ResetEventSeasonalQuests(uint16 event_id) = 0;
-    virtual time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour) = 0;
-    virtual time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) = 0;
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;

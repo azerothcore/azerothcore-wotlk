@@ -23,18 +23,16 @@
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"
-#include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicObject.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MMapFactory.h"
-#include "MMapMgr.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -57,7 +55,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
@@ -1493,6 +1490,11 @@ void Spell::SelectImplicitTargetDestTargets(SpellEffIndex effIndex, SpellImplici
                 dist *= float(rand_norm());
             }
 
+            if (targetType.GetTarget() == TARGET_DEST_TARGET_BACK)
+            {
+                dist += target->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
+            }
+
             Position pos = dest._position;
             target->MovePositionToFirstCollision(pos, dist, angle);
 
@@ -2439,7 +2441,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     // Xinef: absorb delayed projectiles for 500ms
     if (getState() == SPELL_STATE_DELAYED && !m_spellInfo->IsTargetingArea() && !m_spellInfo->IsPositive() &&
-            (World::GetGameTimeMS() - target->timeDelay) <= effectUnit->m_lastSanctuaryTime && World::GetGameTimeMS() < (effectUnit->m_lastSanctuaryTime + 500) &&
+            (GameTime::GetGameTimeMS().count() - target->timeDelay) <= effectUnit->m_lastSanctuaryTime && GameTime::GetGameTimeMS().count() < (effectUnit->m_lastSanctuaryTime + 500) &&
             effectUnit->FindMap() && !effectUnit->FindMap()->IsDungeon()
        )
         return;                                             // No missinfo in that case
@@ -3718,6 +3720,51 @@ void Spell::_cast(bool skipCheck)
     // we must send smsg_spell_go packet before m_castItem delete in TakeCastItem()...
     SendSpellGo();
 
+    if (modOwner)
+        modOwner->SetSpellModTakingSpell(this, false);
+
+    if (m_originalCaster)
+    {
+        // Handle procs on cast
+        uint32 procAttacker = m_procAttacker;
+        if (!procAttacker)
+        {
+            bool IsPositive = m_spellInfo->IsPositive();
+            if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+            {
+                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
+            }
+            else
+            {
+                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG;
+            }
+        }
+
+        uint32 procEx = PROC_EX_NORMAL_HIT;
+
+        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        {
+            if (ihit->missCondition != SPELL_MISS_NONE)
+            {
+                continue;
+            }
+
+            if (!ihit->crit)
+            {
+                continue;
+            }
+
+            procEx |= PROC_EX_CRITICAL_HIT;
+            break;
+        }
+
+        m_originalCaster->ProcDamageAndSpell(m_originalCaster, procAttacker, PROC_FLAG_NONE, procEx, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+            m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_CAST);
+    }
+
+    if (modOwner)
+        modOwner->SetSpellModTakingSpell(this, true);
+
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
     if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this || m_spellInfo->Id == 14157*/)
     {
@@ -3972,6 +4019,44 @@ void Spell::_handle_finish_phase()
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsCooldownStartedOnEvent())
                         m_caster->ToPlayer()->SendCooldownEvent(m_spellInfo);
             }
+
+    // Handle procs on finish
+    if (m_originalCaster)
+    {
+        uint32 procAttacker = m_procAttacker;
+        if (!procAttacker)
+        {
+            bool IsPositive = m_spellInfo->IsPositive();
+            if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+            {
+                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
+            }
+            else
+            {
+                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG;
+            }
+        }
+
+        uint32 procEx = PROC_EX_NORMAL_HIT;
+        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        {
+            if (ihit->missCondition != SPELL_MISS_NONE)
+            {
+                continue;
+            }
+
+            if (!ihit->crit)
+            {
+                continue;
+            }
+
+            procEx |= PROC_EX_CRITICAL_HIT;
+            break;
+        }
+
+        m_originalCaster->ProcDamageAndSpell(m_originalCaster, procAttacker, PROC_FLAG_NONE, procEx, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+            m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_FINISH);
+    }
 }
 
 void Spell::SendSpellCooldown()
@@ -4460,7 +4545,7 @@ void Spell::SendSpellGo()
     data << uint8(m_cast_count);                            // pending spell cast?
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint32(castFlags);                              // cast flags
-    data << uint32(World::GetGameTimeMS());                 // timestamp
+    data << uint32(GameTime::GetGameTimeMS().count());                 // timestamp
 
     WriteSpellGoTargets(&data);
 
@@ -4960,7 +5045,7 @@ void Spell::TakePower()
 
     // Set the five second timer
     if (PowerType == POWER_MANA && m_powerCost > 0)
-        m_caster->SetLastManaUse(World::GetGameTimeMS());
+        m_caster->SetLastManaUse(GameTime::GetGameTimeMS().count());
 }
 
 void Spell::TakeAmmo()
@@ -6029,7 +6114,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_BAD_TARGETS;
 
                     // Xinef: Implement summon pending error
-                    if (target->GetSummonExpireTimer() > time(nullptr))
+                    if (target->GetSummonExpireTimer() > GameTime::GetGameTime().count())
                         return SPELL_FAILED_SUMMON_PENDING;
 
                     // check if our map is dungeon
@@ -6069,7 +6154,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_BAD_TARGETS;
 
                     // Xinef: Implement summon pending error
-                    if (target->GetSummonExpireTimer() > time(nullptr))
+                    if (target->GetSummonExpireTimer() > GameTime::GetGameTime().count())
                         return SPELL_FAILED_SUMMON_PENDING;
 
                     break;

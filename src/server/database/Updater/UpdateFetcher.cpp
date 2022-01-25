@@ -20,7 +20,6 @@
 #include "DBUpdater.h"
 #include "Field.h"
 #include "Log.h"
-#include "QueryResult.h"
 #include "Tokenize.h"
 #include "Util.h"
 #include <fstream>
