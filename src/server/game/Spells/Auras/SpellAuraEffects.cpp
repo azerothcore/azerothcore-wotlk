@@ -20,6 +20,7 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Common.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "InstanceScript.h"
 #include "Log.h"
@@ -1421,6 +1422,8 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                         int32 bp = aurEff->GetAmount();
                         target->CastCustomSpell(target, 48421, &bp, nullptr, nullptr, true);
                     }
+                    // Always cast Moonkin Aura
+                    target->CastSpell(target, 24907, true, nullptr, this, target->GetGUID());
                     break;
                 // Master Shapeshifter - Tree of Life
                 case FORM_TREE:
@@ -2944,7 +2947,7 @@ void AuraEffect::HandleAuraFeatherFall(AuraApplication const* aurApp, uint8 mode
 
     // start fall from current height
     if (!apply && target->GetTypeId() == TYPEID_PLAYER)
-        target->ToPlayer()->SetFallInformation(time(nullptr), target->GetPositionZ());
+        target->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), target->GetPositionZ());
 }
 
 void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool apply) const
