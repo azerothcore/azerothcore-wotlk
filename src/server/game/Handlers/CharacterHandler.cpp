@@ -2193,7 +2193,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             stmt->setUInt32(0, lowGuid);
             trans->Append(stmt);
 
-            if (level > 7)
+            /*if (level > 7)
             {
                 // Update Taxi path
                 // this doesn't seem to be 100% blizzlike... but it can't really be helped.
@@ -2220,7 +2220,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                 stmt->setString(0, taximaskstream.str());
                 stmt->setUInt32(1, lowGuid);
                 trans->Append(stmt);
-            }
+            }*/
 
             // Reset guild
             if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
