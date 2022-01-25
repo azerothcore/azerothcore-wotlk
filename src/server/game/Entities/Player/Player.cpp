@@ -1229,7 +1229,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
         {
             if (!itemId || *itemId)
             {
-                FMT_LOG_WARN("entities.player.loading", "Player {} has invalid equipment '{}' in `equipmentcache` at index {}. Skipped.",
+                LOG_WARN("entities.player.loading", "Player {} has invalid equipment '{}' in `equipmentcache` at index {}. Skipped.",
                     guid.ToString(), (visualBase < equipment.size()) ? equipment[visualBase] : "<none>", visualBase);
             }
 
@@ -1250,7 +1250,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
         if (!enchants)
         {
-            FMT_LOG_WARN("entities.player.loading", "Player {} has invalid enchantment info '{}' in `equipmentcache` at index {}. Skipped.",
+            LOG_WARN("entities.player.loading", "Player {} has invalid enchantment info '{}' in `equipmentcache` at index {}. Skipped.",
                 guid.ToString(), ((visualBase + 1) < equipment.size()) ? equipment[visualBase + 1] : "<none>", visualBase + 1);
 
             enchants = 0;
@@ -15279,7 +15279,7 @@ void Player::_LoadPetStable(uint8 petStableSlots, PreparedQueryResult result)
 
     if (m_petStable->MaxStabledPets > MAX_PET_STABLES)
     {
-        FMT_LOG_ERROR("entities.player", "Player::LoadFromDB: Player ({}) can't have more stable slots than {}, but has {} in DB",
+        LOG_ERROR("entities.player", "Player::LoadFromDB: Player ({}) can't have more stable slots than {}, but has {} in DB",
             GetGUID().ToString(), MAX_PET_STABLES, m_petStable->MaxStabledPets);
 
         m_petStable->MaxStabledPets = MAX_PET_STABLES;

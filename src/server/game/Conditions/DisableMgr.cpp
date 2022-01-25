@@ -118,7 +118,7 @@ namespace DisableMgr
                             if (Optional<uint32> mapId = Acore::StringTo<uint32>(mapStr))
                                 data.params[0].insert(*mapId);
                             else
-                                FMT_LOG_ERROR("sql.sql", "Disable map '{}' for spell {} is invalid, skipped.", mapStr, entry);
+                                LOG_ERROR("sql.sql", "Disable map '{}' for spell {} is invalid, skipped.", mapStr, entry);
                         }
                     }
 
@@ -129,7 +129,7 @@ namespace DisableMgr
                             if (Optional<uint32> areaId = Acore::StringTo<uint32>(areaStr))
                                 data.params[1].insert(*areaId);
                             else
-                                FMT_LOG_ERROR("sql.sql", "Disable area '{}' for spell {} is invalid, skipped.", areaStr, entry);
+                                LOG_ERROR("sql.sql", "Disable area '{}' for spell {} is invalid, skipped.", areaStr, entry);
                         }
                     }
 

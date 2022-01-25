@@ -230,7 +230,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         uint32 temp;
         recvData >> temp;                                   // zone id, 0 if zone is unknown...
         zoneids[i] = temp;
-        FMT_LOG_DEBUG("network.who", "Zone {}: {}", i, zoneids[i]);
+        LOG_DEBUG("network.who", "Zone {}: {}", i, zoneids[i]);
     }
 
     recvData >> strCount;                                   // user entered strings count, client limit=4 (checked on 2.0.10)
@@ -238,7 +238,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     if (strCount > 4)
         return;                                             // can't be received from real client or broken packet
 
-    FMT_LOG_DEBUG("network.who", "Minlvl {}, maxlvl {}, name {}, guild {}, racemask {}, classmask {}, zones {}, strings {}",
+    LOG_DEBUG("network.who", "Minlvl {}, maxlvl {}, name {}, guild {}, racemask {}, classmask {}, zones {}, strings {}",
         levelMin, levelMax, packetPlayerName, packetGuildName, racemask, classmask, zonesCount, strCount);
 
     std::wstring str[4];                                    // 4 is client limit
@@ -252,7 +252,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 
         wstrToLower(str[i]);
 
-        FMT_LOG_DEBUG("network.who", "String {}: {}", i, temp);
+        LOG_DEBUG("network.who", "String {}: {}", i, temp);
     }
 
     std::wstring wpacketPlayerName;
@@ -405,7 +405,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     data.put(4, matchCount);                              // insert right count, count of matches
 
     SendPacket(&data);
-    FMT_LOG_DEBUG("network", "WORLD: Send SMSG_WHO Message");
+    LOG_DEBUG("network", "WORLD: Send SMSG_WHO Message");
 }
 
 void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequest& /*logoutRequest*/)

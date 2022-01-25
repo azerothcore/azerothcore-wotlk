@@ -204,13 +204,13 @@ int main(int argc, char** argv)
     Acore::Banner::Show("worldserver-daemon",
         [](std::string_view text)
         {
-            FMT_LOG_INFO("server.worldserver", text);
+            LOG_INFO("server.worldserver", text);
         },
         []()
         {
-            FMT_LOG_INFO("server.worldserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
-            FMT_LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            FMT_LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            LOG_INFO("server.worldserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
+            LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
 
     OpenSSLCrypto::threadsSetup();
