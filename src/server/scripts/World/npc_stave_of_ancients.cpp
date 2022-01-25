@@ -17,6 +17,7 @@
 
 #include "npc_stave_of_ancients.h"
 #include "CreatureGroups.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -602,7 +603,7 @@ public:
             if (Precious()->isDead())
             {
                 // Make it so that Precious respawns after Simone
-                uint32 respawnTime = me->GetRespawnTime() - time(nullptr);
+                uint32 respawnTime = me->GetRespawnTime() - GameTime::GetGameTime().count();
                 Precious()->SetRespawnTime(respawnTime);
                 return;
             }

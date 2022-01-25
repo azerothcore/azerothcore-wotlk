@@ -21,6 +21,7 @@
 #include "Chat.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
+#include "GameTime.h"
 #include "Geometry.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -386,7 +387,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
     if (!IsGridLoaded(GridCoord(cell.data.Part.grid_x, cell.data.Part.grid_y)))
         return;
 
-    //TC_LOG_DEBUG(LOG_FILTER_MAPS, "Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
+    //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(ngrid != nullptr);
 
@@ -628,7 +629,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     _transports.insert(obj);
 
     // Broadcast creation to players
-    if (!GetPlayers().isEmpty())
+    if (!GetPlayers().IsEmpty())
     {
         for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         {
@@ -957,7 +958,7 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
         RemoveFromActive(obj);
 
     Map::PlayerList const& players = GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         UpdateData data;
         obj->BuildOutOfRangeUpdateBlock(&data);
@@ -2873,7 +2874,7 @@ Map::EnterState InstanceMap::CannotEnter(Player* player, bool loginCheck)
 
     // cannot enter if instance is in use by another party/soloer that have a permanent save in the same instance id
     PlayerList const& playerList = GetPlayers();
-    if (!playerList.isEmpty())
+    if (!playerList.IsEmpty())
         for (PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
             if (Player* iPlayer = i->GetSource())
             {
@@ -2946,7 +2947,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         // increase current instances (hourly limit)
         // xinef: specific instances are still limited
         if (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance())
-            player->AddInstanceEnterTime(GetInstanceId(), time(nullptr));
+            player->AddInstanceEnterTime(GetInstanceId(), GameTime::GetGameTime().count());
 
         if (!playerBind->perm && !mapSave->CanReset() && group && !group->isLFGGroup() && !group->IsLfgRandomInstance())
         {
@@ -3066,7 +3067,7 @@ bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
             m_resetAfterUnload = true;
         }
 
-        return m_mapRefMgr.isEmpty();
+        return m_mapRefMgr.IsEmpty();
     }
 
     if (HavePlayers())
@@ -3083,7 +3084,7 @@ bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
         m_resetAfterUnload = true;
     }
 
-    return m_mapRefMgr.isEmpty();
+    return m_mapRefMgr.IsEmpty();
 }
 
 std::string const& InstanceMap::GetScriptName() const
@@ -3297,7 +3298,7 @@ void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTi
         return;
     }
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime().count();
     if (GetInstanceResetPeriod() > 0 && respawnTime - now + 5 >= GetInstanceResetPeriod())
         respawnTime = now + YEAR;
 
@@ -3331,7 +3332,7 @@ void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
         return;
     }
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime().count();
     if (GetInstanceResetPeriod() > 0 && respawnTime - now + 5 >= GetInstanceResetPeriod())
         respawnTime = now + YEAR;
 
@@ -3622,7 +3623,7 @@ Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= 
 
 void Map::RemoveOldCorpses()
 {
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime().count();
 
     std::vector<ObjectGuid> corpses;
     corpses.reserve(_corpsesByPlayer.size());
@@ -3679,7 +3680,7 @@ void Map::SendZoneDynamicInfo(Player* player)
 void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId)
 {
     Map::PlayerList const& players = GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         WorldPacket data(SMSG_PLAY_SOUND, 4);
         data << uint32(soundId);
@@ -3699,7 +3700,7 @@ void Map::SetZoneMusic(uint32 zoneId, uint32 musicId)
     _zoneDynamicInfo[zoneId].MusicId = musicId;
 
     Map::PlayerList const& players = GetPlayers();
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         WorldPacket data(SMSG_PLAY_MUSIC, 4);
         data << uint32(musicId);
@@ -3721,7 +3722,7 @@ void Map::SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGra
     info.WeatherGrade = weatherGrade;
     Map::PlayerList const& players = GetPlayers();
 
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         WorldPackets::Misc::Weather weather(weatherId, weatherGrade);
 
@@ -3742,7 +3743,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeI
     info.LightFadeInTime = static_cast<uint32>(fadeInTime.count());
     Map::PlayerList const& players = GetPlayers();
 
-    if (!players.isEmpty())
+    if (!players.IsEmpty())
     {
         WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
         data << uint32(_defaultLight);

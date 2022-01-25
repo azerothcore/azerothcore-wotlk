@@ -18,6 +18,7 @@
 #include "ScriptedCreature.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
@@ -255,7 +256,7 @@ void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
         targets = new ObjectList();
 
-        if (!players.isEmpty())
+        if (!players.IsEmpty())
         {
             for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                 if (Player* player = i->GetSource())
@@ -493,9 +494,10 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea()
     if (me->IsInEvadeMode() || !me->IsInCombat())
         return false;
 
-    if (_evadeCheckCooldown == time(nullptr))
+    if (_evadeCheckCooldown == GameTime::GetGameTime().count())
         return false;
-    _evadeCheckCooldown = time(nullptr);
+
+    _evadeCheckCooldown = GameTime::GetGameTime().count();
 
     if (!CheckEvadeIfOutOfCombatArea())
         return false;

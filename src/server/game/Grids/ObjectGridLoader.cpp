@@ -22,7 +22,6 @@
 #include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
@@ -200,7 +199,7 @@ void ObjectGridLoader::LoadN(void)
 template<class T>
 void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
 {
-    while (!m.isEmpty())
+    while (!m.IsEmpty())
     {
         T* obj = m.getFirst()->GetSource();
         // if option set then object already saved at this moment
