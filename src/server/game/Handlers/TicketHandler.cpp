@@ -16,6 +16,7 @@
  */
 
 #include "Chat.h"
+#include "GameTime.h"
 #include "Language.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -24,7 +25,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "zlib.h"
+#include <zlib.h>
 
 void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 {
@@ -272,7 +273,7 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     stmt->setFloat (4, y);
     stmt->setFloat (5, z);
     stmt->setUInt32(6, GetLatency());
-    stmt->setUInt32(7, time(nullptr));
+    stmt->setUInt32(7, GameTime::GetGameTime().count());
     CharacterDatabase.Execute(stmt);
 }
 
