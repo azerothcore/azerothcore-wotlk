@@ -816,51 +816,96 @@ public:
         if (!ValidatePDumpTarget(handler, name, characterName, characterGUID))
             return false;
 
-        switch (PlayerDumpReader().LoadDump(fileName, account, name, characterGUID.value_or(0)))
+        switch (PlayerDumpReader().LoadDumpFromFile(fileName, account, name, characterGUID.value_or(0)))
         {
-            case DUMP_SUCCESS:
-                handler->PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
-                break;
-            case DUMP_FILE_OPEN_ERROR:
-                handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
-                handler->SetSentErrorMessage(true);
-                return false;
-            case DUMP_FILE_BROKEN:
-                handler->PSendSysMessage(LANG_DUMP_BROKEN, fileName.c_str());
-                handler->SetSentErrorMessage(true);
-                return false;
-            case DUMP_TOO_MANY_CHARS:
-                handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, account.GetName().c_str(), account.GetID());
-                handler->SetSentErrorMessage(true);
-                return false;
-            default:
-                handler->PSendSysMessage(LANG_COMMAND_IMPORT_FAILED);
-                handler->SetSentErrorMessage(true);
-                return false;
+        case DUMP_SUCCESS:
+            handler->PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
+            break;
+        case DUMP_FILE_OPEN_ERROR:
+            handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        case DUMP_FILE_BROKEN:
+            handler->PSendSysMessage(LANG_DUMP_BROKEN, fileName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        case DUMP_TOO_MANY_CHARS:
+            handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, account.GetName().c_str(), account.GetID());
+            handler->SetSentErrorMessage(true);
+            return false;
+        default:
+            handler->PSendSysMessage(LANG_COMMAND_IMPORT_FAILED);
+            handler->SetSentErrorMessage(true);
+            return false;
         }
+
+        return true;
+    }
+
+    static bool HandlePDumpCopyCommand(ChatHandler* handler, PlayerIdentifier player, AccountIdentifier account, Optional<std::string_view> characterName, Optional<ObjectGuid::LowType> characterGUID)
+    {
+        std::string name;
+        if (!ValidatePDumpTarget(handler, name, characterName, characterGUID))
+            return false;
+
+        std::string dump;
+        switch (PlayerDumpWriter().WriteDumpToString(dump, player.GetGUID().GetCounter()))
+        {
+        case DUMP_SUCCESS:
+            break;
+        case DUMP_CHARACTER_DELETED:
+            handler->PSendSysMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
+            handler->SetSentErrorMessage(true);
+            return false;
+        case DUMP_FILE_OPEN_ERROR: // this error code should not happen
+        default:
+            handler->PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        switch (PlayerDumpReader().LoadDumpFromString(dump, account, name, characterGUID.value_or(0)))
+        {
+        case DUMP_SUCCESS:
+            break;
+        case DUMP_TOO_MANY_CHARS:
+            handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, account.GetName().c_str(), account.GetID());
+            handler->SetSentErrorMessage(true);
+            return false;
+        case DUMP_FILE_OPEN_ERROR: // this error code should not happen
+        case DUMP_FILE_BROKEN: // this error code should not happen
+        default:
+            handler->PSendSysMessage(LANG_COMMAND_IMPORT_FAILED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // Original TC Notes from Refactor vvv
+        //ToDo: use a new trinity_string for this commands
+        handler->PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
 
         return true;
     }
 
     static bool HandlePDumpWriteCommand(ChatHandler* handler, std::string fileName, PlayerIdentifier player)
     {
-        switch (PlayerDumpWriter().WriteDump(fileName, player.GetGUID().GetCounter()))
+        switch (PlayerDumpWriter().WriteDumpToFile(fileName, player.GetGUID().GetCounter()))
         {
-            case DUMP_SUCCESS:
-                handler->PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
-                break;
-            case DUMP_FILE_OPEN_ERROR:
-                handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
-                handler->SetSentErrorMessage(true);
-                return false;
-            case DUMP_CHARACTER_DELETED:
-                handler->PSendSysMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
-                handler->SetSentErrorMessage(true);
-                return false;
-            default:
-                handler->PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
-                handler->SetSentErrorMessage(true);
-                return false;
+        case DUMP_SUCCESS:
+            handler->PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
+            break;
+        case DUMP_FILE_OPEN_ERROR:
+            handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        case DUMP_CHARACTER_DELETED:
+            handler->PSendSysMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
+            handler->SetSentErrorMessage(true);
+            return false;
+        default:
+            handler->PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
+            handler->SetSentErrorMessage(true);
+            return false;
         }
 
         return true;
