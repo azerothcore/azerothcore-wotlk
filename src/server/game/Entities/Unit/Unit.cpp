@@ -34,6 +34,7 @@
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
 #include "Formulas.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
@@ -67,6 +68,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 #include <math.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -319,12 +322,12 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 bool GlobalCooldownMgr::HasGlobalCooldown(SpellInfo const* spellInfo) const
 {
     GlobalCooldownList::const_iterator itr = m_GlobalCooldowns.find(spellInfo->StartRecoveryCategory);
-    return itr != m_GlobalCooldowns.end() && itr->second.duration && getMSTimeDiff(itr->second.cast_time, World::GetGameTimeMS()) < itr->second.duration;
+    return itr != m_GlobalCooldowns.end() && itr->second.duration && getMSTimeDiff(itr->second.cast_time, GameTime::GetGameTimeMS().count()) < itr->second.duration;
 }
 
 void GlobalCooldownMgr::AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd)
 {
-    m_GlobalCooldowns[spellInfo->StartRecoveryCategory] = GlobalCooldown(gcd, World::GetGameTimeMS());
+    m_GlobalCooldowns[spellInfo->StartRecoveryCategory] = GlobalCooldown(gcd, GameTime::GetGameTimeMS().count());
 }
 
 void GlobalCooldownMgr::CancelGlobalCooldown(SpellInfo const* spellInfo)
@@ -497,7 +500,7 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 T
 
     data << uint8(0);                                       // new in 3.1
     data << GetPositionX() << GetPositionY() << GetPositionZ();
-    data << World::GetGameTimeMS();
+    data << GameTime::GetGameTimeMS().count();
     data << uint8(0);
     data << uint32(sf);
     data << TransitTime;                                           // Time in between points
@@ -993,7 +996,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         {
             // Part of Evade mechanics. DoT's and Thorns / Retribution Aura do not contribute to this
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
-                victim->ToCreature()->SetLastDamagedTime(sWorld->GetGameTime() + MAX_AGGRO_RESET_TIME);
+                victim->ToCreature()->SetLastDamagedTime(GameTime::GetGameTime().count() + MAX_AGGRO_RESET_TIME);
 
             if (attacker)
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
@@ -5356,7 +5359,7 @@ uint32 Unit::GetDiseasesByCaster(ObjectGuid casterGUID, uint8 mode)
                 {
                     Aura* aura = (*i)->GetBase();
                     if (aura && !aura->IsRemoved() && aura->GetDuration() > 0)
-                        if ((aura->GetApplyTime() + aura->GetMaxDuration() / 1000 + 8) > (time(nullptr) + aura->GetDuration() / 1000))
+                        if ((aura->GetApplyTime() + aura->GetMaxDuration() / 1000 + 8) > (GameTime::GetGameTime().count() + aura->GetDuration() / 1000))
                             aura->SetDuration(aura->GetDuration() + 3000);
                 }
             }
@@ -5846,15 +5849,15 @@ void Unit::SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, 
     SendSpellNonMeleeDamageLog(&log);
 }
 
-void Unit::ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellInfo const* procSpellInfo, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo)
+void Unit::ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellInfo const* procSpellInfo, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo, uint32 procPhase)
 {
     // Not much to do if no flags are set.
     if (procAttacker)
-        ProcDamageAndSpellFor(false, victim, procAttacker, procExtra, attType, procSpellInfo, amount, procAura, procAuraEffectIndex, procSpell, damageInfo, healInfo);
+        ProcDamageAndSpellFor(false, victim, procAttacker, procExtra, attType, procSpellInfo, amount, procAura, procAuraEffectIndex, procSpell, damageInfo, healInfo, procPhase);
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
     if (victim && victim->IsAlive() && procVictim)
-        victim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpellInfo, amount, procAura, procAuraEffectIndex, procSpell, damageInfo, healInfo);
+        victim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpellInfo, amount, procAura, procAuraEffectIndex, procSpell, damageInfo, healInfo, procPhase);
 }
 
 void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
@@ -7078,7 +7081,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 if (AuraEffect* aurEff = victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x100000, 0, 0, GetGUID()))
                                     if (Aura* aur = aurEff->GetBase())
                                         if (!aur->IsRemoved() && aur->GetDuration() > 0)
-                                            if ((aur->GetApplyTime() + aur->GetMaxDuration() / 1000 + 5) > (time(nullptr) + aur->GetDuration() / 1000) )
+                                            if ((aur->GetApplyTime() + aur->GetMaxDuration() / 1000 + 5) > (GameTime::GetGameTime().count() + aur->GetDuration() / 1000) )
                                             {
                                                 aur->SetDuration(aur->GetDuration() + 2000);
                                                 return true;
@@ -8400,7 +8403,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
     return false;
 }
 
-bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown)
+bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown, uint32 procPhase)
 {
     // Get triggered aura spell info
     SpellInfo const* auraSpellInfo = triggeredByAura->GetSpellInfo();
@@ -9292,18 +9295,21 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         // Fingers of Frost, synchronise with Frostbite
         case 44544:
             {
-                // Find Frostbite
-                if (AuraEffect* aurEff = this->GetAuraEffect(SPELL_AURA_ADD_TARGET_TRIGGER, SPELLFAMILY_MAGE, 119, EFFECT_0))
+                if (procPhase == PROC_SPELL_PHASE_HIT)
                 {
-                    if (!victim)
-                        return false;
+                    // Find Frostbite
+                    if (AuraEffect* aurEff = this->GetAuraEffect(SPELL_AURA_ADD_TARGET_TRIGGER, SPELLFAMILY_MAGE, 119, EFFECT_0))
+                    {
+                        if (!victim)
+                            return false;
 
-                    uint8 fofRank = sSpellMgr->GetSpellRank(triggeredByAura->GetId());
-                    uint8 fbRank  = sSpellMgr->GetSpellRank(aurEff->GetId());
-                    uint8 chance = uint8(std::ceil(fofRank * fbRank * 16.6f));
+                        uint8 fofRank = sSpellMgr->GetSpellRank(triggeredByAura->GetId());
+                        uint8 fbRank  = sSpellMgr->GetSpellRank(aurEff->GetId());
+                        uint8 chance  = uint8(std::ceil(fofRank * fbRank * 16.6f));
 
-                    if (roll_chance_i(chance))
-                        CastSpell(victim, aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+                        if (roll_chance_i(chance))
+                            CastSpell(victim, aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+                    }
                 }
                 break;
             }
@@ -11969,9 +11975,14 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
 uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint32 stack)
 {
     float TakenTotalMod = 1.0f;
-
+    float minval = 0.0f;
     // Healing taken percent
-    float minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+
+    if (!sScriptMgr->OnSpellHealingBonusTakenNegativeModifiers(this, caster, spellProto, minval))
+    {
+        minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+    }
+
     if (minval)
         AddPct(TakenTotalMod, minval);
 
@@ -12793,7 +12804,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data << GetPackGUID();
-        data << uint32(sWorld->GetGameTime());   // Packet counter
+        data << uint32(GameTime::GetGameTime().count());   // Packet counter
         data << player->GetCollisionHeight();
         player->GetSession()->SendPacket(&data);
     }
@@ -12813,7 +12824,7 @@ void Unit::Dismount()
     {
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data << GetPackGUID();
-        data << uint32(sWorld->GetGameTime());   // Packet counter
+        data << uint32(GameTime::GetGameTime().count());   // Packet counter
         data << thisPlayer->GetCollisionHeight();
         thisPlayer->GetSession()->SendPacket(&data);
     }
@@ -14239,7 +14250,7 @@ DiminishingLevels Unit::GetDiminishing(DiminishingGroup group)
             return DIMINISHING_LEVEL_1;
 
         // If last spell was casted more than 15 seconds ago - reset the count.
-        if (i->stack == 0 && getMSTimeDiff(i->hitTime, World::GetGameTimeMS()) > 15000)
+        if (i->stack == 0 && getMSTimeDiff(i->hitTime, GameTime::GetGameTimeMS().count()) > 15000)
         {
             i->hitCount = DIMINISHING_LEVEL_1;
             return DIMINISHING_LEVEL_1;
@@ -14262,7 +14273,7 @@ void Unit::IncrDiminishing(DiminishingGroup group)
             i->hitCount += 1;
         return;
     }
-    m_Diminishing.push_back(DiminishingReturn(group, World::GetGameTimeMS(), DIMINISHING_LEVEL_2));
+    m_Diminishing.push_back(DiminishingReturn(group, GameTime::GetGameTimeMS().count(), DIMINISHING_LEVEL_2));
 }
 
 float Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, Unit* caster, DiminishingLevels Level, int32 limitduration)
@@ -14359,7 +14370,7 @@ void Unit::ApplyDiminishingAura(DiminishingGroup group, bool apply)
             i->stack -= 1;
             // Remember time after last aura from group removed
             if (i->stack == 0)
-                i->hitTime = World::GetGameTimeMS();
+                i->hitTime = GameTime::GetGameTimeMS().count();
         }
         break;
     }
@@ -15218,30 +15229,36 @@ void CharmInfo::SetPetNumber(uint32 petnumber, bool statwindow)
 
 void CharmInfo::LoadPetActionBar(const std::string& data)
 {
-    Tokenizer tokens(data, ' ');
+    std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
     if (tokens.size() != (ACTION_BAR_INDEX_END - ACTION_BAR_INDEX_START) * 2)
         return;                                             // non critical, will reset to default
 
-    uint8 index = ACTION_BAR_INDEX_START;
-    Tokenizer::const_iterator iter = tokens.begin();
-    for (; index < ACTION_BAR_INDEX_END; ++iter, ++index)
+    auto iter = tokens.begin();
+    for (uint8 index = ACTION_BAR_INDEX_START; index < ACTION_BAR_INDEX_END; ++index)
     {
-        // use unsigned cast to avoid sign negative format use at long-> ActiveStates (int) conversion
-        ActiveStates type  = ActiveStates(atol(*iter));
-        ++iter;
-        uint32 action = uint32(atol(*iter));
+        Optional<uint8> type = Acore::StringTo<uint8>(*(iter++));
+        Optional<uint32> action = Acore::StringTo<uint32>(*(iter++));
 
-        PetActionBar[index].SetActionAndType(action, type);
+        if (!type || !action)
+        {
+            continue;
+        }
+
+        PetActionBar[index].SetActionAndType(*action, static_cast<ActiveStates>(*type));
 
         // check correctness
         if (PetActionBar[index].IsActionBarForSpell())
         {
-            SpellInfo const* spelInfo = sSpellMgr->GetSpellInfo(PetActionBar[index].GetAction());
-            if (!spelInfo)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(PetActionBar[index].GetAction());
+            if (!spellInfo)
+            {
                 SetActionBar(index, 0, ACT_PASSIVE);
-            else if (!spelInfo->IsAutocastable())
+            }
+            else if (!spellInfo->IsAutocastable())
+            {
                 SetActionBar(index, PetActionBar[index].GetAction(), ACT_PASSIVE);
+            }
         }
     }
 }
@@ -15489,13 +15506,13 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
     return procEx;
 }
 
-void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo)
+void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo, uint32 procPhase)
 {
     // Player is loaded now - do not allow passive spell casts to proc
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetSession()->PlayerLoading())
         return;
     // For melee/ranged based attack need update skills and set some Aura states if victim present
-    if (procFlag & MELEE_BASED_TRIGGER_MASK && target)
+    if (procFlag & MELEE_BASED_TRIGGER_MASK && target && procPhase == PROC_SPELL_PHASE_HIT)
     {
         // Xinef: Shaman in ghost wolf form cant proc anything melee based
         if (!isVictim && GetShapeshiftForm() == FORM_GHOSTWOLF)
@@ -15584,7 +15601,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
     Unit* actor = isVictim ? target : this;
     Unit* actionTarget = !isVictim ? target : this;
 
-    ProcEventInfo eventInfo = ProcEventInfo(actor, actionTarget, target, procFlag, 0, 0, procExtra, procSpell, damageInfo, healInfo, procAura, procAuraEffectIndex);
+    ProcEventInfo eventInfo = ProcEventInfo(actor, actionTarget, target, procFlag, 0, procPhase, procExtra, procSpell, damageInfo, healInfo, procAura, procAuraEffectIndex);
 
     ProcTriggeredList procTriggered;
     // Fill procTriggered list
@@ -15774,7 +15791,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell %u (triggered by %s aura of spell %u)", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
                             // Don`t drop charge or add cooldown for not started trigger
-                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown))
+                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase))
                                 takeCharges = true;
                             break;
                         }
@@ -15833,7 +15850,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell %u (triggered with value by %s aura of spell %u)", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
 
-                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown))
+                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown, procPhase))
                                 takeCharges = true;
                             break;
                         }
@@ -16621,7 +16638,7 @@ float Unit::GetAPMultiplier(WeaponAttackType attType, bool normalized)
 
 bool Unit::IsUnderLastManaUseEffect() const
 {
-    return  getMSTimeDiff(m_lastManaUse, World::GetGameTimeMS()) < 5000;
+    return  getMSTimeDiff(m_lastManaUse, GameTime::GetGameTimeMS().count()) < 5000;
 }
 
 void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuards)
@@ -17485,7 +17502,7 @@ void Unit::SetStunned(bool apply)
             SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        SetRooted(true);
+        SetRooted(true, true);
 
         CastStop();
     }
@@ -17511,12 +17528,12 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            SetRooted(false);
+            SetRooted(false, true);
         }
     }
 }
 
-void Unit::SetRooted(bool apply)
+void Unit::SetRooted(bool apply, bool isStun)
 {
     if (apply)
     {
@@ -17540,7 +17557,14 @@ void Unit::SetRooted(bool apply)
          // Creature specific
         if (GetTypeId() != TYPEID_PLAYER)
         {
-            StopMoving();
+            if (isStun && movespline->Finalized())
+            {
+                StopMovingOnCurrentPos();
+            }
+            else
+            {
+                StopMoving();
+            }
         }
 
         if (m_movedByPlayer)
@@ -17842,7 +17866,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
                             GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
 
                         // if charmed two demons the same session, the 2nd gets the 1st one's name
-                        SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr))); // cast can't be helped
+                        SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(GameTime::GetGameTime().count())); // cast can't be helped
                     }
                 }
                 GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
@@ -19079,7 +19103,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     if (player)
     {
-        player->SetFallInformation(time(nullptr), GetPositionZ());
+        player->SetFallInformation(GameTime::GetGameTime().count(), GetPositionZ());
 
         sScriptMgr->AnticheatSetUnderACKmount(player);
         sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
@@ -19161,7 +19185,7 @@ void Unit::BuildMovementPacket(ByteBuffer* data) const
 {
     *data << uint32(GetUnitMovementFlags());            // movement flags
     *data << uint16(GetExtraUnitMovementFlags());       // 2.3.0
-    *data << uint32(World::GetGameTimeMS());                       // time / counter
+    *data << uint32(GameTime::GetGameTimeMS().count());                       // time / counter
     *data << GetPositionX();
     *data << GetPositionY();
     *data << GetPositionZ();

@@ -20,6 +20,7 @@
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SocialMgr.h"
@@ -34,6 +35,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _channelId(channelId),
     _channelDBId(channelDBId),
     _teamId(teamId),
+    _lastSpeakTime(0),
     _name(name),
     _password("")
 {
@@ -95,7 +97,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
 bool Channel::IsBanned(ObjectGuid guid) const
 {
     BannedContainer::const_iterator itr = bannedStore.find(guid);
-    return itr != bannedStore.end() && itr->second > time(nullptr);
+    return itr != bannedStore.end() && itr->second > GameTime::GetGameTime().count();
 }
 
 void Channel::UpdateChannelInDB() const
@@ -208,7 +210,6 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
     PlayerInfo pinfo;
     pinfo.player = guid;
     pinfo.flags = MEMBER_FLAG_NONE;
-    pinfo.lastSpeakTime = 0;
     pinfo.plrPtr = player;
 
     playersStore[guid] = pinfo;
@@ -428,8 +429,8 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (!IsBanned(victim))
         {
-            bannedStore[victim] = time(nullptr) + CHANNEL_BAN_DURATION;
-            AddChannelBanToDB(victim, time(nullptr) + CHANNEL_BAN_DURATION);
+            bannedStore[victim] = GameTime::GetGameTime().count() + CHANNEL_BAN_DURATION;
+            AddChannelBanToDB(victim, GameTime::GetGameTime().count() + CHANNEL_BAN_DURATION);
 
             if (notify)
             {
@@ -811,9 +812,9 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
         else if (playersStore.size() >= 10)
             speakDelay = 5;
 
-        if (!pinfo.IsAllowedToSpeak(speakDelay))
+        if (!IsAllowedToSpeak(speakDelay))
         {
-            std::string timeStr = secsToTimeString(pinfo.lastSpeakTime + speakDelay - sWorld->GetGameTime());
+            std::string timeStr = secsToTimeString(_lastSpeakTime + speakDelay - GameTime::GetGameTime().count());
             if (_channelRights.speakMessage.length() > 0)
                 player->GetSession()->SendNotification("%s", _channelRights.speakMessage.c_str());
             player->GetSession()->SendNotification("You must wait %s before speaking again.", timeStr.c_str());
@@ -828,6 +829,17 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
         ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, _name);
 
     SendToAll(&data, pinfo.IsModerator() ? ObjectGuid::Empty : guid);
+}
+
+bool Channel::IsAllowedToSpeak(uint32 speakDelay)
+{
+    if (_lastSpeakTime + speakDelay <= GameTime::GetGameTime().count())
+    {
+        _lastSpeakTime = GameTime::GetGameTime().count();
+        return true;
+    }
+
+    return false;
 }
 
 void Channel::Invite(Player const* player, std::string const& newname)
