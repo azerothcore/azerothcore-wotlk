@@ -23,6 +23,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "StringConvert.h"
 #include "World.h"
 #include <fstream>
 #include <sstream>
@@ -502,7 +503,7 @@ inline T RegisterNewGuid(T oldGuid, MapType<T, T, Rest...>& guidMap, T guidOffse
 template <typename T, template<class, class, class...> class MapType, class... Rest>
 inline bool ChangeGuid(TableStruct const& ts, std::string& str, std::string const& column, MapType<T, T, Rest...>& guidMap, T guidOffset, bool allowZero = false)
 {
-    T oldGuid(atoull(GetColumn(ts, str, column).c_str()));
+    T oldGuid(*Acore::StringTo<uint64>(GetColumn(ts, str, column)));
     if (allowZero && !oldGuid)
         return true;                                        // not an error
 
