@@ -79,7 +79,7 @@ namespace
                 PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
 
 #ifdef CONFIG_ABORT_INCORRECT_OPTIONS
-                ABORT_MSG("> Core can't start if found incorrect options");
+                ABORT("> Core can't start if found incorrect options");
 #endif
 
                 return;
