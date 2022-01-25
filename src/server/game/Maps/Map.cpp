@@ -3757,6 +3757,51 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeI
     }
 }
 
+void Map::RemoveAurasDueToSpellOnPlayersInZone(uint32 spellId, uint32 zoneId /*= 0*/)
+{
+    Map::PlayerList const& playerList = GetPlayers();
+
+    if (!playerList.IsEmpty())
+    {
+        for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+        {
+            if (Player* player = itr->GetSource())
+            {
+                if (!player->IsGameMaster() && ((zoneId && player->GetZoneId() == zoneId) || !zoneId))
+                {
+                    player->RemoveAurasDueToSpell(spellId);
+                }
+            }
+        }
+    }
+}
+
+void Map::RemoveAurasDueToSpellsOnPlayersInZone(std::list<uint32> spellIds, uint32 zoneId /*= 0*/)
+{
+    if (spellIds.empty())
+    {
+        return;
+    }
+
+    Map::PlayerList const& playerList = GetPlayers();
+    if (!playerList.IsEmpty())
+    {
+        for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+        {
+            if (Player* player = itr->GetSource())
+            {
+                if (!player->IsGameMaster() && ((zoneId && player->GetZoneId() == zoneId) || !zoneId))
+                {
+                    for (auto& spellId : spellIds)
+                    {
+                        player->RemoveAurasDueToSpell(spellId);
+                    }
+                }
+            }
+        }
+    }
+}
+
 /**
  * @brief Check if a given source can reach a specific point following a path
  * and normalize the coords. Use this method for long paths, otherwise use the

@@ -3575,6 +3575,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
+    ApplySpellFix({ 21147 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 4; // 30 yards
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
+    });
+
     //They Must Burn Bomb Aura (self)
     ApplySpellFix({ 36350 }, [](SpellEntry* spellInfo)
     {
