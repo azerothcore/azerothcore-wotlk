@@ -22,6 +22,7 @@
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "Common.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
