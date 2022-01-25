@@ -328,7 +328,6 @@ private:
     uint32 _channelDBId;
     TeamId _teamId;
     ObjectGuid _ownerGUID;
-    uint32 _lastSpeakTime;
     std::string _name;
     std::string _password;
     ChannelRights _channelRights;

@@ -35,7 +35,6 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _channelId(channelId),
     _channelDBId(channelDBId),
     _teamId(teamId),
-    _lastSpeakTime(0),
     _name(name),
     _password("")
 {
