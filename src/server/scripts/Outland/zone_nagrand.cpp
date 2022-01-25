@@ -604,6 +604,38 @@ public:
     }
 };
 
+// 32307 - Plant Warmaul Ogre Banner
+enum PlantWarmaulOgreBanner
+{
+    NPC_SHADOW_COUNCIL_CREDIT_MARKER = 18388
+}
+
+class spell_nag_plant_warmaul_ogre_banner : public SpellScript
+{
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+
+        if (!caster->ToPlayer())
+        {
+            return;
+        }
+
+        caster->RewardPlayerAndGroupAtEvent(NPC_SHADOW_COUNCIL_CREDIT_MARKER, target);
+        if (target->ToCreature())
+        {
+            target->setDeathState(CORPSE);
+            target->RemoveCorpse();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_nag_plant_warmaul_ogre_banner::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_nagrand()
 {
     new npc_maghar_captive();
@@ -612,4 +644,5 @@ void AddSC_nagrand()
     new go_corkis_prison();
     new npc_kurenai_captive();
     new go_warmaul_prison();
+    RegisterSpellScript(spell_nag_plant_warmaul_ogre_banner);
 }

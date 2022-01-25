@@ -1505,17 +1505,53 @@ public:
     }
 };
 
+enum ReturnedSevenfold
+{
+    SPELL_FREYAS_WARD           = 51845,
+    SPELL_SEVENFOLD_RETRIBUTION = 51856,
+    SPELL_DEATHBOLT             = 51855
+};
+
+// 51854 - Deathbolt
+class spell_q12611_deathbolt : public SpellScript
+{
+    PrepareSpellScript(spell_q12611_deathbolt);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FREYAS_WARD,
+                SPELL_SEVENFOLD_RETRIBUTION,
+                SPELL_DEATHBOLT
+            });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+
+        if (target->HasAura(SPELL_FREYAS_WARD))
+            target->CastSpell(caster, SPELL_SEVENFOLD_RETRIBUTION, true);
+        else
+            caster->CastSpell(target, SPELL_DEATHBOLT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12611_deathbolt::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_sholazar_basin()
 {
-    // Ours
     new spell_q12726_song_of_wind_and_water();
     new npc_artruis_the_hearthless();
     new npc_still_at_it_trigger();
     new npc_mcmanus();
     new go_pressure_valve();
     new go_brazier();
-
-    // Theirs
     new npc_vekjik();
     new npc_avatar_of_freya();
     new npc_bushwhacker();
@@ -1526,4 +1562,5 @@ void AddSC_sholazar_basin()
     new spell_q12589_shoot_rjr();
     new npc_vics_flying_machine();
     new spell_shango_tracks();
+    RegisterSpellScript(spell_q12611_deathbolt);
 }
