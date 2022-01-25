@@ -154,8 +154,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     {
         if (GetPlayer()->InBattleground()) // currently in battleground
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
-            err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+        {
+            if (GetPlayer()->isUsingLfg()) // using lfg system
+                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
         else if (!_player->CanJoinToBattleground()) // has deserter debuff
             err = ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
@@ -672,8 +675,11 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     {
         if (GetPlayer()->InBattleground()) // currently in battleground
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
-            err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+        {
+            if (GetPlayer()->isUsingLfg()) // using lfg system
+                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
 
         if (err <= 0)
         {
