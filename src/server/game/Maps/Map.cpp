@@ -3757,6 +3757,19 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeI
     }
 }
 
+void Map::DoForAllPlayers(std::function<void(Player*)> exec)
+{
+    Map::PlayerList const& playerList = GetPlayers();
+
+    for (auto& it : playerList)
+    {
+        if (Player* player = it.GetSource())
+        {
+            exec(player);
+        }
+    }
+}
+
 /**
  * @brief Check if a given source can reach a specific point following a path
  * and normalize the coords. Use this method for long paths, otherwise use the
