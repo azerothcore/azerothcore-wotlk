@@ -278,10 +278,10 @@ void Spell::EffectResurrectNew(SpellEffIndex effIndex)
 
 void DelayMe(float seconds)
 {
-    clock_t startClock = clock();
+    std::clock_t startClock = std::clock();
     float secondsAhead = seconds * CLOCKS_PER_SEC;
     // do nothing until the elapsed time has passed.
-    while (clock() < startClock + secondsAhead);
+    while (std::clock() < startClock + secondsAhead);
     return;
 }
 
