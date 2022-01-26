@@ -59,7 +59,7 @@ public:
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
     static std::pair<PetStable::PetInfo const*, PetSaveMode> GetLoadPetInfo(PetStable const& stable, uint32 petEntry, uint32 petnumber, bool current);
-    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current);
+    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct = 0);
     bool isBeingLoaded() const override { return m_loading; }
     void SavePetToDB(PetSaveMode mode);
     void FillPetInfo(PetStable::PetInfo* petInfo) const;
