@@ -3575,6 +3575,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
+    // Arcane Vacuum
     ApplySpellFix({ 21147 }, [](SpellEntry* spellInfo)
     {
         spellInfo->RangeIndex = 4; // 30 yards

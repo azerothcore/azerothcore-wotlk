@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "TaskScheduler.h"
 
 enum Say
@@ -59,10 +60,20 @@ public:
         void Reset() override
         {
             me->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST_AURA);
-            me->GetMap()->RemoveAurasDueToSpellsOnPlayersInZone({ SPELL_MARK_OF_FROST, SPELL_AURA_OF_FROST, SPELL_CHILL }, me->GetZoneId());
             _scheduler.CancelAll();
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->RestoreFaction();
+            me->GetMap()->DoForAllPlayers([&](Player* p)
+                {
+                    if (p->GetZoneId() == me->GetZoneId())
+                    {
+
+                        p->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
+                        p->RemoveAurasDueToSpell(SPELL_AURA_OF_FROST);
+                        p->RemoveAurasDueToSpell(SPELL_CHILL);
+                        p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
+                    }
+                });
         }
 
         void KilledUnit(Unit* victim) override
@@ -117,7 +128,17 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             me->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
-            me->GetMap()->RemoveAurasDueToSpellsOnPlayersInZone({ SPELL_MARK_OF_FROST, SPELL_AURA_OF_FROST, SPELL_CHILL }, me->GetZoneId());
+            me->GetMap()->DoForAllPlayers([&](Player* p)
+                {
+                    if (p->GetZoneId() == me->GetZoneId())
+                    {
+
+                        p->RemoveAurasDueToSpell(SPELL_MARK_OF_FROST);
+                        p->RemoveAurasDueToSpell(SPELL_AURA_OF_FROST);
+                        p->RemoveAurasDueToSpell(SPELL_CHILL);
+                        p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
+                    }
+                });
         }
 
         void UpdateAI(uint32 diff) override

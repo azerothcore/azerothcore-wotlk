@@ -602,10 +602,6 @@ public:
     void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
     void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
 
-    // Remove auras from certain spell in zone (if 0, it will use all the map)
-    void RemoveAurasDueToSpellOnPlayersInZone(uint32 spellId, uint32 zoneId = 0);
-    void RemoveAurasDueToSpellsOnPlayersInZone(std::list<uint32> spellIds, uint32 zoneId = 0);
-
     // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
     void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);
