@@ -262,7 +262,7 @@ std::vector<uint8> Field::GetBinary() const
 
 void Field::GetBinarySizeChecked(uint8* buf, size_t length) const
 {
-    ASSERT(data.value && (data.length == length), "Expected %zu-byte binary blob, got %sdata (%u bytes) instead", length, data.value ? "" : "no ", data.length);
+    ASSERT(data.value && (data.length == length), "Expected {}-byte binary blob, got {}data ({} bytes) instead", length, data.value ? "" : "no ", data.length);
     memcpy(buf, data.value, length);
 }
 
