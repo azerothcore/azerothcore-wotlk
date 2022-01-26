@@ -16,6 +16,7 @@
  */
 
 #include "CreatureTextMgr.h"
+#include "GameTime.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ScriptMgr.h"
@@ -424,7 +425,7 @@ public:
             return false;
 
         bool summoned = false;
-        time_t now = time(nullptr);
+        time_t now = GameTime::GetGameTime().count();
         for (int32 i = first; i <= last; ++i)
         {
             if (_respawnCooldowns[i] > now)
@@ -460,7 +461,7 @@ public:
     void ClearSlot(PassengerSlots slot)
     {
         _controlledSlots[slot].Clear();
-        _respawnCooldowns[slot] = time(nullptr) + _slotInfo[slot].Cooldown;
+        _respawnCooldowns[slot] = GameTime::GetGameTime().count() + _slotInfo[slot].Cooldown;
     }
 
 private:
@@ -749,7 +750,7 @@ public:
             _controller.ResetSlots(TEAM_HORDE, creature->GetTransport()->ToMotionTransport());
             me->SetRegeneratingHealth(false);
             me->m_CombatDistance = 70.0f;
-            _firstMageCooldown = time(nullptr) + 45;
+            _firstMageCooldown = GameTime::GetGameTime().count() + 45;
             _axethrowersYellCooldown = time_t(0);
             _rocketeersYellCooldown = time_t(0);
             checkTimer = 1000;
@@ -814,7 +815,7 @@ public:
             }
             else if (action == ACTION_SPAWN_MAGE)
             {
-                time_t now = time(nullptr);
+                time_t now = GameTime::GetGameTime().count();
                 if (_firstMageCooldown > now)
                     _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
                 else
@@ -989,10 +990,10 @@ public:
                 case EVENT_CHECK_RIFLEMAN:
                     if (_controller.SummonCreatures(me, SLOT_RIFLEMAN_1, Is25ManRaid() ? SLOT_RIFLEMAN_8 : SLOT_RIFLEMAN_4))
                     {
-                        if (_axethrowersYellCooldown < time(nullptr))
+                        if (_axethrowersYellCooldown < GameTime::GetGameTime().count())
                         {
                             Talk(SAY_SAURFANG_AXETHROWERS);
-                            _axethrowersYellCooldown = time(nullptr) + 5;
+                            _axethrowersYellCooldown = GameTime::GetGameTime().count() + 5;
                         }
                     }
                     _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 1500);
@@ -1000,10 +1001,10 @@ public:
                 case EVENT_CHECK_MORTAR:
                     if (_controller.SummonCreatures(me, SLOT_MORTAR_1, Is25ManRaid() ? SLOT_MORTAR_4 : SLOT_MORTAR_2))
                     {
-                        if (_rocketeersYellCooldown < time(nullptr))
+                        if (_rocketeersYellCooldown < GameTime::GetGameTime().count())
                         {
                             Talk(SAY_SAURFANG_ROCKETEERS);
-                            _rocketeersYellCooldown = time(nullptr) + 5;
+                            _rocketeersYellCooldown = GameTime::GetGameTime().count() + 5;
                         }
                     }
                     _events.ScheduleEvent(EVENT_CHECK_MORTAR, 1500);
@@ -1084,7 +1085,7 @@ public:
             _controller.ResetSlots(TEAM_ALLIANCE, creature->GetTransport()->ToMotionTransport());
             me->SetRegeneratingHealth(false);
             me->m_CombatDistance = 70.0f;
-            _firstMageCooldown = time(nullptr) + 45;
+            _firstMageCooldown = GameTime::GetGameTime().count() + 45;
             _riflemanYellCooldown = time_t(0);
             _mortarYellCooldown = time_t(0);
             checkTimer = 1000;
@@ -1150,7 +1151,7 @@ public:
             }
             else if (action == ACTION_SPAWN_MAGE)
             {
-                time_t now = time(nullptr);
+                time_t now = GameTime::GetGameTime().count();
                 if (_firstMageCooldown > now)
                     _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
                 else
@@ -1328,10 +1329,10 @@ public:
                 case EVENT_CHECK_RIFLEMAN:
                     if (_controller.SummonCreatures(me, SLOT_RIFLEMAN_1, Is25ManRaid() ? SLOT_RIFLEMAN_8 : SLOT_RIFLEMAN_4))
                     {
-                        if (_riflemanYellCooldown < time(nullptr))
+                        if (_riflemanYellCooldown < GameTime::GetGameTime().count())
                         {
                             Talk(SAY_MURADIN_RIFLEMAN);
-                            _riflemanYellCooldown = time(nullptr) + 5;
+                            _riflemanYellCooldown = GameTime::GetGameTime().count() + 5;
                         }
                     }
                     _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 1500);
@@ -1339,10 +1340,10 @@ public:
                 case EVENT_CHECK_MORTAR:
                     if (_controller.SummonCreatures(me, SLOT_MORTAR_1, Is25ManRaid() ? SLOT_MORTAR_4 : SLOT_MORTAR_2))
                     {
-                        if (_mortarYellCooldown < time(nullptr))
+                        if (_mortarYellCooldown < GameTime::GetGameTime().count())
                         {
                             Talk(SAY_MURADIN_MORTAR);
-                            _mortarYellCooldown = time(nullptr) + 5;
+                            _mortarYellCooldown = GameTime::GetGameTime().count() + 5;
                         }
                     }
                     _events.ScheduleEvent(EVENT_CHECK_MORTAR, 1500);

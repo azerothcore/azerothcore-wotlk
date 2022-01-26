@@ -24,7 +24,6 @@
 #include "WorldModel.h"
 #include <G3D/Vector3.h>
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -125,7 +124,7 @@ namespace VMAP
                 instanceTree = iInstanceMapTrees.insert(InstanceTreeMap::value_type(mapId, nullptr)).first;
             }
             else
-                ASSERT(false, "Invalid mapId %u tile [%u, %u] passed to VMapMgr2 after startup in thread unsafe environment",
+                ABORT("Invalid mapId {} tile [{}, {}] passed to VMapMgr2 after startup in thread unsafe environment",
                        mapId, tileX, tileY);
         }
 

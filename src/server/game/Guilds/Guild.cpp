@@ -23,6 +23,7 @@
 #include "Chat.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "GuildMgr.h"
 #include "GuildPackets.h"
 #include "Language.h"
@@ -172,6 +173,9 @@ inline uint32 Guild::LogHolder<Entry>::GetNextGUID()
     return m_nextGUID;
 }
 
+Guild::LogEntry::LogEntry(uint32 guildId, ObjectGuid::LowType guid) :
+    m_guildId(guildId), m_guid(guid), m_timestamp(GameTime::GetGameTime().count()) { }
+
 // EventLogEntry
 void Guild::EventLogEntry::SaveToDB(CharacterDatabaseTransaction trans) const
 {
@@ -201,7 +205,7 @@ void Guild::EventLogEntry::WritePacket(WorldPackets::Guild::GuildEventLogQueryRe
     eventEntry.PlayerGUID = playerGUID;
     eventEntry.OtherGUID = otherGUID;
     eventEntry.TransactionType = uint8(m_eventType);
-    eventEntry.TransactionDate = uint32(::time(nullptr) - m_timestamp);
+    eventEntry.TransactionDate = uint32(GameTime::GetGameTime().count() - m_timestamp);
     eventEntry.RankID = uint8(m_newRank);
     packet.Entry.push_back(eventEntry);
 }
@@ -235,7 +239,7 @@ void Guild::BankEventLogEntry::WritePacket(WorldPackets::Guild::GuildBankLogQuer
 {
     WorldPackets::Guild::GuildBankLogEntry bankLogEntry;
     bankLogEntry.PlayerGUID = ObjectGuid::Create<HighGuid::Player>(m_playerGuid.GetCounter());
-    bankLogEntry.TimeOffset = int32(::time(nullptr) - m_timestamp);
+    bankLogEntry.TimeOffset = int32(GameTime::GetGameTime().count() - m_timestamp);
     bankLogEntry.EntryType = int8(m_eventType);
 
     switch(m_eventType)
@@ -574,6 +578,11 @@ void Guild::Member::ChangeRank(uint8 newRank)
     stmt->setUInt8 (0, newRank);
     stmt->setUInt32(1, m_guid.GetCounter());
     CharacterDatabase.Execute(stmt);
+}
+
+void Guild::Member::UpdateLogoutTime()
+{
+    m_logoutTime = GameTime::GetGameTime().count();
 }
 
 void Guild::Member::SaveToDB(CharacterDatabaseTransaction trans) const
@@ -1050,7 +1059,7 @@ bool Guild::Create(Player* pLeader, std::string_view name)
     m_info = "";
     m_motd = "No message set.";
     m_bankMoney = 0;
-    m_createdDate = sWorld->GetGameTime();
+    m_createdDate = GameTime::GetGameTime().count();
 
     LOG_DEBUG("guild", "GUILD: creating guild [%s] for leader %s (%s)",
               m_name.c_str(), pLeader->GetName().c_str(), m_leaderGuid.ToString().c_str());
@@ -1198,7 +1207,7 @@ void Guild::HandleRoster(WorldSession* session)
         memberData.Guid = member.GetGUID();
         memberData.RankID = int32(member.GetRankId());
         memberData.AreaID = int32(member.GetZoneId());
-        memberData.LastSave = float(float(::time(nullptr) - member.GetLogoutTime()) / DAY);
+        memberData.LastSave = float(float(GameTime::GetGameTime().count() - member.GetLogoutTime()) / DAY);
 
         memberData.Status = member.GetFlags();
         memberData.Level = member.GetLevel();
@@ -1646,9 +1655,9 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
     std::string aux = Acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());
 
-    if (amount > 10 * GOLD)
-        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB DEPOSIT> %s (guild id: %u, members: %u, new amount: %u, leader guid low: %u, char level: %u)\", NOW())",
-            session->GetAccountId(), player->GetGUID().GetCounter(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel());
+    if (amount > 10 * GOLD)     // receiver_acc = Guild id, receiver_name = Guild name
+        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"(guild members: %u, new amount: %u, leader guid low: %u, sender level: %u)\", NOW(), %u)",
+            session->GetAccountId(), player->GetGUID().GetCounter(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), GetId(), GetName().c_str(), amount, GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel(), 3);
 }
 
 bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool repair)
@@ -1690,9 +1699,9 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     _LogBankEvent(trans, repair ? GUILD_BANK_LOG_REPAIR_MONEY : GUILD_BANK_LOG_WITHDRAW_MONEY, uint8(0), player->GetGUID(), amount);
     CharacterDatabase.CommitTransaction(trans);
 
-    if (amount > 10 * GOLD)
-        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB WITHDRAW> %s (guild id: %u, members: %u, new amount: %u, leader guid low: %u, char level: %u)\", NOW())",
-            session->GetAccountId(), player->GetGUID().GetCounter(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel());
+    if (amount > 10 * GOLD)     // sender_acc = 0 (guild has no account), sender_guid = Guild id, sender_name = Guild name
+        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"(guild, members: %u, new amount: %u, leader guid low: %u, withdrawer level: %u)\", NOW(), %u)",
+            0, GetId(), GetName().c_str(), session->GetRemoteAddress().c_str(), session->GetAccountId(), player->GetName().c_str(), amount, GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel(), 4);
 
     std::string aux = Acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());

@@ -18,15 +18,16 @@
 #include "AuctionHouseMgr.h"
 #include "AccountMgr.h"
 #include "AsyncAuctionListing.h"
-#include "AvgDiffTracker.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Item.h"
 #include "Logging/Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "UpdateTime.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include <vector>
@@ -345,7 +346,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, Characte
         uint32 deliveryDelay = sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY);
 
         ByteBuffer timePacker;
-        timePacker.AppendPackedTime(time_t(time(nullptr) + deliveryDelay));
+        timePacker.AppendPackedTime(GameTime::GetGameTime().count() + time_t(deliveryDelay));
 
         if (sendMail) // can be changed in the hook
             MailDraft(auction->BuildAuctionMailSubject(AUCTION_SALE_PENDING),
@@ -393,8 +394,8 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
                     owner_name = gpd_owner->Name;
                     owner_level = gpd_owner->Level;
                 }
-                CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<AH> profit: %ug, bidder: %s %u lvl (guid: %u), seller: %s %u lvl (guid: %u), item %u (%u)\", NOW())",
-                    gpd->AccountId, auction->bidder.GetCounter(), gpd->Name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", owner_accId, owner_name.c_str(), auction->bid, (profit / GOLD), gpd->Name.c_str(), gpd->Level, auction->bidder.GetCounter(), owner_name.c_str(), owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount);
+                CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"profit: %ug, bidder: %s %u lvl (guid: %u), seller: %s %u lvl (guid: %u), item %u (%u)\", NOW(), %u)",
+                    gpd->AccountId, auction->bidder.GetCounter(), gpd->Name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", owner_accId, owner_name.c_str(), auction->bid, (profit / GOLD), gpd->Name.c_str(), gpd->Level, auction->bidder.GetCounter(), owner_name.c_str(), owner_level, auction->owner.GetCounter(), auction->item_template, auction->itemCount, 2);
             }
     }
 }
@@ -650,7 +651,7 @@ bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 
 void AuctionHouseObject::Update()
 {
-    time_t checkTime = sWorld->GetGameTime() + 60;
+    time_t checkTime = GameTime::GetGameTime().count() + 60;
     ///- Handle expired auctions
 
     // If storage is empty, no need to update. next == nullptr in this case.
@@ -743,7 +744,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     }
     else
     {
-        time_t curTime = sWorld->GetGameTime();
+        auto curTime = GameTime::GetGameTime();
 
         int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
         int locdbc_idx = player->GetSession()->GetSessionDbcLocale();
@@ -754,7 +755,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
             {
                 if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
                 {
-                    if (avgDiffTracker.getAverage() >= 30 || getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
+                    if (sWorldUpdateTime.GetAverageUpdateTime() >= 30 || GetMSTimeDiff(GameTime::GetGameTimeMS(), GetTimeMS()) >= 10ms) // pussywizard: stop immediately if diff is high or waiting too long
                     {
                         return false;
                     }
@@ -763,7 +764,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 
             AuctionEntry* Aentry = itr->second;
             // Skip expired auctions
-            if (Aentry->expire_time < curTime)
+            if (Aentry->expire_time < curTime.count())
             {
                 continue;
             }
@@ -948,7 +949,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     data << uint32(bid ? GetAuctionOutBid() : 0);
     // Minimal outbid
     data << uint32(buyout);                                         // Auction->buyout
-    data << uint32((expire_time - time(nullptr)) * IN_MILLISECONDS); // time left
+    data << uint32((expire_time - GameTime::GetGameTime().count()) * IN_MILLISECONDS); // time left
     data << bidder;                                                 // auction->bidder current
     data << uint32(bid);                                            // current bid
     return true;
