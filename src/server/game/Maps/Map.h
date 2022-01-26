@@ -602,11 +602,6 @@ public:
     void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
     void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
 
-    // Cast spell on (alive or not) all players in map, or in a certain zone or area. Excludes GameMasters.
-    void DoCastSpellOnPlayers(uint32 spellId, bool aliveOnly = true, uint32 zoneId = 0, uint32 areaId = 0);
-    // Cast spell on (alive or not) all players in map, or in a list of zones or areas. Excludes GameMasters.
-    void DoCastSpellOnPlayersInZoneOrAreaList(uint32 spellId, std::list<uint32>& zoneOrAreaIds, bool aliveOnly = true);
-
     // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
     void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);

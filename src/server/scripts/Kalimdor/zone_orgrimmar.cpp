@@ -273,8 +273,16 @@ public:
                     {
                         DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        std::list<uint32> areaIds = { AREA_ORGRIMMAR, AREA_CAMP_TAURAJO, AREA_RAZOR_HILL };
-                        me->GetMap()->DoCastSpellOnPlayersInZoneOrAreaList(SPELL_WARCHIEF_BLESSING, areaIds);
+                        me->GetMap()->DoForAllPlayers([&](Player* p)
+                            {
+                                if (p->IsAlive() && !p->IsGameMaster())
+                                {
+                                    if (p->GetAreaId() == AREA_ORGRIMMAR || p->GetAreaId() == AREA_RAZOR_HILL || p->GetAreaId() == AREA_CROSSROADS || p->GetAreaId() == AREA_CAMP_TAURAJO)
+                                    {
+                                        p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
+                                    }
+                                }
+                            });
                     });
             }
         }

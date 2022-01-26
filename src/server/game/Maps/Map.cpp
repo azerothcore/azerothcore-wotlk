@@ -3756,60 +3756,6 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeI
     }
 }
 
-void Map::DoCastSpellOnPlayers(uint32 spellId, bool aliveOnly /*= true*/, uint32 zoneId /*= 0*/, uint32 areaId /*= 0*/)
-{
-    Map::PlayerList const& playerList = GetPlayers();
-
-    if (!playerList.IsEmpty())
-    {
-        for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-        {
-            if (Player* player = itr->GetSource())
-            {
-                if (((aliveOnly && player->IsAlive()) || !aliveOnly) && !player->IsGameMaster())
-                {
-                    if ((zoneId && player->GetZoneId() == zoneId) || (areaId && player->GetAreaId() == areaId) || (!zoneId && !areaId))
-                    {
-                        player->CastSpell(player, spellId, true);
-                    }
-                }
-            }
-        }
-    }
-}
-
-void Map::DoCastSpellOnPlayersInZoneOrAreaList(uint32 spellId, std::list<uint32>& zoneOrAreaIds, bool aliveOnly /*= true*/)
-{
-    if (zoneOrAreaIds.empty())
-    {
-        DoCastSpellOnPlayers(spellId, aliveOnly);
-    }
-    else
-    {
-        Map::PlayerList const& playerList = GetPlayers();
-
-        if (!playerList.IsEmpty())
-        {
-            for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-            {
-                if (Player* player = itr->GetSource())
-                {
-                    if (((aliveOnly && player->IsAlive()) || !aliveOnly) && !player->IsGameMaster())
-                    {
-                        for (auto& zoneOrAreaId : zoneOrAreaIds)
-                        {
-                            if (player->GetZoneId() == zoneOrAreaId || player->GetAreaId() == zoneOrAreaId)
-                            {
-                                player->CastSpell(player, spellId, true);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 /**
  * @brief Check if a given source can reach a specific point following a path
  * and normalize the coords. Use this method for long paths, otherwise use the
