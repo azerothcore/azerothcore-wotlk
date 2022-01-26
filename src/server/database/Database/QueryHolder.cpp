@@ -37,7 +37,7 @@ bool SQLQueryHolderBase::SetPreparedQueryImpl(size_t index, PreparedStatementBas
 PreparedQueryResult SQLQueryHolderBase::GetPreparedResult(size_t index) const
 {
     // Don't call to this function if the index is of a prepared statement
-    ASSERT(index < m_queries.size(), "Query holder result index out of range, tried to access index " SZFMTD " but there are only " SZFMTD " results",
+    ASSERT(index < m_queries.size(), "Query holder result index out of range, tried to access index {} but there are only {} results",
         index, m_queries.size());
 
     return m_queries[index].second;

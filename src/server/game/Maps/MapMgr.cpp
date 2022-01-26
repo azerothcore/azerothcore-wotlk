@@ -16,7 +16,6 @@
  */
 
 #include "MapMgr.h"
-#include "AvgDiffTracker.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
@@ -252,13 +251,12 @@ void MapMgr::Update(uint32 diff)
     //if (mapUpdateStep == 0)
     {
         if (m_updater.activated())
+        {
             m_updater.schedule_lfg_update(diff);
+        }
         else
         {
-            uint32 startTime = getMSTime();
             sLFGMgr->Update(diff, 1);
-            uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-            lfgDiffTracker.Update(10000 + totalTime); // +10k to mark it was NOT multithreaded
         }
     }
 
