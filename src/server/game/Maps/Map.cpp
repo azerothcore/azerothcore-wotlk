@@ -3759,9 +3759,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeI
 
 void Map::DoForAllPlayers(std::function<void(Player*)> exec)
 {
-    Map::PlayerList const& playerList = GetPlayers();
-
-    for (auto& it : playerList)
+    for (auto const& it : GetPlayers())
     {
         if (Player* player = it.GetSource())
         {
