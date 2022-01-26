@@ -308,7 +308,7 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     data << uint32(m_spellInfo->Id);
     m_caster->SendMessageToSet(&data, true);
 
-    DelayMe(0.5);
+    DelayMe(0.5f);
 
     Unit::DealDamage(m_caster, unitTarget, unitTarget->GetHealth(), nullptr, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 }
