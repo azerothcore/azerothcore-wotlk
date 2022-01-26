@@ -1176,18 +1176,18 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     // Hack for modules
     std::vector<uint32> CustomCreatures;
     std::stringstream stringCreatureIds(sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", ""));
-    
+
     for (std::string id; std::getline(stringCreatureIds, id, ',');) // Process each Creature ID in the string, delimited by the comma - ","
     {
         CustomCreatures.push_back(stoul(id));
     }
-    
+
     for (auto i = 0; i < CustomCreatures.size(); i++)
     {
         if (cInfo->Entry == CustomCreatures[i])
             return;
     }
-    
+
     if (cInfo->GossipMenuId && !(cInfo->npcflag & UNIT_NPC_FLAG_GOSSIP))
     {
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has assigned gossip menu %u, but npcflag does not include UNIT_NPC_FLAG_GOSSIP (1).", cInfo->Entry, cInfo->GossipMenuId);
