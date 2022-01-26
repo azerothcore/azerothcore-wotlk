@@ -1,3 +1,19 @@
+-- DB update 2022_01_26_00 -> 2022_01_26_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_26_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_26_00 2022_01_26_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1643215013369974869'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 -- Fixes Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/7327
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643215013369974869');
 
@@ -53,3 +69,13 @@ INSERT INTO `creature` (`guid`,`id1`,`id2`,`id3`,`map`,`zoneId`,`areaId`,`spawnM
 (61268, 17199, 0, 0, 530, 0, 0, 1, 1, 0, -3417.4426, -12716.594, 16.267937, 2.189768791198730468, 300, 10, 0, 1, 0, 1, 0, 0, 0, '', 0),
 (61269, 17199, 0, 0, 530, 0, 0, 1, 1, 0, -3412.6267, -12687.893, 22.139761, 5.748758792877197265, 300, 10, 0, 1, 0, 1, 0, 0, 0, '', 0),
 (61270, 17199, 0, 0, 530, 0, 0, 1, 1, 0, -3381.6501, -12779.417, 14.582455, 5.741998672485351562, 300, 10, 0, 1, 0, 1, 0, 0, 0, '', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_26_01' WHERE sql_rev = '1643215013369974869';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
