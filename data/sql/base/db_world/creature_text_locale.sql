@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.creature_text_locale
 DROP TABLE IF EXISTS `creature_text_locale`;
 CREATE TABLE IF NOT EXISTS `creature_text_locale` (
-  `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
   `ID` TINYINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,

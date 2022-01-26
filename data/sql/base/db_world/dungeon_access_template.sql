@@ -16,7 +16,7 @@
 DROP TABLE IF EXISTS `dungeon_access_template`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_template` (
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT COMMENT 'The dungeon template ID',
-  `map_id` mediumint(8) unsigned NOT NULL COMMENT 'Map ID from instance_template',
+  `map_id` MEDIUMINT unsigned NOT NULL COMMENT 'Map ID from instance_template',
   `difficulty` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic',
   `min_level` TINYINT unsigned DEFAULT NULL,
   `max_level` TINYINT unsigned DEFAULT NULL,

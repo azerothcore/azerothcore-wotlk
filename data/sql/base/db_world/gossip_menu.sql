@@ -16,7 +16,7 @@
 DROP TABLE IF EXISTS `gossip_menu`;
 CREATE TABLE IF NOT EXISTS `gossip_menu` (
   `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `TextID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `TextID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`MenuID`,`TextID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

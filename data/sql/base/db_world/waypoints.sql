@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.waypoints
 DROP TABLE IF EXISTS `waypoints`;
 CREATE TABLE IF NOT EXISTS `waypoints` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `pointid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `pointid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,

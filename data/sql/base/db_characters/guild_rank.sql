@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `guild_rank` (
   `guildid` INT unsigned NOT NULL DEFAULT 0,
   `rid` TINYINT unsigned NOT NULL,
   `rname` varchar(20) NOT NULL DEFAULT '',
-  `rights` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `rights` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BankMoneyPerDay` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`,`rid`),
   KEY `Idx_rid` (`rid`)

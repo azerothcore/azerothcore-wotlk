@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.gameobject_questender
 DROP TABLE IF EXISTS `gameobject_questender`;
 CREATE TABLE IF NOT EXISTS `gameobject_questender` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

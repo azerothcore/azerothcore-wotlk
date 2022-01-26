@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `game_event` (
   `end_time` timestamp NULL DEFAULT '2000-01-01 14:00:00' COMMENT 'Absolute end date, the event will never start after',
   `occurence` BIGINT unsigned NOT NULL DEFAULT 5184000 COMMENT 'Delay in minutes between occurences of the event',
   `length` BIGINT unsigned NOT NULL DEFAULT 2592000 COMMENT 'Length in minutes of the event',
-  `holiday` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Client side holiday id',
+  `holiday` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Client side holiday id',
   `holidayStage` TINYINT unsigned NOT NULL DEFAULT 0,
   `description` varchar(255) DEFAULT NULL COMMENT 'Description of the event displayed in console',
   `world_event` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT '0 if normal event, 1 if world event',

@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.item_set_names
 DROP TABLE IF EXISTS `item_set_names`;
 CREATE TABLE IF NOT EXISTS `item_set_names` (
-  `entry` mediumint(8) unsigned NOT NULL,
+  `entry` MEDIUMINT unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `InventoryType` TINYINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,

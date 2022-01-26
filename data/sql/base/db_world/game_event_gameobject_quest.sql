@@ -16,8 +16,8 @@
 DROP TABLE IF EXISTS `game_event_gameobject_quest`;
 CREATE TABLE IF NOT EXISTS `game_event_gameobject_quest` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`quest`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

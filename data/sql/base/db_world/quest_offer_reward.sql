@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.quest_offer_reward
 DROP TABLE IF EXISTS `quest_offer_reward`;
 CREATE TABLE IF NOT EXISTS `quest_offer_reward` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Emote1` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Emote2` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Emote3` SMALLINT unsigned NOT NULL DEFAULT 0,

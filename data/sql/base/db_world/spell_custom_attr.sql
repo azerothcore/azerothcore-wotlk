@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.spell_custom_attr
 DROP TABLE IF EXISTS `spell_custom_attr`;
 CREATE TABLE IF NOT EXISTS `spell_custom_attr` (
-  `spell_id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'spell id',
+  `spell_id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'spell id',
   `attributes` INT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellCustomAttributes',
   PRIMARY KEY (`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='SpellInfo custom attributes';

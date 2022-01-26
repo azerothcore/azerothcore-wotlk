@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.spell_target_position
 DROP TABLE IF EXISTS `spell_target_position`;
 CREATE TABLE IF NOT EXISTS `spell_target_position` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
   `EffectIndex` TINYINT unsigned NOT NULL DEFAULT 0,
   `MapID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `PositionX` float NOT NULL DEFAULT 0,

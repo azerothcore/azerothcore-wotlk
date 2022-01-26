@@ -15,14 +15,14 @@
 -- Дамп структуры для таблица acore_world.achievement_reward
 DROP TABLE IF EXISTS `achievement_reward`;
 CREATE TABLE IF NOT EXISTS `achievement_reward` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `TitleA` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `TitleH` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Sender` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `TitleA` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `TitleH` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Sender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Subject` varchar(255) DEFAULT NULL,
   `Body` text DEFAULT NULL,
-  `MailTemplateID` mediumint(8) unsigned DEFAULT 0,
+  `MailTemplateID` MEDIUMINT unsigned DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 

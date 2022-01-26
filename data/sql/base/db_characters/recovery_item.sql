@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `recovery_item`;
 CREATE TABLE IF NOT EXISTS `recovery_item` (
   `Id` INT unsigned NOT NULL AUTO_INCREMENT,
   `Guid` INT unsigned NOT NULL DEFAULT 0,
-  `ItemEntry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ItemEntry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Count` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`Id`),
   KEY `idx_guid` (`Guid`)

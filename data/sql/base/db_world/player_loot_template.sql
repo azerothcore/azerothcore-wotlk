@@ -15,9 +15,9 @@
 -- Дамп структуры для таблица acore_world.player_loot_template
 DROP TABLE IF EXISTS `player_loot_template`;
 CREATE TABLE IF NOT EXISTS `player_loot_template` (
-  `Entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Item` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Reference` mediumint(9) NOT NULL DEFAULT 0,
+  `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Reference` MEDIUMINT NOT NULL DEFAULT 0,
   `Chance` float NOT NULL DEFAULT 100,
   `QuestRequired` TINYINT NOT NULL DEFAULT 0,
   `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,

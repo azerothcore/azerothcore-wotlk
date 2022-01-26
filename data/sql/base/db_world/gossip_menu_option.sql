@@ -17,17 +17,17 @@ DROP TABLE IF EXISTS `gossip_menu_option`;
 CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `OptionID` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `OptionIcon` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `OptionIcon` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `OptionText` text DEFAULT NULL,
-  `OptionBroadcastTextID` mediumint(9) NOT NULL DEFAULT 0,
+  `OptionBroadcastTextID` MEDIUMINT NOT NULL DEFAULT 0,
   `OptionType` TINYINT unsigned NOT NULL DEFAULT 0,
   `OptionNpcFlag` INT unsigned NOT NULL DEFAULT 0,
   `ActionMenuID` INT unsigned NOT NULL DEFAULT 0,
-  `ActionPoiID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ActionPoiID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BoxCoded` TINYINT unsigned NOT NULL DEFAULT 0,
   `BoxMoney` INT unsigned NOT NULL DEFAULT 0,
   `BoxText` text DEFAULT NULL,
-  `BoxBroadcastTextID` mediumint(9) NOT NULL DEFAULT 0,
+  `BoxBroadcastTextID` MEDIUMINT NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`MenuID`,`OptionID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

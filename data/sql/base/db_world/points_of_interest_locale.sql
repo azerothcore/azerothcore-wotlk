@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.points_of_interest_locale
 DROP TABLE IF EXISTS `points_of_interest_locale`;
 CREATE TABLE IF NOT EXISTS `points_of_interest_locale` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `locale` varchar(4) NOT NULL,
   `Name` text DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,

@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.pet_levelstats
 DROP TABLE IF EXISTS `pet_levelstats`;
 CREATE TABLE IF NOT EXISTS `pet_levelstats` (
-  `creature_entry` mediumint(8) unsigned NOT NULL,
+  `creature_entry` MEDIUMINT unsigned NOT NULL,
   `level` TINYINT unsigned NOT NULL,
   `hp` SMALLINT unsigned NOT NULL,
   `mana` SMALLINT unsigned NOT NULL,

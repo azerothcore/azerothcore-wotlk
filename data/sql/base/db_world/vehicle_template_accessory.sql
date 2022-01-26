@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.vehicle_template_accessory
 DROP TABLE IF EXISTS `vehicle_template_accessory`;
 CREATE TABLE IF NOT EXISTS `vehicle_template_accessory` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `accessory_entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `accessory_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `seat_id` TINYINT NOT NULL DEFAULT 0,
   `minion` TINYINT unsigned NOT NULL DEFAULT 0,
   `description` text NOT NULL,

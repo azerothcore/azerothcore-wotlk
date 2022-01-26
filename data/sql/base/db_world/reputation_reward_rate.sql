@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.reputation_reward_rate
 DROP TABLE IF EXISTS `reputation_reward_rate`;
 CREATE TABLE IF NOT EXISTS `reputation_reward_rate` (
-  `faction` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `faction` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `quest_rate` float NOT NULL DEFAULT 1,
   `quest_daily_rate` float NOT NULL DEFAULT 1,
   `quest_weekly_rate` float NOT NULL DEFAULT 1,

@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `game_event_model_equip`;
 CREATE TABLE IF NOT EXISTS `game_event_model_equip` (
   `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
   `guid` INT unsigned NOT NULL DEFAULT 0,
-  `modelid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `modelid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `equipment_id` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

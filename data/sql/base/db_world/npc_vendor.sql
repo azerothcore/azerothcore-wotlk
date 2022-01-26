@@ -15,12 +15,12 @@
 -- Дамп структуры для таблица acore_world.npc_vendor
 DROP TABLE IF EXISTS `npc_vendor`;
 CREATE TABLE IF NOT EXISTS `npc_vendor` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `slot` SMALLINT NOT NULL DEFAULT 0,
-  `item` mediumint(9) NOT NULL DEFAULT 0,
+  `item` MEDIUMINT NOT NULL DEFAULT 0,
   `maxcount` TINYINT unsigned NOT NULL DEFAULT 0,
   `incrtime` INT unsigned NOT NULL DEFAULT 0,
-  `ExtendedCost` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ExtendedCost` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`entry`,`item`,`ExtendedCost`),
   KEY `slot` (`slot`)

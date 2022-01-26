@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `playercreateinfo_spell_custom`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_spell_custom` (
   `racemask` INT unsigned NOT NULL DEFAULT 0,
   `classmask` INT unsigned NOT NULL DEFAULT 0,
-  `Spell` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `Spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`racemask`,`classmask`,`Spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

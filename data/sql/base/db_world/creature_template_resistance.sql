@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.creature_template_resistance
 DROP TABLE IF EXISTS `creature_template_resistance`;
 CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
-  `CreatureID` mediumint(8) unsigned NOT NULL,
+  `CreatureID` MEDIUMINT unsigned NOT NULL,
   `School` TINYINT unsigned NOT NULL,
   `Resistance` SMALLINT DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,

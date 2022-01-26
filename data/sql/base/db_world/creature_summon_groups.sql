@@ -15,10 +15,10 @@
 -- Дамп структуры для таблица acore_world.creature_summon_groups
 DROP TABLE IF EXISTS `creature_summon_groups`;
 CREATE TABLE IF NOT EXISTS `creature_summon_groups` (
-  `summonerId` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `summonerId` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `summonerType` TINYINT unsigned NOT NULL DEFAULT 0,
   `groupId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,

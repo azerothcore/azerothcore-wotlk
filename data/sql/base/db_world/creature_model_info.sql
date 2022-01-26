@@ -15,11 +15,11 @@
 -- Дамп структуры для таблица acore_world.creature_model_info
 DROP TABLE IF EXISTS `creature_model_info`;
 CREATE TABLE IF NOT EXISTS `creature_model_info` (
-  `DisplayID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `DisplayID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BoundingRadius` float NOT NULL DEFAULT 0,
   `CombatReach` float NOT NULL DEFAULT 0,
   `Gender` TINYINT unsigned NOT NULL DEFAULT 2,
-  `DisplayID_Other_Gender` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `DisplayID_Other_Gender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`DisplayID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Creature System (Model related info)';
 

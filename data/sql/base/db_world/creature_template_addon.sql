@@ -15,12 +15,12 @@
 -- Дамп структуры для таблица acore_world.creature_template_addon
 DROP TABLE IF EXISTS `creature_template_addon`;
 CREATE TABLE IF NOT EXISTS `creature_template_addon` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `path_id` INT unsigned NOT NULL DEFAULT 0,
-  `mount` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `mount` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `bytes1` INT unsigned NOT NULL DEFAULT 0,
   `bytes2` INT unsigned NOT NULL DEFAULT 0,
-  `emote` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `emote` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `visibilityDistanceType` TINYINT unsigned NOT NULL DEFAULT 0,
   `auras` text DEFAULT NULL,
   PRIMARY KEY (`entry`)

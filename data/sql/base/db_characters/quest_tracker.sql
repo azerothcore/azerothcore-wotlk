@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_characters.quest_tracker
 DROP TABLE IF EXISTS `quest_tracker`;
 CREATE TABLE IF NOT EXISTS `quest_tracker` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `character_guid` INT unsigned NOT NULL DEFAULT 0,
   `quest_accept_time` datetime NOT NULL,
   `quest_complete_time` datetime DEFAULT NULL,

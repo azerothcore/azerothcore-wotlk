@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.pool_template
 DROP TABLE IF EXISTS `pool_template`;
 CREATE TABLE IF NOT EXISTS `pool_template` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Pool entry',
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Pool entry',
   `max_limit` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Max number of objects (0) is no limit',
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`entry`)

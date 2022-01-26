@@ -15,15 +15,15 @@
 -- Дамп структуры для таблица acore_world.creature_onkill_reputation
 DROP TABLE IF EXISTS `creature_onkill_reputation`;
 CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
-  `creature_id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Creature Identifier',
+  `creature_id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Creature Identifier',
   `RewOnKillRepFaction1` SMALLINT NOT NULL DEFAULT 0,
   `RewOnKillRepFaction2` SMALLINT NOT NULL DEFAULT 0,
   `MaxStanding1` TINYINT NOT NULL DEFAULT 0,
   `IsTeamAward1` TINYINT NOT NULL DEFAULT 0,
-  `RewOnKillRepValue1` mediumint(9) NOT NULL DEFAULT 0,
+  `RewOnKillRepValue1` MEDIUMINT NOT NULL DEFAULT 0,
   `MaxStanding2` TINYINT NOT NULL DEFAULT 0,
   `IsTeamAward2` TINYINT NOT NULL DEFAULT 0,
-  `RewOnKillRepValue2` mediumint(9) NOT NULL DEFAULT 0,
+  `RewOnKillRepValue2` MEDIUMINT NOT NULL DEFAULT 0,
   `TeamDependent` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`creature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Creature OnKill Reputation gain';

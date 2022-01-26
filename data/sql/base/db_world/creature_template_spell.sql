@@ -15,9 +15,9 @@
 -- Дамп структуры для таблица acore_world.creature_template_spell
 DROP TABLE IF EXISTS `creature_template_spell`;
 CREATE TABLE IF NOT EXISTS `creature_template_spell` (
-  `CreatureID` mediumint(8) unsigned NOT NULL,
+  `CreatureID` MEDIUMINT unsigned NOT NULL,
   `Index` TINYINT unsigned NOT NULL DEFAULT 0,
-  `Spell` mediumint(8) unsigned DEFAULT NULL,
+  `Spell` MEDIUMINT unsigned DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`,`Index`),
   CHECK (`Index` >= 0 and `Index` <= 7)

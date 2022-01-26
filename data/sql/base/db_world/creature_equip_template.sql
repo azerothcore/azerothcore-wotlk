@@ -15,11 +15,11 @@
 -- Дамп структуры для таблица acore_world.creature_equip_template
 DROP TABLE IF EXISTS `creature_equip_template`;
 CREATE TABLE IF NOT EXISTS `creature_equip_template` (
-  `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `ID` TINYINT unsigned NOT NULL DEFAULT 1,
-  `ItemID1` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID2` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID3` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ItemID1` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID2` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID3` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

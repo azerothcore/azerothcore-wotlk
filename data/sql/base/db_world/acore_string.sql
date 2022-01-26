@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.acore_string
 DROP TABLE IF EXISTS `acore_string`;
 CREATE TABLE IF NOT EXISTS `acore_string` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `content_default` text NOT NULL,
   `locale_koKR` text DEFAULT NULL,
   `locale_frFR` text DEFAULT NULL,

@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.game_tele
 DROP TABLE IF EXISTS `game_tele`;
 CREATE TABLE IF NOT EXISTS `game_tele` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `id` MEDIUMINT unsigned NOT NULL AUTO_INCREMENT,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,

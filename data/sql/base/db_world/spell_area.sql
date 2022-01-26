@@ -15,12 +15,12 @@
 -- Дамп структуры для таблица acore_world.spell_area
 DROP TABLE IF EXISTS `spell_area`;
 CREATE TABLE IF NOT EXISTS `spell_area` (
-  `spell` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `area` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest_start` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest_end` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `aura_spell` mediumint(9) NOT NULL DEFAULT 0,
-  `racemask` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `area` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest_start` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest_end` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `aura_spell` MEDIUMINT NOT NULL DEFAULT 0,
+  `racemask` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `gender` TINYINT unsigned NOT NULL DEFAULT 2,
   `autocast` TINYINT unsigned NOT NULL DEFAULT 0,
   `quest_start_status` INT NOT NULL DEFAULT 64,

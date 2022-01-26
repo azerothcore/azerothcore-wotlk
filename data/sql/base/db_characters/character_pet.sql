@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `character_pet` (
   `entry` INT unsigned NOT NULL DEFAULT 0,
   `owner` INT unsigned NOT NULL DEFAULT 0,
   `modelid` INT unsigned DEFAULT 0,
-  `CreatedBySpell` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `CreatedBySpell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `PetType` TINYINT unsigned NOT NULL DEFAULT 0,
   `level` SMALLINT unsigned NOT NULL DEFAULT 1,
   `exp` INT unsigned NOT NULL DEFAULT 0,

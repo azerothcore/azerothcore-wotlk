@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.graveyard_zone
 DROP TABLE IF EXISTS `graveyard_zone`;
 CREATE TABLE IF NOT EXISTS `graveyard_zone` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `GhostZone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `GhostZone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Faction` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Comment` text DEFAULT NULL,
   PRIMARY KEY (`ID`,`GhostZone`)

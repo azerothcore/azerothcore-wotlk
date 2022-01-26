@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.spell_linked_spell
 DROP TABLE IF EXISTS `spell_linked_spell`;
 CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
-  `spell_trigger` mediumint(9) NOT NULL,
-  `spell_effect` mediumint(9) NOT NULL DEFAULT 0,
+  `spell_trigger` MEDIUMINT NOT NULL,
+  `spell_effect` MEDIUMINT NOT NULL DEFAULT 0,
   `type` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` text NOT NULL,
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)

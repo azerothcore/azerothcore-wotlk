@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.achievement_reward_locale
 DROP TABLE IF EXISTS `achievement_reward_locale`;
 CREATE TABLE IF NOT EXISTS `achievement_reward_locale` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,
   `Subject` text DEFAULT NULL,
   `Text` text DEFAULT NULL,

@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.quest_request_items
 DROP TABLE IF EXISTS `quest_request_items`;
 CREATE TABLE IF NOT EXISTS `quest_request_items` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `EmoteOnComplete` SMALLINT unsigned NOT NULL DEFAULT 0,
   `EmoteOnIncomplete` SMALLINT unsigned NOT NULL DEFAULT 0,
   `CompletionText` text DEFAULT NULL,

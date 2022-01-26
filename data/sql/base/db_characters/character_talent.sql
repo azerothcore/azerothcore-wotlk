@@ -16,7 +16,7 @@
 DROP TABLE IF EXISTS `character_talent`;
 CREATE TABLE IF NOT EXISTS `character_talent` (
   `guid` INT unsigned NOT NULL,
-  `spell` mediumint(8) unsigned NOT NULL,
+  `spell` MEDIUMINT unsigned NOT NULL,
   `specMask` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

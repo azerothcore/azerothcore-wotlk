@@ -16,7 +16,7 @@
 DROP TABLE IF EXISTS `pool_quest`;
 CREATE TABLE IF NOT EXISTS `pool_quest` (
   `entry` INT unsigned NOT NULL DEFAULT 0,
-  `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `pool_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`entry`),
   KEY `idx_guid` (`entry`)

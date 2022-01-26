@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `dungeon_access_requirements`;
 CREATE TABLE IF NOT EXISTS `dungeon_access_requirements` (
   `dungeon_access_id` TINYINT unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
   `requirement_type` TINYINT unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
-  `requirement_id` mediumint(8) unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
+  `requirement_id` MEDIUMINT unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
   `requirement_note` varchar(255) DEFAULT NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
   `faction` TINYINT unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
   `priority` TINYINT unsigned DEFAULT NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',

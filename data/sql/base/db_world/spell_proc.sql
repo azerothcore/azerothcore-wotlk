@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.spell_proc
 DROP TABLE IF EXISTS `spell_proc`;
 CREATE TABLE IF NOT EXISTS `spell_proc` (
-  `spellId` mediumint(9) NOT NULL DEFAULT 0,
+  `spellId` MEDIUMINT NOT NULL DEFAULT 0,
   `schoolMask` TINYINT NOT NULL DEFAULT 0,
   `spellFamilyName` SMALLINT unsigned NOT NULL DEFAULT 0,
   `spellFamilyMask0` INT unsigned NOT NULL DEFAULT 0,

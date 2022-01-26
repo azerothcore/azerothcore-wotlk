@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.npc_trainer
 DROP TABLE IF EXISTS `npc_trainer`;
 CREATE TABLE IF NOT EXISTS `npc_trainer` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `SpellID` mediumint(9) NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `SpellID` MEDIUMINT NOT NULL DEFAULT 0,
   `MoneyCost` INT unsigned NOT NULL DEFAULT 0,
   `ReqSkillLine` SMALLINT unsigned NOT NULL DEFAULT 0,
   `ReqSkillRank` SMALLINT unsigned NOT NULL DEFAULT 0,

@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.areatrigger_teleport
 DROP TABLE IF EXISTS `areatrigger_teleport`;
 CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Name` text DEFAULT NULL,
   `target_map` SMALLINT unsigned NOT NULL DEFAULT 0,
   `target_position_x` float NOT NULL DEFAULT 0,

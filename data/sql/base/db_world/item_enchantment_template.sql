@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.item_enchantment_template
 DROP TABLE IF EXISTS `item_enchantment_template`;
 CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ench` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ench` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `chance` float NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry`,`ench`),
   CHECK (`chance` >= 0)

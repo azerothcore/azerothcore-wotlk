@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `playercreateinfo_item`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_item` (
   `race` TINYINT unsigned NOT NULL DEFAULT 0,
   `class` TINYINT unsigned NOT NULL DEFAULT 0,
-  `itemid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `itemid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `amount` INT NOT NULL DEFAULT 1,
   `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`race`,`class`,`itemid`),

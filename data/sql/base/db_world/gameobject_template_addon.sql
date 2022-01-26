@@ -15,11 +15,11 @@
 -- Дамп структуры для таблица acore_world.gameobject_template_addon
 DROP TABLE IF EXISTS `gameobject_template_addon`;
 CREATE TABLE IF NOT EXISTS `gameobject_template_addon` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `faction` SMALLINT unsigned NOT NULL DEFAULT 0,
   `flags` INT unsigned NOT NULL DEFAULT 0,
-  `mingold` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `maxgold` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `mingold` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `maxgold` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 

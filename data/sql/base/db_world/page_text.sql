@@ -15,9 +15,9 @@
 -- Дамп структуры для таблица acore_world.page_text
 DROP TABLE IF EXISTS `page_text`;
 CREATE TABLE IF NOT EXISTS `page_text` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Text` longtext NOT NULL,
-  `NextPageID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `NextPageID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Item System';

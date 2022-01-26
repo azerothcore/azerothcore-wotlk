@@ -15,17 +15,17 @@
 -- Дамп структуры для таблица acore_world.creature_text
 DROP TABLE IF EXISTS `creature_text`;
 CREATE TABLE IF NOT EXISTS `creature_text` (
-  `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
   `ID` TINYINT unsigned NOT NULL DEFAULT 0,
   `Text` longtext DEFAULT NULL,
   `Type` TINYINT unsigned NOT NULL DEFAULT 0,
   `Language` TINYINT NOT NULL DEFAULT 0,
   `Probability` float NOT NULL DEFAULT 0,
-  `Emote` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Duration` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Sound` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `BroadcastTextId` mediumint(9) NOT NULL DEFAULT 0,
+  `Emote` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Duration` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Sound` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `BroadcastTextId` MEDIUMINT NOT NULL DEFAULT 0,
   `TextRange` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` varchar(255) DEFAULT '',
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`),

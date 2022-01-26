@@ -15,8 +15,8 @@
 -- Дамп структуры для таблица acore_world.script_waypoint
 DROP TABLE IF EXISTS `script_waypoint`;
 CREATE TABLE IF NOT EXISTS `script_waypoint` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'creature_template entry',
-  `pointid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'creature_template entry',
+  `pointid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `location_x` float NOT NULL DEFAULT 0,
   `location_y` float NOT NULL DEFAULT 0,
   `location_z` float NOT NULL DEFAULT 0,

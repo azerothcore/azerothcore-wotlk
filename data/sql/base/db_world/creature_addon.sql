@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `creature_addon`;
 CREATE TABLE IF NOT EXISTS `creature_addon` (
   `guid` INT unsigned NOT NULL DEFAULT 0,
   `path_id` INT unsigned NOT NULL DEFAULT 0,
-  `mount` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `mount` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `bytes1` INT unsigned NOT NULL DEFAULT 0,
   `bytes2` INT unsigned NOT NULL DEFAULT 0,
   `emote` INT unsigned NOT NULL DEFAULT 0,

@@ -15,7 +15,7 @@
 -- Дамп структуры для таблица acore_world.game_weather
 DROP TABLE IF EXISTS `game_weather`;
 CREATE TABLE IF NOT EXISTS `game_weather` (
-  `zone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `zone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `spring_rain_chance` TINYINT unsigned NOT NULL DEFAULT 25,
   `spring_snow_chance` TINYINT unsigned NOT NULL DEFAULT 25,
   `spring_storm_chance` TINYINT unsigned NOT NULL DEFAULT 25,

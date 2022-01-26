@@ -16,7 +16,7 @@
 DROP TABLE IF EXISTS `game_event_condition`;
 CREATE TABLE IF NOT EXISTS `game_event_condition` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `condition_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `condition_id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `req_num` float DEFAULT 0,
   `max_world_state_field` SMALLINT unsigned NOT NULL DEFAULT 0,
   `done_world_state_field` SMALLINT unsigned NOT NULL DEFAULT 0,
