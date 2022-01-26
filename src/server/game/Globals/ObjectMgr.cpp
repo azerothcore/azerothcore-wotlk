@@ -1182,9 +1182,9 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         CustomCreatures.push_back(stoul(id));
     }
 
-    for (auto i = 0; i < CustomCreatures.size(); ++i)
+    for (std::vector<uint32>::const_iterator itr = CustomCreatures.begin(); itr != CustomCreatures.end(); itr++)
     {
-        if (cInfo->Entry == CustomCreatures[i])
+        if (cInfo->Entry == *itr)
             return;
     }
 
