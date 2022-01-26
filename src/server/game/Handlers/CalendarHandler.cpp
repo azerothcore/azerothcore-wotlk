@@ -442,8 +442,7 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
 
     recvData >> eventId >> inviteId;
     recvData.ReadPackedTime(eventTime);
-    LOG_DEBUG("network", "CMSG_CALENDAR_COPY_EVENT [{}], EventId [" UI64FMTD
-                   "] inviteId [{}] Time: {}", guid.ToString(), eventId, inviteId, eventTime);
+    LOG_DEBUG("network", "CMSG_CALENDAR_COPY_EVENT [{}], EventId [{}] inviteId [{}] Time: {}", guid.ToString(), eventId, inviteId, eventTime);
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
@@ -647,9 +646,8 @@ void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
     uint32 status;
 
     recvData >> eventId >> inviteId >> status;
-    LOG_DEBUG("network", "CMSG_CALENDAR_EVENT_RSVP [{}] EventId ["
-                   UI64FMTD "], InviteId [{}], status {}", guid.ToString(), eventId,
-                   inviteId, status);
+    LOG_DEBUG("network", "CMSG_CALENDAR_EVENT_RSVP [{}] EventId [{}], InviteId [{}], status {}",
+        guid.ToString(), eventId, inviteId, status);
 
     if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(eventId))
     {
@@ -747,9 +745,8 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 
     recvData>> invitee.ReadAsPacked();
     recvData >> eventId >>  inviteId >> ownerInviteId >> rank;
-    LOG_DEBUG("network", "CMSG_CALENDAR_EVENT_MODERATOR_STATUS [{}] EventId ["
-                   UI64FMTD "] ownerInviteId [{}], Invitee ([{}] id: ["
-                   UI64FMTD "], rank {}", guid.ToString(), eventId, ownerInviteId, invitee.ToString(), inviteId, rank);
+    LOG_DEBUG("network", "CMSG_CALENDAR_EVENT_MODERATOR_STATUS [{}] EventId [{}] ownerInviteId [{}], Invitee ([{}] id: [{}], rank {}",
+        guid.ToString(), eventId, ownerInviteId, invitee.ToString(), inviteId, rank);
 
     if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(eventId))
     {
@@ -773,8 +770,7 @@ void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
     ObjectGuid complainGUID;
 
     recvData >> eventId >> complainGUID;
-    LOG_DEBUG("network", "CMSG_CALENDAR_COMPLAIN [{}] EventId ["
-                   UI64FMTD "] guid [{}]", guid.ToString(), eventId, complainGUID.ToString());
+    LOG_DEBUG("network", "CMSG_CALENDAR_COMPLAIN [{}] EventId [{}] guid [{}]", guid.ToString(), eventId, complainGUID.ToString());
 
     // what to do with complains?
 }
