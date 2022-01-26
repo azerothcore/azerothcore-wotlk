@@ -61,12 +61,17 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include <chrono>
+#include <iostream>
+#include <ctime>
 
  // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
+
+using namespace std;
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
@@ -273,6 +278,15 @@ void Spell::EffectResurrectNew(SpellEffIndex effIndex)
     SendResurrectRequest(target);
 }
 
+void DelayMe(float seconds)
+{
+    clock_t startClock = clock();
+    float secondsAhead = seconds * CLOCKS_PER_SEC;
+    // do nothing until the elapsed time has passed.
+    while (clock() < startClock + secondsAhead);
+    return;
+}
+
 void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
@@ -293,6 +307,8 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     data << unitTarget->GetGUID();
     data << uint32(m_spellInfo->Id);
     m_caster->SendMessageToSet(&data, true);
+
+    DelayMe(0.5);
 
     Unit::DealDamage(m_caster, unitTarget, unitTarget->GetHealth(), nullptr, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 }
