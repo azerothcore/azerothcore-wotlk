@@ -1182,7 +1182,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         CustomCreatures.push_back(stoul(id));
     }
 
-    for (auto i = 0; i < CustomCreatures.size(); i++)
+    for (auto i = 0; i < CustomCreatures.size(); ++i)
     {
         if (cInfo->Entry == CustomCreatures[i])
             return;
