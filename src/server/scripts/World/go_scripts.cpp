@@ -43,6 +43,7 @@ EndContentData */
 
 #include "CellImpl.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -295,7 +296,7 @@ public:
             requireSummon = 0;
             int8 count = urand(1, 3);
             for (int8 i = 0; i < count; ++i)
-                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + std::sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
         void OnStateChanged(uint32 state, Unit*  /*unit*/) override
@@ -1414,7 +1415,7 @@ class go_inconspicuous_landmark : public GameObjectScript
 public:
     go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
     {
-        _lastUsedTime = time(nullptr);
+        _lastUsedTime = GameTime::GetGameTime().count();
     }
 
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
@@ -1422,10 +1423,10 @@ public:
         if (player->HasItemCount(ITEM_CUERGOS_KEY))
             return true;
 
-        if (_lastUsedTime > time(nullptr))
+        if (_lastUsedTime > GameTime::GetGameTime().count())
             return true;
 
-        _lastUsedTime = time(nullptr) + MINUTE;
+        _lastUsedTime = GameTime::GetGameTime().count() + MINUTE;
         player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
         return true;
     }
@@ -1890,11 +1891,8 @@ public:
                 {
                 case EVENT_TIME:
                 {
-                    // Get how many times it should ring
-                    time_t t = time(nullptr);
-                    tm local_tm;
                     tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
-                    localtime_r(&t, &local_tm);
+                    tm local_tm = Acore::Time::TimeBreakdown();
                     uint8 _rings = (local_tm.tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
 
@@ -1928,6 +1926,30 @@ public:
     }
 };
 
+/*########
+#### go_duskwither_spire_power_source
+#####*/
+
+enum DuskwitherSpirePowersource
+{
+    NPC_POWER_SOURCE_INVISIBLE_BUNNY = 17984
+};
+
+class go_duskwither_spire_power_source : public GameObjectScript
+{
+public:
+    go_duskwither_spire_power_source() : GameObjectScript("go_duskwither_spire_power_source") {}
+
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    {
+        if (Creature* bunny = go->FindNearestCreature(NPC_POWER_SOURCE_INVISIBLE_BUNNY, 1.0f))
+        {
+            bunny->DespawnOrUnsummon(0ms, 10s);
+        }
+        return false;
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1943,6 +1965,7 @@ void AddSC_go_scripts()
     new go_flames();
     new go_heat();
     new go_bear_trap();
+    new go_duskwither_spire_power_source();
 
     // Theirs
     new go_brewfest_music();
@@ -1973,4 +1996,3 @@ void AddSC_go_scripts()
     new go_veil_skith_cage();
     new go_bells();
 }
-

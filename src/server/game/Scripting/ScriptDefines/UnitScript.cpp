@@ -191,6 +191,18 @@ bool ScriptMgr::IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, By
     return false;
 }
 
+bool ScriptMgr::OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index)
+{
+    auto ret = IsValidBoolScript<UnitScript>([&](UnitScript* script) { return script->OnBuildValuesUpdate(unit, updateType, fieldBuffer, target, index); });
+
+    if (ret && *ret)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void ScriptMgr::OnUnitUpdate(Unit* unit, uint32 diff)
 {
     ExecuteScript<UnitScript>([&](UnitScript* script)

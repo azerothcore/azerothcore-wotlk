@@ -213,7 +213,7 @@ public:
     void LoadQuestOfferReward(Field* fields);
     void LoadQuestTemplateAddon(Field* fields);
 
-    uint32 XPValue(uint8 playerLevel = 0) const;
+    [[nodiscard]] uint32 XPValue(uint8 playerLevel = 0) const;
 
     [[nodiscard]] bool HasFlag(uint32 flag) const { return (Flags & flag) != 0; }
     void SetFlag(uint32 flag) { Flags |= flag; }

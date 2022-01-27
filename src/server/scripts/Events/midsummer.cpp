@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -169,8 +170,11 @@ struct npc_midsummer_torch_target : public ScriptedAI
         for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
         {
             Position pos;
-            pos.Relocate(*itr);
-            posVec.push_back(pos);
+            pos.Relocate(posVec.at(num));
+            me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+            me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
+
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
         }
     }
 
@@ -264,11 +268,9 @@ class spell_midsummer_ribbon_pole : public AuraScript
             else
                 target->CastSpell(target, SPELL_RIBBON_POLE_XP, true);
 
-            if (roll_chance_i(5))
-            {
-                cr->Relocate(cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ() - 6.5f);
-                cr->CastSpell(cr, SPELL_RIBBON_POLE_FIREWORKS, true);
-                cr->Relocate(cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ() + 6.5f);
+                // Achievement
+                if ((GameTime::GetGameTime().count() - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
+                    target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
             }
 
             // Achievement
