@@ -85,28 +85,28 @@ public:
         return t <<= n;
     }
 
-    int CompareTo(BigNumber const& bn) const;
+    [[nodiscard]] int CompareTo(BigNumber const& bn) const;
     bool operator<=(BigNumber const& bn) const { return (CompareTo(bn) <= 0); }
     bool operator==(BigNumber const& bn) const { return (CompareTo(bn) == 0); }
     bool operator>=(BigNumber const& bn) const { return (CompareTo(bn) >= 0); }
     bool operator<(BigNumber const& bn) const { return (CompareTo(bn) < 0); }
     bool operator>(BigNumber const& bn) const { return (CompareTo(bn) > 0); }
 
-    bool IsZero() const;
-    bool IsNegative() const;
+    [[nodiscard]] bool IsZero() const;
+    [[nodiscard]] bool IsNegative() const;
 
-    BigNumber ModExp(BigNumber const& bn1, BigNumber const& bn2) const;
-    BigNumber Exp(BigNumber const&) const;
+    [[nodiscard]] BigNumber ModExp(BigNumber const& bn1, BigNumber const& bn2) const;
+    [[nodiscard]] BigNumber Exp(BigNumber const&) const;
 
-    int32 GetNumBytes() const;
+    [[nodiscard]] int32 GetNumBytes() const;
 
     struct bignum_st* BN() { return _bn; }
-    struct bignum_st const* BN() const { return _bn; }
+    [[nodiscard]] struct bignum_st const* BN() const { return _bn; }
 
-    uint32 AsDword() const;
+    [[nodiscard]] uint32 AsDword() const;
 
     void GetBytes(uint8* buf, size_t bufsize, bool littleEndian = true) const;
-    std::vector<uint8> ToByteVector(int32 minSize = 0, bool littleEndian = true) const;
+    [[nodiscard]] std::vector<uint8> ToByteVector(int32 minSize = 0, bool littleEndian = true) const;
 
     template <std::size_t Size>
     std::array<uint8, Size> ToByteArray(bool littleEndian = true) const
@@ -116,8 +116,8 @@ public:
         return buf;
     }
 
-    std::string AsHexStr() const;
-    std::string AsDecStr() const;
+    [[nodiscard]] std::string AsHexStr() const;
+    [[nodiscard]] std::string AsDecStr() const;
 
 private:
     struct bignum_st* _bn;

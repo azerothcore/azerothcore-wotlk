@@ -26,6 +26,7 @@ EndScriptData */
 #include "BanMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
+#include "GameTime.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -305,7 +306,7 @@ public:
 
             time_t unbanDate = time_t(fields[3].GetUInt32());
             bool active = false;
-            if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= time(nullptr)))
+            if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= GameTime::GetGameTime().count()))
                 active = true;
             bool permanent = (fields[1].GetUInt64() == uint64(0));
             std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
@@ -353,7 +354,7 @@ public:
             Field* fields = result->Fetch();
             time_t unbanDate = time_t(fields[3].GetUInt32());
             bool active = false;
-            if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= time(nullptr)))
+            if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= GameTime::GetGameTime().count()))
                 active = true;
             bool permanent = (fields[1].GetUInt32() == uint32(0));
             std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
@@ -474,9 +475,7 @@ public:
                     Field* fields2 = banInfo->Fetch();
                     do
                     {
-                        time_t timeBan = time_t(fields2[0].GetUInt32());
-                        tm tmBan;
-                        localtime_r(&timeBan, &tmBan);
+                        tm tmBan = Acore::Time::TimeBreakdown(fields2[0].GetUInt32());
 
                         if (fields2[0].GetUInt32() == fields2[1].GetUInt32())
                         {
@@ -486,9 +485,7 @@ public:
                         }
                         else
                         {
-                            time_t timeUnban = time_t(fields2[1].GetUInt32());
-                            tm tmUnban;
-                            localtime_r(&timeUnban, &tmUnban);
+                            tm tmUnban = Acore::Time::TimeBreakdown(fields2[1].GetUInt32());
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                                      accountName.c_str(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                                      tmUnban.tm_year % 100, tmUnban.tm_mon + 1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,
@@ -562,9 +559,7 @@ public:
                     Field* banFields = banInfo->Fetch();
                     do
                     {
-                        time_t timeBan = time_t(banFields[0].GetUInt32());
-                        tm tmBan;
-                        localtime_r(&timeBan, &tmBan);
+                        tm tmBan = Acore::Time::TimeBreakdown(banFields[0].GetUInt32());
 
                         if (banFields[0].GetUInt32() == banFields[1].GetUInt32())
                         {
@@ -574,9 +569,7 @@ public:
                         }
                         else
                         {
-                            time_t timeUnban = time_t(banFields[1].GetUInt32());
-                            tm tmUnban;
-                            localtime_r(&timeUnban, &tmUnban);
+                            tm tmUnban = Acore::Time::TimeBreakdown(banFields[1].GetUInt32());
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                                      char_name.c_str(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                                      tmUnban.tm_year % 100, tmUnban.tm_mon + 1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,
@@ -640,9 +633,7 @@ public:
             {
                 handler->SendSysMessage("-------------------------------------------------------------------------------");
                 Field* fields = result->Fetch();
-                time_t timeBan = time_t(fields[1].GetUInt32());
-                tm tmBan;
-                localtime_r(&timeBan, &tmBan);
+                tm tmBan = Acore::Time::TimeBreakdown(fields[1].GetUInt32());
                 if (fields[1].GetUInt32() == fields[2].GetUInt32())
                 {
                     handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|   permanent  |%-15.15s|%-15.15s|",
@@ -651,9 +642,7 @@ public:
                 }
                 else
                 {
-                    time_t timeUnban = time_t(fields[2].GetUInt32());
-                    tm tmUnban;
-                    localtime_r(&timeUnban, &tmUnban);
+                    tm tmUnban = Acore::Time::TimeBreakdown(fields[2].GetUInt32());
                     handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                              fields[0].GetCString(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                              tmUnban.tm_year % 100, tmUnban.tm_mon + 1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,

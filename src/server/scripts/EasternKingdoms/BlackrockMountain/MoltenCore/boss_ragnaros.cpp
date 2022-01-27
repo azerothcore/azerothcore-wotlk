@@ -137,7 +137,7 @@ public:
                 extraEvents.Reset();
                 extraEvents.SetPhase(PHASE_EMERGED);
                 me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC|UNIT_FLAG_NOT_SELECTABLE);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
             }
@@ -334,9 +334,17 @@ public:
                     }
                     case EVENT_MAGMA_BLAST_MELEE_CHECK:
                     {
+                        if (Unit* target = ObjectAccessor::GetUnit(*me, me->GetTarget()))
+                        {
+                            if (!target->IsAlive())
+                            {
+                                me->SetTarget(ObjectGuid::Empty);
+                            }
+                        }
+
                         if (!IsVictimWithinMeleeRange())
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
                             {
                                 me->AttackerStateUpdate(target);
                                 me->SetTarget(target->GetGUID());
@@ -372,7 +380,7 @@ public:
                     }
                     case EVENT_MIGHT_OF_RAGNAROS:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, [](Unit const* target)
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [](Unit const* target)
                         {
                             return target->IsPlayer() && target->getPowerType() == POWER_MANA;
                         }))
@@ -452,7 +460,7 @@ public:
 
             me->RemoveAurasDueToSpell(SPELL_RAGNA_SUBMERGE_VISUAL);
 
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 AttackStart(target);
             }

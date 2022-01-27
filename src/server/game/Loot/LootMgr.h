@@ -188,7 +188,7 @@ struct QuestItem
     bool    is_looted{false};
 
     QuestItem()
-         {}
+         = default;
 
     QuestItem(uint8 _index, bool _islooted = false)
         : index(_index), is_looted(_islooted) {}
@@ -363,7 +363,7 @@ struct Loot
         loot_type = LOOT_NONE;
     }
 
-    [[nodiscard]] bool empty() const { return items.empty() && quest_items.empty() && gold == 0; }
+    [[nodiscard]] bool empty() const { return items.empty() && gold == 0; }
     [[nodiscard]] bool isLooted() const { return gold == 0 && unlootedCount == 0; }
 
     void NotifyItemRemoved(uint8 lootIndex);
@@ -380,7 +380,7 @@ struct Loot
 
     LootItem* LootItemInSlot(uint32 lootslot, Player* player, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(Player* player) const;
-    bool hasItemForAll() const;
+    [[nodiscard]] bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
     void FillNotNormalLootFor(Player* player);
