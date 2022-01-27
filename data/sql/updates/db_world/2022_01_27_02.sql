@@ -1,3 +1,19 @@
+-- DB update 2022_01_27_01 -> 2022_01_27_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_01_27_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_01_27_01 2022_01_27_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1642743246127125600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642743246127125600');
 /* Teldrassil Creatures - East of Dolanar Northern Wildlife */
 /* Bad creature_addon entry */
@@ -46,3 +62,13 @@ INSERT INTO `creature` (`guid`,`id1`,`id2`,`id3`,`map`,`zoneId`,`areaId`,`spawnM
 (47505, 1998, 0, 0, 1, 0, 0, 1, 1, 0, 9984.2705, 716.6536, 1321.6016, 2.539757966995239257, 360, 20, 0, 1, 0, 1, 0, 0, 0, '', 0), -- .go xyz 9984.2705 716.6536 1321.6016
 (47516, 1998, 0, 0, 1, 0, 0, 1, 1, 0, 9950.124, 718.86523, 1316.5347, 1.26849377155303955, 360, 20, 0, 1, 0, 1, 0, 0, 0, '', 0), -- .go xyz 9950.124 718.86523 1316.5347
 (47518, 1998, 0, 0, 1, 0, 0, 1, 1, 0, 9982.858, 751.40497, 1323.9512, 5.331696033477783203, 360, 20, 0, 1, 0, 1, 0, 0, 0, '', 0); -- .go xyz 9982.858 751.40497 1323.9512
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_01_27_02' WHERE sql_rev = '1642743246127125600';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
