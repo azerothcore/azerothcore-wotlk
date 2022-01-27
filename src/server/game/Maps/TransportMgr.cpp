@@ -452,13 +452,13 @@ void TransportMgr::SpawnContinentTransports()
     if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
     {
         // pussywizard: preload grids for continent static transports
-        result = WorldDatabase.Query("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11");
+        QueryResult result2 = WorldDatabase.Query("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11");
 
-        if (result)
+        if (result2)
         {
             do
             {
-                Field* fields = result->Fetch();
+                Field* fields = result2->Fetch();
                 uint16 mapId = fields[0].GetUInt16();
                 float x = fields[1].GetFloat();
                 float y = fields[2].GetFloat();
@@ -470,7 +470,7 @@ void TransportMgr::SpawnContinentTransports()
                         map->LoadGrid(x, y);
                         ++count;
                     }
-            } while (result->NextRow());
+            } while (result2->NextRow());
         }
 
         LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
