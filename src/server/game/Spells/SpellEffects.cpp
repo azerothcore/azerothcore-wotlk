@@ -28,6 +28,7 @@
 #include "Formulas.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -686,7 +687,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     case 17731:
                     case 69294:
                         {
-                            if( !gameObjTarget || gameObjTarget->GetRespawnTime() > time(nullptr) )
+                            if( !gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime().count() )
                                 return;
 
                             gameObjTarget->SetRespawnTime(10);
@@ -3805,11 +3806,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
-                    case 55693:                                 // Remove Collapsing Cave Aura
-                        if (!unitTarget)
-                            return;
-                        unitTarget->RemoveAurasDueToSpell(m_spellInfo->Effects[effIndex].CalcValue());
-                        break;
                     // Bending Shinbone
                     case 8856:
                         {
@@ -4305,7 +4301,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     }
 
     // Xinef: Set last sanctuary time
-    unitTarget->m_lastSanctuaryTime = World::GetGameTimeMS();
+    unitTarget->m_lastSanctuaryTime = GameTime::GetGameTimeMS().count();
 
     // Vanish allows to remove all threat and cast regular stealth so other spells can be used
     if (m_caster->GetTypeId() == TYPEID_PLAYER
@@ -5079,7 +5075,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 
         // charge changes fall time
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
-            m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
+            m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_caster->GetPositionZ());
 
         ObjectGuid targetGUID = ObjectGuid::Empty;
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
@@ -5224,7 +5220,7 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
 
     // xinef: changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
+        m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_caster->GetPositionZ());
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)
@@ -5379,35 +5375,31 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
 
     Player* player = m_caster->ToPlayer();
     if (!player)
+    {
         return;
+    }
 
-    // Maybe player dismissed dead pet or pet despawned?
-    bool hadPet = true;
-
-    if (!player->GetPet())
+    Pet* pet = player->GetPet();
+    if (!pet)
     {
         // Position passed to SummonPet is irrelevant with current implementation,
         // pet will be relocated without using these coords in Pet::LoadPetFromDB
-        player->SummonPet(0, 0.0f, 0.0f, 0.0f, 0.0f, SUMMON_PET);
-        hadPet = false;
+        player->SummonPet(0, 0.0f, 0.0f, 0.0f, 0.0f, SUMMON_PET, 0s, damage);
+        return;
     }
 
     // TODO: Better to fail Hunter's "Revive Pet" at cast instead of here when casting ends
-    Pet* pet = player->GetPet(); // Attempt to get current pet
-    if (!pet || pet->IsAlive())
-        return;
-
-    // If player did have a pet before reviving, teleport it
-    if (hadPet)
+    if (pet->IsAlive())
     {
-        // Reposition the pet's corpse before reviving so as not to grab aggro
-        // We can use a different, more accurate version of GetClosePoint() since we have a pet
-        float x, y, z; // Will be used later to reposition the pet if we have one
-        player->GetClosePoint(x, y, z, pet->GetCombatReach(), PET_FOLLOW_DIST, pet->GetFollowAngle());
-        pet->NearTeleportTo(x, y, z, player->GetOrientation());
-        pet->Relocate(x, y, z, player->GetOrientation()); // This is needed so SaveStayPosition() will get the proper coords.
+        return;
     }
 
+    // Reposition the pet's corpse before reviving so as not to grab aggro
+    // We can use a different, more accurate version of GetClosePoint() since we have a pet
+    float x, y, z; // Will be used later to reposition the pet if we have one
+    player->GetClosePoint(x, y, z, pet->GetCombatReach(), PET_FOLLOW_DIST, pet->GetFollowAngle());
+    pet->NearTeleportTo(x, y, z, player->GetOrientation());
+    pet->Relocate(x, y, z, player->GetOrientation()); // This is needed so SaveStayPosition() will get the proper coords.
     pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
     pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
     pet->setDeathState(ALIVE);
