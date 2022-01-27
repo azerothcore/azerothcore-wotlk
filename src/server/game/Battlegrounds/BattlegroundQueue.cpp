@@ -161,7 +161,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, PvPDiffi
 
     sScriptMgr->OnAddGroup(this, ginfo, index, leader, grp, bracketEntry, isPremade);
 
-    LOG_DEBUG("bg.battleground", "Adding Group to BattlegroundQueue bgTypeId: %u, bracket_id: %u, index: %u", m_bgTypeId, bracketId, index);
+    LOG_DEBUG("bg.battleground", "Adding Group to BattlegroundQueue bgTypeId: {}, bracket_id: {}, index: {}", m_bgTypeId, bracketId, index);
 
     // pussywizard: store indices at which GroupQueueInfo is in m_QueuedGroups
     ginfo->_bracketId = bracketId;
@@ -1040,7 +1040,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
     uint32 qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);
     auto qTotal = qHorde + qAlliance;
 
-    LOG_DEBUG("bg.battleground", "> Queue status for %s (Lvl: %u to %u) Queued: %u (Need at least %u more)",
+    LOG_DEBUG("bg.battleground", "> Queue status for {} (Lvl: {} to {}) Queued: {} (Need at least {} more)",
         bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers - qTotal);
 
     // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
@@ -1087,7 +1087,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
         Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId);
         if (!bg)
         {
-            LOG_ERROR("bg.arena", "> Not found bg template for bgtype id %u", uint32(ginfo->BgTypeId));
+            LOG_ERROR("bg.arena", "> Not found bg template for bgtype id {}", uint32(ginfo->BgTypeId));
             return;
         }
 
@@ -1105,8 +1105,8 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
         uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
         uint32 qPlayers = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE) + GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);
 
-        LOG_DEBUG("bg.arena", "> Queue status for %s (skirmish %s) (Lvl: %u to %u) Queued: %u (Need at least %u more)",
-            bgName, arenatype.c_str(), q_min_level, q_max_level, qPlayers, playersNeed - qPlayers);
+        LOG_DEBUG("bg.arena", "> Queue status for {} (skirmish {}) (Lvl: {} to {}) Queued: {} (Need at least {} more)",
+            bgName, arenatype, q_min_level, q_max_level, qPlayers, playersNeed - qPlayers);
 
         if (sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY))
         {
