@@ -273,14 +273,6 @@ void Spell::EffectResurrectNew(SpellEffIndex effIndex)
     SendResurrectRequest(target);
 }
 
-void DelayMe(Milliseconds delayMs)
-{
-    SystemTimePoint delay = std::chrono::system_clock::now() + delayMs;
-
-    // do nothing until the elapsed time has passed.
-    while (std::chrono::system_clock::now() < delay);
-}
-
 void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
