@@ -506,11 +506,27 @@ enum Skirmisher
 {
     // Quest
     QUEST_OVERWHELMED           = 12288,
+
     // Spell
     SPELL_RENEW_SKIRMISHER      = 48812,
     SPELL_KILL_CREDIT           = 48813,
+    SPELL_CLEAVE                = 15496,
+    SPELL_HAMSTRING             = 9080,
+    SPELL_MORTAL_STRIKE         = 32736,
+
     // Text
-    SAY_RANDOM                  = 0
+    SAY_RANDOM                  = 0,
+
+    // EVENT
+    EVENT_WOUNDED_MOVE          = 1,
+    EVENT_CLEAVE                = 2,
+    EVENT_HAMSTRING             = 3,
+    EVENT_MORTAL_STRIKE         = 4,
+
+    // Waypoints
+    WOUNDED_MOVE_1              = 274630,
+    WOUNDED_MOVE_2              = 274631,
+    WOUNDED_MOVE_3              = 274632
 };
 
 class npc_wounded_skirmisher : public CreatureScript
@@ -520,52 +536,197 @@ public:
 
     struct npc_wounded_skirmisherAI : public ScriptedAI
     {
-        npc_wounded_skirmisherAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_wounded_skirmisherAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetReactState(REACT_DEFENSIVE);
+        }
 
         void Reset() override
         {
-            _despawnTimer = 5000;
-            _playerGUID.Clear();
+            Initialize();
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void MovementInform(uint32, uint32 id) override
+        void EnterCombat(Unit* /*who*/) override
         {
-            if (id == 1)
-                me->DespawnOrUnsummon(_despawnTimer);
+            _events.ScheduleEvent(EVENT_CLEAVE, urand(1000, 7000));
+            _events.ScheduleEvent(EVENT_HAMSTRING, urand(5000, 12000));
+            _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 10000));
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_RENEW_SKIRMISHER && caster->GetTypeId() == TYPEID_PLAYER
-                    && caster->ToPlayer()->GetQuestStatus(QUEST_OVERWHELMED) == QUEST_STATUS_INCOMPLETE)
+            Player* playerCaster = caster->ToPlayer();
+            if (!playerCaster)
+                return;
+
+            if (spell->Id == SPELL_RENEW_SKIRMISHER && playerCaster->GetQuestStatus(QUEST_OVERWHELMED) == QUEST_STATUS_INCOMPLETE)
             {
-                DoCast(caster, SPELL_KILL_CREDIT);
+                me->SetFacingToObject(caster);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 Talk(SAY_RANDOM, caster);
-                if (me->IsStandState())
-                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 7, me->GetPositionY() + 7, me->GetPositionZ());
-                else
+                DoCast(caster, SPELL_KILL_CREDIT);
+
+                if (!me->IsStandState())
                 {
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->DespawnOrUnsummon(_despawnTimer);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                    _events.ScheduleEvent(EVENT_WOUNDED_MOVE, 3000);
                 }
             }
         }
 
-        void UpdateAI(uint32 /*diff*/) override
+        void UpdateAI(uint32 diff) override
         {
+            _events.Update(diff);
+
+            switch (_events.ExecuteEvent())
+            {
+                case EVENT_WOUNDED_MOVE:
+                    if (me->GetPositionY() == -2835.11f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                        me->DespawnOrUnsummon(20000);
+                    }
+                    if (me->GetPositionY() == -2981.89f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                        me->DespawnOrUnsummon(18000);
+                    }
+                    if (me->GetPositionY() == -2934.44f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                        me->DespawnOrUnsummon(9000);
+                    }
+                    if (me->GetPositionY() == -3020.99f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                        me->DespawnOrUnsummon(22000);
+                    }
+                    if (me->GetPositionY() == -2964.73f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
+                        me->DespawnOrUnsummon(15000);
+                    }
+                    if (me->GetPositionY() == -2940.50f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                        me->DespawnOrUnsummon(20000);
+                    }
+                    if (me->GetPositionY() == -2847.93f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                        me->DespawnOrUnsummon(30000);
+                    }
+                    if (me->GetPositionY() == -2835.31f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                        me->DespawnOrUnsummon(27000);
+                    }
+                    if (me->GetPositionY() == -2822.20f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                        me->DespawnOrUnsummon(25000);
+                    }
+                    if (me->GetPositionY() == -2846.31f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
+                        me->DespawnOrUnsummon(21000);
+                    }
+                    if (me->GetPositionY() == -2897.23f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                        me->DespawnOrUnsummon(15000);
+                    }
+                    if (me->GetPositionY() == -2886.01f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                        me->DespawnOrUnsummon(25000);
+                    }
+                    if (me->GetPositionY() == -2906.89f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
+                        me->DespawnOrUnsummon(25000);
+                    }
+                    if (me->GetPositionY() == -3048.94f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
+                        me->DespawnOrUnsummon(30000);
+                    }
+                    if (me->GetPositionY() == -2961.08f)
+                    {
+                        me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
+                        me->DespawnOrUnsummon(25000);
+                    }
+                    break;
+                case EVENT_CLEAVE:
+                    me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
+                    _events.RepeatEvent(urand(7000, 15000));
+                    break;
+                case EVENT_HAMSTRING:
+                    me->CastSpell(me->GetVictim(), SPELL_HAMSTRING, false);
+                    _events.RepeatEvent(urand(9000, 15000));
+                    break;
+                case EVENT_MORTAL_STRIKE:
+                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
+                    _events.RepeatEvent(urand(10000, 15000));
+                    break;
+            }
+
             if (!UpdateVictim())
                 return;
 
             DoMeleeAttackIfReady();
         }
+
     private:
-        ObjectGuid _playerGUID;
-        uint32 _despawnTimer;
+        EventMap _events;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_wounded_skirmisherAI(creature);
+    }
+};
+
+enum renewskirmisher
+{
+    NPC_WOUNDED_SKIRMISHER = 27463
+};
+
+class spell_renew_skirmisher : public SpellScriptLoader
+{
+public:
+    spell_renew_skirmisher() : SpellScriptLoader("spell_renew_skirmisher") { }
+
+    class spell_renew_skirmisher_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_renew_skirmisher_SpellScript);
+
+        SpellCastResult CheckRequirement()
+        {
+            if (Unit* caster = GetCaster())
+                if (Creature* wounded = caster->FindNearestCreature(NPC_WOUNDED_SKIRMISHER, 5.0f))
+                    if (!wounded->IsInCombat())
+                        return SPELL_CAST_OK;
+
+            return SPELL_FAILED_CASTER_AURASTATE;
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_renew_skirmisher_SpellScript::CheckRequirement);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_renew_skirmisher_SpellScript();
     }
 };
 
@@ -1164,6 +1325,7 @@ void AddSC_grizzly_hills()
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();
     new npc_wounded_skirmisher();
+    new spell_renew_skirmisher();
     new npc_venture_co_straggler();
     new npc_lake_frog();
     new spell_shredder_delivery();
