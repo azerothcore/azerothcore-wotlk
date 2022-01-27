@@ -68,13 +68,13 @@ void TransportMgr::LoadTransportTemplates()
         GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
         if (goInfo == nullptr)
         {
-            LOG_ERROR("entities.transport", "Transport %u has no associated GameObjectTemplate from `gameobject_template` , skipped.", entry);
+            LOG_ERROR("entities.transport", "Transport {} has no associated GameObjectTemplate from `gameobject_template` , skipped.", entry);
             continue;
         }
 
         if (goInfo->moTransport.taxiPathId >= sTaxiPathNodesByPath.size())
         {
-            LOG_ERROR("entities.transport", "Transport %u (name: %s) has an invalid path specified in `gameobject_template`.`data0` (%u) field, skipped.", entry, goInfo->name.c_str(), goInfo->moTransport.taxiPathId);
+            LOG_ERROR("entities.transport", "Transport {} (name: {}) has an invalid path specified in `gameobject_template`.`data0` ({}) field, skipped.", entry, goInfo->name, goInfo->moTransport.taxiPathId);
             continue;
         }
 
@@ -90,7 +90,7 @@ void TransportMgr::LoadTransportTemplates()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u transport templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} transport templates in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -372,7 +372,7 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType
     TransportTemplate const* tInfo = GetTransportTemplate(entry);
     if (!tInfo)
     {
-        LOG_ERROR("entities.transport", "Transport %u will not be loaded, `transport_template` missing", entry);
+        LOG_ERROR("entities.transport", "Transport {} will not be loaded, `transport_template` missing", entry);
         return nullptr;
     }
 
@@ -400,7 +400,7 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType
     {
         if (mapEntry->Instanceable() != tInfo->inInstance)
         {
-            LOG_ERROR("entities.transport", "Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName().c_str(), mapId);
+            LOG_ERROR("entities.transport", "Transport {} (name: {}) attempted creation in instance map (id: {}) but it is not an instanced transport!", entry, trans->GetName(), mapId);
             delete trans;
             return nullptr;
         }
@@ -445,7 +445,7 @@ void TransportMgr::SpawnContinentTransports()
             } while (result->NextRow());
         }
 
-        LOG_INFO("server.loading", ">> Spawned %u continent motion transports in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Spawned {} continent motion transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
 
         if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
@@ -473,7 +473,7 @@ void TransportMgr::SpawnContinentTransports()
                 } while (result->NextRow());
             }
 
-            LOG_INFO("server.loading", ">> Preloaded grids for %u continent static transports in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         }
     }
 }

@@ -126,7 +126,7 @@ public:
 
             if (!result)
             {
-                LOG_ERROR("misc", "Account %u not found in login database when processing .account 2fa setup command.", accountId);
+                LOG_ERROR("misc", "Account {} not found in login database when processing .account 2fa setup command.", accountId);
                 handler->SendSysMessage(LANG_UNKNOWN_ERROR);
                 handler->SetSentErrorMessage(true);
                 return false;
@@ -201,7 +201,7 @@ public:
 
             if (!result)
             {
-                LOG_ERROR("misc", "Account %u not found in login database when processing .account 2fa setup command.", accountId);
+                LOG_ERROR("misc", "Account {} not found in login database when processing .account 2fa setup command.", accountId);
                 handler->SendSysMessage(LANG_UNKNOWN_ERROR);
                 handler->SetSentErrorMessage(true);
                 return false;
@@ -225,7 +225,7 @@ public:
                 bool success = Acore::Crypto::AEDecrypt<Acore::Crypto::AES>(secret, *masterKey);
                 if (!success)
                 {
-                    LOG_ERROR("misc", "Account %u has invalid ciphertext in TOTP token.", accountId);
+                    LOG_ERROR("misc", "Account {} has invalid ciphertext in TOTP token.", accountId);
                     handler->SendSysMessage(LANG_UNKNOWN_ERROR);
                     handler->SetSentErrorMessage(true);
                     return false;
@@ -263,8 +263,8 @@ public:
 
         uint32 accountId = handler->GetSession()->GetAccountId();
 
-        int expansion = atoi(exp); //get int anyway (0 if error)
-        if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
+        auto expansion = Acore::StringTo<uint8>(exp); //get int anyway (0 if error)
+        if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
         {
             handler->SendSysMessage(LANG_IMPROPER_VALUE);
             handler->SetSentErrorMessage(true);
@@ -273,12 +273,12 @@ public:
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
-        stmt->setUInt8(0, uint8(expansion));
+        stmt->setUInt8(0, *expansion);
         stmt->setUInt32(1, accountId);
 
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_ACCOUNT_ADDON, expansion);
+        handler->PSendSysMessage(LANG_ACCOUNT_ADDON, *expansion);
         return true;
     }
 
@@ -301,9 +301,9 @@ public:
                 handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
                 if (handler->GetSession())
                 {
-                    LOG_DEBUG("warden", "Account: %d (IP: %s) Character:[%s] (%s) Change Password.",
-                                   handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress().c_str(),
-                                   handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUID().ToString().c_str());
+                    LOG_DEBUG("warden", "Account: {} (IP: {}) Character:[{}] ({}) Change Password.",
+                                   handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress(),
+                                   handler->GetSession()->GetPlayer()->GetName(), handler->GetSession()->GetPlayer()->GetGUID().ToString());
                 }
                 break;
             case AOR_NAME_TOO_LONG:
@@ -756,18 +756,18 @@ public:
                 handler->HasLowerSecurityAccount(nullptr, accountId, true))
             return false;
 
-        int expansion = atoi(exp); //get int anyway (0 if error)
-        if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
+        auto expansion = Acore::StringTo<uint8>(exp); //get int anyway (0 if error)
+        if (!expansion || *expansion > sWorld->getIntConfig(CONFIG_EXPANSION))
             return false;
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
-        stmt->setUInt8(0, expansion);
+        stmt->setUInt8(0, *expansion);
         stmt->setUInt32(1, accountId);
 
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName.c_str(), accountId, expansion);
+        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName.c_str(), accountId, *expansion);
         return true;
     }
 
@@ -809,7 +809,7 @@ public:
         }
 
         // Check for invalid specified GM level.
-        gm = (isAccountNameGiven) ? atoi(arg2) : atoi(arg1);
+        gm = (isAccountNameGiven) ? Acore::StringTo<int32>(arg2).value_or(0) : Acore::StringTo<int32>(arg1).value_or(0);
         if (gm > SEC_CONSOLE)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
@@ -819,7 +819,7 @@ public:
 
         // handler->getSession() == nullptr only for console
         targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->getSelectedPlayer()->GetSession()->GetAccountId();
-        int32 gmRealmID = (isAccountNameGiven) ? atoi(arg3) : atoi(arg2);
+        int32 gmRealmID = (isAccountNameGiven) ? Acore::StringTo<int32>(arg3).value_or(0) : Acore::StringTo<int32>(arg2).value_or(0);
         uint32 playerSecurity;
         if (handler->GetSession())
             playerSecurity = AccountMgr::GetSecurity(handler->GetSession()->GetAccountId(), gmRealmID);
