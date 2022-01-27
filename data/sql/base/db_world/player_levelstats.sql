@@ -1268,7 +1268,7 @@ INSERT INTO `player_levelstats` (`race`, `class`, `level`, `str`, `agi`, `sta`, 
 	(11, 8, 17, 23, 20, 24, 47, 46),
 	(11, 8, 18, 23, 20, 24, 49, 48),
 	(11, 8, 19, 23, 20, 25, 50, 49),
-	(11, 8, 20, 23, 21, 25, 52, 51)
+	(11, 8, 20, 23, 21, 25, 52, 51);
 	
 /*!40000 ALTER TABLE `player_levelstats` ENABLE KEYS */;
 
