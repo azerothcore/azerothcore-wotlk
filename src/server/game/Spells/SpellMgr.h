@@ -278,6 +278,7 @@ struct SpellProcEventEntry
     flag96      spellFamilyMask;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
     uint32      procFlags;                                  // bitmask for matching proc event
     uint32      procEx;                                     // proc Extend info (see ProcFlagsEx)
+    uint32      procPhase;                                  // proc phase (see ProcFlagsSpellPhase)
     float       ppmRate;                                    // for melee (ranged?) damage spells - proc rate per minute. if zero, falls back to flat chance from Spell.dbc
     float       customChance;                               // Owerride chance (in most cases for debug only)
     uint32      cooldown;                                   // hidden cooldown used for some spell proc events, applied to _triggered_spell_
