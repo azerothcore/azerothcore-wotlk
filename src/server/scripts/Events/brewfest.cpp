@@ -18,6 +18,7 @@
 #include "CellImpl.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
@@ -99,7 +100,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
                 {
                     if (Aura* aur = player->GetAura(SPELL_RAM_AURA))
                     {
-                        int32 diff = aur->GetApplyTime() - (time(nullptr) - (HOUR * 18) + spellCooldown);
+                        int32 diff = aur->GetApplyTime() - (GameTime::GetGameTime().count() - (HOUR * 18) + spellCooldown);
                         if (diff > 10) // aura applied later
                             return;
 
