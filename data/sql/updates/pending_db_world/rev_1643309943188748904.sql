@@ -8,10 +8,10 @@ UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=13722 AND `I
 
 -- delete and insert for rerun locking the loot to skill id requirement for loot
 -- none currently exist in acdb
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=4 AND `SourceGroup`IN ( 173232, 173234, 176325, 176327);
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=4 AND `SourceGroup`IN ( 11524, 11525, 13721, 13722);
 INSERT INTO `conditions` SET 
     `SourceTypeOrReferenceId`=4, -- gameobject loot template
-    `SourceGroup`=176327, -- gameobject Blacksmithing Plans
+    `SourceGroup`=13722, -- gameobject Blacksmithing Plans loot id
     `SourceEntry`=12830, -- item id Plans Coruption
     `SourceId`=0,
     `ElseGroup`=0,
@@ -27,7 +27,7 @@ INSERT INTO `conditions` SET
 	
 INSERT INTO `conditions` SET 
     `SourceTypeOrReferenceId`=4, -- gameobject loot template
-    `SourceGroup`=176325, -- gameobject Blacksmithing Plans
+    `SourceGroup`=13721, -- gameobject Blacksmithing Plans loot id
     `SourceEntry`=12827, -- item id Plans Serenity
     `SourceId`=0,
     `ElseGroup`=0,
@@ -43,7 +43,7 @@ INSERT INTO `conditions` SET
 	
 INSERT INTO `conditions` SET 
     `SourceTypeOrReferenceId`=4, -- gameobject loot template
-    `SourceGroup`=173232, -- gameobject Blacksmithing Plans
+    `SourceGroup`=11524, -- gameobject Blacksmithing Plans loot id
     `SourceEntry`=11614, -- item id Plans Dark Iron Mail
     `SourceId`=0,
     `ElseGroup`=0,
@@ -59,7 +59,7 @@ INSERT INTO `conditions` SET
 		
 INSERT INTO `conditions` SET 
     `SourceTypeOrReferenceId`=4, -- gameobject loot template
-    `SourceGroup`=173234, -- gameobject Blacksmithing Plans
+    `SourceGroup`=11525, -- gameobject Blacksmithing Plans loot id
     `SourceEntry`=11615, -- item id Plans Dark Iron Shoulder
     `SourceId`=0,
     `ElseGroup`=0,
