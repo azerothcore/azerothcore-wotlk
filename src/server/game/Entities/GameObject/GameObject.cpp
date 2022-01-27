@@ -329,7 +329,31 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     // GAMEOBJECT_BYTES_1, index at 0, 1, 2 and 3
     SetGoType(GameobjectTypes(goinfo->type));
-    SetGoState(go_state);
+
+    if (isInstanceGameobject())
+    {
+        if (hasStateSavedOnInstance())
+        {
+            switch (getInstanceSavedState())
+            {
+            case 0:
+                SetGoState(GO_STATE_ACTIVE);
+                break;
+            case 1:
+                SetGoState(GO_STATE_READY);
+                break;
+            case 2:
+                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                break;
+            }
+            
+        }
+    }
+    else
+    {
+        SetGoState(go_state);
+    }
+
     SetGoArtKit(artKit);
 
     SetDisplayId(goinfo->displayId);
@@ -2415,19 +2439,16 @@ void GameObject::SetGoState(GOState state)
      * save it's state on the database to be loaded properly
      * on server restart or crash.
      */
-    if (auto* map = FindMap())
+    if (isInstanceGameobject())
     {
-        if (map->IsDungeon() || map->IsRaid())
+        // Save the gameobject state on the Database
+        if (!hasStateSavedOnInstance())
         {
-            // Save the gameobject state on the Database
-            if (!hasStateSavedOnInstance())
-            {
-                saveInstanceData(&state);
-            }
-            else
-            {
-                updateInstanceData(&state);
-            }
+            saveInstanceData(&state);
+        }
+        else
+        {
+            updateInstanceData(&state);
         }
     }
 }
@@ -2467,6 +2488,26 @@ bool GameObject::hasStateSavedOnInstance()
 
     // Found gameobject on the database saved
     return true;
+}
+
+int8 GameObject::getInstanceSavedState()
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
+    stmt->setUInt32(0, GetInstanceId());
+    stmt->setUInt32(1, GetEntry());
+    stmt->setUInt32(2, GetSpawnId());
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+    {
+        // There's no gameobject with this GUID saved on the DB
+        return 0;
+    }
+
+    Field* fields = result->Fetch();
+
+    // Found gameobject on the database saved
+    return fields[0].GetInt8();
 }
 
 void GameObject::SetDisplayId(uint32 displayid)
