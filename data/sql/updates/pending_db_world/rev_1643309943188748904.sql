@@ -75,3 +75,4 @@ INSERT INTO `conditions` SET
     `ErrorTextId`=0,
     `ScriptName`='',
     `Comment`="Blacksmithing Plans - Plans Dark Iron Shoulder while having Black Smith skill 285";
+	
