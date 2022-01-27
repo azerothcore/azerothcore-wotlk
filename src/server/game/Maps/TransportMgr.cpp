@@ -430,7 +430,6 @@ void TransportMgr::SpawnContinentTransports()
     if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT))
     {
 
-
         if (result)
         {
             do
