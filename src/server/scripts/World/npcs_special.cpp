@@ -42,6 +42,7 @@ EndContentData */
 #include "CreatureTextMgr.h"
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
