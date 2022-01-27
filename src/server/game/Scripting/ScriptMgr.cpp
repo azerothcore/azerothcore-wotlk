@@ -16,11 +16,11 @@
  */
 
 #include "ScriptMgr.h"
+#include "InstanceScript.h"
+#include "ScriptSystem.h"
+#include "SmartAI.h"
 #include "SpellMgr.h"
 #include "UnitAI.h"
-#include "SmartAI.h"
-#include "ScriptSystem.h"
-#include "InstanceScript.h"
 
 namespace
 {
@@ -151,7 +151,7 @@ void ScriptMgr::LoadDatabase()
 
     CheckIfScriptsInDatabaseExist();
 
-    LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} C++ scripts in {} ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -195,7 +195,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<GroupScript>::GetScriptById(sid) &&
                 !ScriptRegistry<DatabaseScript>::GetScriptById(sid))
                 {
-                    LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
+                    LOG_ERROR("sql.sql", "Script named '{}' is assigned in the database, but has no code!", scriptName);
                 }
         }
     }

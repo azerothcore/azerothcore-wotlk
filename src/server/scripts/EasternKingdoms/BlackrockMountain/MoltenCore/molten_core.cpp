@@ -190,6 +190,7 @@ public:
             else
             {
                 Unit::Kill(creatureTarget, creatureTarget);
+                creatureTarget->DespawnOrUnsummon(14000);
             }
         }
 
