@@ -55,14 +55,6 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (@NPC,0,@REFGREY0,20,0,1,0,1,1, 'Ragged Timber Wolf - (Grey 1-5 EXP 0 ReferenceTable)'),
 (@NPC,750,0,90,1,1,0,1,1, 'Ragged Timber Wolf - Tough Wolf Meat');
 
--- Update loot for Entry 1503 : Wretched Zombie
-SET @NPC := 1503;
-DELETE FROM `creature_loot_template` WHERE `Entry`=@NPC;
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(@NPC,0,@REFFOOD2,30,0,1,0,1,1, 'Wretched Zombie - (Food 1-5 EXP 0 ReferenceTable)'),
-(@NPC,0,@REFGREY0,30,0,1,0,1,1, 'Wretched Zombie - (Grey 1-5 EXP 0 ReferenceTable)'),
-(@NPC,0,11111,.2,0,1,0,1,1, 'Wretched Zombie - (Small Pouch ReferenceTable)');
-
 -- Update loot for Entry 1509 : Ragged Scavenger
 SET @NPC := 1509;
 DELETE FROM `creature_loot_template` WHERE `Entry`=@NPC;
