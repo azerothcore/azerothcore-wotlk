@@ -67,6 +67,8 @@ class CreatureAI : public UnitAI
 protected:
     Creature* const me;
 
+    EventMap events;
+
     bool UpdateVictim();
     bool UpdateVictimWithGaze();
 
