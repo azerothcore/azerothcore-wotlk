@@ -61,7 +61,7 @@ namespace AddonMgr
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded %u known addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} known addons in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
 
         oldMSTime = getMSTime();
@@ -90,7 +90,7 @@ namespace AddonMgr
                 ++count2;
             } while (result->NextRow());
 
-            LOG_INFO("server.loading", ">> Loaded %u banned addons in %u ms", count2, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Loaded {} banned addons in {} ms", count2, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
         }
     }
