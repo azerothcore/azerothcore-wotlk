@@ -2411,6 +2411,62 @@ void GameObject::SetGoState(GOState state)
         else if (state == GO_STATE_READY)
             EnableCollision(!startOpen);*/
     }
+    /* Whenever a gameobject inside an instance changes
+     * save it's state on the database to be loaded properly
+     * on server restart or crash.
+     */
+    if (auto* map = GetMap())
+    {
+        if (map->IsDungeon() || map->IsRaid())
+        {
+            // Save the gameobject state on the Database
+            if (!hasStateSavedOnInstance())
+            {
+                saveInstanceData(&state);
+            }
+            else
+            {
+                updateInstanceData(&state);
+            }
+        }
+    }
+}
+
+void GameObject::saveInstanceData(GOState* state)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
+    stmt->setUInt32(0, GetInstanceId());
+    stmt->setUInt32(1, GetEntry());
+    stmt->setUInt32(2, GetSpawnId());
+    stmt->setUInt32(3, *state);
+    CharacterDatabase.Execute(stmt);
+}
+
+void GameObject::updateInstanceData(GOState* state)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
+    stmt->setUInt32(0, *state);
+    stmt->setUInt32(1, GetSpawnId());
+    stmt->setUInt32(2, GetInstanceId());
+    CharacterDatabase.Execute(stmt);
+}
+
+bool GameObject::hasStateSavedOnInstance()
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
+    stmt->setUInt32(0, GetInstanceId());
+    stmt->setUInt32(1, GetEntry());
+    stmt->setUInt32(2, GetSpawnId());
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+    {
+        // There's no gameobject with this GUID saved on the DB
+        return false;
+    }
+
+    // Found gameobject on the database saved
+    return true;
 }
 
 void GameObject::SetDisplayId(uint32 displayid)
