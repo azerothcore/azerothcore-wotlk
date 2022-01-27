@@ -738,9 +738,11 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
 {
     // No extra req need
     uint32 procEvent_procEx = PROC_EX_NONE;
+    uint32 procEvent_procPhase = PROC_SPELL_PHASE_HIT;
 
     uint32 procFlags = eventInfo.GetTypeMask();
     uint32 procExtra = eventInfo.GetHitMask();
+    uint32 procPhase = eventInfo.GetSpellPhaseMask();
     SpellInfo const* procSpellInfo = eventInfo.GetSpellInfo();
 
     // check prockFlags for condition
@@ -798,6 +800,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
     {
         // Store extra req
         procEvent_procEx = spellProcEvent->procEx;
+        procEvent_procPhase = spellProcEvent->procPhase;
 
         // For melee triggers
         if (!procSpellInfo)
@@ -845,6 +848,11 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
     {
         if (!hasFamilyMask)
             return false;
+    }
+
+    if (!(procEvent_procPhase & procPhase))
+    {
+        return false;
     }
 
     // Check for extra req (if none) and hit/crit
@@ -1730,8 +1738,8 @@ void SpellMgr::LoadSpellProcEvents()
 
     mSpellProcEventMap.clear();                             // need for reload case
 
-    //                                                0      1           2                3                 4                 5                 6          7       8        9             10
-    QueryResult result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
+    //                                                0      1           2                3                 4                 5                 6          7       8          9             10       11
+    QueryResult result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, procFlags, procEx, procPhase, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
     if (!result)
     {
         LOG_INFO("server.loading", ">> Loaded 0 spell proc event conditions. DB table `spell_proc_event` is empty.");
@@ -1781,9 +1789,16 @@ void SpellMgr::LoadSpellProcEvents()
         spellProcEvent.spellFamilyMask[2] = fields[5].GetUInt32();
         spellProcEvent.procFlags          = fields[6].GetUInt32();
         spellProcEvent.procEx             = fields[7].GetUInt32();
-        spellProcEvent.ppmRate            = fields[8].GetFloat();
-        spellProcEvent.customChance       = fields[9].GetFloat();
-        spellProcEvent.cooldown           = fields[10].GetUInt32();
+        spellProcEvent.procPhase          = fields[8].GetUInt32();
+        spellProcEvent.ppmRate            = fields[9].GetFloat();
+        spellProcEvent.customChance       = fields[10].GetFloat();
+        spellProcEvent.cooldown           = fields[11].GetUInt32();
+
+        // PROC_SPELL_PHASE_NONE is by default PROC_SPELL_PHASE_HIT
+        if (spellProcEvent.procPhase == PROC_SPELL_PHASE_NONE)
+        {
+            spellProcEvent.procPhase = PROC_SPELL_PHASE_HIT;
+        }
 
         while (spellInfo)
         {
@@ -7550,6 +7565,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_CASTER;
         spellInfo->EffectMiscValue[EFFECT_1] = 127;
         spellInfo->EffectSpellClassMask[EFFECT_1][1] = 0x00020000;
+    });
+
+    // Bestial Wrath
+    ApplySpellFix({ 19574 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

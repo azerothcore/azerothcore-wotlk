@@ -25,6 +25,7 @@
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GossipDef.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
@@ -45,7 +46,6 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "WaypointMgr.h"
 #include "World.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
@@ -1729,7 +1729,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const CreatureData* slave = GetCreatureData(guidLow);
                     if (!slave)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get creature data for GUIDLow %u", guidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature (guid) %u not found in creature table", guidLow);
                         error = true;
                         break;
                     }
@@ -1737,7 +1737,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const CreatureData* master = GetCreatureData(linkedGuidLow);
                     if (!master)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get creature data for GUIDLow %u", linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature (linkedGuid) %u not found in creature table", linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -1745,14 +1745,14 @@ void ObjectMgr::LoadLinkedRespawn()
                     const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
                     if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
                     {
-                        LOG_ERROR("sql.sql", "Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to Creature '%u' on an unpermitted map.", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
 
                     if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
                     {
-                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to Creature '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -1766,7 +1766,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const CreatureData* slave = GetCreatureData(guidLow);
                     if (!slave)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get creature data for GUIDLow %u", guidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature (guid) %u not found in creature table", guidLow);
                         error = true;
                         break;
                     }
@@ -1774,7 +1774,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const GameObjectData* master = GetGOData(linkedGuidLow);
                     if (!master)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get gameobject data for GUIDLow %u", linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) %u not found in gameobject table", linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -1782,14 +1782,14 @@ void ObjectMgr::LoadLinkedRespawn()
                     const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
                     if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
                     {
-                        LOG_ERROR("sql.sql", "Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to Gameobject '%u' on an unpermitted map.", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
 
                     if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
                     {
-                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to Gameobject '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -1803,7 +1803,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const GameObjectData* slave = GetGOData(guidLow);
                     if (!slave)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get gameobject data for GUIDLow %u", guidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) %u not found in gameobject table", guidLow);
                         error = true;
                         break;
                     }
@@ -1811,7 +1811,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const GameObjectData* master = GetGOData(linkedGuidLow);
                     if (!master)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get gameobject data for GUIDLow %u", linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) %u not found in gameobject table", linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -1819,14 +1819,14 @@ void ObjectMgr::LoadLinkedRespawn()
                     const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
                     if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
                     {
-                        LOG_ERROR("sql.sql", "Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject '%u' linking to Gameobject '%u' on an unpermitted map.", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
 
                     if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
                     {
-                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject '%u' linking to Gameobject '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -1840,7 +1840,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const GameObjectData* slave = GetGOData(guidLow);
                     if (!slave)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get gameobject data for GUIDLow %u", guidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) %u not found in gameobject table", guidLow);
                         error = true;
                         break;
                     }
@@ -1848,7 +1848,7 @@ void ObjectMgr::LoadLinkedRespawn()
                     const CreatureData* master = GetCreatureData(linkedGuidLow);
                     if (!master)
                     {
-                        LOG_ERROR("sql.sql", "Couldn't get creature data for GUIDLow %u", linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature (linkedGuid) %u not found in creature table", linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -1856,14 +1856,14 @@ void ObjectMgr::LoadLinkedRespawn()
                     const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
                     if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
                     {
-                        LOG_ERROR("sql.sql", "Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject '%u' linking to Creature '%u' on an unpermitted map.", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
 
                     if (!(master->spawnMask & slave->spawnMask))  // they must have a possibility to meet (normal/heroic difficulty)
                     {
-                        LOG_ERROR("sql.sql", "LinkedRespawn: Creature '%u' linking to '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
+                        LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject '%u' linking to Creature '%u' with not corresponding spawnMask", guidLow, linkedGuidLow);
                         error = true;
                         break;
                     }
@@ -5924,7 +5924,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 {
     uint32 oldMSTime = getMSTime();
 
-    time_t curTime = time(nullptr);
+    time_t curTime = GameTime::GetGameTime().count();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL);
     stmt->setUInt32(0, uint32(curTime));
@@ -9119,7 +9119,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
         BroadcastTextContainer::iterator bct = _broadcastTextStore.find(id);
         if (bct == _broadcastTextStore.end())
         {
-            LOG_ERROR("sql.sql", "BroadcastText (Id: %u) in table `broadcast_text_locale` does not exist. Skipped!", id);
+            LOG_ERROR("sql.sql", "BroadcastText (Id: %u) found in table `broadcast_text_locale` but does not exist in `broadcast_text`. Skipped!", id);
             continue;
         }
 

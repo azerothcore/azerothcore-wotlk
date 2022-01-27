@@ -19,6 +19,7 @@
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoRandom.h"
+#include "GameTime.h"
 #include "HMAC.h"
 #include "Log.h"
 #include "Opcodes.h"
@@ -255,7 +256,7 @@ void WardenWin::RequestChecks()
             _ChecksTodo[i].assign(sWardenCheckMgr->CheckIdPool[i].begin(), sWardenCheckMgr->CheckIdPool[i].end());
     }
 
-    _serverTicks = World::GetGameTimeMS();
+    _serverTicks = GameTime::GetGameTimeMS().count();
     _CurrentChecks.clear();
 
     // No pending checks
@@ -493,7 +494,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
         uint32 newClientTicks;
         buff >> newClientTicks;
 
-        uint32 ticksNow = World::GetGameTimeMS();
+        uint32 ticksNow = GameTime::GetGameTimeMS().count();
         uint32 ourTicks = newClientTicks + (ticksNow - _serverTicks);
 
         LOG_DEBUG("warden", "ServerTicks %u", ticksNow);         // Now
