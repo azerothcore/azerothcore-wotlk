@@ -19,6 +19,7 @@
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "ItemEnchantmentMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -39,7 +40,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
     if (!set)
     {
-        LOG_ERROR("sql.sql", "Item set %u for item (id %u) not found, mods not applied.", setid, proto->ItemId);
+        LOG_ERROR("sql.sql", "Item set {} for item (id {}) not found, mods not applied.", setid, proto->ItemId);
         return;
     }
 
@@ -99,7 +100,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(set->spells[x]);
                 if (!spellInfo)
                 {
-                    LOG_ERROR("entities.item", "WORLD: unknown spell id %u in items set %u effects", set->spells[x], setid);
+                    LOG_ERROR("entities.item", "WORLD: unknown spell id {} in items set {} effects", set->spells[x], setid);
                     break;
                 }
 
@@ -124,7 +125,7 @@ void RemoveItemsSetItem(Player* player, ItemTemplate const* proto)
 
     if (!set)
     {
-        LOG_ERROR("sql.sql", "Item set #%u for item #%u not found, mods not removed.", setid, proto->ItemId);
+        LOG_ERROR("sql.sql", "Item set #{} for item #{} not found, mods not removed.", setid, proto->ItemId);
         return;
     }
 
@@ -253,7 +254,7 @@ Item::Item()
     m_container = nullptr;
     m_lootGenerated = false;
     mb_in_trade = false;
-    m_lastPlayedTimeUpdate = time(nullptr);
+    m_lastPlayedTimeUpdate = GameTime::GetGameTime().count();
 
     m_refundRecipient = 0;
     m_paidMoney = 0;
@@ -301,7 +302,7 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
     if (!GetUInt32Value(ITEM_FIELD_DURATION))
         return;
 
-    LOG_DEBUG("entities.player.items", "Item::UpdateDuration Item (Entry: %u Duration %u Diff %u)", GetEntry(), GetUInt32Value(ITEM_FIELD_DURATION), diff);
+    LOG_DEBUG("entities.player.items", "Item::UpdateDuration Item (Entry: {} Duration {} Diff {})", GetEntry(), GetUInt32Value(ITEM_FIELD_DURATION), diff);
 
     if (GetUInt32Value(ITEM_FIELD_DURATION) <= diff)
     {
@@ -413,7 +414,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     ItemTemplate const* proto = GetTemplate();
     if (!proto)
     {
-        FMT_LOG_ERROR("entities.item", "Invalid entry {} for item {}. Refusing to load.", GetEntry(), GetGUID().ToString());
+        LOG_ERROR("entities.item", "Invalid entry {} for item {}. Refusing to load.", GetEntry(), GetGUID().ToString());
         return false;
     }
 
@@ -443,7 +444,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
             if (Optional<int32> charges = Acore::StringTo<int32>(tokens[i]))
                 SetSpellCharges(i, *charges);
             else
-                FMT_LOG_ERROR("entities.item", "Invalid charge info '{}' for item {}, charge data not loaded.", tokens.at(i), GetGUID().ToString());
+                LOG_ERROR("entities.item", "Invalid charge info '{}' for item {}, charge data not loaded.", tokens.at(i), GetGUID().ToString());
         }
     }
 
@@ -459,7 +460,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
 
     if (!_LoadIntoDataField(fields[6].GetString(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET))
     {
-        FMT_LOG_WARN("entities.item", "Invalid enchantment data '{}' for item {}. Forcing partial load.", fields[6].GetString(), GetGUID().ToString());
+        LOG_WARN("entities.item", "Invalid enchantment data '{}' for item {}. Forcing partial load.", fields[6].GetString(), GetGUID().ToString());
     }
 
     SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetInt16());
@@ -614,7 +615,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     // item can have not null only one from field values
     if ((itemProto->RandomProperty) && (itemProto->RandomSuffix))
     {
-        LOG_ERROR("sql.sql", "Item template %u have RandomProperty == %u and RandomSuffix == %u, but must have one from field =0", itemProto->ItemId, itemProto->RandomProperty, itemProto->RandomSuffix);
+        LOG_ERROR("sql.sql", "Item template {} have RandomProperty == {} and RandomSuffix == {}, but must have one from field =0", itemProto->ItemId, itemProto->RandomProperty, itemProto->RandomSuffix);
         return 0;
     }
 
@@ -625,7 +626,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
         ItemRandomPropertiesEntry const* random_id = sItemRandomPropertiesStore.LookupEntry(randomPropId);
         if (!random_id)
         {
-            LOG_ERROR("sql.sql", "Enchantment id #%u used but it doesn't have records in 'ItemRandomProperties.dbc'", randomPropId);
+            LOG_ERROR("sql.sql", "Enchantment id #{} used but it doesn't have records in 'ItemRandomProperties.dbc'", randomPropId);
             return 0;
         }
 
@@ -638,7 +639,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
         ItemRandomSuffixEntry const* random_id = sItemRandomSuffixStore.LookupEntry(randomPropId);
         if (!random_id)
         {
-            LOG_ERROR("sql.sql", "Enchantment id #%u used but it doesn't have records in sItemRandomSuffixStore.", randomPropId);
+            LOG_ERROR("sql.sql", "Enchantment id #{} used but it doesn't have records in sItemRandomSuffixStore.", randomPropId);
             return 0;
         }
 
@@ -731,7 +732,7 @@ void Item::AddToUpdateQueueOf(Player* player)
 
     if (player->GetGUID() != GetOwnerGUID())
     {
-        LOG_DEBUG("entities.player.items", "Item::AddToUpdateQueueOf - Owner's guid (%s) and player's guid (%s) don't match!", GetOwnerGUID().ToString().c_str(), player->GetGUID().ToString().c_str());
+        LOG_DEBUG("entities.player.items", "Item::AddToUpdateQueueOf - Owner's guid ({}) and player's guid ({}) don't match!", GetOwnerGUID().ToString(), player->GetGUID().ToString());
         return;
     }
 
@@ -751,7 +752,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
 
     if (player->GetGUID() != GetOwnerGUID())
     {
-        LOG_DEBUG("entities.player.items", "Item::RemoveFromUpdateQueueOf - Owner's guid (%s) and player's guid (%s) don't match!", GetOwnerGUID().ToString().c_str(), player->GetGUID().ToString().c_str());
+        LOG_DEBUG("entities.player.items", "Item::RemoveFromUpdateQueueOf - Owner's guid ({}) and player's guid ({}) don't match!", GetOwnerGUID().ToString(), player->GetGUID().ToString());
         return;
     }
 
@@ -1205,7 +1206,7 @@ void Item::UpdatePlayedTime(Player* owner)
     // Get current played time
     uint32 current_playtime = GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME);
     // Calculate time elapsed since last played time update
-    time_t curtime = time(nullptr);
+    time_t curtime = GameTime::GetGameTime().count();
     uint32 elapsed = uint32(curtime - m_lastPlayedTimeUpdate);
     uint32 new_playtime = current_playtime + elapsed;
     // Check if the refund timer has expired yet
@@ -1226,7 +1227,7 @@ void Item::UpdatePlayedTime(Player* owner)
 
 uint32 Item::GetPlayedTime()
 {
-    time_t curtime = time(nullptr);
+    time_t curtime = GameTime::GetGameTime().count();
     uint32 elapsed = uint32(curtime - m_lastPlayedTimeUpdate);
     return GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME) + elapsed;
 }

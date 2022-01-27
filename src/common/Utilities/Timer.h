@@ -76,7 +76,7 @@ inline TimePoint GetApplicationStartTime()
 {
     using namespace std::chrono;
 
-    static const steady_clock::time_point ApplicationStartTime = steady_clock::now();
+    static const TimePoint ApplicationStartTime = steady_clock::now();
 
     return ApplicationStartTime;
 }

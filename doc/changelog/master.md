@@ -1,3 +1,22 @@
+## 5.0.0-dev.1 | Commit: [8b7df23f064f8c1c41aea222342b53f109c4e3b9
+](https://github.com/azerothcore/azerothcore-wotlk/commit/8b7df23f064f8c1c41aea222342b53f109c4e3b9
+
+
+### How to upgrade
+
+```diff
+- time(nullptr)
++ GameTime::GetGameTime().count()
+```
+```diff
+- sWorld->GetGameTime()
++ GameTime::GetGameTime().count()
+```
+```diff
+- World::GetGameTimeMS()
++ GameTime::GetGameTimeMS().count()
+```
+
 ## 5.0.0-dev.0 | Commit: [2fd8b00d7bac1f9c9b565916453cf490fb069df0
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/2fd8b00d7bac1f9c9b565916453cf490fb069df0
 
