@@ -35,7 +35,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (%s)", guid.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from ({})", guid.ToString());
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
@@ -815,7 +815,7 @@ void WorldSession::HandleReportPvPAFK(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: %s reported %s", _player->GetName().c_str(), reportedPlayer->GetName().c_str());
+    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: {} reported {}", _player->GetName(), reportedPlayer->GetName());
 
     reportedPlayer->ReportedAfkBy(_player);
 }
