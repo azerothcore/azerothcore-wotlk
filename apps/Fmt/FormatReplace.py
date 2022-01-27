@@ -20,12 +20,12 @@ def isABORTMSG(line):
     else :
         return False
 
-# def islog(line):
-#     substring = 'LOG_'
-#     if substring in line:
-#         return True
-#     else :
-#         return False
+def islog(line):
+    substring = 'LOG_'
+    if substring in line:
+        return True
+    else :
+        return False
 
 # def isSendSysMessage(line):
 #     substring = 'SendSysMessage'
@@ -81,8 +81,8 @@ def checkSoloLine(line):
         return handleCleanup(line), False
     elif isASSERT(line):
         return handleCleanup(line), False
-    # elif islog(line):
-    #     return handleCleanup(line), False
+    elif islog(line):
+        return handleCleanup(line), False
     # elif isPExecute(line):
     #     return handleCleanup(line), False
     # elif isPQuery(line):
@@ -104,8 +104,8 @@ def startMultiLine(line):
         return handleCleanup(line), True
     elif isASSERT(line):
         return handleCleanup(line), True
-    # elif islog(line):
-    #     return handleCleanup(line), True
+    elif islog(line):
+        return handleCleanup(line), True
     # elif isSendSysMessage(line):
     #     return handleCleanup(line), True
     # elif isPSendSysMessage(line):

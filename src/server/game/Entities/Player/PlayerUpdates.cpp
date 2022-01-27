@@ -267,8 +267,8 @@ void Player::Update(uint32 p_time)
 
     if (!IsPositionValid()) // pussywizard: will crash below at eg. GetZoneAndAreaId
     {
-        LOG_INFO("misc", "Player::Update - invalid position (%.1f, %.1f, %.1f)! Map: %u, MapId: %u, %s",
-            GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUID().ToString().c_str());
+        LOG_INFO("misc", "Player::Update - invalid position ({0:.1f}, {0:.1f}, {0:.1f})! Map: {}, MapId: {}, {}",
+            GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUID().ToString());
         GetSession()->KickPlayer("Invalid position");
         return;
     }
@@ -323,7 +323,7 @@ void Player::Update(uint32 p_time)
         {
             // m_nextSave reset in SaveToDB call
             SaveToDB(false, false);
-            FMT_LOG_DEBUG("entities.player", "Player::Update: Player '{}' ({}) saved", GetName(), GetGUID().ToString());
+            LOG_DEBUG("entities.player", "Player::Update: Player '{}' ({}) saved", GetName(), GetGUID().ToString());
         }
         else
         {
@@ -726,7 +726,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
                                uint32 RedLevel, uint32 Multiplicator)
 {
     LOG_DEBUG("entities.player.skills",
-              "UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)",
+              "UpdateGatherSkill(SkillId {} SkillLevel {} RedLevel {})",
               SkillId, SkillValue, RedLevel);
 
     uint32 gathering_skill_gain =
@@ -785,7 +785,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
 
 bool Player::UpdateCraftSkill(uint32 spellid)
 {
-    LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid %d", spellid);
+    LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid {}", spellid);
 
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
 
@@ -874,7 +874,7 @@ static const size_t bonusSkillLevelsSize =
 bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
 {
     LOG_DEBUG("entities.player.skills",
-              "UpdateSkillPro(SkillId %d, Chance %3.1f%%)", SkillId,
+              "UpdateSkillPro(SkillId {}, Chance {:3.1f}%)", SkillId,
               Chance / 10.0f);
     if (!SkillId)
         return false;
@@ -882,7 +882,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     if (Chance <= 0) // speedup in 0 chance case
     {
         LOG_DEBUG("entities.player.skills",
-                  "Player::UpdateSkillPro Chance=%3.1f%% missed",
+                  "Player::UpdateSkillPro Chance={:3.1f}% missed",
                   Chance / 10.0f);
         return false;
     }
@@ -925,13 +925,13 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL,
                                   SkillId);
         LOG_DEBUG("entities.player.skills",
-                  "Player::UpdateSkillPro Chance=%3.1f%% taken",
+                  "Player::UpdateSkillPro Chance={:3.1f}% taken",
                   Chance / 10.0f);
         return true;
     }
 
     LOG_DEBUG("entities.player.skills",
-              "Player::UpdateSkillPro Chance=%3.1f%% missed", Chance / 10.0f);
+              "Player::UpdateSkillPro Chance={:3.1f}% missed", Chance / 10.0f);
     return false;
 }
 
@@ -1366,9 +1366,9 @@ void Player::UpdateHomebindTime(uint32 time)
         GetSession()->SendPacket(&data);
         LOG_DEBUG(
             "maps",
-            "PLAYER: Player '%s' (%s) will be teleported to homebind in 60 "
+            "PLAYER: Player '{}' ({}) will be teleported to homebind in 60 "
             "seconds",
-            GetName().c_str(), GetGUID().ToString().c_str());
+            GetName(), GetGUID().ToString());
     }
 }
 
