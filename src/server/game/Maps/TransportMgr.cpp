@@ -400,7 +400,7 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType
     {
         if (mapEntry->Instanceable() != tInfo->inInstance)
         {
-            LOG_ERROR("entities.transport", "Transport {} (name: {}) attempted creation in instance map (id: {}) but it is not an instanced transport!", entry, trans->GetName, mapId);
+            LOG_ERROR("entities.transport", "Transport {} (name: {}) attempted creation in instance map (id: {}) but it is not an instanced transport!", entry, trans->GetName(), mapId);
             delete trans;
             return nullptr;
         }
