@@ -1,13 +1,10 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643309943188748904');
 
--- delete and insert for rerun for gameobject loot of blacksmithing plans
--- none currently exist in acdb
-DELETE FROM `gameobject_loot_template` WHERE `Entry` IN ( 173232, 173234, 176325, 176327);
-INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES 
-(176327, 12830, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans Coruption'),
-(176325, 12827, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans Serenity'),
-(173232, 11614, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans Dark Iron Mail'),
-(173234, 11615, 0, 100, 0, 1, 0, 1, 1, 'Blacksmithing Plans - Plans Dark Iron Shoulder');
+-- update current loot to 100% per wowhead
+UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=11524 AND `Item`=11614;
+UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=11525 AND `Item`=11615;
+UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=13721 AND `Item`=12827;
+UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=13722 AND `Item`=12830;
 
 -- delete and insert for rerun locking the loot to skill id requirement for loot
 -- none currently exist in acdb
@@ -75,4 +72,3 @@ INSERT INTO `conditions` SET
     `ErrorTextId`=0,
     `ScriptName`='',
     `Comment`="Blacksmithing Plans - Plans Dark Iron Shoulder while having Black Smith skill 285";
-    
