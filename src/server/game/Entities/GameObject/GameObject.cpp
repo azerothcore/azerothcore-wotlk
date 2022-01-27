@@ -2415,7 +2415,7 @@ void GameObject::SetGoState(GOState state)
      * save it's state on the database to be loaded properly
      * on server restart or crash.
      */
-    if (auto* map = GetMap())
+    if (auto* map = FindMap())
     {
         if (map->IsDungeon() || map->IsRaid())
         {
