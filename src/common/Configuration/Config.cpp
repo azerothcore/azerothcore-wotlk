@@ -19,8 +19,8 @@
 #include "Log.h"
 #include "StringConvert.h"
 #include "StringFormat.h"
-#include "Util.h"
 #include "Tokenize.h"
+#include "Util.h"
 #include <fstream>
 #include <mutex>
 #include <unordered_map>
@@ -79,7 +79,7 @@ namespace
                 PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
 
 #ifdef CONFIG_ABORT_INCORRECT_OPTIONS
-                ABORT_MSG("> Core can't start if found incorrect options");
+                ABORT("> Core can't start if found incorrect options");
 #endif
 
                 return;

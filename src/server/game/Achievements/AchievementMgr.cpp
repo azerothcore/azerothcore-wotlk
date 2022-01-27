@@ -29,6 +29,7 @@
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -417,15 +418,13 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             return source->GetMapId() == map_id.mapId;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY:
         {
-            time_t birthday_start = time_t(sWorld->getIntConfig(CONFIG_BIRTHDAY_TIME));
-            tm birthday_tm;
-            localtime_r(&birthday_start, &birthday_tm);
+            tm birthday_tm = Acore::Time::TimeBreakdown(sWorld->getIntConfig(CONFIG_BIRTHDAY_TIME));
 
             // exactly N birthday
             birthday_tm.tm_year += birthday_login.nth_birthday;
 
             time_t birthday = mktime(&birthday_tm);
-            time_t now = sWorld->GetGameTime();
+            time_t now = GameTime::GetGameTime().count();
             return now <= birthday + DAY && now >= birthday;
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE:
@@ -650,7 +649,7 @@ void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQ
                 continue;
             }
 
-            if (criteria->timeLimit && time_t(date + criteria->timeLimit) < time(nullptr))
+            if (criteria->timeLimit && time_t(date + criteria->timeLimit) < GameTime::GetGameTime().count())
                 continue;
 
             CriteriaProgress& progress = m_criteriaProgress[id];
@@ -728,7 +727,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);
     data << GetPlayer()->GetPackGUID();
     data << uint32(achievement->ID);
-    data.AppendPackedTime(time(nullptr));
+    data.AppendPackedTime(GameTime::GetGameTime().count());
     data << uint32(0);
     GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
@@ -1004,13 +1003,13 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 }
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST_DAILY:
                 {
-                    time_t nextDailyResetTime = sWorld->GetNextDailyQuestsResetTime();
+                    Seconds nextDailyResetTime = sWorld->GetNextDailyQuestsResetTime();
                     CriteriaProgress* progress = GetCriteriaProgress(achievementCriteria);
 
                     if (!miscValue1) // Login case.
                     {
                         // reset if player missed one day.
-                        if (progress && progress->date < (nextDailyResetTime - 2 * DAY))
+                        if (progress && Seconds(progress->date) < (nextDailyResetTime - 2_days))
                             SetCriteriaProgress(achievementCriteria, 0, PROGRESS_SET);
                         continue;
                     }
@@ -1019,10 +1018,10 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     if (!progress)
                         // 1st time. Start count.
                         progressType = PROGRESS_SET;
-                    else if (progress->date < (nextDailyResetTime - 2 * DAY))
+                    else if (Seconds(progress->date) < (nextDailyResetTime - 2_days))
                         // last progress is older than 2 days. Player missed 1 day => Retart count.
                         progressType = PROGRESS_RESET;
-                    else if (progress->date < (nextDailyResetTime - DAY))
+                    else if (Seconds(progress->date) < (nextDailyResetTime - 1_days))
                         // last progress is between 1 and 2 days. => 1st time of the day.
                         progressType = PROGRESS_ACCUMULATE;
                     else
@@ -2077,7 +2076,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     }
 
     progress->changed = true;
-    progress->date = time(nullptr); // set the date to the latest update.
+    progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
 
     uint32 timeElapsed = 0;
     bool timedCompleted = false;
@@ -2200,7 +2199,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
-    ca.date = time(nullptr);
+    ca.date = GameTime::GetGameTime().count();
     ca.changed = true;
 
     sScriptMgr->OnAchievementComplete(GetPlayer(), achievement);
@@ -2421,20 +2420,20 @@ bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement)
     if (itr == m_allCompletedAchievements.end())
         return false;
 
-    if (itr->second == std::chrono::system_clock::time_point::min())
+    if (itr->second == SystemTimePoint::min())
         return false;
 
     if (!sScriptMgr->IsRealmCompleted(this, achievement, itr->second))
         return false;
 
-    if (itr->second == std::chrono::system_clock::time_point::max())
+    if (itr->second == SystemTimePoint::max())
         return true;
 
     // Allow completing the realm first kill for entire minute after first person did it
     // it may allow more than one group to achieve it (highly unlikely)
     // but apparently this is how blizz handles it as well
     if (achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL)
-        return (std::chrono::system_clock::now() - itr->second) > std::chrono::minutes(1);
+        return (GameTime::GetSystemTime() - itr->second) > 1min;
 
     sScriptMgr->SetRealmCompleted(achievement);
 
@@ -2446,7 +2445,7 @@ void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement
     if (IsRealmCompleted(achievement))
         return;
 
-    m_allCompletedAchievements[achievement->ID] = std::chrono::system_clock::now();
+    m_allCompletedAchievements[achievement->ID] = GameTime::GetSystemTime();
 }
 
 //==========================================================
@@ -2773,7 +2772,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     for (uint32 i = 0; i < sAchievementStore.GetNumRows(); ++i)
         if (AchievementEntry const* achievement = sAchievementStore.LookupEntry(i))
             if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
-                m_allCompletedAchievements[achievement->ID] = std::chrono::system_clock::time_point::min();
+                m_allCompletedAchievements[achievement->ID] = SystemTimePoint::min();
 
     if (!result)
     {
@@ -2801,7 +2800,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
             continue;
         }
         else if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
-            m_allCompletedAchievements[achievementId] =  std::chrono::system_clock::time_point::max();
+            m_allCompletedAchievements[achievementId] =  SystemTimePoint::max();
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded %lu completed achievements in %u ms", (unsigned long)m_allCompletedAchievements.size(), GetMSTimeDiffToNow(oldMSTime));

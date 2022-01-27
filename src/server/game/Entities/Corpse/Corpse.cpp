@@ -19,6 +19,7 @@
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -30,13 +31,9 @@ Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type
 {
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;
-
     m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_POSITION);
-
     m_valuesCount = CORPSE_END;
-
-    m_time = time(nullptr);
-
+    m_time = GameTime::GetGameTime().count();
     lootRecipient = nullptr;
 }
 
@@ -148,7 +145,13 @@ bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
 
     SetObjectScale(1.0f);
     SetUInt32Value(CORPSE_FIELD_DISPLAY_ID, fields[5].GetUInt32());
-    _LoadIntoDataField(fields[6].GetCString(), CORPSE_FIELD_ITEM, EQUIPMENT_SLOT_END);
+
+    if (!_LoadIntoDataField(fields[6].GetString(), CORPSE_FIELD_ITEM, EQUIPMENT_SLOT_END))
+    {
+        FMT_LOG_ERROR("entities.player", "Corpse ({}, owner: {}) is not created, given equipment info is not valid ('{}')",
+            GetGUID().ToString(), GetOwnerGUID().ToString(), fields[6].GetString());
+    }
+
     SetUInt32Value(CORPSE_FIELD_BYTES_1, fields[7].GetUInt32());
     SetUInt32Value(CORPSE_FIELD_BYTES_2, fields[8].GetUInt32());
     SetUInt32Value(CORPSE_FIELD_GUILD, fields[9].GetUInt32());
@@ -188,4 +191,9 @@ bool Corpse::IsExpired(time_t t) const
         return m_time < t - 60 * MINUTE;
     else
         return m_time < t - 3 * DAY;
+}
+
+void Corpse::ResetGhostTime()
+{
+    m_time = GameTime::GetGameTime().count();
 }

@@ -27,6 +27,7 @@
 #include "Tokenize.h"
 #include "Transaction.h"
 #include "Util.h"
+#include "StringConvert.h"
 #include <errmsg.h>
 #include <mysqld_error.h>
 
@@ -87,20 +88,17 @@ void MySQLConnection::Close()
 
 uint32 MySQLConnection::Open()
 {
-    MYSQL *mysqlInit;
-    mysqlInit = mysql_init(nullptr);
+    MYSQL* mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
         LOG_ERROR("sql.sql", "Could not initialize Mysql connection to database `%s`", m_connectionInfo.database.c_str());
         return CR_UNKNOWN_ERROR;
     }
 
-    int port;
+    uint32 port;
     char const* unix_socket;
-    //unsigned int timeout = 10;
 
     mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8");
-    //mysql_options(mysqlInit, MYSQL_OPT_READ_TIMEOUT, (char const*)&timeout);
     #ifdef _WIN32
     if (m_connectionInfo.host == ".")                                           // named pipe use option (Windows)
     {
@@ -111,7 +109,7 @@ uint32 MySQLConnection::Open()
     }
     else                                                    // generic case
     {
-        port = atoi(m_connectionInfo.port_or_socket.c_str());
+        port = *Acore::StringTo<uint32>(m_connectionInfo.port_or_socket);
         unix_socket = 0;
     }
     #else
@@ -125,7 +123,7 @@ uint32 MySQLConnection::Open()
     }
     else                                                    // generic case
     {
-        port = atoi(m_connectionInfo.port_or_socket.c_str());
+        port = *Acore::StringTo<uint32>(m_connectionInfo.port_or_socket);
         unix_socket = nullptr;
     }
     #endif
@@ -469,8 +467,8 @@ uint32 MySQLConnection::GetServerVersion() const
 
 MySQLPreparedStatement* MySQLConnection::GetPreparedStatement(uint32 index)
 {
-    ASSERT(index < m_stmts.size(), "Tried to access invalid prepared statement index %u (max index " SZFMTD ") on database `%s`, connection type: %s",
-        index, m_stmts.size(), m_connectionInfo.database.c_str(), (m_connectionFlags & CONNECTION_ASYNC) ? "asynchronous" : "synchronous");
+    ASSERT(index < m_stmts.size(), "Tried to access invalid prepared statement index {} (max index {}) on database `{}`, connection type: {}",
+        index, m_stmts.size(), m_connectionInfo.database, (m_connectionFlags & CONNECTION_ASYNC) ? "asynchronous" : "synchronous");
     MySQLPreparedStatement* ret = m_stmts[index].get();
     if (!ret)
         LOG_ERROR("sql.sql", "Could not fetch prepared statement %u on database `%s`, connection type: %s.",
