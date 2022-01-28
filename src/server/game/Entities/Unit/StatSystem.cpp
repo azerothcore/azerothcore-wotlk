@@ -16,6 +16,7 @@
  */
 
 #include "Creature.h"
+#include "Config.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
