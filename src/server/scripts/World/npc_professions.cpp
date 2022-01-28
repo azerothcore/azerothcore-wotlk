@@ -18,7 +18,7 @@
 /* ScriptData
 SDName: Npc_Professions
 SD%Complete: 80
-SDComment: Provides learn/unlearn/relearn-options for professions. Not supported: Unlearn engineering, re-learn engineering, re-learn leatherworking.
+SDComment: Provides learn/unlearn/relearn-options for professions. Not supported: Unlearn engineering, re-learn engineering.
 SDCategory: NPCs
 EndScriptData */
 
@@ -347,7 +347,11 @@ void ProfessionUnlearnSpells(Player* player, uint32 type)
             player->removeSpell(36259, SPEC_MASK_ALL, false);                     // Lionheart Executioner
             break;
         case S_UNLEARN_DRAGON:                              // S_UNLEARN_DRAGON
+            player->removeSpell(10619, SPEC_MASK_ALL, false);                     // Dragonscale Guantlets
+            player->removeSpell(10650, SPEC_MASK_ALL, false);                     // Dragonscale Breastplate
             player->removeSpell(36076, SPEC_MASK_ALL, false);                     // Dragonstrike Leggings
+            player->removeSpell(24655, SPEC_MASK_ALL, false);                     // Green Dragonscale Gauntlets
+            player->removeSpell(24654, SPEC_MASK_ALL, false);                     // Blue Dragonscale Leggings
             player->removeSpell(36079, SPEC_MASK_ALL, false);                     // Golden Dragonstrike Breastplate
             player->removeSpell(35576, SPEC_MASK_ALL, false);                     // Ebon Netherscale Belt
             player->removeSpell(35577, SPEC_MASK_ALL, false);                     // Ebon Netherscale Bracers
@@ -362,6 +366,8 @@ void ProfessionUnlearnSpells(Player* player, uint32 type)
             player->removeSpell(35590, SPEC_MASK_ALL, false);                     // Primalstrike Belt
             player->removeSpell(35591, SPEC_MASK_ALL, false);                     // Primalstrike Bracers
             player->removeSpell(35589, SPEC_MASK_ALL, false);                     // Primalstrike Vest
+            player->removeSpell(10630, SPEC_MASK_ALL, false);                     // Gauntlets of the Sea
+            player->removeSpell(10632, SPEC_MASK_ALL, false);                     // Helm of Fire
             break;
         case S_UNLEARN_TRIBAL:                              // S_UNLEARN_TRIBAL
             player->removeSpell(35585, SPEC_MASK_ALL, false);                     // Windhawk Hauberk
@@ -369,6 +375,8 @@ void ProfessionUnlearnSpells(Player* player, uint32 type)
             player->removeSpell(35588, SPEC_MASK_ALL, false);                     // Windhawk Bracers
             player->removeSpell(36075, SPEC_MASK_ALL, false);                     // Wildfeather Leggings
             player->removeSpell(36078, SPEC_MASK_ALL, false);                     // Living Crystal Breastplate
+            player->removeSpell(10621, SPEC_MASK_ALL, false);                     // Wolfshead Helm
+            player->removeSpell(10647, SPEC_MASK_ALL, false);                     // Feathered Breastplate
             break;
         case S_UNLEARN_SPELLFIRE:                           // S_UNLEARN_SPELLFIRE
             player->removeSpell(26752, SPEC_MASK_ALL, false);                     // Spellfire Belt
@@ -956,38 +964,38 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        // pussywizard: NO UNLEARNING! LEATHERWORKING SPECIALTY IS A PERMANENT DECISION AND CANNOT BE CHANGED IN ANY WAY!
-        // pussywizard: CAN RE-LEARN ONLY THE ONE FOR WHICH QUEST IS COMPLETED!
-
-        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 250 && player->getLevel() > 49)
+        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() > 40)
         {
             switch (creature->GetEntry())
             {
                 case N_TRAINER_DRAGON1:                                      //Peter Galen
                 case N_TRAINER_DRAGON2:                                      //Thorkaf Dragoneye
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5145)))
+                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_DRAGON,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     if (player->HasSpell(S_DRAGON))
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Unlearn dragon", GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF +4);
                     }
                     break;
                 case N_TRAINER_ELEMENTAL1:                                      //Sarah Tanner
                 case N_TRAINER_ELEMENTAL2:                                      //Brumn Winterhoof
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5146)))
+                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_ELEMENTAL,   GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                     if (player->HasSpell(S_ELEMENTAL))
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Unlearn Elemental", GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 5);
                     }
                     break;
                 case N_TRAINER_TRIBAL1:                                      //Caryssia Moonhunter
                 case N_TRAINER_TRIBAL2:                                      //Se'Jib
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5148)))
+                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_TRIBAL,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                     if (player->HasSpell(S_TRIBAL))
                     {
                         AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Unlearn tribal", GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 6);
                     }
                     break;
             }
@@ -1017,6 +1025,71 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 3:
                 ProcessCastaction(player, creature, S_TRIBAL, S_LEARN_TRIBAL, 0);
                 break;
+            case GOSSIP_ACTION_INFO_DEF + 4:
+                ProcessUnlearnAction(player, creature, S_UNLEARN_DRAGON, 0, DoMedUnlearnCost(player));
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 5:
+                ProcessUnlearnAction(player, creature, S_UNLEARN_ELEMENTAL, 0, DoMedUnlearnCost(player));
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 6:
+                ProcessUnlearnAction(player, creature, S_UNLEARN_TRIBAL, 0, DoMedUnlearnCost(player));
+                break;
+        }
+    }
+
+    void SendConfirmLearn(Player* player, Creature* creature, uint32 action)
+    {
+        if (action)
+        {
+            switch (creature->GetEntry())
+            {
+                case N_TRAINER_DRAGON1: // Peter Galen
+                case N_TRAINER_DRAGON2: // Thorkaf Dragoneye
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Gossip de learn dragon", GOSSIP_SENDER_CHECK, action);
+                    // unknown textID ()
+                    SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                    break;
+                case N_TRAINER_ELEMENTAL1: // Sarah Tanner
+                case N_TRAINER_ELEMENTAL2: // Brumn Winterhoof
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Gossip de learn elemental", GOSSIP_SENDER_CHECK, action);
+                    // unknown textID ()
+                    SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                    break;
+                case N_TRAINER_TRIBAL1: // Caryssia Moonhunter
+                case N_TRAINER_TRIBAL2: // Se'Jib
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Gossip de learn tribal", GOSSIP_SENDER_CHECK, action);
+                    // unknown textID ()
+                    SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                    break;
+            }
+        }
+    }
+
+    void SendConfirmUnlearn(Player* player, Creature* creature, uint32 action)
+    {
+        if (action)
+        {
+            switch (creature->GetEntry())
+            {
+            case N_TRAINER_DRAGON1: // Peter Galen
+            case N_TRAINER_DRAGON2: // Thorkaf Dragoneye
+                AddGossipItemFor(player, 0, "Gossip unlearn dragon", GOSSIP_SENDER_CHECK, action, "Box unlearn dragon", DoMedUnlearnCost(player), false);
+                // unknown textID ()
+                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                break;
+            case N_TRAINER_ELEMENTAL1: // Sarah Tanner
+            case N_TRAINER_ELEMENTAL2: // Brumn Winterhoof
+                AddGossipItemFor(player, 0, "Gossip unlearn elemental", GOSSIP_SENDER_CHECK, action, "Box unlearn elemental", DoMedUnlearnCost(player), false);
+                // unknown textID ()
+                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                break;
+            case N_TRAINER_TRIBAL1: // Caryssia Moonhunter
+            case N_TRAINER_TRIBAL2: // Se'Jib
+                AddGossipItemFor(player, 0, "Gossip unlearn tribal", GOSSIP_SENDER_CHECK, action, "Box unlearn tribal", DoMedUnlearnCost(player), false);
+                // unknown textID ()
+                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                break;
+            }
         }
     }
 
@@ -1026,6 +1099,15 @@ public:
         switch (sender)
         {
             case GOSSIP_SENDER_MAIN:
+                SendActionMenu(player, creature, action);
+                break;
+            case GOSSIP_SENDER_LEARN:
+                SendConfirmLearn(player, creature, action);
+                break;
+            case GOSSIP_SENDER_UNLEARN:
+                SendConfirmUnlearn(player, creature, action);
+                break;
+            case GOSSIP_SENDER_CHECK:
                 SendActionMenu(player, creature, action);
                 break;
         }
@@ -1210,9 +1292,14 @@ class go_evil_book_for_dummies : public GameObjectScript
 public:
     go_evil_book_for_dummies() : GameObjectScript("go_evil_book_for_dummies") { }
 
+    inline bool HasLeatherSpecialty(Player* player)
+    {
+        return (player->HasSpell(S_DRAGON) || player->HasSpell(S_ELEMENTAL) || player->HasSpell(S_TRIBAL));
+    }
+
     bool OnGossipHello(Player* player, GameObject* gameobject) override
     {
-        //TAILORING SPEC
+        //ENGINEERING SPEC
         if (player->HasSkill(SKILL_ENGINEERING) && player->GetBaseSkillValue(SKILL_ENGINEERING) >= 225 && player->getLevel() >= 35)
         {
             if (player->GetQuestRewardStatus(3643) || player->GetQuestRewardStatus(3641) || player->GetQuestRewardStatus(3639))
@@ -1230,6 +1317,17 @@ public:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_GOBLIN, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 1, BOX_LEARN_ENGIN_SPEC, DoLearnCost(player), false);
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_GNOMISH, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 2, BOX_LEARN_ENGIN_SPEC, DoLearnCost(player), false);
                 }
+            }
+        }
+
+        //LEATHERWORKING SPEC
+        if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() >= 40)
+        {
+            if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_DRAGON, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_ELEMENTAL, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 6);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_TRIBAL, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 7);
             }
         }
 
@@ -1256,6 +1354,18 @@ public:
             //Unlearn Gnomish
             case GOSSIP_ACTION_INFO_DEF + 4:
                 ProcessUnlearnAction(player, nullptr, S_UNLEARN_GNOMISH, 0, DoHighUnlearnCost(player));
+                break;
+                //Learn Dragon
+            case GOSSIP_ACTION_INFO_DEF + 5:
+                ProcessCastaction(player, nullptr, S_DRAGON, S_LEARN_DRAGON, 0);
+                break;
+                //Learn Elemental
+            case GOSSIP_ACTION_INFO_DEF + 6:
+                ProcessCastaction(player, nullptr, S_ELEMENTAL, S_LEARN_ELEMENTAL, 0);
+                break;
+                //Learn Tribal
+            case GOSSIP_ACTION_INFO_DEF + 7:
+                ProcessCastaction(player, nullptr, S_TRIBAL, S_LEARN_TRIBAL, 0);
                 break;
         }
     }
