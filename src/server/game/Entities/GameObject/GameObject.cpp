@@ -2466,7 +2466,7 @@ void GameObject::SaveInstanceData(GOState* state)
     CharacterDatabase.Execute(stmt);
 }
 
-void GameObject::updateInstanceData(GOState* state)
+void GameObject::UpdateInstanceData(GOState* state)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, *state);
