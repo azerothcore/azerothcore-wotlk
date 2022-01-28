@@ -2493,7 +2493,7 @@ bool GameObject::HasStateSavedOnInstance()
     return true;
 }
 
-int8 GameObject::getInstanceSavedState()
+int8 GameObject::GetInstanceSavedState()
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, GetInstanceId());
