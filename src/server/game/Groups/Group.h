@@ -313,7 +313,7 @@ public:
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
 
-    void resetInstanceSavedGameobjects(uint32 instanceId);
+    void ResetInstanceSavedGameobjects(uint32 instanceId);
 protected:
     void _homebindIfInstance(Player* player);
     void _cancelHomebindIfInstance(Player* player);

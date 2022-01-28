@@ -223,7 +223,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
                 }
 
-                deleteInstanceSavedData(instanceSave->GetInstanceId());
+                DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
             {
@@ -258,7 +258,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     p->SendResetInstanceFailed(0, instanceSave->GetMapId());
                 }
 
-                deleteInstanceSavedData(instanceSave->GetInstanceId());
+                DeleteInstanceSavedData(instanceSave->GetInstanceId());
             }
             for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                 sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -287,7 +287,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     //else
                     //  p->SendResetInstanceFailed(0, instanceSave->GetMapId());
 
-                    deleteInstanceSavedData(instanceSave->GetInstanceId());
+                    DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->PlayerUnbindInstance(p->GetGUID(), (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);
@@ -315,7 +315,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                     //else
                     //  p->SendResetInstanceFailed(0, instanceSave->GetMapId());
 
-                    deleteInstanceSavedData(instanceSave->GetInstanceId());
+                    DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->PlayerUnbindInstance(guid, (*itr)->GetMapId(), (*itr)->GetDifficulty(), true, p);

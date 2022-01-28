@@ -330,11 +330,11 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
     // GAMEOBJECT_BYTES_1, index at 0, 1, 2 and 3
     SetGoType(GameobjectTypes(goinfo->type));
 
-    if (isInstanceGameobject())
+    if (IsInstanceGameobject())
     {
-        if (hasStateSavedOnInstance())
+        if (HasStateSavedOnInstance())
         {
-            switch (getInstanceSavedState())
+            switch (GetInstanceSavedState())
             {
                 case 0:
                     SetGoState(GO_STATE_ACTIVE);
@@ -2442,16 +2442,16 @@ void GameObject::SetGoState(GOState state)
      * save it's state on the database to be loaded properly
      * on server restart or crash.
      */
-    if (isInstanceGameobject())
+    if (IsInstanceGameobject())
     {
         // Save the gameobject state on the Database
-        if (!hasStateSavedOnInstance())
+        if (!HasStateSavedOnInstance())
         {
-            saveInstanceData(&state);
+            SaveInstanceData(&state);
         }
         else
         {
-            updateInstanceData(&state);
+            UpdateInstanceData(&state);
         }
     }
 }
