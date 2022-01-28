@@ -614,9 +614,9 @@ void Player::UpdateBlockPercentage()
         // Increase from rating
         value += GetRatingBonusValue(CR_BLOCK);
 
-        if (sConfigMgr->GetOption<bool>(CONFIG_STATS_LIMITS_ENABLE))
+        if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
         {
-            value = value > sWorld->GetOption<float>(CONFIG_STATS_LIMITS_BLOCK) ? sWorld->GetOption<float>(CONFIG_STATS_LIMITS_BLOCK) : value;
+            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Block", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Block", 95.0f) : value;
         }
 
         value = value < 0.0f ? 0.0f : value;
@@ -654,9 +654,9 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
     value += (int32(GetWeaponSkillValue(attType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
 
-    if (sConfigMgr->GetOption<bool>(CONFIG_STATS_LIMITS_ENABLE))
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
     {
-        value = value > sWorld->GetOption<float>(CONFIG_STATS_LIMITS_CRIT) ? sWorld->GetOption<float>(CONFIG_STATS_LIMITS_CRIT) : value;
+        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) : value;
     }
 
     value = value < 0.0f ? 0.0f : value;
@@ -755,9 +755,9 @@ void Player::UpdateParryPercentage()
 
         value = std::max(diminishing + nondiminishing, 0.0f);
 
-        if (sConfigMgr->GetOption<bool>(CONFIG_STATS_LIMITS_ENABLE))
+        if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
         {
-            value = value > sWorld->GetOption<float>(CONFIG_STATS_LIMITS_PARRY) ? sWorld->GetOption<float>(CONFIG_STATS_LIMITS_PARRY) : value;
+            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) : value;
         }
     }
 
@@ -797,9 +797,9 @@ void Player::UpdateDodgePercentage()
     m_realDodge = m_realDodge < 0.0f ? 0.0f : m_realDodge;
     float value = std::max(diminishing + nondiminishing, 0.0f);
 
-    if (sConfigMgr->GetOption<bool>(CONFIG_STATS_LIMITS_ENABLE))
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
     {
-        value = value > sWorld->GetOption<float>(CONFIG_STATS_LIMITS_DODGE) ? sWorld->GetOption<float>(CONFIG_STATS_LIMITS_DODGE) : value;
+        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) : value;
     }
 
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
