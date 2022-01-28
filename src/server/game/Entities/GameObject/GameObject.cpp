@@ -2475,7 +2475,7 @@ void GameObject::UpdateInstanceData(GOState* state)
     CharacterDatabase.Execute(stmt);
 }
 
-bool GameObject::hasStateSavedOnInstance()
+bool GameObject::HasStateSavedOnInstance()
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, GetInstanceId());
