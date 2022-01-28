@@ -7506,7 +7506,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcChance = 101;
         spellInfo->Effects[EFFECT_1].Effect = 24;
         spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_1].ItemType = 37889;
+        spellInfo->Effects[EFFECT_1].ItemType = 37888;
     });
 
     // Serverside - Create Rocket Pack
