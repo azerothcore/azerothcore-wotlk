@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "SpellMgr.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "WorldSession.h"
 
 using namespace Acore::ChatCommands;

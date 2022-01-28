@@ -21,6 +21,7 @@
 #include "CalendarMgr.h"
 #include "CharacterCache.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Item.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -52,7 +53,7 @@ MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery
         default:
             m_messageType = MAIL_NORMAL;
             m_senderId = 0;                                 // will show mail from not existed player
-            LOG_ERROR("mail", "MailSender::MailSender - Mail have unexpected sender typeid (%u)", sender->GetTypeId());
+            LOG_ERROR("mail", "MailSender::MailSender - Mail have unexpected sender typeid ({})", sender->GetTypeId());
             break;
     }
 }
@@ -206,7 +207,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
 
     uint32 mailId = sObjectMgr->GenerateMailID();
 
-    time_t deliver_time = time(nullptr) + deliver_delay;
+    time_t deliver_time = GameTime::GetGameTime().count() + deliver_delay;
 
     //expire time if COD 3 days, if no COD 30 days, if auction sale pending 1 hour
     uint32 expire_delay;
