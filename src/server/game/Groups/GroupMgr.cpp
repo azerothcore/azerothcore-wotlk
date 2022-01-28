@@ -143,7 +143,7 @@ void GroupMgr::LoadGroups()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server.loading", ">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Loaded {} group definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
         }
     }
@@ -178,7 +178,7 @@ void GroupMgr::LoadGroups()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server.loading", ">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Loaded {} group members in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
         }
     }
