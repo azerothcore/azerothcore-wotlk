@@ -120,7 +120,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     // Check if player is already in a similar arena team
     if ((player && player->GetArenaTeamId(GetSlot())) || sCharacterCache->GetCharacterArenaTeamIdByGuid(playerGuid, GetSlot()) != 0)
     {
-        LOG_ERROR("bg.arena", "Arena: Player %s (%s) already has an arena team of type %u", playerName.c_str(), playerGuid.ToString().c_str(), GetType());
+        LOG_ERROR("bg.arena", "Arena: Player {} ({}) already has an arena team of type {}", playerName, playerGuid.ToString(), GetType());
         return false;
     }
 
@@ -255,7 +255,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         // Delete member if character information is missing
         if (fields[6].GetString().empty())
         {
-            LOG_ERROR("sql.sql", "ArenaTeam %u has member with empty name - probably player %s doesn't exist, deleting him from memberlist!", arenaTeamId, newMember.Guid.ToString().c_str());
+            LOG_ERROR("sql.sql", "ArenaTeam {} has member with empty name - probably player {} doesn't exist, deleting him from memberlist!", arenaTeamId, newMember.Guid.ToString());
             this->DelMember(newMember.Guid, true);
             continue;
         }
@@ -272,7 +272,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
     if (Empty() || !captainPresentInTeam)
     {
         // Arena team is empty or captain is not in team, delete from db
-        LOG_DEBUG("bg.battleground", "ArenaTeam %u does not have any members or its captain is not in team, disbanding it...", TeamId);
+        LOG_DEBUG("bg.battleground", "ArenaTeam {} does not have any members or its captain is not in team, disbanding it...", TeamId);
         return false;
     }
 
@@ -314,9 +314,9 @@ void ArenaTeam::SetCaptain(ObjectGuid guid)
         newCaptain->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 0);
         /*if (oldCaptain)
         {
-            LOG_DEBUG("bg.battleground", "Player: %s [%s] promoted player: %s [%s] to leader of arena team [Id: %u] [Type: %u].",
-                oldCaptain->GetName().c_str(), oldCaptain->GetGUID().ToString().c_str(), newCaptain->GetName().c_str(),
-                newCaptain->GetGUID().ToString().c_str(), GetId(), GetType());
+            LOG_DEBUG("bg.battleground", "Player: {} [{}] promoted player: {} [{}] to leader of arena team [Id: {}] [Type: {}].",
+                oldCaptain->GetName(), oldCaptain->GetGUID().ToString(), newCaptain->GetName(),
+                newCaptain->GetGUID().ToString(), GetId(), GetType());
         }*/
     }
 }
@@ -586,7 +586,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 str
             data << str1 << str2 << str3;
             break;
         default:
-            LOG_ERROR("bg.arena", "Unhandled strCount %u in ArenaTeam::BroadcastEvent", strCount);
+            LOG_ERROR("bg.arena", "Unhandled strCount {} in ArenaTeam::BroadcastEvent", strCount);
             return;
     }
 
@@ -622,7 +622,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     auto const& itr = ArenaSlotByType.find(type);
     if (itr == ArenaSlotByType.end())
     {
-        sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
+        LOG_ERROR("bg.arena", "Unknown arena team type {} for some arena team", type);
         return slot;
     }
 
@@ -636,7 +636,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
         return slot;
     }
 
-    LOG_ERROR("bg.arena", "FATAL: Unknown arena team type %u for some arena team", type);
+    LOG_ERROR("bg.arena", "Unknown arena team type {} for some arena team", type);
     return 0xFF;
 }
 
@@ -1013,7 +1013,7 @@ uint8 ArenaTeam::GetReqPlayersForType(uint32 type)
     auto const& itr = ArenaReqPlayersForType.find(type);
     if (itr == ArenaReqPlayersForType.end())
     {
-        sLog->outError("FATAL: Unknown arena type %u!", type);
+        LOG_ERROR("bg.arena", "FATAL: Unknown arena type {}!", type);
         return 0xFF;
     }
 

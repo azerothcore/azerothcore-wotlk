@@ -46,7 +46,7 @@ public:
         }
         catch (boost::system::system_error const& err)
         {
-            LOG_ERROR("network", "Exception caught in SocketMgr.StartNetwork (%s:%u): %s", bindIp.c_str(), port, err.what());
+            LOG_ERROR("network", "Exception caught in SocketMgr.StartNetwork ({}:{}): {}", bindIp, port, err.what());
             return false;
         }
 
@@ -106,7 +106,7 @@ public:
         }
         catch (boost::system::system_error const& err)
         {
-            LOG_WARN("network", "Failed to retrieve client's remote address %s", err.what());
+            LOG_WARN("network", "Failed to retrieve client's remote address {}", err.what());
         }
     }
 
