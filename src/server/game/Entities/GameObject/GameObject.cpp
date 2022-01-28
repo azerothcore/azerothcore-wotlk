@@ -332,9 +332,10 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (IsInstanceGameobject())
     {
+        LoadInstanceSavedState();
         if (HasStateSavedOnInstance())
         {
-            switch (GetInstanceSavedState())
+            switch (FindInstanceSavedState(GetInstanceId()))
             {
                 case 0:
                     SetGoState(GO_STATE_ACTIVE);
@@ -2477,23 +2478,10 @@ void GameObject::UpdateInstanceData(GOState* state)
 
 bool GameObject::HasStateSavedOnInstance()
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
-    stmt->setUInt32(0, GetInstanceId());
-    stmt->setUInt32(1, GetEntry());
-    stmt->setUInt32(2, GetSpawnId());
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-    if (!result)
-    {
-        // There's no gameobject with this GUID saved on the DB
-        return false;
-    }
-
-    // Found gameobject on the database saved
-    return true;
+    return GameobjectInstanceSavedStateList.size();
 }
 
-int8 GameObject::GetInstanceSavedState()
+void GameObject::LoadInstanceSavedState()
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, GetInstanceId());
@@ -2504,13 +2492,17 @@ int8 GameObject::GetInstanceSavedState()
     if (!result)
     {
         // There's no gameobject with this GUID saved on the DB
-        return 0;
+        return;
     }
 
-    Field* fields = result->Fetch();
-
-    // Found gameobject on the database saved
-    return fields[0].GetInt8();
+    Field* fields;
+    do
+    {
+        fields = result->Fetch();
+        uint32 instance = fields[0].GetUInt32();
+        uint32 state    = fields[1].GetUInt32();
+        GameobjectInstanceSavedStateList.insert(instance, state);
+    } while (result->NextRow());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)

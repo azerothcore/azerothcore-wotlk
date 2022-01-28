@@ -717,6 +717,15 @@ enum GOState
 
 #define MAX_GO_STATE              3
 
+/*  The data loaded from `instance_saved_go_state_data`
+ *  Each instance can have a different state for a gameobject
+ */
+struct GameobjectInstanceSavedState
+{
+    uint32 instanceID;
+    uint32 state;
+};
+
 // from `gameobject`
 struct GameObjectData
 {
@@ -982,7 +991,8 @@ public:
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
-    int8 GetInstanceSavedState();
+    void LoadInstanceSavedState();
+    uint8 FindInstanceSavedState(uint32 instanceId) { auto state = GameobjectInstanceSavedStateList.find(instanceId); return state->second; }
     void SaveInstanceData(GOState* state);
     void UpdateInstanceData(GOState* state);
     bool HasStateSavedOnInstance();
@@ -997,6 +1007,8 @@ public:
         }
         return false;
     };
+
+    std::unordered_map<uint32, uint8> GameobjectInstanceSavedStateList;
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();
@@ -1035,7 +1047,6 @@ protected:
     uint32 m_lootGenerationTime;
 
     ObjectGuid m_linkedTrap;
-
 private:
     void CheckRitualList();
     void ClearRitualList();

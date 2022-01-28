@@ -9352,6 +9352,29 @@ void ObjectMgr::LoadFactionChangeQuests()
     LOG_INFO("server.loading", " ");
 }
 
+void ObjectMgr::LoadInstanceSavedState()
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+    {
+        // There's no gameobject with this GUID saved on the DB
+        return;
+    }
+
+    Field* fields;
+    do
+    {
+        fields = result->Fetch();
+        uint32 instance = fields[0].GetUInt32();
+        uint32 state = fields[1].GetUInt32();
+        UniqueGameobjects ugob = { fields[2].GetUInt32(), fields[3].GetUInt32() };
+        Gameobjects gobjs = { fields[1].GetUInt32(), ugob. };
+        GameobjectInstanceSavedStateList.insert(instance, state);
+    } while (result->NextRow());
+}
+
 void ObjectMgr::LoadFactionChangeReputations()
 {
     uint32 oldMSTime = getMSTime();
