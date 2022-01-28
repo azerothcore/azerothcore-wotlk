@@ -2456,7 +2456,7 @@ void GameObject::SetGoState(GOState state)
     }
 }
 
-void GameObject::saveInstanceData(GOState* state)
+void GameObject::SaveInstanceData(GOState* state)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, GetInstanceId());
