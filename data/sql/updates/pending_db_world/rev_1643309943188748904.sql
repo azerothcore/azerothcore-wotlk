@@ -1,10 +1,10 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643309943188748904');
 
 -- update current loot to 100% per wowhead
-UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=11524 AND `Item`=11614;
-UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=11525 AND `Item`=11615;
-UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=13721 AND `Item`=12827;
-UPDATE `gameobject_loot_template` SET `Chance`='100' WHERE  `Entry`=13722 AND `Item`=12830;
+UPDATE `gameobject_loot_template` SET `Chance`=100 WHERE  `Entry`=11524 AND `Item`=11614;
+UPDATE `gameobject_loot_template` SET `Chance`=100 WHERE  `Entry`=11525 AND `Item`=11615;
+UPDATE `gameobject_loot_template` SET `Chance`=100 WHERE  `Entry`=13721 AND `Item`=12827;
+UPDATE `gameobject_loot_template` SET `Chance`=100 WHERE  `Entry`=13722 AND `Item`=12830;
 
 -- delete and insert for rerun locking the loot to skill id requirement for loot
 -- none currently exist in acdb
