@@ -1432,6 +1432,13 @@ void World::LoadConfigSettings(bool reload)
     // Realm Availability
     m_bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", true);
 
+    // Stats limits
+    m_bool_configs[CONFIG_STATS_LIMITS_ENABLE] = sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false);
+    m_float_configs[CONFIG_STATS_LIMITS_DODGE] = sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f);
+    m_float_configs[CONFIG_STATS_LIMITS_PARRY] = sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f);
+    m_float_configs[CONFIG_STATS_LIMITS_BLOCK] = sConfigMgr->GetOption<float>("Stats.Limits.Block", 95.0f);
+    m_float_configs[CONFIG_STATS_LIMITS_CRIT]  = sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
