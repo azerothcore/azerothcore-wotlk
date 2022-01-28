@@ -346,7 +346,6 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
                 SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 break;
             }
-            
         }
     }
     else
