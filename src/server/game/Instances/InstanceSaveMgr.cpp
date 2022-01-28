@@ -467,16 +467,6 @@ void InstanceSaveMgr::Update()
     }
 }
 
-void InstanceSaveMgr::resetInstanceSavedGameobjects(uint32 instanceId)
-{
-    if (instanceId)
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
-        stmt->setUInt32(0, instanceId);
-        CharacterDatabase.Execute(stmt);
-    }
-}
-
 void InstanceSaveMgr::_ResetSave(InstanceSaveHashMap::iterator& itr)
 {
     lock_instLists = true;
@@ -522,9 +512,6 @@ void InstanceSaveMgr::_ResetSave(InstanceSaveHashMap::iterator& itr)
         itr->second->SetResetTime(GetResetTimeFor(itr->second->GetMapId(), itr->second->GetDifficulty()));
         itr->second->SetExtendedResetTime(GetExtendedResetTimeFor(itr->second->GetMapId(), itr->second->GetDifficulty()));
     }
-
-    // Reset saved gameobjects on instance
-    resetInstanceSavedGameobjects(itr->second->GetInstanceId());
 
     lock_instLists = false;
 }

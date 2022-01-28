@@ -336,16 +336,20 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         {
             switch (getInstanceSavedState())
             {
-            case 0:
-                SetGoState(GO_STATE_ACTIVE);
-                break;
-            case 1:
-                SetGoState(GO_STATE_READY);
-                break;
-            case 2:
-                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                break;
+                case 0:
+                    SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case 1:
+                    SetGoState(GO_STATE_READY);
+                    break;
+                case 2:
+                    SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    break;
             }
+        }
+        else
+        {
+            SetGoState(go_state);
         }
     }
     else

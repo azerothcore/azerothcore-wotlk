@@ -2407,7 +2407,6 @@ public:
     void SetLastPetNumber(uint32 petnumber) { m_lastpetnumber = petnumber; }
     [[nodiscard]] uint32 GetLastPetSpell() const { return m_oldpetspell; }
     void SetLastPetSpell(uint32 petspell) { m_oldpetspell = petspell; }
-
     /*********************************************************/
     /***                   GROUP SYSTEM                    ***/
     /*********************************************************/
