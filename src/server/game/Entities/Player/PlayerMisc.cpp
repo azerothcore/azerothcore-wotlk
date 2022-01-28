@@ -181,7 +181,7 @@ void Player::SendResetFailedNotify(uint32 mapid)
     GetSession()->SendPacket(&data);
 }
 
-void deleteInstanceSavedData(uint32 instanceId)
+void DeleteInstanceSavedData(uint32 instanceId)
 {
     if (instanceId)
     {
