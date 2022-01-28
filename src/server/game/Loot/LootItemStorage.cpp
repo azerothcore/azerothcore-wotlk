@@ -60,7 +60,7 @@ void LootItemStorage::LoadStorageFromDB()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %d stored items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} stored items in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -82,7 +82,7 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 {
     if (lootItemStore.find(loot->containerGUID) != lootItemStore.end())
     {
-        LOG_INFO("misc", "LootItemStorage::AddNewStoredLoot (A1) - %s!", loot->containerGUID.ToString().c_str());
+        LOG_INFO("misc", "LootItemStorage::AddNewStoredLoot (A1) - {}!", loot->containerGUID.ToString());
         return;
     }
 
