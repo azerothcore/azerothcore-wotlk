@@ -977,7 +977,6 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         //if (attacker && victim->GetTypeId() == TYPEID_PLAYER && victim != attacker)
         //victim->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health); // pussywizard: optimization
-        
         //Pussywarlock Elite - MDic Unit death not showing full spell animation.
         //This delay of 400ms provides that opportunity for it to not be nerfed.
         std::this_thread::sleep_for(400ms);
