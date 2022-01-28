@@ -2013,7 +2013,7 @@ void Group::SetRaidDifficulty(Difficulty difficulty)
     }
 }
 
-void Group::resetInstanceSavedGameobjects(uint32 instanceId)
+void Group::ResetInstanceSavedGameobjects(uint32 instanceId)
 {
     if (instanceId)
     {
