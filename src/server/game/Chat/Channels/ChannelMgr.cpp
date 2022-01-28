@@ -73,7 +73,7 @@ void ChannelMgr::LoadChannels()
         std::wstring channelWName;
         if (!Utf8toWStr(channelName, channelWName))
         {
-            LOG_ERROR("server.loading", "Failed to load channel '%s' from database - invalid utf8 sequence? Deleted.", channelName.c_str());
+            LOG_ERROR("server.loading", "Failed to load channel '{}' from database - invalid utf8 sequence? Deleted.", channelName);
             toDelete.push_back({ channelName, team });
             continue;
         }
@@ -81,7 +81,7 @@ void ChannelMgr::LoadChannels()
         ChannelMgr* mgr = forTeam(team);
         if (!mgr)
         {
-            LOG_ERROR("server.loading", "Failed to load custom chat channel '%s' from database - invalid team %u. Deleted.", channelName.c_str(), team);
+            LOG_ERROR("server.loading", "Failed to load custom chat channel '{}' from database - invalid team {}. Deleted.", channelName, team);
             toDelete.push_back({ channelName, team });
             continue;
         }
@@ -114,7 +114,7 @@ void ChannelMgr::LoadChannels()
         CharacterDatabase.Execute(stmt);
     }
 
-    LOG_INFO("server.loading", ">> Loaded %u channels in %ums", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} channels in {}ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -201,7 +201,7 @@ void ChannelMgr::LoadChannelRights()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Channel Rights in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
