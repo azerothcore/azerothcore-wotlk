@@ -9352,27 +9352,31 @@ void ObjectMgr::LoadFactionChangeQuests()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::LoadInstanceSavedState()
+void ObjectMgr::LoadInstanceSavedGameobjectStateData()
 {
+    uint32 oldMSTime = getMSTime();
+
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
     {
         // There's no gameobject with this GUID saved on the DB
+        LOG_ERROR("sql.sql", ">> Loaded 0 Instance saved gameobject state data. DB table `instance_saved_go_state_data` is empty.");
         return;
     }
 
     Field* fields;
+    uint32 count;
     do
     {
         fields = result->Fetch();
-        uint32 instance = fields[0].GetUInt32();
-        uint32 state = fields[1].GetUInt32();
-        UniqueGameobjects ugob = { fields[2].GetUInt32(), fields[3].GetUInt32() };
-        Gameobjects gobjs = { fields[1].GetUInt32(), ugob. };
-        GameobjectInstanceSavedStateList.insert(instance, state);
+        GameobjectInstanceSavedStateList.push_back({ fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetUInt8() });
+        count++;
     } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} instance saved gameobject state data in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void ObjectMgr::LoadFactionChangeReputations()

@@ -991,11 +991,9 @@ public:
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
-    void LoadInstanceSavedState();
-    uint8 FindInstanceSavedState(uint32 instanceId) { auto state = GameobjectInstanceSavedStateList.find(instanceId); return state->second; }
     void SaveInstanceData(GOState* state);
     void UpdateInstanceData(GOState* state);
-    bool HasStateSavedOnInstance();
+    uint8 FindStateSavedOnInstance();
     bool IsInstanceGameobject()
     {
         if (auto* map = FindMap())
@@ -1007,8 +1005,6 @@ public:
         }
         return false;
     };
-
-    std::unordered_map<uint32, uint8> GameobjectInstanceSavedStateList;
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();

@@ -332,25 +332,20 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (IsInstanceGameobject())
     {
-        LoadInstanceSavedState();
-        if (HasStateSavedOnInstance())
+        switch (FindStateSavedOnInstance())
         {
-            switch (FindInstanceSavedState(GetInstanceId()))
-            {
-                case 0:
-                    SetGoState(GO_STATE_ACTIVE);
-                    break;
-                case 1:
-                    SetGoState(GO_STATE_READY);
-                    break;
-                case 2:
-                    SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                    break;
-            }
-        }
-        else
-        {
-            SetGoState(go_state);
+            case 0:
+                SetGoState(GO_STATE_ACTIVE);
+                break;
+            case 1:
+                SetGoState(GO_STATE_READY);
+                break;
+            case 2:
+                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                break;
+            default:
+                SetGoState(go_state);
+                break;
         }
     }
     else
@@ -2446,7 +2441,7 @@ void GameObject::SetGoState(GOState state)
     if (IsInstanceGameobject())
     {
         // Save the gameobject state on the Database
-        if (!HasStateSavedOnInstance())
+        if (!FindStateSavedOnInstance())
         {
             SaveInstanceData(&state);
         }
@@ -2476,33 +2471,9 @@ void GameObject::UpdateInstanceData(GOState* state)
     CharacterDatabase.Execute(stmt);
 }
 
-bool GameObject::HasStateSavedOnInstance()
+uint8 GameObject::FindStateSavedOnInstance()
 {
-    return GameobjectInstanceSavedStateList.size();
-}
-
-void GameObject::LoadInstanceSavedState()
-{
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
-    stmt->setUInt32(0, GetInstanceId());
-    stmt->setUInt32(1, GetEntry());
-    stmt->setUInt32(2, GetSpawnId());
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-    if (!result)
-    {
-        // There's no gameobject with this GUID saved on the DB
-        return;
-    }
-
-    Field* fields;
-    do
-    {
-        fields = result->Fetch();
-        uint32 instance = fields[0].GetUInt32();
-        uint32 state    = fields[1].GetUInt32();
-        GameobjectInstanceSavedStateList.insert(instance, state);
-    } while (result->NextRow());
+    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetEntry(), GetSpawnId());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)

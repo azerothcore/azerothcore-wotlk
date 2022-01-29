@@ -1374,9 +1374,18 @@ public:
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
 
-
-    void LoadInstanceSavedState();
-    //uint8 FindInstanceSavedState(uint32 instanceId) { auto state = GameobjectInstanceSavedStateList.find(instanceId); return state->second; }
+    void LoadInstanceSavedGameobjectStateData();
+    uint8 FindInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid)
+    {
+        for (auto it = GameobjectInstanceSavedStateList.begin(); it != GameobjectInstanceSavedStateList.end(); it++)
+        {
+            if (it->m_entry == entry && it->m_guid == guid && it->m_instance == id)
+            {
+                return it->m_state;
+            }
+        }
+        return 0;
+    }
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1543,9 +1552,14 @@ private:
 
     QuestMoneyRewardStore _questMoneyRewards;
 
-    typedef std::unordered_map<uint32, uint8> UniqueGameobjects; // GUID, State
-    typedef std::unordered_map<uint32, UniqueGameobjects> Gameobjects; // Entry, eachGameobject with this Entry
-    std::unordered_map<uint32, Gameobjects> GameobjectInstanceSavedStateList; // InstanceID, Each Gameobject
+    struct GameobjectInstanceSavedState
+    {
+        uint32 m_instance;
+        uint32 m_entry;
+        uint32 m_guid;
+        uint8 m_state;
+    };
+    std::vector<GameobjectInstanceSavedState> GameobjectInstanceSavedStateList; 
 };
 
 #define sObjectMgr ObjectMgr::instance()
