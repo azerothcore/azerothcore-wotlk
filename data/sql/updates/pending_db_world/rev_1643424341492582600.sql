@@ -30,9 +30,9 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (3072, 1, 0, 'I wish to unlearn tribal leatherworking!', 18975, 1, 1, 3077, 0, 0, 0, '', 0, 0),
 (3073, 0, 3, 'I would like to train.', 5597, 5, 16, 0, 0, 0, 0, '', 0, 0),
 (3073, 1, 0, 'I wish to unlearn tribal leatherworking!', 18975, 1, 1, 3077, 0, 0, 0, '', 0, 0),
-(3075, 1, 0, 'I wish to unlearn dragonscale leatherworking!', 18977, 1, 1, 0, 0, 0, 500000, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0),
-(3076, 1, 0, 'I wish to unlearn elemental leatherworking!', 18917, 1, 1, 0, 0, 0, 500000, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0),
-(3077, 1, 0, 'I wish to unlearn tribal leatherworking!', 18975, 1, 1, 0, 0, 0, 500000, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0);
+(3075, 1, 0, 'I wish to unlearn dragonscale leatherworking!', 18977, 1, 1, 0, 0, 0, 0, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0),
+(3076, 1, 0, 'I wish to unlearn elemental leatherworking!', 18917, 1, 1, 0, 0, 0, 0, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0),
+(3077, 1, 0, 'I wish to unlearn tribal leatherworking!', 18975, 1, 1, 0, 0, 0, 0, 'Do you really want to unlearn your leatherworking specialty and lose all associated recipes?', 18969, 0);
 
 
 UPDATE `creature_template` SET `gossip_menu_id` = 3068, `npcflag` = `npcflag`|1 WHERE `entry` = 7867; -- Thorkaf Dragoneye

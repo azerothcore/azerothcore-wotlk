@@ -1027,7 +1027,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
 
@@ -1037,15 +1037,15 @@ public:
                 player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             case GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE:
-                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_DRAGONSCALE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_DRAGONSCALE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, DoMedUnlearnCost(player));
                 SendGossipMenuFor(player, GOSSIP_TEXT_UNLEARN_CONFIRM_DRAGONSCALE, creature);
                 break;
             case GOSSIP_MENU_UNLEARN_CONFIRM_ELEMENTAL:
-                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_ELEMENTAL, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_ELEMENTAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_ELEMENTAL, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_ELEMENTAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2, DoMedUnlearnCost(player));
                 SendGossipMenuFor(player, GOSSIP_TEXT_UNLEARN_CONFIRM_ELEMENTAL, creature);
                 break;
             case GOSSIP_MENU_UNLEARN_CONFIRM_TRIBAL:
-                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_TRIBAL, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_TRIBAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_TRIBAL, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_TRIBAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3, DoMedUnlearnCost(player));
                 SendGossipMenuFor(player, GOSSIP_TEXT_UNLEARN_CONFIRM_TRIBAL, creature);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
