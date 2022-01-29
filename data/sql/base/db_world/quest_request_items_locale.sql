@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.quest_request_items_locale
+-- Дамп структуры для таблица acore_world.quest_request_items_locale
 DROP TABLE IF EXISTS `quest_request_items_locale`;
 CREATE TABLE IF NOT EXISTS `quest_request_items_locale` (
   `ID` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `quest_request_items_locale` (
   PRIMARY KEY (`ID`,`locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Дамп данных таблицы _acore_world.quest_request_items_locale: ~40 426 rows (приблизительно)
+-- Дамп данных таблицы acore_world.quest_request_items_locale: ~33 951 rows (приблизительно)
 DELETE FROM `quest_request_items_locale`;
 /*!40000 ALTER TABLE `quest_request_items_locale` DISABLE KEYS */;
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
@@ -17234,6 +17234,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9278, 'zhCN', '您好!很高兴见到您!$B$B我看到您手里拿着一张特殊的礼品券，把它交给我，您就可以得到一件特殊的礼品!', 0),
 	(9279, 'frFR', NULL, 18019),
 	(9280, 'deDE', '$N, habt Ihr schon das benötigte Mottenblut für die Heilkristalle? Überlebende sind über das gesamte Tal verstreut und die Zeit drängt!', 26972),
+	(9280, 'esES', '$n, ¿traes la sangre de polilla del valle para los cristales de sanación? ¡Debemos apresurarnos, hay muchos supervivientes en el valle!', 18019),
+	(9280, 'esMX', '$n, ¿traes la sangre de polilla del valle para los cristales de sanación? ¡Debemos apresurarnos, hay muchos supervivientes en el valle!', 18019),
 	(9280, 'frFR', '$N, avez-vous pu récolter le sang de phalène dont nous avons besoin pour nos cristaux de soins ? Il reste des survivants éparpillés dans le val entier. Nous devons faire vite !', 18019),
 	(9280, 'zhCN', '你弄到治疗水晶必要的飞蛾血清了吗?溪谷里到处都是生还者，时间紧迫!', 0),
 	(9281, 'frFR', NULL, 18019),
@@ -17241,6 +17243,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9282, 'frFR', NULL, 18019),
 	(9282, 'zhCN', '嗯，$N?', 0),
 	(9283, 'deDE', 'Mit Euer Hilfe können wir das alles noch überleben.', 18019),
+	(9283, 'esES', 'Sobreviviremos a esto con tu ayuda.', 18019),
+	(9283, 'esMX', 'Sobreviviremos a esto con tu ayuda.', 18019),
 	(9283, 'frFR', NULL, 18019),
 	(9283, 'zhCN', '有你的帮忙我们会安然度过!', 0),
 	(9284, 'frFR', NULL, 18019),
@@ -17259,9 +17263,13 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9292, 'frFR', 'Avez-vous besoin de quelque chose ?', 18019),
 	(9292, 'zhCN', '你需要协助吗?', 0),
 	(9293, 'deDE', 'Der Zustand aller Proben muss einwandfrei sein, damit wir eine Chance haben, den See zu entseuchen.$B$BUns bleibt nicht viel Zeit, $C!', 26972),
+	(9293, 'esES', 'Necesitaré todas las muestras en buen estado si queremos tener una posibilidad de limpiar el lago.$B$B¡No nos queda mucho tiempo, $c!', 18019),
+	(9293, 'esMX', 'Necesitaré todas las muestras en buen estado si queremos tener una posibilidad de limpiar el lago.$B$B¡No nos queda mucho tiempo, $c!', 18019),
 	(9293, 'frFR', 'Je vais avoir besoin de tous ces échantillons en bon état si nous voulons avoir une chance de nettoyer le lac.$B$BNous n’avons pas beaucoup de temps, $c !', 18019),
 	(9293, 'zhCN', '如果我们要净化湖水，我就需要那些样本保持在良好状态。我知道你能胜任这个挑战，$C，如果我之前太歇斯底里，我很抱歉。$B$B我们没有多少时间了，$C!', 0),
 	(9294, 'deDE', 'Je eher Ihr den Wirkstoff beim See einsetzt, desto weniger einheimische Kreaturen, einschließlich unsereiner selbst, werden auf den Grund des verseuchten Trinkwassers mutieren!$B$BEs ist traurig, dass wir den bereits verseuchten Kreaturen nicht helfen können. Wenn doch nur meine Laborausrüstung noch heil wäre.', 18019),
+	(9294, 'esES', 'Cuanto antes se disperse el agente en el lago, menos criaturas nativas mutarán al beber el agua, ¡incluidos nosotros mismos! $B$BSiento que no podamos hacer nada para ayudar a las pobres criaturas que ya han sido infectadas. Si tan sólo mi equipo de laboratorio estuviera intacto.', 18019),
+	(9294, 'esMX', 'Cuanto antes se disperse el agente en el lago, menos criaturas nativas mutarán al beber el agua, ¡incluidos nosotros mismos! $B$BSiento que no podamos hacer nada para ayudar a las pobres criaturas que ya han sido infectadas. Si tan sólo mi equipo de laboratorio estuviera intacto.', 18019),
 	(9294, 'frFR', NULL, 18019),
 	(9294, 'zhCN', '你越快将中和剂散播在湖里，就会有越少的生物因为喝了湖水而产生突变，包括我们!$B$B很遗憾我们对已经被感染的生物束手无策。要是我的实验器材还完整就好了。', 0),
 	(9295, 'frFR', 'Oui ? Qu\'avez-vous donc là ?', 18019),
@@ -17283,12 +17291,16 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9302, 'frFR', 'Oui ? Qu\'avez-vous donc là ?', 18019),
 	(9302, 'zhCN', '什么事吗?你手里拿着的是什么?', 0),
 	(9303, 'deDE', 'Je mehr wir tun können, um den Nistelwald aufzuräumen, desto schneller kann Zhanaa zurück an die Arbeit.', 26972),
+	(9303, 'esES', 'Cuanto más hagamos por despejar Cubrebosque, antes podrá Zhanaa volver al trabajo.', 18019),
+	(9303, 'esMX', 'Cuanto más hagamos por despejar Cubrebosque, antes podrá Zhanaa volver al trabajo.', 18019),
 	(9303, 'frFR', 'Plus nous en ferons pour nettoyer Nidebois, plus vite Zhanaa pourra se mettre au travail.', 18019),
 	(9303, 'zhCN', '我们越努力把奈斯特清理干净，就能越快让萨那开始动工 。', 0),
 	(9304, 'deDE', 'Ja? Was habt Ihr denn da?', 18019),
 	(9304, 'frFR', 'Oui ? Qu\'avez-vous donc là ?', 18019),
 	(9304, 'zhCN', '什么事吗?你手里拿着的是什么?', 0),
 	(9305, 'deDE', 'Ich bin mir sicher, dass wir den Emitter mit den Ersatzteilen reparieren können! Mit etwas Glück, werden wir da draußen noch andere finden, mit denen wir uns in Verbindung setzen können.', 26972),
+	(9305, 'esES', 'Cuando tengamos esas piezas de repuesto, sé que conseguiremos reparar este emisor. Con un poco de suerte quedará alguien más por ahí fuera con quien hablar.', 18019),
+	(9305, 'esMX', 'Cuando tengamos esas piezas de repuesto, sé que conseguiremos reparar este emisor. Con un poco de suerte quedará alguien más por ahí fuera con quien hablar.', 18019),
 	(9305, 'frFR', 'Quand nous aurons ces pièces de rechange, nous pourrons réparer l’émetteur. Avec un peu de chance, il restera également quelqu’un à qui parler.', 18019),
 	(9305, 'zhCN', '等我们收集完那些备用零件，我相信我们就能修好这个发射器。幸运的话，还可以跟留在那边的人谈话。', 0),
 	(9306, 'frFR', NULL, 18019),
@@ -17300,6 +17312,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9310, 'frFR', 'Puis-je vous aider ?', 18019),
 	(9310, 'zhCN', '有什么事吗?', 0),
 	(9311, 'deDE', 'Dann stimmt es also... ein Aufklärungstrupp der Blutelfen hier im Am\'mental! Wie konnten sie uns nur folgen?$B$BIch schicke sofort jemanden los, um Tolaan zurückzubringen.', 18019),
+	(9311, 'esES', 'Entonces es cierto... ¡un grupo de exploradores de elfos de sangre aquí en el Valle de Ammen! ¿Cómo nos han seguido?$B$BEnviaré a alguien inmediatamente para que traiga a Tolaan de vuelta.', 18019),
+	(9311, 'esMX', 'Entonces es cierto... ¡un grupo de exploradores de elfos de sangre aquí en el Valle de Ammen! ¿Cómo nos han seguido?$B$BEnviaré a alguien inmediatamente para que traiga a Tolaan de vuelta.', 18019),
 	(9311, 'frFR', NULL, 18019),
 	(9311, 'zhCN', '那么那是真的……埃门谷这里有一批侦察血精灵小队!他们怎么跟踪到我们的?$B$B我要立刻派个人去把托兰带回来!', 0),
 	(9312, 'frFR', NULL, 18019),
@@ -17551,6 +17565,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9408, 'frFR', NULL, 18019),
 	(9408, 'zhCN', '又来一个啊?', 0),
 	(9409, 'deDE', 'Hallo, $C. Was habt Ihr da? Ist das für mich?', 26972),
+	(9409, 'esES', 'Hola, $c. ¿Traes algo para mí?', 18019),
+	(9409, 'esMX', 'Hola, $c. ¿Traes algo para mí?', 18019),
 	(9409, 'frFR', 'Bonjour, $C. Qu\'est-ce que vous avez là ? C\'est pour moi ?', 18019),
 	(9409, 'zhCN', '嗨，$C。你拿着什么?是给我的吗?', 0),
 	(9410, 'deDE', 'Ihr könnt froh sein, dass Ihr noch lebt.', 26972),
@@ -17659,18 +17675,28 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9448, 'zhCN', '你做了正确的事，$C。失落者已经受了这么多苦难。他们不该再忍受这样的屈辱。', 0),
 	(9449, 'frFR', NULL, 18019),
 	(9450, 'deDE', 'Das Gleichgewicht der Elemente scheint noch immer gestört, $N.', 26972),
+	(9450, 'esES', 'Los elementos me siguen pareciendo desequilibrados, $n.', 18019),
+	(9450, 'esMX', 'Los elementos me siguen pareciendo desequilibrados, $n.', 18019),
 	(9450, 'frFR', NULL, 18019),
 	(9450, 'zhCN', '在我看来元素还是处在失衡状态，$N。', 0),
 	(9451, 'deDE', 'Zusammen werden die Zerschlagenen und die Draenei ein tieferes Verständniss für die Mysterien der Elemente wiedererlangen.$B$BSeid Ihr mit der für die Herstellung Eures Erdtotems notwendigen Komponenten zurückgekehrt?', 26972),
+	(9451, 'esES', 'Juntos, los Tábidos y los $r recuperarán un entendimiento profundo de los misterios de los elementos.$B$B¿Traes lo necesario para crear tu tótem de Tierra?', 18019),
+	(9451, 'esMX', 'Juntos, los Tábidos y los $r recuperarán un entendimiento profundo de los misterios de los elementos.$B$B¿Traes lo necesario para crear tu tótem de Tierra?', 18019),
 	(9451, 'frFR', 'Ensemble, les Roués et les $R pourront obtenir une compréhension plus achevée des mystères que détiennent les éléments.$B$BÊtes-vous revenu avec tout le nécessaire à la création de votre totem de terre ?', 18019),
 	(9451, 'zhCN', '破碎者和德莱尼会一起重获对元素秘密更深的了解。$B$B你带回制造大地图腾所需的物品了吗?', 0),
 	(9452, 'deDE', 'Nehmt Euch vor den Murlocs in Acht: seltsame und extrem lästige kleine Kreaturen.', 26972),
+	(9452, 'esES', 'Cuidado con los múrlocs; son unas criaturas pequeñas, raras y muy, muy molestas.', 18019),
+	(9452, 'esMX', 'Cuidado con los múrlocs; son unas criaturas pequeñas, raras y muy, muy molestas.', 18019),
 	(9452, 'frFR', 'Faites attention aux murlocs. Ces drôles de petites créatures sont extrêmement pénibles.', 18019),
 	(9452, 'zhCN', '小心鱼人:奇怪又特别讨人厌的小生物。', 0),
 	(9453, 'deDE', 'Was haltet Ihr von meiner Rüstung? Habe sie selbst hergestellt! Sie unterscheidet sich zwar etwas von den traditionellen Rüstungen, die wir normalerweise tragen, ist aber sehr bequem.', 26972),
+	(9453, 'esES', '¿Qué te parece mi armadura? ¡La hice yo! Es un poco distinta de lo normal, pero muy cómoda.', 18019),
+	(9453, 'esMX', '¿Qué te parece mi armadura? ¡La hice yo! Es un poco distinta de lo normal, pero muy cómoda.', 18019),
 	(9453, 'frFR', 'Que pensez-vous de mon armure ? C’est du fait maison ! Elle est un peu différente de ce que nous portons d’habitude, mais elle est très confortable.', 18019),
 	(9453, 'zhCN', '你觉得我的护甲怎么样?我自己制作的!这和我们习惯上穿的不太一样，但却极为舒服。', 0),
 	(9454, 'deDE', 'Die Bälge der Hirsche taugen nichts, dafür ist ihr Fleisch köstlich zart.', 26972),
+	(9454, 'esES', 'Las pieles de venado son delicadas, lo que suele dar una carne tierna y suculenta.', 18019),
+	(9454, 'esMX', 'Las pieles de venado son delicadas, lo que suele dar una carne tierna y suculenta.', 18019),
 	(9454, 'frFR', 'La peau des cerfs est fine, ce qui rend leur chair tendre et succulente.', 18019),
 	(9454, 'zhCN', '成鹿皮革容易损坏也因此形成柔软多汁的鹿肉。', 0),
 	(9455, 'deDE', 'Was habt Ihr gefunden? Wo?', 26972),
@@ -18514,9 +18540,13 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(9797, 'frFR', NULL, 18019),
 	(9797, 'zhCN', '你是从萨布拉金来的吗?那么卡兹瑞克的工作已经完成了。', 0),
 	(9798, 'deDE', 'Was habt Ihr denn da?', 26972),
+	(9798, 'esES', '¿Qué tienes ahí?', 18019),
+	(9798, 'esMX', '¿Qué tienes ahí?', 18019),
 	(9798, 'frFR', 'Qu\'avez-vous donc là ?', 18019),
 	(9798, 'zhCN', '你拿着什么?', 0),
 	(9799, 'deDE', 'Hallo, $C. Habt Ihr die Blumen?', 26972),
+	(9799, 'esES', 'Hola, $c. ¿Traes las flores?', 18019),
+	(9799, 'esMX', 'Hola, $c. ¿Traes las flores?', 18019),
 	(9799, 'frFR', 'Bonjour, $C. Avez-vous déjà les fleurs ?', 18019),
 	(9799, 'zhCN', '哈罗，$C。你弄到那些花了吗?', 0),
 	(9800, 'deDE', '<Elementarist Lo\'ap ballt seine Hände zu Fäusten und schüttelt den Kopf.>$B$BOgerfäuste...', 26972),
@@ -19784,9 +19814,13 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(10301, 'frFR', 'Avez-vous récupéré l\'oculus ?', 18019),
 	(10301, 'zhCN', '你拿到紫罗兰之目了吗?', 0),
 	(10302, 'deDE', 'Ich arbeite an einer Lösung, die für die merkwürdigen Kreaturen große Wirkung haben sollte. Ich brauche nur mehr Zeit.', 18019),
+	(10302, 'esES', 'Estoy trabajando en una solución que creo que puede ser eficaz con las criaturas extrañas. Sólo necesito más tiempo.', 18019),
+	(10302, 'esMX', 'Estoy trabajando en una solución que creo que puede ser eficaz con las criaturas extrañas. Sólo necesito más tiempo.', 18019),
 	(10302, 'frFR', NULL, 18019),
 	(10302, 'zhCN', '我正在进行我认为对这些奇怪生物有效的解决办法。我只是需要更多的时间。', 0),
 	(10303, 'deDE', 'Es sind zu viele... Wir müssen sie zurechtstutzen, sonst haben die Überlebenden keine Chance gegen sie.', 18019),
+	(10303, 'esES', 'Son demasiados... Debemos reducirlos o los supervivientes no tendrán ninguna oportunidad contra ellos.', 18019),
+	(10303, 'esMX', 'Son demasiados... Debemos reducirlos o los supervivientes no tendrán ninguna oportunidad contra ellos.', 18019),
 	(10303, 'frFR', NULL, 18019),
 	(10303, 'zhCN', '他们的人数太多了……我们必须削弱他们，否则那些幸存者将没有机会对抗他们。', 0),
 	(10304, 'frFR', NULL, 18019),
@@ -19839,6 +19873,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(10323, 'frFR', NULL, 18019),
 	(10323, 'zhCN', '你完成我要求的任务了吗，$N?', 0),
 	(10324, 'deDE', 'Die Bälge der Böcke sind grob und stark und halten das Fleisch zäh. Es ist kaum essbar, aber wir können es für andere Zwecke einsetzen.', 26972),
+	(10324, 'esES', 'Las pieles de los ciervos son tupidas y resistentes, con lo que su carne es muy dura, prácticamente incomible. Pero nos vale para otros propósitos.', 18019),
+	(10324, 'esMX', 'Las pieles de los ciervos son tupidas y resistentes, con lo que su carne es muy dura, prácticamente incomible. Pero nos vale para otros propósitos.', 18019),
 	(10324, 'frFR', 'Les peaux des chevreuils sont raides et épaisses, et leur chair est coriace, presque immangeable, mais nous pouvons leur trouver d\'autres usages.', 18019),
 	(10324, 'zhCN', '这些雄鹿的皮革是坚固而表面布满粗线条的图案，他们的肉非常的坚韧 - 几乎不能吃，但是我们有其它的用途。', 0),
 	(10325, 'deDE', 'Tragt Ihr irgendwelche Insignien des Feindes bei Euch, $N?', 18019),
@@ -23445,7 +23481,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(11765, 'frFR', NULL, 18019),
 	(11766, 'frFR', NULL, 18019),
 	(11767, 'frFR', NULL, 18019),
-	(11768, 'frFR', NULL, 18019),
+	(11768, 'frFR', NULL, 18019);
+INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 	(11769, 'frFR', NULL, 18019),
 	(11770, 'frFR', NULL, 18019),
 	(11771, 'frFR', NULL, 18019),
@@ -23481,8 +23518,7 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(11793, 'deDE', 'Herold Vurenn hat Euch geschickt?', 18019),
 	(11793, 'frFR', 'C\'est le messager Vurenn qui vous envoie ?', 18019),
 	(11793, 'zhCN', '先驱者瓦锐恩派你来的?', 0),
-	(11794, 'deDE', 'Habt Ihr die Aufgabe erledigt, um die ich Euch gebeten habe, $N?', 18019);
-INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
+	(11794, 'deDE', 'Habt Ihr die Aufgabe erledigt, um die ich Euch gebeten habe, $N?', 18019),
 	(11794, 'frFR', 'Avez-vous accompli la tâche que je vous ai confiée, $N ?', 18019),
 	(11794, 'zhCN', '你完成我交代你的任务了吗，$N?', 0),
 	(11795, 'deDE', 'Habt Ihr die Insignien bei Euch?', 18019),
@@ -33446,7 +33482,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(28931, 'frFR', NULL, 18019),
 	(28932, 'frFR', NULL, 18019),
 	(28933, 'frFR', NULL, 18019),
-	(28934, 'frFR', NULL, 18019),
+	(28934, 'frFR', NULL, 18019);
+INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 	(28935, 'frFR', NULL, 18019),
 	(28936, 'frFR', NULL, 18019),
 	(28937, 'frFR', NULL, 18019),
@@ -33482,8 +33519,7 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 	(28967, 'frFR', NULL, 18019),
 	(28968, 'frFR', NULL, 18019),
 	(28969, 'frFR', NULL, 18019),
-	(28970, 'frFR', NULL, 18019);
-INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
+	(28970, 'frFR', NULL, 18019),
 	(28971, 'frFR', NULL, 18019),
 	(28972, 'frFR', NULL, 18019),
 	(28973, 'frFR', NULL, 18019),
