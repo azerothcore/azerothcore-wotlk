@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gtbarbershopcostbase_dbc
+-- Дамп структуры для таблица acore_world.gtbarbershopcostbase_dbc
 DROP TABLE IF EXISTS `gtbarbershopcostbase_dbc`;
 CREATE TABLE IF NOT EXISTS `gtbarbershopcostbase_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `gtbarbershopcostbase_dbc` (
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
--- Дамп данных таблицы _acore_world.gtbarbershopcostbase_dbc: 100 rows
+-- Дамп данных таблицы acore_world.gtbarbershopcostbase_dbc: 100 rows
 DELETE FROM `gtbarbershopcostbase_dbc`;
 /*!40000 ALTER TABLE `gtbarbershopcostbase_dbc` DISABLE KEYS */;
 INSERT INTO `gtbarbershopcostbase_dbc` (`ID`, `Data`) VALUES

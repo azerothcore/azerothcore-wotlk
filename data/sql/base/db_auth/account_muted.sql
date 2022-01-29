@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.account_muted
+-- Дамп структуры для таблица acore_auth.account_muted
 DROP TABLE IF EXISTS `account_muted`;
 CREATE TABLE IF NOT EXISTS `account_muted` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `account_muted` (
   PRIMARY KEY (`guid`,`mutedate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='mute List';
 
--- Дамп данных таблицы _acore_auth.account_muted: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.account_muted: ~0 rows (приблизительно)
 DELETE FROM `account_muted`;
 /*!40000 ALTER TABLE `account_muted` DISABLE KEYS */;
 /*!40000 ALTER TABLE `account_muted` ENABLE KEYS */;
