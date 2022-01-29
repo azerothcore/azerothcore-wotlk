@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.game_event_save
+-- Дамп структуры для таблица acore_characters.game_event_save
 DROP TABLE IF EXISTS `game_event_save`;
 CREATE TABLE IF NOT EXISTS `game_event_save` (
   `eventEntry` TINYINT unsigned NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `game_event_save` (
   PRIMARY KEY (`eventEntry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.game_event_save: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.game_event_save: ~0 rows (приблизительно)
 DELETE FROM `game_event_save`;
 /*!40000 ALTER TABLE `game_event_save` DISABLE KEYS */;
 /*!40000 ALTER TABLE `game_event_save` ENABLE KEYS */;
