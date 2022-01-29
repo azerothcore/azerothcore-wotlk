@@ -1399,7 +1399,7 @@ public:
     }
     void NewInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state)
     {
-        GameobjectInstanceSavedStateList.push_back({ id, entry, guid, state });
+        GameobjectInstanceSavedStateList.emplace_back(id, entry, guid, state);
     }
 private:
     // first free id for selected id type
