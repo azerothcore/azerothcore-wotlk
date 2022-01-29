@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.quest_mail_sender
+-- Дамп структуры для таблица acore_world.quest_mail_sender
 DROP TABLE IF EXISTS `quest_mail_sender`;
 CREATE TABLE IF NOT EXISTS `quest_mail_sender` (
   `QuestId` INT unsigned NOT NULL DEFAULT 0,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `quest_mail_sender` (
   PRIMARY KEY (`QuestId`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Дамп данных таблицы _acore_world.quest_mail_sender: ~10 rows (приблизительно)
+-- Дамп данных таблицы acore_world.quest_mail_sender: ~10 rows (приблизительно)
 DELETE FROM `quest_mail_sender`;
 /*!40000 ALTER TABLE `quest_mail_sender` DISABLE KEYS */;
 INSERT INTO `quest_mail_sender` (`QuestId`, `RewardMailSenderEntry`) VALUES

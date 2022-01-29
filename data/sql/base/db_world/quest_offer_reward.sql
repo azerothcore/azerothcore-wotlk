@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.quest_offer_reward
+-- Дамп структуры для таблица acore_world.quest_offer_reward
 DROP TABLE IF EXISTS `quest_offer_reward`;
 CREATE TABLE IF NOT EXISTS `quest_offer_reward` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Emote1` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Emote2` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Emote3` SMALLINT unsigned NOT NULL DEFAULT 0,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `quest_offer_reward` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.quest_offer_reward: 8 643 rows
+-- Дамп данных таблицы acore_world.quest_offer_reward: 8 645 rows
 DELETE FROM `quest_offer_reward`;
 /*!40000 ALTER TABLE `quest_offer_reward` DISABLE KEYS */;
 INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `RewardText`, `VerifiedBuild`) VALUES
@@ -8677,7 +8677,9 @@ INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, 
 	(1661, 0, 0, 0, 0, 0, 0, 0, 0, 'Congratulations, and may the Light protect you.', 0),
 	(5677, 0, 0, 0, 0, 0, 0, 0, 0, 'Ah, you have wonderful timing, <name>. I was beginning to wonder if all of my messengers had been successful. I\'m glad to see they were, otherwise I would wager you\'d still be out in the world learning more about all the threats that exist against our people.$B$BAre you ready? Ready for more training I mean. You\'re growing in power more quickly, and I feel you are ready to learn more about our faith.', 0),
 	(5678, 0, 0, 0, 0, 0, 0, 0, 0, 'Ah, you have wonderful timing, <name>. I was beginning to wonder if all of my messengers had been successful. I\'m glad to see they were, otherwise I would wager you\'d still be out in the world learning more about all the threats that exist against our people.$B$BAre you ready? Ready for more training I mean. You\'re growing in power more quickly, and I feel you are ready to learn more about our faith.', 0),
-	(8807, 2, 0, 0, 0, 0, 0, 0, 0, 'Why, yes... these will be of tremendous aid!  These materials are awfully hard to come by in the desert, $n.  Thank you.', 0);
+	(8807, 2, 0, 0, 0, 0, 0, 0, 0, 'Why, yes... these will be of tremendous aid!  These materials are awfully hard to come by in the desert, $n.  Thank you.', 0),
+	(4485, 0, 0, 0, 0, 0, 0, 0, 0, 'Ah, you\'ve returned to the Cathedral, $N. Good. A lot has happened recently, and I would seek your aid if you prove worthy.$B$BMany treacherous enemies are about. I will need your help to stop them.', 0),
+	(4486, 0, 0, 0, 0, 0, 0, 0, 0, 'Ah, you\'ve returned to the Cathedral, $N. Good. A lot has happened recently, and I would seek your aid if you prove worthy.$B$BMany treacherous enemies are about. I will need your help to stop them.', 0);
 /*!40000 ALTER TABLE `quest_offer_reward` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
