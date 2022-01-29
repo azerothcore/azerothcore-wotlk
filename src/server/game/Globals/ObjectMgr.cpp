@@ -9367,7 +9367,7 @@ void ObjectMgr::LoadInstanceSavedGameobjectStateData()
     }
 
     Field* fields;
-    uint32 count;
+    uint32 count = 0;
     do
     {
         fields = result->Fetch();
