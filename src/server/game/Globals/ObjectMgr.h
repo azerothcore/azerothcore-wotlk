@@ -1559,7 +1559,7 @@ private:
         uint32 m_guid;
         uint8 m_state;
     };
-    std::vector<GameobjectInstanceSavedState> GameobjectInstanceSavedStateList; 
+    std::vector<GameobjectInstanceSavedState> GameobjectInstanceSavedStateList;
 };
 
 #define sObjectMgr ObjectMgr::instance()
