@@ -117,7 +117,7 @@ void WorldUpdateTime::RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uin
     {
         if (GetMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
         {
-            FMT_LOG_INFO("time.update", "Update time diff: {}. Players online: {}.", GetAverageUpdateTime(), sessionCount);
+            LOG_INFO("time.update", "Update time diff: {}. Players online: {}.", GetAverageUpdateTime(), sessionCount);
             _lastRecordTime = gameTimeMs;
         }
     }
