@@ -717,15 +717,6 @@ enum GOState
 
 #define MAX_GO_STATE              3
 
-/*  The data loaded from `instance_saved_go_state_data`
- *  Each instance can have a different state for a gameobject
- */
-struct GameobjectInstanceSavedState
-{
-    uint32 instanceID;
-    uint32 state;
-};
-
 // from `gameobject`
 struct GameObjectData
 {
