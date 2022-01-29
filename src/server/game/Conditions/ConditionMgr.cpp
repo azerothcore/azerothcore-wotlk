@@ -929,7 +929,7 @@ void ConditionMgr::LoadConditions(bool isReload)
         cond->ElseGroup                     = fields[4].GetUInt32();
         int32 iConditionTypeOrReference     = fields[5].GetInt32();
         cond->ConditionTarget               = fields[6].GetUInt8();
-        cond->ConditionVvoid Map::SwitchGridContainers(T* /*obj*/, bool /*on*/)alue1               = fields[7].GetUInt32();
+        cond->ConditionValue1               = fields[7].GetUInt32();
         cond->ConditionValue2               = fields[8].GetUInt32();
         cond->ConditionValue3               = fields[9].GetUInt32();
         cond->NegativeCondition             = fields[10].GetUInt8();
