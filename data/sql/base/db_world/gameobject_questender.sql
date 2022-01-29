@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gameobject_questender
+-- Дамп структуры для таблица acore_world.gameobject_questender
 DROP TABLE IF EXISTS `gameobject_questender`;
 CREATE TABLE IF NOT EXISTS `gameobject_questender` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.gameobject_questender: 457 rows
+-- Дамп данных таблицы acore_world.gameobject_questender: 457 rows
 DELETE FROM `gameobject_questender`;
 /*!40000 ALTER TABLE `gameobject_questender` DISABLE KEYS */;
 INSERT INTO `gameobject_questender` (`id`, `quest`) VALUES
