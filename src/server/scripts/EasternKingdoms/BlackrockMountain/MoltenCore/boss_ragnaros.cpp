@@ -346,7 +346,7 @@ public:
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, [&](Unit* u) { return u && u->IsPlayer() && me->IsWithinMeleeRange(u); }))
                             {
-                                me->AttackerStateUpdate(target);
+                                me->AttackerStateUpdate(target, BASE_ATTACK, true);
                                 me->SetTarget(target->GetGUID());
                                 events.RepeatEvent(500);
                             }
