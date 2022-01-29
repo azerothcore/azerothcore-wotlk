@@ -7567,6 +7567,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectSpellClassMask[EFFECT_1][1] = 0x00020000;
     });
 
+    // Focused Assault
+    // Brutal Assault
+    ApplySpellFix({ 46392, 46393 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+
     // Bestial Wrath
     ApplySpellFix({ 19574 }, [](SpellEntry* spellInfo)
     {

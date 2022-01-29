@@ -427,6 +427,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                 condMeets = (((1 << pet->getPetType()) & ConditionValue1) != 0);
         break;
     }
+    case CONDITION_CHARMED:
+    {
+        if (Unit* unit = object->ToUnit())
+            condMeets = unit->IsCharmed();
+        break;
+    }
     default:
         condMeets = false;
         break;
@@ -614,6 +620,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_PET_TYPE:
         mask |= GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_CHARMED:
+        mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
         break;
     default:
         ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
@@ -920,7 +929,7 @@ void ConditionMgr::LoadConditions(bool isReload)
         cond->ElseGroup                     = fields[4].GetUInt32();
         int32 iConditionTypeOrReference     = fields[5].GetInt32();
         cond->ConditionTarget               = fields[6].GetUInt8();
-        cond->ConditionValue1               = fields[7].GetUInt32();
+        cond->ConditionVvoid Map::SwitchGridContainers(T* /*obj*/, bool /*on*/)alue1               = fields[7].GetUInt32();
         cond->ConditionValue2               = fields[8].GetUInt32();
         cond->ConditionValue3               = fields[9].GetUInt32();
         cond->NegativeCondition             = fields[10].GetUInt8();
@@ -1673,7 +1682,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table has a ConditionType that is not supported on 3.3.5a ({}), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
     case CONDITION_STAND_STATE:
-    case CONDITION_CHARMED:
     case CONDITION_TAXI:
         LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table has a ConditionType that is not yet supported on AzerothCore ({}), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
@@ -2221,10 +2229,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         break;
     }
-    case CONDITION_IN_WATER:
-    {
-        break;
-    }
     case CONDITION_QUEST_OBJECTIVE_PROGRESS:
     {
         const Quest* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
@@ -2269,6 +2273,8 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             return false;
         }
         break;
+    case CONDITION_IN_WATER:
+    case CONDITION_CHARMED:
     default:
         break;
     }
