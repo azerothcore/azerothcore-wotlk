@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gameobject_addon
+-- Дамп структуры для таблица acore_world.gameobject_addon
 DROP TABLE IF EXISTS `gameobject_addon`;
 CREATE TABLE IF NOT EXISTS `gameobject_addon` (
   `guid` INT unsigned NOT NULL DEFAULT 0,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_addon` (
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.gameobject_addon: 32 rows
+-- Дамп данных таблицы acore_world.gameobject_addon: 32 rows
 DELETE FROM `gameobject_addon`;
 /*!40000 ALTER TABLE `gameobject_addon` DISABLE KEYS */;
 INSERT INTO `gameobject_addon` (`guid`, `invisibilityType`, `invisibilityValue`) VALUES
