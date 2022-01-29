@@ -19,19 +19,15 @@
 #include "StringFormat.h"
 #include "Timer.h"
 
-LogMessage::LogMessage(LogLevel _level, std::string const& _type, std::string&& _text)
-    : level(_level), type(_type), text(std::forward<std::string>(_text)), mtime(time(nullptr))
-{
-}
+LogMessage::LogMessage(LogLevel _level, std::string const& _type, std::string_view _text)
+    : level(_level), type(_type), text(std::string(_text)), mtime(GetEpochTime()) { }
 
-LogMessage::LogMessage(LogLevel _level, std::string const& _type, std::string&& _text, std::string&& _param1)
-    : level(_level), type(_type), text(std::forward<std::string>(_text)), param1(std::forward<std::string>(_param1)), mtime(time(nullptr))
-{
-}
+LogMessage::LogMessage(LogLevel _level, std::string const& _type, std::string_view _text, std::string_view _param1)
+    : level(_level), type(_type), text(std::string(_text)), param1(std::string(_param1)), mtime(GetEpochTime()) { }
 
-std::string LogMessage::getTimeStr(time_t time)
+std::string LogMessage::getTimeStr(Seconds time)
 {
-    return Acore::Time::TimeToTimestampStr(Seconds(time), "%Y-%m-%d %X");
+    return Acore::Time::TimeToTimestampStr(time, "%Y-%m-%d %X");
 }
 
 std::string LogMessage::getTimeStr() const
