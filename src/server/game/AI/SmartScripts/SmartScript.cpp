@@ -243,7 +243,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             else
                                 target->PlayDirectSound(e.action.sound.sound, e.action.sound.onlySelf ? target->ToPlayer() : nullptr);
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SOUND: target: {} ({}), sound: {}, onlyself: {}",
-                                           target->GetName().c_str(), target->GetGUID().ToString().c_str(), e.action.sound.sound, e.action.sound.onlySelf);
+                                           target->GetName(), target->GetGUID().ToString(), e.action.sound.sound, e.action.sound.onlySelf);
                         }
                     }
 
@@ -289,7 +289,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         else
                             target->PlayDirectSound(sound, e.action.randomSound.onlySelf ? target->ToPlayer() : nullptr);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_SOUND: target: {} ({}), sound: {}, onlyself: {}",
-                                       target->GetName().c_str(), target->GetGUID().ToString().c_str(), sound, e.action.randomSound.onlySelf);
+                                       target->GetName(), target->GetGUID().ToString(), sound, e.action.randomSound.onlySelf);
                     }
                 }
 
