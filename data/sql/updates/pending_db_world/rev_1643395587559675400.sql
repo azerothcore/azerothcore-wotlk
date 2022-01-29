@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643395587559675400');
 
-DROP TABLE IF EXISTS `instance_saved_go_state_data`);
+DROP TABLE IF EXISTS `instance_saved_go_state_data`;
 CREATE TABLE IF NOT EXISTS `instance_saved_go_state_data` (
   `id` int unsigned NOT NULL COMMENT 'id = instance.id',
   `entry` int unsigned NOT NULL COMMENT 'entry = gameobject.entry',
