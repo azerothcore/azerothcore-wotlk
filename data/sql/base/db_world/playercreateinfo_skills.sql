@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.playercreateinfo_skills
+-- Дамп структуры для таблица acore_world.playercreateinfo_skills
 DROP TABLE IF EXISTS `playercreateinfo_skills`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_skills` (
   `raceMask` INT unsigned NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_skills` (
   PRIMARY KEY (`raceMask`,`classMask`,`skill`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.playercreateinfo_skills: ~77 rows (приблизительно)
+-- Дамп данных таблицы acore_world.playercreateinfo_skills: ~77 rows (приблизительно)
 DELETE FROM `playercreateinfo_skills`;
 /*!40000 ALTER TABLE `playercreateinfo_skills` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_skills` (`raceMask`, `classMask`, `skill`, `rank`, `comment`) VALUES
