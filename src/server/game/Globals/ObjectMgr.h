@@ -1386,6 +1386,21 @@ public:
         }
         return 0;
     }
+
+    void SetInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state)
+    {
+        for (auto it = GameobjectInstanceSavedStateList.begin(); it != GameobjectInstanceSavedStateList.end(); it++)
+        {
+            if (it->m_entry == entry && it->m_guid == guid && it->m_instance == id)
+            {
+                it->m_state = state;
+            }
+        }
+    }
+    void NewInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state)
+    {
+        GameobjectInstanceSavedStateList.push_back({ id, entry, guid, state });
+    }
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
