@@ -11975,8 +11975,8 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
 {
     float TakenTotalMod = 1.0f;
     float minval = 0.0f;
-    // Healing taken percent
 
+    // Healing taken percent
     if (!sScriptMgr->OnSpellHealingBonusTakenNegativeModifiers(this, caster, spellProto, minval))
     {
         minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
