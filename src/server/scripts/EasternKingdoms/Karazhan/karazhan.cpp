@@ -239,7 +239,7 @@ public:
 
         void PrepareEncounter()
         {
-            LOG_DEBUG("scripts.ai", "Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            LOG_DEBUG("scripts.ai", "Barnes Opera Event - Introduction complete - preparing encounter {}", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 
