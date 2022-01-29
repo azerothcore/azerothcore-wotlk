@@ -86,10 +86,6 @@ there is no difference here (except that default text is chosen with `gameobject
 
 #define BOX_UNLEARN_WEAPON_SPEC     "Do you really want to unlearn your weaponsmith specialty and lose all associated recipes? \n Cost: "
 
-#define GOSSIP_LEARN_DRAGON       "I wish to learn Dragonscale Leatherworking"
-#define GOSSIP_LEARN_ELEMENTAL    "I wish to learn Elemental Leatherworking"
-#define GOSSIP_LEARN_TRIBAL       "I wish to learn Tribal Leatherworking"
-
 #define GOSSIP_LEARN_SPELLFIRE      "Please teach me how to become a Spellcloth tailor"
 #define GOSSIP_UNLEARN_SPELLFIRE    "I wish to unlearn Spellfire Tailoring"
 #define GOSSIP_LEARN_MOONCLOTH      "Please teach me how to become a Mooncloth tailor"
@@ -228,6 +224,37 @@ enum SpecializationQuests
     Q_MASTER_TRANSMUTE      = 10899,
     Q_MASTER_ELIXIR         = 10902,
     Q_MASTER_POTION         = 10897,
+};
+
+// All referred to gossips (menu, menu_opt, actions)
+enum Gossips
+{
+    // Leatherworking
+    GOSSIP_MENU_PETER_GALEN           = 3067,
+    GOSSIP_MENU_THORKAF_DRAGONEYE     = 3068,
+    GOSSIP_MENU_BRUMN_WINTERHOOF      = 3069,
+    GOSSIP_MENU_SARAH_TANNER          = 3070,
+    GOSSIP_MENU_CARYSSIA_MOONHUNTER   = 3072,
+    GOSSIP_MENU_SEJIB                 = 3073,
+
+    GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE   = 3075,
+    GOSSIP_MENU_UNLEARN_CONFIRM_ELEMENTAL     = 3076,
+    GOSSIP_MENU_UNLEARN_CONFIRM_TRIBAL        = 3077,
+
+    GOSSIP_MENU_OPTION_TRAIN                       = 0,
+    GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_DRAGONSCALE = 1,
+    GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_ELEMENTAL   = 1,
+    GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_TRIBAL      = 1,
+
+    GOSSIP_TEXT_UNLEARN_CONFIRM_DRAGONSCALE = 10304,
+    GOSSIP_TEXT_UNLEARN_CONFIRM_ELEMENTAL   = 10302,
+    GOSSIP_TEXT_UNLEARN_CONFIRM_TRIBAL      = 10303,
+
+    GOSSIP_MENU_GO_SOOTHSAYING_FOR_DUMMIES = 7058,
+    GOSSIP_MENU_OPTION_GO_LEARN_DRAGONSCALE = 4,
+    GOSSIP_MENU_OPTION_GO_LEARN_ELEMENTAL   = 5,
+    GOSSIP_MENU_OPTION_GO_LEARN_TRIBAL      = 6,
+
 };
 
 /*###
@@ -958,44 +985,39 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        ClearGossipMenuFor(player);
 
-        if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        if (creature->IsQuestGiver())
+        {
+            player->PrepareQuestMenu(creature->GetGUID());
+        }
 
         if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 225 && player->getLevel() > 40)
         {
             switch (creature->GetEntry())
             {
-                case N_TRAINER_DRAGON1:                                      //Peter Galen
-                case N_TRAINER_DRAGON2:                                      //Thorkaf Dragoneye
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_DRAGON,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                case N_TRAINER_DRAGON1:             //Peter Galen
+                case N_TRAINER_DRAGON2:             //Thorkaf Dragoneye
                     if (player->HasSpell(S_DRAGON))
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Unlearn dragon", GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF +4);
+                        AddGossipItemFor(player, creature->GetEntry() == N_TRAINER_DRAGON1 ? GOSSIP_MENU_PETER_GALEN : GOSSIP_MENU_THORKAF_DRAGONEYE, GOSSIP_MENU_OPTION_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, creature->GetEntry() == N_TRAINER_DRAGON1 ? GOSSIP_MENU_PETER_GALEN : GOSSIP_MENU_THORKAF_DRAGONEYE, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_DRAGONSCALE, GOSSIP_SENDER_MAIN, GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE);
                     }
                     break;
-                case N_TRAINER_ELEMENTAL1:                                      //Sarah Tanner
-                case N_TRAINER_ELEMENTAL2:                                      //Brumn Winterhoof
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_ELEMENTAL,   GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                case N_TRAINER_ELEMENTAL1:          //Sarah Tanner
+                case N_TRAINER_ELEMENTAL2:          //Brumn Winterhoof
                     if (player->HasSpell(S_ELEMENTAL))
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Unlearn Elemental", GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 5);
+                        AddGossipItemFor(player, creature->GetEntry() == N_TRAINER_ELEMENTAL1 ? GOSSIP_MENU_SARAH_TANNER : GOSSIP_MENU_BRUMN_WINTERHOOF, GOSSIP_MENU_OPTION_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, creature->GetEntry() == N_TRAINER_ELEMENTAL1 ? GOSSIP_MENU_SARAH_TANNER : GOSSIP_MENU_BRUMN_WINTERHOOF, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_ELEMENTAL, GOSSIP_SENDER_MAIN, GOSSIP_MENU_UNLEARN_CONFIRM_ELEMENTAL);
                     }
                     break;
-                case N_TRAINER_TRIBAL1:                                      //Caryssia Moonhunter
-                case N_TRAINER_TRIBAL2:                                      //Se'Jib
-                    if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_TRIBAL,      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                case N_TRAINER_TRIBAL1:             //Caryssia Moonhunter
+                case N_TRAINER_TRIBAL2:             //Se'Jib
                     if (player->HasSpell(S_TRIBAL))
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Unlearn tribal", GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 6);
+                        AddGossipItemFor(player, creature->GetEntry() == N_TRAINER_TRIBAL1 ? GOSSIP_MENU_CARYSSIA_MOONHUNTER : GOSSIP_MENU_SEJIB, GOSSIP_MENU_OPTION_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+                        AddGossipItemFor(player, creature->GetEntry() == N_TRAINER_TRIBAL1 ? GOSSIP_MENU_CARYSSIA_MOONHUNTER : GOSSIP_MENU_SEJIB, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_TRIBAL, GOSSIP_SENDER_MAIN, GOSSIP_MENU_UNLEARN_CONFIRM_TRIBAL);
                     }
                     break;
             }
@@ -1005,110 +1027,35 @@ public:
         return true;
     }
 
-    void SendActionMenu(Player* player, Creature* creature, uint32 action)
-    {
-        switch (action)
-        {
-            case GOSSIP_ACTION_TRADE:
-                player->GetSession()->SendListInventory(creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
-                break;
-            // Learn Leather
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                ProcessCastaction(player, creature, S_DRAGON, S_LEARN_DRAGON, 0);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                ProcessCastaction(player, creature, S_ELEMENTAL, S_LEARN_ELEMENTAL, 0);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                ProcessCastaction(player, creature, S_TRIBAL, S_LEARN_TRIBAL, 0);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                ProcessUnlearnAction(player, creature, S_UNLEARN_DRAGON, 0, DoMedUnlearnCost(player));
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 5:
-                ProcessUnlearnAction(player, creature, S_UNLEARN_ELEMENTAL, 0, DoMedUnlearnCost(player));
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 6:
-                ProcessUnlearnAction(player, creature, S_UNLEARN_TRIBAL, 0, DoMedUnlearnCost(player));
-                break;
-        }
-    }
-
-    void SendConfirmLearn(Player* player, Creature* creature, uint32 action)
-    {
-        if (action)
-        {
-            switch (creature->GetEntry())
-            {
-                case N_TRAINER_DRAGON1: // Peter Galen
-                case N_TRAINER_DRAGON2: // Thorkaf Dragoneye
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Gossip de learn dragon", GOSSIP_SENDER_CHECK, action);
-                    // unknown textID ()
-                    SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-                    break;
-                case N_TRAINER_ELEMENTAL1: // Sarah Tanner
-                case N_TRAINER_ELEMENTAL2: // Brumn Winterhoof
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Gossip de learn elemental", GOSSIP_SENDER_CHECK, action);
-                    // unknown textID ()
-                    SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-                    break;
-                case N_TRAINER_TRIBAL1: // Caryssia Moonhunter
-                case N_TRAINER_TRIBAL2: // Se'Jib
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Gossip de learn tribal", GOSSIP_SENDER_CHECK, action);
-                    // unknown textID ()
-                    SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-                    break;
-            }
-        }
-    }
-
-    void SendConfirmUnlearn(Player* player, Creature* creature, uint32 action)
-    {
-        if (action)
-        {
-            switch (creature->GetEntry())
-            {
-            case N_TRAINER_DRAGON1: // Peter Galen
-            case N_TRAINER_DRAGON2: // Thorkaf Dragoneye
-                AddGossipItemFor(player, 0, "Gossip unlearn dragon", GOSSIP_SENDER_CHECK, action, "Box unlearn dragon", DoMedUnlearnCost(player), false);
-                // unknown textID ()
-                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-                break;
-            case N_TRAINER_ELEMENTAL1: // Sarah Tanner
-            case N_TRAINER_ELEMENTAL2: // Brumn Winterhoof
-                AddGossipItemFor(player, 0, "Gossip unlearn elemental", GOSSIP_SENDER_CHECK, action, "Box unlearn elemental", DoMedUnlearnCost(player), false);
-                // unknown textID ()
-                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-                break;
-            case N_TRAINER_TRIBAL1: // Caryssia Moonhunter
-            case N_TRAINER_TRIBAL2: // Se'Jib
-                AddGossipItemFor(player, 0, "Gossip unlearn tribal", GOSSIP_SENDER_CHECK, action, "Box unlearn tribal", DoMedUnlearnCost(player), false);
-                // unknown textID ()
-                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-                break;
-            }
-        }
-    }
-
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        switch (sender)
+
+        switch (action)
         {
-            case GOSSIP_SENDER_MAIN:
-                SendActionMenu(player, creature, action);
+            case GOSSIP_ACTION_TRAIN:
+                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
-            case GOSSIP_SENDER_LEARN:
-                SendConfirmLearn(player, creature, action);
+            case GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE:
+                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_DRAGONSCALE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, GOSSIP_TEXT_UNLEARN_CONFIRM_DRAGONSCALE, creature);
                 break;
-            case GOSSIP_SENDER_UNLEARN:
-                SendConfirmUnlearn(player, creature, action);
+            case GOSSIP_MENU_UNLEARN_CONFIRM_ELEMENTAL:
+                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_ELEMENTAL, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_ELEMENTAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, GOSSIP_TEXT_UNLEARN_CONFIRM_ELEMENTAL, creature);
                 break;
-            case GOSSIP_SENDER_CHECK:
-                SendActionMenu(player, creature, action);
+            case GOSSIP_MENU_UNLEARN_CONFIRM_TRIBAL:
+                AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_TRIBAL, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_TRIBAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                SendGossipMenuFor(player, GOSSIP_TEXT_UNLEARN_CONFIRM_TRIBAL, creature);
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                ProcessUnlearnAction(player, creature, S_UNLEARN_DRAGON, 0, DoMedUnlearnCost(player));
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 2:
+                ProcessUnlearnAction(player, creature, S_UNLEARN_ELEMENTAL, 0, DoMedUnlearnCost(player));
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 3:
+                ProcessUnlearnAction(player, creature, S_UNLEARN_TRIBAL, 0, DoMedUnlearnCost(player));
                 break;
         }
         return true;
@@ -1325,9 +1272,9 @@ public:
         {
             if (!HasLeatherSpecialty(player) && (player->GetQuestRewardStatus(5141) || player->GetQuestRewardStatus(5143) || player->GetQuestRewardStatus(5144) || player->GetQuestRewardStatus(5145) || player->GetQuestRewardStatus(5146) || player->GetQuestRewardStatus(5148)))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_DRAGON, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 5);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_ELEMENTAL, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 6);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_TRIBAL, GOSSIP_SENDER_LEARN, GOSSIP_ACTION_INFO_DEF + 7);
+                AddGossipItemFor(player, GOSSIP_MENU_GO_SOOTHSAYING_FOR_DUMMIES, GOSSIP_MENU_OPTION_GO_LEARN_DRAGONSCALE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, GOSSIP_MENU_GO_SOOTHSAYING_FOR_DUMMIES, GOSSIP_MENU_OPTION_GO_LEARN_ELEMENTAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+                AddGossipItemFor(player, GOSSIP_MENU_GO_SOOTHSAYING_FOR_DUMMIES, GOSSIP_MENU_OPTION_GO_LEARN_TRIBAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
             }
         }
 
@@ -1355,15 +1302,15 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 4:
                 ProcessUnlearnAction(player, nullptr, S_UNLEARN_GNOMISH, 0, DoHighUnlearnCost(player));
                 break;
-                //Learn Dragon
+            //Learn Dragon
             case GOSSIP_ACTION_INFO_DEF + 5:
                 ProcessCastaction(player, nullptr, S_DRAGON, S_LEARN_DRAGON, 0);
                 break;
-                //Learn Elemental
+            //Learn Elemental
             case GOSSIP_ACTION_INFO_DEF + 6:
                 ProcessCastaction(player, nullptr, S_ELEMENTAL, S_LEARN_ELEMENTAL, 0);
                 break;
-                //Learn Tribal
+            //Learn Tribal
             case GOSSIP_ACTION_INFO_DEF + 7:
                 ProcessCastaction(player, nullptr, S_TRIBAL, S_LEARN_TRIBAL, 0);
                 break;
