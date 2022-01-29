@@ -4974,6 +4974,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Speed = 8.0f;
     });
 
+    // Shadowflame
+    ApplySpellFix({ 22539 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     // Spell Absorption
     ApplySpellFix({ 41034 }, [](SpellEntry* spellInfo)
     {
