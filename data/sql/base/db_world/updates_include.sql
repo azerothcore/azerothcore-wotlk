@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.updates_include
+-- Дамп структуры для таблица acore_world.updates_include
 DROP TABLE IF EXISTS `updates_include`;
 CREATE TABLE IF NOT EXISTS `updates_include` (
   `path` varchar(200) NOT NULL COMMENT 'directory to include. $ means relative to the source directory.',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `updates_include` (
   PRIMARY KEY (`path`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of directories where we want to include sql updates.';
 
--- Дамп данных таблицы _acore_world.updates_include: 3 rows
+-- Дамп данных таблицы acore_world.updates_include: 3 rows
 DELETE FROM `updates_include`;
 /*!40000 ALTER TABLE `updates_include` DISABLE KEYS */;
 INSERT INTO `updates_include` (`path`, `state`) VALUES
