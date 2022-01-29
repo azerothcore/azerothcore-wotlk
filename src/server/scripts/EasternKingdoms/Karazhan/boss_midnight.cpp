@@ -256,7 +256,7 @@ public:
             {
                 Talk(SAY_ATTUMEN1_MOUNT);
                 _events.Reset();
-                me->GetMotionMaster()->MovePoint(POINT_MOVE_TO_MIDNIGHT, target->GetPositionX() + 2.0f * cos(target->GetAngle(me)), target->GetPositionY() + 2.0f * sin(target->GetAngle(me)), target->GetPositionZ() + 0.2f, true, true, MOTION_SLOT_CONTROLLED);
+                me->GetMotionMaster()->MovePoint(POINT_MOVE_TO_MIDNIGHT, target->GetPositionX() + 2.0f * cos(target->GetAngle(me)), target->GetPositionY() + 2.0f * std::sin(target->GetAngle(me)), target->GetPositionZ() + 0.2f, true, true, MOTION_SLOT_CONTROLLED);
             }
         }
 
@@ -398,7 +398,7 @@ public:
                     _events.ScheduleEvent(EVENT_RANDOM_YELL, urand(30000, 70000));
                     break;
                 case EVENT_SPELL_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0, 24.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 24.0f, true))
                         me->CastSpell(target, SPELL_CHARGE_MIDNIGHT, false);
                     _events.ScheduleEvent(EVENT_SPELL_CHARGE, 20000);
                     break;

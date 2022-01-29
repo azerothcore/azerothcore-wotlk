@@ -1758,6 +1758,14 @@ ListenRange.TextEmote = 40
 
 ListenRange.Yell = 300
 
+#
+#    Creature.MovingStopTimeForPlayer
+#        Description: Time (in milliseconds) during which creature will not move after
+#                     interaction with player.
+#        Default: 180000
+
+Creature.MovingStopTimeForPlayer = 180000
+
 #    WaypointMovementStopTimeForPlayer
 #        Description: Specifies the time (in seconds) that a creature with waypoint
 #                     movement will wait after a player interacts with it.
@@ -3615,6 +3623,14 @@ LFG.KickPreventionTimer = 900
 EnablePlayerSettings = 0
 
 #
+#     JoinBGAndLFG.Enable
+#        Description: Allow queueing for BG and LFG at the same time.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+
+JoinBGAndLFG.Enable = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3716,6 +3732,8 @@ Logger.scripts.hotswap=4,Console Server
 Logger.server=4,Console Server
 Logger.sql.sql=2,Console DBErrors
 Logger.sql=4,Console Server
+Logger.time.update=4,Console Server
+Logger.module=4,Console Server
 
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server

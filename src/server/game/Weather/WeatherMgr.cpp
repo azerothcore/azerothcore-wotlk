@@ -21,6 +21,7 @@
 
 #include "WeatherMgr.h"
 #include "Log.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Weather.h"
@@ -117,19 +118,19 @@ namespace WeatherMgr
                 if (wzc.data[season].rainChance > 100)
                 {
                     wzc.data[season].rainChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone %u season %u has wrong rain chance > 100%%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong rain chance > 100%", zone_id, season);
                 }
 
                 if (wzc.data[season].snowChance > 100)
                 {
                     wzc.data[season].snowChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone %u season %u has wrong snow chance > 100%%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong snow chance > 100%", zone_id, season);
                 }
 
                 if (wzc.data[season].stormChance > 100)
                 {
                     wzc.data[season].stormChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone %u season %u has wrong storm chance > 100%%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong storm chance > 100%", zone_id, season);
                 }
             }
 
@@ -138,17 +139,14 @@ namespace WeatherMgr
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded %u weather definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} weather definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 
     void SendFineWeatherUpdateToPlayer(Player* player)
     {
-        WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
-        data << (uint32)WEATHER_STATE_FINE;
-        data << (float)0.0f;
-        data << uint8(0);
-        player->GetSession()->SendPacket(&data);
+        WorldPackets::Misc::Weather weather(WEATHER_STATE_FINE);
+        player->SendDirectMessage(weather.Write());
     }
 
     void Update(uint32 diff)

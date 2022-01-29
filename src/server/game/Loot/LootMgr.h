@@ -188,7 +188,7 @@ struct QuestItem
     bool    is_looted{false};
 
     QuestItem()
-         {}
+         = default;
 
     QuestItem(uint8 _index, bool _islooted = false)
         : index(_index), is_looted(_islooted) {}
@@ -380,7 +380,7 @@ struct Loot
 
     LootItem* LootItemInSlot(uint32 lootslot, Player* player, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(Player* player) const;
-    bool hasItemForAll() const;
+    [[nodiscard]] bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
     void FillNotNormalLootFor(Player* player);

@@ -272,8 +272,8 @@ public:
                 {
                     float angle = rand_norm() * 2 * M_PI;
                     float dist  = rand_norm() * 4.0f;
-                    me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + sin(angle) * dist, -89.0f, 17646, true);
-                    me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + sin(angle) * dist, -89.0f, 17646, true);
+                    me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, 17646, true);
+                    me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, 17646, true);
                     whelpCount += 2;
                     whelpSpamTimer += 600;
                 }
@@ -390,7 +390,7 @@ public:
             }
             case EVENT_SPELL_FIREBALL_FIRST:
             {
-                if (Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                if (Unit* v = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
                 {
                     me->SetFacingToObject(v);
                     DoCast(v, SPELL_FIREBALL);
@@ -401,7 +401,7 @@ public:
             }
             case EVENT_SPELL_FIREBALL_SECOND:
             {
-                if (Unit* v = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                if (Unit* v = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
                 {
                     me->SetFacingToObject(v);
                     DoCast(v, SPELL_FIREBALL);
@@ -467,7 +467,7 @@ public:
             {
                 me->SetReactState(REACT_AGGRESSIVE);
 
-                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0, false))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0, false))
                 {
                     AttackStart(target);
                 }
@@ -502,8 +502,8 @@ public:
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist  = rand_norm() * 4.0f;
-                me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + sin(angle) * dist, -89.0f, 17646, true);
-                me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + sin(angle) * dist, -89.0f, 17646, true);
+                me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, 17646, true);
+                me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, 17646, true);
                 events.RepeatEvent(30000);
                 break;
             }

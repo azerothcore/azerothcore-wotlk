@@ -1185,8 +1185,9 @@ public:
                 return;
             }
             player->CastSpell(player, spellInfoTrigger->Id, false);
-            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 6000))
+            if (TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE, 6000))
             {
+                summons->SetCorpseDelay(5 * MINUTE);
                 summons->SetTarget(player->GetGUID());
                 summons->SetLootRecipient(player);
                 summons->CastSpell(summons, SPELL_SPAWN_IN, false);
