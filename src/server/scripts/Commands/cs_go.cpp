@@ -431,6 +431,8 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
+
+        return false;
     }
 
     static CreatureData const* GetCreatureData(ChatHandler* handler, uint32 entry)
