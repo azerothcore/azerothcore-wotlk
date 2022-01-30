@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -35,10 +36,10 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if (target->GetGuidValue(PLAYER_DUEL_ARBITER) != guid)
         return;
 
-    LOG_DEBUG("network.opcode", "Player 1 is: %s (%s)", player->GetGUID().ToString().c_str(), player->GetName().c_str());
-    LOG_DEBUG("network.opcode", "Player 2 is: %s (%s)", target->GetGUID().ToString().c_str(), target->GetName().c_str());
+    LOG_DEBUG("network.opcode", "Player 1 is: {} ({})", player->GetGUID().ToString(), player->GetName());
+    LOG_DEBUG("network.opcode", "Player 2 is: {} ({})", target->GetGUID().ToString(), target->GetName());
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime().count();
     player->duel->StartTime = now + 3;
     target->duel->StartTime = now + 3;
 

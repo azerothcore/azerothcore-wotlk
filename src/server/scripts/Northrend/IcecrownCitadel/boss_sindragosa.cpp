@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -950,7 +951,7 @@ public:
             if (!spellInfo)
                 return false;
 
-            uint32 currMSTime = World::GetGameTimeMS();
+            uint32 currMSTime = GameTime::GetGameTimeMS().count();
             std::map<uint32, uint32>::iterator itr = _lastMSTimeForSpell.find(spellInfo->Id);
             if (itr != _lastMSTimeForSpell.end())
             {
