@@ -2378,7 +2378,7 @@ public:
     void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
     virtual void ProcessTerrainStatusUpdate();
 
-    bool CanRestoreMana(SpellInfo const* spellInfo);
+    [[nodiscard]] bool CanRestoreMana(SpellInfo const* spellInfo) const;
 
 protected:
     explicit Unit (bool isWorldObject);

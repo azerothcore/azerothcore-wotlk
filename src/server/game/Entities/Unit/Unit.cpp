@@ -12320,8 +12320,12 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
     uint32 effect = spellInfo->Effects[index].Effect;
     SpellImmuneList const& effectList = m_spellImmune[IMMUNITY_EFFECT];
     for (SpellImmuneList::const_iterator itr = effectList.begin(); itr != effectList.end(); ++itr)
-        if (itr->type == effect && (itr->spellId != 62692 || spellInfo->Effects[index].MiscValue == POWER_MANA))
+    {
+        if (itr->type == effect && (itr->spellId != 62692 || (spellInfo->Effects[index].MiscValue == POWER_MANA && !CanRestoreMana(spellInfo))))
+        {
             return true;
+        }
+    }
 
     if (uint32 mechanic = spellInfo->Effects[index].Mechanic)
     {
@@ -12335,10 +12339,18 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
     {
         SpellImmuneList const& list = m_spellImmune[IMMUNITY_STATE];
         for (SpellImmuneList::const_iterator itr = list.begin(); itr != list.end(); ++itr)
-            if (itr->type == aura && (itr->spellId != 64848 || spellInfo->Effects[index].MiscValue == POWER_MANA))
+        {
+            if (itr->type == aura && (itr->spellId != 64848 || (spellInfo->Effects[index].MiscValue == POWER_MANA && !CanRestoreMana(spellInfo))))
+            {
                 if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
+                {
                     if (itr->blockType == SPELL_BLOCK_TYPE_ALL || spellInfo->IsPositive()) // xinef: added for pet scaling
+                    {
                         return true;
+                    }
+                }
+            }
+        }
 
         if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
         {
@@ -20449,32 +20461,26 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     target->SendDirectMessage(&data);
 }
 
-bool Unit::CanRestoreMana(SpellInfo const* spellInfo)
+bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
 {
-    // Aura of Despair
-    if (HasAuraType(SPELL_AURA_PREVENT_REGENERATE_POWER))
+    // Aura of Despair exceptions
+    switch (spellInfo->Id)
     {
-        // Exceptions
-        switch (spellInfo->Id)
-        {
-            case 30824: // Shamanistic Rage
-            case 31786: // Spiritual Attunement
-            case 31930: // Judgements of the Wise
-            case 34075: // Aspect of the Viper
-            case 34720: // Thrill of the hunt
-            case 47755: // Rapture
-            case 63337: // Saronite Vapors (regenerate mana)
-            case 63375: // Improved stormstrike
-            case 64372: // Lifebloom
-                return true;
-            case 54428: // Divine Plea - only with talent Guarded by the Light
-                return HasSpell(53583);
-            default:
-                break;
-        }
-
-        return false;
+        case 30824: // Shamanistic Rage
+        case 31786: // Spiritual Attunement
+        case 31930: // Judgements of the Wise
+        case 34075: // Aspect of the Viper
+        case 34720: // Thrill of the hunt
+        case 47755: // Rapture
+        case 63337: // Saronite Vapors (regenerate mana)
+        case 63375: // Improved stormstrike
+        case 64372: // Lifebloom
+            return true;
+        case 54428: // Divine Plea - only with talent Guarded by the Light
+            return HasSpell(53583);
+        default:
+            break;
     }
 
-    return true;
+    return false;
 }
