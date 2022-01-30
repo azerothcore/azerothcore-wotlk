@@ -2100,7 +2100,7 @@ void Group::BroadcastGroupUpdate(void)
         {
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
-            LOG_DEBUG("group", "-- Forced group value update for '%s'", pp->GetName().c_str());
+            LOG_DEBUG("group", "-- Forced group value update for '{}'", pp->GetName());
         }
     }
 }

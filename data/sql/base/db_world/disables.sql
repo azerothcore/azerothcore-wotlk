@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.disables
+-- Дамп структуры для таблица acore_world.disables
 DROP TABLE IF EXISTS `disables`;
 CREATE TABLE IF NOT EXISTS `disables` (
   `sourceType` INT unsigned NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `disables` (
   PRIMARY KEY (`sourceType`,`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.disables: 899 rows
+-- Дамп данных таблицы acore_world.disables: 904 rows
 DELETE FROM `disables`;
 /*!40000 ALTER TABLE `disables` DISABLE KEYS */;
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, `comment`) VALUES
@@ -926,7 +926,12 @@ INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, 
 	(1, 8299, 0, '', '', 'Deprecated quest: Cut Arathor Supply Lines'),
 	(0, 56711, 64, '', '', 'Disable LOS for Image Channel'),
 	(0, 56713, 64, '', '', 'Disable LOS for Image Channel'),
-	(0, 50313, 64, '0', '0', 'Disable LOS for Spell Mole Machine Emerge');
+	(0, 50313, 64, '0', '0', 'Disable LOS for Spell Mole Machine Emerge'),
+	(1, 6521, 0, '0', '0', 'Deprecated quest: An Unholy Alliance'),
+	(1, 6522, 0, '0', '0', 'Deprecated quest: An Unholy Alliance'),
+	(0, 54612, 64, '', '', 'Chained Peasant (Chest) LOS'),
+	(1, 6144, 0, '', '', 'Disable Quest The Call to Command'),
+	(1, 6145, 0, '', '', 'Disable Quest The Crimson Courier');
 /*!40000 ALTER TABLE `disables` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
