@@ -223,7 +223,6 @@ public:
     // pussywizard:
     void AddWatching(Player* p);
     void RemoveWatching(Player* p);
-    bool IsAllowedToSpeak(uint32 speakDelay); // pussywizard
 
 private:
     // initial packet data (notify type and channel name)
@@ -329,7 +328,6 @@ private:
     uint32 _channelDBId;
     TeamId _teamId;
     ObjectGuid _ownerGUID;
-    uint32 _lastSpeakTime;
     std::string _name;
     std::string _password;
     ChannelRights _channelRights;
