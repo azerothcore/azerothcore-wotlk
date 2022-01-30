@@ -173,9 +173,11 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
             if (optionBroadcastText)
                 ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->MaleText : optionBroadcastText->FemaleText, locale, strOptionText);
-            if (strOptionText.empty() && gossipMenuLocale)  //if we have no text for our gender
+            // if we have no text for our gender
+            if (strOptionText.empty() && gossipMenuLocale)
                  ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
-            if (strOptionText.empty())                      //if gossip_menu_option_locale have no text for our locale
+            // if gossip_menu_option_locale have no text for our locale
+            if (strOptionText.empty())
                 strOptionText = itr->second.OptionText;
 
             if (boxBroadcastText)
