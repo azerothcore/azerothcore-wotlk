@@ -84,6 +84,11 @@ public:
             Talk(SAY_DEATH);
         }
 
+        bool CanAIAttack(Unit const* target) const override
+        {
+            return !(target->GetTypeId() == TYPEID_UNIT && !secondPhase);
+        }
+
         void DoChangePhase()
         {
             secondPhase = true;

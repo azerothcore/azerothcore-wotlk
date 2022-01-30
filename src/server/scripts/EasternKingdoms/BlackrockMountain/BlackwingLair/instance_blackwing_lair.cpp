@@ -52,7 +52,7 @@ Position const SummonPosition[8] =
     {-7584.175781f, -989.6691289f, 407.199585f, 4.527447f},
 };
 
-uint32 const Entry[5] = {12422, 12458, 12416, 12420, 12459};
+uint32 const Entry[3] = { 12422, 12416, 12420 };
 
 class instance_blackwing_lair : public InstanceMapScript
 {
@@ -240,13 +240,13 @@ public:
                         }
                         break;
                     case SPECIAL:
-                        if (++EggCount == 15)
+                        if (++EggCount >= 15)
                         {
                             if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             {
                                 SetData(DATA_EGG_EVENT, DONE);
-                                razor->RemoveAurasDueToSpell(42013); // MindControl
-                                DoRemoveAurasDueToSpellOnPlayers(42013);
+                                razor->RemoveAurasDueToSpell(19832); // MindControl
+                                DoRemoveAurasDueToSpellOnPlayers(19832);
                             }
                             _events.ScheduleEvent(EVENT_RAZOR_PHASE_TWO, 1000);
                             _events.CancelEvent(EVENT_RAZOR_SPAWN);
@@ -295,7 +295,7 @@ public:
                 {
                     case EVENT_RAZOR_SPAWN:
                         for (uint8 i = urand(2, 5); i > 0; --i)
-                            if (Creature* summon = instance->SummonCreature(Entry[urand(0, 4)], SummonPosition[urand(0, 7)]))
+                            if (Creature* summon = instance->SummonCreature(Entry[urand(0, 2)], SummonPosition[urand(0, 7)]))
                                 summon->AI()->DoZoneInCombat();
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 12000, 17000);
                         break;
