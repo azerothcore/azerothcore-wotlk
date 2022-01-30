@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.playercreateinfo_action
+-- Дамп структуры для таблица acore_world.playercreateinfo_action
 DROP TABLE IF EXISTS `playercreateinfo_action`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo_action` (
   `race` TINYINT unsigned NOT NULL DEFAULT 0,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_action` (
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.playercreateinfo_action: 325 rows
+-- Дамп данных таблицы acore_world.playercreateinfo_action: 325 rows
 DELETE FROM `playercreateinfo_action`;
 /*!40000 ALTER TABLE `playercreateinfo_action` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_action` (`race`, `class`, `button`, `action`, `type`) VALUES
