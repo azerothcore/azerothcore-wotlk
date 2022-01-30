@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.player_xp_for_level
+-- Дамп структуры для таблица acore_world.player_xp_for_level
 DROP TABLE IF EXISTS `player_xp_for_level`;
 CREATE TABLE IF NOT EXISTS `player_xp_for_level` (
   `Level` TINYINT unsigned NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `player_xp_for_level` (
   PRIMARY KEY (`Level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.player_xp_for_level: 79 rows
+-- Дамп данных таблицы acore_world.player_xp_for_level: 79 rows
 DELETE FROM `player_xp_for_level`;
 /*!40000 ALTER TABLE `player_xp_for_level` DISABLE KEYS */;
 INSERT INTO `player_xp_for_level` (`Level`, `Experience`) VALUES

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -276,10 +277,10 @@ public:
             if (id == 1337)
             {
                 if (lastShatterMSTime)
-                    if (getMSTimeDiff(lastShatterMSTime, World::GetGameTimeMS()) <= 5000)
+                    if (getMSTimeDiff(lastShatterMSTime, GameTime::GetGameTimeMS().count()) <= 5000)
                         bShattered = true;
 
-                lastShatterMSTime = World::GetGameTimeMS();
+                lastShatterMSTime = GameTime::GetGameTimeMS().count();
             }
         }
 

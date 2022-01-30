@@ -1,12 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Errors.h"
-#include "StringFormat.h"
-#include <cstdarg>
+#include "Duration.h"
 #include <cstdio>
 #include <cstdlib>
 #include <thread>
@@ -29,116 +39,120 @@
     RaiseException(EXCEPTION_ASSERTION_FAILURE, 0, 2, execeptionArgs);
 #else
 // should be easily accessible in gdb
-extern "C" { char const* TrinityAssertionFailedMessage = nullptr; }
+extern "C" { char const* AcoreAssertionFailedMessage = nullptr; }
 #define Crash(message) \
-    TrinityAssertionFailedMessage = strdup(message); \
+    AcoreAssertionFailedMessage = strdup(message); \
     *((volatile int*)nullptr) = 0; \
     exit(1);
 #endif
 
 namespace
 {
-    std::string FormatAssertionMessage(char const* format, va_list args)
+    /**
+    * @name MakeMessage
+    * @brief Make message for display erros
+    * @param messageType Message type (ASSERTION FAILED, FATAL ERROR, ERROR) end etc
+    * @param file Path to file
+    * @param line Line number in file
+    * @param function Functionn name
+    * @param message Condition to string format
+    * @param fmtMessage [optional] Display format message after condition
+    * @param debugInfo [optional] Display debug info
+    */
+    inline std::string MakeMessage(std::string_view messageType, std::string_view file, uint32 line, std::string_view function,
+        std::string_view message, std::string_view fmtMessage = {}, std::string_view debugInfo = {})
     {
-        std::string formatted;
-        va_list len;
+        std::string msg = Acore::StringFormatFmt("\n>> {}\n\n# Location '{}:{}'\n# Function '{}'\n# Condition '{}'\n", messageType, file, line, function, message);
 
-        va_copy(len, args);
-        int32 length = vsnprintf(nullptr, 0, format, len);
-        va_end(len);
+        if (!fmtMessage.empty())
+        {
+            msg.append(Acore::StringFormatFmt("# Message '{}'\n", fmtMessage));
+        }
 
-        formatted.resize(length);
-        vsnprintf(&formatted[0], length + 1, format, args);
+        if (!debugInfo.empty())
+        {
+            msg.append(Acore::StringFormatFmt("\n# Debug info: '{}'\n", debugInfo));
+        }
 
-        return formatted;
+        return Acore::StringFormatFmt(
+            "#{0:-^{2}}#\n"
+            " {1: ^{2}} \n"
+            "#{0:-^{2}}#\n", "", msg, 70);
+    }
+
+    /**
+    * @name MakeAbortMessage
+    * @brief Make message for display erros
+    * @param file Path to file
+    * @param line Line number in file
+    * @param function Functionn name
+    * @param fmtMessage [optional] Display format message after condition
+    */
+    inline std::string MakeAbortMessage(std::string_view file, uint32 line, std::string_view function, std::string_view fmtMessage = {})
+    {
+        std::string msg = Acore::StringFormatFmt("\n>> ABORTED\n\n# Location '{}:{}'\n# Function '{}'\n", file, line, function);
+
+        if (!fmtMessage.empty())
+        {
+            msg.append(Acore::StringFormatFmt("# Message '{}'\n", fmtMessage));
+        }
+
+        return Acore::StringFormatFmt(
+            "\n#{0:-^{2}}#\n"
+            " {1: ^{2}} \n"
+            "#{0:-^{2}}#\n", "", msg, 70);
     }
 }
 
-namespace Acore
+void Acore::Assert(std::string_view file, uint32 line, std::string_view function, std::string_view debugInfo, std::string_view message, std::string_view fmtMessage /*= {}*/)
 {
-    void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message)
-    {
-        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + debugInfo + '\n';
-        fprintf(stderr, "%s", formattedMessage.c_str());
-        fflush(stderr);
-        Crash(formattedMessage.c_str());
-    }
+    std::string formattedMessage = MakeMessage("ASSERTION FAILED", file, line, function, message, fmtMessage, debugInfo);
+    fmt::print(stderr, "{}", formattedMessage);
+    fflush(stderr);
+    Crash(formattedMessage.c_str());
+}
 
-    void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message, char const* format, ...)
-    {
-        va_list args;
-        va_start(args, format);
+void Acore::Fatal(std::string_view file, uint32 line, std::string_view function, std::string_view message, std::string_view fmtMessage /*= {}*/)
+{
+    std::string formattedMessage = MakeMessage("FATAL ERROR", file, line, function, message, fmtMessage);
+    fmt::print(stderr, "{}", formattedMessage);
+    fflush(stderr);
+    std::this_thread::sleep_for(10s);
+    Crash(formattedMessage.c_str());
+}
 
-        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + FormatAssertionMessage(format, args) + '\n' + debugInfo + '\n';
-        va_end(args);
+void Acore::Error(std::string_view file, uint32 line, std::string_view function, std::string_view message)
+{
+    std::string formattedMessage = MakeMessage("ERROR", file, line, function, message);
+    fmt::print(stderr, "{}", formattedMessage);
+    fflush(stderr);
+    std::this_thread::sleep_for(10s);
+    Crash(formattedMessage.c_str());
+}
 
-        fprintf(stderr, "%s", formattedMessage.c_str());
-        fflush(stderr);
+void Acore::Warning(std::string_view file, uint32 line, std::string_view function, std::string_view message)
+{
+    std::string formattedMessage = MakeMessage("WARNING", file, line, function, message);
+    fmt::print(stderr, "{}", formattedMessage);
+}
 
-        Crash(formattedMessage.c_str());
-    }
+void Acore::Abort(std::string_view file, uint32 line, std::string_view function, std::string_view fmtMessage /*= {}*/)
+{
+    std::string formattedMessage = MakeAbortMessage(file, line, function, fmtMessage);
+    fmt::print(stderr, "{}", formattedMessage);
+    fflush(stderr);
+    std::this_thread::sleep_for(10s);
+    Crash(formattedMessage.c_str());
+}
 
-    void Fatal(char const* file, int line, char const* function, char const* message, ...)
-    {
-        va_list args;
-        va_start(args, message);
-
-        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s FATAL ERROR:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
-        va_end(args);
-
-        fprintf(stderr, "%s", formattedMessage.c_str());
-        fflush(stderr);
-
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        Crash(formattedMessage.c_str());
-    }
-
-    void Error(char const* file, int line, char const* function, char const* message)
-    {
-        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ERROR:\n  %s\n", file, line, function, message);
-        fprintf(stderr, "%s", formattedMessage.c_str());
-        fflush(stderr);
-        Crash(formattedMessage.c_str());
-    }
-
-    void Warning(char const* file, int line, char const* function, char const* message)
-    {
-        fprintf(stderr, "\n%s:%i in %s WARNING:\n  %s\n",
-                file, line, function, message);
-    }
-
-    void Abort(char const* file, int line, char const* function)
-    {
-        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ABORTED.\n", file, line, function);
-        fprintf(stderr, "%s", formattedMessage.c_str());
-        fflush(stderr);
-        Crash(formattedMessage.c_str());
-    }
-
-    void Abort(char const* file, int line, char const* function, char const* message, ...)
-    {
-        va_list args;
-        va_start(args, message);
-
-        std::string formattedMessage = StringFormat("\n%s:%i in %s ABORTED:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
-        va_end(args);
-
-        fprintf(stderr, "%s", formattedMessage.c_str());
-        fflush(stderr);
-
-        Crash(formattedMessage.c_str());
-    }
-
-    void AbortHandler(int sigval)
-    {
-        // nothing useful to log here, no way to pass args
-        std::string formattedMessage = Acore::StringFormat("Caught signal %i\n", sigval);
-        fprintf(stderr, "%s", formattedMessage.c_str());
-        fflush(stderr);
-        Crash(formattedMessage.c_str());
-    }
-
-} // namespace Acore
+void Acore::AbortHandler(int sigval)
+{
+    // nothing useful to log here, no way to pass args
+    std::string formattedMessage = StringFormatFmt("Caught signal {}\n", sigval);
+    fmt::print(stderr, "{}", formattedMessage);
+    fflush(stderr);
+    Crash(formattedMessage.c_str());
+}
 
 std::string GetDebugInfo()
 {
