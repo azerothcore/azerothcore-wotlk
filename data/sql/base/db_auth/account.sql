@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.account
+-- Дамп структуры для таблица acore_auth.account
 DROP TABLE IF EXISTS `account`;
 CREATE TABLE IF NOT EXISTS `account` (
   `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   UNIQUE KEY `idx_username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COMMENT='Account System';
 
--- Дамп данных таблицы _acore_auth.account: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.account: ~0 rows (приблизительно)
 DELETE FROM `account`;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
