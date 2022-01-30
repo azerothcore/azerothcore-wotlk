@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.version
+-- Дамп структуры для таблица acore_world.version
 DROP TABLE IF EXISTS `version`;
 CREATE TABLE IF NOT EXISTS `version` (
   `core_version` varchar(255) NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS `version` (
   PRIMARY KEY (`core_version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Version Notes';
 
--- Дамп данных таблицы _acore_world.version: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_world.version: ~0 rows (приблизительно)
 DELETE FROM `version`;
 /*!40000 ALTER TABLE `version` DISABLE KEYS */;
 INSERT INTO `version` (`core_version`, `core_revision`, `db_version`, `cache_id`) VALUES
-  ('AzerothCore rev. 747a2a4f0edf 2021-10-13 20:07:19 +0200 (master branch) (Win64, RelWithDebInfo, Static)','747a2a4f0edf','ACDB 335.5-dev',5);
+	('AzerothCore rev. 747a2a4f0edf 2021-10-13 20:07:19 +0200 (master branch) (Win64, RelWithDebInfo, Static)', '747a2a4f0edf', 'ACDB 335.5-dev', 5);
 /*!40000 ALTER TABLE `version` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

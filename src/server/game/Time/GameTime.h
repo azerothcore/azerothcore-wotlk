@@ -15,8 +15,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AvgDiffTracker.h"
+#ifndef __GAMETIME_H
+#define __GAMETIME_H
 
-AvgDiffTracker avgDiffTracker;
-AvgDiffTracker lfgDiffTracker;
-AvgDiffTracker devDiffTracker;
+#include "Define.h"
+#include "Duration.h"
+
+namespace GameTime
+{
+    // Server start time
+    AC_GAME_API Seconds GetStartTime();
+
+    // Current server time (unix)
+    AC_GAME_API Seconds GetGameTime();
+
+    // Milliseconds since server start
+    AC_GAME_API Milliseconds GetGameTimeMS();
+
+    /// Current chrono system_clock time point
+    AC_GAME_API SystemTimePoint GetSystemTime();
+
+    /// Current chrono steady_clock time point
+    AC_GAME_API TimePoint Now();
+
+    /// Uptime
+    AC_GAME_API Seconds GetUptime();
+
+    /// Update all timers
+    void UpdateGameTimers();
+}
+
+#endif

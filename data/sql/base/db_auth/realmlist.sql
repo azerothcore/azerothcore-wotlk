@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.realmlist
+-- Дамп структуры для таблица acore_auth.realmlist
 DROP TABLE IF EXISTS `realmlist`;
 CREATE TABLE IF NOT EXISTS `realmlist` (
   `id` INT unsigned NOT NULL AUTO_INCREMENT,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `realmlist` (
   CHECK (`population` >= 0)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='Realm System';
 
--- Дамп данных таблицы _acore_auth.realmlist: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.realmlist: ~0 rows (приблизительно)
 DELETE FROM `realmlist`;
 /*!40000 ALTER TABLE `realmlist` DISABLE KEYS */;
 INSERT INTO `realmlist` (`id`, `name`, `address`, `localAddress`, `localSubnetMask`, `port`, `icon`, `flag`, `timezone`, `allowedSecurityLevel`, `population`, `gamebuild`) VALUES
