@@ -427,6 +427,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                 condMeets = (((1 << pet->getPetType()) & ConditionValue1) != 0);
         break;
     }
+    case CONDITION_TAXI:
+    {
+        if (Player* player = object->ToPlayer())
+            condMeets = player->IsInFlight();
+        break;
+    }
     case CONDITION_CHARMED:
     {
         if (Unit* unit = object->ToUnit())
@@ -619,6 +625,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
         break;
     case CONDITION_PET_TYPE:
+        mask |= GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_TAXI:
         mask |= GRID_MAP_TYPE_MASK_PLAYER;
         break;
     case CONDITION_CHARMED:
@@ -1682,7 +1691,6 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table has a ConditionType that is not supported on 3.3.5a ({}), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
     case CONDITION_STAND_STATE:
-    case CONDITION_TAXI:
         LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table has a ConditionType that is not yet supported on AzerothCore ({}), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
     default:
@@ -2273,6 +2281,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             return false;
         }
         break;
+    case CONDITION_TAXI:
     case CONDITION_IN_WATER:
     case CONDITION_CHARMED:
     default:
