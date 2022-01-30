@@ -634,6 +634,7 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_TAXI:
         mask |= GRID_MAP_TYPE_MASK_PLAYER;
+        break;
     case CONDITION_CHARMED:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
         break;
