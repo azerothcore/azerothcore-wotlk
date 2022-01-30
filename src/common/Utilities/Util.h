@@ -78,7 +78,7 @@ inline T ApplyPct(T& base, U pct)
 template <class T>
 inline T RoundToInterval(T& num, T floor, T ceil)
 {
-    return num = std::min(std::max(num, floor), ceil);
+    return num = std::min<T>(std::max<T>(num, floor), ceil);
 }
 
 // UTF8 handling

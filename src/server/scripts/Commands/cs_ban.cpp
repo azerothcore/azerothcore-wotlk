@@ -304,12 +304,12 @@ public:
         {
             Field* fields = result->Fetch();
 
-            time_t unbanDate = time_t(fields[3].GetUInt32());
+            time_t unbanDate = time_t(fields[3].Get<uint32>());
             bool active = false;
-            if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= GameTime::GetGameTime().count()))
+            if (fields[2].Get<bool>() && (fields[1].Get<uint64>() == uint64(0) || unbanDate >= GameTime::GetGameTime().count()))
                 active = true;
-            bool permanent = (fields[1].GetUInt64() == uint64(0));
-            std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
+            bool permanent = (fields[1].Get<uint64>() == uint64(0));
+            std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].Get<uint64>(), true);
             handler->PSendSysMessage(LANG_BANINFO_HISTORYENTRY,
                                      fields[0].GetCString(), banTime.c_str(), active ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO), fields[4].GetCString(), fields[5].GetCString());
         } while (result->NextRow());
@@ -339,7 +339,7 @@ public:
             targetGuid = target->GetGUID();
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO);
-        stmt->setUInt32(0, targetGuid.GetCounter());
+        stmt->SetData(0, targetGuid.GetCounter());
 
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
@@ -352,12 +352,12 @@ public:
         do
         {
             Field* fields = result->Fetch();
-            time_t unbanDate = time_t(fields[3].GetUInt32());
+            time_t unbanDate = time_t(fields[3].Get<uint32>());
             bool active = false;
-            if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= GameTime::GetGameTime().count()))
+            if (fields[2].Get<uint8>() && (!fields[1].Get<uint32>() || unbanDate >= GameTime::GetGameTime().count()))
                 active = true;
-            bool permanent = (fields[1].GetUInt32() == uint32(0));
-            std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
+            bool permanent = (fields[1].Get<uint32>() == uint32(0));
+            std::string banTime = permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].Get<uint64>(), true);
             handler->PSendSysMessage(LANG_BANINFO_HISTORYENTRY,
                                      fields[0].GetCString(), banTime.c_str(), active ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO), fields[4].GetCString(), fields[5].GetCString());
         } while (result->NextRow());
@@ -388,10 +388,10 @@ public:
         }
 
         Field* fields = result->Fetch();
-        bool permanent = !fields[6].GetUInt64();
+        bool permanent = !fields[6].Get<uint64>();
         handler->PSendSysMessage(LANG_BANINFO_IPENTRY,
                                  fields[0].GetCString(), fields[1].GetCString(), permanent ? handler->GetAcoreString(LANG_BANINFO_NEVER) : fields[2].GetCString(),
-                                 permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].GetUInt64(), true).c_str(), fields[4].GetCString(), fields[5].GetCString());
+                                 permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].Get<uint64>(), true).c_str(), fields[4].GetCString(), fields[5].GetCString());
 
         return true;
     }
@@ -414,7 +414,7 @@ public:
         else
         {
             LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_BY_USERNAME);
-            stmt2->setString(0, filter);
+            stmt2->SetData(0, filter);
             result = LoginDatabase.Query(stmt2);
         }
 
@@ -437,7 +437,7 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                uint32 accountid = fields[0].GetUInt32();
+                uint32 accountid = fields[0].Get<uint32>();
 
                 QueryResult banResult = LoginDatabase.PQuery("SELECT account.username FROM account, account_banned WHERE account_banned.id='%u' AND account_banned.id=account.id", accountid);
                 if (banResult)
@@ -457,13 +457,13 @@ public:
             {
                 handler->SendSysMessage("-------------------------------------------------------------------------------");
                 Field* fields = result->Fetch();
-                uint32 accountId = fields[0].GetUInt32();
+                uint32 accountId = fields[0].Get<uint32>();
 
                 std::string accountName;
 
                 // "account" case, name can be get in same query
                 if (result->GetFieldCount() > 1)
-                    accountName = fields[1].GetString();
+                    accountName = fields[1].Get<std::string>();
                 // "character" case, name need extract from another DB
                 else
                     AccountMgr::GetName(accountId, accountName);
@@ -475,9 +475,9 @@ public:
                     Field* fields2 = banInfo->Fetch();
                     do
                     {
-                        tm tmBan = Acore::Time::TimeBreakdown(fields2[0].GetUInt32());
+                        tm tmBan = Acore::Time::TimeBreakdown(fields2[0].Get<uint32>());
 
-                        if (fields2[0].GetUInt32() == fields2[1].GetUInt32())
+                        if (fields2[0].Get<uint32>() == fields2[1].Get<uint32>())
                         {
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|   permanent  |%-15.15s|%-15.15s|",
                                                      accountName.c_str(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
@@ -485,7 +485,7 @@ public:
                         }
                         else
                         {
-                            tm tmUnban = Acore::Time::TimeBreakdown(fields2[1].GetUInt32());
+                            tm tmUnban = Acore::Time::TimeBreakdown(fields2[1].Get<uint32>());
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                                      accountName.c_str(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                                      tmUnban.tm_year % 100, tmUnban.tm_mon + 1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,
@@ -512,7 +512,7 @@ public:
 
         std::string filter(filterStr);
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUID_BY_NAME_FILTER);
-        stmt->setString(0, filter);
+        stmt->SetData(0, filter);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
         {
@@ -529,7 +529,7 @@ public:
             {
                 Field* fields = result->Fetch();
                 CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANNED_NAME);
-                stmt2->setUInt32(0, fields[0].GetUInt32());
+                stmt2->SetData(0, fields[0].Get<uint32>());
 
                 PreparedQueryResult banResult = CharacterDatabase.Query(stmt2);
                 if (banResult)
@@ -548,10 +548,10 @@ public:
 
                 Field* fields = result->Fetch();
 
-                std::string char_name = fields[1].GetString();
+                std::string char_name = fields[1].Get<std::string>();
 
                 CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO_LIST);
-                stmt2->setUInt32(0, fields[0].GetUInt32());
+                stmt2->SetData(0, fields[0].Get<uint32>());
 
                 PreparedQueryResult banInfo = CharacterDatabase.Query(stmt2);
                 if (banInfo)
@@ -559,9 +559,9 @@ public:
                     Field* banFields = banInfo->Fetch();
                     do
                     {
-                        tm tmBan = Acore::Time::TimeBreakdown(banFields[0].GetUInt32());
+                        tm tmBan = Acore::Time::TimeBreakdown(banFields[0].Get<uint32>());
 
-                        if (banFields[0].GetUInt32() == banFields[1].GetUInt32())
+                        if (banFields[0].Get<uint32>() == banFields[1].Get<uint32>())
                         {
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|   permanent  |%-15.15s|%-15.15s|",
                                                      char_name.c_str(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
@@ -569,7 +569,7 @@ public:
                         }
                         else
                         {
-                            tm tmUnban = Acore::Time::TimeBreakdown(banFields[1].GetUInt32());
+                            tm tmUnban = Acore::Time::TimeBreakdown(banFields[1].Get<uint32>());
                             handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                                      char_name.c_str(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                                      tmUnban.tm_year % 100, tmUnban.tm_mon + 1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,
@@ -603,7 +603,7 @@ public:
         else
         {
             LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_BY_IP);
-            stmt2->setString(0, filter);
+            stmt2->SetData(0, filter);
             result = LoginDatabase.Query(stmt2);
         }
 
@@ -633,8 +633,8 @@ public:
             {
                 handler->SendSysMessage("-------------------------------------------------------------------------------");
                 Field* fields = result->Fetch();
-                tm tmBan = Acore::Time::TimeBreakdown(fields[1].GetUInt32());
-                if (fields[1].GetUInt32() == fields[2].GetUInt32())
+                tm tmBan = Acore::Time::TimeBreakdown(fields[1].Get<uint32>());
+                if (fields[1].Get<uint32>() == fields[2].Get<uint32>())
                 {
                     handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|   permanent  |%-15.15s|%-15.15s|",
                                              fields[0].GetCString(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
@@ -642,7 +642,7 @@ public:
                 }
                 else
                 {
-                    tm tmUnban = Acore::Time::TimeBreakdown(fields[2].GetUInt32());
+                    tm tmUnban = Acore::Time::TimeBreakdown(fields[2].Get<uint32>());
                     handler->PSendSysMessage("|%-15.15s|%02d-%02d-%02d %02d:%02d|%02d-%02d-%02d %02d:%02d|%-15.15s|%-15.15s|",
                                              fields[0].GetCString(), tmBan.tm_year % 100, tmBan.tm_mon + 1, tmBan.tm_mday, tmBan.tm_hour, tmBan.tm_min,
                                              tmUnban.tm_year % 100, tmUnban.tm_mon + 1, tmUnban.tm_mday, tmUnban.tm_hour, tmUnban.tm_min,

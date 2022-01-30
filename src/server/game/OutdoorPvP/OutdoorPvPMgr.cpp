@@ -64,7 +64,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
     {
         Field* fields = result->Fetch();
 
-        typeId = fields[0].GetUInt8();
+        typeId = fields[0].Get<uint8>();
 
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_OUTDOORPVP, typeId, nullptr))
             continue;

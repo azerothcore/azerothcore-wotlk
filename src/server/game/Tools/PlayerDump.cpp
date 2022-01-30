@@ -266,7 +266,7 @@ void PlayerDump::InitializeTables()
         int32 i = 0;
         do
         {
-            std::string columnName = (*result)[0].GetString();
+            std::string columnName = (*result)[0].Get<std::string>();
             t.FieldIndices.emplace(columnName, i++);
 
             TableField f;
@@ -613,19 +613,19 @@ void PlayerDumpWriter::PopulateGuids(ObjectGuid::LowType guid)
             switch (baseTable.StoredType)
             {
             case GUID_TYPE_ITEM:
-                if (ObjectGuid::LowType itemLowGuid = (*result)[0].GetUInt32())
+                if (ObjectGuid::LowType itemLowGuid = (*result)[0].Get<uint32>())
                     _items.insert(itemLowGuid);
                 break;
             case GUID_TYPE_MAIL:
-                if (ObjectGuid::LowType mailLowGuid = (*result)[0].GetUInt32())
+                if (ObjectGuid::LowType mailLowGuid = (*result)[0].Get<uint32>())
                     _mails.insert(mailLowGuid);
                 break;
             case GUID_TYPE_PET:
-                if (ObjectGuid::LowType petLowGuid = (*result)[0].GetUInt32())
+                if (ObjectGuid::LowType petLowGuid = (*result)[0].Get<uint32>())
                     _pets.insert(petLowGuid);
                 break;
             case GUID_TYPE_EQUIPMENT_SET:
-                if (uint64 eqSetId = (*result)[0].GetUInt64())
+                if (uint64 eqSetId = (*result)[0].Get<uint64>())
                     _itemSets.insert(eqSetId);
                 break;
             default:
@@ -681,7 +681,7 @@ bool PlayerDumpWriter::AppendTable(StringTransaction& trans, ObjectGuid::LowType
             int32 index = GetColumnIndexByName(tableStruct, "deleteInfos_Account");
             ASSERT(index != -1); // checked at startup
 
-            if ((*result)[index].GetUInt32())
+            if ((*result)[index].Get<uint32>())
                 return false;
         }
         break;
@@ -773,7 +773,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     if (guid && guid < sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
-        stmt->setUInt32(0, guid);
+        stmt->SetData(0, guid);
 
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
             guid = sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed();                     // use first free if exists
@@ -790,7 +790,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
-        stmt->setString(0, name);
+        stmt->SetData(0, name);
 
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
             name.clear();                                       // use the one from the dump

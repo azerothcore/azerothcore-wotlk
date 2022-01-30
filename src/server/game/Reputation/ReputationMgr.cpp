@@ -527,13 +527,13 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
 
-            FactionEntry const* factionEntry = sFactionStore.LookupEntry(fields[0].GetUInt16());
+            FactionEntry const* factionEntry = sFactionStore.LookupEntry(fields[0].Get<uint16>());
             if (factionEntry && (factionEntry->reputationListID >= 0))
             {
                 FactionState* faction = &_factions[factionEntry->reputationListID];
 
                 // update standing to current
-                faction->Standing = fields[1].GetInt32();
+                faction->Standing = fields[1].Get<int32>();
 
                 // update counters
                 int32 BaseRep = GetBaseReputation(factionEntry);
@@ -541,7 +541,7 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
                 ReputationRank new_rank = ReputationToRank(BaseRep + faction->Standing);
                 UpdateRankCounters(old_rank, new_rank);
 
-                uint32 dbFactionFlags = fields[2].GetUInt16();
+                uint32 dbFactionFlags = fields[2].Get<uint16>();
 
                 if (dbFactionFlags & FACTION_FLAG_VISIBLE)
                     SetVisible(faction);                    // have internal checks for forced invisibility
@@ -583,15 +583,15 @@ void ReputationMgr::SaveToDB(CharacterDatabaseTransaction trans)
         if (itr->second.needSave)
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_REPUTATION_BY_FACTION);
-            stmt->setUInt32(0, _player->GetGUID().GetCounter());
-            stmt->setUInt16(1, uint16(itr->second.ID));
+            stmt->SetData(0, _player->GetGUID().GetCounter());
+            stmt->SetData(1, uint16(itr->second.ID));
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_REPUTATION_BY_FACTION);
-            stmt->setUInt32(0, _player->GetGUID().GetCounter());
-            stmt->setUInt16(1, uint16(itr->second.ID));
-            stmt->setInt32(2, itr->second.Standing);
-            stmt->setUInt16(3, uint16(itr->second.Flags));
+            stmt->SetData(0, _player->GetGUID().GetCounter());
+            stmt->SetData(1, uint16(itr->second.ID));
+            stmt->SetData(2, itr->second.Standing);
+            stmt->SetData(3, uint16(itr->second.Flags));
             trans->Append(stmt);
 
             itr->second.needSave = false;

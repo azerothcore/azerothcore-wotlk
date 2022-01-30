@@ -669,42 +669,42 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
     Acore::Asio::Resolver resolver(ioContext);
 
     Field* fields = result->Fetch();
-    realm.Name = fields[1].GetString();
+    realm.Name = fields[1].Get<std::string>();
 
-    Optional<boost::asio::ip::tcp::endpoint> externalAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[2].GetString(), "");
+    Optional<boost::asio::ip::tcp::endpoint> externalAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[2].Get<std::string>(), "");
     if (!externalAddress)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[2].GetString());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[2].Get<std::string>());
         return false;
     }
 
     realm.ExternalAddress = std::make_unique<boost::asio::ip::address>(externalAddress->address());
 
-    Optional<boost::asio::ip::tcp::endpoint> localAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[3].GetString(), "");
+    Optional<boost::asio::ip::tcp::endpoint> localAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[3].Get<std::string>(), "");
     if (!localAddress)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[3].GetString());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[3].Get<std::string>());
         return false;
     }
 
     realm.LocalAddress = std::make_unique<boost::asio::ip::address>(localAddress->address());
 
-    Optional<boost::asio::ip::tcp::endpoint> localSubmask = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[4].GetString(), "");
+    Optional<boost::asio::ip::tcp::endpoint> localSubmask = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[4].Get<std::string>(), "");
     if (!localSubmask)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[4].GetString());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[4].Get<std::string>());
         return false;
     }
 
     realm.LocalSubnetMask = std::make_unique<boost::asio::ip::address>(localSubmask->address());
 
-    realm.Port = fields[5].GetUInt16();
-    realm.Type = fields[6].GetUInt8();
-    realm.Flags = RealmFlags(fields[7].GetUInt8());
-    realm.Timezone = fields[8].GetUInt8();
-    realm.AllowedSecurityLevel = AccountTypes(fields[9].GetUInt8());
-    realm.PopulationLevel = fields[10].GetFloat();
-    realm.Build = fields[11].GetUInt32();
+    realm.Port = fields[5].Get<uint16>();
+    realm.Type = fields[6].Get<uint8>();
+    realm.Flags = RealmFlags(fields[7].Get<uint8>());
+    realm.Timezone = fields[8].Get<uint8>();
+    realm.AllowedSecurityLevel = AccountTypes(fields[9].Get<uint8>());
+    realm.PopulationLevel = fields[10].Get<float>();
+    realm.Build = fields[11].Get<uint32>();
     return true;
 }
 

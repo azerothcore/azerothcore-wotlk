@@ -68,7 +68,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
                 while (reconnectCount < attempts)
                 {
-                    LOG_INFO(_logger, "> Retrying after {} seconds", static_cast<uint32>(reconnectSeconds.count()));
+                    LOG_WARN(_logger, "> Retrying after {} seconds", static_cast<uint32>(reconnectSeconds.count()));
                     std::this_thread::sleep_for(reconnectSeconds);
                     error = pool.Open();
 
@@ -153,7 +153,22 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
 bool DatabaseLoader::Load()
 {
-    return OpenDatabases() && PopulateDatabases() && UpdateDatabases() && PrepareStatements();
+    if (!_updateFlags)
+        LOG_INFO("sql.updates", "Automatic database updates are disabled for all databases!");
+
+    if (!OpenDatabases())
+        return false;
+
+    if (!PopulateDatabases())
+        return false;
+
+    if (!UpdateDatabases())
+        return false;
+
+    if (!PrepareStatements())
+        return false;
+
+    return true;
 }
 
 bool DatabaseLoader::OpenDatabases()

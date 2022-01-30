@@ -38,7 +38,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     if (!result)
         return;
 
-    uint32 flags = (*result)[0].GetUInt32();
+    uint32 flags = (*result)[0].Get<uint32>();
 
     // clean up
     if (flags & CLEANING_FLAG_ACHIEVEMENT_PROGRESS)
@@ -82,7 +82,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
     {
         Field* fields = result->Fetch();
 
-        uint32 id = fields[0].GetUInt32();
+        uint32 id = fields[0].Get<uint32>();
 
         if (!check(id))
         {

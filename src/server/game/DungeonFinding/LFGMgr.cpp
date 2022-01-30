@@ -72,10 +72,10 @@ namespace lfg
         if (!guid.IsGroup())
             return;
 
-        SetLeader(guid, ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32()));
+        SetLeader(guid, ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()));
 
-        uint32 dungeon = fields[17].GetUInt32();
-        uint8 state = fields[18].GetUInt8();
+        uint32 dungeon = fields[17].Get<uint32>();
+        uint8 state = fields[18].Get<uint8>();
 
         if (!dungeon || !state)
             return;
@@ -99,9 +99,9 @@ namespace lfg
             return;
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
-        stmt->setUInt32(0, guid.GetCounter());
-        stmt->setUInt32(1, GetDungeon(guid));
-        stmt->setUInt32(2, GetState(guid));
+        stmt->SetData(0, guid.GetCounter());
+        stmt->SetData(1, GetDungeon(guid));
+        stmt->SetData(2, GetState(guid));
         CharacterDatabase.Execute(stmt);
     }
 
@@ -129,10 +129,10 @@ namespace lfg
         do
         {
             fields = result->Fetch();
-            uint32 dungeonId = fields[0].GetUInt32();
-            uint32 maxLevel = fields[1].GetUInt8();
-            uint32 firstQuestId = fields[2].GetUInt32();
-            uint32 otherQuestId = fields[3].GetUInt32();
+            uint32 dungeonId = fields[0].Get<uint32>();
+            uint32 maxLevel = fields[1].Get<uint8>();
+            uint32 firstQuestId = fields[2].Get<uint32>();
+            uint32 otherQuestId = fields[3].Get<uint32>();
 
             if (!GetLFGDungeonEntry(dungeonId))
             {
@@ -215,7 +215,7 @@ namespace lfg
         do
         {
             Field* fields = result->Fetch();
-            uint32 dungeonId = fields[0].GetUInt32();
+            uint32 dungeonId = fields[0].Get<uint32>();
             LFGDungeonContainer::iterator dungeonItr = LfgDungeonStore.find(dungeonId);
             if (dungeonItr == LfgDungeonStore.end())
             {
@@ -224,10 +224,10 @@ namespace lfg
             }
 
             LFGDungeonData& data = dungeonItr->second;
-            data.x = fields[1].GetFloat();
-            data.y = fields[2].GetFloat();
-            data.z = fields[3].GetFloat();
-            data.o = fields[4].GetFloat();
+            data.x = fields[1].Get<float>();
+            data.y = fields[2].Get<float>();
+            data.z = fields[3].Get<float>();
+            data.o = fields[4].Get<float>();
 
             ++count;
         } while (result->NextRow());

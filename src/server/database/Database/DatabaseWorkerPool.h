@@ -22,7 +22,6 @@
 #include "Define.h"
 #include "StringFormat.h"
 #include <array>
-#include <string>
 #include <vector>
 
 template <typename T>
@@ -45,13 +44,11 @@ private:
 public:
     /* Activity state */
     DatabaseWorkerPool();
-
     ~DatabaseWorkerPool();
 
-    void SetConnectionInfo(std::string const& infoString, uint8 const asyncThreads, uint8 const synchThreads);
+    void SetConnectionInfo(std::string_view infoString, uint8 const asyncThreads, uint8 const synchThreads);
 
     uint32 Open();
-
     void Close();
 
     //! Prepares all prepared statements
@@ -68,7 +65,7 @@ public:
 
     //! Enqueues a one-way SQL operation in string format that will be executed asynchronously.
     //! This method should only be used for queries that are only executed once, e.g during startup.
-    void Execute(char const* sql);
+    void Execute(std::string_view sql);
 
     //! Enqueues a one-way SQL operation in string format -with variable args- that will be executed asynchronously.
     //! This method should only be used for queries that are only executed once, e.g during startup.
@@ -78,7 +75,7 @@ public:
         if (Acore::IsFormatEmptyOrNull(sql))
             return;
 
-        Execute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        Execute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...));
     }
 
     //! Enqueues a one-way SQL operation in prepared statement format that will be executed asynchronously.
@@ -91,7 +88,7 @@ public:
 
     //! Directly executes a one-way SQL operation in string format, that will block the calling thread until finished.
     //! This method should only be used for queries that are only executed once, e.g during startup.
-    void DirectExecute(char const* sql);
+    void DirectExecute(std::string_view sql);
 
     //! Directly executes a one-way SQL operation in string format -with variable args-, that will block the calling thread until finished.
     //! This method should only be used for queries that are only executed once, e.g during startup.
@@ -101,7 +98,7 @@ public:
         if (Acore::IsFormatEmptyOrNull(sql))
             return;
 
-        DirectExecute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        DirectExecute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...));
     }
 
     //! Directly executes a one-way SQL operation in prepared statement format, that will block the calling thread until finished.
@@ -114,7 +111,7 @@ public:
 
     //! Directly executes an SQL query in string format that will block the calling thread until finished.
     //! Returns reference counted auto pointer, no need for manual memory management in upper level code.
-    QueryResult Query(char const* sql, T* connection = nullptr);
+    QueryResult Query(std::string_view, T* connection = nullptr);
 
     //! Directly executes an SQL query in string format -with variable args- that will block the calling thread until finished.
     //! Returns reference counted auto pointer, no need for manual memory management in upper level code.
@@ -124,7 +121,7 @@ public:
         if (Acore::IsFormatEmptyOrNull(sql))
             return QueryResult(nullptr);
 
-        return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str(), conn);
+        return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...), conn);
     }
 
     //! Directly executes an SQL query in string format -with variable args- that will block the calling thread until finished.
@@ -135,7 +132,7 @@ public:
         if (Acore::IsFormatEmptyOrNull(sql))
             return QueryResult(nullptr);
 
-        return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...));
     }
 
     //! Directly executes an SQL query in prepared format that will block the calling thread until finished.
@@ -149,7 +146,7 @@ public:
 
     //! Enqueues a query in string format that will set the value of the QueryResultFuture return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
-    QueryCallback AsyncQuery(char const* sql);
+    QueryCallback AsyncQuery(std::string_view sql);
 
     //! Enqueues a query in prepared format that will set the value of the PreparedQueryResultFuture return object as soon as the query is executed.
     //! The return value is then processed in ProcessQueryCallback methods.
@@ -183,7 +180,7 @@ public:
 
     //! Method used to execute ad-hoc statements in a diverse context.
     //! Will be wrapped in a transaction if valid object is present, otherwise executed standalone.
-    void ExecuteOrAppend(SQLTransaction<T>& trans, char const* sql);
+    void ExecuteOrAppend(SQLTransaction<T>& trans, std::string_view sql);
 
     //! Method used to execute prepared statements in a diverse context.
     //! Will be wrapped in a transaction if valid object is present, otherwise executed standalone.
@@ -226,7 +223,7 @@ private:
     //! Caller MUST call t->Unlock() after touching the MySQL context to prevent deadlocks.
     T* GetFreeConnection();
 
-    [[nodiscard]] char const* GetDatabaseName() const;
+    [[nodiscard]] std::string_view GetDatabaseName() const;
 
     //! Queue shared by async worker threads.
     std::unique_ptr<ProducerConsumerQueue<SQLOperation*>> _queue;

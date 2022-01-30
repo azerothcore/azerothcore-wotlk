@@ -931,20 +931,20 @@ void ConditionMgr::LoadConditions(bool isReload)
         Field* fields = result->Fetch();
 
         Condition* cond                     = new Condition();
-        int32      iSourceTypeOrReferenceId = fields[0].GetInt32();
-        cond->SourceGroup                   = fields[1].GetUInt32();
-        cond->SourceEntry                   = fields[2].GetInt32();
-        cond->SourceId                      = fields[3].GetInt32();
-        cond->ElseGroup                     = fields[4].GetUInt32();
-        int32 iConditionTypeOrReference     = fields[5].GetInt32();
-        cond->ConditionTarget               = fields[6].GetUInt8();
-        cond->ConditionValue1               = fields[7].GetUInt32();
-        cond->ConditionValue2               = fields[8].GetUInt32();
-        cond->ConditionValue3               = fields[9].GetUInt32();
-        cond->NegativeCondition             = fields[10].GetUInt8();
-        cond->ErrorType                     = fields[11].GetUInt32();
-        cond->ErrorTextId                   = fields[12].GetUInt32();
-        cond->ScriptId                      = sObjectMgr->GetScriptId(fields[13].GetCString());
+        int32      iSourceTypeOrReferenceId = fields[0].Get<int32>();
+        cond->SourceGroup                   = fields[1].Get<uint32>();
+        cond->SourceEntry                   = fields[2].Get<int32>();
+        cond->SourceId                      = fields[3].Get<int32>();
+        cond->ElseGroup                     = fields[4].Get<uint32>();
+        int32 iConditionTypeOrReference     = fields[5].Get<int32>();
+        cond->ConditionTarget               = fields[6].Get<uint8>();
+        cond->ConditionValue1               = fields[7].Get<uint32>();
+        cond->ConditionValue2               = fields[8].Get<uint32>();
+        cond->ConditionValue3               = fields[9].Get<uint32>();
+        cond->NegativeCondition             = fields[10].Get<uint8>();
+        cond->ErrorType                     = fields[11].Get<uint32>();
+        cond->ErrorTextId                   = fields[12].Get<uint32>();
+        cond->ScriptId                      = sObjectMgr->GetScriptId(fields[13].Get<std::string>());
 
         if (iConditionTypeOrReference >= 0)
             cond->ConditionType = ConditionTypes(iConditionTypeOrReference);

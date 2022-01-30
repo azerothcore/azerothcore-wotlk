@@ -149,15 +149,15 @@ void AccountInfo::LoadResult(Field* fields)
     // aa.gmlevel (, more query-specific fields)
     // FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 LEFT JOIN ip_banned ipb ON ipb.ip = ? WHERE a.username = ?
 
-    Id = fields[0].GetUInt32();
-    Login = fields[1].GetString();
-    IsLockedToIP = fields[2].GetBool();
-    LockCountry = fields[3].GetString();
-    LastIP = fields[4].GetString();
-    FailedLogins = fields[5].GetUInt32();
-    IsBanned = fields[6].GetBool() || fields[8].GetBool();
-    IsPermanentlyBanned = fields[7].GetBool() || fields[9].GetBool();
-    SecurityLevel = static_cast<AccountTypes>(fields[10].GetUInt8()) > SEC_CONSOLE ? SEC_CONSOLE : static_cast<AccountTypes>(fields[10].GetUInt8());
+    Id = fields[0].Get<uint32>();
+    Login = fields[1].Get<std::string>();
+    IsLockedToIP = fields[2].Get<bool>();
+    LockCountry = fields[3].Get<std::string>();
+    LastIP = fields[4].Get<std::string>();
+    FailedLogins = fields[5].Get<uint32>();
+    IsBanned = fields[6].Get<bool>() || fields[8].Get<bool>();
+    IsPermanentlyBanned = fields[7].Get<bool>() || fields[9].Get<bool>();
+    SecurityLevel = static_cast<AccountTypes>(fields[10].Get<uint8>()) > SEC_CONSOLE ? SEC_CONSOLE : static_cast<AccountTypes>(fields[10].Get<uint8>());
 
     // Use our own uppercasing of the account name instead of using UPPER() in mysql query
     // This is how the account was created in the first place and changing it now would result in breaking
@@ -174,7 +174,7 @@ void AuthSession::Start()
     LOG_TRACE("session", "Accepted connection from {}", ip_address);
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_INFO);
-    stmt->setString(0, ip_address);
+    stmt->SetData(0, ip_address);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::CheckIpCallback, this, std::placeholders::_1)));
 }
@@ -198,7 +198,7 @@ void AuthSession::CheckIpCallback(PreparedQueryResult result)
         do
         {
             Field* fields = result->Fetch();
-            if (fields[0].GetUInt64() != 0)
+            if (fields[0].Get<uint64>() != 0)
                 banned = true;
 
         } while (result->NextRow());
@@ -309,8 +309,8 @@ bool AuthSession::HandleLogonChallenge()
 
     // Get the account details from the account table
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
-    stmt->setString(0, GetRemoteIpAddress().to_string());
-    stmt->setString(1, login);
+    stmt->SetData(0, GetRemoteIpAddress().to_string());
+    stmt->SetData(1, login);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::LogonChallengeCallback, this, std::placeholders::_1)));
     return true;
@@ -392,7 +392,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     if (!fields[11].IsNull())
     {
         securityFlags = 4;
-        _totpSecret = fields[11].GetBinary();
+        _totpSecret = fields[11].Get<Binary>();
 
         if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
         {
@@ -407,10 +407,9 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         }
     }
 
-    _srp6.emplace(
-        _accountInfo.Login,
-        fields[12].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>(),
-        fields[13].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>());
+    _srp6.emplace(_accountInfo.Login,
+        fields[12].Get<Binary, Acore::Crypto::SRP6::SALT_LENGTH>(),
+        fields[13].Get<Binary, Acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
     // Fill the response packet with the result
     if (AuthHelper::IsAcceptedClientBuild(_build))
@@ -518,11 +517,11 @@ bool AuthSession::HandleLogonProof()
 
         std::string address = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true) ? GetRemoteIpAddress().to_string() : "0.0.0.0";
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
-        stmt->setBinary(0, _sessionKey);
-        stmt->setString(1, address);
-        stmt->setUInt32(2, GetLocaleByName(_localizationName));
-        stmt->setString(3, _os);
-        stmt->setString(4, _accountInfo.Login);
+        stmt->SetData(0, _sessionKey);
+        stmt->SetData(1, address);
+        stmt->SetData(2, GetLocaleByName(_localizationName));
+        stmt->SetData(3, _os);
+        stmt->SetData(4, _accountInfo.Login);
         LoginDatabase.DirectExecute(stmt);
 
         // Finish SRP6 and send the final result to the client
@@ -574,9 +573,9 @@ bool AuthSession::HandleLogonProof()
         if (sConfigMgr->GetOption<bool>("WrongPass.Logging", false))
         {
             LoginDatabasePreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
-            logstmt->setUInt32(0, _accountInfo.Id);
-            logstmt->setString(1, GetRemoteIpAddress().to_string());
-            logstmt->setString(2, "Login to WoW Failed - Incorrect Password");
+            logstmt->SetData(0, _accountInfo.Id);
+            logstmt->SetData(1, GetRemoteIpAddress().to_string());
+            logstmt->SetData(2, "Login to WoW Failed - Incorrect Password");
 
             LoginDatabase.Execute(logstmt);
         }
@@ -585,7 +584,7 @@ bool AuthSession::HandleLogonProof()
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
-            stmt->setString(0, _accountInfo.Login);
+            stmt->SetData(0, _accountInfo.Login);
             LoginDatabase.Execute(stmt);
 
             if (++_accountInfo.FailedLogins >= MaxWrongPassCount)
@@ -596,8 +595,8 @@ bool AuthSession::HandleLogonProof()
                 if (WrongPassBanType)
                 {
                     stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_AUTO_BANNED);
-                    stmt->setUInt32(0, _accountInfo.Id);
-                    stmt->setUInt32(1, WrongPassBanTime);
+                    stmt->SetData(0, _accountInfo.Id);
+                    stmt->SetData(1, WrongPassBanTime);
                     LoginDatabase.Execute(stmt);
 
                     LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] account {} got banned for '{}' seconds because it failed to authenticate '{}' times",
@@ -606,8 +605,8 @@ bool AuthSession::HandleLogonProof()
                 else
                 {
                     stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_AUTO_BANNED);
-                    stmt->setString(0, GetRemoteIpAddress().to_string());
-                    stmt->setUInt32(1, WrongPassBanTime);
+                    stmt->SetData(0, GetRemoteIpAddress().to_string());
+                    stmt->SetData(1, WrongPassBanTime);
                     LoginDatabase.Execute(stmt);
 
                     LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] IP got banned for '{}' seconds because account {} failed to authenticate '{}' times",
@@ -648,8 +647,8 @@ bool AuthSession::HandleReconnectChallenge()
 
     // Get the account details from the account table
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RECONNECTCHALLENGE);
-    stmt->setString(0, GetRemoteIpAddress().to_string());
-    stmt->setString(1, login);
+    stmt->SetData(0, GetRemoteIpAddress().to_string());
+    stmt->SetData(1, login);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::ReconnectChallengeCallback, this, std::placeholders::_1)));
     return true;
@@ -670,7 +669,7 @@ void AuthSession::ReconnectChallengeCallback(PreparedQueryResult result)
     Field* fields = result->Fetch();
 
     _accountInfo.LoadResult(fields);
-    _sessionKey = fields[11].GetBinary<SESSION_KEY_LENGTH>();
+    _sessionKey = fields[11].Get<Binary, SESSION_KEY_LENGTH>();
     Acore::Crypto::GetRandomBytes(_reconnectProof);
     _status = STATUS_RECONNECT_PROOF;
 
@@ -734,7 +733,7 @@ bool AuthSession::HandleRealmList()
     LOG_DEBUG("server.authserver", "Entering _HandleRealmList");
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALM_CHARACTER_COUNTS);
-    stmt->setUInt32(0, _accountInfo.Id);
+    stmt->SetData(0, _accountInfo.Id);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::RealmListCallback, this, std::placeholders::_1)));
     _status = STATUS_WAITING_FOR_REALM_LIST;
@@ -749,7 +748,7 @@ void AuthSession::RealmListCallback(PreparedQueryResult result)
         do
         {
             Field* fields = result->Fetch();
-            characterCounts[fields[0].GetUInt32()] = fields[1].GetUInt8();
+            characterCounts[fields[0].Get<uint32>()] = fields[1].Get<uint8>();
         } while (result->NextRow());
     }
 

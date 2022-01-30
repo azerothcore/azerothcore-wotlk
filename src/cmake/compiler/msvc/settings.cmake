@@ -101,6 +101,12 @@ target_compile_definitions(acore-compile-option-interface
     -D__STDC_LIMIT_MACROS)
 message(STATUS "MSVC: Disabled INTMAX_MAX warnings")
 
+# Define NOMINMAX
+target_compile_definitions(acore-compile-option-interface
+  INTERFACE
+    -DNOMINMAX)
+message(STATUS "MSVC: Enable NOMINMAX")
+
 # disable warnings in Visual Studio 8 and above if not wanted
 if(NOT WITH_WARNINGS)
   if(MSVC AND NOT CMAKE_GENERATOR MATCHES "Visual Studio 7")
