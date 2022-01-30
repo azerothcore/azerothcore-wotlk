@@ -1024,6 +1024,7 @@ protected:
     uint32 m_lootGenerationTime;
 
     ObjectGuid m_linkedTrap;
+
 private:
     void CheckRitualList();
     void ClearRitualList();
