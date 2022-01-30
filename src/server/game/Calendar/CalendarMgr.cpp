@@ -16,6 +16,7 @@
  */
 
 #include "CalendarMgr.h"
+#include "GameTime.h"
 #include "GuildMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -23,6 +24,9 @@
 #include "Player.h"
 #include "QueryResult.h"
 #include <unordered_map>
+
+CalendarInvite::CalendarInvite() : _inviteId(1), _eventId(0), _statusTime(GameTime::GetGameTime().count()),
+_status(CALENDAR_STATUS_INVITED), _rank(CALENDAR_RANK_PLAYER), _text("") { }
 
 CalendarInvite::~CalendarInvite()
 {
@@ -90,7 +94,7 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u calendar events", count);
+    LOG_INFO("server.loading", ">> Loaded {} calendar events", count);
     count = 0;
 
     //                                                       0   1      2        3       4       5            6      7
@@ -116,7 +120,7 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u calendar invites", count);
+    LOG_INFO("server.loading", ">> Loaded {} calendar invites", count);
     LOG_INFO("server.loading", " ");
 
     for (uint64 i = 1; i < _maxEventId; ++i)
@@ -316,7 +320,7 @@ CalendarInvite* CalendarMgr::GetInvite(uint64 inviteId) const
             if ((*itr2)->GetInviteId() == inviteId)
                 return *itr2;
 
-    LOG_DEBUG("entities.unit", "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
+    LOG_DEBUG("entities.unit", "CalendarMgr::GetInvite: [{}] not found!", inviteId);
     return nullptr;
 }
 
@@ -358,7 +362,7 @@ uint64 CalendarMgr::GetFreeInviteId()
 
 void CalendarMgr::DeleteOldEvents()
 {
-    time_t oldEventsTime = time(nullptr) - CALENDAR_OLD_EVENTS_DELETION_TIME;
+    time_t oldEventsTime = GameTime::GetGameTime().count() - CALENDAR_OLD_EVENTS_DELETION_TIME;
 
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
     {
