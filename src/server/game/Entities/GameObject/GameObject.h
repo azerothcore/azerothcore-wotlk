@@ -985,17 +985,7 @@ public:
     void SaveInstanceData(GOState* state);
     void UpdateInstanceData(GOState* state);
     uint8 FindStateSavedOnInstance();
-    bool IsInstanceGameobject()
-    {
-        if (auto* map = FindMap())
-        {
-            if (map->IsDungeon() || map->IsRaid())
-            {
-                return true;
-            }
-        }
-        return false;
-    };
+    bool IsInstanceGameobject();
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();

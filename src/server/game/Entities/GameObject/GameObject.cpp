@@ -2452,6 +2452,18 @@ void GameObject::SetGoState(GOState state)
     }
 }
 
+bool GameObject::IsInstanceGameobject()
+{
+    if (auto* map = FindMap())
+    {
+        if (map->IsDungeon() || map->IsRaid())
+        {
+            return true;
+        }
+    }
+    return false;
+};
+
 void GameObject::SaveInstanceData(GOState* state)
 {
     uint32 id       = GetInstanceId();
