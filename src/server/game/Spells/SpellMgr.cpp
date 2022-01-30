@@ -7580,6 +7580,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
     });
 
+    // PX-238 Winter Wondervolt
+    ApplySpellFix({ 26157, 26272, 26273, 26274 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Mechanic = 0;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
