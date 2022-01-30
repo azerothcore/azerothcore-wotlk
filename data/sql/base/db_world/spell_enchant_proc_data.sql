@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_enchant_proc_data
+-- Дамп структуры для таблица acore_world.spell_enchant_proc_data
 DROP TABLE IF EXISTS `spell_enchant_proc_data`;
 CREATE TABLE IF NOT EXISTS `spell_enchant_proc_data` (
   `entry` INT unsigned NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `spell_enchant_proc_data` (
   CHECK (`PPMChance` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
 
--- Дамп данных таблицы _acore_world.spell_enchant_proc_data: 42 rows
+-- Дамп данных таблицы acore_world.spell_enchant_proc_data: 42 rows
 DELETE FROM `spell_enchant_proc_data`;
 /*!40000 ALTER TABLE `spell_enchant_proc_data` DISABLE KEYS */;
 INSERT INTO `spell_enchant_proc_data` (`entry`, `customChance`, `PPMChance`, `procEx`) VALUES

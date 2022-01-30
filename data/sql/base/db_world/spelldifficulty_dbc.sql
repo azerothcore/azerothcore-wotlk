@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spelldifficulty_dbc
+-- Дамп структуры для таблица acore_world.spelldifficulty_dbc
 DROP TABLE IF EXISTS `spelldifficulty_dbc`;
 CREATE TABLE IF NOT EXISTS `spelldifficulty_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `spelldifficulty_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.spelldifficulty_dbc: 293 rows
+-- Дамп данных таблицы acore_world.spelldifficulty_dbc: 299 rows
 DELETE FROM `spelldifficulty_dbc`;
 /*!40000 ALTER TABLE `spelldifficulty_dbc` DISABLE KEYS */;
 INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`, `DifficultySpellID_3`, `DifficultySpellID_4`) VALUES
@@ -319,7 +319,13 @@ INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpell
 	(27994, 27994, 55646, 0, 0),
 	(55648, 55648, 27995, 0, 0),
 	(66809, 66809, 67331, 0, 0),
-	(56701, 56701, 59104, 0, 0);
+	(56701, 56701, 59104, 0, 0),
+	(63356, 63356, 64003, 0, 0),
+	(63821, 63821, 64001, 0, 0),
+	(63666, 63666, 65026, 0, 0),
+	(62478, 62478, 63512, 0, 0),
+	(62528, 62528, 62892, 0, 0),
+	(62411, 62411, 62413, 0, 0);
 /*!40000 ALTER TABLE `spelldifficulty_dbc` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.player_factionchange_titles
+-- Дамп структуры для таблица acore_world.player_factionchange_titles
 DROP TABLE IF EXISTS `player_factionchange_titles`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_titles` (
   `alliance_id` INT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `player_factionchange_titles` (
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.player_factionchange_titles: 22 rows
+-- Дамп данных таблицы acore_world.player_factionchange_titles: 22 rows
 DELETE FROM `player_factionchange_titles`;
 /*!40000 ALTER TABLE `player_factionchange_titles` DISABLE KEYS */;
 INSERT INTO `player_factionchange_titles` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
