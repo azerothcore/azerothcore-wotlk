@@ -22,7 +22,7 @@
 namespace lfg
 {
     LfgGroupData::LfgGroupData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE),
-        m_Dungeon(0), m_KicksLeft(sWorld->getIntConfig(CONFIG_LFG_MAX_KICK_COUNT)), _isLFGGroup(false)
+        m_Dungeon(0), _isLFGGroup(false), m_KicksLeft(sWorld->getIntConfig(CONFIG_LFG_MAX_KICK_COUNT))
     { }
 
     LfgGroupData::~LfgGroupData()
