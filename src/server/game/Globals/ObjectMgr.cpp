@@ -649,7 +649,7 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.MechanicImmuneMask    = fields[67].Get<uint32>();
     creatureTemplate.SpellSchoolImmuneMask = fields[68].Get<uint8>();
     creatureTemplate.flags_extra           = fields[69].Get<uint32>();
-    creatureTemplate.ScriptID              = GetScriptId(fields[70].GetCString());
+    creatureTemplate.ScriptID              = GetScriptId(fields[70].Get<std::string>());
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
@@ -2721,7 +2721,7 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Duration                = fields[129].Get<uint32>();
         itemTemplate.ItemLimitCategory       = uint32(fields[130].Get<int16>());
         itemTemplate.HolidayId               = fields[131].Get<uint32>();
-        itemTemplate.ScriptId                = sObjectMgr->GetScriptId(fields[132].GetCString());
+        itemTemplate.ScriptId                = sObjectMgr->GetScriptId(fields[132].Get<std::string>());
         itemTemplate.DisenchantID            = fields[133].Get<uint32>();
         itemTemplate.FoodType                = uint32(fields[134].Get<uint8>());
         itemTemplate.MinMoneyLoot            = fields[135].Get<uint32>();
@@ -5478,7 +5478,7 @@ void ObjectMgr::LoadSpellScriptNames()
         Field* fields = result->Fetch();
 
         int32 spellId          = fields[0].Get<int32>();
-        const char* scriptName = fields[1].GetCString();
+        std::string scriptName = fields[1].Get<std::string>();
 
         bool allRanks = false;
         if (spellId <= 0)
@@ -5490,7 +5490,7 @@ void ObjectMgr::LoadSpellScriptNames()
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
         {
-            LOG_ERROR("sql.sql", "Scriptname:`{}` spell (spell_id:{}) does not exist in `Spell.dbc`.", scriptName, fields[0].Get<int32>());
+            LOG_ERROR("sql.sql", "Scriptname: `{}` spell (spell_id:{}) does not exist in `Spell.dbc`.", scriptName, fields[0].Get<int32>());
             continue;
         }
 
@@ -5498,7 +5498,7 @@ void ObjectMgr::LoadSpellScriptNames()
         {
             if (sSpellMgr->GetFirstSpellInChain(spellId) != uint32(spellId))
             {
-                LOG_ERROR("sql.sql", "Scriptname:`{}` spell (spell_id:{}) is not first rank of spell.", scriptName, fields[0].Get<int32>());
+                LOG_ERROR("sql.sql", "Scriptname: `{}` spell (spell_id:{}) is not first rank of spell.", scriptName, fields[0].Get<int32>());
                 continue;
             }
             while (spellInfo)
@@ -5696,7 +5696,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
         instanceTemplate.AllowMount = fields[3].Get<bool>();
         instanceTemplate.Parent     = uint32(fields[1].Get<uint16>());
-        instanceTemplate.ScriptId   = sObjectMgr->GetScriptId(fields[2].GetCString());
+        instanceTemplate.ScriptId   = sObjectMgr->GetScriptId(fields[2].Get<std::string>());
 
         _instanceTemplateStore[mapID] = instanceTemplate;
 
@@ -6222,7 +6222,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
         Field* fields = result->Fetch();
 
         uint32 Trigger_ID      = fields[0].Get<uint32>();
-        const char* scriptName = fields[1].GetCString();
+        std::string scriptName = fields[1].Get<std::string>();
 
         AreaTrigger const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
@@ -6900,7 +6900,7 @@ void ObjectMgr::LoadGameObjectTemplate()
             got.raw.data[i] = fields[8 + i].Get<int32>(); // data1 and data6 can be -1
 
         got.AIName = fields[32].Get<std::string>();
-        got.ScriptId = GetScriptId(fields[33].GetCString());
+        got.ScriptId = GetScriptId(fields[33].Get<std::string>());
         got.IsForQuests = false;
 
         // Checks

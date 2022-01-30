@@ -169,7 +169,7 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                char const* name = fields[0].GetCString();
+                char const* name = fields[0].Get<std::string>().c_str();
                 uint8 security = fields[1].Get<uint8>();
                 uint8 max = (16 - strlen(name)) / 2;
                 uint8 max2 = max;

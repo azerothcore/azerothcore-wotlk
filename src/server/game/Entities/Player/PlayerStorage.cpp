@@ -5362,7 +5362,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     m_resetTalentsCost = fields[29].Get<uint32>();
     m_resetTalentsTime = time_t(fields[30].Get<uint32>());
 
-    m_taxi.LoadTaxiMask(fields[22].GetCString());            // must be before InitTaxiNodesForLevel
+    m_taxi.LoadTaxiMask(fields[22].Get<std::string_view>());            // must be before InitTaxiNodesForLevel
 
     uint32 extraflags = fields[36].Get<uint16>();
 

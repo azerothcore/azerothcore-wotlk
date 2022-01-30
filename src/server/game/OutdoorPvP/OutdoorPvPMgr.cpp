@@ -78,7 +78,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
         OutdoorPvPData* data = new OutdoorPvPData();
         OutdoorPvPTypes realTypeId = OutdoorPvPTypes(typeId);
         data->TypeId = realTypeId;
-        data->ScriptId = sObjectMgr->GetScriptId(fields[1].GetCString());
+        data->ScriptId = sObjectMgr->GetScriptId(fields[1].Get<std::string>());
         m_OutdoorPvPDatas[realTypeId] = data;
 
         ++count;

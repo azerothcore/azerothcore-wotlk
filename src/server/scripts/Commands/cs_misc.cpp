@@ -2557,7 +2557,7 @@ public:
         do
         {
             Field* fields = result->Fetch();
-            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, Acore::Time::TimeToHumanReadable(Seconds(fields[0].Get<uint32>())).c_str(), fields[1].Get<uint32>(), fields[2].GetCString(), fields[3].GetCString());
+            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, Acore::Time::TimeToHumanReadable(Seconds(fields[0].Get<uint32>())).c_str(), fields[1].Get<uint32>(), fields[2].Get<std::string>().c_str(), fields[3].Get<std::string>().c_str());
         } while (result->NextRow());
 
         return true;

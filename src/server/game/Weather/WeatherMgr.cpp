@@ -134,7 +134,7 @@ namespace WeatherMgr
                 }
             }
 
-            wzc.ScriptId = sObjectMgr->GetScriptId(fields[13].GetCString());
+            wzc.ScriptId = sObjectMgr->GetScriptId(fields[13].Get<std::string>());
 
             ++count;
         } while (result->NextRow());

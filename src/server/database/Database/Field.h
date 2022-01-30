@@ -104,9 +104,7 @@ public:
     Field();
     ~Field() = default;
 
-    char const* GetCString() const;
-
-    [[nodiscard]] bool IsNull() const
+    [[nodiscard]] inline bool IsNull() const
     {
         return data.value == nullptr;
     }

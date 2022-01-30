@@ -538,11 +538,11 @@ inline void AppendTableDump(StringTransaction& trans, TableStruct const& tableSt
 
         for (uint32 i = 0; i < fieldSize;)
         {
-            char const* cString = fields[i].GetCString();
+            std::string cString = fields[i].Get<std::string>();
             ++i;
 
             // null pointer -> we have null
-            if (!cString)
+            if (cString.empty())
                 ss << "'NULL'";
             else
             {

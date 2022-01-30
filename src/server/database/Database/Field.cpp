@@ -337,19 +337,3 @@ Binary Field::GetDataBinary() const
     memcpy(result.data(), data.value, data.length);
     return result;
 }
-
-char const* Field::GetCString() const
-{
-    if (!data.value)
-        return nullptr;
-
-#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
-    if (IsNumeric() && data.raw)
-    {
-        LogWrongType(__FUNCTION__, "char const*");
-        return nullptr;
-    }
-#endif
-
-    return static_cast<char const*>(data.value);
-}

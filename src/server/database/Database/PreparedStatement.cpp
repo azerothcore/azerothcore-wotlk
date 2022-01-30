@@ -104,7 +104,7 @@ bool PreparedStatementTask::Execute()
 template<typename T>
 std::string PreparedStatementData::ToString(T value)
 {
-    return Acore::StringFormat("{}", value);
+    return Acore::StringFormatFmt("{}", value);
 }
 
 template<>
