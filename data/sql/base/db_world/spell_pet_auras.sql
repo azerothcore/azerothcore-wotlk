@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_pet_auras
+-- Дамп структуры для таблица acore_world.spell_pet_auras
 DROP TABLE IF EXISTS `spell_pet_auras`;
 CREATE TABLE IF NOT EXISTS `spell_pet_auras` (
-  `spell` mediumint(8) unsigned NOT NULL COMMENT 'dummy spell id',
+  `spell` MEDIUMINT unsigned NOT NULL COMMENT 'dummy spell id',
   `effectId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `pet` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'pet id; 0 = all',
-  `aura` mediumint(8) unsigned NOT NULL COMMENT 'pet aura id',
+  `pet` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'pet id; 0 = all',
+  `aura` MEDIUMINT unsigned NOT NULL COMMENT 'pet aura id',
   PRIMARY KEY (`spell`,`effectId`,`pet`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.spell_pet_auras: 49 rows
+-- Дамп данных таблицы acore_world.spell_pet_auras: 49 rows
 DELETE FROM `spell_pet_auras`;
 /*!40000 ALTER TABLE `spell_pet_auras` DISABLE KEYS */;
 INSERT INTO `spell_pet_auras` (`spell`, `effectId`, `pet`, `aura`) VALUES

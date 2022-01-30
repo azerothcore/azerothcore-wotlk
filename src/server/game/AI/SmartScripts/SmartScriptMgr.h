@@ -677,6 +677,7 @@ struct SmartAction
         {
             uint32 sound;
             SAIBool onlySelf;
+            uint32 distance;
         } sound;
 
         struct
@@ -686,6 +687,7 @@ struct SmartAction
             uint32 sound3;
             uint32 sound4;
             SAIBool onlySelf;
+            uint32 distance;
         } randomSound;
 
         struct
