@@ -2262,7 +2262,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     case CONDITION_DIFFICULTY_ID:
         if (cond->ConditionValue1 >= MAX_DIFFICULTY)
         {
-            LOG_ERROR("sql.sql", "CONDITION_DIFFICULTY_ID has non existing difficulty in value1 (%u), skipped.", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "CONDITION_DIFFICULTY_ID has non existing difficulty in value1 ({}), skipped.", cond->ConditionValue1);
             return false;
         }
         break;
