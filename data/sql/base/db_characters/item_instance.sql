@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.item_instance
+-- Дамп структуры для таблица acore_characters.item_instance
 DROP TABLE IF EXISTS `item_instance`;
 CREATE TABLE IF NOT EXISTS `item_instance` (
   `guid` INT unsigned NOT NULL DEFAULT 0,
-  `itemEntry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `itemEntry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `owner_guid` INT unsigned NOT NULL DEFAULT 0,
   `creatorGuid` INT unsigned NOT NULL DEFAULT 0,
   `giftCreatorGuid` INT unsigned NOT NULL DEFAULT 0,
   `count` INT unsigned NOT NULL DEFAULT 1,
   `duration` INT NOT NULL DEFAULT 0,
   `charges` tinytext DEFAULT NULL,
-  `flags` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `flags` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `enchantments` text NOT NULL,
   `randomPropertyId` SMALLINT NOT NULL DEFAULT 0,
   `durability` SMALLINT unsigned NOT NULL DEFAULT 0,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `item_instance` (
   KEY `idx_owner_guid` (`owner_guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Item System';
 
--- Дамп данных таблицы _acore_characters.item_instance: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.item_instance: ~0 rows (приблизительно)
 DELETE FROM `item_instance`;
 /*!40000 ALTER TABLE `item_instance` DISABLE KEYS */;
 /*!40000 ALTER TABLE `item_instance` ENABLE KEYS */;

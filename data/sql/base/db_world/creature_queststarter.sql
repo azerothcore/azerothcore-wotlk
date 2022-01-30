@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_queststarter
+-- Дамп структуры для таблица acore_world.creature_queststarter
 DROP TABLE IF EXISTS `creature_queststarter`;
 CREATE TABLE IF NOT EXISTS `creature_queststarter` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Creature System';
 
--- Дамп данных таблицы _acore_world.creature_queststarter: 7 457 rows
+-- Дамп данных таблицы acore_world.creature_queststarter: 7 457 rows
 DELETE FROM `creature_queststarter`;
 /*!40000 ALTER TABLE `creature_queststarter` DISABLE KEYS */;
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
@@ -2480,13 +2480,11 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(10837, 5098),
 	(10837, 5228),
 	(10837, 5238),
-	(10837, 5511),
 	(10838, 211),
 	(10838, 5092),
 	(10838, 5097),
 	(10838, 5215),
 	(10838, 5237),
-	(10838, 5505),
 	(10838, 5533),
 	(10838, 8414),
 	(10838, 8418),
@@ -2578,10 +2576,12 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(11055, 5231),
 	(11055, 5233),
 	(11055, 5235),
+	(11056, 5505),
 	(11056, 5537),
 	(11056, 5538),
 	(11056, 5803),
 	(11057, 964),
+	(11057, 5511),
 	(11057, 5514),
 	(11057, 5804),
 	(11063, 5168),

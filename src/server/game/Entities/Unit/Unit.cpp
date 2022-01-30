@@ -977,7 +977,6 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         //if (attacker && victim->GetTypeId() == TYPEID_PLAYER && victim != attacker)
         //victim->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health); // pussywizard: optimization
-
         Unit::Kill(attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto);
     }
     else

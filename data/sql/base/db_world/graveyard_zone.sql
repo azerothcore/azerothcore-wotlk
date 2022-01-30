@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.graveyard_zone
+-- Дамп структуры для таблица acore_world.graveyard_zone
 DROP TABLE IF EXISTS `graveyard_zone`;
 CREATE TABLE IF NOT EXISTS `graveyard_zone` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `GhostZone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `GhostZone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Faction` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Comment` text DEFAULT NULL,
   PRIMARY KEY (`ID`,`GhostZone`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Trigger System';
 
--- Дамп данных таблицы _acore_world.graveyard_zone: 703 rows
+-- Дамп данных таблицы acore_world.graveyard_zone: 704 rows
 DELETE FROM `graveyard_zone`;
 /*!40000 ALTER TABLE `graveyard_zone` DISABLE KEYS */;
 INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
@@ -728,7 +728,8 @@ INSERT INTO `graveyard_zone` (`ID`, `GhostZone`, `Faction`, `Comment`) VALUES
 	(1682, 4820, 0, 'Icecrown Glacier, Citadel GY'),
 	(852, 1537, 469, 'Dun Morogh, Gates of Ironforge - Ironforge'),
 	(1256, 209, 0, 'Silverpine Forest, South GY - Silverpine Forest'),
-	(101, 135, 469, 'Frostmane Hold, Kharanos GY - Dun Morogh');
+	(101, 135, 469, 'Frostmane Hold, Kharanos GY - Dun Morogh'),
+	(1409, 1497, 469, 'Tirisfal Glades - Undercity - Alliance');
 /*!40000 ALTER TABLE `graveyard_zone` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
