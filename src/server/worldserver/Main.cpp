@@ -23,7 +23,6 @@
 #include "AppenderDB.h"
 #include "AsyncAcceptor.h"
 #include "AsyncAuctionListing.h"
-#include "AvgDiffTracker.h"
 #include "Banner.h"
 #include "BattlegroundMgr.h"
 #include "BigNumber.h"
@@ -205,13 +204,13 @@ int main(int argc, char** argv)
     Acore::Banner::Show("worldserver-daemon",
         [](std::string_view text)
         {
-            FMT_LOG_INFO("server.worldserver", text);
+            LOG_INFO("server.worldserver", text);
         },
         []()
         {
-            FMT_LOG_INFO("server.worldserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
-            FMT_LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            FMT_LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            LOG_INFO("server.worldserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
+            LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
 
     OpenSSLCrypto::threadsSetup();
@@ -228,10 +227,10 @@ int main(int argc, char** argv)
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            LOG_ERROR("server", "Daemon PID: %u\n", pid); // outError for red color in console
+            LOG_ERROR("server", "Daemon PID: {}\n", pid); // outError for red color in console
         else
         {
-            LOG_ERROR("server", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
+            LOG_ERROR("server", "Cannot create PID file {} (possible error: permission)\n", pidFile);
             return 1;
         }
     }
@@ -390,10 +389,10 @@ int main(int argc, char** argv)
     {
         freezeDetector = std::make_shared<FreezeDetector>(*ioContext, coreStuckTime * 1000);
         FreezeDetector::Start(freezeDetector);
-        LOG_INFO("server.worldserver", "Starting up anti-freeze thread (%u seconds max stuck time)...", coreStuckTime);
+        LOG_INFO("server.worldserver", "Starting up anti-freeze thread ({} seconds max stuck time)...", coreStuckTime);
     }
 
-    LOG_INFO("server.worldserver", "%s (worldserver-daemon) ready...", GitRevision::GetFullVersion());
+    LOG_INFO("server.worldserver", "{} (worldserver-daemon) ready...", GitRevision::GetFullVersion());
 
     sScriptMgr->OnStartup();
 
@@ -470,7 +469,7 @@ bool StartDB()
     }
 
     LOG_INFO("server.loading", "Loading world information...");
-    LOG_INFO("server.loading", "> RealmID:              %u", realm.Id.Realm);
+    LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
 
     ///- Clean the database before starting
     ClearOnlineAccounts();
@@ -481,7 +480,7 @@ bool StartDB()
     sWorld->LoadDBVersion();
     sWorld->LoadDBRevision();
 
-    LOG_INFO("server.loading", "> Version DB world:     %s", sWorld->GetDBVersion());
+    LOG_INFO("server.loading", "> Version DB world:     {}", sWorld->GetDBVersion());
 
     sScriptMgr->OnAfterDatabasesLoaded(loader.GetUpdateFlags());
 
@@ -525,7 +524,7 @@ void ShutdownCLIThread(std::thread* cliThread)
             if (!formatReturnCode)
                 errorBuffer = "Unknown error";
 
-            LOG_DEBUG("server.worldserver", "Error cancelling I/O of CliThread, error code %u, detail: %s", uint32(errorCode), errorBuffer);
+            LOG_DEBUG("server.worldserver", "Error cancelling I/O of CliThread, error code {}, detail: {}", uint32(errorCode), errorBuffer);
 
             if (!formatReturnCode)
                 LocalFree((LPSTR)errorBuffer);
@@ -590,8 +589,6 @@ void WorldUpdateLoop()
         realPrevTime = realCurrTime;
 
         uint32 executionTimeDiff = getMSTimeDiff(realCurrTime, getMSTime());
-        devDiffTracker.Update(executionTimeDiff);
-        avgDiffTracker.Update(executionTimeDiff > WORLD_SLEEP_CONST ? executionTimeDiff : WORLD_SLEEP_CONST);
 
         // we know exactly how long it took to update the world, if the update took less than WORLD_SLEEP_CONST, sleep for WORLD_SLEEP_CONST - world update time
         if (executionTimeDiff < WORLD_SLEEP_CONST)
@@ -677,7 +674,7 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
     Optional<boost::asio::ip::tcp::endpoint> externalAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[2].GetString(), "");
     if (!externalAddress)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address %s", fields[2].GetString().c_str());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[2].GetString());
         return false;
     }
 
@@ -686,7 +683,7 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
     Optional<boost::asio::ip::tcp::endpoint> localAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[3].GetString(), "");
     if (!localAddress)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address %s", fields[3].GetString().c_str());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[3].GetString());
         return false;
     }
 
@@ -695,7 +692,7 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
     Optional<boost::asio::ip::tcp::endpoint> localSubmask = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[4].GetString(), "");
     if (!localSubmask)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address %s", fields[4].GetString().c_str());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[4].GetString());
         return false;
     }
 
