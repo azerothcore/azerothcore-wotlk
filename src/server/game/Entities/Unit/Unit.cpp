@@ -20452,7 +20452,6 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo)
             case 30824: // Shamanistic Rage
             case 31786: // Spiritual Attunement
             case 31930: // Judgements of the Wise
-            case 34074: // Aspect of the Viper
             case 34075: // Aspect of the Viper
             case 34720: // Thrill of the hunt
             case 47755: // Rapture
