@@ -72,7 +72,7 @@ friend class PreparedStatementTask;
 public:
     explicit PreparedStatementBase(uint32 index, uint8 capacity);
     virtual ~PreparedStatementBase();
-    
+
     // Set numerlic and default binary
     template<typename T>
     inline Acore::Types::is_default<T> SetData(const uint8 index, T value)
