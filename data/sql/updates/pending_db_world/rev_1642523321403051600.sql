@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642523321403051600');
 
 SET @AIR_ELEMENTAL_RIFT = 179667;
 SET @WHIRLING_INVADER = 14455;
-SET @THE_WINDREAVER = 14454;
+SET @THE_WINDREAVER = 247205;
 
 -- Adding Boss to Game event 13: Elemental Invasions
 DELETE FROM `game_event_creature` WHERE `eventEntry` = 13 AND `guid` = @THE_WINDREAVER;
