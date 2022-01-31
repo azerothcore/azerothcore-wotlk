@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.skill_extra_item_template
+-- Дамп структуры для таблица acore_world.skill_extra_item_template
 DROP TABLE IF EXISTS `skill_extra_item_template`;
 CREATE TABLE IF NOT EXISTS `skill_extra_item_template` (
-  `spellId` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
-  `requiredSpecialization` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
+  `spellId` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
+  `requiredSpecialization` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
   `additionalCreateChance` float NOT NULL DEFAULT 0 COMMENT 'chance to create add',
   `additionalMaxNum` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Skill Specialization System';
 
--- Дамп данных таблицы _acore_world.skill_extra_item_template: 226 rows
+-- Дамп данных таблицы acore_world.skill_extra_item_template: 226 rows
 DELETE FROM `skill_extra_item_template`;
 /*!40000 ALTER TABLE `skill_extra_item_template` DISABLE KEYS */;
 INSERT INTO `skill_extra_item_template` (`spellId`, `requiredSpecialization`, `additionalCreateChance`, `additionalMaxNum`) VALUES

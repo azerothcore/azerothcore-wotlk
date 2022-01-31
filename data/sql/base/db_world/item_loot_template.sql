@@ -12,12 +12,12 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.item_loot_template
+-- Дамп структуры для таблица acore_world.item_loot_template
 DROP TABLE IF EXISTS `item_loot_template`;
 CREATE TABLE IF NOT EXISTS `item_loot_template` (
-  `Entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Item` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Reference` mediumint(9) NOT NULL DEFAULT 0,
+  `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Reference` MEDIUMINT NOT NULL DEFAULT 0,
   `Chance` float NOT NULL DEFAULT 100,
   `QuestRequired` TINYINT NOT NULL DEFAULT 0,
   `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `item_loot_template` (
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Дамп данных таблицы _acore_world.item_loot_template: 5 007 rows
+-- Дамп данных таблицы acore_world.item_loot_template: 4 983 rows
 DELETE FROM `item_loot_template`;
 /*!40000 ALTER TABLE `item_loot_template` DISABLE KEYS */;
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -1119,36 +1119,20 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(5738, 5694, 0, 92.9, 0, 1, 0, 1, 1, 'Covert Ops Pack - NG-5 Explosives (Red)'),
 	(5738, 5695, 0, 78.6, 0, 1, 0, 1, 1, 'Covert Ops Pack - NG-5 Explosives (Blue)'),
 	(5738, 5737, 0, 90.8, 0, 1, 0, 1, 1, 'Covert Ops Pack - Covert Ops Plans: Alpha & Beta'),
-	(5758, 785, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Mageroyal'),
 	(5758, 1203, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Aegis of Stormwind'),
 	(5758, 1210, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Shadowgem'),
 	(5758, 1607, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Soulkeeper'),
-	(5758, 1645, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Moonberry Juice'),
 	(5758, 1721, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Viking Warhammer'),
 	(5758, 1725, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Large Knapsack'),
-	(5758, 2319, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Medium Leather'),
-	(5758, 2449, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Earthroot'),
-	(5758, 2450, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Briarthorn'),
-	(5758, 3356, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Kingsblood'),
-	(5758, 3357, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Liferoot'),
 	(5758, 3395, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Recipe: Limited Invulnerability Potion'),
 	(5758, 3815, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Double Mail Vest'),
-	(5758, 3858, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Mithril Ore'),
 	(5758, 3914, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Journeyman\'s Backpack'),
-	(5758, 3927, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Fine Aged Cheddar'),
 	(5758, 4089, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Ricochet Blunderbuss'),
-	(5758, 4234, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Heavy Leather'),
-	(5758, 4338, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Mageweave Cloth'),
-	(5758, 4339, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Bolt of Mageweave'),
 	(5758, 4353, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Pattern: Spider Belt'),
-	(5758, 4419, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Scroll of Intellect III'),
-	(5758, 4426, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Scroll of Strength III'),
 	(5758, 4500, 0, 4.1, 0, 1, 1, 1, 1, 'Mithril Lockbox - Traveler\'s Backpack'),
-	(5758, 4607, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Delicious Cave Mold'),
 	(5758, 4720, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Nightsky Sash'),
 	(5758, 4726, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Chief Brigadier Cloak'),
 	(5758, 4733, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Blackforge Pauldrons'),
-	(5758, 6149, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Greater Mana Potion'),
 	(5758, 6420, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Glyphed Boots'),
 	(5758, 6427, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Mistscape Robe'),
 	(5758, 6660, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Julie\'s Dagger'),
@@ -1160,8 +1144,6 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(5758, 7734, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Six Demon Bag'),
 	(5758, 7909, 0, 2, 0, 1, 1, 1, 1, 'Mithril Lockbox - Aquamarine'),
 	(5758, 7910, 0, 2.1, 0, 1, 1, 1, 1, 'Mithril Lockbox - Star Ruby'),
-	(5758, 7912, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Solid Stone'),
-	(5758, 7974, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Zesty Clam Meat'),
 	(5758, 7990, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Plans: Heavy Mithril Helm'),
 	(5758, 7993, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Plans: Dazzling Mithril Rapier'),
 	(5758, 8106, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Hibernal Armor'),
@@ -1216,10 +1198,6 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(5758, 8319, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Alabaster Plate Pauldrons'),
 	(5758, 8320, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Alabaster Shield'),
 	(5758, 8389, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Pattern: Big Voodoo Pants'),
-	(5758, 8932, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Alterac Swiss'),
-	(5758, 8950, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Homemade Cherry Pie'),
-	(5758, 8953, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Deep Fried Plantains'),
-	(5758, 9030, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Restorative Potion'),
 	(5758, 9295, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Recipe: Invisibility Potion'),
 	(5758, 9943, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Abjurer\'s Robe'),
 	(5758, 9944, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Abjurer\'s Crystal'),
@@ -1325,8 +1303,6 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(5758, 11208, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Formula: Enchant Weapon - Demonslaying'),
 	(5758, 11225, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Formula: Enchant Bracer - Greater Stamina'),
 	(5758, 11302, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Uther\'s Strength'),
-	(5758, 11914, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Empty Cursed Ooze Jar'),
-	(5758, 11948, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Empty Tainted Ooze Jar'),
 	(5758, 11974, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Aquamarine Ring'),
 	(5758, 11976, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Sardonyx Knuckle'),
 	(5758, 11977, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Serpentine Loop'),
@@ -1369,7 +1345,6 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(5758, 13122, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Dark Phantom Cape'),
 	(5758, 13126, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Battlecaller Gauntlets'),
 	(5758, 13144, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Serenity Belt'),
-	(5758, 13446, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Major Healing Potion'),
 	(5758, 13486, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Recipe: Transmute Undeath to Water'),
 	(5758, 13487, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Recipe: Transmute Water to Undeath'),
 	(5758, 13489, 0, 0, 0, 1, 1, 1, 1, 'Mithril Lockbox - Recipe: Transmute Earth to Life'),
@@ -1896,7 +1871,7 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(9265, 9356, 0, 32.8, 0, 1, 0, 1, 3, 'Cuergo\'s Hidden Treasure - A Wooden Leg'),
 	(9265, 9357, 0, 38.9, 0, 1, 0, 1, 3, 'Cuergo\'s Hidden Treasure - A Parrot Skeleton'),
 	(9265, 9358, 0, 34.1, 0, 1, 0, 1, 3, 'Cuergo\'s Hidden Treasure - A Head Rag'),
-	(9265, 9360, 0, 100, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Cuergo\'s Gold'),
+	(9265, 9360, 0, 86, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Cuergo\'s Gold'),
 	(9265, 9881, 0, 0.3, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Sorcerer Mantle'),
 	(9265, 9883, 0, 0.3, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Sorcerer Pants'),
 	(9265, 9884, 0, 1.6, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Sorcerer Robe'),
@@ -4002,8 +3977,8 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(22171, 22177, 0, 100, 0, 1, 0, 1, 1, 'Gift of Friendship: Thunder Bluff - Freshly Picked Flowers'),
 	(22172, 22174, 0, 100, 0, 1, 0, 1, 1, 'Gift of Friendship: Undercity - Romantic Poem'),
 	(22178, 22117, 0, 50.2, 0, 1, 0, 1, 1, 'Pledge of Friendship: Stormwind - Pledge of Loyalty: Stormwind'),
-	(22320, 4388, 0, 98.5, 0, 1, 0, 1, 1, 'Mux\'s Quality Goods - Discombobulator Ray'),
-	(22320, 9061, 0, 81.6, 0, 1, 0, 8, 8, 'Mux\'s Quality Goods - Goblin Rocket Fuel'),
+	(22320, 4388, 0, 100, 0, 1, 0, 1, 1, 'Mux\'s Quality Goods - Discombobulator Ray'),
+	(22320, 9061, 0, 100, 0, 1, 0, 8, 8, 'Mux\'s Quality Goods - Goblin Rocket Fuel'),
 	(22320, 18588, 0, 100, 0, 1, 0, 5, 7, 'Mux\'s Quality Goods - Ez-Thro Dynamite II'),
 	(22568, 22600, 0, 0, 0, 1, 1, 1, 1, 'Sealed Craftsman\'s Writ - Craftsman\'s Writ - Dense Weightstone'),
 	(22568, 22601, 0, 0, 0, 1, 1, 1, 1, 'Sealed Craftsman\'s Writ - Craftsman\'s Writ - Imperial Plate Chest'),
@@ -5038,7 +5013,8 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 	(20768, 15757, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Wicked Leather Pants'),
 	(20768, 14484, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Brightcloth Cloak'),
 	(20768, 14494, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Brightcloth Pants'),
-	(20768, 14508, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Felcloth Shoulders');
+	(20768, 14508, 0, 0.07, 0, 1, 4, 1, 1, 'Oozing Bag - Pattern: Felcloth Shoulders'),
+	(9265, 9361, 0, 8, 0, 1, 0, 1, 1, 'Cuergo\'s Hidden Treasure - Cuergo\'s Gold with worm');
 /*!40000 ALTER TABLE `item_loot_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -417,7 +417,7 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
     if (mailItems.empty())
     {
         // Skip send if empty items
-        FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Attempt to send almost with items without items. Player {}", GetGUID().ToString());
+        LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Attempt to send almost with items without items. Player {}", GetGUID().ToString());
         return;
     }
 
@@ -432,13 +432,13 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemEntry);
         if (!itemTemplate)
         {
-            FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Item id {} is invalid", itemEntry);
+            LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Item id {} is invalid", itemEntry);
             return;
         }
 
         if (itemCount < 1 || (itemTemplate->MaxCount > 0 && itemCount > static_cast<uint32>(itemTemplate->MaxCount)))
         {
-            FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Incorrect item count ({}) for item id {}", itemEntry, itemCount);
+            LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Incorrect item count ({}) for item id {}", itemEntry, itemCount);
             return;
         }
 

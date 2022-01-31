@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.areatrigger
+-- Дамп структуры для таблица acore_world.areatrigger
 DROP TABLE IF EXISTS `areatrigger`;
 CREATE TABLE IF NOT EXISTS `areatrigger` (
   `entry` INT unsigned NOT NULL AUTO_INCREMENT,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5873 DEFAULT CHARSET=latin1;
 
--- Дамп данных таблицы _acore_world.areatrigger: ~1 217 rows (приблизительно)
+-- Дамп данных таблицы acore_world.areatrigger: ~1 217 rows (приблизительно)
 DELETE FROM `areatrigger`;
 /*!40000 ALTER TABLE `areatrigger` DISABLE KEYS */;
 INSERT INTO `areatrigger` (`entry`, `map`, `x`, `y`, `z`, `radius`, `length`, `width`, `height`, `orientation`) VALUES
