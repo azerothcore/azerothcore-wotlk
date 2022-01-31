@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_entry_point
+-- Дамп структуры для таблица acore_characters.character_entry_point
 DROP TABLE IF EXISTS `character_entry_point`;
 CREATE TABLE IF NOT EXISTS `character_entry_point` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `character_entry_point` (
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.character_entry_point: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_entry_point: ~0 rows (приблизительно)
 DELETE FROM `character_entry_point`;
 /*!40000 ALTER TABLE `character_entry_point` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_entry_point` ENABLE KEYS */;

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.corpse
+-- Дамп структуры для таблица acore_characters.corpse
 DROP TABLE IF EXISTS `corpse`;
 CREATE TABLE IF NOT EXISTS `corpse` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `corpse` (
   KEY `idx_time` (`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Death System';
 
--- Дамп данных таблицы _acore_characters.corpse: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.corpse: ~0 rows (приблизительно)
 DELETE FROM `corpse`;
 /*!40000 ALTER TABLE `corpse` DISABLE KEYS */;
 /*!40000 ALTER TABLE `corpse` ENABLE KEYS */;
