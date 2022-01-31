@@ -9634,7 +9634,7 @@ void ObjectMgr::LoadInstanceSavedGameobjectStateData()
     if (!result)
     {
         // There's no gameobject with this GUID saved on the DB
-        LOG_ERROR("sql.sql", ">> Loaded 0 Instance saved gameobject state data. DB table `instance_saved_go_state_data` is empty.");
+        LOG_INFO("sql.sql", ">> Loaded 0 Instance saved gameobject state data. DB table `instance_saved_go_state_data` is empty.");
         return;
     }
 
