@@ -1248,7 +1248,9 @@ enum AcoreStrings
     LANG_CMD_SETTINGS_ANNOUNCER_ON      = 5080,
     LANG_CMD_SETTINGS_ANNOUNCER_OFF     = 5081,
 
-    // Room for more strings    5082-9999
+    LANG_CMD_GOQUEST_INVALID_SYNTAX     = 5082,
+
+    // Room for more strings    5083-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
