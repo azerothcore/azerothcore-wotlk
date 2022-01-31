@@ -67,6 +67,13 @@ enum Events
     EVENT_FRENZY        = 5
 };
 
+enum Misc
+{
+    DATA_LEVER_USED = 0
+};
+
+Position const homePos = { -7487.577148f, -1074.366943f, 476.555023f, 5.325001f };
+
 class boss_chromaggus : public CreatureScript
 {
 public:
@@ -185,6 +192,14 @@ public:
         {
             CurrentVurln_Spell = 0;     // We use this to store our last vulnerabilty spell so we can remove it later
             Enraged = false;
+        }
+
+        void SetData(uint32 id, uint32 /*data*/) override
+        {
+            if (id == DATA_LEVER_USED)
+            {
+                me->SetHomePosition(homePos);
+            }
         }
 
         void Reset() override
@@ -314,7 +329,10 @@ class go_chromaggus_lever : public GameObjectScript
                         _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
 
                         if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
+                        {
                             creature->AI()->AttackStart(player);
+                            creature->AI()->SetData(DATA_LEVER_USED, 1);
+                        }
 
                         if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
                             _instance->HandleGameObject(ObjectGuid::Empty, true, go);
