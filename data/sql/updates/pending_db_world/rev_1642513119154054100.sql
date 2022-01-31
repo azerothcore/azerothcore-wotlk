@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642513119154054100');
 
 SET @EARTH_ELEMENTAL_RIFT = 179664;
 SET @THUNDERING_INVADER = 14462;
-SET @AVALANCHION = 14464;
+SET @AVALANCHION = 247215;
 
 -- Adding Boss to Game event 13: Elemental Invasions
 DELETE FROM `game_event_creature` WHERE `eventEntry` = 13 AND `guid` = @AVALANCHION;
