@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.quest_poi_points
+-- Дамп структуры для таблица acore_world.quest_poi_points
 DROP TABLE IF EXISTS `quest_poi_points`;
 CREATE TABLE IF NOT EXISTS `quest_poi_points` (
   `QuestID` INT unsigned NOT NULL DEFAULT 0,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `quest_poi_points` (
   KEY `questId_id` (`QuestID`,`Idx1`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.quest_poi_points: 57 138 rows
+-- Дамп данных таблицы acore_world.quest_poi_points: 57 147 rows
 DELETE FROM `quest_poi_points`;
 /*!40000 ALTER TABLE `quest_poi_points` DISABLE KEYS */;
 INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBuild`) VALUES
@@ -16641,7 +16641,7 @@ INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBu
 	(5245, 3, 0, 6477, -4102, 0),
 	(5245, 4, 0, 6569, -4039, 0),
 	(5246, 1, 0, 3232, -4256, 0),
-	(5246, 2, 0, 5167, -7170, 0),
+	(5246, 2, 0, 3565, -5381, 0),
 	(5247, 0, 0, 3232, -4256, 0),
 	(5248, 0, 0, 6430, -4303, 0),
 	(5249, 0, 0, 7095, -4007, 0),
@@ -18846,7 +18846,7 @@ INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBu
 	(6661, 0, 5, -76, 34, 0),
 	(6661, 0, 6, -73, -15, 0),
 	(6661, 1, 0, -20, 40, 0),
-	(6662, 0, 0, -21, 2459, 0),
+	(6662, 0, 0, -4838, -1318, 0),
 	(6681, 0, 0, 107, -1492, 0),
 	(6681, 1, 0, 1, -1581, 0),
 	(6701, 0, 0, -15, -584, 0),
@@ -57171,7 +57171,16 @@ INSERT INTO `quest_poi_points` (`QuestID`, `Idx1`, `Idx2`, `X`, `Y`, `VerifiedBu
 	(25495, 0, 0, -804, -5373, 0),
 	(1945, 1, 1, 2524, -1801, 0),
 	(1945, 1, 2, 2519, -1618, 0),
-	(3444, 1, 0, -7988, -3856, 0);
+	(3444, 1, 0, -7988, -3856, 0),
+	(8311, 1, 0, -8869, 670, 12340),
+	(8311, 2, 0, -4594, -1003, 12340),
+	(8311, 3, 0, -4845, -860, 12340),
+	(8311, 4, 0, 10124, 2227, 12340),
+	(11356, 1, 0, -5622, -473, 12340),
+	(11356, 2, 0, -4187, -12501, 12340),
+	(11357, 1, 0, 356, -4742, 12340),
+	(11357, 2, 0, 9516, -6815, 12340),
+	(6662, 1, 0, -8364, 535, 0);
 /*!40000 ALTER TABLE `quest_poi_points` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

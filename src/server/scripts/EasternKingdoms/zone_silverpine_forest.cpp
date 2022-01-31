@@ -256,7 +256,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            //LOG_INFO("scripts", "DEBUG: p(%i) k(%i) d(%u) W(%i)", Phase, KillCount, diff, WaitTimer);
+            //LOG_INFO("scripts", "DEBUG: p({}) k({}) d({}) W({})", Phase, KillCount, diff, WaitTimer);
 
             if (!QuestInProgress)
                 return;
