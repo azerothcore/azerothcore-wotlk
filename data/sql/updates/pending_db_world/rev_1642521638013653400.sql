@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642521638013653400');
 
 SET @WATER_ELEMENTAL_RIFT = 179665;
 SET @WATERY_INVADER = 14458;
-SET @PRINCESS_TEMPESTRIA = 14457;
+SET @PRINCESS_TEMPESTRIA = 247210;
 
 -- Adding Boss to Game event 13: Elemental Invasions
 DELETE FROM `game_event_creature` WHERE `eventEntry` = 13 AND `guid` = @PRINCESS_TEMPESTRIA;
