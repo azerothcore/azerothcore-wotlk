@@ -1531,6 +1531,9 @@ public:
 
     // Called when checking for spell negative healing modifiers
     virtual bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* /*target*/, Unit const* /*caster*/, SpellInfo const* /*spellInfo*/, float& /*val*/) { return false; };
+
+    // Called after loading spell dbc corrections
+    virtual void OnLoadSpellCustomAttr(SpellInfo* spell) { }
 };
 
 class BGScript : public ScriptObject
@@ -2350,6 +2353,7 @@ public: /* GlobalScript */
     void OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update);
     bool OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod);
     bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
+    void OnLoadSpellCustomAttr(SpellInfo* spell);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
