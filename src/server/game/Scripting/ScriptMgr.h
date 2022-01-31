@@ -1533,7 +1533,7 @@ public:
     virtual bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* /*target*/, Unit const* /*caster*/, SpellInfo const* /*spellInfo*/, float& /*val*/) { return false; };
 
     // Called after loading spell dbc corrections
-    virtual void OnLoadSpellCustomAttr(SpellInfo* spell) { }
+    virtual void OnLoadSpellCustomAttr(SpellInfo* /*spell*/) { }
 };
 
 class BGScript : public ScriptObject
