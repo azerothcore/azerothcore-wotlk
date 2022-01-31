@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643656464415474000');
 
 -- All Blackwing Technician's spawns
-DELETE FROM `creature` WHERE `id1` IN (13996, 3996);
+DELETE FROM `creature` WHERE `id1` IN (13996);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`,`position_x`, `position_y`, `position_z`, `curhealth`, `unit_flags`) VALUES 
 (84134, 13996, 469, 2677, 2677, 1, -7541.99, -981.618, 449.325, 15260, 64),
 (84135, 13996, 469, 2677, 2677, 1, -7535.72, -987.541, 449.325, 15260, 64),
