@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_template_resistance
+-- Дамп структуры для таблица acore_world.creature_template_resistance
 DROP TABLE IF EXISTS `creature_template_resistance`;
 CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
-  `CreatureID` mediumint(8) unsigned NOT NULL,
+  `CreatureID` MEDIUMINT unsigned NOT NULL,
   `School` TINYINT unsigned NOT NULL,
   `Resistance` SMALLINT DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
   CHECK (`School` >= 1 and `School` <= 6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.creature_template_resistance: ~1 600 rows (приблизительно)
+-- Дамп данных таблицы acore_world.creature_template_resistance: ~1 600 rows (приблизительно)
 DELETE FROM `creature_template_resistance`;
 /*!40000 ALTER TABLE `creature_template_resistance` DISABLE KEYS */;
 INSERT INTO `creature_template_resistance` (`CreatureID`, `School`, `Resistance`, `VerifiedBuild`) VALUES

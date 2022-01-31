@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.arena_team
+-- Дамп структуры для таблица acore_characters.arena_team
 DROP TABLE IF EXISTS `arena_team`;
 CREATE TABLE IF NOT EXISTS `arena_team` (
   `arenaTeamId` INT unsigned NOT NULL DEFAULT 0,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `arena_team` (
   PRIMARY KEY (`arenaTeamId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.arena_team: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.arena_team: ~0 rows (приблизительно)
 DELETE FROM `arena_team`;
 /*!40000 ALTER TABLE `arena_team` DISABLE KEYS */;
 /*!40000 ALTER TABLE `arena_team` ENABLE KEYS */;

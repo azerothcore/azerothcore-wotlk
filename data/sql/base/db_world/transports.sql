@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.transports
+-- Дамп структуры для таблица acore_world.transports
 DROP TABLE IF EXISTS `transports`;
 CREATE TABLE IF NOT EXISTS `transports` (
   `guid` INT unsigned NOT NULL AUTO_INCREMENT,
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `name` text DEFAULT NULL,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`),
   UNIQUE KEY `idx_entry` (`entry`)
 ) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Transports';
 
--- Дамп данных таблицы _acore_world.transports: 20 rows
+-- Дамп данных таблицы acore_world.transports: 20 rows
 DELETE FROM `transports`;
 /*!40000 ALTER TABLE `transports` DISABLE KEYS */;
 INSERT INTO `transports` (`guid`, `entry`, `name`, `ScriptName`) VALUES

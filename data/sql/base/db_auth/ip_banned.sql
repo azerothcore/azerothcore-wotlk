@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.ip_banned
+-- Дамп структуры для таблица acore_auth.ip_banned
 DROP TABLE IF EXISTS `ip_banned`;
 CREATE TABLE IF NOT EXISTS `ip_banned` (
   `ip` varchar(15) NOT NULL DEFAULT '127.0.0.1',
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `ip_banned` (
   PRIMARY KEY (`ip`,`bandate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Banned IPs';
 
--- Дамп данных таблицы _acore_auth.ip_banned: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.ip_banned: ~0 rows (приблизительно)
 DELETE FROM `ip_banned`;
 /*!40000 ALTER TABLE `ip_banned` DISABLE KEYS */;
 /*!40000 ALTER TABLE `ip_banned` ENABLE KEYS */;
