@@ -25,8 +25,8 @@
 
 struct LogMessage
 {
-    LogMessage(LogLevel _level, std::string const& _type, std::string&& _text);
-    LogMessage(LogLevel _level, std::string const& _type, std::string&& _text, std::string&& _param1);
+    LogMessage(LogLevel _level, std::string const& _type, std::string_view _text);
+    LogMessage(LogLevel _level, std::string const& _type, std::string_view _text, std::string_view _param1);
 
     LogMessage(LogMessage const& /*other*/) = delete;
     LogMessage& operator=(LogMessage const& /*other*/) = delete;
