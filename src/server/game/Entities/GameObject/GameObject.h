@@ -984,7 +984,8 @@ public:
 
     void SaveInstanceData(GOState* state);
     void UpdateInstanceData(GOState* state);
-    uint8 FindStateSavedOnInstance();
+    bool FindStateSavedOnInstance();
+    uint8 GetStateSavedOnInstance();
     bool IsInstanceGameobject();
 protected:
     bool AIM_Initialize();

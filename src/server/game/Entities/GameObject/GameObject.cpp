@@ -332,7 +332,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (IsInstanceGameobject())
     {
-        switch (FindStateSavedOnInstance())
+        switch (GetStateSavedOnInstance())
         {
             case 0:
                 SetGoState(GO_STATE_ACTIVE);
@@ -2495,7 +2495,12 @@ void GameObject::UpdateInstanceData(GOState* state)
     sObjectMgr->SetInstanceSavedGameobjectState(id, entry, guid, *state);
 }
 
-uint8 GameObject::FindStateSavedOnInstance()
+uint8 GameObject::GetStateSavedOnInstance()
+{
+    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetEntry(), GetSpawnId());
+}
+
+bool GameObject::FindStateSavedOnInstance()
 {
     return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetEntry(), GetSpawnId());
 }

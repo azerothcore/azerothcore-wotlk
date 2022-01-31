@@ -1375,7 +1375,8 @@ public:
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
 
     void LoadInstanceSavedGameobjectStateData();
-    uint8 FindInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid);
+    bool FindInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid);
+    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid);
     void SetInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state);
     void NewInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state);
 private:
