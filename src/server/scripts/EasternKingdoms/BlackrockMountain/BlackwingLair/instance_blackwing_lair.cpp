@@ -129,7 +129,9 @@ public:
                     AddDoor(go, true);
                     nefarianDoorGUID = go->GetGUID();
                     if (GetBossState(DATA_CHROMAGGUS) != DONE)
+                    {
                         HandleGameObject(ObjectGuid::Empty, false, go);
+                    }
                     break;
                 case GO_PORTCULLIS_CHROMAGGUS:
                     AddDoor(go, true);
@@ -205,6 +207,7 @@ public:
                     {
                         HandleGameObject(nefarianDoorGUID, true);
                     }
+                    break;
                 case DATA_NEFARIAN:
                     switch (state)
                     {
@@ -335,7 +338,7 @@ public:
         EventMap _events;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_blackwing_lair_InstanceMapScript(map);
     }
@@ -376,7 +379,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_bwl_shadowflame_SpellScript;
     }
