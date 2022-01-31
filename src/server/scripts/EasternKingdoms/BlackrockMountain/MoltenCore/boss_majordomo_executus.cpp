@@ -73,8 +73,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_MAGIC_REFLECTION                  = 1,
-    EVENT_DAMAGE_REFLECTION,
+    EVENT_SHIELD_REFLECTION                 = 1,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -247,8 +246,7 @@ public:
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
-            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_SHIELD_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
             events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
 
@@ -336,15 +334,16 @@ public:
                     {
                         switch (eventId)
                         {
-                            case EVENT_MAGIC_REFLECTION:
+                            case EVENT_SHIELD_REFLECTION:
                             {
-                                DoCastSelf(SPELL_MAGIC_REFLECTION);
-                                events.RepeatEvent(30000);
-                                break;
-                            }
-                            case EVENT_DAMAGE_REFLECTION:
-                            {
-                                DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                if (rand_chance() <= 50.f)
+                                {
+                                    DoCastSelf(SPELL_MAGIC_REFLECTION);
+                                }
+                                else
+                                {
+                                    DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                }
                                 events.RepeatEvent(30000);
                                 break;
                             }

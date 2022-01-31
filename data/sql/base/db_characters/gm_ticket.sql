@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.gm_ticket
+-- Дамп структуры для таблица acore_characters.gm_ticket
 DROP TABLE IF EXISTS `gm_ticket`;
 CREATE TABLE IF NOT EXISTS `gm_ticket` (
   `id` INT unsigned NOT NULL AUTO_INCREMENT,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `gm_ticket` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.gm_ticket: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.gm_ticket: ~0 rows (приблизительно)
 DELETE FROM `gm_ticket`;
 /*!40000 ALTER TABLE `gm_ticket` DISABLE KEYS */;
 /*!40000 ALTER TABLE `gm_ticket` ENABLE KEYS */;

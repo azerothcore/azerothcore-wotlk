@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.log_arena_fights
+-- Дамп структуры для таблица acore_characters.log_arena_fights
 DROP TABLE IF EXISTS `log_arena_fights`;
 CREATE TABLE IF NOT EXISTS `log_arena_fights` (
   `fight_id` INT unsigned NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `log_arena_fights` (
   PRIMARY KEY (`fight_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.log_arena_fights: 0 rows
+-- Дамп данных таблицы acore_characters.log_arena_fights: 0 rows
 DELETE FROM `log_arena_fights`;
 /*!40000 ALTER TABLE `log_arena_fights` DISABLE KEYS */;
 /*!40000 ALTER TABLE `log_arena_fights` ENABLE KEYS */;

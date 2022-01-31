@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.gtregenmpperspt_dbc
+-- Дамп структуры для таблица acore_world.gtregenmpperspt_dbc
 DROP TABLE IF EXISTS `gtregenmpperspt_dbc`;
 CREATE TABLE IF NOT EXISTS `gtregenmpperspt_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `gtregenmpperspt_dbc` (
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
--- Дамп данных таблицы _acore_world.gtregenmpperspt_dbc: 1 100 rows
+-- Дамп данных таблицы acore_world.gtregenmpperspt_dbc: 1 100 rows
 DELETE FROM `gtregenmpperspt_dbc`;
 /*!40000 ALTER TABLE `gtregenmpperspt_dbc` DISABLE KEYS */;
 INSERT INTO `gtregenmpperspt_dbc` (`ID`, `Data`) VALUES
