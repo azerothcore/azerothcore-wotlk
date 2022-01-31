@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_required
+-- Дамп структуры для таблица acore_world.spell_required
 DROP TABLE IF EXISTS `spell_required`;
 CREATE TABLE IF NOT EXISTS `spell_required` (
-  `spell_id` mediumint(9) NOT NULL DEFAULT 0,
-  `req_spell` mediumint(9) NOT NULL DEFAULT 0,
+  `spell_id` MEDIUMINT NOT NULL DEFAULT 0,
+  `req_spell` MEDIUMINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`spell_id`,`req_spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
 
--- Дамп данных таблицы _acore_world.spell_required: 50 rows
+-- Дамп данных таблицы acore_world.spell_required: 50 rows
 DELETE FROM `spell_required`;
 /*!40000 ALTER TABLE `spell_required` DISABLE KEYS */;
 INSERT INTO `spell_required` (`spell_id`, `req_spell`) VALUES
