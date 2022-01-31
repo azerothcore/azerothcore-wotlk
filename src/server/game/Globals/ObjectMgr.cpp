@@ -9675,5 +9675,5 @@ void ObjectMgr::SetInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 
 }
 void ObjectMgr::NewInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state)
 {
-    GameobjectInstanceSavedStateList.emplace_back(id, entry, guid, state);
+    GameobjectInstanceSavedStateList.push_back({ id, entry, guid, state });
 }
