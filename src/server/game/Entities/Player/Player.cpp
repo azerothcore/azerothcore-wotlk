@@ -2388,15 +2388,26 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     uint32 newXP = curXP + xp + bonus_xp;
 
-    while (newXP >= nextLvlXP && level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    if (xp == 1 && level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    {
+        GiveLevel(level + 1);
+        xp = 0;
+
+        level = getLevel();
+        nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+
+        return;
+    }
+
+    while (newXP >= nextLvlXP)
     {
         newXP -= nextLvlXP;
 
         if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-            GiveLevel(level + 1);
+            GiveLevel(level);
 
         level = getLevel();
-        nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+        nextLvlXP = sObjectMgr->GetXPForLevel(level);
     }
 
     SetUInt32Value(PLAYER_XP, newXP);

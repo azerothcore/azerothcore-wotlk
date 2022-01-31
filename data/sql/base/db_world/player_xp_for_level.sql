@@ -42,9 +42,8 @@ INSERT INTO `player_xp_for_level` (`Level`, `Experience`) VALUES
 	(16, 150000),
 	(17, 164000),
 	(18, 178000),
-	(19, 193000)
+	(19, 193000),
 	(20, 200000);
-
 /*!40000 ALTER TABLE `player_xp_for_level` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
