@@ -12,21 +12,21 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.achievement_reward
+-- Дамп структуры для таблица acore_world.achievement_reward
 DROP TABLE IF EXISTS `achievement_reward`;
 CREATE TABLE IF NOT EXISTS `achievement_reward` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `TitleA` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `TitleH` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Sender` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `TitleA` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `TitleH` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Sender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Subject` varchar(255) DEFAULT NULL,
   `Body` text DEFAULT NULL,
-  `MailTemplateID` mediumint(8) unsigned DEFAULT 0,
+  `MailTemplateID` MEDIUMINT unsigned DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Loot System';
 
--- Дамп данных таблицы _acore_world.achievement_reward: 103 rows
+-- Дамп данных таблицы acore_world.achievement_reward: 103 rows
 DELETE FROM `achievement_reward`;
 /*!40000 ALTER TABLE `achievement_reward` DISABLE KEYS */;
 INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`) VALUES
