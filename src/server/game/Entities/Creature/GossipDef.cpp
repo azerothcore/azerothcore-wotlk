@@ -98,10 +98,10 @@ void GossipMenu::AddMenuItem(uint32 menuId, uint32 menuItemId, uint32 sender, ui
         /// OptionText
         if (optionBroadcastText)
             ObjectMgr::GetLocaleString(optionBroadcastText->MaleText, GetLocale(), strOptionText);
-        // if we have no text for our gender
+        // if we have no BroadcastText ID for this text - search localized text in gossip_menu_option_locale
         if (strOptionText.empty() && gossipMenuLocale)
             ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, GetLocale(), strOptionText);
-        // if gossip_menu_option_locale have no text for our locale
+        // if gossip_menu_option_locale have no text for our locale - English text will be shown
         if (strOptionText.empty())
             strOptionText = itr->second.OptionText;
 
