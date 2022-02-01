@@ -78,17 +78,6 @@ public:
         Execute(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
     }
 
-    //! Enqueues a one-way SQL operation in string format -with variable args- that will be executed asynchronously.
-    //! This method should only be used for queries that are only executed once, e.g during startup.
-    template<typename Format, typename... Args>
-    void PExecute(Format&& sql, Args&&... args)
-    {
-        if (Acore::IsFormatEmptyOrNull(sql))
-            return;
-
-        Execute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...));
-    }
-
     //! Enqueues a one-way SQL operation in prepared statement format that will be executed asynchronously.
     //! Statement must be prepared with CONNECTION_ASYNC flag.
     void Execute(PreparedStatement<T>* stmt);
@@ -112,17 +101,6 @@ public:
         DirectExecute(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
     }
 
-    //! Directly executes a one-way SQL operation in string format -with variable args-, that will block the calling thread until finished.
-    //! This method should only be used for queries that are only executed once, e.g during startup.
-    template<typename Format, typename... Args>
-    void DirectPExecute(Format&& sql, Args&&... args)
-    {
-        if (Acore::IsFormatEmptyOrNull(sql))
-            return;
-
-        DirectExecute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...));
-    }
-
     //! Directly executes a one-way SQL operation in prepared statement format, that will block the calling thread until finished.
     //! Statement must be prepared with the CONNECTION_SYNCH flag.
     void DirectExecute(PreparedStatement<T>* stmt);
@@ -144,17 +122,6 @@ public:
             return QueryResult(nullptr);
 
         return Query(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
-    }
-
-    //! Directly executes an SQL query in string format -with variable args- that will block the calling thread until finished.
-    //! Returns reference counted auto pointer, no need for manual memory management in upper level code.
-    template<typename Format, typename... Args>
-    QueryResult PQuery(Format&& sql, Args&&... args)
-    {
-        if (Acore::IsFormatEmptyOrNull(sql))
-            return QueryResult(nullptr);
-
-        return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...));
     }
 
     //! Directly executes an SQL query in prepared format that will block the calling thread until finished.

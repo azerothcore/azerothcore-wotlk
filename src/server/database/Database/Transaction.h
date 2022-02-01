@@ -48,12 +48,6 @@ public:
         Append(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
     }
 
-    template<typename Format, typename... Args>
-    void PAppend(Format&& sql, Args&&... args)
-    {
-        Append(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...));
-    }
-
     [[nodiscard]] std::size_t GetSize() const { return m_queries.size(); }
 
 protected:
