@@ -1175,11 +1175,11 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     // Hack for modules
     std::vector<uint32> CustomCreatures;
-    std::stringstream stringCreatureIds(sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", ""));
-
-    for (std::string id; std::getline(stringCreatureIds, id, ',');) // Process each Creature ID in the string, delimited by the comma - ","
+    std::string stringCreatureIds(sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "")); 
+    for (std::string_view id : Acore::Tokenize(stringCreatureIds, ',', false))
     {
-        CustomCreatures.push_back(stoul(id));
+        uint32 entry = Acore::StringTo<uint32>(id).value_or(0);
+        CustomCreatures.emplace_back(entry);
     }
 
     for (std::vector<uint32>::const_iterator itr = CustomCreatures.begin(); itr != CustomCreatures.end(); itr++)
