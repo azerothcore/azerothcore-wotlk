@@ -561,7 +561,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
         uint32 value = ((uint32*)&e.event.raw)[index];
         if (value != 0)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has unused event_param {} with value {}, it must be 0, skipped.",
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has unused event_param{} with value {}, it must be 0, skipped.",
                          e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
             valid = false;
         }
