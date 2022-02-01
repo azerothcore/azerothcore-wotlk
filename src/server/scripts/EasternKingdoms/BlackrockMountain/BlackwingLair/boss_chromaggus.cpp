@@ -72,6 +72,7 @@ enum Misc
     DATA_LEVER_USED = 0
 };
 
+// not sniffed yet.
 Position const homePos = { -7487.577148f, -1074.366943f, 476.555023f, 5.325001f };
 
 class boss_chromaggus : public CreatureScript
