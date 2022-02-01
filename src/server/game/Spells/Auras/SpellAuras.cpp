@@ -2031,9 +2031,14 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
         // xinef: check priority before effect mask
         SpellGroupSpecialFlags thisAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(GetId());
         SpellGroupSpecialFlags existingAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(existingSpellInfo->Id);
-        if (thisAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && existingAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1)
+        if (thisAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && thisAuraFlag <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4 &&
+            existingAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && existingAuraFlag <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4)
+        {
             if (thisAuraFlag < existingAuraFlag)
+            {
                 return false;
+            }
+        }
 
         // xinef: forced strongest aura in group by flag
         if (stackFlags & SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST)
