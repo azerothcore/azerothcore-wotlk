@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.outdoorpvp_template
+-- Дамп структуры для таблица acore_world.outdoorpvp_template
 DROP TABLE IF EXISTS `outdoorpvp_template`;
 CREATE TABLE IF NOT EXISTS `outdoorpvp_template` (
   `TypeId` TINYINT unsigned NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `outdoorpvp_template` (
   PRIMARY KEY (`TypeId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='OutdoorPvP Templates';
 
--- Дамп данных таблицы _acore_world.outdoorpvp_template: 7 rows
+-- Дамп данных таблицы acore_world.outdoorpvp_template: 7 rows
 DELETE FROM `outdoorpvp_template`;
 /*!40000 ALTER TABLE `outdoorpvp_template` DISABLE KEYS */;
 INSERT INTO `outdoorpvp_template` (`TypeId`, `ScriptName`, `comment`) VALUES
