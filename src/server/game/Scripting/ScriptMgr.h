@@ -294,7 +294,7 @@ public:
         _mapEntry = sMapStore.LookupEntry(_mapId);
 
         if (!_mapEntry)
-            LOG_ERROR("maps.script", "Invalid MapScript for %u; no such map ID.", _mapId);
+            LOG_ERROR("maps.script", "Invalid MapScript for {}; no such map ID.", _mapId);
     }
 
     // Gets the MapEntry structure associated with this script. Can return nullptr.
@@ -335,7 +335,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsWorldMap())
-            LOG_ERROR("maps.script", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "WorldMapScript for map {} is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -352,7 +352,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsDungeon())
-            LOG_ERROR("maps.script", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "InstanceMapScript for map {} is invalid.", GetEntry()->MapID);
     }
 
     // Gets an InstanceScript object for this instance.
@@ -372,7 +372,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsBattleground())
-            LOG_ERROR("maps.script", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "BattlegroundMapScript for map {} is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -1530,7 +1530,10 @@ public:
     virtual bool OnIsAffectedBySpellModCheck(SpellInfo const* /*affectSpell*/, SpellInfo const* /*checkSpell*/, SpellModifier const* /*mod*/) { return true; };
 
     // Called when checking for spell negative healing modifiers
-    virtual bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* /*target*/, Unit const* /*caster*/, SpellInfo const* /*spellInfo*/, float& /*val*/) { return true; };
+    virtual bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* /*target*/, Unit const* /*caster*/, SpellInfo const* /*spellInfo*/, float& /*val*/) { return false; };
+
+    // Called after loading spell dbc corrections
+    virtual void OnLoadSpellCustomAttr(SpellInfo* /*spell*/) { }
 };
 
 class BGScript : public ScriptObject
@@ -2350,6 +2353,7 @@ public: /* GlobalScript */
     void OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update);
     bool OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod);
     bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
+    void OnLoadSpellCustomAttr(SpellInfo* spell);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
@@ -2695,8 +2699,8 @@ public:
                 {
                     // The script uses a script name from database, but isn't assigned to anything.
                     if (script->GetName().find("Smart") == std::string::npos)
-                        LOG_ERROR("sql.sql", "Script named '%s' is not assigned in the database.",
-                                         script->GetName().c_str());
+                        LOG_ERROR("sql.sql", "Script named '{}' is not assigned in the database.",
+                                         script->GetName());
                 }
             }
             else
@@ -2729,8 +2733,8 @@ private:
         {
             if (it->second == script)
             {
-                LOG_ERROR("scripts", "Script '%s' has same memory pointer as '%s'.",
-                               script->GetName().c_str(), it->second->GetName().c_str());
+                LOG_ERROR("scripts", "Script '{}' has same memory pointer as '{}'.",
+                               script->GetName(), it->second->GetName());
 
                 return false;
             }
