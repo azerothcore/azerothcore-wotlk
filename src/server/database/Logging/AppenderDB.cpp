@@ -27,7 +27,7 @@ AppenderDB::~AppenderDB() { }
 
 void AppenderDB::_write(LogMessage const* message)
 {
-    // Avoid infinite loop, PExecute triggers Logging with "sql.sql" type
+    // Avoid infinite loop, Execute triggers Logging with "sql.sql" type
     if (!enabled || (message->type.find("sql") != std::string::npos))
         return;
 

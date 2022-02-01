@@ -202,8 +202,8 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     {
         LOG_DEBUG("network", "Invalid petition: {}", petition->petitionGuid.ToString());
 
-        trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
-        trans->PAppend("DELETE FROM petition_sign WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
+        trans->Append("DELETE FROM petition WHERE petitionguid = {}", petition->petitionGuid.GetCounter());
+        trans->Append("DELETE FROM petition_sign WHERE petitionguid = {}", petition->petitionGuid.GetCounter());
 
         // xinef: clear petition store
         sPetitionMgr->RemovePetition(petition->petitionGuid);

@@ -53,7 +53,7 @@ void ChannelMgr::LoadChannels()
     uint32 count = 0;
 
     //                                                    0          1     2     3         4          5
-    QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
+    QueryResult result = CharacterDatabase.Query("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
     if (!result)
     {
         LOG_INFO("server.loading", ">> Loaded 0 channels. DB table `channels` is empty.");
@@ -90,7 +90,7 @@ void ChannelMgr::LoadChannels()
         newChannel->SetPassword(password);
         mgr->channels[channelWName] = newChannel;
 
-        if (QueryResult banResult = CharacterDatabase.PQuery("SELECT playerGUID, banTime FROM channels_bans WHERE channelId = %u", channelDBId))
+        if (QueryResult banResult = CharacterDatabase.Query("SELECT playerGUID, banTime FROM channels_bans WHERE channelId = {}", channelDBId))
         {
             do
             {

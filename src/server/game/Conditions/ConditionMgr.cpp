@@ -2277,7 +2277,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     case CONDITION_PET_TYPE:
         if (cond->ConditionValue1 >= (1 << MAX_PET_TYPE))
         {
-            LOG_ERROR("sql.sql", "CONDITION_PET_TYPE has non-existing pet type %u, skipped.", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "CONDITION_PET_TYPE has non-existing pet type {}, skipped.", cond->ConditionValue1);
             return false;
         }
         break;

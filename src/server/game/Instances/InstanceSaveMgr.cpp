@@ -280,7 +280,7 @@ void InstanceSaveMgr::LoadResetTimes()
             if (!mapDiff)
             {
                 LOG_ERROR("instance.save", "InstanceSaveMgr::LoadResetTimes: invalid mapid({})/difficulty({}) pair in instance_reset!", mapid, difficulty);
-                CharacterDatabase.DirectPExecute("DELETE FROM instance_reset WHERE mapid = '%u' AND difficulty = '%u'", mapid, difficulty);
+                CharacterDatabase.DirectExecute("DELETE FROM instance_reset WHERE mapid = '{}' AND difficulty = '{}'", mapid, difficulty);
                 continue;
             }
 
@@ -310,7 +310,7 @@ void InstanceSaveMgr::LoadResetTimes()
             // initialize the reset time
             t = today + period + diff;
             SetResetTimeFor(mapid, difficulty, t);
-            CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u', '%u', '%u')", mapid, difficulty, (uint32)t);
+            CharacterDatabase.DirectExecute("INSERT INTO instance_reset VALUES ('{}', '{}', '{}')", mapid, difficulty, (uint32)t);
         }
 
         if (t < now)
@@ -319,7 +319,7 @@ void InstanceSaveMgr::LoadResetTimes()
             // calculate the next reset time
             t = (t * DAY) / DAY;
             t += ((today - t) / period + 1) * period + diff;
-            CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '%u' WHERE mapid = '%u' AND difficulty = '%u'", (uint32)t, mapid, difficulty);
+            CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
         }
 
         SetExtendedResetTimeFor(mapid, difficulty, t);

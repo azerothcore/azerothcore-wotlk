@@ -97,7 +97,7 @@ public:
         else
         {
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
-            QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM character_queststatus WHERE guid = %u AND quest = %u", guid, entry);
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (result)
             {
@@ -348,7 +348,7 @@ public:
         else
         {
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
-            QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM character_queststatus WHERE guid = %u AND quest = %u", guid, entry);
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (!result)
             {
@@ -536,7 +536,7 @@ public:
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             CharacterDatabasePreparedStatement* stmt;
 
-            QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM character_queststatus WHERE guid = %u AND quest = %u AND status = 1", guid, entry);
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {} AND status = 1", guid, entry);
 
             if (!result)
             {

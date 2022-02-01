@@ -259,7 +259,7 @@ void PlayerDump::InitializeTables()
         TableStruct t;
         t.TableName = dumpTable.Name;
 
-        QueryResult result = CharacterDatabase.PQuery("DESC %s", dumpTable.Name);
+        QueryResult result = CharacterDatabase.Query("DESC {}", dumpTable.Name);
         // prepared statement is correct (checked at startup) so table must exist
         ASSERT(result);
 
@@ -604,7 +604,7 @@ void PlayerDumpWriter::PopulateGuids(ObjectGuid::LowType guid)
         }
 
         std::string whereStr = GenerateWhereStr(baseTable.PlayerGuid, guid);
-        QueryResult result = CharacterDatabase.PQuery("SELECT %s FROM %s WHERE %s", baseTable.PrimaryKey, baseTable.TableName, whereStr.c_str());
+        QueryResult result = CharacterDatabase.Query("SELECT {} FROM {} WHERE {}", baseTable.PrimaryKey, baseTable.TableName, whereStr);
         if (!result)
             continue;
 
@@ -671,7 +671,7 @@ bool PlayerDumpWriter::AppendTable(StringTransaction& trans, ObjectGuid::LowType
         break;
     }
 
-    QueryResult result = CharacterDatabase.PQuery("SELECT * FROM %s WHERE %s", dumpTable.Name, whereStr.c_str());
+    QueryResult result = CharacterDatabase.Query("SELECT * FROM {} WHERE {}", dumpTable.Name, whereStr);
     switch (dumpTable.Type)
     {
     case DTT_CHARACTER:

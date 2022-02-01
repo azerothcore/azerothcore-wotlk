@@ -92,7 +92,7 @@ void CharacterCache::LoadCharacterCacheStorage()
 
 void CharacterCache::RefreshCacheEntry(uint32 lowGuid)
 {
-    QueryResult result = CharacterDatabase.PQuery("SELECT guid, name, account, race, gender, class, level FROM characters WHERE guid = %u", lowGuid);
+    QueryResult result = CharacterDatabase.Query("SELECT guid, name, account, race, gender, class, level FROM characters WHERE guid = {}", lowGuid);
     if (!result)
     {
         return;
@@ -105,7 +105,7 @@ void CharacterCache::RefreshCacheEntry(uint32 lowGuid)
         AddCharacterCacheEntry(ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()) /*guid*/, fields[2].Get<uint32>() /*account*/, fields[1].Get<std::string>() /*name*/, fields[4].Get<uint8>() /*gender*/, fields[3].Get<uint8>() /*race*/, fields[5].Get<uint8>() /*class*/, fields[6].Get<uint8>() /*level*/);
     } while (result->NextRow());
 
-    QueryResult mailCountResult = CharacterDatabase.PQuery("SELECT receiver, COUNT(receiver) FROM mail WHERE receiver = %u GROUP BY receiver", lowGuid);
+    QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail WHERE receiver = {} GROUP BY receiver", lowGuid);
     if (mailCountResult)
     {
         do

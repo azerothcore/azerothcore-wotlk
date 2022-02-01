@@ -570,7 +570,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     }
 
     // xinef: sync query
-    if (QueryResult result = CharacterDatabase.PQuery("SELECT flags FROM character_social WHERE guid = %u AND friend = %u", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
+    if (QueryResult result = CharacterDatabase.Query("SELECT flags FROM character_social WHERE guid = {} AND friend = {}", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
     {
         Field* fields = result->Fetch();
         if (fields[0].Get<uint8>() & SOCIAL_FLAG_IGNORED)
