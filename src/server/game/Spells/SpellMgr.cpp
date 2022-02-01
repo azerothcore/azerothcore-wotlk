@@ -31,6 +31,7 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -3403,6 +3404,8 @@ void SpellMgr::LoadSpellCustomAttr()
             }
         }
        spellInfo->_InitializeExplicitTargetMask();
+
+       sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
@@ -7497,7 +7500,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->ProcChance = 101;
         spellInfo->Effect[1] = 24;
         spellInfo->EffectImplicitTargetA[1] = 25;
-        spellInfo->EffectItemType[1] = 37889;
+        spellInfo->EffectItemType[1] = 37888;
     });
 
     // Serverside - Create Rocket Pack
@@ -7567,10 +7570,23 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectSpellClassMask[EFFECT_1][1] = 0x00020000;
     });
 
+    // Focused Assault
+    // Brutal Assault
+    ApplySpellFix({ 46392, 46393 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+    });
+
     // Bestial Wrath
     ApplySpellFix({ 19574 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx4 |= SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
+    });
+
+    // PX-238 Winter Wondervolt
+    ApplySpellFix({ 26157, 26272, 26273, 26274 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Mechanic = 0;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

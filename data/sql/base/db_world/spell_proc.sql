@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_proc
+-- Дамп структуры для таблица acore_world.spell_proc
 DROP TABLE IF EXISTS `spell_proc`;
 CREATE TABLE IF NOT EXISTS `spell_proc` (
-  `spellId` mediumint(9) NOT NULL DEFAULT 0,
+  `spellId` MEDIUMINT NOT NULL DEFAULT 0,
   `schoolMask` TINYINT NOT NULL DEFAULT 0,
   `spellFamilyName` SMALLINT unsigned NOT NULL DEFAULT 0,
   `spellFamilyMask0` INT unsigned NOT NULL DEFAULT 0,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `spell_proc` (
   CHECK (`cooldown` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.spell_proc: 0 rows
+-- Дамп данных таблицы acore_world.spell_proc: 0 rows
 DELETE FROM `spell_proc`;
 /*!40000 ALTER TABLE `spell_proc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `spell_proc` ENABLE KEYS */;

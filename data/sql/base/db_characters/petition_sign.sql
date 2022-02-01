@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.petition_sign
+-- Дамп структуры для таблица acore_characters.petition_sign
 DROP TABLE IF EXISTS `petition_sign`;
 CREATE TABLE IF NOT EXISTS `petition_sign` (
   `ownerguid` INT unsigned NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `petition_sign` (
   KEY `Idx_ownerguid` (`ownerguid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
 
--- Дамп данных таблицы _acore_characters.petition_sign: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.petition_sign: ~0 rows (приблизительно)
 DELETE FROM `petition_sign`;
 /*!40000 ALTER TABLE `petition_sign` DISABLE KEYS */;
 /*!40000 ALTER TABLE `petition_sign` ENABLE KEYS */;

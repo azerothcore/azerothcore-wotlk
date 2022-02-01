@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.quest_tracker
+-- Дамп структуры для таблица acore_characters.quest_tracker
 DROP TABLE IF EXISTS `quest_tracker`;
 CREATE TABLE IF NOT EXISTS `quest_tracker` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `character_guid` INT unsigned NOT NULL DEFAULT 0,
   `quest_accept_time` datetime NOT NULL,
   `quest_complete_time` datetime DEFAULT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `quest_tracker` (
   `core_revision` varchar(120) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Дамп данных таблицы _acore_characters.quest_tracker: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.quest_tracker: ~0 rows (приблизительно)
 DELETE FROM `quest_tracker`;
 /*!40000 ALTER TABLE `quest_tracker` DISABLE KEYS */;
 /*!40000 ALTER TABLE `quest_tracker` ENABLE KEYS */;

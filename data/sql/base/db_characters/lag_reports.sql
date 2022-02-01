@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.lag_reports
+-- Дамп структуры для таблица acore_characters.lag_reports
 DROP TABLE IF EXISTS `lag_reports`;
 CREATE TABLE IF NOT EXISTS `lag_reports` (
   `reportId` INT unsigned NOT NULL AUTO_INCREMENT,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `lag_reports` (
   PRIMARY KEY (`reportId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.lag_reports: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.lag_reports: ~0 rows (приблизительно)
 DELETE FROM `lag_reports`;
 /*!40000 ALTER TABLE `lag_reports` DISABLE KEYS */;
 /*!40000 ALTER TABLE `lag_reports` ENABLE KEYS */;
