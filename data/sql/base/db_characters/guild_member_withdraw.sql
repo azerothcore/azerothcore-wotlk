@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.guild_member_withdraw
+-- Дамп структуры для таблица acore_characters.guild_member_withdraw
 DROP TABLE IF EXISTS `guild_member_withdraw`;
 CREATE TABLE IF NOT EXISTS `guild_member_withdraw` (
   `guid` INT unsigned NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `guild_member_withdraw` (
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild Member Daily Withdraws';
 
--- Дамп данных таблицы _acore_characters.guild_member_withdraw: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.guild_member_withdraw: ~0 rows (приблизительно)
 DELETE FROM `guild_member_withdraw`;
 /*!40000 ALTER TABLE `guild_member_withdraw` DISABLE KEYS */;
 /*!40000 ALTER TABLE `guild_member_withdraw` ENABLE KEYS */;

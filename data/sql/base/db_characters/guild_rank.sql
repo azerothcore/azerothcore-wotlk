@@ -12,19 +12,19 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.guild_rank
+-- Дамп структуры для таблица acore_characters.guild_rank
 DROP TABLE IF EXISTS `guild_rank`;
 CREATE TABLE IF NOT EXISTS `guild_rank` (
   `guildid` INT unsigned NOT NULL DEFAULT 0,
   `rid` TINYINT unsigned NOT NULL,
   `rname` varchar(20) NOT NULL DEFAULT '',
-  `rights` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `rights` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BankMoneyPerDay` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`,`rid`),
   KEY `Idx_rid` (`rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guild System';
 
--- Дамп данных таблицы _acore_characters.guild_rank: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.guild_rank: ~0 rows (приблизительно)
 DELETE FROM `guild_rank`;
 /*!40000 ALTER TABLE `guild_rank` DISABLE KEYS */;
 /*!40000 ALTER TABLE `guild_rank` ENABLE KEYS */;

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.lfg_dungeon_template
+-- Дамп структуры для таблица acore_world.lfg_dungeon_template
 DROP TABLE IF EXISTS `lfg_dungeon_template`;
 CREATE TABLE IF NOT EXISTS `lfg_dungeon_template` (
   `dungeonId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Unique id from LFGDungeons.dbc',
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `lfg_dungeon_template` (
   PRIMARY KEY (`dungeonId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.lfg_dungeon_template: 21 rows
+-- Дамп данных таблицы acore_world.lfg_dungeon_template: 21 rows
 DELETE FROM `lfg_dungeon_template`;
 /*!40000 ALTER TABLE `lfg_dungeon_template` DISABLE KEYS */;
 INSERT INTO `lfg_dungeon_template` (`dungeonId`, `name`, `position_x`, `position_y`, `position_z`, `orientation`, `VerifiedBuild`) VALUES
