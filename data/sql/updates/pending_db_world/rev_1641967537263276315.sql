@@ -1022,9 +1022,7 @@ UPDATE `smart_scripts` SET `action_param1`=0 WHERE `entryorguid`=10812 AND `sour
 UPDATE `smart_scripts` SET `action_param1`=0 WHERE `entryorguid`=11016 AND `source_type`=0 AND `id`=34;
 UPDATE `smart_scripts` SET `action_param1`=0 WHERE `entryorguid`=11016 AND `source_type`=0 AND `id`=37;
 
---
-UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=3694 AND `source_type`=0 AND `id` IN(6,8);
-UPDATE `smart_scripts` SET `event_param1`=0 WHERE `entryorguid`=3694 AND `source_type`=0 AND `id` IN(6,8);
+UPDATE `smart_scripts` SET `event_param1`=0, `event_param2` = 0 WHERE `entryorguid`=3694 AND `source_type`=0 AND `id` IN(6,8);
 
 -- ???
 DELETE FROM `smart_scripts` WHERE `entryorguid`=31279 AND `source_type`=0 AND `id`=11;
