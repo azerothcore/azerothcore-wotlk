@@ -42,6 +42,12 @@ public:
 
     void Append(std::string_view sql);
 
+    template<typename... Args>
+    void Append(std::string_view sql, Args&&... args)
+    {
+        Append(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
+    }
+
     template<typename Format, typename... Args>
     void PAppend(Format&& sql, Args&&... args)
     {

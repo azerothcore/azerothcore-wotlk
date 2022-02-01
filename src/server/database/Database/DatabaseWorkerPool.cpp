@@ -184,10 +184,9 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
 }
 
 template <class T>
-QueryResult DatabaseWorkerPool<T>::Query(std::string_view sql, T* connection /*= nullptr*/)
+QueryResult DatabaseWorkerPool<T>::Query(std::string_view sql)
 {
-    if (!connection)
-        connection = GetFreeConnection();
+    auto connection = GetFreeConnection();
 
     ResultSet* result = connection->Query(sql);
     connection->Unlock();
