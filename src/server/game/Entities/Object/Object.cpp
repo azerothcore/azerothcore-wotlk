@@ -21,9 +21,9 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Creature.h"
-#include "DynamicTree.h"
 #include "DynamicVisibility.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Log.h"
 #include "MapMgr.h"
@@ -48,6 +48,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -89,7 +91,7 @@ WorldObject::~WorldObject()
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            LOG_FATAL("entities.object", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
+            LOG_FATAL("entities.object", "Object::~Object Corpse {}, type={} deleted but still in map!!", GetGUID().ToString(), ((Corpse*)this)->GetType());
             ABORT();
         }
         ResetMap();
@@ -102,15 +104,15 @@ Object::~Object()
 
     if (IsInWorld())
     {
-        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - {} deleted but still in world!!", GetGUID().ToString());
         if (isType(TYPEMASK_ITEM))
-            LOG_FATAL("entities.object", "Item slot %u", ((Item*)this)->GetSlot());
+            LOG_FATAL("entities.object", "Item slot {}", ((Item*)this)->GetSlot());
         ABORT();
     }
 
     if (m_objectUpdated)
     {
-        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - {} deleted but still in update list!!", GetGUID().ToString());
         ABORT();
     }
 
@@ -610,21 +612,29 @@ uint32 Object::GetUpdateFieldData(Player const* target, uint32*& flags) const
     return visibleFlag;
 }
 
-void Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count)
+bool Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count)
 {
     if (data.empty())
-        return;
+        return false;
 
-    Tokenizer tokens(data, ' ', count);
+    std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
     if (tokens.size() != count)
-        return;
+        return false;
 
     for (uint32 index = 0; index < count; ++index)
     {
-        m_uint32Values[startOffset + index] = atol(tokens[index]);
+        Optional<uint32> val = Acore::StringTo<uint32>(tokens[index]);
+        if (!val)
+        {
+            return false;
+        }
+
+        m_uint32Values[startOffset + index] = *val;
         _changesMask.SetBit(startOffset + index);
     }
+
+    return true;
 }
 
 void Object::SetInt32Value(uint16 index, int32 value)
@@ -746,7 +756,7 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 
     if (offset > 3)
     {
-        LOG_ERROR("entities.object", "Object::SetByteValue: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteValue: wrong offset {}", offset);
         return;
     }
 
@@ -766,7 +776,7 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 
     if (offset > 1)
     {
-        LOG_ERROR("entities.object", "Object::SetUInt16Value: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetUInt16Value: wrong offset {}", offset);
         return;
     }
 
@@ -907,7 +917,7 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("entities.object", "Object::SetByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteFlag: wrong offset {}", offset);
         return;
     }
 
@@ -926,7 +936,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("entities.object", "Object::RemoveByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::RemoveByteFlag: wrong offset {}", offset);
         return;
     }
 
@@ -992,7 +1002,7 @@ void Object::ApplyModFlag64(uint16 index, uint64 flag, bool apply)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    LOG_INFO("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",
+    LOG_INFO("misc", "Attempt {} non-existed value field: {} (count: {}) for object typeid: {} type mask: {}",
         (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
@@ -1067,35 +1077,35 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 void MovementInfo::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");
-    LOG_INFO("movement", "guid %s", guid.ToString().c_str());
-    LOG_INFO("movement", "flags %u", flags);
-    LOG_INFO("movement", "flags2 %u", flags2);
-    LOG_INFO("movement", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
-    LOG_INFO("movement", "position: `%s`", pos.ToString().c_str());
+    LOG_INFO("movement", "guid {}", guid.ToString());
+    LOG_INFO("movement", "flags {}", flags);
+    LOG_INFO("movement", "flags2 {}", flags2);
+    LOG_INFO("movement", "time {} current time {}", flags2, uint64(::GameTime::GetGameTime().count()));
+    LOG_INFO("movement", "position: `{}`", pos.ToString());
 
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
         LOG_INFO("movement", "TRANSPORT:");
-        LOG_INFO("movement", "guid: %s", transport.guid.ToString().c_str());
-        LOG_INFO("movement", "position: `%s`", transport.pos.ToString().c_str());
-        LOG_INFO("movement", "seat: %i", transport.seat);
-        LOG_INFO("movement", "time: %u", transport.time);
+        LOG_INFO("movement", "guid: {}", transport.guid.ToString());
+        LOG_INFO("movement", "position: `{}`", transport.pos.ToString());
+        LOG_INFO("movement", "seat: {}", transport.seat);
+        LOG_INFO("movement", "time: {}", transport.time);
 
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
         {
-            LOG_INFO("movement", "time2: %u", transport.time2);
+            LOG_INFO("movement", "time2: {}", transport.time2);
         }
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        LOG_INFO("movement", "pitch: %f", pitch);
+        LOG_INFO("movement", "pitch: {}", pitch);
 
-    LOG_INFO("movement", "fallTime: %u", fallTime);
+    LOG_INFO("movement", "fallTime: {}", fallTime);
     if (flags & MOVEMENTFLAG_FALLING)
-        LOG_INFO("movement", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+        LOG_INFO("movement", "j_zspeed: {} j_sinAngle: {} j_cosAngle: {} j_xyspeed: {}", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        LOG_INFO("movement", "splineElevation: %f", splineElevation);
+        LOG_INFO("movement", "splineElevation: {}", splineElevation);
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
@@ -1908,8 +1918,22 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     // Creature scripts
     if (Creature const* cObj = obj->ToCreature())
-        if (cObj->IsAIEnabled && this->ToPlayer() && !cObj->AI()->CanBeSeen(this->ToPlayer()))
-            return false;
+    {
+        if (Player const* player = this->ToPlayer())
+        {
+            if (cObj->IsAIEnabled && !cObj->AI()->CanBeSeen(player))
+            {
+                return false;
+            }
+
+            ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY, cObj->GetEntry());
+
+            if (!sConditionMgr->IsObjectMeetToConditions((WorldObject*)this, conditions))
+            {
+                return false;
+            }
+        }
+    }
 
     // Gameobject scripts
     if (GameObject const* goObj = obj->ToGameObject())
@@ -2224,7 +2248,7 @@ void WorldObject::SetMap(Map* map)
 
     if (m_currMap)
     {
-        LOG_FATAL("entities.object", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
+        LOG_FATAL("entities.object", "WorldObject::SetMap: obj {} new map {} {}, old map {} {}", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
 
@@ -2263,7 +2287,7 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        LOG_ERROR("entities.object", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
+        LOG_ERROR("entities.object", "Object {} at attempt add to move list not have valid map (Id: {}).", GetGUID().ToString(), GetMapId());
         return;
     }
 
@@ -2403,7 +2427,7 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template {} not found in database!", entry);
         return nullptr;
     }
 
@@ -2468,7 +2492,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template {} not found in database!", entry);
         return nullptr;
     }
 
@@ -2868,7 +2892,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
         return;
     }
 
@@ -3042,13 +3066,13 @@ void WorldObject::AddToNotify(uint16 f)
             {
                 uint32 EVENT_VISIBILITY_DELAY = u->FindMap() ? DynamicVisibilityMgr::GetVisibilityNotifyDelay(u->FindMap()->GetEntry()->map_type) : 1000;
 
-                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, World::GetGameTimeMS());
+                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, GameTime::GetGameTimeMS().count());
                 if (diff >= EVENT_VISIBILITY_DELAY / 2)
                     EVENT_VISIBILITY_DELAY /= 2;
                 else
                     EVENT_VISIBILITY_DELAY -= diff;
                 u->m_delayed_unit_relocation_timer = EVENT_VISIBILITY_DELAY;
-                u->m_last_notify_mstime = World::GetGameTimeMS() + EVENT_VISIBILITY_DELAY - 1;
+                u->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + EVENT_VISIBILITY_DELAY - 1;
             }
             else if (f & NOTIFY_AI_RELOCATION)
             {

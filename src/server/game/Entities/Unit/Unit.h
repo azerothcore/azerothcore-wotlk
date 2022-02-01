@@ -28,6 +28,7 @@
 #include "SpellDefines.h"
 #include "ThreatMgr.h"
 #include <functional>
+#include <utility>
 
 #define WORLD_TRIGGER   12999
 
@@ -909,7 +910,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 
 struct RedirectThreatInfo
 {
-    RedirectThreatInfo()  { }
+    RedirectThreatInfo()  = default;
     ObjectGuid _targetGUID;
     uint32 _threatPct{0};
 
@@ -971,7 +972,7 @@ private:
     GlobalCooldownList m_GlobalCooldowns;
 };
 
-enum ActiveStates
+enum ActiveStates : uint8
 {
     ACT_PASSIVE  = 0x01,                                    // 0x01 - passive
     ACT_DISABLED = 0x81,                                    // 0x80 - castable
@@ -1138,7 +1139,7 @@ private:
 };
 
 struct AttackPosition {
-    AttackPosition(Position pos) : _pos(pos), _taken(false) {}
+    AttackPosition(Position pos) : _pos(std::move(pos)), _taken(false) {}
     bool operator==(const int val)
     {
         return !val;
@@ -1491,8 +1492,8 @@ public:
     static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr);
     static int32 DealHeal(Unit* healer, Unit* victim, uint32 addhealth);
 
-    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr);
-    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr);
+    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr, uint32 procPhase = 2 /*PROC_SPELL_PHASE_HIT*/);
+    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr, uint32 procPhase = 2 /*PROC_SPELL_PHASE_HIT*/);
 
     void GetProcAurasTriggeredOnEvent(std::list<AuraApplication*>& aurasTriggeringProc, std::list<AuraApplication*>* procAuras, ProcEventInfo eventInfo);
     void TriggerAurasProcOnEvent(CalcDamageInfo& damageInfo);
@@ -1613,6 +1614,7 @@ public:
     void ClearInCombat();
     void ClearInPetCombat();
     [[nodiscard]] uint32 GetCombatTimer() const { return m_CombatTimer; }
+    void SetCombatTimer(uint32 timer) { m_CombatTimer = timer; }
 
     [[nodiscard]] bool HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint32 familyFlags) const;
     [[nodiscard]] bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
@@ -1981,7 +1983,7 @@ public:
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     [[nodiscard]] int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
-    virtual bool IsMovementPreventedByCasting() const;
+    [[nodiscard]] virtual bool IsMovementPreventedByCasting() const;
 
     ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
     ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
@@ -2462,7 +2464,7 @@ private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
     bool HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
     bool HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, bool* handled);
-    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
+    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, uint32 procPhase);
     bool HandleOverrideClassScriptAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 cooldown);
     bool HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura);
     bool HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura);
@@ -2478,7 +2480,7 @@ protected:
     void SetFeared(bool apply);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
-    void SetRooted(bool apply);
+    void SetRooted(bool apply, bool isStun = false);
 
     uint32 m_rootTimes;
 
@@ -2505,7 +2507,7 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
 
-    float processDummyAuras(float TakenTotalMod) const;
+    [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 };
 
 namespace Acore

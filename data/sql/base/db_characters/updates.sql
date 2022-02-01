@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.updates
+-- Дамп структуры для таблица acore_characters.updates
 DROP TABLE IF EXISTS `updates`;
 CREATE TABLE IF NOT EXISTS `updates` (
   `name` varchar(200) NOT NULL COMMENT 'filename with extension of the update.',
   `hash` char(40) DEFAULT '' COMMENT 'sha1 hash of the sql file.',
-  `state` enum('RELEASED','ARCHIVED','CUSTOM') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
+  `state` enum('RELEASED','CUSTOM','MODULE','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'timestamp when the query was applied.',
   `speed` INT unsigned NOT NULL DEFAULT 0 COMMENT 'time the query takes to apply in ms.',
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of all applied updates in this database.';
 
--- Дамп данных таблицы _acore_characters.updates: 40 rows
+-- Дамп данных таблицы acore_characters.updates: 44 rows
 DELETE FROM `updates`;
 /*!40000 ALTER TABLE `updates` DISABLE KEYS */;
 INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
@@ -66,7 +66,11 @@ INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 	('2019_05_12_00.sql', '75DB225858A4D21DA92D21AC292A9DD9A5551BA5', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 	('2019_11_22_00.sql', 'CA433BC426072EF7DDC555B086F65B17BB83CAF5', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 	('2020_01_04_00.sql', '7DA0D914F60BE3827068447FE4EA6AA85266E328', 'ARCHIVED', '2021-10-14 04:13:44', 1),
-	('2021_10_14_00.sql', 'FD481BA8924F107B9B5B2359999820D57A016907', 'ARCHIVED', '2021-10-14 22:01:28', 46);
+	('2021_10_14_00.sql', 'FD481BA8924F107B9B5B2359999820D57A016907', 'ARCHIVED', '2021-10-14 22:01:28', 46),
+	('2021_10_14_01_characters.sql', 'D34A3947055382A390A134D91DD68903CA5FA7C4', 'ARCHIVED', '2022-01-21 23:39:14', 21),
+	('2021_11_06_00.sql', 'B36ED498D42A54BC818B6027AB1F92A7ACD0DA25', 'ARCHIVED', '2022-01-21 23:39:14', 70),
+	('2021_12_26_00.sql', '089B77AAA7C676D7850070C1C05644CC50EC7F36', 'ARCHIVED', '2022-01-21 23:39:14', 46),
+	('2021_12_26_01.sql', '22C450827DB8E89AF4B0F6B23B3D829B96F69B6A', 'ARCHIVED', '2022-01-21 23:39:14', 54);
 /*!40000 ALTER TABLE `updates` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
