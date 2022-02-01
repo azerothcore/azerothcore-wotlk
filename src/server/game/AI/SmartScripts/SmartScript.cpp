@@ -204,7 +204,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         }
 
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SIMPLE_TALK: talker: {} ({}), textGroupId: {}",
-                                       (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), uint8(e.action.simpleTalk.textGroupID));
+                                       (*itr)->GetName(), (*itr)->GetGUID().ToString(), uint8(e.action.simpleTalk.textGroupID));
                     }
 
                     delete targets;
@@ -780,7 +780,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         (*itr)->ToUnit()->AddAura(e.action.addAura.spell, (*itr)->ToUnit());
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ADD_AURA: Adding aura {} to unit {}",
-                                       e.action.addAura.spell, (*itr)->GetGUID().ToString().c_str());
+                                       e.action.addAura.spell, (*itr)->GetGUID().ToString());
                     }
                 }
 
