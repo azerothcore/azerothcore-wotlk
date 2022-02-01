@@ -1,6 +1,4 @@
-## 5.0.0-dev.1 | Commit: [8b7df23f064f8c1c41aea222342b53f109c4e3b9
-](https://github.com/azerothcore/azerothcore-wotlk/commit/8b7df23f064f8c1c41aea222342b53f109c4e3b9
-
+## 5.0.0-dev.1 | Commit: [8b7df23f064f8c1c41aea222342b53f109c4e3b9](https://github.com/azerothcore/azerothcore-wotlk/commit/8b7df23f064f8c1c41aea222342b53f109c4e3b9
 
 ### How to upgrade
 
@@ -17,9 +15,7 @@
 + GameTime::GetGameTimeMS().count()
 ```
 
-## 5.0.0-dev.0 | Commit: [2fd8b00d7bac1f9c9b565916453cf490fb069df0
-](https://github.com/azerothcore/azerothcore-wotlk/commit/2fd8b00d7bac1f9c9b565916453cf490fb069df0
-
+## 5.0.0-dev.0 | Commit: [2fd8b00d7bac1f9c9b565916453cf490fb069df0](https://github.com/azerothcore/azerothcore-wotlk/commit/2fd8b00d7bac1f9c9b565916453cf490fb069df0
 
 We suggest that you always use the latest version of our master branch.
 https://github.com/azerothcore/azerothcore-wotlk/tree/master
@@ -38,9 +34,7 @@ If this causes an issue for in game or custom spawns the following line of SAI c
 
 Special thanks to @Shin @Kitzunu @M'Dic for assistance.
 
-## 4.0.0-dev.13 | Commit: [bc82f36f1ff46bb21d32e1cfdaec8271dde08af1
-](https://github.com/azerothcore/azerothcore-wotlk/commit/bc82f36f1ff46bb21d32e1cfdaec8271dde08af1
-
+## 4.0.0-dev.13 | Commit: [bc82f36f1ff46bb21d32e1cfdaec8271dde08af1](https://github.com/azerothcore/azerothcore-wotlk/commit/bc82f36f1ff46bb21d32e1cfdaec8271dde08af1
 
 ### Added
 
@@ -96,10 +90,7 @@ Special thanks to @Shin @Kitzunu @M'Dic for assistance.
  PlayDirectSound(uint32 sound_id, Player* target = nullptr);
 ```
 
-## 4.0.0-dev.12 | Commit: [bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1
-](https://github.com/azerothcore/azerothcore-wotlk/commit/bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1
-
-
+## 4.0.0-dev.12 | Commit: [bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1](https://github.com/azerothcore/azerothcore-wotlk/commit/bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1
 
 ### Added
 
@@ -141,11 +132,7 @@ Changelog for commit "[feature(Core/Spells): Allow to learn all spells for chara
 
 - Update the worldserver.conf file with the new PlayerStart.AllSpells if you want to change it to "ON". Otherwise it will go with the default option "OFF" from the worldserver.conf.dist file.
 
-## 4.0.0-dev.8 | Commit: [edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23
-](https://github.com/azerothcore/azerothcore-wotlk/commit/edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23
-
-
-Changelog for commit "[fix(Core/Player): Use SkillLineAbility.dbc to determine player initial spells - skill assignment done in a new table `playercreateinfo_skills`](https://github.com/azerothcore/azerothcore-wotlk/commit/1be561e03b56dc396270335886e59eddad9fa0c6)"
+## 4.0.0-dev.8 | Commit: [edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23](https://github.com/azerothcore/azerothcore-wotlk/commit/edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23
 
 ### Added
 
@@ -193,9 +180,7 @@ Changelog for commit "[fix(Core/Player): Use SkillLineAbility.dbc to determine p
 
 - for example skillLine->forward_spellid will become skillLine->SupercededBySpell
 
-## 4.0.0-dev.7 | Commit: [59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
-](https://github.com/azerothcore/azerothcore-wotlk/commit/59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
-
+## 4.0.0-dev.7 | Commit: [59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244](https://github.com/azerothcore/azerothcore-wotlk/commit/59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
 
 ### Removed
 - Old gossips api [#5414](https://github.com/azerothcore/azerothcore-wotlk/pull/5414)
@@ -209,9 +194,7 @@ Changelog for commit "[fix(Core/Player): Use SkillLineAbility.dbc to determine p
 
 You also need  `#include "ScriptedGossip.h"` in your cpp files
 
-## 4.0.0-dev.6 | Commit: [59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
-](https://github.com/azerothcore/azerothcore-wotlk/commit/59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
-
+## 4.0.0-dev.6 | Commit: [59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244](https://github.com/azerothcore/azerothcore-wotlk/commit/59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
 
 ### Changed
 - New options for loading scripts `static dynamic minimal-static minimal-dynamic` [#5346](https://github.com/azerothcore/azerothcore-wotlk/pull/5346)
@@ -254,9 +237,7 @@ void Addmod_server_auto_shutdownScripts()
 - List modules support new script loader api:
 https://github.com/azerothcore/mod-server-auto-shutdown
 
-## 4.0.0-dev.5 | Commit: [59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
-](https://github.com/azerothcore/azerothcore-wotlk/commit/59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
-
+## 4.0.0-dev.5 | Commit: [59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244](https://github.com/azerothcore/azerothcore-wotlk/commit/59a3912a3b3bd4dd2d8e2b1c2cdd225b9c4d6244
 
 ### Added
 - New cmake option `WITH_STRICT_DATABASE_TYPE_CHECKS` [#5611](https://github.com/azerothcore/azerothcore-wotlk/pull/5611)
@@ -278,9 +259,7 @@ https://github.com/azerothcore/mod-server-auto-shutdown
 - SQLTransaction trans = CharacterDatabase.BeginTransaction();
 + CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 ```
-## 4.0.0-dev.4 | Commit: [fbad1f3d6c27a5d3eea22483913c67a827ab01be
-](https://github.com/azerothcore/azerothcore-wotlk/commit/fbad1f3d6c27a5d3eea22483913c67a827ab01be
-
+## 4.0.0-dev.4 | Commit: [fbad1f3d6c27a5d3eea22483913c67a827ab01be](https://github.com/azerothcore/azerothcore-wotlk/commit/fbad1f3d6c27a5d3eea22483913c67a827ab01be
 
 ### Added
 - new hook `OnBeforeSendJoinMessageArenaQueue` and `OnBeforeSendExitMessageArenaQueue`
@@ -293,11 +272,7 @@ https://github.com/azerothcore/mod-server-auto-shutdown
 - Just rename all hooks from `CanExitJoinMessageArenaQueue` and `CanSendMessageArenaQueue`, to `OnBeforeSendExitMessageArenaQueue`
 - Just rename all hooks from `CanSendJoinMessageArenaQueue` and `OnBeforeSendJoinMessageArenaQueue`
 
-## 4.0.0-dev.3 | Commit: [c35dde6fae732269357b78fb796fba21956b83fc
-](https://github.com/azerothcore/azerothcore-wotlk/commit/c35dde6fae732269357b78fb796fba21956b83fc
-
-
-Changelog for commit "[refactor(Collision): Update some methods to UpperCamelCase](https://github.com/azerothcore/azerothcore-wotlk/commit/b84f9b8a4b334632cb37dcebbb2dd4e087f65610)"
+## 4.0.0-dev.3 | Commit: [c35dde6fae732269357b78fb796fba21956b83fc](https://github.com/azerothcore/azerothcore-wotlk/commit/c35dde6fae732269357b78fb796fba21956b83fc
 
 ### Changes
 
@@ -334,12 +309,9 @@ Example: `getAreaInfo` -> `GetAreaInfo`
 
 ## 4.0.0-dev.2 | Commit: [3f70d0b80ff483f142ffbebf8960aeb503913a35](https://github.com/azerothcore/azerothcore-wotlk/commit/3f70d0b80ff483f142ffbebf8960aeb503913a35)
 
-
 ### Added
 - Created new changelog system.
 
 ### How to upgrade
 
 To create a new changelog please follow the instructions on our [wiki page](https://www.azerothcore.org/wiki/how-to-use-changelog)
-
-

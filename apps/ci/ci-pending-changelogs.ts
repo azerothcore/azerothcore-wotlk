@@ -21,8 +21,8 @@ const res=Deno.run({ cmd: [ "git", "rev-parse",
                    stderr: 'piped',
                    stdin: 'null'  });
 await res.status();
-const gitVersion = new TextDecoder().decode(await res.output());
-
+const gitCommit = new TextDecoder().decode(await res.output());
+const gitVersion = gitCommit.replace("\n", "");
 
 for await (const dirEntry of Deno.readDir(CHANGELOG_PENDING_PATH)) {
   if (!dirEntry.isFile || !dirEntry.name.endsWith(".md")) {
@@ -38,7 +38,8 @@ for await (const dirEntry of Deno.readDir(CHANGELOG_PENDING_PATH)) {
   const data = await Deno.readTextFile(
     `${CHANGELOG_PENDING_PATH}/${dirEntry.name}`,
   );
-  changelogText = `## ${acoreInfo.version} | Commit: [${gitVersion}](https://github.com/azerothcore/azerothcore-wotlk/commit/${gitVersion}\n\n${data}\n${changelogText}`;
+
+  changelogText = `## ${acoreInfo.version} | Commit: [${gitVersion}](https://github.com/azerothcore/azerothcore-wotlk/commit/${gitVersion}\n${data}\n${changelogText}`;
 
   // remove the pending file
   await Deno.remove(`${CHANGELOG_PENDING_PATH}/${dirEntry.name}`);
