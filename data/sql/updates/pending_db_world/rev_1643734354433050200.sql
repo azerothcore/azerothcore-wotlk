@@ -1,12 +1,7 @@
-INSERT INTO `version_db_world` (`sql_rev`)
-VALUES ('1643734354433050200');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643734354433050200');
 
-UPDATE creature_template
-SET gossip_menu_id=61026
-WHERE entry = 3567;
-DELETE
-FROM `npc_text`
-WHERE `ID` = 50032;
+UPDATE `creature_template` SET `gossip_menu_id` = 61026 WHERE `entry` = 3567;
+DELETE FROM `npc_text` WHERE `ID` = 50032;
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`, `lang0`, `Probability0`, `em0_0`, `em0_1`,
                         `em0_2`, `em0_3`, `em0_4`, `em0_5`, `text1_0`, `text1_1`, `BroadcastTextID1`, `lang1`,
                         `Probability1`, `em1_0`, `em1_1`, `em1_2`, `em1_3`, `em1_4`, `em1_5`, `text2_0`, `text2_1`,
@@ -25,9 +20,6 @@ VALUES (50032,
         NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
 
-DELETE
-FROM `gossip_menu`
-WHERE `MenuID` = 61026
-  AND `TextID` = 50032;
-INSERT INTO `gossip_menu` (`MenuID`, `TextID`)
-VALUES (61026, 50032);
+DELETE FROM `gossip_menu` WHERE `MenuID` = 61026 AND `TextID` = 50032;
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(61026, 50032);
