@@ -63,7 +63,7 @@ public:
     */
     void Update(Milliseconds time)
     {
-        _time += time.count();
+        _time += static_cast<uint32>(time.count());
     }
 
     /**
