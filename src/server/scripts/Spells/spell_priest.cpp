@@ -78,11 +78,11 @@ class spell_pri_shadowfiend_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: shadowfiend inherits 30% of intellect / stamina (guessed)
+        // xinef: shadowfiend inherits 30% of intellect and 65% of stamina (guessed)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), stat == STAT_STAMINA ? 65 : 30);
         }
     }
 
