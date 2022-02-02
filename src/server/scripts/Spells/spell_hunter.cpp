@@ -280,8 +280,12 @@ class spell_hun_taming_the_beast : public AuraScript
     void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
+        {
             if (Creature* creature = target->ToCreature())
+            {
                 creature->DeleteThreatList();
+            }
+        }
     }
 
     void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
