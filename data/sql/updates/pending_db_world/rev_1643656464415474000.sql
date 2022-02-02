@@ -78,4 +78,4 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`
 UPDATE `creature_template_addon` SET `emote`= 133 WHERE `entry`=13996;
 
 -- Clean-up
-DELETE FROM `linked_respawn` WHERE `guid` >= 84533 AND `guid` <= 85779;
+DELETE FROM `linked_respawn` WHERE `guid` BETWEEN 84533 AND 85779;
