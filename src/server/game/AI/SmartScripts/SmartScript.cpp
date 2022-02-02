@@ -234,13 +234,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 ObjectList* targets = GetTargets(e, unit);
                 if (targets)
                 {
-                    for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                    for (auto& target : *targets)
                     {
-                        if (IsUnit(*itr))
+                        if (IsUnit(target))
                         {
-                            (*itr)->PlayDirectSound(e.action.sound.sound, e.action.sound.onlySelf ? (*itr)->ToPlayer() : nullptr);
+                            if (e.action.sound.distance == 1)
+                                target->PlayDistanceSound(e.action.sound.sound, e.action.sound.onlySelf ? target->ToPlayer() : nullptr);
+                            else
+                                target->PlayDirectSound(e.action.sound.sound, e.action.sound.onlySelf ? target->ToPlayer() : nullptr);
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SOUND: target: {} ({}), sound: {}, onlyself: {}",
-                                           (*itr)->GetName(), (*itr)->GetGUID().ToString(), e.action.sound.sound, e.action.sound.onlySelf);
+                                           target->GetName(), target->GetGUID().ToString(), e.action.sound.sound, e.action.sound.onlySelf);
                         }
                     }
 
@@ -276,14 +279,17 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
                 }
 
-                for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+                for (auto& target : *targets)
                 {
-                    if (IsUnit(*itr))
+                    if (IsUnit(target))
                     {
                         uint32 sound = temp[urand(0, count - 1)];
-                        (*itr)->PlayDirectSound(sound, e.action.randomSound.onlySelf ? (*itr)->ToPlayer() : nullptr);
+                        if (e.action.randomSound.distance == 1)
+                            target->PlayDistanceSound(sound, e.action.randomSound.onlySelf ? target->ToPlayer() : nullptr);
+                        else
+                            target->PlayDirectSound(sound, e.action.randomSound.onlySelf ? target->ToPlayer() : nullptr);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_SOUND: target: {} ({}), sound: {}, onlyself: {}",
-                                       (*itr)->GetName(), (*itr)->GetGUID().ToString(), sound, e.action.randomSound.onlySelf);
+                                       target->GetName(), target->GetGUID().ToString(), sound, e.action.randomSound.onlySelf);
                     }
                 }
 
