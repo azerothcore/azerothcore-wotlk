@@ -2467,23 +2467,20 @@ bool GameObject::IsInstanceGameobject()
 void GameObject::SaveInstanceData(GOState* state)
 {
     uint32 id       = GetInstanceId();
-    uint32 entry    = GetEntry();
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, id);
-    stmt->setUInt32(1, entry);
     stmt->setUInt32(2, guid);
     stmt->setUInt32(3, *state);
     CharacterDatabase.Execute(stmt);
 
-    sObjectMgr->NewInstanceSavedGameobjectState(id, entry, guid, *state);
+    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, *state);
 }
 
 void GameObject::UpdateInstanceData(GOState* state)
 {
     uint32 id       = GetInstanceId();
-    uint32 entry    = GetEntry();
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
@@ -2492,17 +2489,17 @@ void GameObject::UpdateInstanceData(GOState* state)
     stmt->setUInt32(2, id);
     CharacterDatabase.Execute(stmt);
 
-    sObjectMgr->SetInstanceSavedGameobjectState(id, entry, guid, *state);
+    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, *state);
 }
 
 uint8 GameObject::GetStateSavedOnInstance()
 {
-    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetEntry(), GetSpawnId());
+    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }
 
 bool GameObject::FindStateSavedOnInstance()
 {
-    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetEntry(), GetSpawnId());
+    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)

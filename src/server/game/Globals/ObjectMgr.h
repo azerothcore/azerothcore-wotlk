@@ -1375,10 +1375,10 @@ public:
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
 
     void LoadInstanceSavedGameobjectStateData();
-    bool FindInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid);
-    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid);
-    void SetInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state);
-    void NewInstanceSavedGameobjectState(uint32 id, uint32 entry, uint32 guid, uint8 state);
+    bool FindInstanceSavedGameobjectState(uint32 id, uint32 guid);
+    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
+    void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
+    void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1548,7 +1548,6 @@ private:
     struct GameobjectInstanceSavedState
     {
         uint32 m_instance;
-        uint32 m_entry;
         uint32 m_guid;
         uint8 m_state;
     };

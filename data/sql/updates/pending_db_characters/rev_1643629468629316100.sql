@@ -3,7 +3,6 @@ INSERT INTO `version_db_characters` (`sql_rev`) VALUES ('1643629468629316100');
 DROP TABLE IF EXISTS `instance_saved_go_state_data`;
 CREATE TABLE IF NOT EXISTS `instance_saved_go_state_data` (
   `id` INT UNSIGNED NOT NULL COMMENT 'instance.id',
-  `entry` INT UNSIGNED NOT NULL COMMENT 'gameobject_template.entry',
   `guid` INT UNSIGNED NOT NULL COMMENT 'gameobject.guid',
   `state` INT UNSIGNED DEFAULT '0' COMMENT 'gameobject.state',
   PRIMARY KEY (`id`, `entry`, `guid`) USING BTREE
