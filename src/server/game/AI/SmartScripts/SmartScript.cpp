@@ -1797,7 +1797,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     me->SetFacingTo(e.target.o);
                     if (e.action.orientation.quickChange)
-                        me->SetInFront(*targets->begin());
+                        me->SetOrientation(e.target.o);
                 }
             delete targets;
             }
