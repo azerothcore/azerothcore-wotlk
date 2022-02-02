@@ -39,7 +39,7 @@ for await (const dirEntry of Deno.readDir(CHANGELOG_PENDING_PATH)) {
     `${CHANGELOG_PENDING_PATH}/${dirEntry.name}`,
   );
 
-  changelogText = `## ${acoreInfo.version} | Commit: [${gitVersion}](https://github.com/azerothcore/azerothcore-wotlk/commit/${gitVersion}\n${data}\n${changelogText}`;
+  changelogText = `## ${acoreInfo.version} | Commit: [${gitVersion}](https://github.com/azerothcore/azerothcore-wotlk/commit/${gitVersion})\n${data}\n${changelogText}`;
 
   // remove the pending file
   await Deno.remove(`${CHANGELOG_PENDING_PATH}/${dirEntry.name}`);
