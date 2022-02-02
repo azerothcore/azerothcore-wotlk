@@ -1005,7 +1005,7 @@ public:
     virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/) { }
 
     // Called when a player's reputation changes (before it is actually changed)
-    virtual void OnReputationChange(Player* /*player*/, uint32 /*factionId*/, int32& /*standing*/, bool /*incremental*/) { }
+    virtual bool OnReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }
 
     // Called when a player's reputation rank changes (before it is actually changed)
     virtual void OnReputationRankChange(Player* /*player*/, uint32 /*factionID*/, ReputationRank /*newRank*/, ReputationRank /*olRank*/, bool /*increased*/) { }
@@ -2168,7 +2168,7 @@ public: /* PlayerScript */
     void OnPlayerTalentsReset(Player* player, bool noCost);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
-    void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
+    bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);
     void OnPlayerForgotSpell(Player* player, uint32 spellID);
