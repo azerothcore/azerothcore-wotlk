@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643656464415474000');
 
 -- All Blackwing Technician's spawns
-DELETE FROM `creature` WHERE `id1` IN (13996);
+DELETE FROM `creature` WHERE `id1` IN (13996) AND `guid` IN(84533, 84534, 84535, 84536, 84537, 84538, 84539, 84540, 84544, 84545, 84547, 84549, 84550, 84551, 84552, 84554, 84555, 84556, 84562, 84563, 84564, 84565, 84566, 84567, 84568, 84569, 84570, 84571, 84602, 84617, 84618, 84619, 84623, 84624, 84654, 84655, 84688, 84689, 84691, 84692, 84759, 84760, 84761, 84762, 84763, 85609, 85611, 85612, 85613, 85616, 85620, 85621, 85622, 85623, 85625, 85760, 85764, 85766, 85767, 85768, 85772, 85773, 85776, 85777, 85778, 85779);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`,`position_x`, `position_y`, `position_z`, `curhealth`, `unit_flags`) VALUES 
 (84134, 13996, 469, 2677, 2677, 1, -7541.99, -981.618, 449.325, 15260, 64),
 (84135, 13996, 469, 2677, 2677, 1, -7535.72, -987.541, 449.325, 15260, 64),
@@ -75,8 +75,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`
 (84203, 13996, 469, 2677, 2677, 1, -7518.07, -933.761, 457.659, 15260, 64);
 
 -- Emote crafting for Technicians
-UPDATE `creature_template_addon` SET `emote`=133 WHERE `entry`=13996;
+UPDATE `creature_template_addon` SET `emote`= 133 WHERE `entry`=13996;
 
 -- Clean-up
 DELETE FROM `linked_respawn` WHERE `guid` >= 84533 AND `guid` <= 85779;
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND (`entryorguid` IN(-84616, -84615, -84614, -84606, -84605, -84603)));
