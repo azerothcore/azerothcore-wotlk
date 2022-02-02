@@ -5,7 +5,7 @@ SET @GOSSIP_MENU_ID := 61027;
 SET @NPC_TEXT_ID := 50033;
 
 UPDATE `creature_template` SET `gossip_menu_id` = @GOSSIP_MENU_ID WHERE `entry` = @NPC_ENTRY;
-UPDATE `creature_template` SET `npcflag` = 3 WHERE `entry` = @NPC_ENTRY;
+UPDATE `creature_template` SET `npcflag` = `npcflag`|1|2 WHERE `entry` = @NPC_ENTRY;
 DELETE FROM `npc_text` WHERE `ID` = @NPC_TEXT_ID;
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`)
 VALUES (@NPC_TEXT_ID,
