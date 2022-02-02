@@ -13,7 +13,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`action_type` = 11) A
 
 -- Updating AIName from all creatures without any SmartAI Scripts
 UPDATE `creature_template` 
-INNER JOIN (SELECT `entryorguid`, COUNT(*) amount FROM `smart_scripts` GROUP BY `entryorguid` WHERE (`source_type` = 0)) counter
+INNER JOIN (SELECT `entryorguid`, COUNT(*) amount FROM `smart_scripts` WHERE (`source_type` = 0) GROUP BY `entryorguid`) counter
 ON counter.entryorguid = creature_template.entry
 SET creature_template.AIName = IF(counter.amount > 0, "SmartAI", "");
 
