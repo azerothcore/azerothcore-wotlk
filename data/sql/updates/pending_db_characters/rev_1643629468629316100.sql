@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS `instance_saved_go_state_data` (
   `id` INT UNSIGNED NOT NULL COMMENT 'instance.id',
   `guid` INT UNSIGNED NOT NULL COMMENT 'gameobject.guid',
   `state` INT UNSIGNED DEFAULT '0' COMMENT 'gameobject.state',
-  PRIMARY KEY (`id`, `entry`, `guid`) USING BTREE
+  PRIMARY KEY (`id`, `guid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
