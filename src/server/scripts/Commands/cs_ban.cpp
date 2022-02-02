@@ -292,7 +292,7 @@ public:
 
     static bool HandleBanInfoHelper(uint32 accountId, char const* accountName, ChatHandler* handler)
     {
-        QueryResult result = LoginDatabase.PQuery("SELECT FROM_UNIXTIME(bandate, '%Y-%m-%d..%H:%I:%s') as bandate, unbandate-bandate, active, unbandate, banreason, bannedby FROM account_banned WHERE id = '{}' ORDER BY bandate ASC", accountId);
+        QueryResult result = LoginDatabase.Query("SELECT FROM_UNIXTIME(bandate, '%Y-%m-%d..%H:%I:%s') as bandate, unbandate-bandate, active, unbandate, banreason, bannedby FROM account_banned WHERE id = '{}' ORDER BY bandate ASC", accountId);
         if (!result)
         {
             handler->PSendSysMessage(LANG_BANINFO_NOACCOUNTBAN, accountName);
