@@ -47,7 +47,7 @@ bool ReputationMgr::IsAtWar(uint32 faction_id) const
 
     if (!factionEntry)
     {
-        LOG_ERROR("reputation", "ReputationMgr::IsAtWar: Can't get AtWar flag of %s for unknown faction (faction id) #%u.", _player->GetName().c_str(), faction_id);
+        LOG_ERROR("reputation", "ReputationMgr::IsAtWar: Can't get AtWar flag of {} for unknown faction (faction id) #{}.", _player->GetName(), faction_id);
         return 0;
     }
 
@@ -70,7 +70,7 @@ int32 ReputationMgr::GetReputation(uint32 faction_id) const
 
     if (!factionEntry)
     {
-        LOG_ERROR("reputation", "ReputationMgr::GetReputation: Can't get reputation of %s for unknown faction (faction id) #%u.", _player->GetName().c_str(), faction_id);
+        LOG_ERROR("reputation", "ReputationMgr::GetReputation: Can't get reputation of {} for unknown faction (faction id) #{}.", _player->GetName(), faction_id);
         return 0;
     }
 
@@ -380,33 +380,36 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
         ReputationRank old_rank = ReputationToRank(itr->second.Standing + BaseRep);
         ReputationRank new_rank = ReputationToRank(standing);
 
-        itr->second.Standing = standing - BaseRep;
-        itr->second.needSend = true;
-        itr->second.needSave = true;
+        if (sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental))
+        {
+            itr->second.Standing = standing - BaseRep;
+            itr->second.needSend = true;
+            itr->second.needSave = true;
 
-        SetVisible(&itr->second);
+            SetVisible(&itr->second);
 
-        if (new_rank <= REP_HOSTILE)
-            SetAtWar(&itr->second, true);
+            if (new_rank <= REP_HOSTILE)
+                SetAtWar(&itr->second, true);
 
-        if (new_rank > old_rank)
-            _sendFactionIncreased = true;
+            if (new_rank > old_rank)
+                _sendFactionIncreased = true;
 
-        sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental);
+            if (new_rank != old_rank)
+            {
+                sScriptMgr->OnPlayerReputationRankChange(_player, factionEntry->ID, new_rank, old_rank, _sendFactionIncreased);
+            }
 
-        if (new_rank != old_rank)
-            sScriptMgr->OnPlayerReputationRankChange(_player, factionEntry->ID, new_rank, old_rank, _sendFactionIncreased);
+            UpdateRankCounters(old_rank, new_rank);
 
-        UpdateRankCounters(old_rank, new_rank);
+            _player->ReputationChanged(factionEntry);
+            _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS, factionEntry->ID);
+            _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION, factionEntry->ID);
+            _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION, factionEntry->ID);
+            _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION, factionEntry->ID);
+            _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION, factionEntry->ID);
 
-        _player->ReputationChanged(factionEntry);
-        _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS,          factionEntry->ID);
-        _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION,         factionEntry->ID);
-        _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION, factionEntry->ID);
-        _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION, factionEntry->ID);
-        _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION, factionEntry->ID);
-
-        return true;
+            return true;
+        }
     }
     return false;
 }

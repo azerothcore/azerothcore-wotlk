@@ -21,6 +21,7 @@
 #include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "DisableMgr.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
@@ -34,7 +35,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (%s)", guid.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from ({})", guid.ToString());
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
@@ -153,8 +154,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     {
         if (GetPlayer()->InBattleground()) // currently in battleground
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
-            err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+        {
+            if (GetPlayer()->isUsingLfg()) // using lfg system
+                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
         else if (!_player->CanJoinToBattleground()) // has deserter debuff
             err = ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
@@ -548,7 +552,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
             if (!bg)
                 continue;
 
-            uint32 remainingTime = (World::GetGameTimeMS() < ginfo.RemoveInviteTime ? getMSTimeDiff(World::GetGameTimeMS(), ginfo.RemoveInviteTime) : 1);
+            uint32 remainingTime = (GameTime::GetGameTimeMS().count() < ginfo.RemoveInviteTime ? getMSTimeDiff(GameTime::GetGameTimeMS().count(), ginfo.RemoveInviteTime) : 1);
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, i, STATUS_WAIT_JOIN, remainingTime, 0, ginfo.ArenaType, TEAM_NEUTRAL, bg->isRated(), ginfo.BgTypeId);
             SendPacket(&data);
         }
@@ -565,7 +569,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
                 continue;
 
             uint32 avgWaitTime = bgQueue.GetAverageQueueWaitTime(&ginfo);
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, i, STATUS_WAIT_QUEUE, avgWaitTime, getMSTimeDiff(ginfo.JoinTime, World::GetGameTimeMS()), ginfo.ArenaType, TEAM_NEUTRAL, ginfo.IsRated);
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, i, STATUS_WAIT_QUEUE, avgWaitTime, getMSTimeDiff(ginfo.JoinTime, GameTime::GetGameTimeMS().count()), ginfo.ArenaType, TEAM_NEUTRAL, ginfo.IsRated);
             SendPacket(&data);
         }
     }
@@ -671,8 +675,11 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     {
         if (GetPlayer()->InBattleground()) // currently in battleground
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
-            err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+        {
+            if (GetPlayer()->isUsingLfg()) // using lfg system
+                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
 
         if (err <= 0)
         {
@@ -808,7 +815,7 @@ void WorldSession::HandleReportPvPAFK(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: %s reported %s", _player->GetName().c_str(), reportedPlayer->GetName().c_str());
+    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: {} reported {}", _player->GetName(), reportedPlayer->GetName());
 
     reportedPlayer->ReportedAfkBy(_player);
 }

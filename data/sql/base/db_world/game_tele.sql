@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_tele
+-- Дамп структуры для таблица acore_world.game_tele
 DROP TABLE IF EXISTS `game_tele`;
 CREATE TABLE IF NOT EXISTS `game_tele` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `id` MEDIUMINT unsigned NOT NULL AUTO_INCREMENT,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,
@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS `game_tele` (
   `map` SMALLINT unsigned NOT NULL DEFAULT 0,
   `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1491 DEFAULT CHARSET=utf8mb4 COMMENT='Tele Command';
+) ENGINE=MyISAM AUTO_INCREMENT=1492 DEFAULT CHARSET=utf8mb4 COMMENT='Tele Command';
 
--- Дамп данных таблицы _acore_world.game_tele: 1 490 rows
+-- Дамп данных таблицы acore_world.game_tele: 1 491 rows
 DELETE FROM `game_tele`;
 /*!40000 ALTER TABLE `game_tele` DISABLE KEYS */;
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES
@@ -1457,7 +1457,7 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 	(1426, 2781.57, 3006.76, 23.2219, 0.5, 169, 'EmeraldDreamStatue'),
 	(1427, -2128.12, -1005.89, 132.213, 0.5, 169, 'VerdantFields'),
 	(1428, 2738.87, -3320.93, 101.917, 0.366472, 169, 'EmeraldDreamForest'),
-	(1429, -4819.56, -974.088, 464.709, 3.963, 0, 'ironjaskinia'),
+	(1429, -4819.56, -974.088, 464.709, 3.963, 0, 'OldIronForge'),
 	(1430, -7933.11, 1942.26, 5.72931, 4.90082, 1, 'goldbug'),
 	(1431, 80.2287, 3.33371, -144.709, 5.95369, 25, 'minek'),
 	(1432, -23.9044, 9.59795, -144.709, 1.7014, 25, 'box'),
@@ -1518,7 +1518,8 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 	(1487, 4857.47, -1791.17, 1156.66, 4.79909, 1, 'HyjalCaveInside'),
 	(1488, 4822.82, -1749.73, 1162.03, 5.47845, 1, 'HyjalCaveOutside'),
 	(1489, 5372.72, -3378.71, 1655.47, 5.27658, 1, 'HyjalTheWorldTree'),
-	(1490, 5474.07, 39.7615, 149.546, 6.27193, 571, 'CrystalsongForest');
+	(1490, 5474.07, 39.7615, 149.546, 6.27193, 571, 'CrystalsongForest'),
+	(1491, 79, -1, 18.6778, 0, 44, 'OldScarletMonastery');
 /*!40000 ALTER TABLE `game_tele` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
