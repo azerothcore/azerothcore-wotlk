@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "dire_maul.h"
 #include "TaskScheduler.h"
+#include "dire_maul.h"
 
 enum Texts
 {

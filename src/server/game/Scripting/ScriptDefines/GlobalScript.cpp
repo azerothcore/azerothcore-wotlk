@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
-#include "Player.h"
 
 void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
 {
@@ -137,4 +137,27 @@ bool ScriptMgr::OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellI
     }
 
     return true;
+}
+
+bool ScriptMgr::OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val)
+{
+    auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
+    {
+        return script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val);
+    });
+
+    if (ret && *ret)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void ScriptMgr::OnLoadSpellCustomAttr(SpellInfo* spell)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnLoadSpellCustomAttr(spell);
+    });
 }

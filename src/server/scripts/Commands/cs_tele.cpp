@@ -23,8 +23,8 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Group.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -328,7 +328,7 @@ public:
         CreatureData const* spawnpoint = nullptr;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id != *creatureId)
+            if (pair.second.id1 != *creatureId)
                 continue;
 
             if (!spawnpoint)
@@ -362,7 +362,7 @@ public:
             return false;
         }
 
-        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(spawnpoint->id));
+        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(spawnpoint->id1));
 
         return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
     }
@@ -372,7 +372,8 @@ public:
         std::string normalizedName(name);
         WorldDatabase.EscapeString(normalizedName);
 
-        QueryResult result = WorldDatabase.PQuery("SELECT c.position_x, c.position_y, c.position_z, c.orientation, c.map, ct.name FROM creature c INNER JOIN creature_template ct ON c.creature_id1 = ct.entry WHERE ct.name LIKE '%s'", normalizedName.c_str());
+        // May need work //PussyWizardEliteMalcrom
+        QueryResult result = WorldDatabase.PQuery("SELECT c.position_x, c.position_y, c.position_z, c.orientation, c.map, ct.name FROM creature c INNER JOIN creature_template ct ON c.id1 = ct.entry WHERE ct.name LIKE '%s'", normalizedName.c_str());
         if (!result)
         {
             handler->SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
