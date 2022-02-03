@@ -2443,17 +2443,24 @@ void GameObject::SetGoState(GOState state)
         // Save the gameobject state on the Database
         if (!FindStateSavedOnInstance())
         {
-            SaveInstanceData(GetGameobjectStateAsUInt8(&state));
+            SaveInstanceData(GetGameobjectStateAsShort(&state));
         }
         else
         {
-            UpdateInstanceData(GetGameobjectStateAsUInt8(&state));
+            UpdateInstanceData(GetGameobjectStateAsShort(&state));
         }
     }
 }
 
 bool GameObject::IsInstanceGameobject()
 {
+    // Avoid checking for unecessary gameobjects whose
+    // states don't matter for the dungeon progression
+    if (!ValidateGameobjectType())
+    {
+        return false;
+    }
+
     if (auto* map = FindMap())
     {
         if (map->IsDungeon() || map->IsRaid())
@@ -2462,52 +2469,72 @@ bool GameObject::IsInstanceGameobject()
         }
     }
     return false;
-};
+}
 
-uint8 GameObject::GetGameobjectStateAsUInt8(GOState* state)
+bool GameObject::ValidateGameobjectType()
 {
+    switch (m_goInfo->type)
+    {
+        case GAMEOBJECT_TYPE_DOOR:
+        case GAMEOBJECT_TYPE_BUTTON:
+        case GAMEOBJECT_TYPE_TRAP:
+        case GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING:
+        case GAMEOBJECT_TYPE_TRAPDOOR:
+            return true;
+        default:
+            return false;
+    }
+}
+
+unsigned short GameObject::GetGameobjectStateAsShort(GOState* state)
+{
+    unsigned short m_state = 3;
+
     if (state)
     {
         switch (*state)
         {
             case GO_STATE_ACTIVE:
-                return 0;
+                m_state = 0;
+                return m_state;
                 break;
             case GO_STATE_READY:
-                return 1;
+                m_state = 1;
+                return m_state;
                 break;
             case GO_STATE_ACTIVE_ALTERNATIVE:
-                return 2;
+                m_state = 2;
+                return m_state;
                 break;
         }
     }
 
     // Returning any value that is not one of the specified ones
     // Which will default into the invalid part of the switch
-    return 3;
+    return m_state;
 }
 
-void GameObject::SaveInstanceData(uint8 state)
+void GameObject::SaveInstanceData(unsigned short state)
 {
     uint32 id       = GetInstanceId();
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, id);
-    stmt->setUInt32(2, guid);
-    stmt->setUInt8(3, state);
+    stmt->setUInt32(1, guid);
+    stmt->setUInt32(2, static_cast<uint32>(state));
     CharacterDatabase.Execute(stmt);
 
     sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
 }
 
-void GameObject::UpdateInstanceData(uint8 state)
+void GameObject::UpdateInstanceData(unsigned short state)
 {
     uint32 id       = GetInstanceId();
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
-    stmt->setUInt8(0, state);
+    stmt->setUInt32(0, static_cast<uint32>(state));
     stmt->setUInt32(1, guid);
     stmt->setUInt32(2, id);
     CharacterDatabase.Execute(stmt);
@@ -2515,7 +2542,7 @@ void GameObject::UpdateInstanceData(uint8 state)
     sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
 }
 
-uint8 GameObject::GetStateSavedOnInstance()
+unsigned short GameObject::GetStateSavedOnInstance()
 {
     return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }

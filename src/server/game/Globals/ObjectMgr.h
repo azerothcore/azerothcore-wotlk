@@ -1376,9 +1376,9 @@ public:
 
     void LoadInstanceSavedGameobjectStateData();
     bool FindInstanceSavedGameobjectState(uint32 id, uint32 guid);
-    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
-    void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
-    void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
+    unsigned short GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
+    void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, unsigned short state);
+    void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, unsigned short state);
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1549,7 +1549,7 @@ private:
     {
         uint32 m_instance;
         uint32 m_guid;
-        uint8 m_state;
+        unsigned short m_state;
     };
     std::vector<GameobjectInstanceSavedState> GameobjectInstanceSavedStateList;
 };
