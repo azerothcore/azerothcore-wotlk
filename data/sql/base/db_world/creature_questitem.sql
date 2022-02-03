@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_questitem
+-- Дамп структуры для таблица acore_world.creature_questitem
 DROP TABLE IF EXISTS `creature_questitem`;
 CREATE TABLE IF NOT EXISTS `creature_questitem` (
   `CreatureEntry` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `creature_questitem` (
   PRIMARY KEY (`CreatureEntry`,`Idx`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.creature_questitem: 4 406 rows
+-- Дамп данных таблицы acore_world.creature_questitem: 4 405 rows
 DELETE FROM `creature_questitem`;
 /*!40000 ALTER TABLE `creature_questitem` DISABLE KEYS */;
 INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES
@@ -1313,7 +1313,6 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 	(4363, 0, 5847, 0),
 	(4364, 0, 22094, 0),
 	(4366, 0, 22094, 0),
-	(4368, 0, 22094, 0),
 	(4370, 0, 22094, 0),
 	(4371, 0, 22094, 0),
 	(4376, 0, 5884, 0),
