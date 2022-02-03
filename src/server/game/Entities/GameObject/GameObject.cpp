@@ -2443,11 +2443,11 @@ void GameObject::SetGoState(GOState state)
         // Save the gameobject state on the Database
         if (!FindStateSavedOnInstance())
         {
-            SaveInstanceData(&state);
+            SaveInstanceData(GetGameobjectStateAsUInt8(&state));
         }
         else
         {
-            UpdateInstanceData(&state);
+            UpdateInstanceData(GetGameobjectStateAsUInt8(&state));
         }
     }
 }
@@ -2464,7 +2464,30 @@ bool GameObject::IsInstanceGameobject()
     return false;
 };
 
-void GameObject::SaveInstanceData(GOState* state)
+uint8 GameObject::GetGameobjectStateAsUInt8(GOState* state)
+{
+    if (state)
+    {
+        switch (*state)
+        {
+            case GO_STATE_ACTIVE:
+                return 0;
+                break;
+            case GO_STATE_READY:
+                return 1;
+                break;
+            case GO_STATE_ACTIVE_ALTERNATIVE:
+                return 2;
+                break;
+        }
+    }
+
+    // Returning any value that is not one of the specified ones
+    // Which will default into the invalid part of the switch
+    return 3;
+}
+
+void GameObject::SaveInstanceData(uint8 state)
 {
     uint32 id       = GetInstanceId();
     uint32 guid     = GetSpawnId();
@@ -2472,24 +2495,24 @@ void GameObject::SaveInstanceData(GOState* state)
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, id);
     stmt->setUInt32(2, guid);
-    stmt->setUInt32(3, *state);
+    stmt->setUInt8(3, state);
     CharacterDatabase.Execute(stmt);
 
-    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, *state);
+    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
 }
 
-void GameObject::UpdateInstanceData(GOState* state)
+void GameObject::UpdateInstanceData(uint8 state)
 {
     uint32 id       = GetInstanceId();
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
-    stmt->setUInt32(0, *state);
+    stmt->setUInt8(0, state);
     stmt->setUInt32(1, guid);
     stmt->setUInt32(2, id);
     CharacterDatabase.Execute(stmt);
 
-    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, *state);
+    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
 }
 
 uint8 GameObject::GetStateSavedOnInstance()
