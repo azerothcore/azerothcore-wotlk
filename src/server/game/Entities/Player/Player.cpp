@@ -2398,7 +2398,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
 
         return;
     }
-
+// TODO: level 20 players recieve something else for levelup designated quests. 
     while (newXP >= nextLvlXP)
     {
         newXP -= nextLvlXP;
