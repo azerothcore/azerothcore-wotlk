@@ -35,16 +35,16 @@ using Minutes = std::chrono::minutes;
 // Fix GCC for C++20
 #if defined(__GNUC__) && !defined(__clang__)
 /// days
-using Days = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
+using Days = std::chrono::duration<__INT64_TYPE__, ratio<86400>>;
 
 /// weeks
-using Weeks = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<604800>>;
+using Weeks = std::chrono::duration<__INT64_TYPE__, ratio<604800>>;
 
 /// years
-using Years = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
+using Years = std::chrono::duration<__INT64_TYPE__, ratio<31556952>>;
 
 /// months
-using Months = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
+using Months = std::chrono::duration<__INT64_TYPE__, ratio<2629746>>;
 
 #else
 
