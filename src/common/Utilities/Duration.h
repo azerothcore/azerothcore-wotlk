@@ -47,6 +47,21 @@ using Years = std::chrono::years;
 
 /// Months shorthand typedef.
 using Months = std::chrono::months;
+
+#if GCC_VERSION
+
+/// days
+using Days = duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
+
+/// weeks
+using Weeks = duration<_GLIBCXX_CHRONO_INT64_T, ratio<604800>>;
+
+/// years
+using Years = duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
+
+/// months
+using Months = duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
+
 #else
 /// Days shorthand typedef. (delete after start support c++20)
 using Days = std::chrono::duration<int, std::ratio_multiply<std::ratio<24>, Hours::period>>;
