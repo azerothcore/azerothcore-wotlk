@@ -193,7 +193,7 @@ uint32 Quest::XPValue(uint8 playerLevel) const
         return 0;
     }
 
-    if (quest_level = 255)
+    if (quest_level == 255)
     {
         return 1;
     }
