@@ -49,7 +49,7 @@ using Years = std::chrono::years;
 using Months = std::chrono::months;
 
 // Fix GCC for C++20
-#if AC_COMPILER == AC_COMPILER_GNU
+#ifdef GCC_VERSION
 /// days
 using Days = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
 
@@ -62,7 +62,7 @@ using Years = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
 /// months
 using Months = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
 
-#endif // AC_COMPILER_GNU
+#endif // GCC_VERSION
 
 #else
 /// Days shorthand typedef. (delete after start support c++20)
