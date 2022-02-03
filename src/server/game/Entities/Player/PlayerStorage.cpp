@@ -7640,30 +7640,38 @@ void Player::_SaveWeeklyQuestStatus(CharacterDatabaseTransaction trans)
 
 void Player::_SaveSeasonalQuestStatus(CharacterDatabaseTransaction trans)
 {
-    if (!m_SeasonalQuestChanged || m_seasonalquests.empty())
+    if (!m_SeasonalQuestChanged)
+    {
         return;
+    }
 
     // we don't need transactions here.
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_SEASONAL_CHAR);
     stmt->SetData(0, GetGUID().GetCounter());
     trans->Append(stmt);
 
+    m_SeasonalQuestChanged = false;
+
+    if (m_seasonalquests.empty())
+    {
+        return;
+    }
+
     for (SeasonalEventQuestMap::const_iterator iter = m_seasonalquests.begin(); iter != m_seasonalquests.end(); ++iter)
     {
-        uint16 event_id = iter->first;
+        uint16 eventId = iter->first;
+
         for (SeasonalQuestSet::const_iterator itr = iter->second.begin(); itr != iter->second.end(); ++itr)
         {
-            uint32 quest_id = (*itr);
+            uint32 questId = *itr;
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SEASONALQUESTSTATUS);
-            stmt->SetData(0, GetGUID().GetCounter());
-            stmt->SetData(1, quest_id);
-            stmt->SetData(2, event_id);
+            stmt->setUInt32(0, GetGUID().GetCounter());
+            stmt->setUInt32(1, questId);
+            stmt->setUInt32(2, eventId);
             trans->Append(stmt);
         }
     }
-
-    m_SeasonalQuestChanged = false;
 }
 
 void Player::_SaveMonthlyQuestStatus(CharacterDatabaseTransaction trans)
