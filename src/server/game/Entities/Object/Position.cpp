@@ -19,6 +19,7 @@
 #include "ByteBuffer.h"
 #include "DBCStores.h"
 #include "GridDefines.h"
+#include "Object.h"
 #include "Random.h"
 #include "World.h"
 #include "Geometry.h"
