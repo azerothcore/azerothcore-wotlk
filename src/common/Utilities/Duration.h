@@ -37,7 +37,7 @@ using Hours = std::chrono::hours;
 
 #if __cplusplus > 201703L
 /// Days shorthand typedef.
-using Days = std::chrono::day;
+using Days = std::chrono::days;
 
 /// Weeks shorthand typedef.
 using Weeks = std::chrono::weeks;
