@@ -9,8 +9,8 @@ UPDATE `creature_template` SET `npcflag` = `npcflag`|1 WHERE `entry` = @NPC_ENTR
 DELETE FROM `npc_text` WHERE `ID` = @NPC_TEXT_ID;
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`)
 VALUES (@NPC_TEXT_ID,
-        'Keep the door closed, $c. Never know when the Dark Riders will be passing through again.',
-        'Keep the door closed, $c. Never know when the Dark Riders will be passing through again.', 0);
+        'Keep the door closed, $C. Never know when the Dark Riders will be passing through again.',
+        'Keep the door closed, $C. Never know when the Dark Riders will be passing through again.', 0);
 
 DELETE FROM `gossip_menu` WHERE `MenuID` = @GOSSIP_MENU_ID AND `TextID` = @NPC_TEXT_ID;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
