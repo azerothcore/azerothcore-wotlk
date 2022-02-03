@@ -53,6 +53,16 @@ public:
         _callbacks.insert(_callbacks.end(), std::make_move_iterator(updateCallbacks.begin()), std::make_move_iterator(updateCallbacks.end()));
     }
 
+    bool IsEmpty()
+    {
+        return _callbacks.empty();
+    }
+
+    size_t Size()
+    {
+        return _callbacks.size();
+    }
+
 private:
     AsyncCallbackProcessor(AsyncCallbackProcessor const&) = delete;
     AsyncCallbackProcessor& operator=(AsyncCallbackProcessor const&) = delete;

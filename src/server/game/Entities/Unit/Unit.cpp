@@ -18,6 +18,7 @@
 #include "Unit.h"
 #include "AccountMgr.h"
 #include "ArenaSpectator.h"
+#include "AsyncCallback.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
@@ -977,7 +978,8 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         //if (attacker && victim->GetTypeId() == TYPEID_PLAYER && victim != attacker)
         //victim->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health); // pussywizard: optimization
-        Unit::Kill(attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto);
+
+        sAsyncCallbackMgr->AddAsyncCallback(std::bind(&Unit::AsyncKill, attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto));
     }
     else
     {
@@ -17024,6 +17026,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
     CastCustomSpell(this, 33110, &heal, nullptr, nullptr, true, nullptr, nullptr, caster_guid);
     return true;
 }
+
 bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
 {
     // aura can be deleted at casts
@@ -17392,6 +17395,15 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
                 sScriptMgr->OnPlayerKilledByCreature(killerCre, killed);
         }
     }
+}
+
+void Unit::AsyncKill(Unit* killer, Unit* victim, bool durabilityLoss /*= true*/, WeaponAttackType attackType /*= BASE_ATTACK*/, SpellInfo const* spellProto /*= nullptr*/)
+{
+    // Pussywarlock Elite MDic - Unit death not showing full spell animation.
+    // This delay of 400ms provides that opportunity for it to not be nerfed.
+    std::this_thread::sleep_for(400ms);
+
+    Unit::Kill(killer, victim, durabilityLoss, attackType, spellProto);
 }
 
 void Unit::SetControlled(bool apply, UnitState state)

@@ -25,6 +25,7 @@
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
 #include "AsyncAuctionListing.h"
+#include "AsyncCallback.h"
 #include "AuctionHouseMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
@@ -2452,6 +2453,11 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
         playersSaveScheduler.Update(diff);
+    }
+
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update AsyncCallbackMgr"));
+        sAsyncCallbackMgr->ProcessReadyCallbacks();
     }
 
     {

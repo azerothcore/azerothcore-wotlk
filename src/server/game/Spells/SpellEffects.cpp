@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AsyncCallback.h"
 #include "Battleground.h"
 #include "BattlegroundEY.h"
 #include "BattlegroundIC.h"
@@ -293,6 +294,15 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     data << unitTarget->GetGUID();
     data << uint32(m_spellInfo->Id);
     m_caster->SendMessageToSet(&data, true);
+
+    sAsyncCallbackMgr->AddAsyncCallback(std::bind(&Spell::AsyncEffectInstaKill, this));
+}
+
+void Spell::AsyncEffectInstaKill()
+{
+    // MDic - acidmanifesto: This is needed due to the Unit::DealDamage firing off immediately after the worldpacket which nerfs out additional spell animations
+    // The delay of half a second ensures the spell animations which are typically 0.4 seconds long have enough time to fire off
+    std::this_thread::sleep_for(500ms);
 
     Unit::DealDamage(m_caster, unitTarget, unitTarget->GetHealth(), nullptr, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 }
