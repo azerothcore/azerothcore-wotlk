@@ -34,17 +34,17 @@ using Minutes = std::chrono::minutes;
 
 // Fix GCC for C++20
 #if defined(__GNUC__) && !defined(__clang__)
-/// Days shorthand typedef. (delete after start support c++20)
-using Days = std::chrono::duration<int, std::ratio_multiply<std::ratio<24>, Hours::period>>;
+/// days
+using Days = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
 
-/// Weeks shorthand typedef. (delete after start support c++20)
-using Weeks = std::chrono::duration<int, std::ratio_multiply<std::ratio<7>, Days::period>>;
+/// weeks
+using Weeks = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<604800>>;
 
-/// Years shorthand typedef. (delete after start support c++20)
-using Years = std::chrono::duration<int, std::ratio_multiply<std::ratio<146097, 400>, Days::period>>;
+/// years
+using Years = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
 
-/// Months shorthand typedef. (delete after start support c++20)
-using Months = std::chrono::duration<int, std::ratio_divide<Years::period, std::ratio<12>>>;
+/// months
+using Months = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
 
 #else
 
