@@ -19,6 +19,7 @@
 #define ACore_game_Position_h__
 
 #include "Common.h"
+#include "Object.h"
 #include "G3D/Vector3.h"
 
 class ByteBuffer;
