@@ -787,7 +787,7 @@ void BfGraveyard::RelocateDeadPlayers()
 
 Creature* Battlefield::SpawnCreature(uint32 entry, Position pos, TeamId teamId)
 {
-    return SpawnCreature(entry, pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation, teamId);
+    return SpawnCreature(entry, pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.GetOrientation(), teamId);
 }
 
 Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, float o, TeamId teamId)
