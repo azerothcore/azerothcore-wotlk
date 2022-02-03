@@ -170,11 +170,6 @@ namespace Acore
         bool const is_secure;
 
         std::atomic<bool> was_terminated;
-
-        // Workaround for missing move support in boost < 1.57
-        Optional<std::shared_ptr<std::future<int>>> result;
-        Optional<std::reference_wrapper<child>> my_child;
-
     public:
         explicit AsyncProcessResultImplementation(std::string executable_, std::vector<std::string> args_,
             std::string logger_, std::string input_file_,
