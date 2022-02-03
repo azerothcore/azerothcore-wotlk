@@ -121,7 +121,7 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
     {
         if (vmgr->isMapLoadingEnabled())
         {
-            VMAP::LoadResult result = vmgr->existsMap((sWorld->GetDataPath() + "vmaps"), mapid, gx, gy);
+            VMAP::LoadResult result = vmgr->existsMap((sWorld->GetDataPath() + "vmaps").c_str(), mapid, gx, gy);
             std::string name = vmgr->getDirFileName(mapid, gx, gy);
             switch (result)
             {
