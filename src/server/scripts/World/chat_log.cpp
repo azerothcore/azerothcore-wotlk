@@ -36,26 +36,26 @@ public:
         switch (type)
         {
             case CHAT_MSG_SAY:
-                LOG_CHAT("say", "Player %s says (language %u): %s",
-                    player->GetName().c_str(), lang, msg.c_str());
+                LOG_CHAT("say", "Player {} says (language {}): {}",
+                    player->GetName(), lang, msg);
                 break;
 
             case CHAT_MSG_EMOTE:
-                LOG_CHAT("emote", "Player %s emotes: %s",
-                    player->GetName().c_str(), msg.c_str());
+                LOG_CHAT("emote", "Player {} emotes: {}",
+                    player->GetName(), msg);
                 break;
 
             case CHAT_MSG_YELL:
-                LOG_CHAT("yell", "Player %s yells (language %u): %s",
-                    player->GetName().c_str(), lang, msg.c_str());
+                LOG_CHAT("yell", "Player {} yells (language {}): {}",
+                    player->GetName(), lang, msg);
                 break;
         }
     }
 
     void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) override
     {
-        LOG_CHAT("whisper", "Player %s tells %s: %s",
-               player->GetName().c_str(), receiver ? receiver->GetName().c_str() : "<unknown>", msg.c_str());
+        LOG_CHAT("whisper", "Player {} tells {}: {}",
+               player->GetName(), receiver ? receiver->GetName() : "<unknown>", msg);
     }
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group) override
@@ -65,38 +65,38 @@ public:
         switch (type)
         {
             case CHAT_MSG_PARTY:
-                LOG_CHAT("party", "Player %s tells group with leader %s: %s",
-                    player->GetName().c_str(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
+                LOG_CHAT("party", "Player {} tells group with leader {}: {}",
+                    player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_PARTY_LEADER:
-                LOG_CHAT("party", "Leader %s tells group: %s",
-                    player->GetName().c_str(), msg.c_str());
+                LOG_CHAT("party", "Leader {} tells group: {}",
+                    player->GetName(), msg);
                 break;
 
             case CHAT_MSG_RAID:
-                LOG_CHAT("raid", "Player %s tells raid with leader %s: %s",
-                    player->GetName().c_str(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
+                LOG_CHAT("raid", "Player {} tells raid with leader {}: {}",
+                    player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_RAID_LEADER:
-                LOG_CHAT("raid", "Leader player %s tells raid: %s",
-                    player->GetName().c_str(), msg.c_str());
+                LOG_CHAT("raid", "Leader player {} tells raid: {}",
+                    player->GetName(), msg);
                 break;
 
             case CHAT_MSG_RAID_WARNING:
-                LOG_CHAT("raid", "Leader player %s warns raid with: %s",
-                    player->GetName().c_str(), msg.c_str());
+                LOG_CHAT("raid", "Leader player {} warns raid with: {}",
+                    player->GetName(), msg);
                 break;
 
             case CHAT_MSG_BATTLEGROUND:
-                LOG_CHAT("bg", "Player %s tells battleground with leader %s: %s",
-                    player->GetName().c_str(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
+                LOG_CHAT("bg", "Player {} tells battleground with leader {}: {}",
+                    player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_BATTLEGROUND_LEADER:
-                LOG_CHAT("bg", "Leader player %s tells battleground: %s",
-                    player->GetName().c_str(), msg.c_str());
+                LOG_CHAT("bg", "Leader player {} tells battleground: {}",
+                    player->GetName(), msg);
                 break;
         }
     }
@@ -106,13 +106,13 @@ public:
         switch (type)
         {
             case CHAT_MSG_GUILD:
-                LOG_CHAT("guild", "Player %s tells guild %s: %s",
-                    player->GetName().c_str(), guild ? guild->GetName().c_str() : "<unknown>", msg.c_str());
+                LOG_CHAT("guild", "Player {} tells guild {}: {}",
+                    player->GetName(), guild ? guild->GetName() : "<unknown>", msg);
                 break;
 
             case CHAT_MSG_OFFICER:
-                LOG_CHAT("guild.officer", "Player %s tells guild %s officers: %s",
-                    player->GetName().c_str(), guild ? guild->GetName().c_str() : "<unknown>", msg.c_str());
+                LOG_CHAT("guild.officer", "Player {} tells guild {} officers: {}",
+                    player->GetName(), guild ? guild->GetName() : "<unknown>", msg);
                 break;
         }
     }
@@ -127,14 +127,14 @@ public:
 
         if (isSystem)
         {
-            LOG_CHAT("system", "Player %s tells channel %s: %s",
-                player->GetName().c_str(), channel->GetName().c_str(), msg.c_str());
+            LOG_CHAT("system", "Player {} tells channel {}: {}",
+                player->GetName(), channel->GetName(), msg);
         }
         else
         {
             std::string channelName = channel ? channel->GetName() : "<unknown>";
-            LOG_CHAT("channel." + channelName, "Player %s tells channel %s: %s",
-                player->GetName().c_str(), channelName.c_str(), msg.c_str());
+            LOG_CHAT("channel." + channelName, "Player {} tells channel {}: {}",
+                player->GetName(), channelName, msg);
         }
     }
 };
