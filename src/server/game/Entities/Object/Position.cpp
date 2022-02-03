@@ -40,14 +40,13 @@ void Position::RelocatePolarOffset(float angle, float dist, float z /*= 0.0f*/)
     m_positionZ = GetPositionZ() + z;
 }
 
-bool Position::HasInLine(WorldObject const* target, float width) const
+bool Position::HasInLine(Position const* pos, float width) const
 {
-    if (!HasInArc(M_PI, target))
+    if (!HasInArc(float(M_PI), pos))
         return false;
-    width += target->GetObjectSize();
-    float angle = GetRelativeAngle(target);
 
-    return std::fabs(std::sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
+    float angle = GetRelativeAngle(pos);
+    return std::fabs(std::sin(angle)) * GetExactDist2d(pos->GetPositionX(), pos->GetPositionY()) < width;
 }
 
 std::string Position::ToString() const
