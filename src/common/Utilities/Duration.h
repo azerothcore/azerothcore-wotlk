@@ -48,8 +48,8 @@ using Years = std::chrono::years;
 /// Months shorthand typedef.
 using Months = std::chrono::months;
 
+// Fix GCC for C++20
 #if GCC_VERSION
-
 /// days
 using Days = duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
 
@@ -61,6 +61,8 @@ using Years = duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
 
 /// months
 using Months = duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
+
+#endif // GCC_VERSION
 
 #else
 /// Days shorthand typedef. (delete after start support c++20)
