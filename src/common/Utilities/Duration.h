@@ -33,7 +33,7 @@ using Seconds = std::chrono::seconds;
 using Minutes = std::chrono::minutes;
 
 // Fix GCC for C++20
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && (!defined(__clang__) || (__clang_major__ == 10))
 /// days
 using Days = std::chrono::duration<__INT64_TYPE__, std::ratio<86400>>;
 
