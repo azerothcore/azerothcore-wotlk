@@ -51,16 +51,16 @@ using Months = std::chrono::months;
 // Fix GCC for C++20
 #if GCC_VERSION
 /// days
-using Days = duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
+using Days = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
 
 /// weeks
-using Weeks = duration<_GLIBCXX_CHRONO_INT64_T, ratio<604800>>;
+using Weeks = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<604800>>;
 
 /// years
-using Years = duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
+using Years = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
 
 /// months
-using Months = duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
+using Months = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
 
 #endif // GCC_VERSION
 
