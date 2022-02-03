@@ -49,7 +49,7 @@ using Years = std::chrono::years;
 using Months = std::chrono::months;
 
 // Fix GCC for C++20
-#ifdef GCC_VERSION
+#if defined(__GNUC__) && !defined(__clang__)
 /// days
 using Days = std::chrono::duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
 
