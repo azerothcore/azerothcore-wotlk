@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.account_instance_times
+-- Дамп структуры для таблица acore_characters.account_instance_times
 DROP TABLE IF EXISTS `account_instance_times`;
 CREATE TABLE IF NOT EXISTS `account_instance_times` (
   `accountId` INT unsigned NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `account_instance_times` (
   PRIMARY KEY (`accountId`,`instanceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.account_instance_times: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.account_instance_times: ~0 rows (приблизительно)
 DELETE FROM `account_instance_times`;
 /*!40000 ALTER TABLE `account_instance_times` DISABLE KEYS */;
 /*!40000 ALTER TABLE `account_instance_times` ENABLE KEYS */;

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.talent_dbc
+-- Дамп структуры для таблица acore_world.talent_dbc
 DROP TABLE IF EXISTS `talent_dbc`;
 CREATE TABLE IF NOT EXISTS `talent_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `talent_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.talent_dbc: 0 rows
+-- Дамп данных таблицы acore_world.talent_dbc: 0 rows
 DELETE FROM `talent_dbc`;
 /*!40000 ALTER TABLE `talent_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `talent_dbc` ENABLE KEYS */;
