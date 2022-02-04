@@ -357,8 +357,8 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
 
                     LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
                     if (localeConstant != LOCALE_enUS)
-                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_0[0], localeConstant, strGreeting);
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_0[0], localeConstant, strGreeting);
                 }
                 else
                 {
@@ -366,8 +366,8 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
 
                     LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
                     if (localeConstant != LOCALE_enUS)
-                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_1[0], localeConstant, strGreeting);
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_1[0], localeConstant, strGreeting);
                 }
             }
         }
