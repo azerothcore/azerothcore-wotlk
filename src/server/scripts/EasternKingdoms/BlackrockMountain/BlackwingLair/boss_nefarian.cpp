@@ -24,6 +24,7 @@
 #include "ScriptedGossip.h"
 #include "TemporarySummon.h"
 #include "blackwing_lair.h"
+#include "TaskScheduler.h"
 
 enum Events
 {
@@ -104,6 +105,10 @@ enum Creatures
     NPC_BLACK_DRAKANOID        = 14265,
     NPC_CHROMATIC_DRAKANOID    = 14302,
     NPC_BONE_CONSTRUCT         = 14605,
+    NPC_TOTEM_C_FIRE_NOVA      = 14662,
+    NPC_TOTEM_C_STONESKIN      = 14663,
+    NPC_TOTEM_C_HEALING        = 14664,
+    NPC_TOTEM_C_WINDFURY       = 14666,
     // UBRS
     NPC_GYTH                   = 10339
 };
@@ -146,7 +151,6 @@ enum Spells
     SPELL_CORRUPTED_STONESKIN_TOTEM = 23420,
     SPELL_CORRUPTED_HEALING_TOTEM   = 23422,
     SPELL_CORRUPTED_WINDFURY_TOTEM  = 23423
-
 };
 
 Position const DrakeSpawnLoc[2] = // drakonid
@@ -613,6 +617,169 @@ public:
     }
 };
 
+enum TotemSpells
+{
+    AURA_AVOIDANCE = 23198,
+    SPELL_ROOT_SELF = 17507,
+
+    SPELL_STONESKIN_EFFECT = 10405,
+    SPELL_HEALING_EFFECT   = 10461,
+    SPELL_WINDFURY_EFFECT  = 8515,
+    SPELL_FIRE_NOVA_EFFECT = 11307
+};
+
+struct npc_corrupted_totem : public ScriptedAI
+{
+    npc_corrupted_totem(Creature* creature) : ScriptedAI(creature)
+    {
+        uint32 hp = urand(200, 2000);
+        me->SetMaxHealth(hp);
+        me->SetHealth(hp);
+        _auraAdded = false;
+        Reset();
+    }
+
+    void Reset() override
+    {
+        me->AddUnitState(UNIT_STATE_ROOT);
+        if (!me->HasAura(SPELL_ROOT_SELF))
+        {
+            me->AddAura(SPELL_ROOT_SELF, me);
+        }
+
+        me->AddAura(AURA_AVOIDANCE, me);
+        _scheduler.CancelAll();
+    }
+
+    void SetAura(bool apply) const
+    {
+        uint32 spellId = 0;
+
+        switch (me->GetEntry())
+        {
+            case NPC_TOTEM_C_STONESKIN:
+                spellId = SPELL_STONESKIN_EFFECT;
+                break;
+            case NPC_TOTEM_C_HEALING:
+                spellId = SPELL_HEALING_EFFECT;
+                break;
+            case NPC_TOTEM_C_WINDFURY:
+                spellId = SPELL_WINDFURY_EFFECT;
+                break;
+        }
+
+        if (!spellId)
+        {
+            return;
+        }
+
+        std::vector<uint32> mobsEntries;
+        mobsEntries.push_back(NPC_NEFARIAN);
+        mobsEntries.push_back(NPC_BONE_CONSTRUCT);
+        mobsEntries.push_back(NPC_BRONZE_DRAKANOID);
+        mobsEntries.push_back(NPC_BLUE_DRAKANOID);
+        mobsEntries.push_back(NPC_RED_DRAKANOID);
+        mobsEntries.push_back(NPC_GREEN_DRAKANOID);
+        mobsEntries.push_back(NPC_BLACK_DRAKANOID);
+        mobsEntries.push_back(NPC_CHROMATIC_DRAKANOID);
+
+        for (auto& entry : mobsEntries)
+        {
+            std::list<Creature*> tmpMobList;
+            GetCreatureListWithEntryInGrid(tmpMobList, me, entry, 100.f);
+            while (!tmpMobList.empty())
+            {
+                Creature* curr = tmpMobList.front();
+                tmpMobList.pop_front();
+
+                if (!curr->IsAlive())
+                {
+                    continue;
+                }
+
+                if (apply && me->IsAlive())
+                {
+                    if (me->IsWithinDistInMap(curr, 40.f))
+                    {
+                        if (!curr->HasAura(spellId))
+                        {
+                            curr->AddAura(spellId, curr);
+                        }
+                    }
+                    else
+                    {
+                        if (curr->HasAura(spellId))
+                        {
+                            curr->RemoveAurasDueToSpell(spellId);
+                        }
+                    }
+                }
+                else
+                {
+                    curr->RemoveAurasDueToSpell(spellId);
+                }
+            }
+        }
+    }
+
+    void IsSummonedBy(Unit* /*summoner*/) override
+    {
+        me->SetInCombatWithZone();
+
+        _scheduler
+            .Schedule(1ms, [this](TaskContext context)
+            {
+                if (me->GetEntry() == NPC_TOTEM_C_FIRE_NOVA)
+                {
+                    if (!_auraAdded)
+                    {
+                        context.Schedule(4s, [this](TaskContext context)
+                            {
+                                if (me->IsAlive())
+                                {
+                                    DoCastAOE(SPELL_FIRE_NOVA_EFFECT, true);
+                                }
+                            });
+                        _auraAdded = true;
+                        return;
+                    }
+                }
+
+                SetAura(true);
+                context.Repeat(1s);
+            })
+            .Schedule(me->GetEntry() == NPC_TOTEM_C_WINDFURY ? 89s : 59s, [this](TaskContext context)
+            {
+                SetAura(false);
+                me->DespawnOrUnsummon();
+            });
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (me->GetEntry() != NPC_TOTEM_C_FIRE_NOVA)
+        {
+            SetAura(false);
+        }
+
+        _scheduler.CancelAll();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _scheduler.Update(diff);
+    }
+
+    protected:
+        TaskScheduler _scheduler;
+        bool _auraAdded;
+};
+
 std::unordered_map<uint32, uint8> const classCallSpells =
 {
     { SPELL_MAGE, CLASS_MAGE },
@@ -685,6 +852,7 @@ void AddSC_boss_nefarian()
 {
     new boss_victor_nefarius();
     new boss_nefarian();
+    RegisterCreatureAI(npc_corrupted_totem);
     RegisterSpellScript(spell_class_call_handler);
     RegisterSpellScript(spell_corrupted_totems);
 }
