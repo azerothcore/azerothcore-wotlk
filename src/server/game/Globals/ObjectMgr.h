@@ -497,6 +497,11 @@ struct AcoreString
     std::vector<std::string> Content;
 };
 
+struct QuestGreetingLocale
+{
+    std::vector<std::string> greeting;
+};
+
 typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
 typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContainer;
 typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
@@ -513,6 +518,7 @@ typedef std::unordered_map<uint32, PageTextLocale> PageTextLocaleContainer;
 typedef std::unordered_map<int32, AcoreString> AcoreStringContainer;
 typedef std::unordered_map<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef std::unordered_map<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
+typedef std::unordered_map<uint32, QuestGreetingLocale> QuestGreetingLocaleContainer;
 
 typedef std::multimap<uint32, uint32> QuestRelations;
 typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator> QuestRelationBounds;
@@ -643,6 +649,19 @@ struct QuestPOI
 
 typedef std::vector<QuestPOI> QuestPOIVector;
 typedef std::unordered_map<uint32, QuestPOIVector> QuestPOIContainer;
+
+struct QuestGreeting
+{
+    uint16 greetEmoteType;
+    uint32 greetEmoteDelay;
+    std::string greeting;
+
+    QuestGreeting() : greetEmoteType(0), greetEmoteDelay(0) { }
+    QuestGreeting(uint16 _greetEmoteType, uint32 _greetEmoteDelay, std::string _greeting)
+        : greetEmoteType(_greetEmoteType), greetEmoteDelay(_greetEmoteDelay), greeting(_greeting) { }
+};
+
+typedef std::unordered_map<uint8, std::unordered_map<uint32, QuestGreeting>> QuestGreetingContainer;
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
@@ -821,6 +840,7 @@ public:
     }
 
     [[nodiscard]] GossipText const* GetGossipText(uint32 Text_ID) const;
+    [[nodiscard]] QuestGreeting const* GetQuestGreeting(ObjectGuid guid) const;
 
     [[nodiscard]] AreaTrigger const* GetAreaTrigger(uint32 trigger) const
     {
@@ -1015,6 +1035,7 @@ public:
     void LoadPageTextLocales();
     void LoadGossipMenuItemsLocales();
     void LoadPointOfInterestLocales();
+    void LoadQuestGreetingsLocales();
     void LoadInstanceTemplate();
     void LoadInstanceEncounters();
     void LoadMailLevelRewards();
@@ -1027,6 +1048,7 @@ public:
     void LoadAreaTriggerTeleports();
     void LoadAccessRequirements();
     void LoadQuestAreaTriggers();
+    void LoadQuestGreetings();
     void LoadAreaTriggerScripts();
     void LoadTavernAreaTriggers();
     void LoadGameObjectForQuests();
@@ -1225,6 +1247,12 @@ public:
         if (itr == _pointOfInterestLocaleStore.end()) return nullptr;
         return &itr->second;
     }
+    [[nodiscard]] QuestGreetingLocale const* GetQuestGreetingLocale(uint32 id) const
+    {
+        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(id);
+        if (itr == _questGreetingLocaleStore.end()) return nullptr;
+        return &itr->second;
+    }
     [[nodiscard]] QuestOfferRewardLocale const* GetQuestOfferRewardLocale(uint32 entry) const
     {
         auto itr = _questOfferRewardLocaleStore.find(entry);
@@ -1409,6 +1437,7 @@ private:
     QuestAreaTriggerContainer _questAreaTriggerStore;
     TavernAreaTriggerContainer _tavernAreaTriggerStore;
     GossipTextContainer _gossipTextStore;
+    QuestGreetingContainer _questGreetingStore;
     AreaTriggerContainer _areaTriggerStore;
     AreaTriggerTeleportContainer _areaTriggerTeleportStore;
     AreaTriggerScriptContainer _areaTriggerScriptStore;
@@ -1521,6 +1550,7 @@ private:
     AcoreStringContainer _acoreStringStore;
     GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
     PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
+    QuestGreetingLocaleContainer _questGreetingLocaleStore;
 
     CacheVendorItemContainer _cacheVendorItemStore;
     CacheTrainerSpellContainer _cacheTrainerSpellStore;
