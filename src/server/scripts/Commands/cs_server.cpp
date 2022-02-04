@@ -221,7 +221,10 @@ public:
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
 
-        handler->SendSysMessage("> List enable modules:");
+        if (Acore::Module::GetEnableModulesList().empty())
+            handler->SendSysMessage("No modules enabled");
+        else
+            handler->SendSysMessage("> List enable modules:");
 
         for (auto const& modName : Acore::Module::GetEnableModulesList())
         {
