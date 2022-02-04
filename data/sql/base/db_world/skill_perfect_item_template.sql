@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.skill_perfect_item_template
+-- Дамп структуры для таблица acore_world.skill_perfect_item_template
 DROP TABLE IF EXISTS `skill_perfect_item_template`;
 CREATE TABLE IF NOT EXISTS `skill_perfect_item_template` (
-  `spellId` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
-  `requiredSpecialization` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
+  `spellId` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
+  `requiredSpecialization` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
   `perfectCreateChance` float NOT NULL DEFAULT 0 COMMENT 'chance to create the perfect item instead',
-  `perfectItemType` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'perfect item type to create instead',
+  `perfectItemType` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'perfect item type to create instead',
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Crafting Perfection System';
 
--- Дамп данных таблицы _acore_world.skill_perfect_item_template: 72 rows
+-- Дамп данных таблицы acore_world.skill_perfect_item_template: 72 rows
 DELETE FROM `skill_perfect_item_template`;
 /*!40000 ALTER TABLE `skill_perfect_item_template` DISABLE KEYS */;
 INSERT INTO `skill_perfect_item_template` (`spellId`, `requiredSpecialization`, `perfectCreateChance`, `perfectItemType`) VALUES

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_graveyard
+-- Дамп структуры для таблица acore_world.game_graveyard
 DROP TABLE IF EXISTS `game_graveyard`;
 CREATE TABLE IF NOT EXISTS `game_graveyard` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `game_graveyard` (
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Дамп данных таблицы _acore_world.game_graveyard: ~685 rows (приблизительно)
+-- Дамп данных таблицы acore_world.game_graveyard: ~685 rows (приблизительно)
 DELETE FROM `game_graveyard`;
 /*!40000 ALTER TABLE `game_graveyard` DISABLE KEYS */;
 INSERT INTO `game_graveyard` (`ID`, `Map`, `x`, `y`, `z`, `Comment`) VALUES
