@@ -145,7 +145,7 @@ enum Spells
     SPELL_HUNTER                = 23436,     // bow broke
     SPELL_ROGUE                 = 23414,     // Paralise
     SPELL_DEATH_KNIGHT          = 49576,     // Death Grip
-
+    SPELL_POLYMORPH             = 23603,
     // Totems
     SPELL_CORRUPTED_FIRE_NOVA_TOTEM = 23419,
     SPELL_CORRUPTED_STONESKIN_TOTEM = 23420,
@@ -825,6 +825,63 @@ class spell_class_call_handler : public SpellScript
     }
 };
 
+class aura_wild_magic : public AuraScript
+{
+    PrepareAuraScript(aura_wild_magic);
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        if (!target)
+        {
+            return;
+        }
+
+        target->CastSpell(target, SPELL_POLYMORPH, true);
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(aura_wild_magic::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_class_call_polymorph : public SpellScript
+{
+    PrepareSpellScript(spell_class_call_polymorph);
+
+    std::list<WorldObject*> targetList;
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+            {
+                return target->GetTypeId() != TYPEID_PLAYER || target->ToPlayer()->IsGameMaster() || target->ToPlayer()->HasAura(SPELL_POLYMORPH);
+            });
+
+        if (!targets.empty())
+        {
+            Acore::Containers::RandomResize(targets, 1);
+            targetList.clear();
+            targetList = targets;
+        }
+    }
+
+    void FilterTargetsEff(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+        targets = targetList;
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_polymorph::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_polymorph::FilterTargetsEff, EFFECT_1, TARGET_UNIT_SRC_AREA_ALLY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_polymorph::FilterTargetsEff, EFFECT_2, TARGET_UNIT_SRC_AREA_ALLY);
+    }
+};
+
 class spell_corrupted_totems : public SpellScript
 {
     PrepareSpellScript(spell_corrupted_totems);
@@ -854,5 +911,7 @@ void AddSC_boss_nefarian()
     new boss_nefarian();
     RegisterCreatureAI(npc_corrupted_totem);
     RegisterSpellScript(spell_class_call_handler);
+    RegisterSpellScript(aura_wild_magic);
+    RegisterSpellScript(spell_class_call_polymorph);
     RegisterSpellScript(spell_corrupted_totems);
 }
