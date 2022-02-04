@@ -2486,9 +2486,9 @@ bool GameObject::ValidateGameobjectType()
     }
 }
 
-unsigned short GameObject::GetGameobjectStateAsShort(GOState* state)
+uint8 GameObject::GetGameobjectStateAsShort(GOState* state)
 {
-    unsigned short m_state = 3;
+    uint8 m_state = 3;
 
     if (state)
     {
@@ -2514,7 +2514,7 @@ unsigned short GameObject::GetGameobjectStateAsShort(GOState* state)
     return m_state;
 }
 
-void GameObject::SaveInstanceData(unsigned short state)
+void GameObject::SaveInstanceData(uint8 state)
 {
     uint32 id       = GetInstanceId();
     uint32 guid     = GetSpawnId();
@@ -2522,19 +2522,19 @@ void GameObject::SaveInstanceData(unsigned short state)
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
     stmt->setUInt32(0, id);
     stmt->setUInt32(1, guid);
-    stmt->setUInt32(2, static_cast<uint32>(state));
+    stmt->setUInt8(2, state);
     CharacterDatabase.Execute(stmt);
 
     sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
 }
 
-void GameObject::UpdateInstanceData(unsigned short state)
+void GameObject::UpdateInstanceData(uint8 state)
 {
     uint32 id       = GetInstanceId();
     uint32 guid     = GetSpawnId();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
-    stmt->setUInt32(0, static_cast<uint32>(state));
+    stmt->setUInt8(0, state);
     stmt->setUInt32(1, guid);
     stmt->setUInt32(2, id);
     CharacterDatabase.Execute(stmt);
@@ -2542,7 +2542,7 @@ void GameObject::UpdateInstanceData(unsigned short state)
     sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
 }
 
-unsigned short GameObject::GetStateSavedOnInstance()
+uint8 GameObject::GetStateSavedOnInstance()
 {
     return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }

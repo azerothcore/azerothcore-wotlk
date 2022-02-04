@@ -9643,7 +9643,7 @@ void ObjectMgr::LoadInstanceSavedGameobjectStateData()
     do
     {
         fields = result->Fetch();
-        GameobjectInstanceSavedStateList.push_back({ fields[0].GetUInt32(), fields[1].GetUInt32(), static_cast<unsigned short>(fields[2].GetUInt32()) });
+        GameobjectInstanceSavedStateList.push_back({ fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt8() });
         count++;
     } while (result->NextRow());
 
@@ -9651,7 +9651,7 @@ void ObjectMgr::LoadInstanceSavedGameobjectStateData()
     LOG_INFO("server.loading", " ");
 }
 
-unsigned short ObjectMgr::GetInstanceSavedGameobjectState(uint32 id, uint32 guid)
+uint8 ObjectMgr::GetInstanceSavedGameobjectState(uint32 id, uint32 guid)
 {
     for (auto it = GameobjectInstanceSavedStateList.begin(); it != GameobjectInstanceSavedStateList.end(); it++)
     {
@@ -9675,7 +9675,7 @@ bool ObjectMgr::FindInstanceSavedGameobjectState(uint32 id, uint32 guid)
     return false;
 }
 
-void ObjectMgr::SetInstanceSavedGameobjectState(uint32 id, uint32 guid, unsigned short state)
+void ObjectMgr::SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state)
 {
     for (auto it = GameobjectInstanceSavedStateList.begin(); it != GameobjectInstanceSavedStateList.end(); it++)
     {
@@ -9685,7 +9685,7 @@ void ObjectMgr::SetInstanceSavedGameobjectState(uint32 id, uint32 guid, unsigned
         }
     }
 }
-void ObjectMgr::NewInstanceSavedGameobjectState(uint32 id, uint32 guid, unsigned short state)
+void ObjectMgr::NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state)
 {
     GameobjectInstanceSavedStateList.push_back({ id, guid, state });
 }
