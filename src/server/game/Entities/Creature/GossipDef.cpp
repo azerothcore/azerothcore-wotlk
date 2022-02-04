@@ -311,13 +311,14 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Object* questgiver)
 {
     ObjectGuid guid = questgiver->GetGUID();
     LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
+    std::string strGreeting = "";
 
     WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100);  // guess size
     data << guid;
 
     if (QuestGreeting const* questGreeting = sObjectMgr->GetQuestGreeting(questgiver->GetTypeId(), questgiver->GetEntry()))
     {
-        std::string strGreeting = questGreeting->Text;
+        strGreeting = questGreeting->Text;
 
         LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
         if (localeConstant != LOCALE_enUS)
@@ -330,7 +331,7 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Object* questgiver)
     }
     else
     {
-        data << std::string("");
+        data << strGreeting;
         data << uint32(0);
         data << uint32(0);
     }
