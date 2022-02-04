@@ -355,7 +355,7 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
                 {
                     strGreeting = gossiptext->Options[0].Text_0;
 
-                    int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                    int8 loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                         if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
                             ObjectMgr::GetLocaleString(nl->Text_0[0], loc_idx, strGreeting);
@@ -364,7 +364,7 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
                 {
                     strGreeting = gossiptext->Options[0].Text_1;
 
-                    int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                    int8 loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                         if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
                             ObjectMgr::GetLocaleString(nl->Text_1[0], loc_idx, strGreeting);
