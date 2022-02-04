@@ -6160,8 +6160,8 @@ void ObjectMgr::LoadQuestGreetings()
     {
         Field* fields = result->Fetch();
 
-        uint32 id = fields[0].GetUInt32();
-        uint8 type = fields[1].GetUInt8();
+        uint32 id = fields[0].Get<uint32>();
+        uint8 type = fields[1].Get<uint32>();
         switch (type)
         {
         case 0: // Creature
@@ -6182,9 +6182,9 @@ void ObjectMgr::LoadQuestGreetings()
             continue;
         }
 
-        uint16 greetEmoteType = fields[2].GetUInt16();
-        uint32 greetEmoteDelay = fields[3].GetUInt32();
-        std::string greeting = fields[4].GetString();
+        uint16 greetEmoteType = fields[2].Get<uint16>();
+        uint32 greetEmoteDelay = fields[3].Get<uint32>();
+        std::string greeting = fields[4].Get<std::string>();
 
         _questGreetingStore[type].emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(greetEmoteType, greetEmoteDelay, std::move(greeting)));
 
@@ -6215,8 +6215,8 @@ void ObjectMgr::LoadQuestGreetingsLocales()
     {
         Field* fields = result->Fetch();
 
-        uint32 id = fields[0].GetUInt32();
-        uint8 type = fields[1].GetUInt8();
+        uint32 id = fields[0].Get<uint32>();
+        uint8 type = fields[1].Get<uint8>();
         switch (type)
         {
         case 0: // Creature
@@ -6237,14 +6237,14 @@ void ObjectMgr::LoadQuestGreetingsLocales()
             continue;
         }
 
-        std::string localeName = fields[2].GetString();
+        std::string localeName = fields[2].Get<std::string>();
 
         LocaleConstant locale = GetLocaleByName(localeName);
         if (locale == LOCALE_enUS)
             continue;
 
         QuestGreetingLocale& data = _questGreetingLocaleStore[type][id];
-        AddLocaleString(fields[3].GetString(), locale, data.Greeting);
+        AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
         ++count;
     } while (result->NextRow());
 
