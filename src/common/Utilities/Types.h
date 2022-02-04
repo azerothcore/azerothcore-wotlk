@@ -18,6 +18,8 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
+#include <type_traits>
+
 namespace Acore
 {
     // end "iterator" tag for find_type_if
