@@ -331,9 +331,9 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
     }
     else
     {
-        QEmote qe;
-        qe._Delay = 0;
-        qe._Emote = 0;
+        QEmote qEmote;
+        qEmote._Delay = 0;
+        qEmote._Emote = 0;
 
         // need pet case for some quests
         Creature* creature = questgiver->ToCreature();
@@ -343,13 +343,13 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
             GossipText const* gossiptext = sObjectMgr->GetGossipText(textid);
             if (!gossiptext)
             {
-                qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
-                qe._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
+                qEmote._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
+                qEmote._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
                 strGreeting = "";
             }
             else
             {
-                qe = gossiptext->Options[0].Emotes[0];
+                qEmote = gossiptext->Options[0].Emotes[0];
 
                 if (!gossiptext->Options[0].Text_0.empty())
                 {
@@ -373,8 +373,8 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
         }
 
         data << strGreeting;
-        data << uint32(qe._Delay);
-        data << uint32(qe._Emote);
+        data << uint32(qEmote._Delay);
+        data << uint32(qEmote._Emote);
     }
 
     size_t count_pos = data.wpos();
