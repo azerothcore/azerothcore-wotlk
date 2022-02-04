@@ -126,7 +126,7 @@ enum Spells
     SPELL_SHADOWFLAME_INITIAL   = 22992,
     SPELL_SHADOWFLAME           = 22539,
     SPELL_BELLOWINGROAR         = 22686,
-    SPELL_VEILOFSHADOW          = 7068,
+    SPELL_VEILOFSHADOW          = 22687,
     SPELL_CLEAVE                = 20691,
     SPELL_TAILLASH              = 23364,
 
@@ -139,12 +139,14 @@ enum Spells
     SPELL_WARLOCK               = 23427,     // infernals
     SPELL_HUNTER                = 23436,     // bow broke
     SPELL_ROGUE                 = 23414,     // Paralise
-    SPELL_DEATH_KNIGHT          = 49576      // Death Grip
+    SPELL_DEATH_KNIGHT          = 49576,     // Death Grip
 
-                                  // 19484
-                                  // 22664
-                                  // 22674
-                                  // 22666
+    // Totems
+    SPELL_CORRUPTED_FIRE_NOVA_TOTEM = 23419,
+    SPELL_CORRUPTED_STONESKIN_TOTEM = 23420,
+    SPELL_CORRUPTED_HEALING_TOTEM   = 23422,
+    SPELL_CORRUPTED_WINDFURY_TOTEM  = 23423
+
 };
 
 Position const DrakeSpawnLoc[2] = // drakonid
@@ -436,7 +438,7 @@ public:
             events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
             events.ScheduleEvent(EVENT_VEILOFSHADOW, urand(25000, 35000));
             events.ScheduleEvent(EVENT_CLEAVE, 7000);
-            //events.ScheduleEvent(EVENT_TAILLASH, 10000);
+            events.ScheduleEvent(EVENT_TAILLASH, 10000);
             events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
             Talk(SAY_RANDOM);
         }
@@ -522,50 +524,52 @@ public:
                         break;
                     case EVENT_CLASSCALL:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                            switch (target->getClass())
                         {
-                            case CLASS_MAGE:
-                                Talk(SAY_MAGE);
-                                DoCast(me, SPELL_MAGE);
-                                break;
-                            case CLASS_WARRIOR:
-                                Talk(SAY_WARRIOR);
-                                DoCast(me, SPELL_WARRIOR);
-                                break;
-                            case CLASS_DRUID:
-                                Talk(SAY_DRUID);
-                                DoCast(target, SPELL_DRUID);
-                                break;
-                            case CLASS_PRIEST:
-                                Talk(SAY_PRIEST);
-                                DoCast(me, SPELL_PRIEST);
-                                break;
-                            case CLASS_PALADIN:
-                                Talk(SAY_PALADIN);
-                                DoCast(me, SPELL_PALADIN);
-                                break;
-                            case CLASS_SHAMAN:
-                                Talk(SAY_SHAMAN);
-                                DoCast(me, SPELL_SHAMAN);
-                                break;
-                            case CLASS_WARLOCK:
-                                Talk(SAY_WARLOCK);
-                                DoCast(me, SPELL_WARLOCK);
-                                break;
-                            case CLASS_HUNTER:
-                                Talk(SAY_HUNTER);
-                                DoCast(me, SPELL_HUNTER);
-                                break;
-                            case CLASS_ROGUE:
-                                Talk(SAY_ROGUE);
-                                DoCast(me, SPELL_ROGUE);
-                                break;
-                            case CLASS_DEATH_KNIGHT:
-                                Talk(SAY_DEATH_KNIGHT);
-                                DoCast(me, SPELL_DEATH_KNIGHT);
-                                break;
-                            default:
-                                break;
+                            switch (target->getClass())
+                            {
+                                case CLASS_MAGE:
+                                    Talk(SAY_MAGE);
+                                    DoCast(me, SPELL_MAGE);
+                                    break;
+                                case CLASS_WARRIOR:
+                                    Talk(SAY_WARRIOR);
+                                    DoCast(me, SPELL_WARRIOR);
+                                    break;
+                                case CLASS_DRUID:
+                                    Talk(SAY_DRUID);
+                                    DoCast(target, SPELL_DRUID);
+                                    break;
+                                case CLASS_PRIEST:
+                                    Talk(SAY_PRIEST);
+                                    DoCast(me, SPELL_PRIEST);
+                                    break;
+                                case CLASS_PALADIN:
+                                    Talk(SAY_PALADIN);
+                                    DoCast(me, SPELL_PALADIN);
+                                    break;
+                                case CLASS_SHAMAN:
+                                    Talk(SAY_SHAMAN);
+                                    DoCast(me, SPELL_SHAMAN);
+                                    break;
+                                case CLASS_WARLOCK:
+                                    Talk(SAY_WARLOCK);
+                                    DoCast(me, SPELL_WARLOCK);
+                                    break;
+                                case CLASS_HUNTER:
+                                    Talk(SAY_HUNTER);
+                                    DoCast(me, SPELL_HUNTER);
+                                    break;
+                                case CLASS_ROGUE:
+                                    Talk(SAY_ROGUE);
+                                    DoCast(me, SPELL_ROGUE);
+                                    break;
+                                case CLASS_DEATH_KNIGHT:
+                                    Talk(SAY_DEATH_KNIGHT);
+                                    DoCast(me, SPELL_DEATH_KNIGHT);
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                         events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
                         break;
@@ -609,8 +613,78 @@ public:
     }
 };
 
+std::unordered_map<uint32, uint8> const classCallSpells =
+{
+    { SPELL_MAGE, CLASS_MAGE },
+    { SPELL_WARRIOR, CLASS_WARRIOR },
+    { SPELL_DRUID, CLASS_DRUID },
+    { SPELL_PRIEST, CLASS_PRIEST },
+    { SPELL_PALADIN, CLASS_PALADIN },
+    { SPELL_SHAMAN, CLASS_SHAMAN },
+    { SPELL_WARLOCK, CLASS_WARLOCK },
+    { SPELL_HUNTER, CLASS_HUNTER },
+    { SPELL_ROGUE, CLASS_ROGUE }
+};
+
+class spell_class_call_handler : public SpellScript
+{
+    PrepareSpellScript(spell_class_call_handler);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (SpellInfo const* spellInfo = GetSpellInfo())
+        {
+            targets.remove_if([spellInfo](WorldObject const* target) -> bool
+                {
+                    if (!target->ToPlayer())
+                    {
+                        return true;
+                    }
+
+                    auto it = classCallSpells.find(spellInfo->Id);
+                    if (it != classCallSpells.end()) // should never happen but only to be sure.
+                    {
+                        return target->ToPlayer()->getClass() != it->second;
+                    }
+
+                    return false;
+                });
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_handler::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+class spell_corrupted_totems : public SpellScript
+{
+    PrepareSpellScript(spell_corrupted_totems);
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (!GetCaster())
+        {
+            return;
+        }
+
+        std::list<uint32> spellList = { SPELL_CORRUPTED_FIRE_NOVA_TOTEM, SPELL_CORRUPTED_HEALING_TOTEM, SPELL_CORRUPTED_STONESKIN_TOTEM, SPELL_CORRUPTED_WINDFURY_TOTEM };
+        uint32 spellId = Acore::Containers::SelectRandomContainerElement(spellList);
+        GetCaster()->CastSpell(GetCaster(), spellId);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_corrupted_totems::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_nefarian()
 {
     new boss_victor_nefarius();
     new boss_nefarian();
+    RegisterSpellScript(spell_class_call_handler);
+    RegisterSpellScript(spell_corrupted_totems);
 }
