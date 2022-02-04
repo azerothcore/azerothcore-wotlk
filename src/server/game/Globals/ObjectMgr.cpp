@@ -6229,7 +6229,6 @@ void ObjectMgr::LoadQuestGreetingsLocales()
     LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", uint32(_questGreetingLocaleStore.size()), GetMSTimeDiffToNow(oldMSTime));
 }
 
-
 void ObjectMgr::LoadQuestOfferRewardLocale()
 {
     uint32 oldMSTime = getMSTime();
