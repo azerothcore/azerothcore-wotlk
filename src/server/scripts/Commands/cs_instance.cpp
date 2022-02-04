@@ -44,10 +44,10 @@ public:
     {
         static ChatCommandTable instanceCommandTable =
         {
-            { "listbinds",    HandleInstanceListBindsCommand,    SEC_MODERATOR,     Console::No },
-            { "unbind",       HandleInstanceUnbindCommand,       SEC_GAMEMASTER,    Console::No },
+            { "listbinds",    HandleInstanceListBindsCommand,    SEC_MODERATOR,     Console::No  },
+            { "unbind",       HandleInstanceUnbindCommand,       SEC_GAMEMASTER,    Console::Yes },
             { "stats",        HandleInstanceStatsCommand,        SEC_MODERATOR,     Console::Yes },
-            { "savedata",     HandleInstanceSaveDataCommand,     SEC_ADMINISTRATOR, Console::No },
+            { "savedata",     HandleInstanceSaveDataCommand,     SEC_ADMINISTRATOR, Console::No  },
             { "setbossstate", HandleInstanceSetBossStateCommand, SEC_GAMEMASTER,    Console::Yes },
             { "getbossstate", HandleInstanceGetBossStateCommand, SEC_MODERATOR,     Console::Yes },
         };
@@ -87,11 +87,18 @@ public:
         return true;
     }
 
-    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Variant<uint16, EXACT_SEQUENCE("all")> mapArg, Optional<uint8> difficultyArg)
+    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Variant<uint16, EXACT_SEQUENCE("all")> mapArg, Optional<PlayerIdentifier> player, Optional<uint8> difficultyArg)
     {
-        Player* player = handler->getSelectedPlayer();
+        // Character name must be provided when using this from console.
+        if (!player && !handler->GetSession())
+        {
+            handler->PSendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (!player)
-            player = handler->GetSession()->GetPlayer();
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
 
         uint16 counter = 0;
         uint16 mapId = 0;
@@ -109,13 +116,13 @@ public:
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
             {
                 InstanceSave const* save = itr->second.save;
-                if (itr->first != player->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
+                if (itr->first != player->GetConnectedPlayer()->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                     uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
                     std::string timeleft = secsToTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
-                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);
+                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player->GetConnectedPlayer());
                     itr = m_boundInstances.begin();
                     counter++;
                 }
