@@ -18,6 +18,7 @@
 #include "GossipDef.h"
 #include "Formulas.h"
 #include "ObjectMgr.h"
+#include "Object.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "QuestDef.h"
