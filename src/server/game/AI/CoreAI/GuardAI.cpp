@@ -37,7 +37,7 @@ void GuardAI::Reset()
     me->CastSpell(me, 18950 /*SPELL_INVISIBILITY_AND_STEALTH_DETECTION*/, true);
 }
 
-void GuardAI::EnterEvadeMode()
+void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     if (!me->IsAlive())
     {

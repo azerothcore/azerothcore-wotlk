@@ -31,7 +31,7 @@ public:
 
     void MoveInLineOfSight(Unit* who) override;
     void AttackStart(Unit* victim) override;
-    void EnterEvadeMode() override;
+    void EnterEvadeMode(EvadeReason /*why*/) override;
     void SpellHit(Unit* /*caster*/, const SpellInfo* /*spellInfo*/) override;
     void DoAction(int32 param) override;
 
