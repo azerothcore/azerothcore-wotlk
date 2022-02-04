@@ -24,6 +24,17 @@
 // this namespace holds implementations of upcoming stdlib features that our c++ version doesn't have yet
 namespace advstd
 {
+    // This workaround is needed for GCC 8 as it doesn't recognize std::type_identity in C++20...
+    // C++20 std::type_identity
+    template <typename T>
+    struct type_identity
+    {
+        using type = T;
+    };
+
+    // C++20 std::type_identity_t
+    template <typename T>
+    using type_identity_t = typename type_identity<T>::type;
 }
 
 #endif // _ADV_STD_H_
