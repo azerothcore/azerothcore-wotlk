@@ -148,8 +148,52 @@ void Player::SendPreparedQuest(WorldObject* source)
             }
         }
     }
+    // multiple entries
+    else
+    {
+        QEmote qe;
+        qe._Delay = 0;
+        qe._Emote = 0;
+        std::string title = "";
 
-    PlayerTalkClass->SendQuestGiverQuestListMessage(this, source);
+        // need pet case for some quests
+        Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, source->GetGUID());
+        if (creature)
+        {
+            uint32 textid = GetGossipTextId(creature);
+            GossipText const* gossiptext = sObjectMgr->GetGossipText(textid);
+            if (!gossiptext)
+            {
+                qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
+                qe._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
+                title = "";
+            }
+            else
+            {
+                qe = gossiptext->Options[0].Emotes[0];
+                LocaleConstant localeConstant = GetSession()->GetSessionDbLocaleIndex();
+
+                if (!gossiptext->Options[0].Text_0.empty())
+                {
+                    title = gossiptext->Options[0].Text_0;
+
+                    if (localeConstant != LOCALE_enUS)
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_0[0], localeConstant, title);
+                }
+                else
+                {
+                    title = gossiptext->Options[0].Text_1;
+
+                    if (localeConstant != LOCALE_enUS)
+                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_1[0], localeConstant, title);
+                }
+            }
+        }
+
+        PlayerTalkClass->SendQuestGiverQuestList(qe, title, source);
+    }
 }
 
 bool Player::IsActiveQuest(uint32 quest_id) const

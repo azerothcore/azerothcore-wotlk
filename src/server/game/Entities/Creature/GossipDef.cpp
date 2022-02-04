@@ -307,20 +307,18 @@ void QuestMenu::ClearMenu()
     _questMenuItems.clear();
 }
 
-void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiver)
+void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, Object* questgiver)
 {
     ObjectGuid guid = questgiver->GetGUID();
     LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
-    std::string strGreeting = "";
 
     WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100);  // guess size
     data << guid;
 
     if (QuestGreeting const* questGreeting = sObjectMgr->GetQuestGreeting(questgiver->GetTypeId(), questgiver->GetEntry()))
     {
-        strGreeting = questGreeting->Text;
+        std::string strGreeting = questGreeting->Text;
 
-        LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
         if (localeConstant != LOCALE_enUS)
             if (QuestGreetingLocale const* questGreetingLocale = sObjectMgr->GetQuestGreetingLocale(questgiver->GetTypeId(), questgiver->GetEntry()))
                 ObjectMgr::GetLocaleString(questGreetingLocale->Greeting, localeConstant, strGreeting);
@@ -331,50 +329,9 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiv
     }
     else
     {
-        QEmote qEmote;
-        qEmote._Delay = 0;
-        qEmote._Emote = 0;
-
-        // need pet case for some quests
-        Creature* creature = questgiver->ToCreature();
-        if (creature)
-        {
-            uint32 textid = player->GetGossipTextId(creature);
-            GossipText const* gossiptext = sObjectMgr->GetGossipText(textid);
-            if (!gossiptext)
-            {
-                qEmote._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
-                qEmote._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
-                strGreeting = "";
-            }
-            else
-            {
-                qEmote = gossiptext->Options[0].Emotes[0];
-
-                if (!gossiptext->Options[0].Text_0.empty())
-                {
-                    strGreeting = gossiptext->Options[0].Text_0;
-
-                    LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
-                    if (localeConstant != LOCALE_enUS)
-                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(npcTextLocale->Text_0[0], localeConstant, strGreeting);
-                }
-                else
-                {
-                    strGreeting = gossiptext->Options[0].Text_1;
-
-                    LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
-                    if (localeConstant != LOCALE_enUS)
-                        if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(npcTextLocale->Text_1[0], localeConstant, strGreeting);
-                }
-            }
-        }
-
-        data << strGreeting;
-        data << uint32(qEmote._Delay);
-        data << uint32(qEmote._Emote);
+        data << Title;
+        data << uint32(eEmote._Delay);                         // player emote
+        data << uint32(eEmote._Emote);                         // NPC emote
     }
 
     size_t count_pos = data.wpos();
