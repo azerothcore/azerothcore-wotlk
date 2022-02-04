@@ -328,6 +328,12 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Object* questgiver)
         data << uint32(questGreeting->EmoteDelay);
         data << uint32(questGreeting->EmoteType);
     }
+    else
+    {
+        data << std::string("");
+        data << uint32(0);
+        data << uint32(0);
+    }
 
     size_t count_pos = data.wpos();
     data << uint8(0);
