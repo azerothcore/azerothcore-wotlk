@@ -87,7 +87,7 @@ public:
         return true;
     }
 
-    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Variant<uint16, EXACT_SEQUENCE("all")> mapArg, Optional<PlayerIdentifier> player, Optional<uint8> difficultyArg)
+    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, Variant<uint16, EXACT_SEQUENCE("all")> mapArg, Optional<uint8> difficultyArg)
     {
         // Character name must be provided when using this from console.
         if (!player && !handler->GetSession())
