@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "Duration.h"
+#include "Optional.h"
 #include "SQLOperation.h"
 #include <future>
 #include <tuple>
@@ -60,12 +61,7 @@ struct PreparedStatementData
     template<typename T>
     static std::string ToString(T value);
 
-    static std::string ToString(bool value);
-    static std::string ToString(uint8 value);
-    static std::string ToString(int8 value);
-    static std::string ToString(std::string const& value);
-    static std::string ToString(std::vector<uint8> const& value);
-    static std::string ToString(std::nullptr_t);
+    static std::string ToString(std::nullptr_t /*value*/);
 };
 
 //- Upper-level class that is used in code
@@ -76,28 +72,6 @@ friend class PreparedStatementTask;
 public:
     explicit PreparedStatementBase(uint32 index, uint8 capacity);
     virtual ~PreparedStatementBase();
-
-    void setNull(const uint8 index);
-    void setBool(const uint8 index, const bool value);
-    void setUInt8(const uint8 index, const uint8 value);
-    void setUInt16(const uint8 index, const uint16 value);
-    void setUInt32(const uint8 index, const uint32 value);
-    void setUInt64(const uint8 index, const uint64 value);
-    void setInt8(const uint8 index, const int8 value);
-    void setInt16(const uint8 index, const int16 value);
-    void setInt32(const uint8 index, const int32 value);
-    void setInt64(const uint8 index, const int64 value);
-    void setFloat(const uint8 index, const float value);
-    void setDouble(const uint8 index, const double value);
-    void setString(const uint8 index, const std::string& value);
-    void setStringView(const uint8 index, const std::string_view value);
-    void setBinary(const uint8 index, const std::vector<uint8>& value);
-    template <size_t Size>
-    void setBinary(const uint8 index, std::array<uint8, Size> const& value)
-    {
-        std::vector<uint8> vec(value.begin(), value.end());
-        setBinary(index, vec);
-    }
 
     // Set numerlic and default binary
     template<typename T>
