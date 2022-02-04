@@ -1370,7 +1370,7 @@ public:
     int32 GetQuestLevel(Quest const* quest) const { return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : getLevel(); }
 
     void PrepareQuestMenu(ObjectGuid guid);
-    void SendPreparedQuest(ObjectGuid guid);
+    void SendPreparedQuest(WorldObject* source);
     [[nodiscard]] bool IsActiveQuest(uint32 quest_id) const;
     Quest const* GetNextQuest(ObjectGuid guid, Quest const* quest);
     bool CanSeeStartQuest(Quest const* quest);
