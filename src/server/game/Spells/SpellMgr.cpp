@@ -31,6 +31,7 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -3403,6 +3404,8 @@ void SpellMgr::LoadSpellCustomAttr()
             }
         }
        spellInfo->_InitializeExplicitTargetMask();
+
+       sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
