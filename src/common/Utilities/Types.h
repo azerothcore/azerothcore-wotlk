@@ -35,7 +35,7 @@ namespace Acore
     };
 
     template<template<typename...> typename Check, typename T1, typename... Ts>
-    struct find_type_if<Check, T1, Ts...> : std::conditional_t<Check<T1>::value, std::type_identity<T1>, find_type_if<Check, Ts...>>
+    struct find_type_if<Check, T1, Ts...> : std::conditional_t<Check<T1>::value, std::type_identity_t<T1>, find_type_if<Check, Ts...>>
     {
     };
 
