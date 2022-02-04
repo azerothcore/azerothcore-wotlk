@@ -299,7 +299,7 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     {
         // MDic - acidmanifesto: This is needed due to the Unit::DealDamage firing off immediately after the worldpacket which nerfs out additional spell animations
         // The delay of half a second ensures the spell animations which are typically 0.4 seconds long have enough time to fire off
-        //std::this_thread::sleep_for(500ms);
+        std::this_thread::sleep_for(500ms);
 
         Unit::DealDamage(m_caster, unitTarget, unitTarget->GetHealth(), nullptr, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
     });
