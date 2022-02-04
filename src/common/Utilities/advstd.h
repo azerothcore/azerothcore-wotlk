@@ -25,6 +25,7 @@
 namespace advstd
 {
     // This workaround is needed for GCC 8 as it doesn't recognize std::type_identity in C++20...
+    // Remove when we drop GCC 8 support. https://en.cppreference.com/w/cpp/compiler_support/20
     // C++20 std::type_identity
     template <typename T>
     struct type_identity
