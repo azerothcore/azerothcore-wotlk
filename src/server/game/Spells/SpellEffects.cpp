@@ -295,7 +295,7 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     data << uint32(m_spellInfo->Id);
     m_caster->SendMessageToSet(&data, true);
 
-    sAsyncCallbackMgr->AddAsyncCallback([this]()
+    sAsyncCallbackMgr->AddAsyncCallback([m_caster = m_caster, unitTarget = unitTarget]()
     {
         // MDic - acidmanifesto: This is needed due to the Unit::DealDamage firing off immediately after the worldpacket which nerfs out additional spell animations
         // The delay of half a second ensures the spell animations which are typically 0.4 seconds long have enough time to fire off
