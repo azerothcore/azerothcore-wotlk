@@ -2476,9 +2476,6 @@ private:
     [[nodiscard]] float GetCombatRatingReduction(CombatRating cr) const;
     [[nodiscard]] uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;
 
-    // Async
-    static void AsyncKill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr);
-
 protected:
     void SetFeared(bool apply);
     void SetConfused(bool apply);

@@ -36,7 +36,7 @@ bool Acore::Async::AsyncCallback::InvokeIfReady()
 
 Acore::Async::AsyncCallback& Acore::Async::AsyncCallbackMgr::AddAsyncCallback(std::function<void()> execute)
 {
-    return _asyncCallbacks.AddCallback(AsyncCallback(std::move(std::async(std::launch::async, std::move(execute)))));
+    return _asyncCallbacks.AddCallback(AsyncCallback(std::async(std::launch::async, std::move(execute))));
 }
 
 void Acore::Async::AsyncCallbackMgr::ProcessReadyCallbacks()

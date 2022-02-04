@@ -979,7 +979,14 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         //if (attacker && victim->GetTypeId() == TYPEID_PLAYER && victim != attacker)
         //victim->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health); // pussywizard: optimization
 
-        sAsyncCallbackMgr->AddAsyncCallback(std::bind(&Unit::AsyncKill, attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto));
+        sAsyncCallbackMgr->AddAsyncCallback([attacker, victim, durabilityLoss, cleanDamage, spellProto]()
+        {
+            // Pussywarlock Elite MDic - Unit death not showing full spell animation.
+            // This delay of 400ms provides that opportunity for it to not be nerfed.
+            std::this_thread::sleep_for(400ms);
+
+            Unit::Kill(attacker, victim, durabilityLoss, cleanDamage ? cleanDamage->attackType : BASE_ATTACK, spellProto);
+        });
     }
     else
     {
@@ -17395,15 +17402,6 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
                 sScriptMgr->OnPlayerKilledByCreature(killerCre, killed);
         }
     }
-}
-
-void Unit::AsyncKill(Unit* killer, Unit* victim, bool durabilityLoss /*= true*/, WeaponAttackType attackType /*= BASE_ATTACK*/, SpellInfo const* spellProto /*= nullptr*/)
-{
-    // Pussywarlock Elite MDic - Unit death not showing full spell animation.
-    // This delay of 400ms provides that opportunity for it to not be nerfed.
-    std::this_thread::sleep_for(400ms);
-
-    Unit::Kill(killer, victim, durabilityLoss, attackType, spellProto);
 }
 
 void Unit::SetControlled(bool apply, UnitState state)

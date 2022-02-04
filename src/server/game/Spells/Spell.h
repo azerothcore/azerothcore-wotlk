@@ -782,10 +782,6 @@ public:
     double rand_norm()                      { return m_caster->GetMap()->mtRand.randExc(); }
     double rand_chance()                    { return m_caster->GetMap()->mtRand.randExc(100.0); }
 #endif
-
-private:
-    // Async
-    void AsyncEffectInstaKill();
 };
 
 namespace Acore
