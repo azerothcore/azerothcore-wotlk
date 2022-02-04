@@ -275,7 +275,7 @@ public:
     /*********************************************************/
     void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const;
 
-    void SendQuestGiverQuestListMessage(Object* questgiver);
+    void SendQuestGiverQuestListMessage(Player* player, Object* questgiver);
 
     void SendQuestQueryResponse(Quest const* quest) const;
     void SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool activateAccept) const;

@@ -307,7 +307,7 @@ void QuestMenu::ClearMenu()
     _questMenuItems.clear();
 }
 
-void PlayerMenu::SendQuestGiverQuestListMessage(Object* questgiver)
+void PlayerMenu::SendQuestGiverQuestListMessage(Player* player, Object* questgiver)
 {
     ObjectGuid guid = questgiver->GetGUID();
     LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
@@ -331,9 +331,50 @@ void PlayerMenu::SendQuestGiverQuestListMessage(Object* questgiver)
     }
     else
     {
+        QEmote qe;
+        qe._Delay = 0;
+        qe._Emote = 0;
+
+        // need pet case for some quests
+        Creature* creature = questgiver->ToCreature();
+        if (creature)
+        {
+            uint32 textid = player->GetGossipTextId(creature);
+            GossipText const* gossiptext = sObjectMgr->GetGossipText(textid);
+            if (!gossiptext)
+            {
+                qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
+                qe._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
+                strGreeting = "";
+            }
+            else
+            {
+                qe = gossiptext->Options[0].Emotes[0];
+
+                if (!gossiptext->Options[0].Text_0.empty())
+                {
+                    strGreeting = gossiptext->Options[0].Text_0;
+
+                    int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                    if (loc_idx >= 0)
+                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(nl->Text_0[0], loc_idx, strGreeting);
+                }
+                else
+                {
+                    strGreeting = gossiptext->Options[0].Text_1;
+
+                    int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                    if (loc_idx >= 0)
+                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(nl->Text_1[0], loc_idx, strGreeting);
+                }
+            }
+        }
+
         data << strGreeting;
-        data << uint32(0);
-        data << uint32(0);
+        data << uint32(qe._Delay);
+        data << uint32(qe._Emote);
     }
 
     size_t count_pos = data.wpos();

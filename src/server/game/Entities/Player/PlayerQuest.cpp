@@ -149,7 +149,7 @@ void Player::SendPreparedQuest(WorldObject* source)
         }
     }
 
-    PlayerTalkClass->SendQuestGiverQuestListMessage(source);
+    PlayerTalkClass->SendQuestGiverQuestListMessage(this, source);
 }
 
 bool Player::IsActiveQuest(uint32 quest_id) const
