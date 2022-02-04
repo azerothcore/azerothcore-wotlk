@@ -23,7 +23,6 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Util.h"
-#include "advstd.h"
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <cmath>
@@ -204,7 +203,7 @@ namespace Acore::ChatCommands
     struct Hyperlink : Acore::Impl::ChatCommands::ContainerTag
     {
         using value_type = typename linktag::value_type;
-        using storage_type = advstd::remove_cvref_t<value_type>;
+        using storage_type = std::remove_cvref_t<value_type>;
 
         operator value_type() const { return val; }
         value_type operator*() const { return val; }

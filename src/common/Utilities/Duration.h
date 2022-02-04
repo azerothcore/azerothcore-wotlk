@@ -32,24 +32,24 @@ using Seconds = std::chrono::seconds;
 /// Minutes shorthand typedef.
 using Minutes = std::chrono::minutes;
 
-// Fix GCC for C++20
+/// Hours shorthand typedef.
+using Hours = std::chrono::hours;
+
+// Workaround for GCC and Clang 10 in C++20
 #if defined(__GNUC__) && (!defined(__clang__) || (__clang_major__ == 10))
-/// days
+/// Days shorthand typedef.
 using Days = std::chrono::duration<__INT64_TYPE__, std::ratio<86400>>;
 
-/// weeks
+/// Weeks shorthand typedef.
 using Weeks = std::chrono::duration<__INT64_TYPE__, std::ratio<604800>>;
 
-/// years
+/// Years shorthand typedef.
 using Years = std::chrono::duration<__INT64_TYPE__, std::ratio<31556952>>;
 
-/// months
+/// Months shorthand typedef.
 using Months = std::chrono::duration<__INT64_TYPE__, std::ratio<2629746>>;
 
 #else
-
-/// Hours shorthand typedef.
-using Hours = std::chrono::hours;
 
 /// Days shorthand typedef.
 using Days = std::chrono::days;
