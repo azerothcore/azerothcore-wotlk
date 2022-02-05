@@ -820,9 +820,34 @@ class spell_class_call_handler : public SpellScript
         }
     }
 
+    void HandleOnHitRogue()
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+
+        if (!caster || !target)
+        {
+            return;
+        }
+
+        float angle = rand_norm() * 2 * M_PI;
+        Position tp = caster->GetPosition();
+        tp.m_positionX += std::cos(angle) * 5.f;
+        tp.m_positionY += std::sin(angle) * 5.f;
+        float z = tp.m_positionZ + 0.5f;
+        caster->UpdateAllowedPositionZ(tp.GetPositionX(), tp.GetPositionY(), z);
+        target->NearTeleportTo(tp.GetPositionX(), tp.GetPositionY(), z, angle - M_PI);
+        target->UpdatePositionData();
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_handler::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+
+        if (m_scriptSpellId == SPELL_ROGUE)
+        {
+            OnHit += SpellHitFn(spell_class_call_handler::HandleOnHitRogue);
+        }
     }
 };
 
