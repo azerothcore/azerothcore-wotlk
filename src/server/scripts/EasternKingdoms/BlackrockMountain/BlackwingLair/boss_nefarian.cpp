@@ -22,6 +22,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SpellScript.h"
 #include "TemporarySummon.h"
 #include "blackwing_lair.h"
 #include "TaskScheduler.h"
@@ -419,7 +420,6 @@ public:
         return GetBlackwingLairAI<boss_victor_nefariusAI>(creature);
     }
 };
-
 
 struct boss_nefarian : public BossAI
 {
