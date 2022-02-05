@@ -52,7 +52,6 @@ int32 ReputationMgr::ReputationRankToStanding(ReputationRank rank)
     return std::max(standing - 1, Reputation_Bottom);
 }
 
-
 bool ReputationMgr::IsAtWar(uint32 faction_id) const
 {
     FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
