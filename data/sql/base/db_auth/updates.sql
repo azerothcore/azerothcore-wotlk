@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.updates
+-- Дамп структуры для таблица acore_auth.updates
 DROP TABLE IF EXISTS `updates`;
 CREATE TABLE IF NOT EXISTS `updates` (
   `name` varchar(200) NOT NULL COMMENT 'filename with extension of the update.',
   `hash` char(40) DEFAULT '' COMMENT 'sha1 hash of the sql file.',
-  `state` enum('RELEASED','ARCHIVED','CUSTOM') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
+  `state` enum('RELEASED','CUSTOM','MODULE','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if an update is released or archived.',
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'timestamp when the query was applied.',
   `speed` INT unsigned NOT NULL DEFAULT 0 COMMENT 'time the query takes to apply in ms.',
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='List of all applied updates in this database.';
 
--- Дамп данных таблицы _acore_auth.updates: 26 rows
+-- Дамп данных таблицы acore_auth.updates: 29 rows
 DELETE FROM `updates`;
 /*!40000 ALTER TABLE `updates` DISABLE KEYS */;
 INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
@@ -52,7 +52,9 @@ INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 	('2019_02_08_00.sql', '18FF48FC1B1C238D44198FA1E2D422BAB4C9C338', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 	('2019_02_17_00.sql', '1F4C4A15313A261088E40909DCCAA068EAAAAAAE', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 	('2020_02_07_00.sql', '9549BF7354B4FA5A661EC094A2C3AAF665678152', 'ARCHIVED', '2021-10-14 04:13:44', 1),
-	('2021_10_14_00.sql', 'D4378AFC454DF8351A6DE6C6B6144F82C62980A5', 'ARCHIVED', '2021-10-14 21:59:33', 53);
+	('2021_10_14_00.sql', 'D4378AFC454DF8351A6DE6C6B6144F82C62980A5', 'ARCHIVED', '2021-10-14 21:59:33', 53),
+	('2021_10_14_01_auth.sql', 'A4495131ADD2AB4AB6682C1621683963247368F0', 'ARCHIVED', '2022-01-21 23:36:20', 20),
+	('2021_11_06_00.sql', 'E08D11C492289879C460BB063457DAD968545752', 'ARCHIVED', '2022-01-21 23:36:20', 39);
 /*!40000 ALTER TABLE `updates` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

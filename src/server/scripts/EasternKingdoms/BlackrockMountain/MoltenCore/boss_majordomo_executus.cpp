@@ -247,8 +247,8 @@ public:
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
             events.ScheduleEvent(EVENT_SHIELD_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 25000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 15000, PHASE_COMBAT, PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -355,7 +355,7 @@ public:
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
                                 }
 
-                                events.RepeatEvent(15000);
+                                events.RepeatEvent(30000);
                                 break;
                             }
                             case EVENT_TELEPORT_TARGET:

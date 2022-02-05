@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.item_loot_storage
+-- Дамп структуры для таблица acore_characters.item_loot_storage
 DROP TABLE IF EXISTS `item_loot_storage`;
 CREATE TABLE IF NOT EXISTS `item_loot_storage` (
   `containerGUID` INT unsigned NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `item_loot_storage` (
   `conditionLootId` INT NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.item_loot_storage: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.item_loot_storage: ~0 rows (приблизительно)
 DELETE FROM `item_loot_storage`;
 /*!40000 ALTER TABLE `item_loot_storage` DISABLE KEYS */;
 /*!40000 ALTER TABLE `item_loot_storage` ENABLE KEYS */;

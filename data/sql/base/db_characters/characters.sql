@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.characters
+-- Дамп структуры для таблица acore_characters.characters
 DROP TABLE IF EXISTS `characters`;
 CREATE TABLE IF NOT EXISTS `characters` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `trans_y` float NOT NULL DEFAULT 0,
   `trans_z` float NOT NULL DEFAULT 0,
   `trans_o` float NOT NULL DEFAULT 0,
-  `transguid` mediumint(9) NOT NULL DEFAULT 0,
+  `transguid` MEDIUMINT NOT NULL DEFAULT 0,
   `extra_flags` SMALLINT unsigned NOT NULL DEFAULT 0,
   `stable_slots` TINYINT unsigned NOT NULL DEFAULT 0,
   `at_login` SMALLINT unsigned NOT NULL DEFAULT 0,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `power5` INT unsigned NOT NULL DEFAULT 0,
   `power6` INT unsigned NOT NULL DEFAULT 0,
   `power7` INT unsigned NOT NULL DEFAULT 0,
-  `latency` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `latency` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `talentGroupsCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `activeTalentGroup` TINYINT unsigned NOT NULL DEFAULT 0,
   `exploredZones` longtext DEFAULT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.characters: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.characters: ~0 rows (приблизительно)
 DELETE FROM `characters`;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;

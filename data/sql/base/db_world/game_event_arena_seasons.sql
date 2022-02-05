@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_arena_seasons
+-- Дамп структуры для таблица acore_world.game_event_arena_seasons
 DROP TABLE IF EXISTS `game_event_arena_seasons`;
 CREATE TABLE IF NOT EXISTS `game_event_arena_seasons` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `game_event_arena_seasons` (
   UNIQUE KEY `season` (`season`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_arena_seasons: 6 rows
+-- Дамп данных таблицы acore_world.game_event_arena_seasons: 6 rows
 DELETE FROM `game_event_arena_seasons`;
 /*!40000 ALTER TABLE `game_event_arena_seasons` DISABLE KEYS */;
 INSERT INTO `game_event_arena_seasons` (`eventEntry`, `season`) VALUES
