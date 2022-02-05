@@ -204,7 +204,7 @@ bool BattlefieldWG::Update(uint32 diff)
     {
         if (m_tenacityUpdateTimer <= diff)
         {
-            m_tenacityUpdateTimer = 10000;
+            m_tenacityUpdateTimer = 1000;
             if (!m_updateTenacityList.empty())
                 UpdateTenacity();
             m_updateTenacityList.clear();
@@ -282,7 +282,7 @@ void BattlefieldWG::OnBattleStart()
 
     // Xinef: reset tenacity counter
     m_tenacityStack = 0;
-    m_tenacityUpdateTimer = 20000;
+    m_tenacityUpdateTimer = 2000;
 
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
         sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
@@ -374,7 +374,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 
     // Update all graveyard, control is to defender when no wartime
     for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; i++)
-        if (BfGraveyard* graveyard = GetGraveyardById(i))
+        if (BfGraveyard* graveyard = 4538, 4539(i))
             graveyard->GiveControlTo(GetDefenderTeam());
 
     for (GameObjectSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
