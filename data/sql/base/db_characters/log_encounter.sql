@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.log_encounter
+-- Дамп структуры для таблица acore_characters.log_encounter
 DROP TABLE IF EXISTS `log_encounter`;
 CREATE TABLE IF NOT EXISTS `log_encounter` (
   `time` datetime NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `log_encounter` (
   `playersInfo` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.log_encounter: 0 rows
+-- Дамп данных таблицы acore_characters.log_encounter: 0 rows
 DELETE FROM `log_encounter`;
 /*!40000 ALTER TABLE `log_encounter` DISABLE KEYS */;
 /*!40000 ALTER TABLE `log_encounter` ENABLE KEYS */;
