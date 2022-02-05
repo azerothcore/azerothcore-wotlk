@@ -684,7 +684,7 @@ void Battleground::RewardReputationToTeam(uint32 factionId, uint32 reputation, T
         {
             uint32 realFactionId = GetRealRepFactionForPlayer(factionId, itr->second);
 
-            uint32 repGain = reputation;
+            float repGain = static_cast<float>(reputation);
             AddPct(repGain, itr->second->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
             AddPct(repGain, itr->second->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, realFactionId));
             if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(realFactionId))
@@ -777,14 +777,14 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         if (result)
         {
             Field* fields = result->Fetch();
-            battlegroundId = fields[0].GetUInt64() + 1;
+            battlegroundId = fields[0].Get<uint64>() + 1;
         }
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVPSTATS_BATTLEGROUND);
-        stmt->setUInt64(0, battlegroundId);
-        stmt->setUInt8(1, GetWinner());
-        stmt->setUInt8(2, GetUniqueBracketId());
-        stmt->setUInt8(3, GetBgTypeID(true));
+        stmt->SetData(0, battlegroundId);
+        stmt->SetData(1, GetWinner());
+        stmt->SetData(2, GetUniqueBracketId());
+        stmt->SetData(3, GetBgTypeID(true));
         CharacterDatabase.Execute(stmt);
     }
 
@@ -820,34 +820,34 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
                 CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
-                stmt2->setUInt32(0, fightId);
-                stmt2->setUInt8(1, m_ArenaType);
-                stmt2->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
-                stmt2->setUInt32(3, winnerArenaTeam->GetId());
-                stmt2->setUInt32(4, loserArenaTeam->GetId());
-                stmt2->setUInt16(5, (uint16)winnerTeamRating);
-                stmt2->setUInt16(6, (uint16)winnerMatchmakerRating);
-                stmt2->setInt16(7, (int16)winnerChange);
-                stmt2->setUInt16(8, (uint16)loserTeamRating);
-                stmt2->setUInt16(9, (uint16)loserMatchmakerRating);
-                stmt2->setInt16(10, (int16)loserChange);
-                stmt2->setUInt32(11, currOnline);
+                stmt2->SetData(0, fightId);
+                stmt2->SetData(1, m_ArenaType);
+                stmt2->SetData(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
+                stmt2->SetData(3, winnerArenaTeam->GetId());
+                stmt2->SetData(4, loserArenaTeam->GetId());
+                stmt2->SetData(5, (uint16)winnerTeamRating);
+                stmt2->SetData(6, (uint16)winnerMatchmakerRating);
+                stmt2->SetData(7, (int16)winnerChange);
+                stmt2->SetData(8, (uint16)loserTeamRating);
+                stmt2->SetData(9, (uint16)loserMatchmakerRating);
+                stmt2->SetData(10, (int16)loserChange);
+                stmt2->SetData(11, currOnline);
                 trans->Append(stmt2);
 
                 uint8 memberId = 0;
                 for (Battleground::ArenaLogEntryDataMap::const_iterator itr = ArenaLogEntries.begin(); itr != ArenaLogEntries.end(); ++itr)
                 {
                     stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
-                    stmt2->setUInt32(0, fightId);
-                    stmt2->setUInt8(1, ++memberId);
-                    stmt2->setString(2, itr->second.Name);
-                    stmt2->setUInt32(3, itr->second.Guid);
-                    stmt2->setUInt32(4, itr->second.ArenaTeamId);
-                    stmt2->setUInt32(5, itr->second.Acc);
-                    stmt2->setString(6, itr->second.IP);
-                    stmt2->setUInt32(7, itr->second.DamageDone);
-                    stmt2->setUInt32(8, itr->second.HealingDone);
-                    stmt2->setUInt32(9, itr->second.KillingBlows);
+                    stmt2->SetData(0, fightId);
+                    stmt2->SetData(1, ++memberId);
+                    stmt2->SetData(2, itr->second.Name);
+                    stmt2->SetData(3, itr->second.Guid);
+                    stmt2->SetData(4, itr->second.ArenaTeamId);
+                    stmt2->SetData(5, itr->second.Acc);
+                    stmt2->SetData(6, itr->second.IP);
+                    stmt2->SetData(7, itr->second.DamageDone);
+                    stmt2->SetData(8, itr->second.HealingDone);
+                    stmt2->SetData(9, itr->second.KillingBlows);
                     trans->Append(stmt2);
                 }
 
@@ -879,34 +879,34 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
                 CharacterDatabasePreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
-                stmt3->setUInt32(0, fightId);
-                stmt3->setUInt8(1, m_ArenaType);
-                stmt3->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
-                stmt3->setUInt32(3, winnerArenaTeam->GetId());
-                stmt3->setUInt32(4, loserArenaTeam->GetId());
-                stmt3->setUInt16(5, (uint16)winnerTeamRating);
-                stmt3->setUInt16(6, (uint16)winnerMatchmakerRating);
-                stmt3->setInt16(7, (int16)winnerChange);
-                stmt3->setUInt16(8, (uint16)loserTeamRating);
-                stmt3->setUInt16(9, (uint16)loserMatchmakerRating);
-                stmt3->setInt16(10, (int16)loserChange);
-                stmt3->setUInt32(11, currOnline);
+                stmt3->SetData(0, fightId);
+                stmt3->SetData(1, m_ArenaType);
+                stmt3->SetData(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
+                stmt3->SetData(3, winnerArenaTeam->GetId());
+                stmt3->SetData(4, loserArenaTeam->GetId());
+                stmt3->SetData(5, (uint16)winnerTeamRating);
+                stmt3->SetData(6, (uint16)winnerMatchmakerRating);
+                stmt3->SetData(7, (int16)winnerChange);
+                stmt3->SetData(8, (uint16)loserTeamRating);
+                stmt3->SetData(9, (uint16)loserMatchmakerRating);
+                stmt3->SetData(10, (int16)loserChange);
+                stmt3->SetData(11, currOnline);
                 trans->Append(stmt3);
 
                 uint8 memberId = 0;
                 for (Battleground::ArenaLogEntryDataMap::const_iterator itr = ArenaLogEntries.begin(); itr != ArenaLogEntries.end(); ++itr)
                 {
                     stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
-                    stmt3->setUInt32(0, fightId);
-                    stmt3->setUInt8(1, ++memberId);
-                    stmt3->setString(2, itr->second.Name);
-                    stmt3->setUInt32(3, itr->second.Guid);
-                    stmt3->setUInt32(4, itr->second.ArenaTeamId);
-                    stmt3->setUInt32(5, itr->second.Acc);
-                    stmt3->setString(6, itr->second.IP);
-                    stmt3->setUInt32(7, itr->second.DamageDone);
-                    stmt3->setUInt32(8, itr->second.HealingDone);
-                    stmt3->setUInt32(9, itr->second.KillingBlows);
+                    stmt3->SetData(0, fightId);
+                    stmt3->SetData(1, ++memberId);
+                    stmt3->SetData(2, itr->second.Name);
+                    stmt3->SetData(3, itr->second.Guid);
+                    stmt3->SetData(4, itr->second.ArenaTeamId);
+                    stmt3->SetData(5, itr->second.Acc);
+                    stmt3->SetData(6, itr->second.IP);
+                    stmt3->SetData(7, itr->second.DamageDone);
+                    stmt3->SetData(8, itr->second.HealingDone);
+                    stmt3->SetData(9, itr->second.KillingBlows);
                     trans->Append(stmt3);
                 }
 
@@ -1015,20 +1015,20 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVPSTATS_PLAYER);
             BattlegroundScoreMap::const_iterator score = PlayerScores.find(player->GetGUID());
 
-            stmt->setUInt32(0, battlegroundId);
-            stmt->setUInt32(1, player->GetGUID().GetCounter());
-            stmt->setBool(2, bgTeamId == winnerTeamId);
-            stmt->setUInt32(3, score->second->GetKillingBlows());
-            stmt->setUInt32(4, score->second->GetDeaths());
-            stmt->setUInt32(5, score->second->GetHonorableKills());
-            stmt->setUInt32(6, score->second->GetBonusHonor());
-            stmt->setUInt32(7, score->second->GetDamageDone());
-            stmt->setUInt32(8, score->second->GetHealingDone());
-            stmt->setUInt32(9, score->second->GetAttr1());
-            stmt->setUInt32(10, score->second->GetAttr2());
-            stmt->setUInt32(11, score->second->GetAttr3());
-            stmt->setUInt32(12, score->second->GetAttr4());
-            stmt->setUInt32(13, score->second->GetAttr5());
+            stmt->SetData(0, battlegroundId);
+            stmt->SetData(1, player->GetGUID().GetCounter());
+            stmt->SetData(2, bgTeamId == winnerTeamId);
+            stmt->SetData(3, score->second->GetKillingBlows());
+            stmt->SetData(4, score->second->GetDeaths());
+            stmt->SetData(5, score->second->GetHonorableKills());
+            stmt->SetData(6, score->second->GetBonusHonor());
+            stmt->SetData(7, score->second->GetDamageDone());
+            stmt->SetData(8, score->second->GetHealingDone());
+            stmt->SetData(9, score->second->GetAttr1());
+            stmt->SetData(10, score->second->GetAttr2());
+            stmt->SetData(11, score->second->GetAttr3());
+            stmt->SetData(12, score->second->GetAttr4());
+            stmt->SetData(13, score->second->GetAttr5());
 
             CharacterDatabase.Execute(stmt);
         }
