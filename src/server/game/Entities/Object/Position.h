@@ -97,6 +97,7 @@ struct Position
         m_positionZ = pos.m_positionZ;
         m_orientation = pos.m_orientation;
     }
+
     void Relocate(const Position* pos)
     {
         m_positionX = pos->m_positionX;
