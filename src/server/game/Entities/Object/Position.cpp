@@ -169,7 +169,7 @@ bool Position::HasInArc(float arc, const Position* obj, float targetRadius) cons
         rborder += angularRadius;
     }
 
-    return ((angle >= lborder) && (angle <= rborder));
+    return (angle >= lborder) && (angle <= rborder);
 }
 
 bool Position::IsPositionValid() const
