@@ -7581,7 +7581,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     // Focused Assault
     // Brutal Assault
-    ApplySpellFix({ 46392, 46393 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 46392, 46393 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
     });
