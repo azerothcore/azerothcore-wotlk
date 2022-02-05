@@ -133,6 +133,7 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
     {
         return false;
     }
+
     return true;
 }
 
