@@ -142,6 +142,7 @@ struct Position
     {
         return PositionXYZStreamer(*this);
     }
+
     Position::PositionXYZOStreamer PositionXYZOStream()
     {
         return PositionXYZOStreamer(*this);
