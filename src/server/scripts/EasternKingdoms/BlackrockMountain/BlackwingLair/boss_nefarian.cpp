@@ -573,7 +573,13 @@ public:
                                     break;
                                 case CLASS_DEATH_KNIGHT:
                                     Talk(SAY_DEATH_KNIGHT);
-                                    DoCast(me, SPELL_DEATH_KNIGHT);
+                                    me->GetMap()->DoForAllPlayers([&](Player* p)
+                                        {
+                                            if (!p->IsGameMaster())
+                                            {
+                                                me->CastSpell(p, SPELL_DEATH_KNIGHT, true);
+                                            }
+                                        });
                                     break;
                                 default:
                                     break;
