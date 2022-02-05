@@ -104,6 +104,7 @@ struct Position
         m_positionZ = pos->m_positionZ;
         m_orientation = pos->m_orientation;
     }
+
     void RelocatePolarOffset(float angle, float dist, float z = 0.0f);
     void RelocateOffset(const Position& offset);
     void SetOrientation(float orientation)
