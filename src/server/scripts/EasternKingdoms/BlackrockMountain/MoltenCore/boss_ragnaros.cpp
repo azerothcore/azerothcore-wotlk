@@ -149,6 +149,14 @@ public:
             _lavaBurstGUIDS.clear();
         }
 
+        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (events.IsInPhase(PHASE_SUBMERGED) && damage >= me->GetHealth())
+            {
+                damage = 0;
+            }
+        }
+
         void DoAction(int32 action) override
         {
             if (action == ACTION_FINISH_RAGNAROS_INTRO)
@@ -202,17 +210,9 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            extraEvents.Reset();
-            if (events.IsInPhase(PHASE_SUBMERGED))
-            {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-
-                me->RemoveAurasDueToSpell(SPELL_RAGNA_SUBMERGE_VISUAL);
-            }
-            me->SetFacingTo(DEATH_ORIENTATION);
             _JustDied();
+            extraEvents.Reset();
+            me->SetFacingTo(DEATH_ORIENTATION);
         }
 
         void KilledUnit(Unit* victim) override
