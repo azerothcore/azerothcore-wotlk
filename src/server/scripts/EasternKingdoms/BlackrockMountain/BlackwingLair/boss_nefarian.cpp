@@ -241,7 +241,6 @@ public:
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
-
         {
             if (summon->GetEntry() != NPC_NEFARIAN)
             {
