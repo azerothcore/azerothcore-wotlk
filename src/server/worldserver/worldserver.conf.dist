@@ -1806,7 +1806,7 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                                                                               Skip Dk Module, Racial Trait Swap Modules
 #        Default:     ""
 
-Creatures.CustomIDs = "190010,190010,55005,999991,25462,98888"
+Creatures.CustomIDs = "190010,55005,999991,25462,98888"
 
 #
 ###################################################################################################
