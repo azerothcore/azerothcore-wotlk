@@ -128,26 +128,28 @@ enum Spells
     SPELL_NEFARIANS_BARRIER     = 22663,
 
     // Nefarian
-    SPELL_SHADOWFLAME_INITIAL   = 22992,
-    SPELL_SHADOWFLAME           = 22539,
-    SPELL_BELLOWINGROAR         = 22686,
-    SPELL_VEILOFSHADOW          = 22687,
-    SPELL_CLEAVE                = 20691,
-    SPELL_TAILLASH              = 23364,
+    SPELL_SHADOWFLAME_INITIAL       = 22992,
+    SPELL_SHADOWFLAME               = 22539,
+    SPELL_BELLOWINGROAR             = 22686,
+    SPELL_VEILOFSHADOW              = 22687,
+    SPELL_CLEAVE                    = 20691,
+    SPELL_TAILLASH                  = 23364,
 
-    SPELL_MAGE                  = 23410,     // wild magic
-    SPELL_WARRIOR               = 23397,     // beserk
-    SPELL_DRUID                 = 23398,     // cat form
-    SPELL_PRIEST                = 23401,     // corrupted healing
-    SPELL_PALADIN               = 23418,     // siphon blessing
-    SPELL_SHAMAN                = 23425,     // totems
-    SPELL_WARLOCK               = 23427,     // infernals
-    SPELL_HUNTER                = 23436,     // bow broke
-    SPELL_ROGUE                 = 23414,     // Paralise
-    SPELL_DEATH_KNIGHT          = 49576,     // Death Grip
-    SPELL_POLYMORPH             = 23603,
-    SPELL_BLESSING_PROTECTION   = 23415,
-    // Totems
+    SPELL_MAGE                      = 23410,     // wild magic
+    SPELL_WARRIOR                   = 23397,     // beserk
+    SPELL_DRUID                     = 23398,     // cat form
+    SPELL_PRIEST                    = 23401,     // corrupted healing
+    SPELL_PALADIN                   = 23418,     // siphon blessing
+    SPELL_SHAMAN                    = 23425,     // totems
+    SPELL_WARLOCK                   = 23427,     // infernals
+    SPELL_HUNTER                    = 23436,     // bow broke
+    SPELL_ROGUE                     = 23414,     // Paralise
+    SPELL_DEATH_KNIGHT              = 49576,     // Death Grip
+
+    // Class Call effects
+    SPELL_POLYMORPH                 = 23603,
+    SPELL_BLESSING_PROTECTION       = 23415,
+    SPELL_SUMMON_INFERNALS          = 23426,
     SPELL_CORRUPTED_FIRE_NOVA_TOTEM = 23419,
     SPELL_CORRUPTED_STONESKIN_TOTEM = 23420,
     SPELL_CORRUPTED_HEALING_TOTEM   = 23422,
@@ -840,6 +842,14 @@ class spell_class_call_handler : public SpellScript
         target->UpdatePositionData();
     }
 
+    void HandleOnHitWarlock()
+    {
+        if (GetHitUnit())
+        {
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_SUMMON_INFERNALS, true);
+        }
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_class_call_handler::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
@@ -847,6 +857,10 @@ class spell_class_call_handler : public SpellScript
         if (m_scriptSpellId == SPELL_ROGUE)
         {
             OnHit += SpellHitFn(spell_class_call_handler::HandleOnHitRogue);
+        }
+        else if (m_scriptSpellId == SPELL_WARLOCK)
+        {
+            OnHit += SpellHitFn(spell_class_call_handler::HandleOnHitWarlock);
         }
     }
 };
