@@ -767,7 +767,7 @@ struct npc_corrupted_totem : public ScriptedAI
                 {
                     if (!_auraAdded)
                     {
-                        context.Schedule(4s, [this](TaskContext context)
+                        context.Schedule(4s, [this](TaskContext /*context*/)
                             {
                                 if (me->IsAlive())
                                 {
@@ -782,7 +782,7 @@ struct npc_corrupted_totem : public ScriptedAI
                 SetAura(true);
                 context.Repeat(1s);
             })
-            .Schedule(me->GetEntry() == NPC_TOTEM_C_WINDFURY ? 89s : 59s, [this](TaskContext context)
+            .Schedule(me->GetEntry() == NPC_TOTEM_C_WINDFURY ? 89s : 59s, [this](TaskContext /*context*/)
             {
                 SetAura(false);
                 me->DespawnOrUnsummon();
@@ -920,7 +920,7 @@ class aura_class_call_siphon_blessing : public AuraScript
 {
     PrepareAuraScript(aura_class_call_siphon_blessing);
 
-    void HandlePeriodic(AuraEffect const* aurEff)
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
 
