@@ -172,7 +172,7 @@ public:
         {
             if (!instance->CheckRequiredBosses(DATA_BLOOD_QUEEN_LANA_THEL, who->ToPlayer()) || !me->IsVisible())
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
                 return;
             }
@@ -552,7 +552,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             const Map::PlayerList& pl = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
@@ -564,7 +564,7 @@ public:
             {
                 if (!me->IsAlive())
                     return;
-                _EnterEvadeMode();
+                _EnterEvadeMode(why);
                 Reset();
                 GoToMinchar();
                 return;

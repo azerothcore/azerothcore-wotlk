@@ -182,10 +182,10 @@ public:
             events.ScheduleEvent(EVENT_POISON_SHOCK, urand(7000, 12000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             summons.DespawnAll();
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void JustDied(Unit* /*killer*/) override

@@ -501,7 +501,7 @@ public:
                 {
                     sayFestergutDeathTimer = 0;
                     Talk(SAY_FESTERGUT_DEATH);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 else
                     sayFestergutDeathTimer -= diff;
@@ -512,7 +512,7 @@ public:
                 {
                     sayRotfaceDeathTimer = 0;
                     Talk(SAY_ROTFACE_DEATH);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                 }
                 else
                     sayRotfaceDeathTimer -= diff;
@@ -520,7 +520,7 @@ public:
             else if (bCallEvade)
             {
                 bCallEvade = false;
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 
@@ -665,12 +665,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             Position p = me->GetHomePosition();
             if (!me->IsInCombat() && me->GetExactDist2d(&p) > 10.0f)
                 me->GetMotionMaster()->MoveCharge(tablePos.GetPositionX(), tablePos.GetPositionY(), tablePos.GetPositionZ(), 15.0f, POINT_TABLE);
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void ChangePhase()

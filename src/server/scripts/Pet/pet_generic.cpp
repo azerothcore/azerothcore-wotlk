@@ -155,7 +155,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         memset(_banners, 0, sizeof(_banners));
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (Unit* owner = me->GetCharmerOrOwner())
         {
@@ -689,9 +689,7 @@ struct npc_pet_gen_toxic_wasteling : public PassiveAI
 
     void Reset() override { checkTimer = 3000; }
 
-    void EnterEvadeMode() override
-    {
-    }
+    void EnterEvadeMode(EvadeReason /*why*/) override {}
 
     void MovementInform(uint32 type, uint32 id) override
     {

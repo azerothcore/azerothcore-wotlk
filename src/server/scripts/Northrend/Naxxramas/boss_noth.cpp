@@ -136,7 +136,7 @@ public:
         {
             if (me->GetExactDist(2684.8f, -3502.5f, 261.3f) > 80.0f)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return false;
             }
             return true;
@@ -160,10 +160,10 @@ public:
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void EnterCombat(Unit* who) override

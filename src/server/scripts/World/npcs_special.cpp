@@ -345,9 +345,9 @@ public:
             resetTimer = 5000;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();
@@ -366,7 +366,7 @@ public:
 
             if (resetTimer <= diff)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
                 resetTimer = 5000;
             }
             else
@@ -405,9 +405,9 @@ public:
             me->SelectLevel();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode())
+            if (!_EnterEvadeMode(why))
                 return;
 
             Reset();

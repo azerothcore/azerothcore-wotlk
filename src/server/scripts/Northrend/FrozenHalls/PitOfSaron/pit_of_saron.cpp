@@ -1117,7 +1117,7 @@ public:
             return who->GetEntry() == NPC_FALLEN_WARRIOR;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /* why */) override
         {
             if (!me->IsAlive() || me->IsInEvadeMode())
                 return;

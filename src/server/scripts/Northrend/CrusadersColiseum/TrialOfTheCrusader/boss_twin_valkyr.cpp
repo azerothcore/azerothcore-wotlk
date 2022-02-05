@@ -509,7 +509,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /* why */) override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);

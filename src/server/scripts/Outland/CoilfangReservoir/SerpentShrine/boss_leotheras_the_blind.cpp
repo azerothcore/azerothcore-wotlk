@@ -289,7 +289,7 @@ public:
         ObjectGuid ownerGUID;
         EventMap events;
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon(1);
         }

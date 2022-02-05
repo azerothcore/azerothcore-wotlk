@@ -49,7 +49,7 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
             }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         // _EnterEvadeMode();
         me->DeleteThreatList();
