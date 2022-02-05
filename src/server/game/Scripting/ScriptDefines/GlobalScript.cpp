@@ -143,13 +143,21 @@ bool ScriptMgr::OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Un
 {
     auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
     {
-        return !script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val);
+        return script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val);
     });
 
     if (ret && *ret)
     {
-        return false;
+        return true;
     }
 
-    return true;
+    return false;
+}
+
+void ScriptMgr::OnLoadSpellCustomAttr(SpellInfo* spell)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnLoadSpellCustomAttr(spell);
+    });
 }
