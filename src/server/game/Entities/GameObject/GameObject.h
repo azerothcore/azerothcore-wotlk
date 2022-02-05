@@ -1021,6 +1021,8 @@ protected:
 
     ObjectGuid m_linkedTrap;
 
+    ObjectGuid _lootStateUnitGUID;
+
 private:
     void CheckRitualList();
     void ClearRitualList();
