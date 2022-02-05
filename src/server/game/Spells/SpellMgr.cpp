@@ -7589,6 +7589,11 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Mechanic = 0;
     });
 
+    ApplySpellFix({ 23415 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);

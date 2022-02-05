@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643946548773673200');
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_class_call_handler', 'spell_corrupted_totems', 'spell_class_call_polymorph', 'aura_wild_magic');
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_class_call_handler', 'spell_corrupted_totems', 'spell_class_call_polymorph', 'aura_wild_magic', 'aura_siphon_blessing');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (23410, 'spell_class_call_handler'), -- Mage
 (23397, 'spell_class_call_handler'), -- Warrior
@@ -13,7 +13,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (23414, 'spell_class_call_handler'), -- Rogue
 (23424, 'spell_corrupted_totems'),
 (23603, 'spell_class_call_polymorph'),
-(23410, 'aura_wild_magic');
+(23410, 'aura_wild_magic'),
+(23418, 'aura_siphon_blessing');
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|2|256|131072|33554432, `flags_extra` = `flags_extra`|128|256 WHERE `entry` = 14667;
 

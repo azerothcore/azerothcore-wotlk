@@ -139,13 +139,14 @@ enum Spells
     SPELL_WARRIOR               = 23397,     // beserk
     SPELL_DRUID                 = 23398,     // cat form
     SPELL_PRIEST                = 23401,     // corrupted healing
-    SPELL_PALADIN               = 23418,     // syphon blessing
+    SPELL_PALADIN               = 23418,     // siphon blessing
     SPELL_SHAMAN                = 23425,     // totems
     SPELL_WARLOCK               = 23427,     // infernals
     SPELL_HUNTER                = 23436,     // bow broke
     SPELL_ROGUE                 = 23414,     // Paralise
     SPELL_DEATH_KNIGHT          = 49576,     // Death Grip
     SPELL_POLYMORPH             = 23603,
+    SPELL_BLESSING_PROTECTION   = 23415,
     // Totems
     SPELL_CORRUPTED_FIRE_NOVA_TOTEM = 23419,
     SPELL_CORRUPTED_STONESKIN_TOTEM = 23420,
@@ -831,19 +832,40 @@ class aura_wild_magic : public AuraScript
 
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        Unit* target = GetTarget();
-        if (!target)
+        if (!GetTarget())
         {
             return;
         }
 
-        target->CastSpell(target, SPELL_POLYMORPH, true);
-
+        GetTarget()->CastSpell(GetTarget(), SPELL_POLYMORPH, true);
     }
 
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(aura_wild_magic::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class aura_siphon_blessing : public AuraScript
+{
+    PrepareAuraScript(aura_siphon_blessing);
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = GetTarget())
+        {
+            if (Unit* nefarian = target->FindNearestCreature(NPC_NEFARIAN, 100.f))
+            {
+                target->CastSpell(nefarian, SPELL_BLESSING_PROTECTION, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(aura_siphon_blessing::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -912,6 +934,7 @@ void AddSC_boss_nefarian()
     RegisterCreatureAI(npc_corrupted_totem);
     RegisterSpellScript(spell_class_call_handler);
     RegisterSpellScript(aura_wild_magic);
+    RegisterSpellScript(aura_siphon_blessing);
     RegisterSpellScript(spell_class_call_polymorph);
     RegisterSpellScript(spell_corrupted_totems);
 }
