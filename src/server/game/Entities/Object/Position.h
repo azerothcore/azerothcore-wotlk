@@ -193,6 +193,7 @@ struct Position
     {
         return GetAngle(pos) - m_orientation;
     }
+
     [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
     [[nodiscard]] float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
 
