@@ -7589,6 +7589,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Mechanic = 0;
     });
 
+    // Improved Blessing Protection (Nefarian Class Call)
     ApplySpellFix({ 23415 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
