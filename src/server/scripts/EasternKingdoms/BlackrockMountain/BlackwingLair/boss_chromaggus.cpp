@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "blackwing_lair.h"
 
 enum Emotes
