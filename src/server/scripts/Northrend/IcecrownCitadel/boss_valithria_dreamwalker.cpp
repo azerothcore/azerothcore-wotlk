@@ -859,7 +859,7 @@ public:
 
         void AttackStart(Unit*) override {}
         void MoveInLineOfSight(Unit*) override {}
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void UpdateAI(uint32 diff) override
         {

@@ -389,7 +389,7 @@ public:
                 Talk(SAY_KILL_PLAYER);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             events.Reset();
             summons.DespawnAll();

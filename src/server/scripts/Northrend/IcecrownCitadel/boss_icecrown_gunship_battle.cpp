@@ -780,7 +780,7 @@ public:
             _events.ScheduleEvent(EVENT_CLEAVE, urand(3000, 6000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive())
                 return;
@@ -1116,7 +1116,7 @@ public:
             _events.ScheduleEvent(EVENT_CLEAVE, urand(3000, 6000));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive())
                 return;
@@ -1492,7 +1492,7 @@ struct gunship_npc_AI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;
@@ -1553,7 +1553,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (!me->IsAlive() || !me->IsInCombat())
             return;

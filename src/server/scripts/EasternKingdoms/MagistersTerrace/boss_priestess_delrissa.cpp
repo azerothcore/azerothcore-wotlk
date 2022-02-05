@@ -194,7 +194,7 @@ public:
                 case EVENT_CHECK_DIST:
                     if (me->GetDistance(me->GetHomePosition()) > 75.0f)
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         return;
                     }
                     events.ScheduleEvent(EVENT_CHECK_DIST, 5000);
@@ -325,7 +325,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         summons.Summon(summon);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason why) override
     {
         if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             if (!delrissa->IsAlive())
@@ -333,7 +333,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
                 delrissa->Respawn();
                 return;
             }
-        ScriptedAI::EnterEvadeMode();
+        ScriptedAI::EnterEvadeMode(why);
     }
 
     void EnterCombat(Unit* who) override

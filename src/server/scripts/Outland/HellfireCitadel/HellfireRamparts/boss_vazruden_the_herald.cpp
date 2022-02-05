@@ -163,7 +163,7 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DespawnOrUnsummon(1);
         }
@@ -267,7 +267,7 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             Talk(SAY_WIPE);
             me->DespawnOrUnsummon(1);

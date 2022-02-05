@@ -591,7 +591,7 @@ public:
             }
         }
 
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
 
         void WaypointReached(uint32 i) override
         {

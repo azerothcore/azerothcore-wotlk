@@ -215,7 +215,7 @@ public:
             {
                 damage = 0;
                 me->setActive(false);
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
             }
         }
 
@@ -243,7 +243,7 @@ public:
                             break;
                         }
                     me->setActive(false);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 case EVENT_SUMMON_SOLDIERS:
                     for (uint8 i = 0; i < SUNWELL_DEFENDER_NUM; ++i)
@@ -393,7 +393,7 @@ public:
                 case EVENT_DISAPPEAR:
                     me->SetVisible(false);
                     me->setActive(false);
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_SET_FACING:
                     me->SetFacingTo(2.45f);
@@ -425,11 +425,11 @@ public:
                 events.ScheduleEvent(EVENT_SET_FACING, 0);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (me->isActiveObject())
                 return;
-            ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode(why);
         }
 
         void SetData(uint32 type, uint32 id) override

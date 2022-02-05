@@ -272,12 +272,12 @@ public:
             return false;
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             if (IsAnyPlayerValid())
                 return;
 
-            BossAI::EnterEvadeMode();
+            BossAI::EnterEvadeMode(why);
         }
 
         void AttackStart(Unit* who) override
@@ -473,7 +473,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
         }
 

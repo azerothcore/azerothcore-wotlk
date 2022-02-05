@@ -177,7 +177,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override
@@ -218,7 +217,7 @@ public:
             _events.ScheduleEvent(EVENT_LAVA_GOUT, 5000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             // Prevent EvadeMode
         }

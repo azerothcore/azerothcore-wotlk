@@ -376,7 +376,7 @@ struct violet_hold_trashAI : public npc_escortAI
         me->CastSpell((Unit*)nullptr, SPELL_DESTROY_DOOR_SEAL, true);
     }
 
-    void EnterEvadeMode() override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {

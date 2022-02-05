@@ -433,10 +433,10 @@ public:
                 go->SetGoState(GO_STATE_ACTIVE);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode(EvadeReason why) override
         {
             DisableThorim(false);
-            CreatureAI::EnterEvadeMode();
+            CreatureAI::EnterEvadeMode(why);
         }
 
         void Reset() override
@@ -956,7 +956,7 @@ public:
 
         uint32 Timer;
 
-        void EnterEvadeMode() override {}
+        void EnterEvadeMode(EvadeReason /*why*/) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
 
