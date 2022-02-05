@@ -122,6 +122,7 @@ struct Position
         x = m_positionX;
         y = m_positionY;
     }
+
     void GetPosition(float& x, float& y, float& z) const
     {
         x = m_positionX;
