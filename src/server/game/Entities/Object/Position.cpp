@@ -96,7 +96,7 @@ void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos)
     if (std::fabs(dx) < 0.001f && std::fabs(dy) < 0.001f)
     {
         float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
-        vcos = cos(angle);
+        vcos = std::cos(angle);
         vsin = std::sin(angle);
     }
     else
