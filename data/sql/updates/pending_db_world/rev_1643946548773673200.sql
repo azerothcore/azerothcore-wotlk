@@ -13,9 +13,9 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (23414, 'spell_class_call_handler'), -- Rogue
 (23424, 'spell_corrupted_totems'),
 (23603, 'spell_class_call_polymorph'),
-(23397, 'aura_class_call_berserk'),
 (23410, 'aura_class_call_wild_magic'),
-(23418, 'aura_class_call_siphon_blessing');
+(23418, 'aura_class_call_siphon_blessing'),
+(23397, 'aura_class_call_berserk');
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|2|256|131072|33554432, `flags_extra` = `flags_extra`|128|256 WHERE `entry` = 14667;
 
