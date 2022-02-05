@@ -97,4 +97,6 @@ inline AI* GetBlackwingLairAI(T* obj)
     return GetInstanceAI<AI>(obj, BWLScriptName);
 }
 
+#define RegisterBlackwingLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackwingLairAI)
+
 #endif

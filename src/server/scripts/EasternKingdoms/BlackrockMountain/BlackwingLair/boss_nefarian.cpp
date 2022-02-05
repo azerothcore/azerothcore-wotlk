@@ -47,6 +47,8 @@ enum Events
     EVENT_SUCCESS_1            = 14,
     EVENT_SUCCESS_2            = 15,
     EVENT_SUCCESS_3            = 16,
+
+    ACTION_RESET               = 0
 };
 
 enum Says
@@ -145,6 +147,7 @@ enum Spells
     SPELL_HUNTER                    = 23436,     // bow broke
     SPELL_ROGUE                     = 23414,     // Paralise
     SPELL_DEATH_KNIGHT              = 49576,     // Death Grip
+    SPELL_ROOT_SELF                 = 17507,
 
     // Class Call effects
     SPELL_POLYMORPH                 = 23603,
@@ -206,11 +209,17 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override { return me->IsVisible(); }
-
         void JustReachedHome() override
         {
             Reset();
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_RESET)
+            {
+                me->RemoveAura(SPELL_ROOT_SELF);
+            }
         }
 
         void BeginEvent(Player* target)
@@ -372,6 +381,7 @@ public:
                                     events.CancelEvent(EVENT_MIND_CONTROL);
                                     events.CancelEvent(EVENT_FEAR);
                                     events.CancelEvent(EVENT_SHADOW_BOLT);
+                                    DoCastSelf(SPELL_ROOT_SELF, true);
                                     me->SetVisible(false);
                                     return;
                                 }
@@ -411,226 +421,241 @@ public:
     }
 };
 
-class boss_nefarian : public CreatureScript
+
+struct boss_nefarian : public BossAI
 {
-public:
-    boss_nefarian() : CreatureScript("boss_nefarian") { }
-
-    struct boss_nefarianAI : public BossAI
+    boss_nefarian(Creature* creature) : BossAI(creature, DATA_NEFARIAN)
     {
-        boss_nefarianAI(Creature* creature) : BossAI(creature, DATA_NEFARIAN)
+        Initialize();
+    }
+
+    void Initialize()
+    {
+        Phase3 = false;
+        canDespawn = false;
+        DespawnTimer = 30000;
+    }
+
+    void Reset() override
+    {
+        Initialize();
+    }
+
+    void JustReachedHome() override
+    {
+        canDespawn = true;
+    }
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
+        events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
+        events.ScheduleEvent(EVENT_VEILOFSHADOW, urand(25000, 35000));
+        events.ScheduleEvent(EVENT_CLEAVE, 7000);
+        events.ScheduleEvent(EVENT_TAILLASH, 10000);
+        events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
+        Talk(SAY_RANDOM);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (rand32() % 5)
         {
-            Initialize();
+            return;
         }
 
-        void Initialize()
+        Talk(SAY_SLAY, victim);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE)
         {
-            Phase3 = false;
+            return;
+        }
+
+        if (id == 1)
+        {
+            DoZoneInCombat();
+            if (me->GetVictim())
+            {
+                AttackStart(me->GetVictim());
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (canDespawn && DespawnTimer <= diff)
+        {
+            instance->SetBossState(DATA_NEFARIAN, FAIL);
+
+            std::list<Creature*> constructList;
+            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
+            for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
+            {
+                (*itr)->DespawnOrUnsummon();
+            }
+
+            if (Unit* victor = me->FindNearestCreature(NPC_VICTOR_NEFARIUS, 200.f, true))
+            {
+                if (victor->ToCreature() && victor->ToCreature()->AI())
+                {
+                    victor->ToCreature()->AI()->DoAction(ACTION_RESET);
+                }
+            }
+        }
+        else
+        {
+            DespawnTimer -= diff;
+        }
+
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        if (canDespawn)
+        {
             canDespawn = false;
-            DespawnTimer = 30000;
         }
 
-        void Reset() override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
         {
-            Initialize();
+            return;
         }
 
-        void JustReachedHome() override
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            canDespawn = true;
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
-            events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
-            events.ScheduleEvent(EVENT_VEILOFSHADOW, urand(25000, 35000));
-            events.ScheduleEvent(EVENT_CLEAVE, 7000);
-            events.ScheduleEvent(EVENT_TAILLASH, 10000);
-            events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
-            Talk(SAY_RANDOM);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (rand32() % 5)
-                return;
-
-            Talk(SAY_SLAY, victim);
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type != POINT_MOTION_TYPE)
-                return;
-
-            if (id == 1)
+            switch (eventId)
             {
-                DoZoneInCombat();
-                if (me->GetVictim())
-                    AttackStart(me->GetVictim());
+                case EVENT_SHADOWFLAME:
+                    DoCastVictim(SPELL_SHADOWFLAME);
+                    events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
+                    break;
+                case EVENT_FEAR:
+                    DoCastVictim(SPELL_BELLOWINGROAR);
+                    events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
+                    break;
+                case EVENT_VEILOFSHADOW:
+                    DoCastVictim(SPELL_VEILOFSHADOW);
+                    events.ScheduleEvent(EVENT_VEILOFSHADOW, urand(25000, 35000));
+                    break;
+                case EVENT_CLEAVE:
+                    DoCastVictim(SPELL_CLEAVE);
+                    events.ScheduleEvent(EVENT_CLEAVE, 7000);
+                    break;
+                case EVENT_TAILLASH:
+                    // Cast NYI since we need a better check for behind target
+                    DoCastVictim(SPELL_TAILLASH);
+                    events.ScheduleEvent(EVENT_TAILLASH, 10000);
+                    break;
+                case EVENT_CLASSCALL:
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                    {
+                        switch (target->getClass())
+                        {
+                            case CLASS_MAGE:
+                                Talk(SAY_MAGE);
+                                DoCast(me, SPELL_MAGE);
+                                break;
+                            case CLASS_WARRIOR:
+                                Talk(SAY_WARRIOR);
+                                DoCast(me, SPELL_WARRIOR);
+                                break;
+                            case CLASS_DRUID:
+                                Talk(SAY_DRUID);
+                                DoCast(target, SPELL_DRUID);
+                                break;
+                            case CLASS_PRIEST:
+                                Talk(SAY_PRIEST);
+                                DoCast(me, SPELL_PRIEST);
+                                break;
+                            case CLASS_PALADIN:
+                                Talk(SAY_PALADIN);
+                                DoCast(me, SPELL_PALADIN);
+                                break;
+                            case CLASS_SHAMAN:
+                                Talk(SAY_SHAMAN);
+                                DoCast(me, SPELL_SHAMAN);
+                                break;
+                            case CLASS_WARLOCK:
+                                Talk(SAY_WARLOCK);
+                                DoCast(me, SPELL_WARLOCK);
+                                break;
+                            case CLASS_HUNTER:
+                                Talk(SAY_HUNTER);
+                                DoCast(me, SPELL_HUNTER);
+                                break;
+                            case CLASS_ROGUE:
+                                Talk(SAY_ROGUE);
+                                DoCast(me, SPELL_ROGUE);
+                                break;
+                            case CLASS_DEATH_KNIGHT:
+                                Talk(SAY_DEATH_KNIGHT);
+                                me->GetMap()->DoForAllPlayers([&](Player* p)
+                                {
+                                    if (!p->IsGameMaster())
+                                    {
+                                        me->CastSpell(p, SPELL_DEATH_KNIGHT, true);
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
+                    break;
             }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (canDespawn && DespawnTimer <= diff)
-            {
-                instance->SetBossState(DATA_NEFARIAN, FAIL);
-
-                std::list<Creature*> constructList;
-                me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
-                for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
-                    (*itr)->DespawnOrUnsummon();
-            }
-            else
-            {
-                DespawnTimer -= diff;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            if (canDespawn)
-                canDespawn = false;
-
-            events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_SHADOWFLAME:
-                        DoCastVictim(SPELL_SHADOWFLAME);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
-                        break;
-                    case EVENT_FEAR:
-                        DoCastVictim(SPELL_BELLOWINGROAR);
-                        events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
-                        break;
-                    case EVENT_VEILOFSHADOW:
-                        DoCastVictim(SPELL_VEILOFSHADOW);
-                        events.ScheduleEvent(EVENT_VEILOFSHADOW, urand(25000, 35000));
-                        break;
-                    case EVENT_CLEAVE:
-                        DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 7000);
-                        break;
-                    case EVENT_TAILLASH:
-                        // Cast NYI since we need a better check for behind target
-                        DoCastVictim(SPELL_TAILLASH);
-                        events.ScheduleEvent(EVENT_TAILLASH, 10000);
-                        break;
-                    case EVENT_CLASSCALL:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                        {
-                            switch (target->getClass())
-                            {
-                                case CLASS_MAGE:
-                                    Talk(SAY_MAGE);
-                                    DoCast(me, SPELL_MAGE);
-                                    break;
-                                case CLASS_WARRIOR:
-                                    Talk(SAY_WARRIOR);
-                                    DoCast(me, SPELL_WARRIOR);
-                                    break;
-                                case CLASS_DRUID:
-                                    Talk(SAY_DRUID);
-                                    DoCast(target, SPELL_DRUID);
-                                    break;
-                                case CLASS_PRIEST:
-                                    Talk(SAY_PRIEST);
-                                    DoCast(me, SPELL_PRIEST);
-                                    break;
-                                case CLASS_PALADIN:
-                                    Talk(SAY_PALADIN);
-                                    DoCast(me, SPELL_PALADIN);
-                                    break;
-                                case CLASS_SHAMAN:
-                                    Talk(SAY_SHAMAN);
-                                    DoCast(me, SPELL_SHAMAN);
-                                    break;
-                                case CLASS_WARLOCK:
-                                    Talk(SAY_WARLOCK);
-                                    DoCast(me, SPELL_WARLOCK);
-                                    break;
-                                case CLASS_HUNTER:
-                                    Talk(SAY_HUNTER);
-                                    DoCast(me, SPELL_HUNTER);
-                                    break;
-                                case CLASS_ROGUE:
-                                    Talk(SAY_ROGUE);
-                                    DoCast(me, SPELL_ROGUE);
-                                    break;
-                                case CLASS_DEATH_KNIGHT:
-                                    Talk(SAY_DEATH_KNIGHT);
-                                    me->GetMap()->DoForAllPlayers([&](Player* p)
-                                        {
-                                            if (!p->IsGameMaster())
-                                            {
-                                                me->CastSpell(p, SPELL_DEATH_KNIGHT, true);
-                                            }
-                                        });
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
-                        break;
-                }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
             }
-
-            // Phase3 begins when health below 20 pct
-            if (!Phase3 && HealthBelowPct(20))
-            {
-                std::list<Creature*> constructList;
-                me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
-                for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
-                    if ((*itr) && !(*itr)->IsAlive())
-                    {
-                        (*itr)->Respawn();
-                        DoZoneInCombat((*itr));
-                        (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        (*itr)->SetReactState(REACT_AGGRESSIVE);
-                        (*itr)->SetStandState(UNIT_STAND_STATE_STAND);
-                    }
-
-                Phase3 = true;
-                Talk(SAY_RAISE_SKELETONS);
-            }
-
-            DoMeleeAttackIfReady();
         }
 
-    private:
-        bool canDespawn;
-        uint32 DespawnTimer;
-        bool Phase3;
-    };
+        // Phase3 begins when health below 20 pct
+        if (!Phase3 && HealthBelowPct(20))
+        {
+            std::list<Creature*> constructList;
+            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
+            for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
+            {
+                if ((*itr) && !(*itr)->IsAlive())
+                {
+                    (*itr)->Respawn();
+                    DoZoneInCombat((*itr));
+                    (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    (*itr)->SetReactState(REACT_AGGRESSIVE);
+                    (*itr)->SetStandState(UNIT_STAND_STATE_STAND);
+                }
+            }
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackwingLairAI<boss_nefarianAI>(creature);
+            Phase3 = true;
+            Talk(SAY_RAISE_SKELETONS);
+        }
+
+        DoMeleeAttackIfReady();
     }
+
+private:
+    bool canDespawn;
+    uint32 DespawnTimer;
+    bool Phase3;
 };
 
 enum TotemSpells
 {
     AURA_AVOIDANCE = 23198,
-    SPELL_ROOT_SELF = 17507,
 
     SPELL_STONESKIN_EFFECT = 10405,
     SPELL_HEALING_EFFECT   = 10461,
@@ -994,7 +1019,7 @@ class spell_corrupted_totems : public SpellScript
 void AddSC_boss_nefarian()
 {
     new boss_victor_nefarius();
-    new boss_nefarian();
+    RegisterCreatureAI(boss_nefarian);
     RegisterCreatureAI(npc_corrupted_totem);
     RegisterSpellScript(spell_class_call_handler);
     RegisterSpellScript(aura_class_call_wild_magic);
