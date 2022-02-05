@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "SpellScript.h"
 #include "TaskScheduler.h"
 
 enum Say
@@ -193,6 +195,7 @@ class spell_arcane_vacuum : public SpellScript
     }
 };
 
+// Mark of Frost - Triggered Spell
 class spell_mark_of_frost_freeze : public SpellScript
 {
     PrepareSpellScript(spell_mark_of_frost_freeze);
