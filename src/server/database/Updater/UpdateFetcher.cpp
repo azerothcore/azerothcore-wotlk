@@ -132,8 +132,8 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
         {
             Field* fields = result->Fetch();
 
-            std::string path  = fields[0].GetString();
-            std::string state = fields[1].GetString();
+            std::string path  = fields[0].Get<std::string>();
+            std::string state = fields[1].Get<std::string>();
             if (path.substr(0, 1) == "$")
                 path = _sourceDirectory->generic_string() + path.substr(1);
 
@@ -194,7 +194,7 @@ UpdateFetcher::AppliedFileStorage UpdateFetcher::ReceiveAppliedFiles() const
 
         AppliedFileEntry const entry =
         {
-            fields[0].GetString(), fields[1].GetString(), AppliedFileEntry::StateConvert(fields[2].GetString()), fields[3].GetUInt64()
+            fields[0].Get<std::string>(), fields[1].Get<std::string>(), AppliedFileEntry::StateConvert(fields[2].Get<std::string>()), fields[3].Get<uint64>()
         };
 
         map.emplace(entry.name, entry);
