@@ -6377,6 +6377,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                     }
                     break;
                 }
+            case SPELL_AURA_MOD_SHAPESHIFT:
+                {
+                    if (m_caster && m_caster->HasAura(23397)) // Nefarian Class Call (Warrior): Berserk -- Nefertum: I don't really like this but I didn't find another way.
+                    {
+                        return SPELL_FAILED_NOT_SHAPESHIFT;
+                    }
+                    break;
+                }
             default:
                 break;
         }

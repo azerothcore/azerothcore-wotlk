@@ -117,15 +117,15 @@ enum Spells
 {
     // Victor Nefarius
     // UBRS Spells
-    SPELL_CHROMATIC_CHAOS       = 16337, // Self Cast hits 10339
-    SPELL_VAELASTRASZZ_SPAWN    = 16354, // Self Cast Depawn one sec after
+    SPELL_CHROMATIC_CHAOS           = 16337, // Self Cast hits 10339
+    SPELL_VAELASTRASZZ_SPAWN        = 16354, // Self Cast Depawn one sec after
     // BWL Spells
-    SPELL_SHADOWBOLT            = 22677,
-    SPELL_SHADOWBOLT_VOLLEY     = 22665,
-    SPELL_SHADOW_COMMAND        = 22667,
-    SPELL_FEAR                  = 22678,
+    SPELL_SHADOWBOLT                = 22677,
+    SPELL_SHADOWBOLT_VOLLEY         = 22665,
+    SPELL_SHADOW_COMMAND            = 22667,
+    SPELL_FEAR                      = 22678,
 
-    SPELL_NEFARIANS_BARRIER     = 22663,
+    SPELL_NEFARIANS_BARRIER         = 22663,
 
     // Nefarian
     SPELL_SHADOWFLAME_INITIAL       = 22992,
@@ -150,6 +150,7 @@ enum Spells
     SPELL_POLYMORPH                 = 23603,
     SPELL_BLESSING_PROTECTION       = 23415,
     SPELL_SUMMON_INFERNALS          = 23426,
+    SPELL_WARRIOR_BERSERK           = 2458,
     SPELL_CORRUPTED_FIRE_NOVA_TOTEM = 23419,
     SPELL_CORRUPTED_STONESKIN_TOTEM = 23420,
     SPELL_CORRUPTED_HEALING_TOTEM   = 23422,
@@ -865,9 +866,9 @@ class spell_class_call_handler : public SpellScript
     }
 };
 
-class aura_wild_magic : public AuraScript
+class aura_class_call_wild_magic : public AuraScript
 {
-    PrepareAuraScript(aura_wild_magic);
+    PrepareAuraScript(aura_class_call_wild_magic);
 
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
@@ -881,13 +882,13 @@ class aura_wild_magic : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(aura_wild_magic::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(aura_class_call_wild_magic::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class aura_siphon_blessing : public AuraScript
+class aura_class_call_siphon_blessing : public AuraScript
 {
-    PrepareAuraScript(aura_siphon_blessing);
+    PrepareAuraScript(aura_class_call_siphon_blessing);
 
     void HandlePeriodic(AuraEffect const* aurEff)
     {
@@ -904,7 +905,7 @@ class aura_siphon_blessing : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(aura_siphon_blessing::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(aura_class_call_siphon_blessing::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -943,6 +944,24 @@ class spell_class_call_polymorph : public SpellScript
     }
 };
 
+class aura_class_call_berserk : public AuraScript
+{
+    PrepareAuraScript(aura_class_call_berserk);
+
+    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->CastSpell(target, SPELL_WARRIOR_BERSERK);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(aura_class_call_berserk::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 class spell_corrupted_totems : public SpellScript
 {
     PrepareSpellScript(spell_corrupted_totems);
@@ -972,8 +991,9 @@ void AddSC_boss_nefarian()
     new boss_nefarian();
     RegisterCreatureAI(npc_corrupted_totem);
     RegisterSpellScript(spell_class_call_handler);
-    RegisterSpellScript(aura_wild_magic);
-    RegisterSpellScript(aura_siphon_blessing);
+    RegisterSpellScript(aura_class_call_wild_magic);
+    RegisterSpellScript(aura_class_call_siphon_blessing);
     RegisterSpellScript(spell_class_call_polymorph);
+    RegisterSpellScript(aura_class_call_berserk);
     RegisterSpellScript(spell_corrupted_totems);
 }
