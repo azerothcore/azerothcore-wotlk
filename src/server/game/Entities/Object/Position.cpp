@@ -184,6 +184,7 @@ ByteBuffer& operator>>(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
     streamer.m_pos->Relocate(x, y, z, o);
     return buf;
 }
+
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer)
 {
     float x, y, z;
