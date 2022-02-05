@@ -202,9 +202,17 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
             extraEvents.Reset();
+            if (events.IsInPhase(PHASE_SUBMERGED))
+            {
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+
+                me->RemoveAurasDueToSpell(SPELL_RAGNA_SUBMERGE_VISUAL);
+            }
             me->SetFacingTo(DEATH_ORIENTATION);
+            _JustDied();
         }
 
         void KilledUnit(Unit* victim) override
