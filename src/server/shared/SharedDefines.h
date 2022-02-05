@@ -221,8 +221,8 @@ enum FactionTemplates
 enum MoneyConstants
 {
     COPPER = 1,
-    SILVER = COPPER * 100,
-    GOLD   = SILVER * 100
+    SILVER = COPPER * 10,
+    GOLD   = SILVER * 10
 };
 
 enum Stats
