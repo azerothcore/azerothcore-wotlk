@@ -155,7 +155,7 @@ public:
             MarzonGUID.Clear();
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DisappearAndDie();
 

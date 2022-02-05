@@ -80,7 +80,7 @@ void CritterAI::UpdateAI(uint32 diff)
     {
         _combatTimer += diff;
         if (_combatTimer >= 5000)
-            EnterEvadeMode();
+            EnterEvadeMode(EVADE_REASON_OTHER);
     }
 }
 

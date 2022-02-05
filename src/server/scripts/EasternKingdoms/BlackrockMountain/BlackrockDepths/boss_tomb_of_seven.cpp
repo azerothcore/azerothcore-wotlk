@@ -202,7 +202,7 @@ public:
             _events.ScheduleEvent(EVENT_SPELL_SUMMON_VOIDWALKERS, 1000);
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->RemoveAllAuras();
             me->DeleteThreatList();

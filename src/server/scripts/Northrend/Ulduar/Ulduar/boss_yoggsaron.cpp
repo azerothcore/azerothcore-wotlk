@@ -736,7 +736,7 @@ public:
             if (!SelectTargetFromPlayerList(90, SPELL_INSANE1))
             {
                 m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_INSANE1);
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 

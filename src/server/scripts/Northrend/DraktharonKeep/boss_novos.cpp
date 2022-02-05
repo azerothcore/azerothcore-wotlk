@@ -244,8 +244,6 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SUMMON_MINIONS, 500);
                     break;
             }
-
-            EnterEvadeIfOutOfCombatArea();
         }
 
         bool CheckEvadeIfOutOfCombatArea() const override

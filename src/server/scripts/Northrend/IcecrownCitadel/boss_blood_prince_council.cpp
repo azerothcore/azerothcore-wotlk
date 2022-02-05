@@ -959,7 +959,7 @@ public:
         {
             Creature* keleseth = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_KELESETH_GUID));
             Creature* taldaram = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID));
-            if (keleseth && taldaram)
+            if (keleseth && taldaram && IsInBoundary(me) && IsInBoundary(keleseth) && IsInBoundary(taldaram))
                 return true;
 
             EnterEvadeMode(EVADE_REASON_OTHER);

@@ -3367,7 +3367,7 @@ public:
             return target->GetEntry() != NPC_THE_LICH_KING;
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive())
                 return;

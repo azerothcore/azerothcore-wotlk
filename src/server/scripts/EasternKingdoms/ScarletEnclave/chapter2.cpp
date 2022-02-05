@@ -240,7 +240,7 @@ public:
             }
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             me->DeleteThreatList();
             me->CombatStop(false);

@@ -1202,7 +1202,7 @@ public:
             Position p = me->GetHomePosition();
             if (me->GetExactDist(&p) > 30.0f)
             {
-                EnterEvadeMode();
+                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
 

@@ -509,7 +509,7 @@ public:
         int32 _damageDone;
         bool _combatStarted;
 
-        void EnterEvadeMode(EvadeReason why) override {}
+        void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
         void UpdateAI(uint32  /*diff*/) override {}
