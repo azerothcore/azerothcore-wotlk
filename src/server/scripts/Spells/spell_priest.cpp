@@ -78,11 +78,11 @@ class spell_pri_shadowfiend_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: shadowfiend inherits 30% of intellect / stamina (guessed)
+        // xinef: shadowfiend inherits 30% of intellect and 65% of stamina (guessed)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), stat == STAT_STAMINA ? 65 : 30);
         }
     }
 
@@ -242,7 +242,7 @@ class spell_pri_glyph_of_prayer_of_healing : public AuraScript
         PreventDefaultAction();
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
-        if (!healInfo || healInfo->GetHeal())
+        if (!healInfo || !healInfo->GetHeal())
         {
             return;
         }
@@ -462,7 +462,7 @@ class spell_pri_pain_and_suffering_proc : public SpellScript
         if (Unit* unitTarget = GetHitUnit())
             if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0, 0, GetCaster()->GetGUID()))
             {
-                aur->GetBase()->RefreshTimers();
+                aur->GetBase()->RefreshTimersWithMods();
                 aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
             }
     }
@@ -807,6 +807,43 @@ class spell_pri_vampiric_touch : public AuraScript
     }
 };
 
+// 605 - Mind Control
+class spell_pri_mind_control : public AuraScript
+{
+    PrepareAuraScript(spell_pri_mind_control);
+
+    void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Unit* target = GetTarget())
+            {
+                uint32 duration = static_cast<uint32>(GetDuration());
+                caster->SetInCombatWith(target, duration);
+                target->SetInCombatWith(caster, duration);
+            }
+        }
+    }
+
+    void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Unit* target = GetTarget())
+            {
+                caster->SetCombatTimer(0);
+                target->SetCombatTimer(0);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_pri_mind_control::HandleApplyEffect, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_pri_mind_control::HandleRemoveEffect, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
@@ -828,4 +865,5 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_renew);
     RegisterSpellScript(spell_pri_shadow_word_death);
     RegisterSpellScript(spell_pri_vampiric_touch);
+    RegisterSpellScript(spell_pri_mind_control);
 }

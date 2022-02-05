@@ -16,7 +16,6 @@
  */
 
 #include "SpellInfo.h"
-#include "Battleground.h"
 #include "Chat.h"
 #include "ConditionMgr.h"
 #include "DBCStores.h"
@@ -450,10 +449,10 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     if (caster)
     {
         // bonus amount from combo points
-        if (caster->m_movedByPlayer)
-            if (uint8 comboPoints = caster->m_movedByPlayer->ToPlayer()->GetComboPoints())
-                if (float comboDamage = PointsPerComboPoint)
-                    value += comboDamage * comboPoints;
+        if (uint8 comboPoints = caster->GetComboPoints())
+        {
+            value += PointsPerComboPoint * comboPoints;
+        }
 
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
 
@@ -761,7 +760,7 @@ std::array<SpellEffectInfo::StaticData, TOTAL_SPELL_EFFECTS> SpellEffectInfo::_d
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 157 SPELL_EFFECT_CREATE_ITEM_2
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM}, // 158 SPELL_EFFECT_MILLING
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 159 SPELL_EFFECT_ALLOW_RENAME_PET
-    {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 160 SPELL_EFFECT_160
+    {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 160 SPELL_EFFECT_FORCE_CAST_2
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 161 SPELL_EFFECT_TALENT_SPEC_COUNT
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 162 SPELL_EFFECT_TALENT_SPEC_SELECT
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 163 SPELL_EFFECT_163
@@ -1281,8 +1280,19 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
             return false;
 
     SpellInfo const* affectSpell = sSpellMgr->GetSpellInfo(mod->spellId);
+
+    if (!affectSpell)
+    {
+        return false;
+    }
+
+    if (!sScriptMgr->OnIsAffectedBySpellModCheck(affectSpell, this, mod))
+    {
+        return true;
+    }
+
     // False if affect_spell == nullptr or spellFamily not equal
-    if (!affectSpell || affectSpell->SpellFamilyName != SpellFamilyName)
+    if (affectSpell->SpellFamilyName != SpellFamilyName)
         return false;
 
     // true
@@ -1434,7 +1444,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
         if (!shapeInfo)
         {
-            LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift {}", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
@@ -1608,12 +1618,19 @@ bool SpellInfo::IsStrongerAuraActive(Unit const* caster, Unit const* target) con
             if (!auraGroup || auraGroup != groupId)
                 continue;
 
+            if (IsRankOf((*iter)->GetSpellInfo()) && (sFlag & SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_SAME_SPELL))
+            {
+                continue;
+            }
+
             // xinef: check priority before effect mask
-            if (sFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1)
+            if (sFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlag <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4)
             {
                 SpellGroupSpecialFlags sFlagCurr = sSpellMgr->GetSpellGroupSpecialFlags((*iter)->GetId());
-                if (sFlagCurr >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlagCurr < sFlag)
+                if (sFlagCurr >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlagCurr <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4 && sFlagCurr < sFlag)
+                {
                     return true;
+                }
             }
 
             // xinef: check aura effect equal auras only, some auras have different effects on different ranks - check rank also
@@ -1642,10 +1659,10 @@ bool SpellInfo::IsStrongerAuraActive(Unit const* caster, Unit const* target) con
                 if (player->m_spellModTakingSpell && player->m_spellModTakingSpell->m_spellInfo->Id == Id)
                     basePoints = player->m_spellModTakingSpell->GetSpellValue()->EffectBasePoints[i];
 
-            int32 curValue = abs(Effects[i].CalcValue(caster, &basePoints));
+            int32 curValue = std::abs(Effects[i].CalcValue(caster, &basePoints));
             int32 auraValue = (sFlag & SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK) ?
-                              abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
-                              abs((*iter)->GetAmount());
+                              std::abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
+                              std::abs((*iter)->GetAmount());
 
             // xinef: for same spells, divide amount by stack amount
             if (Id == (*iter)->GetId())
@@ -2281,14 +2298,14 @@ int32 SpellInfo::GetDuration() const
 {
     if (!DurationEntry)
         return 0;
-    return (DurationEntry->Duration[0] == -1) ? -1 : abs(DurationEntry->Duration[0]);
+    return (DurationEntry->Duration[0] == -1) ? -1 : std::abs(DurationEntry->Duration[0]);
 }
 
 int32 SpellInfo::GetMaxDuration() const
 {
     if (!DurationEntry)
         return 0;
-    return (DurationEntry->Duration[2] == -1) ? -1 : abs(DurationEntry->Duration[2]);
+    return (DurationEntry->Duration[2] == -1) ? -1 : std::abs(DurationEntry->Duration[2]);
 }
 
 uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
@@ -2325,6 +2342,7 @@ uint32 SpellInfo::GetMaxTicks() const
                 case SPELL_AURA_PERIODIC_DAMAGE:
                 case SPELL_AURA_PERIODIC_HEAL:
                 case SPELL_AURA_PERIODIC_LEECH:
+                case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     if (Effects[x].Amplitude != 0)
                         return DotDuration / Effects[x].Amplitude;
                     break;
@@ -2350,7 +2368,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
         // Else drain all power
         if (PowerType < MAX_POWERS)
             return caster->GetPower(Powers(PowerType));
-        LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '{}' in spell {}", PowerType, Id);
         return 0;
     }
 
@@ -2379,7 +2397,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
                 LOG_DEBUG("spells.aura", "CalculateManaCost: Not implemented yet!");
                 break;
             default:
-                LOG_ERROR("spells", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                LOG_ERROR("spells", "CalculateManaCost: Unknown power type '{}' in spell {}", PowerType, Id);
                 return 0;
         }
     }
@@ -2656,6 +2674,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     case SPELL_AURA_ADD_TARGET_TRIGGER:
                         return true;
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                         if (!deep)
                         {

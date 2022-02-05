@@ -29,6 +29,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "InstanceScript.h"
@@ -45,6 +46,7 @@
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
 // 46642 - 5,000 Gold
@@ -1678,7 +1680,31 @@ class spell_gen_pet_summoned : public SpellScript
     {
         Player* player = GetCaster()->ToPlayer();
         if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-            Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
+        {
+            PetType newPetType = (player->getClass() == CLASS_HUNTER) ? HUNTER_PET : SUMMON_PET;
+            Pet* newPet = new Pet(player, newPetType);
+            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true))
+            {
+                // revive the pet if it is dead
+                if (newPet->getDeathState() != ALIVE && newPet->getDeathState() != JUST_RESPAWNED)
+                    newPet->setDeathState(JUST_RESPAWNED);
+
+                newPet->SetFullHealth();
+                newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
+
+                switch (newPet->GetEntry())
+                {
+                    case NPC_DOOMGUARD:
+                    case NPC_INFERNAL:
+                        newPet->SetEntry(NPC_IMP);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+                delete newPet;
+        }
     }
 
     void Register() override
@@ -2106,7 +2132,7 @@ class spell_gen_clone_weapon_aura : public AuraScript
             case SPELL_COPY_OFFHAND_AURA:
             case SPELL_COPY_OFFHAND_2_AURA:
                 {
-                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 1;
+                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1);
 
                     if (Player* player = caster->ToPlayer())
                     {
@@ -2119,7 +2145,7 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 }
             case SPELL_COPY_RANGED_AURA:
                 {
-                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) + 2;
+                    prevItem = target->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2);
 
                     if (Player* player = caster->ToPlayer())
                     {
@@ -2225,12 +2251,12 @@ class spell_gen_turkey_marker : public AuraScript
     {
         if (GetStackAmount() > stackAmount)
         {
-            _applyTimes.push_back(World::GetGameTimeMS());
+            _applyTimes.push_back(GameTime::GetGameTimeMS().count());
             stackAmount++;
         }
 
         // pop stack if it expired for us
-        if (_applyTimes.front() + GetMaxDuration() < World::GetGameTimeMS())
+        if (_applyTimes.front() + GetMaxDuration() < GameTime::GetGameTimeMS().count())
         {
             stackAmount--;
             ModStackAmount(-1, AURA_REMOVE_BY_EXPIRE);
@@ -4362,6 +4388,29 @@ class spell_gen_holiday_buff_food : public AuraScript
     }
 };
 
+class spell_gen_arcane_charge : public SpellScript
+{
+    PrepareSpellScript(spell_gen_arcane_charge);
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* target = GetExplTargetUnit())
+        {
+            if (target->GetCreatureType() != CREATURE_TYPE_DEMON && target->GetCreatureType() != CREATURE_TYPE_UNDEAD)
+            {
+                return SPELL_FAILED_DONT_REPORT;
+            }
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_arcane_charge::CheckRequirement);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -4494,4 +4543,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
+    RegisterSpellScript(spell_gen_arcane_charge);
 }

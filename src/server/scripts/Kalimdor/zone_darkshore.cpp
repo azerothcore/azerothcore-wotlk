@@ -422,10 +422,225 @@ public:
     }
 };
 
+enum eRabidThistleBear
+{
+    EVENT_CHECK_FOLLOWING           = 1,
+    NPC_RABID_THISTLE_BEAR          = 2164,
+    NPC_CAPTURED_RABID_THISTLE_BEAR = 11836,
+    OBJECT_BEAR_TRAP                = 111148,
+    QUEST_PLAGUED_LANDS             = 2118,
+    SPELL_BEAR_CAPTURED_IN_TRAP     = 9439,
+    SPELL_THARNARIUMS_HEAL          = 9457
+};
+
+class npc_rabid_thistle_bear : public CreatureScript
+{
+public:
+    npc_rabid_thistle_bear() : CreatureScript("npc_rabid_thistle_bear") {}
+
+    struct npc_rabid_thistle_bearAI : public FollowerAI
+    {
+        npc_rabid_thistle_bearAI(Creature* creature) : FollowerAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetEntry(NPC_RABID_THISTLE_BEAR);
+            me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+            _playerGUID.Clear();
+        }
+
+        void Reset() override {}
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_BEAR_CAPTURED_IN_TRAP)
+            {
+                if (GameObject* trap = me->FindNearestGameObject(OBJECT_BEAR_TRAP, 5.0f))
+                {
+                    if (Unit* owner = trap->GetOwner())
+                    {
+                        if (Player* player = owner->ToPlayer())
+                        {
+                            _playerGUID = player->GetGUID();
+                            me->SetEntry(NPC_CAPTURED_RABID_THISTLE_BEAR);
+                            me->SetFaction(FACTION_FRIENDLY);
+                            me->GetMotionMaster()->MoveFollow(player, 1.0f, PET_FOLLOW_ANGLE - (PET_FOLLOW_ANGLE / 4));
+                            _events.Reset();
+                            _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1000);
+                            player->KilledMonsterCredit(NPC_CAPTURED_RABID_THISTLE_BEAR);
+                            me->DespawnOrUnsummon(240000);
+                        }
+                    }
+                }
+            }
+
+            if (spellInfo->Id == SPELL_THARNARIUMS_HEAL)
+            {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H); // EMOTE_ONESHOT_WOUND
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (me->GetFaction() == FACTION_FRIENDLY)
+            {
+                _events.Update(diff);
+                switch (_events.ExecuteEvent())
+                {
+                    case EVENT_CHECK_FOLLOWING:
+                        Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                        if (!player || me->GetDistance2d(player) > 100.0f || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE || player->GetQuestStatus(QUEST_PLAGUED_LANDS) == QUEST_STATUS_NONE)
+                        {
+                            me->DespawnOrUnsummon();
+                        }
+                        _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1000);
+                        break;
+                }
+            }
+
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap _events;
+        ObjectGuid _playerGUID;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_rabid_thistle_bearAI(creature);
+    }
+};
+
+enum eTharnarian
+{
+    EVENT_POST_QUEST_ONE            = 1,
+    EVENT_POST_QUEST_TWO            = 2,
+    EVENT_POST_QUEST_THREE          = 3,
+    ITEM_THARNARIUMS_HOPE           = 7586,
+    GUID_SCRIPT_INVOKER             = 1,
+    SAY_BE_CLEANSED                 = 0
+};
+
+class npc_tharnarian : public CreatureScript
+{
+public:
+    npc_tharnarian() : CreatureScript("npc_tharnarian") {}
+
+    struct npc_tharnarianAI : public ScriptedAI
+    {
+        npc_tharnarianAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _scriptRunning = false;
+            _facing        = me->GetOrientation();
+        }
+
+        void Reset() override
+        {
+            _events.Reset();
+        }
+
+        void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        {
+            if (gossipListId == 1)
+            {
+                CloseGossipMenuFor(player);
+                player->AddItem(ITEM_THARNARIUMS_HOPE, 1);
+            }
+        }
+
+        void SetGUID(ObjectGuid /*guid*/, int32 type) override
+        {
+            if (type == GUID_SCRIPT_INVOKER && _scriptRunning == false)
+            {
+                if (Creature* bear = me->FindNearestCreature(NPC_CAPTURED_RABID_THISTLE_BEAR, 5.0f))
+                {
+                    _bearGUID      = bear->GetGUID();
+                    _scriptRunning = true;
+                    _events.ScheduleEvent(EVENT_POST_QUEST_ONE, 1000);
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_scriptRunning)
+            {
+                _events.Update(diff);
+                switch (_events.ExecuteEvent())
+                {
+                    case EVENT_POST_QUEST_ONE:
+                        if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
+                        {
+                            Talk(SAY_BE_CLEANSED);
+                            me->CastSpell(bear, SPELL_THARNARIUMS_HEAL);
+                        }
+                        _events.ScheduleEvent(EVENT_POST_QUEST_TWO, 4000);
+                        break;
+                    case EVENT_POST_QUEST_TWO:
+                        if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
+                        {
+                            bear->SetUInt32Value(UNIT_FIELD_BYTES_1, 7);
+                        }
+                        _events.ScheduleEvent(EVENT_POST_QUEST_THREE, 1000);
+                        break;
+                    case EVENT_POST_QUEST_THREE:
+                        if (Creature* bear = ObjectAccessor::GetCreature(*me, _bearGUID))
+                        {
+                            bear->DespawnOrUnsummon();
+                            _scriptRunning = false;
+                        }
+                        break;
+                }
+            }
+
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap   _events;
+        ObjectGuid _bearGUID;
+        bool       _scriptRunning;
+        float      _facing;
+    };
+
+    bool OnQuestReward(Player* player, Creature* creature, const Quest* _Quest, uint32 /*slot*/) override
+    {
+        if (_Quest->GetQuestId() == QUEST_PLAGUED_LANDS)
+        {
+            creature->AI()->SetGUID(player->GetGUID(), GUID_SCRIPT_INVOKER);
+        }
+        return false;
+    }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_tharnarianAI(creature);
+    }
+};
+
 void AddSC_darkshore()
 {
     // Ours
     new npc_murkdeep();
+    new npc_rabid_thistle_bear();
+    new npc_tharnarian();
 
     // Theirs
     new npc_kerlonian();

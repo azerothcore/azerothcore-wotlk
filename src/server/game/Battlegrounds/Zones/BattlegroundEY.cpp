@@ -19,8 +19,8 @@
 #include "BattlegroundMgr.h"
 #include "Creature.h"
 #include "GameGraveyard.h"
+#include "GameTime.h"
 #include "Language.h"
-#include "Object.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
@@ -67,7 +67,7 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
                         AddPoints(TEAM_ALLIANCE, BG_EY_TickPoints[_ownedPointsCount[TEAM_ALLIANCE] - 1]);
                     if (_ownedPointsCount[TEAM_HORDE] > 0)
                         AddPoints(TEAM_HORDE, BG_EY_TickPoints[_ownedPointsCount[TEAM_HORDE] - 1]);
-                    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, BG_EY_FPOINTS_TICK_TIME - (World::GetGameTimeMS() % BG_EY_FPOINTS_TICK_TIME));
+                    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, BG_EY_FPOINTS_TICK_TIME - (GameTime::GetGameTimeMS().count() % BG_EY_FPOINTS_TICK_TIME));
                     break;
                 case BG_EY_EVENT_FLAG_ON_GROUND:
                     RespawnFlagAfterDrop();
@@ -77,7 +77,7 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
                     break;
                 case BG_EY_EVENT_CHECK_CPOINTS:
                     UpdatePointsState();
-                    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, BG_EY_FPOINTS_CHECK_TIME - (World::GetGameTimeMS() % BG_EY_FPOINTS_CHECK_TIME));
+                    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, BG_EY_FPOINTS_CHECK_TIME - (GameTime::GetGameTimeMS().count() % BG_EY_FPOINTS_CHECK_TIME));
                     break;
             }
     }
@@ -135,14 +135,14 @@ void BattlegroundEY::UpdatePointsState()
     const BattlegroundPlayerMap& bgPlayerMap = GetPlayers();
     for (BattlegroundPlayerMap::const_iterator itr = bgPlayerMap.begin(); itr != bgPlayerMap.end(); ++itr)
     {
-        UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW, itr->second);
+        itr->second->SendUpdateWorldState(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW);
         for (uint8 point = 0; point < EY_POINTS_MAX; ++point)
             if (GameObject* pointObject = pointsVec[point])
                 if (itr->second->CanCaptureTowerPoint() && itr->second->IsWithinDistInMap(pointObject, BG_EY_POINT_RADIUS))
                 {
-                    UpdateWorldStateForPlayer(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_SHOW, itr->second);
-                    UpdateWorldStateForPlayer(PROGRESS_BAR_PERCENT_GREY, BG_EY_PROGRESS_BAR_PERCENT_GREY, itr->second);
-                    UpdateWorldStateForPlayer(PROGRESS_BAR_STATUS, _capturePointInfo[point]._barStatus, itr->second);
+                    itr->second->SendUpdateWorldState(PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_SHOW);
+                    itr->second->SendUpdateWorldState(PROGRESS_BAR_PERCENT_GREY, BG_EY_PROGRESS_BAR_PERCENT_GREY);
+                    itr->second->SendUpdateWorldState(PROGRESS_BAR_STATUS, _capturePointInfo[point]._barStatus);
                     ++_capturePointInfo[point]._playersCount[itr->second->GetTeamId()];
 
                     // Xinef: ugly hax... area trigger is no longer called by client...

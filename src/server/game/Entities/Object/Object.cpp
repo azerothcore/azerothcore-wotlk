@@ -20,11 +20,10 @@
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Chat.h"
-#include "Common.h"
 #include "Creature.h"
-#include "DynamicTree.h"
 #include "DynamicVisibility.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Log.h"
 #include "MapMgr.h"
@@ -49,16 +48,14 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
-
-#ifdef ELUNA
-#include "ElunaEventMgr.h"
-#include "LuaEngine.h"
-#endif
 
 constexpr float VisibilityDistances[AsUnderlyingType(VisibilityDistanceType::Max)] =
 {
@@ -87,17 +84,14 @@ Object::Object() : m_PackGUID(sizeof(uint64) + 1)
 
 WorldObject::~WorldObject()
 {
-#ifdef ELUNA
-    delete elunaEvents;
-    elunaEvents = nullptr;
-#endif
+    sScriptMgr->OnWorldObjectDestroy(this);
 
     // this may happen because there are many !create/delete
     if (IsWorldObject() && m_currMap)
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            LOG_FATAL("entities.object", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
+            LOG_FATAL("entities.object", "Object::~Object Corpse {}, type={} deleted but still in map!!", GetGUID().ToString(), ((Corpse*)this)->GetType());
             ABORT();
         }
         ResetMap();
@@ -110,15 +104,15 @@ Object::~Object()
 
     if (IsInWorld())
     {
-        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - {} deleted but still in world!!", GetGUID().ToString());
         if (isType(TYPEMASK_ITEM))
-            LOG_FATAL("entities.object", "Item slot %u", ((Item*)this)->GetSlot());
+            LOG_FATAL("entities.object", "Item slot {}", ((Item*)this)->GetSlot());
         ABORT();
     }
 
     if (m_objectUpdated)
     {
-        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - {} deleted but still in update list!!", GetGUID().ToString());
         ABORT();
     }
 
@@ -618,21 +612,29 @@ uint32 Object::GetUpdateFieldData(Player const* target, uint32*& flags) const
     return visibleFlag;
 }
 
-void Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count)
+bool Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count)
 {
     if (data.empty())
-        return;
+        return false;
 
-    Tokenizer tokens(data, ' ', count);
+    std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
     if (tokens.size() != count)
-        return;
+        return false;
 
     for (uint32 index = 0; index < count; ++index)
     {
-        m_uint32Values[startOffset + index] = atol(tokens[index]);
+        Optional<uint32> val = Acore::StringTo<uint32>(tokens[index]);
+        if (!val)
+        {
+            return false;
+        }
+
+        m_uint32Values[startOffset + index] = *val;
         _changesMask.SetBit(startOffset + index);
     }
+
+    return true;
 }
 
 void Object::SetInt32Value(uint16 index, int32 value)
@@ -754,7 +756,7 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 
     if (offset > 3)
     {
-        LOG_ERROR("entities.object", "Object::SetByteValue: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteValue: wrong offset {}", offset);
         return;
     }
 
@@ -774,7 +776,7 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 
     if (offset > 1)
     {
-        LOG_ERROR("entities.object", "Object::SetUInt16Value: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetUInt16Value: wrong offset {}", offset);
         return;
     }
 
@@ -915,7 +917,7 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("entities.object", "Object::SetByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteFlag: wrong offset {}", offset);
         return;
     }
 
@@ -934,7 +936,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("entities.object", "Object::RemoveByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::RemoveByteFlag: wrong offset {}", offset);
         return;
     }
 
@@ -1000,7 +1002,7 @@ void Object::ApplyModFlag64(uint16 index, uint64 flag, bool apply)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    LOG_INFO("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",
+    LOG_INFO("misc", "Attempt {} non-existed value field: {} (count: {}) for object typeid: {} type mask: {}",
         (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
@@ -1030,7 +1032,8 @@ bool Position::HasInLine(WorldObject const* target, float width) const
         return false;
     width += target->GetObjectSize();
     float angle = GetRelativeAngle(target);
-    return fabs(sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
+
+    return std::fabs(std::sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
 }
 
 std::string Position::ToString() const
@@ -1074,55 +1077,52 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 void MovementInfo::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");
-    LOG_INFO("movement", "guid %s", guid.ToString().c_str());
-    LOG_INFO("movement", "flags %u", flags);
-    LOG_INFO("movement", "flags2 %u", flags2);
-    LOG_INFO("movement", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
-    LOG_INFO("movement", "position: `%s`", pos.ToString().c_str());
+    LOG_INFO("movement", "guid {}", guid.ToString());
+    LOG_INFO("movement", "flags {}", flags);
+    LOG_INFO("movement", "flags2 {}", flags2);
+    LOG_INFO("movement", "time {} current time {}", flags2, uint64(::GameTime::GetGameTime().count()));
+    LOG_INFO("movement", "position: `{}`", pos.ToString());
 
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
         LOG_INFO("movement", "TRANSPORT:");
-        LOG_INFO("movement", "guid: %s", transport.guid.ToString().c_str());
-        LOG_INFO("movement", "position: `%s`", transport.pos.ToString().c_str());
-        LOG_INFO("movement", "seat: %i", transport.seat);
-        LOG_INFO("movement", "time: %u", transport.time);
+        LOG_INFO("movement", "guid: {}", transport.guid.ToString());
+        LOG_INFO("movement", "position: `{}`", transport.pos.ToString());
+        LOG_INFO("movement", "seat: {}", transport.seat);
+        LOG_INFO("movement", "time: {}", transport.time);
 
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
         {
-            LOG_INFO("movement", "time2: %u", transport.time2);
+            LOG_INFO("movement", "time2: {}", transport.time2);
         }
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        LOG_INFO("movement", "pitch: %f", pitch);
+        LOG_INFO("movement", "pitch: {}", pitch);
 
-    LOG_INFO("movement", "fallTime: %u", fallTime);
+    LOG_INFO("movement", "fallTime: {}", fallTime);
     if (flags & MOVEMENTFLAG_FALLING)
-        LOG_INFO("movement", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+        LOG_INFO("movement", "j_zspeed: {} j_sinAngle: {} j_cosAngle: {} j_xyspeed: {}", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        LOG_INFO("movement", "splineElevation: %f", splineElevation);
+        LOG_INFO("movement", "splineElevation: {}", splineElevation);
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
-#ifdef ELUNA
-    elunaEvents(nullptr),
-#endif
     LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
     m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+
+    sScriptMgr->OnWorldObjectCreate(this);
 }
 
-#ifdef ELUNA
 void WorldObject::Update(uint32 time_diff)
 {
-    elunaEvents->Update(time_diff);
+    sScriptMgr->OnWorldObjectUpdate(this, time_diff);
 }
-#endif
 
 void WorldObject::SetWorldObject(bool on)
 {
@@ -1258,7 +1258,7 @@ InstanceScript* WorldObject::GetInstanceScript() const
 
 float WorldObject::GetDistanceZ(const WorldObject* obj) const
 {
-    float dz = fabs(GetPositionZ() - obj->GetPositionZ());
+    float dz = std::fabs(GetPositionZ() - obj->GetPositionZ());
     float sizefactor = GetObjectSize() + obj->GetObjectSize();
     float dist = dz - sizefactor;
     return (dist > 0 ? dist : 0);
@@ -1530,8 +1530,8 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
 
 void Position::RelocateOffset(const Position& offset)
 {
-    m_positionX = GetPositionX() + (offset.GetPositionX() * cos(GetOrientation()) + offset.GetPositionY() * sin(GetOrientation() + M_PI));
-    m_positionY = GetPositionY() + (offset.GetPositionY() * cos(GetOrientation()) + offset.GetPositionX() * sin(GetOrientation()));
+    m_positionX = GetPositionX() + (offset.GetPositionX() * cos(GetOrientation()) + offset.GetPositionY() * std::sin(GetOrientation() + M_PI));
+    m_positionY = GetPositionY() + (offset.GetPositionY() * cos(GetOrientation()) + offset.GetPositionX() * std::sin(GetOrientation()));
     m_positionZ = GetPositionZ() + offset.GetPositionZ();
     m_orientation = GetOrientation() + offset.GetOrientation();
 }
@@ -1541,8 +1541,8 @@ void Position::GetPositionOffsetTo(const Position& endPos, Position& retOffset) 
     float dx = endPos.GetPositionX() - GetPositionX();
     float dy = endPos.GetPositionY() - GetPositionY();
 
-    retOffset.m_positionX = dx * cos(GetOrientation()) + dy * sin(GetOrientation());
-    retOffset.m_positionY = dy * cos(GetOrientation()) - dx * sin(GetOrientation());
+    retOffset.m_positionX = dx * cos(GetOrientation()) + dy * std::sin(GetOrientation());
+    retOffset.m_positionY = dy * cos(GetOrientation()) - dx * std::sin(GetOrientation());
     retOffset.m_positionZ = endPos.GetPositionZ() - GetPositionZ();
     retOffset.m_orientation = endPos.GetOrientation() - GetOrientation();
 }
@@ -1566,11 +1566,11 @@ void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos)
     float dx = GetPositionX() - x;
     float dy = GetPositionY() - y;
 
-    if (fabs(dx) < 0.001f && fabs(dy) < 0.001f)
+    if (std::fabs(dx) < 0.001f && std::fabs(dy) < 0.001f)
     {
         float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
         vcos = cos(angle);
-        vsin = sin(angle);
+        vsin = std::sin(angle);
     }
     else
     {
@@ -1662,7 +1662,7 @@ bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, 
     float A = (obj2->GetPositionY() - obj1->GetPositionY()) / (obj2->GetPositionX() - obj1->GetPositionX());
     float B = -1;
     float C = obj1->GetPositionY() - A * obj1->GetPositionX();
-    float dist = fabs(A * GetPositionX() + B * GetPositionY() + C) / sqrt(A * A + B * B);
+    float dist = std::fabs(A * GetPositionX() + B * GetPositionY() + C) / sqrt(A * A + B * B);
     return dist <= size;
 }
 
@@ -1689,7 +1689,7 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     float new_dist = (float)rand_norm() * static_cast<float>(distance);
 
     rand_x = pos.m_positionX + new_dist * cos(angle);
-    rand_y = pos.m_positionY + new_dist * sin(angle);
+    rand_y = pos.m_positionY + new_dist * std::sin(angle);
     rand_z = pos.m_positionZ;
 
     Acore::NormalizeMapCoord(rand_x);
@@ -1918,8 +1918,22 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     // Creature scripts
     if (Creature const* cObj = obj->ToCreature())
-        if (cObj->IsAIEnabled && this->ToPlayer() && !cObj->AI()->CanBeSeen(this->ToPlayer()))
-            return false;
+    {
+        if (Player const* player = this->ToPlayer())
+        {
+            if (cObj->IsAIEnabled && !cObj->AI()->CanBeSeen(player))
+            {
+                return false;
+            }
+
+            ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY, cObj->GetEntry());
+
+            if (!sConditionMgr->IsObjectMeetToConditions((WorldObject*)this, conditions))
+            {
+                return false;
+            }
+        }
+    }
 
     // Gameobject scripts
     if (GameObject const* goObj = obj->ToGameObject())
@@ -2206,8 +2220,7 @@ void Unit::BuildHeartBeatMsg(WorldPacket* data) const
     BuildMovementPacket(data);
 }
 
-// pussywizard!
-void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr)
+void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
 {
     dist += GetObjectSize();
     if (includeMargin)
@@ -2227,22 +2240,23 @@ void WorldObject::SetMap(Map* map)
 {
     ASSERT(map);
     ASSERT(!IsInWorld());
+
     if (m_currMap == map) // command add npc: first create, than loadfromdb
+    {
         return;
+    }
+
     if (m_currMap)
     {
-        LOG_FATAL("entities.object", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
+        LOG_FATAL("entities.object", "WorldObject::SetMap: obj {} new map {} {}, old map {} {}", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
+
     m_currMap = map;
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
 
-#ifdef ELUNA
-    delete elunaEvents;
-    // On multithread replace this with a pointer to map's Eluna pointer stored in a map
-    elunaEvents = new ElunaEventProcessor(&Eluna::GEluna, this);
-#endif
+    sScriptMgr->OnWorldObjectSetMap(this, map);
 
     if (IsWorldObject())
         m_currMap->AddWorldObject(this);
@@ -2252,13 +2266,13 @@ void WorldObject::ResetMap()
 {
     ASSERT(m_currMap);
     ASSERT(!IsInWorld());
-    if (IsWorldObject())
-        m_currMap->RemoveWorldObject(this);
 
-#ifdef ELUNA
-    delete elunaEvents;
-    elunaEvents = nullptr;
-#endif
+    if (IsWorldObject())
+    {
+        m_currMap->RemoveWorldObject(this);
+    }
+
+    sScriptMgr->OnWorldObjectResetMap(this);
 
     m_currMap = nullptr;
     //maybe not for corpse
@@ -2273,14 +2287,14 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        LOG_ERROR("entities.object", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
+        LOG_ERROR("entities.object", "Object {} at attempt add to move list not have valid map (Id: {}).", GetGUID().ToString(), GetMapId());
         return;
     }
 
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, Unit* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2413,7 +2427,7 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template {} not found in database!", entry);
         return nullptr;
     }
 
@@ -2460,7 +2474,7 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, const Position& pos, TempS
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, isType(TYPEMASK_UNIT) ? (Unit*)this : nullptr))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, (WorldObject*) this))
         {
             summon->SetTempSummonType(spwtype);
             return summon;
@@ -2478,7 +2492,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template {} not found in database!", entry);
         return nullptr;
     }
 
@@ -2796,7 +2810,7 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     // angle calculated from current orientation
     GetNearPoint(forWho, x, y, z, size, distance2d, GetOrientation() + angle);
 
-    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
+    if (std::fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2840,7 +2854,7 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
     // Exclude gameobjects from LoS calculations
-    if (fabs(this->GetPositionZ() - z) > 3.0f || (GetTypeId() != TYPEID_GAMEOBJECT && !IsWithinLOS(x, y, z)))
+    if (std::fabs(this->GetPositionZ() - z) > 3.0f || (GetTypeId() != TYPEID_GAMEOBJECT && !IsWithinLOS(x, y, z)))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2854,7 +2868,7 @@ void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float&
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
-    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
+    if (std::fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2873,31 +2887,31 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     angle += m_orientation;
     float destx, desty, destz, ground, floor;
     destx = pos.m_positionX + dist * cos(angle);
-    desty = pos.m_positionY + dist * sin(angle);
+    desty = pos.m_positionY + dist * std::sin(angle);
 
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
         return;
     }
 
     ground = GetMapHeight(destx, desty, MAX_HEIGHT);
     floor = GetMapHeight(destx, desty, pos.m_positionZ);
-    destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
+    destz = std::fabs(ground - pos.m_positionZ) <= std::fabs(floor - pos.m_positionZ) ? ground : floor;
 
     float step = dist / 10.0f;
 
     for (uint8 j = 0; j < 10; ++j)
     {
         // do not allow too big z changes
-        if (fabs(pos.m_positionZ - destz) > 6.0f)
+        if (std::fabs(pos.m_positionZ - destz) > 6.0f)
         {
             destx -= step * cos(angle);
-            desty -= step * sin(angle);
+            desty -= step * std::sin(angle);
             ground = GetMapHeight(destx, desty, MAX_HEIGHT);
             floor = GetMapHeight(destx, desty, pos.m_positionZ);
-            destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
+            destz = std::fabs(ground - pos.m_positionZ) <= std::fabs(floor - pos.m_positionZ) ? ground : floor;
         }
         // we have correct destz now
         else
@@ -2918,7 +2932,7 @@ Position WorldObject::GetFirstCollisionPosition(float startX, float startY, floa
     auto dx = destX - startX;
     auto dy = destY - startY;
 
-    auto ang = atan2(dy, dx);
+    auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * M_PI + ang;
     Position pos = Position(startX, startY, startZ, ang);
 
@@ -2936,7 +2950,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     auto dx = destX - pos.GetPositionX();
     auto dy = destY - pos.GetPositionY();
 
-    auto ang = atan2(dy, dx);
+    auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * M_PI + ang;
 
     MovePositionToFirstCollision(pos, distance, ang);
@@ -2955,7 +2969,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     angle += GetOrientation();
     float destx, desty, destz;
     destx = pos.m_positionX + dist * cos(angle);
-    desty = pos.m_positionY + dist * sin(angle);
+    desty = pos.m_positionY + dist * std::sin(angle);
     destz = pos.m_positionZ;
 
     if (!GetMap()->CheckCollisionAndGetValidCoords(this, pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz, false))
@@ -3052,13 +3066,13 @@ void WorldObject::AddToNotify(uint16 f)
             {
                 uint32 EVENT_VISIBILITY_DELAY = u->FindMap() ? DynamicVisibilityMgr::GetVisibilityNotifyDelay(u->FindMap()->GetEntry()->map_type) : 1000;
 
-                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, World::GetGameTimeMS());
+                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, GameTime::GetGameTimeMS().count());
                 if (diff >= EVENT_VISIBILITY_DELAY / 2)
                     EVENT_VISIBILITY_DELAY /= 2;
                 else
                     EVENT_VISIBILITY_DELAY -= diff;
                 u->m_delayed_unit_relocation_timer = EVENT_VISIBILITY_DELAY;
-                u->m_last_notify_mstime = World::GetGameTimeMS() + EVENT_VISIBILITY_DELAY - 1;
+                u->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + EVENT_VISIBILITY_DELAY - 1;
             }
             else if (f & NOTIFY_AI_RELOCATION)
             {

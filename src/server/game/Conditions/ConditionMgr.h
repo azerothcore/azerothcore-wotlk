@@ -76,18 +76,18 @@ enum ConditionTypes
     CONDITION_TERRAIN_SWAP          = 41,                   // don't use on 3.3.5a
     CONDITION_STAND_STATE           = 42,                   // TODO: NOT SUPPORTED YET
     CONDITION_DAILY_QUEST_DONE      = 43,                   // quest id         0              0                  true if daily quest has been completed for the day
-    CONDITION_CHARMED               = 44,                   // TODO: NOT SUPPORTED YET
-    CONDITION_PET_TYPE              = 45,                   // TODO: NOT SUPPORTED YET
-    CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
+    CONDITION_CHARMED               = 44,                   // 0                0              0                  true if unit is currently charmed
+    CONDITION_PET_TYPE              = 45,                   // mask             0              0                  true if player has a pet of given type(s)
+    CONDITION_TAXI                  = 46,                   // 0                0              0                  true if player is on taxi
     CONDITION_QUESTSTATE            = 47,                   // quest_id         state_mask     0                  true if player is in any of the provided quest states for the quest (1 = not taken, 2 = completed, 8 = in progress, 32 = failed, 64 = rewarded)
     CONDITION_QUEST_OBJECTIVE_PROGRESS = 48,                // quest_id         objectiveIndex objectiveCount     true if player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest
-    CONDITION_DIFFICULTY_ID            = 49,                // don't use on 3.3.5a
+    CONDITION_DIFFICULTY_ID            = 49,                // Difficulty       0              0                  true is map has difficulty id
     CONDITION_TC_END                   = 50,                // placeholder
 
     CONDITION_AC_START                 = 100,
-    CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,                // quest_id         0              0                  true if satisfied exclusive group
-    CONDITION_HAS_AURA_TYPE            = 102,                // aura_type        0              0                  true if has aura type
-    CONDITION_AC_END                   = 103                 // placeholder
+    CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,                  // quest_id         0              0                  true if satisfied exclusive group
+    CONDITION_HAS_AURA_TYPE            = 102,                  // aura_type        0              0                  true if has aura type
+    CONDITION_AC_END                   = 103                   // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
@@ -148,7 +148,9 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_PHASE                          = 26, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE           = 28,
-    CONDITION_SOURCE_TYPE_MAX                            = 29  // placeholder
+    CONDITION_SOURCE_TYPE_CREATURE_RESPAWN               = 29,
+    CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY            = 30,
+    CONDITION_SOURCE_TYPE_MAX                            = 31 // placeholder
 };
 
 enum RelationType

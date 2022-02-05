@@ -585,7 +585,7 @@ class spell_warl_create_healthstone : public SpellScript
                         rank = 2;
                         break;
                     default:
-                        LOG_ERROR("spells", "Unknown rank of Improved Healthstone id: %d", aurEff->GetId());
+                        LOG_ERROR("spells", "Unknown rank of Improved Healthstone id: {}", aurEff->GetId());
                         break;
                 }
             }
@@ -625,7 +625,7 @@ class spell_warl_everlasting_affliction : public SpellScript
             // Refresh corruption on target
             if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, GetCaster()->GetGUID()))
             {
-                aur->GetBase()->RefreshTimers();
+                aur->GetBase()->RefreshTimersWithMods();
                 aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
             }
     }
@@ -1123,6 +1123,16 @@ class spell_warl_drain_soul : public AuraScript
         });
     }
 
+    void RemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!(GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH && caster && target && caster->IsPlayer() && caster->ToPlayer()->isHonorOrXPTarget(target)))
+        {
+            PreventDefaultAction();
+        }
+    }
+
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         // Drain Soul's proc tries to happen each time the warlock lands a killing blow on a unit while channeling.
@@ -1178,6 +1188,7 @@ class spell_warl_drain_soul : public AuraScript
 
     void Register() override
     {
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_drain_soul::RemoveEffect, EFFECT_0, SPELL_AURA_CHANNEL_DEATH_ITEM, AURA_EFFECT_HANDLE_REAL);
         DoCheckProc += AuraCheckProcFn(spell_warl_drain_soul::CheckProc);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_drain_soul::HandleTick, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
         OnEffectProc += AuraEffectProcFn(spell_warl_drain_soul::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
