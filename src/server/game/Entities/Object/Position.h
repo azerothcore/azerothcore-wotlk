@@ -208,6 +208,7 @@ struct Position
     {
         return GetExactDist2dSq(pos) < dist * dist;
     }
+
     [[nodiscard]] bool IsInDist(float x, float y, float z, float dist) const
     {
         return GetExactDistSq(x, y, z) < dist * dist;
