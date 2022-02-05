@@ -74,6 +74,7 @@ struct Position
         m_positionX = x;
         m_positionY = y;
     }
+
     void Relocate(float x, float y, float z)
     {
         m_positionX = x;
