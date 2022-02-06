@@ -149,7 +149,7 @@ public:
             _lavaBurstGUIDS.clear();
         }
 
-        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (events.IsInPhase(PHASE_SUBMERGED) && damage >= me->GetHealth())
             {
