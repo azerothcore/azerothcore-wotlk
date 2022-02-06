@@ -133,10 +133,10 @@ void Player::Update(uint32 p_time)
         GetSession()->m_muteTime = 0;
         LoginDatabasePreparedStatement* stmt =
             LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-        stmt->setInt64(0, 0); // Set the mute time to 0
-        stmt->setString(1, "");
-        stmt->setString(2, "");
-        stmt->setUInt32(3, GetSession()->GetAccountId());
+        stmt->SetData(0, 0); // Set the mute time to 0
+        stmt->SetData(1, "");
+        stmt->SetData(2, "");
+        stmt->SetData(3, GetSession()->GetAccountId());
         LoginDatabase.Execute(stmt);
     }
 
@@ -439,28 +439,28 @@ void Player::UpdateNextMailTimeAndUnreads()
     // Get the next delivery time
     CharacterDatabasePreparedStatement* stmtNextDeliveryTime =
         CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
-    stmtNextDeliveryTime->setUInt32(0, GetGUID().GetCounter());
-    stmtNextDeliveryTime->setUInt32(1, uint32(cTime));
+    stmtNextDeliveryTime->SetData(0, GetGUID().GetCounter());
+    stmtNextDeliveryTime->SetData(1, uint32(cTime));
     PreparedQueryResult resultNextDeliveryTime =
         CharacterDatabase.Query(stmtNextDeliveryTime);
     if (resultNextDeliveryTime)
     {
         Field* fields          = resultNextDeliveryTime->Fetch();
-        m_nextMailDelivereTime = time_t(fields[0].GetUInt32());
+        m_nextMailDelivereTime = time_t(fields[0].Get<uint32>());
     }
 
     // Get unread mails count
     CharacterDatabasePreparedStatement* stmtUnreadAmount =
         CharacterDatabase.GetPreparedStatement(
             CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
-    stmtUnreadAmount->setUInt32(0, GetGUID().GetCounter());
-    stmtUnreadAmount->setUInt32(1, uint32(cTime));
+    stmtUnreadAmount->SetData(0, GetGUID().GetCounter());
+    stmtUnreadAmount->SetData(1, uint32(cTime));
     PreparedQueryResult resultUnreadAmount =
         CharacterDatabase.Query(stmtUnreadAmount);
     if (resultUnreadAmount)
     {
         Field* fields = resultUnreadAmount->Fetch();
-        unReadMails   = uint8(fields[0].GetUInt64());
+        unReadMails   = uint8(fields[0].Get<uint64>());
     }
 }
 
@@ -2235,11 +2235,11 @@ void Player::UpdateSpecCount(uint8 count)
              itr != m_actionButtons.end(); ++itr)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
-            stmt->setUInt32(0, GetGUID().GetCounter());
-            stmt->setUInt8(1, 1);
-            stmt->setUInt8(2, itr->first);
-            stmt->setUInt32(3, itr->second.GetAction());
-            stmt->setUInt8(4, uint8(itr->second.GetType()));
+            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(1, 1);
+            stmt->SetData(2, itr->first);
+            stmt->SetData(3, itr->second.GetAction());
+            stmt->SetData(4, uint8(itr->second.GetType()));
             trans->Append(stmt);
         }
     }
@@ -2250,8 +2250,8 @@ void Player::UpdateSpecCount(uint8 count)
 
         stmt = CharacterDatabase.GetPreparedStatement(
             CHAR_DEL_CHAR_ACTION_EXCEPT_SPEC);
-        stmt->setUInt8(0, m_activeSpec);
-        stmt->setUInt32(1, GetGUID().GetCounter());
+        stmt->SetData(0, m_activeSpec);
+        stmt->SetData(1, GetGUID().GetCounter());
         trans->Append(stmt);
 
         m_activeSpec = 0;
