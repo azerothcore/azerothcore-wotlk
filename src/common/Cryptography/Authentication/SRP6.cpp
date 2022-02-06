@@ -18,7 +18,6 @@
 #include "SRP6.h"
 #include "CryptoRandom.h"
 #include "Util.h"
-#include <algorithm>
 #include <functional>
 
 using SHA1 = Acore::Crypto::SHA1;

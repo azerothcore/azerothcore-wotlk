@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "blackrock_spire.h"
 #include "TaskScheduler.h"
+#include "blackrock_spire.h"
 
 enum Texts
 {

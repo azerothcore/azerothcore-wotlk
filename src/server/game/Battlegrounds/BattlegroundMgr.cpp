@@ -36,6 +36,7 @@
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
+#include "GameTime.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
@@ -138,11 +139,11 @@ void BattlegroundMgr::Update(uint32 diff)
     {
         if (m_AutoDistributionTimeChecker < diff)
         {
-            if (time(nullptr) > m_NextAutoDistributionTime)
+            if (GameTime::GetGameTime() > m_NextAutoDistributionTime)
             {
                 sArenaTeamMgr->DistributeArenaPoints();
-                m_NextAutoDistributionTime = m_NextAutoDistributionTime + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
-                sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, uint64(m_NextAutoDistributionTime));
+                m_NextAutoDistributionTime = m_NextAutoDistributionTime + 1_days * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
+                sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime.count());
             }
             m_AutoDistributionTimeChecker = 600000; // 10 minutes check
         }
@@ -253,7 +254,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         itr2 = itr++;
         if (!bg->IsPlayerInBattleground(itr2->first))
         {
-            LOG_ERROR("bg.battleground", "Player %s has scoreboard entry for battleground %u but is not in battleground!", itr->first.ToString().c_str(), bg->GetBgTypeID());
+            LOG_ERROR("bg.battleground", "Player {} has scoreboard entry for battleground {} but is not in battleground!", itr->first.ToString(), bg->GetBgTypeID());
             continue;
         }
 
@@ -368,7 +369,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         // should never happen
         if (++scoreCount >= bg->GetMaxPlayersPerTeam() * 2 && itr != bg->GetPlayerScoresEnd())
         {
-            LOG_INFO("misc", "Battleground %u scoreboard has more entries (%u) than allowed players in this bg (%u)", bgTypeId, bg->GetPlayerScoresSize(), bg->GetMaxPlayersPerTeam() * 2);
+            LOG_INFO("misc", "Battleground {} scoreboard has more entries ({}) than allowed players in this bg ({})", bgTypeId, bg->GetPlayerScoresSize(), bg->GetMaxPlayersPerTeam() * 2);
             break;
         }
     }
@@ -527,7 +528,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
     {
         Field* fields = result->Fetch();
 
-        uint32 bgTypeId = fields[0].GetUInt32();
+        uint32 bgTypeId = fields[0].Get<uint32>();
 
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
             continue;
@@ -536,35 +537,35 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
         BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
         if (!bl)
         {
-            LOG_ERROR("bg.battleground", "Battleground ID %u not found in BattlemasterList.dbc. Battleground not created.", bgTypeId);
+            LOG_ERROR("bg.battleground", "Battleground ID {} not found in BattlemasterList.dbc. Battleground not created.", bgTypeId);
             continue;
         }
 
         CreateBattlegroundData data;
         data.bgTypeId = BattlegroundTypeId(bgTypeId);
         data.IsArena = (bl->type == TYPE_ARENA);
-        data.MinPlayersPerTeam = fields[1].GetUInt16();
-        data.MaxPlayersPerTeam = fields[2].GetUInt16();
-        data.LevelMin = fields[3].GetUInt8();
-        data.LevelMax = fields[4].GetUInt8();
-        float dist = fields[9].GetFloat();
+        data.MinPlayersPerTeam = fields[1].Get<uint16>();
+        data.MaxPlayersPerTeam = fields[2].Get<uint16>();
+        data.LevelMin = fields[3].Get<uint8>();
+        data.LevelMax = fields[4].Get<uint8>();
+        float dist = fields[9].Get<float>();
         data.StartMaxDist = dist * dist;
-        data.Weight = fields[10].GetUInt8();
+        data.Weight = fields[10].Get<uint8>();
 
-        data.scriptId = sObjectMgr->GetScriptId(fields[11].GetCString());
+        data.scriptId = sObjectMgr->GetScriptId(fields[11].Get<std::string>());
         data.BattlegroundName = bl->name[sWorld->GetDefaultDbcLocale()];
         data.MapID = bl->mapid[0];
 
         if (data.MaxPlayersPerTeam == 0 || data.MinPlayersPerTeam > data.MaxPlayersPerTeam)
         {
-            LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u has bad values for MinPlayersPerTeam (%u) and MaxPlayersPerTeam(%u)",
+            LOG_ERROR("bg.battleground", "Table `battleground_template` for id {} has bad values for MinPlayersPerTeam ({}) and MaxPlayersPerTeam({})",
                            data.bgTypeId, data.MinPlayersPerTeam, data.MaxPlayersPerTeam);
             continue;
         }
 
         if (data.LevelMin == 0 || data.LevelMax == 0 || data.LevelMin > data.LevelMax)
         {
-            LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u has bad values for LevelMin (%u) and LevelMax(%u)",
+            LOG_ERROR("bg.battleground", "Table `battleground_template` for id {} has bad values for LevelMin ({}) and LevelMax({})",
                            data.bgTypeId, data.LevelMin, data.LevelMax);
             continue;
         }
@@ -574,39 +575,39 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             data.Team1StartLocX = 0;
             data.Team1StartLocY = 0;
             data.Team1StartLocZ = 0;
-            data.Team1StartLocO = fields[6].GetFloat();
+            data.Team1StartLocO = fields[6].Get<float>();
             data.Team2StartLocX = 0;
             data.Team2StartLocY = 0;
             data.Team2StartLocZ = 0;
-            data.Team2StartLocO = fields[8].GetFloat();
+            data.Team2StartLocO = fields[8].Get<float>();
         }
         else
         {
-            uint32 startId = fields[5].GetUInt32();
+            uint32 startId = fields[5].Get<uint32>();
             if (GraveyardStruct const* start = sGraveyard->GetGraveyard(startId))
             {
                 data.Team1StartLocX = start->x;
                 data.Team1StartLocY = start->y;
                 data.Team1StartLocZ = start->z;
-                data.Team1StartLocO = fields[6].GetFloat();
+                data.Team1StartLocO = fields[6].Get<float>();
             }
             else
             {
-                LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `AllianceStartLoc`. BG not created.", data.bgTypeId, startId);
+                LOG_ERROR("bg.battleground", "Table `battleground_template` for id {} have non-existed `game_graveyard` table id {} in field `AllianceStartLoc`. BG not created.", data.bgTypeId, startId);
                 continue;
             }
 
-            startId = fields[7].GetUInt32();
+            startId = fields[7].Get<uint32>();
             if (GraveyardStruct const* start = sGraveyard->GetGraveyard(startId))
             {
                 data.Team2StartLocX = start->x;
                 data.Team2StartLocY = start->y;
                 data.Team2StartLocZ = start->z;
-                data.Team2StartLocO = fields[8].GetFloat();
+                data.Team2StartLocO = fields[8].Get<float>();
             }
             else
             {
-                LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `HordeStartLoc`. BG not created.", data.bgTypeId, startId);
+                LOG_ERROR("bg.battleground", "Table `battleground_template` for id {} have non-existed `game_graveyard` table id {} in field `HordeStartLoc`. BG not created.", data.bgTypeId, startId);
                 continue;
             }
         }
@@ -622,7 +623,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u battlegrounds in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} battlegrounds in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -631,16 +632,21 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
     if (!sWorld->getBoolConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
         return;
 
-    time_t wstime = time_t(sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME));
-    time_t curtime = time(nullptr);
+    Seconds wstime = Seconds(sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME));
+    Seconds curtime = GameTime::GetGameTime();
+
     LOG_INFO("server.loading", "Initializing Automatic Arena Point Distribution");
+
     if (wstime < curtime)
     {
-        m_NextAutoDistributionTime = curtime;           // reset will be called in the next update
+        m_NextAutoDistributionTime = curtime; // reset will be called in the next update
         LOG_INFO("server.loading", "Next arena point distribution time in the past, reseting it now.");
     }
     else
+    {
         m_NextAutoDistributionTime = wstime;
+    }
+
     LOG_INFO("server.loading", "Automatic Arena Point Distribution initialized.");
 }
 
@@ -859,22 +865,22 @@ void BattlegroundMgr::LoadBattleMastersEntry()
 
         Field* fields = result->Fetch();
 
-        uint32 entry = fields[0].GetUInt32();
+        uint32 entry = fields[0].Get<uint32>();
         if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry))
         {
             if ((cInfo->npcflag & UNIT_NPC_FLAG_BATTLEMASTER) == 0)
-                LOG_ERROR("sql.sql", "Creature (Entry: %u) listed in `battlemaster_entry` is not a battlemaster.", entry);
+                LOG_ERROR("sql.sql", "Creature (Entry: {}) listed in `battlemaster_entry` is not a battlemaster.", entry);
         }
         else
         {
-            LOG_ERROR("sql.sql", "Creature (Entry: %u) listed in `battlemaster_entry` does not exist.", entry);
+            LOG_ERROR("sql.sql", "Creature (Entry: {}) listed in `battlemaster_entry` does not exist.", entry);
             continue;
         }
 
-        uint32 bgTypeId  = fields[1].GetUInt32();
+        uint32 bgTypeId  = fields[1].Get<uint32>();
         if (!sBattlemasterListStore.LookupEntry(bgTypeId))
         {
-            LOG_ERROR("sql.sql", "Table `battlemaster_entry` contain entry %u for not existed battleground type %u, ignored.", entry, bgTypeId);
+            LOG_ERROR("sql.sql", "Table `battlemaster_entry` contain entry {} for not existed battleground type {}, ignored.", entry, bgTypeId);
             continue;
         }
 
@@ -883,7 +889,7 @@ void BattlegroundMgr::LoadBattleMastersEntry()
 
     CheckBattleMasters();
 
-    LOG_INFO("server.loading", ">> Loaded %u battlemaster entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} battlemaster entries in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -894,7 +900,7 @@ void BattlegroundMgr::CheckBattleMasters()
     {
         if ((itr->second.npcflag & UNIT_NPC_FLAG_BATTLEMASTER) && mBattleMastersMap.find(itr->second.Entry) == mBattleMastersMap.end())
         {
-            LOG_ERROR("sql.sql", "CreatureTemplate (Entry: %u) has UNIT_NPC_FLAG_BATTLEMASTER but no data in `battlemaster_entry` table. Removing flag!", itr->second.Entry);
+            LOG_ERROR("sql.sql", "CreatureTemplate (Entry: {}) has UNIT_NPC_FLAG_BATTLEMASTER but no data in `battlemaster_entry` table. Removing flag!", itr->second.Entry);
             const_cast<CreatureTemplate*>(&itr->second)->npcflag &= ~UNIT_NPC_FLAG_BATTLEMASTER;
         }
     }
@@ -1012,10 +1018,10 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
     if (bg->isArena() && bg->isRated())
         bg->SetArenaTeamIdForTeam(ginfo->teamId, ginfo->ArenaTeamId);
 
-    ginfo->RemoveInviteTime = World::GetGameTimeMS() + INVITE_ACCEPT_WAIT_TIME;
+    ginfo->RemoveInviteTime = GameTime::GetGameTimeMS().count() + INVITE_ACCEPT_WAIT_TIME;
 
     // loop through the players
-    for (auto itr : ginfo->Players)
+    for (auto& itr : ginfo->Players)
     {
         // get the player
         Player* player = ObjectAccessor::FindConnectedPlayer(itr);

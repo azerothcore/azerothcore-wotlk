@@ -12,14 +12,14 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_scripts
+-- Дамп структуры для таблица acore_world.spell_scripts
 DROP TABLE IF EXISTS `spell_scripts`;
 CREATE TABLE IF NOT EXISTS `spell_scripts` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `effIndex` TINYINT unsigned NOT NULL DEFAULT 0,
   `delay` INT unsigned NOT NULL DEFAULT 0,
-  `command` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `datalong` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `command` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `datalong` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `datalong2` INT unsigned NOT NULL DEFAULT 0,
   `dataint` INT NOT NULL DEFAULT 0,
   `x` float NOT NULL DEFAULT 0,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `spell_scripts` (
   `o` float NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.spell_scripts: 128 rows
+-- Дамп данных таблицы acore_world.spell_scripts: 130 rows
 DELETE FROM `spell_scripts`;
 /*!40000 ALTER TABLE `spell_scripts` DISABLE KEYS */;
 INSERT INTO `spell_scripts` (`id`, `effIndex`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
@@ -159,7 +159,9 @@ INSERT INTO `spell_scripts` (`id`, `effIndex`, `delay`, `command`, `datalong`, `
 	(59064, 0, 0, 6, 1, 0, 0, 1333.49, -4375.51, 26.204, 0.104),
 	(59439, 0, 0, 6, 0, 0, 0, 1969.03, 237.55, 38.39, 3.21),
 	(60940, 0, 0, 6, 0, 0, 0, 1769.13, 772.25, 56.22, 3.97),
-	(24320, 0, 0, 15, 24321, 2, 0, 0, 0, 0, 0);
+	(24320, 0, 0, 15, 24321, 2, 0, 0, 0, 0, 0),
+	(25952, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0),
+	(50499, 0, 0, 15, 50493, 0, 0, 0, 0, 0, 0);
 /*!40000 ALTER TABLE `spell_scripts` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

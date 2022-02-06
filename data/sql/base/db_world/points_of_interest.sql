@@ -12,20 +12,20 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.points_of_interest
+-- Дамп структуры для таблица acore_world.points_of_interest
 DROP TABLE IF EXISTS `points_of_interest`;
 CREATE TABLE IF NOT EXISTS `points_of_interest` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `PositionX` float NOT NULL DEFAULT 0,
   `PositionY` float NOT NULL DEFAULT 0,
-  `Icon` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Flags` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Importance` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `Icon` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Flags` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Importance` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Name` text NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.points_of_interest: 463 rows
+-- Дамп данных таблицы acore_world.points_of_interest: 463 rows
 DELETE FROM `points_of_interest`;
 /*!40000 ALTER TABLE `points_of_interest` DISABLE KEYS */;
 INSERT INTO `points_of_interest` (`ID`, `PositionX`, `PositionY`, `Icon`, `Flags`, `Importance`, `Name`) VALUES

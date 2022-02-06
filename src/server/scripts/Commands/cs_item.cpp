@@ -23,12 +23,12 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
+#include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "Language.h"
 
 using namespace Acore::ChatCommands;
 
@@ -73,10 +73,10 @@ public:
 
         // Check existence of item in recovery table
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM);
-        stmt->setUInt32(0, restoreId);
+        stmt->SetData(0, restoreId);
         PreparedQueryResult fields = CharacterDatabase.Query(stmt);
 
-        if (!fields || !(*fields)[1].GetUInt32() || (*fields)[3].GetUInt32() != player.GetGUID().GetCounter())
+        if (!fields || !(*fields)[1].Get<uint32>() || (*fields)[3].Get<uint32>() != player.GetGUID().GetCounter())
         {
             handler->SendSysMessage(LANG_ITEM_RESTORE_MISSING);
             handler->SetSentErrorMessage(true);
@@ -84,8 +84,8 @@ public:
         }
 
         // Mail item to player
-        uint32 itemEntry = (*fields)[1].GetUInt32();
-        uint32 itemCount = (*fields)[2].GetUInt32();
+        uint32 itemEntry = (*fields)[1].Get<uint32>();
+        uint32 itemCount = (*fields)[2].Get<uint32>();
 
         if (Player* onlinePlayer = player.GetConnectedPlayer())
         {
@@ -112,7 +112,7 @@ public:
 
         // Remove from recovery table
         CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID);
-        delStmt->setUInt32(0, (*fields)[0].GetUInt32());
+        delStmt->SetData(0, (*fields)[0].Get<uint32>());
         CharacterDatabase.Execute(delStmt);
 
         std::string nameLink = handler->playerLink(player.GetName());
@@ -130,7 +130,7 @@ public:
         }
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LIST);
-        stmt->setUInt32(0, player.GetGUID().GetCounter());
+        stmt->SetData(0, player.GetGUID().GetCounter());
         PreparedQueryResult disposedItems = CharacterDatabase.Query(stmt);
 
         if (!disposedItems)
@@ -143,9 +143,9 @@ public:
         do
         {
             Field* fields    = disposedItems->Fetch();
-            uint32 id        = fields[0].GetUInt32();
-            uint32 itemId    = fields[1].GetUInt32();
-            uint32 count     = fields[2].GetUInt32();
+            uint32 id        = fields[0].Get<uint32>();
+            uint32 itemId    = fields[1].Get<uint32>();
+            uint32 count     = fields[2].Get<uint32>();
 
             std::string itemName = "";
             if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
@@ -265,8 +265,8 @@ public:
             ObjectGuid::LowType guid = player.GetGUID().GetCounter();
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
-            stmt->setUInt32(0, itemId);
-            stmt->setUInt32(1, guid);
+            stmt->SetData(0, itemId);
+            stmt->SetData(1, guid);
 
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -275,24 +275,24 @@ public:
                 if (iece->reqhonorpoints)
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HONORPOINTS);
-                    stmt->setUInt32(0, guid);
+                    stmt->SetData(0, guid);
 
                     PreparedQueryResult queryResult = CharacterDatabase.Query(stmt);
 
                     if (queryResult)
                     {
                         Field* fields = queryResult->Fetch();
-                        if ((fields[0].GetUInt32() + iece->reqhonorpoints) > sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS))
+                        if ((fields[0].Get<uint32>() + iece->reqhonorpoints) > sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS))
                         {
-                            handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_HONOR, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS), fields[0].GetUInt32(), iece->reqhonorpoints);
+                            handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_HONOR, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS), fields[0].Get<uint32>(), iece->reqhonorpoints);
                             handler->SetSentErrorMessage(true);
                             return false;
                         }
                     }
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE);
-                    stmt->setUInt32(0, iece->reqhonorpoints);
-                    stmt->setUInt32(1, guid);
+                    stmt->SetData(0, iece->reqhonorpoints);
+                    stmt->SetData(1, guid);
                     trans->Append(stmt);
                     handler->PSendSysMessage(LANG_CMD_ITEM_REFUNDED_HONOR, item->Name1, item->ItemId, iece->reqhonorpoints);
                 }
@@ -300,24 +300,24 @@ public:
                 if (iece->reqarenapoints)
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENAPOINTS);
-                    stmt->setUInt32(0, guid);
+                    stmt->SetData(0, guid);
 
                     PreparedQueryResult queryResult = CharacterDatabase.Query(stmt);
 
                     if (queryResult)
                     {
                         Field* fields = queryResult->Fetch();
-                        if ((fields[0].GetUInt32() + iece->reqhonorpoints) > sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS))
+                        if ((fields[0].Get<uint32>() + iece->reqhonorpoints) > sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS))
                         {
-                            handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_AP, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS), fields[0].GetUInt32(), iece->reqarenapoints);
+                            handler->PSendSysMessage(LANG_CMD_ITEM_REFUND_MAX_AP, item->Name1, item->ItemId, sWorld->getIntConfig(CONFIG_MAX_ARENA_POINTS), fields[0].Get<uint32>(), iece->reqarenapoints);
                             handler->SetSentErrorMessage(true);
                             return false;
                         }
                     }
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS_ACCUMULATIVE);
-                    stmt->setUInt32(0, iece->reqarenapoints);
-                    stmt->setUInt32(1, guid);
+                    stmt->SetData(0, iece->reqarenapoints);
+                    stmt->SetData(1, guid);
                     trans->Append(stmt);
                     handler->PSendSysMessage(LANG_CMD_ITEM_REFUNDED_AP, item->Name1, item->ItemId, iece->reqarenapoints);
                 }
@@ -358,11 +358,11 @@ public:
                 Field* fields = result->Fetch();
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-                stmt->setUInt32(0, fields[0].GetUInt32());
+                stmt->SetData(0, fields[0].Get<uint32>());
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                stmt->setUInt32(0, fields[0].GetUInt32());
+                stmt->SetData(0, fields[0].Get<uint32>());
                 trans->Append(stmt);
 
                 CharacterDatabase.CommitTransaction(trans);
