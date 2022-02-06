@@ -1645,7 +1645,7 @@ public:
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
-    void SetReputation(uint32 factionentry, uint32 value);
+    void SetReputation(uint32 factionentry, float value);
     [[nodiscard]] uint32 GetReputation(uint32 factionentry) const;
     std::string const& GetGuildName();
     [[nodiscard]] uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
@@ -2056,7 +2056,7 @@ public:
     void RewardReputation(Unit* victim, float rate);
     void RewardReputation(Quest const* quest);
 
-    int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
+    float CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, float rep, int32 faction, bool noQuestBonus = false);
 
     void UpdateSkillsForLevel();
     void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
