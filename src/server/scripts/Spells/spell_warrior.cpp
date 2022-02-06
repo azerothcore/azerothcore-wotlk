@@ -811,7 +811,7 @@ class spell_warr_t3_prot_8p_bonus : public AuraScript
         return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->GetHealthPct() <= 20.0f;
     }
 
-    void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         if (Unit* target = eventInfo.GetActionTarget())
