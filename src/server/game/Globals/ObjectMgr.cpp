@@ -5974,7 +5974,6 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->stationery     = fields[6].Get<uint8>();
         m->checked        = fields[7].Get<uint8>();
         m->mailTemplateId = fields[8].Get<int16>();
-        m->auctionId      = fields[9].Get<int32>();
 
         Player* player = nullptr;
         if (serverUp)
