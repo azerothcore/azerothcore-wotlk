@@ -31,6 +31,7 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -451,7 +452,7 @@ void DeleteSpellFromAllPlayers(uint32 spellId)
     for (uint8 i = 0; i < 2; i++)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmts[i]);
-        stmt->setUInt32(0, spellId);
+        stmt->SetData(0, spellId);
         CharacterDatabase.Execute(stmt);
     }
 }
@@ -1319,11 +1320,11 @@ void SpellMgr::LoadSpellRanks()
         {
             Field* fields = result->Fetch();
 
-            currentSpell = fields[0].GetUInt32();
+            currentSpell = fields[0].Get<uint32>();
             if (lastSpell == -1)
                 lastSpell = currentSpell;
-            uint32 spell_id = fields[1].GetUInt32();
-            uint32 rank = fields[2].GetUInt8();
+            uint32 spell_id = fields[1].Get<uint32>();
+            uint32 rank = fields[2].Get<uint8>();
 
             // don't drop the row if we're moving to the next rank
             if (currentSpell == lastSpell)
@@ -1420,8 +1421,8 @@ void SpellMgr::LoadSpellRequired()
     {
         Field* fields = result->Fetch();
 
-        uint32 spellId = fields[0].GetUInt32();
-        uint32 spellReq = fields[1].GetUInt32();
+        uint32 spellId = fields[0].Get<uint32>();
+        uint32 spellReq = fields[1].Get<uint32>();
 
         // check if chain is made with valid first spell
         SpellInfo const* spellInfo = GetSpellInfo(spellId);
@@ -1537,17 +1538,17 @@ void SpellMgr::LoadSpellTargetPositions()
     {
         Field* fields = result->Fetch();
 
-        uint32 Spell_ID = fields[0].GetUInt32();
+        uint32 Spell_ID = fields[0].Get<uint32>();
 
-        SpellEffIndex effIndex = SpellEffIndex(fields[1].GetUInt8());
+        SpellEffIndex effIndex = SpellEffIndex(fields[1].Get<uint8>());
 
         SpellTargetPosition st;
 
-        st.target_mapId       = fields[2].GetUInt16();
-        st.target_X           = fields[3].GetFloat();
-        st.target_Y           = fields[4].GetFloat();
-        st.target_Z           = fields[5].GetFloat();
-        st.target_Orientation = fields[6].GetFloat();
+        st.target_mapId       = fields[2].Get<uint16>();
+        st.target_X           = fields[3].Get<float>();
+        st.target_Y           = fields[4].Get<float>();
+        st.target_Z           = fields[5].Get<float>();
+        st.target_Orientation = fields[6].Get<float>();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(st.target_mapId);
         if (!mapEntry)
@@ -1641,9 +1642,9 @@ void SpellMgr::LoadSpellGroups()
     {
         Field* fields = result->Fetch();
 
-        uint32 group_id = fields[0].GetUInt32();
-        int32 spell_id = fields[1].GetUInt32();
-        SpellGroupSpecialFlags specialFlag = (SpellGroupSpecialFlags)fields[2].GetUInt32();
+        uint32 group_id = fields[0].Get<uint32>();
+        int32 spell_id = fields[1].Get<uint32>();
+        SpellGroupSpecialFlags specialFlag = (SpellGroupSpecialFlags)fields[2].Get<uint32>();
         SpellInfo const* spellInfo = GetSpellInfo(spell_id);
 
         if (!spellInfo)
@@ -1701,8 +1702,8 @@ void SpellMgr::LoadSpellGroupStackRules()
     {
         Field* fields = result->Fetch();
 
-        uint32 group_id = fields[0].GetUInt32();
-        uint8 stack_rule = fields[1].GetInt8();
+        uint32 group_id = fields[0].Get<uint32>();
+        uint8 stack_rule = fields[1].Get<int8>();
         if (stack_rule >= SPELL_GROUP_STACK_FLAG_MAX)
         {
             LOG_ERROR("sql.sql", "SpellGroupStackRule {} listed in `spell_group_stack_rules` does not exist", stack_rule);
@@ -1752,7 +1753,7 @@ void SpellMgr::LoadSpellProcEvents()
     {
         Field* fields = result->Fetch();
 
-        int32 spellId = fields[0].GetInt32();
+        int32 spellId = fields[0].Get<int32>();
 
         bool allRanks = false;
         if (spellId < 0)
@@ -1782,17 +1783,17 @@ void SpellMgr::LoadSpellProcEvents()
 
         SpellProcEventEntry spellProcEvent;
 
-        spellProcEvent.schoolMask         = fields[1].GetInt8();
-        spellProcEvent.spellFamilyName    = fields[2].GetUInt16();
-        spellProcEvent.spellFamilyMask[0] = fields[3].GetUInt32();
-        spellProcEvent.spellFamilyMask[1] = fields[4].GetUInt32();
-        spellProcEvent.spellFamilyMask[2] = fields[5].GetUInt32();
-        spellProcEvent.procFlags          = fields[6].GetUInt32();
-        spellProcEvent.procEx             = fields[7].GetUInt32();
-        spellProcEvent.procPhase          = fields[8].GetUInt32();
-        spellProcEvent.ppmRate            = fields[9].GetFloat();
-        spellProcEvent.customChance       = fields[10].GetFloat();
-        spellProcEvent.cooldown           = fields[11].GetUInt32();
+        spellProcEvent.schoolMask         = fields[1].Get<int8>();
+        spellProcEvent.spellFamilyName    = fields[2].Get<uint16>();
+        spellProcEvent.spellFamilyMask[0] = fields[3].Get<uint32>();
+        spellProcEvent.spellFamilyMask[1] = fields[4].Get<uint32>();
+        spellProcEvent.spellFamilyMask[2] = fields[5].Get<uint32>();
+        spellProcEvent.procFlags          = fields[6].Get<uint32>();
+        spellProcEvent.procEx             = fields[7].Get<uint32>();
+        spellProcEvent.procPhase          = fields[8].Get<uint32>();
+        spellProcEvent.ppmRate            = fields[9].Get<float>();
+        spellProcEvent.customChance       = fields[10].Get<float>();
+        spellProcEvent.cooldown           = fields[11].Get<uint32>();
 
         // PROC_SPELL_PHASE_NONE is by default PROC_SPELL_PHASE_HIT
         if (spellProcEvent.procPhase == PROC_SPELL_PHASE_NONE)
@@ -1846,7 +1847,7 @@ void SpellMgr::LoadSpellProcs()
     {
         Field* fields = result->Fetch();
 
-        int32 spellId = fields[0].GetInt32();
+        int32 spellId = fields[0].Get<int32>();
 
         bool allRanks = false;
         if (spellId < 0)
@@ -1866,28 +1867,28 @@ void SpellMgr::LoadSpellProcs()
         {
             if (spellInfo->GetFirstRankSpell()->Id != uint32(spellId))
             {
-                LOG_ERROR("sql.sql", "Spell {} listed in `spell_proc` is not first rank of spell.", fields[0].GetInt32());
+                LOG_ERROR("sql.sql", "Spell {} listed in `spell_proc` is not first rank of spell.", fields[0].Get<int32>());
                 continue;
             }
         }
 
         SpellProcEntry baseProcEntry;
 
-        baseProcEntry.schoolMask      = fields[1].GetInt8();
-        baseProcEntry.spellFamilyName = fields[2].GetUInt16();
-        baseProcEntry.spellFamilyMask[0] = fields[3].GetUInt32();
-        baseProcEntry.spellFamilyMask[1] = fields[4].GetUInt32();
-        baseProcEntry.spellFamilyMask[2] = fields[5].GetUInt32();
-        baseProcEntry.typeMask        = fields[6].GetUInt32();
-        baseProcEntry.spellTypeMask   = fields[7].GetUInt32();
-        baseProcEntry.spellPhaseMask  = fields[8].GetUInt32();
-        baseProcEntry.hitMask         = fields[9].GetUInt32();
-        baseProcEntry.attributesMask  = fields[10].GetUInt32();
-        baseProcEntry.ratePerMinute   = fields[11].GetFloat();
-        baseProcEntry.chance          = fields[12].GetFloat();
-        float cooldown                = fields[13].GetFloat();
+        baseProcEntry.schoolMask      = fields[1].Get<int8>();
+        baseProcEntry.spellFamilyName = fields[2].Get<uint16>();
+        baseProcEntry.spellFamilyMask[0] = fields[3].Get<uint32>();
+        baseProcEntry.spellFamilyMask[1] = fields[4].Get<uint32>();
+        baseProcEntry.spellFamilyMask[2] = fields[5].Get<uint32>();
+        baseProcEntry.typeMask        = fields[6].Get<uint32>();
+        baseProcEntry.spellTypeMask   = fields[7].Get<uint32>();
+        baseProcEntry.spellPhaseMask  = fields[8].Get<uint32>();
+        baseProcEntry.hitMask         = fields[9].Get<uint32>();
+        baseProcEntry.attributesMask  = fields[10].Get<uint32>();
+        baseProcEntry.ratePerMinute   = fields[11].Get<float>();
+        baseProcEntry.chance          = fields[12].Get<float>();
+        float cooldown                = fields[13].Get<float>();
         baseProcEntry.cooldown        = uint32(cooldown);
-        baseProcEntry.charges         = fields[14].GetUInt32();
+        baseProcEntry.charges         = fields[14].Get<uint32>();
 
         while (spellInfo)
         {
@@ -1983,7 +1984,7 @@ void SpellMgr::LoadSpellBonusess()
     do
     {
         Field* fields = result->Fetch();
-        uint32 entry = fields[0].GetUInt32();
+        uint32 entry = fields[0].Get<uint32>();
 
         SpellInfo const* spell = GetSpellInfo(entry);
         if (!spell)
@@ -1993,10 +1994,10 @@ void SpellMgr::LoadSpellBonusess()
         }
 
         SpellBonusEntry& sbe = mSpellBonusMap[entry];
-        sbe.direct_damage = fields[1].GetFloat();
-        sbe.dot_damage    = fields[2].GetFloat();
-        sbe.ap_bonus      = fields[3].GetFloat();
-        sbe.ap_dot_bonus   = fields[4].GetFloat();
+        sbe.direct_damage = fields[1].Get<float>();
+        sbe.dot_damage    = fields[2].Get<float>();
+        sbe.ap_bonus      = fields[3].Get<float>();
+        sbe.ap_dot_bonus   = fields[4].Get<float>();
 
         ++count;
     } while (result->NextRow());
@@ -2025,7 +2026,7 @@ void SpellMgr::LoadSpellThreats()
     {
         Field* fields = result->Fetch();
 
-        uint32 entry = fields[0].GetUInt32();
+        uint32 entry = fields[0].Get<uint32>();
 
         if (!GetSpellInfo(entry))
         {
@@ -2034,9 +2035,9 @@ void SpellMgr::LoadSpellThreats()
         }
 
         SpellThreatEntry ste;
-        ste.flatMod  = fields[1].GetInt32();
-        ste.pctMod   = fields[2].GetFloat();
-        ste.apPctMod = fields[3].GetFloat();
+        ste.flatMod  = fields[1].Get<int32>();
+        ste.pctMod   = fields[2].Get<float>();
+        ste.apPctMod = fields[3].Get<float>();
 
         mSpellThreatMap[entry] = ste;
         ++count;
@@ -2066,7 +2067,7 @@ void SpellMgr::LoadSpellMixology()
     {
         Field* fields = result->Fetch();
 
-        uint32 entry = fields[0].GetUInt32();
+        uint32 entry = fields[0].Get<uint32>();
 
         if (!GetSpellInfo(entry))
         {
@@ -2074,7 +2075,7 @@ void SpellMgr::LoadSpellMixology()
             continue;
         }
 
-        mSpellMixologyMap[entry] = fields[1].GetFloat();
+        mSpellMixologyMap[entry] = fields[1].Get<float>();
         ++count;
     } while (result->NextRow());
 
@@ -2124,10 +2125,10 @@ void SpellMgr::LoadSpellPetAuras()
     {
         Field* fields = result->Fetch();
 
-        uint32 spell = fields[0].GetUInt32();
-        uint8 eff = fields[1].GetUInt8();
-        uint32 pet = fields[2].GetUInt32();
-        uint32 aura = fields[3].GetUInt32();
+        uint32 spell = fields[0].Get<uint32>();
+        uint8 eff = fields[1].Get<uint8>();
+        uint32 pet = fields[2].Get<uint32>();
+        uint32 aura = fields[3].Get<uint32>();
 
         SpellPetAuraMap::iterator itr = mSpellPetAuraMap.find((spell << 8) + eff);
         if (itr != mSpellPetAuraMap.end())
@@ -2228,7 +2229,7 @@ void SpellMgr::LoadSpellEnchantProcData()
     {
         Field* fields = result->Fetch();
 
-        uint32 enchantId = fields[0].GetUInt32();
+        uint32 enchantId = fields[0].Get<uint32>();
 
         SpellItemEnchantmentEntry const* ench = sSpellItemEnchantmentStore.LookupEntry(enchantId);
         if (!ench)
@@ -2239,9 +2240,9 @@ void SpellMgr::LoadSpellEnchantProcData()
 
         SpellEnchantProcEntry spe;
 
-        spe.customChance = fields[1].GetUInt32();
-        spe.PPMChance = fields[2].GetFloat();
-        spe.procEx = fields[3].GetUInt32();
+        spe.customChance = fields[1].Get<uint32>();
+        spe.PPMChance = fields[2].Get<float>();
+        spe.procEx = fields[3].Get<uint32>();
 
         mSpellEnchantProcEventMap[enchantId] = spe;
 
@@ -2272,9 +2273,9 @@ void SpellMgr::LoadSpellLinked()
     {
         Field* fields = result->Fetch();
 
-        int32 trigger = fields[0].GetInt32();
-        int32 effect = fields[1].GetInt32();
-        int32 type = fields[2].GetUInt8();
+        int32 trigger = fields[0].Get<int32>();
+        int32 effect = fields[1].Get<int32>();
+        int32 type = fields[2].Get<uint8>();
 
         SpellInfo const* spellInfo = GetSpellInfo(std::abs(trigger));
         if (!spellInfo)
@@ -2514,18 +2515,18 @@ void SpellMgr::LoadSpellAreas()
     {
         Field* fields = result->Fetch();
 
-        uint32 spell = fields[0].GetUInt32();
+        uint32 spell = fields[0].Get<uint32>();
         SpellArea spellArea;
         spellArea.spellId             = spell;
-        spellArea.areaId              = fields[1].GetUInt32();
-        spellArea.questStart          = fields[2].GetUInt32();
-        spellArea.questStartStatus    = fields[3].GetUInt32();
-        spellArea.questEndStatus      = fields[4].GetUInt32();
-        spellArea.questEnd            = fields[5].GetUInt32();
-        spellArea.auraSpell           = fields[6].GetInt32();
-        spellArea.raceMask            = fields[7].GetUInt32();
-        spellArea.gender              = Gender(fields[8].GetUInt8());
-        spellArea.autocast            = fields[9].GetBool();
+        spellArea.areaId              = fields[1].Get<uint32>();
+        spellArea.questStart          = fields[2].Get<uint32>();
+        spellArea.questStartStatus    = fields[3].Get<uint32>();
+        spellArea.questEndStatus      = fields[4].Get<uint32>();
+        spellArea.questEnd            = fields[5].Get<uint32>();
+        spellArea.auraSpell           = fields[6].Get<int32>();
+        spellArea.raceMask            = fields[7].Get<uint32>();
+        spellArea.gender              = Gender(fields[8].Get<uint8>());
+        spellArea.autocast            = fields[9].Get<bool>();
 
         if (SpellInfo const* spellInfo = GetSpellInfo(spell))
         {
@@ -2771,8 +2772,8 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             Field const* fields = result->Fetch();
 
-            uint32 const spellId = fields[0].GetUInt32();
-            uint32 attributes = fields[1].GetUInt32();
+            uint32 const spellId = fields[0].Get<uint32>();
+            uint32 attributes = fields[1].Get<uint32>();
 
             SpellInfo* spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
@@ -3403,6 +3404,8 @@ void SpellMgr::LoadSpellCustomAttr()
             }
         }
        spellInfo->_InitializeExplicitTargetMask();
+
+       sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
@@ -7578,6 +7581,12 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 19574 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx4 |= SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
+    });
+
+    // PX-238 Winter Wondervolt
+    ApplySpellFix({ 26157, 26272, 26273, 26274 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Mechanic = 0;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

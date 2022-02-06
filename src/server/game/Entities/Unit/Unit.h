@@ -1163,12 +1163,14 @@ struct AttackPosition {
 
 enum ReactiveType
 {
-    REACTIVE_DEFENSE      = 0,
-    REACTIVE_HUNTER_PARRY = 1,
-    REACTIVE_OVERPOWER    = 2
+    REACTIVE_DEFENSE        = 0,
+    REACTIVE_HUNTER_PARRY   = 1,
+    REACTIVE_OVERPOWER      = 2,
+    REACTIVE_WOLVERINE_BITE = 3,
+
+    MAX_REACTIVE
 };
 
-#define MAX_REACTIVE 3
 #define SUMMON_SLOT_PET     0
 #define SUMMON_SLOT_TOTEM   1
 #define MAX_TOTEM_SLOT      5
@@ -1219,12 +1221,9 @@ public:
         _posOwner.Relocate(c._posOwner);
         _posTarget.Relocate(c._posTarget);
     }
-    /* requried as of C++ 11 */
-#if __cplusplus >= 201103L
     MMapTargetData(MMapTargetData&&) = default;
     MMapTargetData& operator=(const MMapTargetData&) = default;
     MMapTargetData& operator=(MMapTargetData&&) = default;
-#endif
     [[nodiscard]] bool PosChanged(const Position& o, const Position& t) const
     {
         return _posOwner.GetExactDistSq(&o) > 0.5f * 0.5f || _posTarget.GetExactDistSq(&t) > 0.5f * 0.5f;

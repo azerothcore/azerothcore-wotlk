@@ -154,12 +154,19 @@ void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
     });
 }
 
-void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
+bool ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
 {
-    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return !script->OnReputationChange(player, factionID, standing, incremental);
+        });
+
+    if (ret && *ret)
     {
-        script->OnReputationChange(player, factionID, standing, incremental);
-    });
+        return false;
+    }
+
+    return true;
 }
 
 void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased)

@@ -277,6 +277,17 @@ class spell_hun_taming_the_beast : public AuraScript
 {
     PrepareAuraScript(spell_hun_taming_the_beast);
 
+    void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (Creature* creature = target->ToCreature())
+            {
+                creature->DeleteThreatList();
+            }
+        }
+    }
+
     void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
@@ -286,6 +297,7 @@ class spell_hun_taming_the_beast : public AuraScript
 
     void Register() override
     {
+        OnEffectApply += AuraEffectApplyFn(spell_hun_taming_the_beast::HandleOnEffectApply, EFFECT_0, SPELL_AURA_MOD_CHARM, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_hun_taming_the_beast::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_MOD_CHARM, AURA_EFFECT_HANDLE_REAL);
     }
 };
