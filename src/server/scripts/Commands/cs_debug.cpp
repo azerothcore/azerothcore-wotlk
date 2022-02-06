@@ -1259,7 +1259,7 @@ public:
         if (!player)
             return false;
         Creature* target = handler->getSelectedCreature();
-        if (!target || !target->IsAIEnabled())
+        if (!target || !target->IsAIEnabled || !target->AI())
             return false;
 
         uint32 duration = durationArg ? uint32(*durationArg) : 0;
