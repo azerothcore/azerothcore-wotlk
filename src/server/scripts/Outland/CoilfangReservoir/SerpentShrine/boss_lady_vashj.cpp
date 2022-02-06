@@ -195,7 +195,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            EnterEvadeIfOutOfCombatArea();
             if (!UpdateVictim())
                 return;
 

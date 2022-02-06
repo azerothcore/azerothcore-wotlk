@@ -373,7 +373,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (EnterEvadeIfOutOfCombatArea())
                 return;
 
             events2.Update(diff);

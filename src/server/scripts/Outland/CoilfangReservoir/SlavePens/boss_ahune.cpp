@@ -179,7 +179,7 @@ public:
                     me->SetInCombatWithZone();
                     if (!me->IsInCombat())
                     {
-                        EnterEvadeMode();
+                        EnterEvadeMode(EVADE_REASON_OTHER);
                         return;
                     }
                     else

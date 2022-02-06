@@ -21,8 +21,8 @@
 
 DoorData const doorData[] =
 {
-    { GO_MAGTHERIDON_DOORS,  TYPE_MAGTHERIDON,   DOOR_TYPE_ROOM,  BOUNDARY_S },
-    { 0,                0,              DOOR_TYPE_ROOM,     BOUNDARY_NONE } // END
+    { GO_MAGTHERIDON_DOORS,  TYPE_MAGTHERIDON,   DOOR_TYPE_ROOM /*,  BOUNDARY_S*/ }, // @TODO IQ Maybe need fix
+    { 0,                0,              DOOR_TYPE_ROOM } // END
 };
 
 MinionData const minionData[] =
