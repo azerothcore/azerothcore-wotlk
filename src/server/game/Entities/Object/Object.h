@@ -250,12 +250,9 @@ struct Position
         : m_positionX(x), m_positionY(y), m_positionZ(z), m_orientation(NormalizeOrientation(o)) { }
 
     Position(Position const& loc) { Relocate(loc); }
-    /* requried as of C++ 11 */
-#if __cplusplus >= 201103L
     Position(Position&&) = default;
     Position& operator=(const Position&) = default;
     Position& operator=(Position&&) = default;
-#endif
 
     struct PositionXYStreamer
     {

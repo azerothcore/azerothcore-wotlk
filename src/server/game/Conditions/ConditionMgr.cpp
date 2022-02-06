@@ -21,6 +21,7 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -419,7 +420,18 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             condMeets = unit->HasAuraType(AuraType(ConditionValue1));
         break;
     }
-
+    case CONDITION_DIFFICULTY_ID:
+    {
+        condMeets = object->GetMap()->GetDifficulty() == ConditionValue1;
+        break;
+    }
+    case CONDITION_PET_TYPE:
+    {
+        if (Player* player = object->ToPlayer())
+            if (Pet* pet = player->GetPet())
+                condMeets = (((1 << pet->getPetType()) & ConditionValue1) != 0);
+        break;
+    }
     case CONDITION_TAXI:
     {
         if (Player* player = object->ToPlayer())
@@ -616,6 +628,12 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_HAS_AURA_TYPE:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_DIFFICULTY_ID:
+        mask |= GRID_MAP_TYPE_MASK_ALL;
+        break;
+    case CONDITION_PET_TYPE:
+        mask |= GRID_MAP_TYPE_MASK_PLAYER;
         break;
     case CONDITION_TAXI:
         mask |= GRID_MAP_TYPE_MASK_PLAYER;
@@ -921,20 +939,20 @@ void ConditionMgr::LoadConditions(bool isReload)
         Field* fields = result->Fetch();
 
         Condition* cond                     = new Condition();
-        int32      iSourceTypeOrReferenceId = fields[0].GetInt32();
-        cond->SourceGroup                   = fields[1].GetUInt32();
-        cond->SourceEntry                   = fields[2].GetInt32();
-        cond->SourceId                      = fields[3].GetInt32();
-        cond->ElseGroup                     = fields[4].GetUInt32();
-        int32 iConditionTypeOrReference     = fields[5].GetInt32();
-        cond->ConditionTarget               = fields[6].GetUInt8();
-        cond->ConditionValue1               = fields[7].GetUInt32();
-        cond->ConditionValue2               = fields[8].GetUInt32();
-        cond->ConditionValue3               = fields[9].GetUInt32();
-        cond->NegativeCondition             = fields[10].GetUInt8();
-        cond->ErrorType                     = fields[11].GetUInt32();
-        cond->ErrorTextId                   = fields[12].GetUInt32();
-        cond->ScriptId                      = sObjectMgr->GetScriptId(fields[13].GetCString());
+        int32      iSourceTypeOrReferenceId = fields[0].Get<int32>();
+        cond->SourceGroup                   = fields[1].Get<uint32>();
+        cond->SourceEntry                   = fields[2].Get<int32>();
+        cond->SourceId                      = fields[3].Get<int32>();
+        cond->ElseGroup                     = fields[4].Get<uint32>();
+        int32 iConditionTypeOrReference     = fields[5].Get<int32>();
+        cond->ConditionTarget               = fields[6].Get<uint8>();
+        cond->ConditionValue1               = fields[7].Get<uint32>();
+        cond->ConditionValue2               = fields[8].Get<uint32>();
+        cond->ConditionValue3               = fields[9].Get<uint32>();
+        cond->NegativeCondition             = fields[10].Get<uint8>();
+        cond->ErrorType                     = fields[11].Get<uint32>();
+        cond->ErrorTextId                   = fields[12].Get<uint32>();
+        cond->ScriptId                      = sObjectMgr->GetScriptId(fields[13].Get<std::string>());
 
         if (iConditionTypeOrReference >= 0)
             cond->ConditionType = ConditionTypes(iConditionTypeOrReference);
@@ -1677,11 +1695,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     switch (cond->ConditionType)
     {
     case CONDITION_TERRAIN_SWAP:
-    case CONDITION_DIFFICULTY_ID:
         LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table has a ConditionType that is not supported on 3.3.5a ({}), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
     case CONDITION_STAND_STATE:
-    case CONDITION_PET_TYPE:
         LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table has a ConditionType that is not yet supported on AzerothCore ({}), ignoring.", cond->SourceEntry, uint32(cond->ConditionType));
         return false;
     default:
@@ -2265,6 +2281,20 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         break;
     }
+    case CONDITION_DIFFICULTY_ID:
+        if (cond->ConditionValue1 >= MAX_DIFFICULTY)
+        {
+            LOG_ERROR("sql.sql", "CONDITION_DIFFICULTY_ID has non existing difficulty in value1 ({}), skipped.", cond->ConditionValue1);
+            return false;
+        }
+        break;
+    case CONDITION_PET_TYPE:
+        if (cond->ConditionValue1 >= (1 << MAX_PET_TYPE))
+        {
+            LOG_ERROR("sql.sql", "CONDITION_PET_TYPE has non-existing pet type {}, skipped.", cond->ConditionValue1);
+            return false;
+        }
+        break;
     case CONDITION_TAXI:
     case CONDITION_IN_WATER:
     case CONDITION_CHARMED:
