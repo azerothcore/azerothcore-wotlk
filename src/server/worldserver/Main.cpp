@@ -291,7 +291,7 @@ int main(int argc, char** argv)
     std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
 
     // set server offline (not connectable)
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
 
     LoadRealmInfo(*ioContext);
 
@@ -379,7 +379,7 @@ int main(int argc, char** argv)
     });
 
     // Set server online (allow connecting now)
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag & ~%u, population = 0 WHERE id = '%u'", REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag & ~{}, population = 0 WHERE id = '{}'", REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
     realm.PopulationLevel = 0.0f;
     realm.Flags = RealmFlags(realm.Flags & ~uint32(REALM_FLAG_VERSION_MISMATCH));
 
@@ -424,7 +424,7 @@ int main(int argc, char** argv)
     sScriptMgr->OnShutdown();
 
     // set server offline
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
 
     LOG_INFO("server.worldserver", "Halting process...");
 
@@ -475,7 +475,7 @@ bool StartDB()
     ClearOnlineAccounts();
 
     ///- Insert version info into DB
-    WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
+    WorldDatabase.Execute("UPDATE version SET core_version = '{}', core_revision = '{}'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
 
     sWorld->LoadDBVersion();
     sWorld->LoadDBRevision();
@@ -501,7 +501,7 @@ void ClearOnlineAccounts()
 {
     // Reset online status for all accounts with characters on the current realm
     // pussywizard: tc query would set online=0 even if logged in on another realm >_>
-    LoginDatabase.DirectPExecute("UPDATE account SET online = 0 WHERE online = %u", realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE account SET online = 0 WHERE online = {}", realm.Id.Realm);
 
     // Reset online status for all characters
     CharacterDatabase.DirectExecute("UPDATE characters SET online = 0 WHERE online <> 0");
@@ -662,49 +662,49 @@ AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext)
 
 bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
 {
-    QueryResult result = LoginDatabase.PQuery("SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild FROM realmlist WHERE id = %u", realm.Id.Realm);
+    QueryResult result = LoginDatabase.Query("SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild FROM realmlist WHERE id = {}", realm.Id.Realm);
     if (!result)
         return false;
 
     Acore::Asio::Resolver resolver(ioContext);
 
     Field* fields = result->Fetch();
-    realm.Name = fields[1].GetString();
+    realm.Name = fields[1].Get<std::string>();
 
-    Optional<boost::asio::ip::tcp::endpoint> externalAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[2].GetString(), "");
+    Optional<boost::asio::ip::tcp::endpoint> externalAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[2].Get<std::string>(), "");
     if (!externalAddress)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[2].GetString());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[2].Get<std::string>());
         return false;
     }
 
     realm.ExternalAddress = std::make_unique<boost::asio::ip::address>(externalAddress->address());
 
-    Optional<boost::asio::ip::tcp::endpoint> localAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[3].GetString(), "");
+    Optional<boost::asio::ip::tcp::endpoint> localAddress = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[3].Get<std::string>(), "");
     if (!localAddress)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[3].GetString());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[3].Get<std::string>());
         return false;
     }
 
     realm.LocalAddress = std::make_unique<boost::asio::ip::address>(localAddress->address());
 
-    Optional<boost::asio::ip::tcp::endpoint> localSubmask = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[4].GetString(), "");
+    Optional<boost::asio::ip::tcp::endpoint> localSubmask = resolver.Resolve(boost::asio::ip::tcp::v4(), fields[4].Get<std::string>(), "");
     if (!localSubmask)
     {
-        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[4].GetString());
+        LOG_ERROR("server.worldserver", "Could not resolve address {}", fields[4].Get<std::string>());
         return false;
     }
 
     realm.LocalSubnetMask = std::make_unique<boost::asio::ip::address>(localSubmask->address());
 
-    realm.Port = fields[5].GetUInt16();
-    realm.Type = fields[6].GetUInt8();
-    realm.Flags = RealmFlags(fields[7].GetUInt8());
-    realm.Timezone = fields[8].GetUInt8();
-    realm.AllowedSecurityLevel = AccountTypes(fields[9].GetUInt8());
-    realm.PopulationLevel = fields[10].GetFloat();
-    realm.Build = fields[11].GetUInt32();
+    realm.Port = fields[5].Get<uint16>();
+    realm.Type = fields[6].Get<uint8>();
+    realm.Flags = RealmFlags(fields[7].Get<uint8>());
+    realm.Timezone = fields[8].Get<uint8>();
+    realm.AllowedSecurityLevel = AccountTypes(fields[9].Get<uint8>());
+    realm.PopulationLevel = fields[10].Get<float>();
+    realm.Build = fields[11].Get<uint32>();
     return true;
 }
 
