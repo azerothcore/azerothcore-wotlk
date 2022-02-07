@@ -6108,8 +6108,12 @@ void Player::SetHonorPoints(uint32 value)
     {
         if (int32 copperPerPoint = sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT))
         {
-            int32 excessPoints = value - sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS);
-            ModifyMoney(excessPoints * copperPerPoint);
+            // Only convert points on login, not when awarded honor points.
+            if (isBeingLoaded())
+            {
+                int32 excessPoints = value - sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS);
+                ModifyMoney(excessPoints * copperPerPoint);
+            }
         }
 
         value = sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS);
