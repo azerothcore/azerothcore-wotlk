@@ -1,3 +1,19 @@
+-- DB update 2022_02_06_00 -> 2022_02_07_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_06_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_06_00 2022_02_07_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1643486369280661300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643486369280661300');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-84605, -84616, -84606, -84603, -84615, -84614) AND `source_type` = 0 AND `id` IN (2, 3, 4, 5, 6);
@@ -48,3 +64,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 UPDATE `creature` SET `unit_flags` = `unit_flags`|0x00000040 WHERE `guid` IN (84605, 84616, 84606, 84603, 84615, 84614);
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|0x00000040 WHERE `entry` = 13996;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_07_00' WHERE sql_rev = '1643486369280661300';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
