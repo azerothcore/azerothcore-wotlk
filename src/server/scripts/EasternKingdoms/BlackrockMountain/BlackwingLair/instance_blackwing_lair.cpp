@@ -124,8 +124,15 @@ public:
                 case GO_PORTCULLIS_VAELASTRASZ:
                 case GO_PORTCULLIS_BROODLORD:
                 case GO_PORTCULLIS_THREEDRAGONS:
+                    AddDoor(go, true);
+                    break;
                 case GO_PORTCULLIS_NEFARIAN:
                     AddDoor(go, true);
+                    nefarianDoorGUID = go->GetGUID();
+                    if (GetBossState(DATA_CHROMAGGUS) != DONE)
+                    {
+                        HandleGameObject(ObjectGuid::Empty, false, go);
+                    }
                     break;
                 case GO_PORTCULLIS_CHROMAGGUS:
                     AddDoor(go, true);
@@ -146,16 +153,16 @@ public:
 
             switch (go->GetEntry())
             {
-            case GO_PORTCULLIS_RAZORGORE:
-            case GO_PORTCULLIS_VAELASTRASZ:
-            case GO_PORTCULLIS_BROODLORD:
-            case GO_PORTCULLIS_THREEDRAGONS:
-            case GO_PORTCULLIS_CHROMAGGUS:
-            case GO_PORTCULLIS_NEFARIAN:
-                AddDoor(go, false);
-                break;
-            default:
-                break;
+                case GO_PORTCULLIS_RAZORGORE:
+                case GO_PORTCULLIS_VAELASTRASZ:
+                case GO_PORTCULLIS_BROODLORD:
+                case GO_PORTCULLIS_THREEDRAGONS:
+                case GO_PORTCULLIS_CHROMAGGUS:
+                case GO_PORTCULLIS_NEFARIAN:
+                    AddDoor(go, false);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -195,6 +202,12 @@ public:
                                 egg->SetPhaseMask(2, true);
                     }
                     SetData(DATA_EGG_EVENT, NOT_STARTED);
+                    break;
+                case DATA_CHROMAGGUS:
+                    if (state == DONE)
+                    {
+                        HandleGameObject(nefarianDoorGUID, true);
+                    }
                     break;
                 case DATA_NEFARIAN:
                     switch (state)
@@ -314,6 +327,7 @@ public:
         ObjectGuid chromaggusGUID;
         ObjectGuid chromaggusDoorGUID;
         ObjectGuid nefarianGUID;
+        ObjectGuid nefarianDoorGUID;
         ObjectGuid victorNefariusGUID;
 
         // Razorgore
@@ -325,7 +339,7 @@ public:
         EventMap _events;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_blackwing_lair_InstanceMapScript(map);
     }
@@ -366,7 +380,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_bwl_shadowflame_SpellScript;
     }

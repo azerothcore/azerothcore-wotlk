@@ -78,7 +78,7 @@ inline T ApplyPct(T& base, U pct)
 template <class T>
 inline T RoundToInterval(T& num, T floor, T ceil)
 {
-    return num = std::min(std::max(num, floor), ceil);
+    return num = std::min<T>(std::max<T>(num, floor), ceil);
 }
 
 // UTF8 handling
@@ -510,11 +510,8 @@ public:
         part[2] = right.part[2];
         return *this;
     }
-    /* requried as of C++ 11 */
-#if __cplusplus >= 201103L
     flag96(const flag96&) = default;
     flag96(flag96&&) = default;
-#endif
 
     inline flag96 operator&(flag96 const& right) const
     {

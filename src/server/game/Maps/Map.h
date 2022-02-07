@@ -606,6 +606,9 @@ public:
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
     void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);
 
+    // Do whatever you want to all the players in map [including GameMasters], i.e.: param exec = [&](Player* p) { p->Whatever(); }
+    void DoForAllPlayers(std::function<void(Player*)> exec);
+
     GridMap* GetGrid(float x, float y);
     void EnsureGridCreated(const GridCoord&);
     [[nodiscard]] bool AllTransportsEmpty() const; // pussywizard
