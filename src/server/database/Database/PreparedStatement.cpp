@@ -22,7 +22,6 @@
 #include "MySQLPreparedStatement.h"
 #include "MySQLWorkaround.h"
 #include "QueryResult.h"
-#include <type_traits>
 
 PreparedStatementBase::PreparedStatementBase(uint32 index, uint8 capacity) :
     m_index(index),
