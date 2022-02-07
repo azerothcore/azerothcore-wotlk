@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_achievement_progress
+-- Дамп структуры для таблица acore_characters.character_achievement_progress
 DROP TABLE IF EXISTS `character_achievement_progress`;
 CREATE TABLE IF NOT EXISTS `character_achievement_progress` (
   `guid` INT unsigned NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `character_achievement_progress` (
   PRIMARY KEY (`guid`,`criteria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.character_achievement_progress: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_achievement_progress: ~0 rows (приблизительно)
 DELETE FROM `character_achievement_progress`;
 /*!40000 ALTER TABLE `character_achievement_progress` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_achievement_progress` ENABLE KEYS */;
