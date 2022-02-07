@@ -21,6 +21,7 @@
 #include "ConditionMgr.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
+#include "EventMap.h"
 
 class Creature;
 
