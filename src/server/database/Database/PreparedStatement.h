@@ -26,6 +26,7 @@
 #include <tuple>
 #include <variant>
 #include <vector>
+#include <type_traits>
 
 namespace Acore::Types
 {
