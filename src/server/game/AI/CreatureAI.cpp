@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "CreatureAI.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
