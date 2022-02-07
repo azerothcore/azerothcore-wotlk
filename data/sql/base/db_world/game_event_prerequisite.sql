@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_prerequisite
+-- Дамп структуры для таблица acore_world.game_event_prerequisite
 DROP TABLE IF EXISTS `game_event_prerequisite`;
 CREATE TABLE IF NOT EXISTS `game_event_prerequisite` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `prerequisite_event` mediumint(8) unsigned NOT NULL,
+  `prerequisite_event` MEDIUMINT unsigned NOT NULL,
   PRIMARY KEY (`eventEntry`,`prerequisite_event`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_prerequisite: 0 rows
+-- Дамп данных таблицы acore_world.game_event_prerequisite: 0 rows
 DELETE FROM `game_event_prerequisite`;
 /*!40000 ALTER TABLE `game_event_prerequisite` DISABLE KEYS */;
 /*!40000 ALTER TABLE `game_event_prerequisite` ENABLE KEYS */;

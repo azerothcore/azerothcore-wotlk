@@ -134,6 +134,7 @@ public:
     void SetDuration(int32 duration, bool withMods = false);
     void RefreshDuration(bool withMods = false);
     void RefreshTimers(bool periodicReset = false);
+    void RefreshTimersWithMods();
     bool IsExpired() const { return !GetDuration();}
     bool IsPermanent() const { return GetMaxDuration() == -1; }
 

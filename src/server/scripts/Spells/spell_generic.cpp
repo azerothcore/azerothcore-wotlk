@@ -29,6 +29,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "InstanceScript.h"
@@ -2250,12 +2251,12 @@ class spell_gen_turkey_marker : public AuraScript
     {
         if (GetStackAmount() > stackAmount)
         {
-            _applyTimes.push_back(World::GetGameTimeMS());
+            _applyTimes.push_back(GameTime::GetGameTimeMS().count());
             stackAmount++;
         }
 
         // pop stack if it expired for us
-        if (_applyTimes.front() + GetMaxDuration() < World::GetGameTimeMS())
+        if (_applyTimes.front() + GetMaxDuration() < GameTime::GetGameTimeMS().count())
         {
             stackAmount--;
             ModStackAmount(-1, AURA_REMOVE_BY_EXPIRE);
@@ -2462,7 +2463,7 @@ class spell_gen_oracle_wolvar_reputation : public SpellScript
         // Set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
         // Not when player already has equal or higher rep with this faction
         if (player->GetReputationMgr().GetReputation(factionEntry) <= repChange)
-            player->GetReputationMgr().SetReputation(factionEntry, repChange);
+            player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repChange));
 
         // EFFECT_INDEX_2 most likely update at war state, we already handle this in SetReputation
     }

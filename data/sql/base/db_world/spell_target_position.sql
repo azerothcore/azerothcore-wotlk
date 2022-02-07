@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_target_position
+-- Дамп структуры для таблица acore_world.spell_target_position
 DROP TABLE IF EXISTS `spell_target_position`;
 CREATE TABLE IF NOT EXISTS `spell_target_position` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
   `EffectIndex` TINYINT unsigned NOT NULL DEFAULT 0,
   `MapID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `PositionX` float NOT NULL DEFAULT 0,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `spell_target_position` (
   PRIMARY KEY (`ID`,`EffectIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell System';
 
--- Дамп данных таблицы _acore_world.spell_target_position: 601 rows
+-- Дамп данных таблицы acore_world.spell_target_position: 620 rows
 DELETE FROM `spell_target_position`;
 /*!40000 ALTER TABLE `spell_target_position` DISABLE KEYS */;
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
@@ -630,7 +630,26 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 	(26453, 0, 1, 1982.9, -4255.62, 31.6692, 3.31984, 0),
 	(26456, 0, 0, 1642.01, 239.002, 62.5918, 3.02316, 0),
 	(26455, 0, 1, -1031.45, -230.867, 160.14, 3.28358, 0),
-	(62501, 0, 603, 2035.95, -202.085, 432.687, 3.16408, 0);
+	(62501, 0, 603, 2035.95, -202.085, 432.687, 3.16408, 0),
+	(20618, 0, 409, 736.516, -1176.35, -119.006, 0, 0),
+	(20534, 0, 409, 736.516, -1176.35, -119.006, 0, 0),
+	(21886, 0, 409, 871.54, -839.115, -228.992, 0, 0),
+	(21900, 0, 409, 843.509, -798.313, -229.432, 0, 0),
+	(21901, 0, 409, 827.276, -874.028, -229.594, 0, 0),
+	(21902, 0, 409, 864.573, -806.463, -229.786, 0, 0),
+	(21903, 0, 409, 819.757, -807.176, -229.033, 0, 0),
+	(21904, 0, 409, 811.001, -822.282, -229.311, 0, 0),
+	(21905, 0, 409, 892.633, -790.41, -228.928, 0, 0),
+	(21906, 0, 409, 906.695, -828.611, -229.928, 0, 0),
+	(21907, 0, 409, 862.862, -866.955, -228.943, 0, 0),
+	(21110, 0, 409, 811.448, -814.058, -233.177, 0, 0),
+	(21111, 0, 409, 842.542, -797.822, -233.34, 0, 0),
+	(21112, 0, 409, 870.668, -821.862, -232.938, 2.46003, 0),
+	(21113, 0, 409, 874.851, -861.112, -232.336, 2.46003, 0),
+	(21114, 0, 409, 891.442, -789.678, -232.801, 3.54986, 0),
+	(21115, 0, 409, 824.827, -871.046, -232.421, 1.24253, 0),
+	(21116, 0, 409, 868.206, -895.036, -233.1, 2.01042, 0),
+	(21117, 0, 409, 818.517, -898.278, -232.903, 1.28281, 0);
 /*!40000 ALTER TABLE `spell_target_position` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
