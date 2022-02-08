@@ -142,22 +142,22 @@ public:
             // For those, we need last_ip...
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
 
-            stmt->setUInt32(0, playerGuid);
-            stmt->setUInt32(1, characterGuid);
-            stmt->setUInt8(2, aType);
-            stmt->setUInt32(3, playerGuid);
-            stmt->setString(4, systemNote.c_str());
+            stmt->SetData(0, playerGuid);
+            stmt->SetData(1, characterGuid);
+            stmt->SetData(2, aType);
+            stmt->SetData(3, playerGuid);
+            stmt->SetData(4, systemNote.c_str());
             LoginDatabase.Execute(stmt);
         }
         else // ... but for failed login, we query last_attempt_ip from account table. Which we do with an unique query
         {
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
 
-            stmt->setUInt32(0, playerGuid);
-            stmt->setUInt32(1, characterGuid);
-            stmt->setUInt8(2, aType);
-            stmt->setUInt32(3, playerGuid);
-            stmt->setString(4, systemNote.c_str());
+            stmt->SetData(0, playerGuid);
+            stmt->SetData(1, characterGuid);
+            stmt->SetData(2, aType);
+            stmt->SetData(3, playerGuid);
+            stmt->SetData(4, systemNote.c_str());
             LoginDatabase.Execute(stmt);
         }
         return;
@@ -238,11 +238,11 @@ public:
         // Once we have done everything, we can insert the new log.
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
 
-        stmt->setUInt32(0, playerGuid);
-        stmt->setUInt32(1, characterGuid);
-        stmt->setUInt8(2, aType);
-        stmt->setString(3, currentIp.c_str()); // We query the ip here.
-        stmt->setString(4, systemNote.c_str());
+        stmt->SetData(0, playerGuid);
+        stmt->SetData(1, characterGuid);
+        stmt->SetData(2, aType);
+        stmt->SetData(3, currentIp.c_str()); // We query the ip here.
+        stmt->SetData(4, systemNote.c_str());
         // Seeing as the time differences should be minimal, we do not get unixtime and the timestamp right now;
         // Rather, we let it be added with the SQL query.
 
@@ -300,11 +300,11 @@ public:
 
         // Once we have done everything, we can insert the new log.
         LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
-        stmt2->setUInt32(0, playerGuid);
-        stmt2->setUInt32(1, characterGuid);
-        stmt2->setUInt8(2, aType);
-        stmt2->setUInt32(3, playerGuid);
-        stmt2->setString(4, systemNote.c_str());
+        stmt2->SetData(0, playerGuid);
+        stmt2->SetData(1, characterGuid);
+        stmt2->SetData(2, aType);
+        stmt2->SetData(3, playerGuid);
+        stmt2->SetData(4, systemNote.c_str());
         // Seeing as the time differences should be minimal, we do not get unixtime and the timestamp right now;
         // Rather, we let it be added with the SQL query.
 

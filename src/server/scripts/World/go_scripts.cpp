@@ -43,6 +43,7 @@ EndContentData */
 
 #include "CellImpl.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -295,7 +296,7 @@ public:
             requireSummon = 0;
             int8 count = urand(1, 3);
             for (int8 i = 0; i < count; ++i)
-                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                me->SummonCreature(NPC_WINTERFIN_TADPOLE, me->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionY() + std::sin(2 * M_PI * i / 3.0f) * 0.60f, me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
         void OnStateChanged(uint32 state, Unit*  /*unit*/) override
@@ -428,6 +429,66 @@ public:
     GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_heatAI(go);
+    }
+};
+
+enum eBearTrap
+{
+    EVENT_CHECK                     = 1,
+    NPC_RABID_THISTLE_BEAR          = 2164,
+    SPELL_BEAR_CAPTURED_IN_TRAP     = 9439
+};
+
+class go_bear_trap : public GameObjectScript
+{
+public:
+    go_bear_trap() : GameObjectScript("go_bear_trap") {}
+
+    struct go_bear_trapAI : public GameObjectAI
+    {
+        go_bear_trapAI(GameObject* gameObject) : GameObjectAI(gameObject)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _events.ScheduleEvent(EVENT_CHECK, 1000);
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_CHECK:
+                    {
+                        if (Creature* bear = me->FindNearestCreature(NPC_RABID_THISTLE_BEAR, 1.0f))
+                        {
+                            bear->CastSpell(bear, SPELL_BEAR_CAPTURED_IN_TRAP);
+                            me->RemoveFromWorld();
+                        }
+                        else
+                        {
+                            _events.ScheduleEvent(EVENT_CHECK, 1000);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_bear_trapAI(go);
     }
 };
 
@@ -796,12 +857,15 @@ public:
 };
 
 /*######
-## go_gilded_brazier (Paladin First Trail quest (9678))
+## go_gilded_brazier (Paladin quest 9678 "The First Trial")
 ######*/
 
 enum GildedBrazier
 {
-    NPC_STILLBLADE  = 17716,
+    EVENT_STILLBLADE_SPAWN = 1,
+    EVENT_RESET_BRAZIER    = 2,
+    NPC_STILLBLADE         = 17716,
+    QUEST_THE_FIRST_TRIAL  = 9678
 };
 
 class go_gilded_brazier : public GameObjectScript
@@ -809,17 +873,73 @@ class go_gilded_brazier : public GameObjectScript
 public:
     go_gilded_brazier() : GameObjectScript("go_gilded_brazier") { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    struct go_gilded_brazierAI : public GameObjectAI
     {
-        if (go->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
+        go_gilded_brazierAI(GameObject* go) : GameObjectAI(go)
         {
-            if (player->GetQuestStatus(9678) == QUEST_STATUS_INCOMPLETE)
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _playerGUID.Clear();
+        }
+
+        bool GossipHello(Player* player, bool reportUse) override
+        {
+            if (reportUse)
+                return false;
+
+            if (me->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
             {
-                if (Creature* Stillblade = player->SummonCreature(NPC_STILLBLADE, 8106.11f, -7542.06f, 151.775f, 3.02598f, TEMPSUMMON_DEAD_DESPAWN, 60000))
-                    Stillblade->AI()->AttackStart(player);
+                if (player->GetQuestStatus(QUEST_THE_FIRST_TRIAL) == QUEST_STATUS_INCOMPLETE)
+                {
+                    _playerGUID = player->GetGUID();
+                    me->SetFlag(GAMEOBJECT_FLAGS, 1);
+                    me->RemoveByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
+                    _events.ScheduleEvent(EVENT_STILLBLADE_SPAWN, 1000);
+                }
+            }
+            return true;
+        }
+
+        void UpdateAI(uint32 const diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_STILLBLADE_SPAWN:
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                    {
+                        player->SummonCreature(NPC_STILLBLADE, 8032.587f, -7524.518f, 149.68073f, 6.161012172698974609f, TEMPSUMMON_DEAD_DESPAWN, 60000);
+                        _events.ScheduleEvent(EVENT_RESET_BRAZIER, 4000);
+                    }
+                    break;
+                }
+                case EVENT_RESET_BRAZIER:
+                {
+                    me->RemoveFlag(GAMEOBJECT_FLAGS, 1);
+                    me->SetByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
+                    break;
+                }
+                default:
+                    break;
+                }
             }
         }
-        return true;
+
+    private:
+        EventMap _events;
+        ObjectGuid _playerGUID;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_gilded_brazierAI(go);
     }
 };
 
@@ -1295,7 +1415,7 @@ class go_inconspicuous_landmark : public GameObjectScript
 public:
     go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
     {
-        _lastUsedTime = time(nullptr);
+        _lastUsedTime = GameTime::GetGameTime().count();
     }
 
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
@@ -1303,10 +1423,10 @@ public:
         if (player->HasItemCount(ITEM_CUERGOS_KEY))
             return true;
 
-        if (_lastUsedTime > time(nullptr))
+        if (_lastUsedTime > GameTime::GetGameTime().count())
             return true;
 
-        _lastUsedTime = time(nullptr) + MINUTE;
+        _lastUsedTime = GameTime::GetGameTime().count() + MINUTE;
         player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
         return true;
     }
@@ -1771,11 +1891,8 @@ public:
                 {
                 case EVENT_TIME:
                 {
-                    // Get how many times it should ring
-                    time_t t = time(nullptr);
-                    tm local_tm;
                     tzset(); // set timezone for localtime_r() -> fix issues due to daylight time
-                    localtime_r(&t, &local_tm);
+                    tm local_tm = Acore::Time::TimeBreakdown();
                     uint8 _rings = (local_tm.tm_hour) % 12;
                     _rings = (_rings == 0) ? 12 : _rings; // 00:00 and 12:00
 
@@ -1809,6 +1926,30 @@ public:
     }
 };
 
+/*########
+#### go_duskwither_spire_power_source
+#####*/
+
+enum DuskwitherSpirePowersource
+{
+    NPC_POWER_SOURCE_INVISIBLE_BUNNY = 17984
+};
+
+class go_duskwither_spire_power_source : public GameObjectScript
+{
+public:
+    go_duskwither_spire_power_source() : GameObjectScript("go_duskwither_spire_power_source") {}
+
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    {
+        if (Creature* bunny = go->FindNearestCreature(NPC_POWER_SOURCE_INVISIBLE_BUNNY, 1.0f))
+        {
+            bunny->DespawnOrUnsummon(0ms, 10s);
+        }
+        return false;
+    }
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1823,6 +1964,8 @@ void AddSC_go_scripts()
     new go_tadpole_cage();
     new go_flames();
     new go_heat();
+    new go_bear_trap();
+    new go_duskwither_spire_power_source();
 
     // Theirs
     new go_brewfest_music();

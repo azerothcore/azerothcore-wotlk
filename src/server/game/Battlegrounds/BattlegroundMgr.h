@@ -32,8 +32,6 @@ typedef Battleground* (*bgRef)(Battleground*);
 typedef void(*bgMapRef)(WorldPacket*, Battleground::BattlegroundScoreMap::const_iterator);
 typedef void(*bgTypeRef)(WorldPacket*, Battleground::BattlegroundScoreMap::const_iterator, Battleground*);
 
-#define BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY 86400 // how many seconds in day
-
 struct CreateBattlegroundData
 {
     BattlegroundTypeId bgTypeId;
@@ -75,7 +73,6 @@ public:
     void BuildPlayerLeftBattlegroundPacket(WorldPacket* data, ObjectGuid guid);
     void BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere);
     void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, GroupJoinBattlegroundResult result);
-    void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);
     void BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg);
     void BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, TeamId teamId, bool isRated = false, BattlegroundTypeId forceBgTypeId = BATTLEGROUND_TYPE_NONE);
     void BuildPlaySoundPacket(WorldPacket* data, uint32 soundid);
@@ -156,7 +153,7 @@ private:
     bool   m_ArenaTesting;
     bool   m_Testing;
     uint32 m_lastClientVisibleInstanceId;
-    time_t m_NextAutoDistributionTime;
+    Seconds m_NextAutoDistributionTime;
     uint32 m_AutoDistributionTimeChecker;
     uint32 m_NextPeriodicQueueUpdateTime;
     BattleMastersMap mBattleMastersMap;

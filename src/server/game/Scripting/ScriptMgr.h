@@ -82,6 +82,7 @@ struct GroupQueueInfo;
 struct ItemTemplate;
 struct OutdoorPvPData;
 struct TargetInfo;
+struct SpellModifier;
 
 namespace Acore::ChatCommands
 {
@@ -225,6 +226,11 @@ public:
     virtual void OnShutdown() { }
 
     /**
+     * @brief Called after all maps are unloaded from core
+     */
+    virtual void OnAfterUnloadAllMaps() { }
+
+    /**
      * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
      *
      * @param version The cache version that we will be sending to the Client.
@@ -288,7 +294,7 @@ public:
         _mapEntry = sMapStore.LookupEntry(_mapId);
 
         if (!_mapEntry)
-            LOG_ERROR("maps.script", "Invalid MapScript for %u; no such map ID.", _mapId);
+            LOG_ERROR("maps.script", "Invalid MapScript for {}; no such map ID.", _mapId);
     }
 
     // Gets the MapEntry structure associated with this script. Can return nullptr.
@@ -329,7 +335,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsWorldMap())
-            LOG_ERROR("maps.script", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "WorldMapScript for map {} is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -346,7 +352,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsDungeon())
-            LOG_ERROR("maps.script", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "InstanceMapScript for map {} is invalid.", GetEntry()->MapID);
     }
 
     // Gets an InstanceScript object for this instance.
@@ -366,7 +372,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsBattleground())
-            LOG_ERROR("maps.script", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "BattlegroundMapScript for map {} is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -443,6 +449,8 @@ public:
     [[nodiscard]] virtual bool CanSetPhaseMask(Unit const* /*unit*/, uint32 /*newPhaseMask*/, bool /*update*/) { return true; }
 
     [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
+
+    [[nodiscard]] virtual bool OnBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player* /*target*/, uint16 /*index*/) { return false; }
 
     /**
      * @brief This hook runs in Unit::Update
@@ -997,7 +1005,7 @@ public:
     virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/) { }
 
     // Called when a player's reputation changes (before it is actually changed)
-    virtual void OnReputationChange(Player* /*player*/, uint32 /*factionId*/, int32& /*standing*/, bool /*incremental*/) { }
+    virtual bool OnReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }
 
     // Called when a player's reputation rank changes (before it is actually changed)
     virtual void OnReputationRankChange(Player* /*player*/, uint32 /*factionID*/, ReputationRank /*newRank*/, ReputationRank /*olRank*/, bool /*increased*/) { }
@@ -1517,6 +1525,15 @@ public:
 
     // Called before the phase for a WorldObject is set
     virtual void OnBeforeWorldObjectSetPhaseMask(WorldObject const* /*worldObject*/, uint32& /*oldPhaseMask*/, uint32& /*newPhaseMask*/, bool& /*useCombinedPhases*/, bool& /*update*/) { }
+
+    // Called when checking if an aura spell is affected by a mod
+    virtual bool OnIsAffectedBySpellModCheck(SpellInfo const* /*affectSpell*/, SpellInfo const* /*checkSpell*/, SpellModifier const* /*mod*/) { return true; };
+
+    // Called when checking for spell negative healing modifiers
+    virtual bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* /*target*/, Unit const* /*caster*/, SpellInfo const* /*spellInfo*/, float& /*val*/) { return false; };
+
+    // Called after loading spell dbc corrections
+    virtual void OnLoadSpellCustomAttr(SpellInfo* /*spell*/) { }
 };
 
 class BGScript : public ScriptObject
@@ -1720,14 +1737,14 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // After complete global acvievement
     virtual void SetRealmCompleted(AchievementEntry const* /*achievement*/) { }
 
     [[nodiscard]] virtual bool IsCompletedCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntry const* /*achievementCriteria*/, AchievementEntry const* /*achievement*/, CriteriaProgress const* /*progress*/) { return true; }
 
-    [[nodiscard]] virtual bool IsRealmCompleted(AchievementGlobalMgr const* /*globalmgr*/, AchievementEntry const* /*achievement*/, std::chrono::system_clock::time_point /*completionTime*/) { return true; }
+    [[nodiscard]] virtual bool IsRealmCompleted(AchievementGlobalMgr const* /*globalmgr*/, AchievementEntry const* /*achievement*/, SystemTimePoint /*completionTime*/) { return true; }
 
     virtual void OnBeforeCheckCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntryList const* /*achievementCriteriaList*/) { }
 
@@ -1742,7 +1759,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnInitStatsForLevel(Guardian* /*guardian*/, uint8 /*petlevel*/) { }
 
@@ -1770,7 +1787,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
 
@@ -1787,7 +1804,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnConstructObject(Object* /*origin*/) { }
 
@@ -1840,9 +1857,9 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
-    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
+    virtual void OnHandleDevCommand(Player* /*player*/, bool& /*enable*/) { }
 
     /**
      * @brief This hook runs execute chat command
@@ -1861,7 +1878,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnAfterDatabasesLoaded(uint32 /*updateFlags*/) { }
 };
@@ -1874,7 +1891,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before destroy world object
@@ -1921,7 +1938,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }
+    [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     /**
      * @brief This hook called before money loot
@@ -2019,6 +2036,7 @@ public: /* WorldScript */
     void OnStartup();
     void OnShutdown();
     void OnBeforeWorldInitialized();
+    void OnAfterUnloadAllMaps();
 
 public: /* FormulaScript */
     void OnHonorCalculation(float& honor, uint8 level, float multiplier);
@@ -2150,7 +2168,7 @@ public: /* PlayerScript */
     void OnPlayerTalentsReset(Player* player, bool noCost);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
-    void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
+    bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);
     void OnPlayerForgotSpell(Player* player, uint32 spellID);
@@ -2333,6 +2351,9 @@ public: /* GlobalScript */
     void OnAfterInitializeLockedDungeons(Player* player);
     void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
     void OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update);
+    bool OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod);
+    bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
+    void OnLoadSpellCustomAttr(SpellInfo* spell);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
@@ -2356,6 +2377,7 @@ public: /* UnitScript */
     bool IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
     bool CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update);
     bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
+    bool OnBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player* target, uint16 index);
     void OnUnitUpdate(Unit* unit, uint32 diff);
 
 public: /* MovementHandlerScript */
@@ -2464,7 +2486,7 @@ public: /* MiscScript */
 
 public: /* CommandSC */
 
-    void OnHandleDevCommand(Player* player, std::string& argstr);
+    void OnHandleDevCommand(Player* player, bool& enable);
     bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
 
 public: /* DatabaseScript */
@@ -2517,7 +2539,7 @@ public:
     GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
 
 private:
-    SpellScript* GetSpellScript() const override
+    [[nodiscard]] SpellScript* GetSpellScript() const override
     {
         if constexpr (!std::is_same_v<SpellScriptType, Acore::find_type_end>)
         {
@@ -2529,7 +2551,7 @@ private:
         }
     }
 
-    AuraScript* GetAuraScript() const override
+    [[nodiscard]] AuraScript* GetAuraScript() const override
     {
         if constexpr (!std::is_same_v<AuraScriptType, Acore::find_type_end>)
         {
@@ -2567,14 +2589,24 @@ class FactoryCreatureScript : public CreatureScript
 };
 #define RegisterCreatureAIWithFactory(ai_name, factory_fn) new FactoryCreatureScript<ai_name, &factory_fn>(#ai_name)
 
+// Cannot be used due gob scripts not working like this
 template <class AI>
 class GenericGameObjectScript : public GameObjectScript
 {
     public:
         GenericGameObjectScript(char const* name) : GameObjectScript(name) { }
-        GameObjectAI* GetAI(GameObject* go) const override { return new AI(go); }
+        GameObjectAI* GetAI(GameObject* me) const override { return new AI(me); }
 };
 #define RegisterGameObjectAI(ai_name) new GenericGameObjectScript<ai_name>(#ai_name)
+
+// Cannot be used due gob scripts not working like this
+template <class AI, AI* (*AIFactory)(GameObject*)> class FactoryGameObjectScript : public GameObjectScript
+{
+    public:
+        FactoryGameObjectScript(char const* name) : GameObjectScript(name) {}
+        GameObjectAI* GetAI(GameObject* me) const override { return AIFactory(me); }
+};
+#define RegisterGameObjectAIWithFactory(ai_name, factory_fn) new FactoryGameObjectScript<ai_name, &factory_fn>(#ai_name)
 
 #define sScriptMgr ScriptMgr::instance()
 
@@ -2667,8 +2699,8 @@ public:
                 {
                     // The script uses a script name from database, but isn't assigned to anything.
                     if (script->GetName().find("Smart") == std::string::npos)
-                        LOG_ERROR("sql.sql", "Script named '%s' is not assigned in the database.",
-                                         script->GetName().c_str());
+                        LOG_ERROR("sql.sql", "Script named '{}' is not assigned in the database.",
+                                         script->GetName());
                 }
             }
             else
@@ -2701,8 +2733,8 @@ private:
         {
             if (it->second == script)
             {
-                LOG_ERROR("scripts", "Script '%s' has same memory pointer as '%s'.",
-                               script->GetName().c_str(), it->second->GetName().c_str());
+                LOG_ERROR("scripts", "Script '{}' has same memory pointer as '{}'.",
+                               script->GetName(), it->second->GetName());
 
                 return false;
             }

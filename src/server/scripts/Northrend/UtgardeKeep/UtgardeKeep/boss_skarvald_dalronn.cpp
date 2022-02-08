@@ -196,7 +196,7 @@ public:
                     Talk(YELL_SKARVALD_DAL_DIEDFIRST);
                     break;
                 case EVENT_SHARVALD_CHARGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, (IsHeroic() ? 100.0f : 30.0f), true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, (IsHeroic() ? 100.0f : 30.0f), true))
                     {
                         ScriptedAI::DoResetThreat();
                         me->AddThreat(target, 10000.0f);
@@ -372,14 +372,14 @@ public:
                     Talk(YELL_DALRONN_SKA_DIEDFIRST);
                     break;
                 case EVENT_SHADOW_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                     {
                         me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
                     }
                     events.RepeatEvent(2050);
                     break;
                 case EVENT_DEBILITATE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true))
                     {
                         me->CastSpell(target, SPELL_DEBILITATE, false);
                         events.RepeatEvent(urand(5000, 10000));
