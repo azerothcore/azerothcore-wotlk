@@ -278,9 +278,10 @@ enum Razael
     GOSSIP_TEXTID_LYANA2 = 11588
 };
 
-struct npc_razael_and_lyana : public ScriptedAI
+class npc_razael_and_lyana : public CreatureScript
 {
-    npc_razael_and_lyana(Creature* creature) : ScriptedAI(creature) { }
+public:
+    npc_razael_and_lyana() : CreatureScript("npc_razael_and_lyana") { }
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -290,22 +291,22 @@ struct npc_razael_and_lyana : public ScriptedAI
         if (player->GetQuestStatus(QUEST_REPORTS_FROM_THE_FIELD) == QUEST_STATUS_INCOMPLETE)
             switch (creature->GetEntry())
             {
-                case NPC_RAZAEL:
-                    if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_RAZAEL))
-                    {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_RAZAEL_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                        SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL1, creature->GetGUID());
-                        return true;
-                    }
-                    break;
-                case NPC_LYANA:
-                    if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_LYANA))
-                    {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LYANA_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                        SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA1, creature->GetGUID());
-                        return true;
-                    }
-                    break;
+            case NPC_RAZAEL:
+                if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_RAZAEL))
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_RAZAEL_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL1, creature->GetGUID());
+                    return true;
+                }
+                break;
+            case NPC_LYANA:
+                if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_LYANA))
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LYANA_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                    SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA1, creature->GetGUID());
+                    return true;
+                }
+                break;
             }
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -316,14 +317,14 @@ struct npc_razael_and_lyana : public ScriptedAI
         ClearGossipMenuFor(player);
         switch (action)
         {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL2, creature->GetGUID());
-                player->TalkedToCreature(NPC_RAZAEL, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA2, creature->GetGUID());
-                player->TalkedToCreature(NPC_LYANA, creature->GetGUID());
-                break;
+        case GOSSIP_ACTION_INFO_DEF + 1:
+            SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL2, creature->GetGUID());
+            player->TalkedToCreature(NPC_RAZAEL, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 2:
+            SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA2, creature->GetGUID());
+            player->TalkedToCreature(NPC_LYANA, creature->GetGUID());
+            break;
         }
         return true;
     }
@@ -335,5 +336,5 @@ void AddSC_howling_fjord()
     RegisterCreatureAI(npc_your_inner_turmoil);
     RegisterCreatureAI(npc_apothecary_hanes);
     RegisterCreatureAI(npc_plaguehound_tracker);
-    RegisterCreatureAI(npc_razael_and_lyana);
+    new npc_razael_and_lyana;
 }
