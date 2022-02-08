@@ -12332,7 +12332,7 @@ bool Player::IsAtRecruitAFriendDistance(WorldObject const* pOther) const
 {
     if (!pOther)
         return false;
-    const WorldObject* player = GetCorpse();
+    WorldObject const* player = GetCorpse();
     if (!player || IsAlive())
         player = this;
 
@@ -15766,7 +15766,7 @@ Optional<float> Player::GetFarSightDistance() const
     return _farSightDistance;
 }
 
-float Player::GetSightRange(const WorldObject* target) const
+float Player::GetSightRange(WorldObject const* target) const
 {
     float sightRange = WorldObject::GetSightRange(target);
     if (_farSightDistance)

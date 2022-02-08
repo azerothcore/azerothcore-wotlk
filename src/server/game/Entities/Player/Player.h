@@ -2570,7 +2570,7 @@ public:
     void ResetFarSightDistance();
     [[nodiscard]] Optional<float> GetFarSightDistance() const;
 
-    float GetSightRange(const WorldObject* target = nullptr) const override;
+    float GetSightRange(WorldObject const* target = nullptr) const override;
 
     std::string GetPlayerName();
 
