@@ -19,6 +19,7 @@
 #define MiscPackets_h__
 
 #include "Packet.h"
+#include "ObjectGuid.h"
 #include "Weather.h"
 
 enum WeatherState : uint32;
