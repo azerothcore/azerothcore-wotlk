@@ -6126,6 +6126,19 @@ QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
     return Acore::Containers::MapGetValuePtr(_questGreetingStore[typeIndex], id);
 }
 
+QuestGreetingLocale const* ObjectMgr::GetQuestGreetingLocale(TypeID type, uint32 id) const
+{
+    uint32 typeIndex;
+    if (type == TYPEID_UNIT)
+        typeIndex = 0;
+    else if (type == TYPEID_GAMEOBJECT)
+        typeIndex = 1;
+    else
+        return nullptr;
+
+    return Acore::Containers::MapGetValuePtr(_questGreetingLocaleStore[typeIndex], id);
+}
+
 void ObjectMgr::LoadQuestGreetings()
 {
     uint32 oldMSTime = getMSTime();
