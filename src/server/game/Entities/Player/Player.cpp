@@ -9539,7 +9539,7 @@ class SpellModPred
 {
 public:
     SpellModPred() {}
-    bool operator() (const SpellModifier* a, const SpellModifier* b) const
+    bool operator() (SpellModifier const* a, SpellModifier const* b) const
     {
         if (a->type != b->type)
             return a->type == SPELLMOD_FLAT;
@@ -9550,7 +9550,7 @@ class MageSpellModPred
 {
 public:
     MageSpellModPred() {}
-    bool operator() (const SpellModifier* a, const SpellModifier* b) const
+    bool operator() (SpellModifier const* a, SpellModifier const* b) const
     {
         if (a->type != b->type)
             return a->type == SPELLMOD_FLAT;
