@@ -7474,7 +7474,7 @@ void Player::_ApplyAmmoBonuses()
         UpdateDamagePhysical(RANGED_ATTACK);
 }
 
-bool Player::CheckAmmoCompatibility(const ItemTemplate* ammo_proto) const
+bool Player::CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const
 {
     if (!ammo_proto)
         return false;

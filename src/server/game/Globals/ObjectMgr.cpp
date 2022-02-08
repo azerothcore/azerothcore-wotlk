@@ -1481,7 +1481,7 @@ void ObjectMgr::LoadEquipmentTemplates()
             if (!equipmentInfo.ItemEntry[i])
                 continue;
 
-            const ItemTemplate* item = GetItemTemplate(equipmentInfo.ItemEntry[i]);
+            ItemTemplate const* item = GetItemTemplate(equipmentInfo.ItemEntry[i]);
 
             if (!item)
             {
