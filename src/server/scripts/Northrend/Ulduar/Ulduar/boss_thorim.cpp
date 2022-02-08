@@ -1645,7 +1645,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetPositionX() < 2180 && target->GetPositionZ() < 425;
         }

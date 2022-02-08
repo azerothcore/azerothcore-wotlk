@@ -146,7 +146,7 @@ public:
     void OnCharmed(bool apply) override;
 
     // Called when victim is in line of sight
-    bool CanAIAttack(const Unit* who) const override;
+    bool CanAIAttack(Unit const* who) const override;
 
     // Used in scripts to share variables
     void DoAction(int32 param = 0) override;

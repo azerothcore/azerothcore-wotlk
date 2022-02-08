@@ -1962,7 +1962,7 @@ public:
 
         void AttackStart(Unit* /*who*/) override {}
         void MoveInLineOfSight(Unit* /*who*/) override {}
-        bool CanAIAttack(const Unit*  /*target*/) const override { return false; }
+        bool CanAIAttack(Unit const*  /*target*/) const override { return false; }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {

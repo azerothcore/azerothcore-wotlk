@@ -849,7 +849,7 @@ namespace Acore
         AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck(Unit const* funit, float range)
             : i_funit(funit), i_range(range) {}
 
-        bool operator()(const Unit* u)
+        bool operator()(Unit const* u)
         {
             return u->IsAlive()
                    && i_funit->IsWithinDistInMap(u, i_range)

@@ -1862,7 +1862,7 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
     const WorldObject* seer = this;
 
     // Pets don't have detection, they use the detection of their masters
-    if (const Unit* thisUnit = ToUnit())
+    if (Unit const* thisUnit = ToUnit())
         if (Unit* controller = thisUnit->GetCharmerOrOwner())
             seer = controller;
 
@@ -2630,7 +2630,7 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
         y = this->GetPositionY();
         z = this->GetPositionZ();
         if (forWho)
-            if (const Unit* u = forWho->ToUnit())
+            if (Unit const* u = forWho->ToUnit())
                 u->UpdateAllowedPositionZ(x, y, z);
     }
     float maxDist = GetObjectSize() + size + distance2d + 1.0f;

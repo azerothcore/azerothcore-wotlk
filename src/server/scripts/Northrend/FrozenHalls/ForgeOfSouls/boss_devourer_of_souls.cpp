@@ -165,7 +165,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const override { return target->GetPositionZ() > 706.5f; }
+        bool CanAIAttack(Unit const* target) const override { return target->GetPositionZ() > 706.5f; }
 
         void UpdateAI(uint32 diff) override
         {

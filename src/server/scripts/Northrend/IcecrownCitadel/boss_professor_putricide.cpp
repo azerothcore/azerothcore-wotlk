@@ -217,7 +217,7 @@ public:
         return me->IsValidAttackTarget(target);
     }
 private:
-    const Unit* me;
+    Unit const* me;
 };
 
 class boss_professor_putricide : public CreatureScript
@@ -283,7 +283,7 @@ public:
                 BossAI::AttackStart(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return me->IsVisible() && target->GetPositionZ() > 388.0f && target->GetPositionZ() < 410.0f && target->GetPositionY() > 3157.1f && target->GetExactDist2dSq(4356.0f, 3211.0f) < 80.0f * 80.0f;
         }

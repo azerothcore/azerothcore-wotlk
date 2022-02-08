@@ -83,7 +83,7 @@ struct TurretAI : public CreatureAI
 {
 public:
     explicit TurretAI(Creature* c);
-    bool CanAIAttack(const Unit* who) const override;
+    bool CanAIAttack(Unit const* who) const override;
     void AttackStart(Unit* who) override;
     void UpdateAI(uint32 diff) override;
 

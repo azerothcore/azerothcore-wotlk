@@ -3826,7 +3826,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
         return false;
     }
 
-    const Unit* unit = source->ToUnit();
+    Unit const* unit = source->ToUnit();
     // if it's not an unit (Object) then we do not have to continue
     // with walkable checks
     if (!unit)
@@ -3874,7 +3874,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     path.SetUseRaycast(true);
     bool result = path.CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
 
-    const Unit* unit = source->ToUnit();
+    Unit const* unit = source->ToUnit();
     bool notOnGround = path.GetPathType() & PATHFIND_NOT_USING_PATH
         || isWaterNext || (unit && unit->IsFlying());
 

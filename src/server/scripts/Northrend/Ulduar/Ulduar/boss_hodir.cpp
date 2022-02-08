@@ -552,7 +552,7 @@ public:
             summons.Despawn(s);
         }
 
-        bool CanAIAttack(const Unit* t) const override
+        bool CanAIAttack(Unit const* t) const override
         {
             if (t->GetTypeId() == TYPEID_PLAYER)
                 return !t->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER);
@@ -829,7 +829,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -926,7 +926,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1026,7 +1026,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1141,7 +1141,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
