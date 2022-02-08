@@ -2443,7 +2443,7 @@ public:
     void SetMap(Map* map) override;
     void ResetMap() override;
 
-    bool isAllowedToLoot(const Creature* creature);
+    bool isAllowedToLoot(Creature const* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
     [[nodiscard]] uint8 GetRunesState() const { return m_runes->runeState; }

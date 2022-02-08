@@ -28,7 +28,7 @@
 #include "SpellMgr.h"
 #include "Util.h"
 
-int PetAI::Permissible(const Creature* creature)
+int PetAI::Permissible(Creature const* creature)
 {
     if (creature->IsPet())
         return PERMIT_BASE_SPECIAL;

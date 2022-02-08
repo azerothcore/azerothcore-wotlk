@@ -5644,7 +5644,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     return true;
 }
 
-bool Player::isAllowedToLoot(const Creature* creature)
+bool Player::isAllowedToLoot(Creature const* creature)
 {
     if (!creature->isDead() || !creature->IsDamageEnoughForLootingAndReward())
         return false;

@@ -31,7 +31,7 @@ public:
     explicit AggressorAI(Creature* c) : CreatureAI(c) {}
 
     void UpdateAI(uint32) override;
-    static int Permissible(const Creature*);
+    static int Permissible(Creature const*);
 };
 
 typedef std::vector<uint32> SpellVct;

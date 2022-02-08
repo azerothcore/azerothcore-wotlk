@@ -49,7 +49,7 @@ public:
     explicit PetAI(Creature* c);
 
     void UpdateAI(uint32) override;
-    static int Permissible(const Creature*);
+    static int Permissible(Creature const*);
 
     void KilledUnit(Unit* /*victim*/) override;
     void AttackStart(Unit* target) override;

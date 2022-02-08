@@ -665,7 +665,7 @@ bool Unit::GetRandomContactPoint(Unit const* obj, float& x, float& y, float& z, 
     uint32 attacker_number = getAttackers().size();
     if (attacker_number > 0)
         --attacker_number;
-    const Creature* c = obj->ToCreature();
+    Creature const* c = obj->ToCreature();
     if (c)
         if (c->isWorldBoss() || c->IsDungeonBoss() || (obj->IsPet() && const_cast<Unit*>(obj)->ToPet()->isControlled()))
             attacker_number = 0; // pussywizard: pets and bosses just come to target from their angle

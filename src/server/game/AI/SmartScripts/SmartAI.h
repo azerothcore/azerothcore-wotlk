@@ -164,7 +164,7 @@ public:
     ObjectGuid GetGUID(int32 id = 0) const override;
 
     //core related
-    static int32 Permissible(const Creature*);
+    static int32 Permissible(Creature const*);
 
     // Called at movepoint reached
     void MovepointReached(uint32 id);

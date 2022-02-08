@@ -754,7 +754,7 @@ void SmartAI::JustRespawned()
     mFollowArrivedAlive = true;
 }
 
-int SmartAI::Permissible(const Creature* creature)
+int SmartAI::Permissible(Creature const* creature)
 {
     if (creature->GetAIName() == "SmartAI")
         return PERMIT_BASE_SPECIAL;

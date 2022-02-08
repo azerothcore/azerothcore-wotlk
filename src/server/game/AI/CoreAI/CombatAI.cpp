@@ -26,7 +26,7 @@
 // AggressorAI
 /////////////////
 
-int AggressorAI::Permissible(const Creature* creature)
+int AggressorAI::Permissible(Creature const* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
     if (!creature->IsCivilian() && !creature->IsNeutralToAll())

@@ -3838,7 +3838,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
      * Walkable checks
      */
     bool isWaterNext = HasEnoughWater(unit, destX, destY, destZ);
-    const Creature* creature = unit->ToCreature();
+    Creature const* creature = unit->ToCreature();
     bool cannotEnterWater = isWaterNext && (creature && !creature->CanEnterWater());
     bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
     if (cannotEnterWater || cannotWalkOrFly ||
