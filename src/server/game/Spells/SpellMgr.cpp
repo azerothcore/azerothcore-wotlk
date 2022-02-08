@@ -3919,7 +3919,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         19975, // (Rank 1)
         27010, // (Rank 7)
         53313  // (Rank 8)
-    }, [](SpellEntry* spellInfo)
+    }, [](SpellInfo* spellInfo)
     {
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1);
     });
