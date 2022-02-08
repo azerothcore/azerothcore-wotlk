@@ -164,9 +164,9 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     //    map->Remove(cr, false);
     // delete respawn time for this creature
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CREATURE_RESPAWN);
-    stmt->setUInt32(0, spawnId);
-    stmt->setUInt16(1, m_PvP->GetMap()->GetId());
-    stmt->setUInt32(2, 0);  // instance id, always 0 for world maps
+    stmt->SetData(0, spawnId);
+    stmt->SetData(1, m_PvP->GetMap()->GetId());
+    stmt->SetData(2, 0);  // instance id, always 0 for world maps
     CharacterDatabase.Execute(stmt);
 
     sObjectMgr->DeleteCreatureData(spawnId);

@@ -16,6 +16,7 @@
  */
 
 #include "Creature.h"
+#include "Config.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -612,6 +613,12 @@ void Player::UpdateBlockPercentage()
         value += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
         // Increase from rating
         value += GetRatingBonusValue(CR_BLOCK);
+
+        if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+        {
+            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Block", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Block", 95.0f) : value;
+        }
+
         value = value < 0.0f ? 0.0f : value;
     }
     SetStatFloatValue(PLAYER_BLOCK_PERCENTAGE, value);
@@ -646,6 +653,12 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     float value = GetTotalPercentageModValue(modGroup) + GetRatingBonusValue(cr);
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
     value += (int32(GetWeaponSkillValue(attType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+    {
+        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Crit", 95.0f) : value;
+    }
+
     value = value < 0.0f ? 0.0f : value;
     SetStatFloatValue(index, value);
 }
@@ -741,6 +754,11 @@ void Player::UpdateParryPercentage()
         m_realParry = m_realParry < 0.0f ? 0.0f : m_realParry;
 
         value = std::max(diminishing + nondiminishing, 0.0f);
+
+        if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+        {
+            value = value > sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Parry", 95.0f) : value;
+        }
     }
 
     SetStatFloatValue(PLAYER_PARRY_PERCENTAGE, value);
@@ -778,6 +796,11 @@ void Player::UpdateDodgePercentage()
 
     m_realDodge = m_realDodge < 0.0f ? 0.0f : m_realDodge;
     float value = std::max(diminishing + nondiminishing, 0.0f);
+
+    if (sConfigMgr->GetOption<bool>("Stats.Limits.Enable", false))
+    {
+        value = value > sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) ? sConfigMgr->GetOption<float>("Stats.Limits.Dodge", 95.0f) : value;
+    }
 
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
 }

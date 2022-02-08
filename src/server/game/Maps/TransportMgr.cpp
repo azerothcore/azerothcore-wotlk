@@ -64,7 +64,7 @@ void TransportMgr::LoadTransportTemplates()
     do
     {
         Field* fields = result->Fetch();
-        uint32 entry = fields[0].GetUInt32();
+        uint32 entry = fields[0].Get<uint32>();
         GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
         if (goInfo == nullptr)
         {
@@ -423,58 +423,57 @@ void TransportMgr::SpawnContinentTransports()
     if (_transportTemplates.empty())
         return;
 
-    uint32 oldMSTime, count = 0;
-    oldMSTime = getMSTime();
-    QueryResult result;
+    uint32 count = 0;
+    uint32 oldMSTime = getMSTime();
+    QueryResult result = WorldDatabase.Query("SELECT guid, entry FROM transports");
 
     if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT))
     {
-        result = WorldDatabase.Query("SELECT guid, entry FROM transports");
+
         if (result)
         {
             do
             {
                 Field* fields = result->Fetch();
-                ObjectGuid::LowType guid = fields[0].GetUInt32();
-                uint32 entry = fields[1].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                uint32 entry = fields[1].Get<uint32>();
 
                 if (TransportTemplate const* tInfo = GetTransportTemplate(entry))
                     if (!tInfo->inInstance)
                         if (CreateTransport(entry, guid))
                             ++count;
+
             } while (result->NextRow());
         }
 
         LOG_INFO("server.loading", ">> Spawned {} continent motion transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server.loading", " ");
+    }
 
-        if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
+    if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
+    {
+        // pussywizard: preload grids for continent static transports
+        QueryResult result2 = WorldDatabase.Query("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11");
+
+        if (result2)
         {
-            // pussywizard: preload grids for continent static transports
-            oldMSTime = getMSTime();
-            result = WorldDatabase.Query("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11");
-            count = 0;
-            if (result)
+            do
             {
-                do
-                {
-                    Field* fields = result->Fetch();
-                    uint16 mapId = fields[0].GetUInt16();
-                    float x = fields[1].GetFloat();
-                    float y = fields[2].GetFloat();
+                Field* fields = result2->Fetch();
+                uint16 mapId = fields[0].Get<uint16>();
+                float x = fields[1].Get<float>();
+                float y = fields[2].Get<float>();
 
-                    MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-                    if (mapEntry && !mapEntry->Instanceable())
-                        if (Map* map = sMapMgr->CreateBaseMap(mapId))
-                        {
-                            map->LoadGrid(x, y);
-                            ++count;
-                        }
-                } while (result->NextRow());
-            }
-
-            LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+                MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+                if (mapEntry && !mapEntry->Instanceable())
+                    if (Map* map = sMapMgr->CreateBaseMap(mapId))
+                    {
+                        map->LoadGrid(x, y);
+                        ++count;
+                    }
+            } while (result2->NextRow());
         }
+
+        LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
 }
 
