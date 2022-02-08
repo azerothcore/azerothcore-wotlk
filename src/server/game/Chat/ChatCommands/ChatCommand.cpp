@@ -88,9 +88,9 @@ static ChatSubCommandMap COMMAND_MAP;
         do
         {
             Field* fields = result->Fetch();
-            std::string_view const name = fields[0].GetStringView();
-            std::string_view const help = fields[2].GetStringView();
-            uint32 const secLevel = fields[1].GetUInt8();
+            std::string_view const name = fields[0].Get<std::string_view>();
+            std::string_view const help = fields[2].Get<std::string_view>();
+            uint32 const secLevel = fields[1].Get<uint8>();
 
             ChatCommandNode* cmd = nullptr;
             ChatSubCommandMap* map = &COMMAND_MAP;

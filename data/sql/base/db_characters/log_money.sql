@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.log_money
+-- Дамп структуры для таблица acore_characters.log_money
 DROP TABLE IF EXISTS `log_money`;
 CREATE TABLE IF NOT EXISTS `log_money` (
   `sender_acc` INT unsigned NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `log_money` (
   `date` datetime NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- Дамп данных таблицы _acore_characters.log_money: 0 rows
+-- Дамп данных таблицы acore_characters.log_money: 0 rows
 DELETE FROM `log_money`;
 /*!40000 ALTER TABLE `log_money` DISABLE KEYS */;
 /*!40000 ALTER TABLE `log_money` ENABLE KEYS */;

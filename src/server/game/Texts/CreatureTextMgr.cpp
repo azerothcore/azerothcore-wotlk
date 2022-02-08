@@ -102,18 +102,18 @@ void CreatureTextMgr::LoadCreatureTexts()
         Field* fields = result->Fetch();
         CreatureTextEntry temp;
 
-        temp.entry           = fields[0].GetUInt32();
-        temp.group           = fields[1].GetUInt8();
-        temp.id              = fields[2].GetUInt8();
-        temp.text            = fields[3].GetString();
-        temp.type            = ChatMsg(fields[4].GetUInt8());
-        temp.lang            = Language(fields[5].GetUInt8());
-        temp.probability     = fields[6].GetFloat();
-        temp.emote           = Emote(fields[7].GetUInt32());
-        temp.duration        = fields[8].GetUInt32();
-        temp.sound           = fields[9].GetUInt32();
-        temp.BroadcastTextId = fields[10].GetUInt32();
-        temp.TextRange       = CreatureTextRange(fields[11].GetUInt8());
+        temp.entry           = fields[0].Get<uint32>();
+        temp.group           = fields[1].Get<uint8>();
+        temp.id              = fields[2].Get<uint8>();
+        temp.text            = fields[3].Get<std::string>();
+        temp.type            = ChatMsg(fields[4].Get<uint8>());
+        temp.lang            = Language(fields[5].Get<uint8>());
+        temp.probability     = fields[6].Get<float>();
+        temp.emote           = Emote(fields[7].Get<uint32>());
+        temp.duration        = fields[8].Get<uint32>();
+        temp.sound           = fields[9].Get<uint32>();
+        temp.BroadcastTextId = fields[10].Get<uint32>();
+        temp.TextRange       = CreatureTextRange(fields[11].Get<uint8>());
 
         if (temp.sound)
         {
@@ -180,23 +180,23 @@ void CreatureTextMgr::LoadCreatureTextLocales()
     {
         Field* fields = result->Fetch();
 
-        uint32 CreatureId           = fields[0].GetUInt32();
-        uint32 GroupId              = fields[1].GetUInt8();
-        uint32 ID                   = fields[2].GetUInt8();
+        uint32 CreatureId           = fields[0].Get<uint32>();
+        uint32 GroupId              = fields[1].Get<uint8>();
+        uint32 ID                   = fields[2].Get<uint8>();
 
-        LocaleConstant locale = GetLocaleByName(fields[3].GetString());
+        LocaleConstant locale = GetLocaleByName(fields[3].Get<std::string>());
         if (locale == LOCALE_enUS)
             continue;
 
         CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
-        ObjectMgr::AddLocaleString(fields[4].GetString(), locale, data.Text);
+        ObjectMgr::AddLocaleString(fields[4].Get<std::string>(), locale, data.Text);
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Creature Text Locale in {} ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
-uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject const* whisperTarget /*= nullptr*/, ChatMsg msgType /*= CHAT_MSG_ADDON*/, Language language /*= LANG_ADDON*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, uint32 sound /*= 0*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/, Player* srcPlr /*= nullptr*/)
+uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject const* target /*= nullptr*/, ChatMsg msgType /*= CHAT_MSG_ADDON*/, Language language /*= LANG_ADDON*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, uint32 sound /*= 0*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/, Player* srcPlr /*= nullptr*/)
 {
     if (!source)
         return 0;
@@ -282,7 +282,7 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
         range = iter->TextRange;
 
     if (finalSound)
-        SendSound(source, finalSound, finalType, whisperTarget, range, teamId, gmOnly);
+        SendSound(source, finalSound, finalType, target, range, teamId, gmOnly);
 
     Unit* finalSource = source;
     if (srcPlr)
@@ -293,13 +293,13 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
 
     if (srcPlr)
     {
-        PlayerTextBuilder builder(source, finalSource, finalSource->getGender(), finalType, iter->group, iter->id, finalLang, whisperTarget);
-        SendChatPacket(finalSource, builder, finalType, whisperTarget, range, teamId, gmOnly);
+        PlayerTextBuilder builder(source, finalSource, finalSource->getGender(), finalType, iter->group, iter->id, finalLang, target);
+        SendChatPacket(finalSource, builder, finalType, target, range, teamId, gmOnly);
     }
     else
     {
-        CreatureTextBuilder builder(finalSource, finalSource->getGender(), finalType, iter->group, iter->id, finalLang, whisperTarget);
-        SendChatPacket(finalSource, builder, finalType, whisperTarget, range, teamId, gmOnly);
+        CreatureTextBuilder builder(finalSource, finalSource->getGender(), finalType, iter->group, iter->id, finalLang, target);
+        SendChatPacket(finalSource, builder, finalType, target, range, teamId, gmOnly);
     }
     if (isEqualChanced || (!isEqualChanced && totalChance == 100.0f))
         SetRepeatId(source, textGroup, iter->id);
@@ -326,17 +326,17 @@ float CreatureTextMgr::GetRangeForChatType(ChatMsg msgType) const
     return dist;
 }
 
-void CreatureTextMgr::SendSound(Creature* source, uint32 sound, ChatMsg msgType, WorldObject const* whisperTarget, CreatureTextRange range, TeamId teamId, bool gmOnly)
+void CreatureTextMgr::SendSound(Creature* source, uint32 sound, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly)
 {
     if (!sound || !source)
         return;
 
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << uint32(sound);
-    SendNonChatPacket(source, &data, msgType, whisperTarget, range, teamId, gmOnly);
+    SendNonChatPacket(source, &data, msgType, target, range, teamId, gmOnly);
 }
 
-void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket* data, ChatMsg msgType, WorldObject const* whisperTarget, CreatureTextRange range, TeamId teamId, bool gmOnly) const
+void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const
 {
     float dist = GetRangeForChatType(msgType);
 
@@ -347,10 +347,10 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket* data, 
             {
                 if (range == TEXT_RANGE_NORMAL)//ignores team and gmOnly
                 {
-                    if (!whisperTarget || whisperTarget->GetTypeId() != TYPEID_PLAYER)
+                    if (!target || target->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    whisperTarget->ToPlayer()->GetSession()->SendPacket(data);
+                    target->ToPlayer()->GetSession()->SendPacket(data);
                     return;
                 }
                 break;

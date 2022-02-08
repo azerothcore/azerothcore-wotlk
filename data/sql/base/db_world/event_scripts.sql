@@ -12,13 +12,13 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.event_scripts
+-- Дамп структуры для таблица acore_world.event_scripts
 DROP TABLE IF EXISTS `event_scripts`;
 CREATE TABLE IF NOT EXISTS `event_scripts` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `delay` INT unsigned NOT NULL DEFAULT 0,
-  `command` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `datalong` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `command` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `datalong` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `datalong2` INT unsigned NOT NULL DEFAULT 0,
   `dataint` INT NOT NULL DEFAULT 0,
   `x` float NOT NULL DEFAULT 0,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `event_scripts` (
   `o` float NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.event_scripts: 453 rows
+-- Дамп данных таблицы acore_world.event_scripts: 453 rows
 DELETE FROM `event_scripts`;
 /*!40000 ALTER TABLE `event_scripts` DISABLE KEYS */;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES

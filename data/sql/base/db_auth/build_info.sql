@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.build_info
+-- Дамп структуры для таблица acore_auth.build_info
 DROP TABLE IF EXISTS `build_info`;
 CREATE TABLE IF NOT EXISTS `build_info` (
   `build` INT NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `build_info` (
   PRIMARY KEY (`build`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_auth.build_info: ~11 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.build_info: ~11 rows (приблизительно)
 DELETE FROM `build_info`;
 /*!40000 ALTER TABLE `build_info` DISABLE KEYS */;
 INSERT INTO `build_info` (`build`, `majorVersion`, `minorVersion`, `bugfixVersion`, `hotfixVersion`, `winAuthSeed`, `win64AuthSeed`, `mac64AuthSeed`, `winChecksumSeed`, `macChecksumSeed`) VALUES

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_ranks
+-- Дамп структуры для таблица acore_world.spell_ranks
 DROP TABLE IF EXISTS `spell_ranks`;
 CREATE TABLE IF NOT EXISTS `spell_ranks` (
   `first_spell_id` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `spell_ranks` (
   UNIQUE KEY `spell_id` (`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell Rank Data';
 
--- Дамп данных таблицы _acore_world.spell_ranks: 3 502 rows
+-- Дамп данных таблицы acore_world.spell_ranks: 3 502 rows
 DELETE FROM `spell_ranks`;
 /*!40000 ALTER TABLE `spell_ranks` DISABLE KEYS */;
 INSERT INTO `spell_ranks` (`first_spell_id`, `spell_id`, `rank`) VALUES

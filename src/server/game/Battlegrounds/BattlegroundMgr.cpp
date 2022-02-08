@@ -528,7 +528,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
     {
         Field* fields = result->Fetch();
 
-        uint32 bgTypeId = fields[0].GetUInt32();
+        uint32 bgTypeId = fields[0].Get<uint32>();
 
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
             continue;
@@ -544,15 +544,15 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
         CreateBattlegroundData data;
         data.bgTypeId = BattlegroundTypeId(bgTypeId);
         data.IsArena = (bl->type == TYPE_ARENA);
-        data.MinPlayersPerTeam = fields[1].GetUInt16();
-        data.MaxPlayersPerTeam = fields[2].GetUInt16();
-        data.LevelMin = fields[3].GetUInt8();
-        data.LevelMax = fields[4].GetUInt8();
-        float dist = fields[9].GetFloat();
+        data.MinPlayersPerTeam = fields[1].Get<uint16>();
+        data.MaxPlayersPerTeam = fields[2].Get<uint16>();
+        data.LevelMin = fields[3].Get<uint8>();
+        data.LevelMax = fields[4].Get<uint8>();
+        float dist = fields[9].Get<float>();
         data.StartMaxDist = dist * dist;
-        data.Weight = fields[10].GetUInt8();
+        data.Weight = fields[10].Get<uint8>();
 
-        data.scriptId = sObjectMgr->GetScriptId(fields[11].GetCString());
+        data.scriptId = sObjectMgr->GetScriptId(fields[11].Get<std::string>());
         data.BattlegroundName = bl->name[sWorld->GetDefaultDbcLocale()];
         data.MapID = bl->mapid[0];
 
@@ -575,21 +575,21 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             data.Team1StartLocX = 0;
             data.Team1StartLocY = 0;
             data.Team1StartLocZ = 0;
-            data.Team1StartLocO = fields[6].GetFloat();
+            data.Team1StartLocO = fields[6].Get<float>();
             data.Team2StartLocX = 0;
             data.Team2StartLocY = 0;
             data.Team2StartLocZ = 0;
-            data.Team2StartLocO = fields[8].GetFloat();
+            data.Team2StartLocO = fields[8].Get<float>();
         }
         else
         {
-            uint32 startId = fields[5].GetUInt32();
+            uint32 startId = fields[5].Get<uint32>();
             if (GraveyardStruct const* start = sGraveyard->GetGraveyard(startId))
             {
                 data.Team1StartLocX = start->x;
                 data.Team1StartLocY = start->y;
                 data.Team1StartLocZ = start->z;
-                data.Team1StartLocO = fields[6].GetFloat();
+                data.Team1StartLocO = fields[6].Get<float>();
             }
             else
             {
@@ -597,13 +597,13 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
                 continue;
             }
 
-            startId = fields[7].GetUInt32();
+            startId = fields[7].Get<uint32>();
             if (GraveyardStruct const* start = sGraveyard->GetGraveyard(startId))
             {
                 data.Team2StartLocX = start->x;
                 data.Team2StartLocY = start->y;
                 data.Team2StartLocZ = start->z;
-                data.Team2StartLocO = fields[8].GetFloat();
+                data.Team2StartLocO = fields[8].Get<float>();
             }
             else
             {
@@ -865,7 +865,7 @@ void BattlegroundMgr::LoadBattleMastersEntry()
 
         Field* fields = result->Fetch();
 
-        uint32 entry = fields[0].GetUInt32();
+        uint32 entry = fields[0].Get<uint32>();
         if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry))
         {
             if ((cInfo->npcflag & UNIT_NPC_FLAG_BATTLEMASTER) == 0)
@@ -877,7 +877,7 @@ void BattlegroundMgr::LoadBattleMastersEntry()
             continue;
         }
 
-        uint32 bgTypeId  = fields[1].GetUInt32();
+        uint32 bgTypeId  = fields[1].Get<uint32>();
         if (!sBattlemasterListStore.LookupEntry(bgTypeId))
         {
             LOG_ERROR("sql.sql", "Table `battlemaster_entry` contain entry {} for not existed battleground type {}, ignored.", entry, bgTypeId);

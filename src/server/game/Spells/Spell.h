@@ -517,7 +517,7 @@ public:
     void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode);
     void HandleThreatSpells();
 
-    SpellInfo const* m_spellInfo;
+    SpellInfo const* const m_spellInfo;
     Item* m_CastItem;
     Item* m_weaponItem;
     ObjectGuid m_castItemGUID;
@@ -574,7 +574,6 @@ public:
     Unit* GetCaster() const { return m_caster; }
     Unit* GetOriginalCaster() const { return m_originalCaster; }
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
-    void SetSpellInfo(SpellInfo const* info) { m_spellInfo = info; }
     int32 GetPowerCost() const { return m_powerCost; }
 
     bool UpdatePointers();                              // must be used at call Spell code after time delay (non triggered spell cast/update spell call/etc)
