@@ -386,23 +386,6 @@ public:
     }
 };
 
-enum ShaodwFlameEffect
-{
-    SPELL_ONYXIA_SCALE_CLOAK = 22683,
-    SPELL_SHADOW_FLAME = 22682
-
-}
-
-class spell_bwl_shadowflame_effect : public SpellScript
-{
-    PrepareSpellScript(spell_bwl_shadowflame_effect);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ })
-    }
-}
-
 void AddSC_instance_blackwing_lair()
 {
     new instance_blackwing_lair();

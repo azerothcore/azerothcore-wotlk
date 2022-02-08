@@ -608,10 +608,12 @@ public:
 enum PlantWarmaulOgreBanner
 {
     NPC_SHADOW_COUNCIL_CREDIT_MARKER = 18388
-}
+};
 
 class spell_nag_plant_warmaul_ogre_banner : public SpellScript
 {
+    PrepareSpellScript(spell_nag_plant_warmaul_ogre_banner);
+
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
@@ -622,11 +624,11 @@ class spell_nag_plant_warmaul_ogre_banner : public SpellScript
             return;
         }
 
-        caster->RewardPlayerAndGroupAtEvent(NPC_SHADOW_COUNCIL_CREDIT_MARKER, target);
+        caster->ToPlayer()->RewardPlayerAndGroupAtEvent(NPC_SHADOW_COUNCIL_CREDIT_MARKER, target);
         if (target->ToCreature())
         {
             target->setDeathState(CORPSE);
-            target->RemoveCorpse();
+            target->ToCreature()->RemoveCorpse();
         }
     }
 

@@ -3558,7 +3558,7 @@ class spell_item_mirrens_drinking_hat : public SpellScript
 enum RollDice
 {
     TEXT_DECAHEDRAL_DWARVEN_DICE = 26147
-}
+};
 
 // 47770 - Roll Dice
 class spell_item_decahedral_dwarven_dice : public SpellScript
@@ -3581,8 +3581,8 @@ class spell_item_decahedral_dwarven_dice : public SpellScript
     {
         GetCaster()->TextEmote(TEXT_DECAHEDRAL_DWARVEN_DICE, GetHitUnit());
 
-        static uint32 const minimum = 1;
-        static uint32 const maximum = 100;
+        static constexpr uint32 minimum = 1;
+        static constexpr uint32 maximum = 100;
 
         GetCaster()->ToPlayer()->DoRandomRoll(minimum, maximum);
     }
@@ -3596,7 +3596,7 @@ class spell_item_decahedral_dwarven_dice : public SpellScript
 enum RollDemBones
 {
     TEXT_WORN_TROLL_DICE = 26152
-}
+};
 
 // 47776 - Roll 'dem Bones
 class spell_item_worn_troll_dice : public SpellScript
@@ -3619,8 +3619,8 @@ class spell_item_worn_troll_dice : public SpellScript
     {
         GetCaster()->TextEmote(TEXT_WORN_TROLL_DICE, GetHitUnit());
 
-        static uint32 const minimum = 1;
-        static uint32 const maximum = 6;
+        static constexpr uint32 minimum = 1;
+        static constexpr uint32 maximum = 6;
 
         // roll twice
         GetCaster()->ToPlayer()->DoRandomRoll(minimum, maximum);
@@ -3661,7 +3661,7 @@ enum MercurialShield
 };
 
 
-class spell_item_mercurial_shield : public RegisterSpellScript
+class spell_item_mercurial_shield : public SpellScript
 {
     PrepareSpellScript(spell_item_mercurial_shield);
 
@@ -3674,7 +3674,7 @@ class spell_item_mercurial_shield : public RegisterSpellScript
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_mercurial_shield::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
-}
+};
 
 void AddSC_item_spell_scripts()
 {

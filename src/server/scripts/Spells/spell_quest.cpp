@@ -2429,7 +2429,7 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10985_light_of_the_naaru);
     RegisterSpellScript(spell_q9718_crow_transform);
     new spell_q55_sacred_cleansing();
-    RegisterSpelLScript(spell_q1846_bending_shinbone);
+    RegisterSpellScript(spell_q1846_bending_shinbone);
     RegisterSpellScript(spell_q2203_thaumaturgy_channel);
     RegisterSpellScript(spell_q5206_test_fetid_skull);
     RegisterSpellScript(spell_q6124_6129_apply_salve);
