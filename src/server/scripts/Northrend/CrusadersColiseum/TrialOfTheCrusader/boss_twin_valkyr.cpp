@@ -897,7 +897,7 @@ public:
                 if (target->GetDisplayId() != 11686)
                     if (Creature* creature = target->ToCreature())
                         if (Player* player = creature->SelectNearestPlayer(2.75f))
-                            if (creature->GetExactDist2d(p) <= 2.75f)
+                            if (creature->GetExactDist2d(player) <= 2.75f)
                             {
                                 creature->AI()->DoAction(1); // despawning = true;
                                 creature->GetMotionMaster()->MoveIdle();
