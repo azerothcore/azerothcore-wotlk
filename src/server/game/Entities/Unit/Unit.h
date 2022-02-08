@@ -905,7 +905,7 @@ struct SpellPeriodicAuraLogInfo
     bool   critical;
 };
 
-void createProcFlags(const SpellInfo* spellInfo, WeaponAttackType attackType, bool positive, uint32& procAttacker, uint32& procVictim);
+void createProcFlags(SpellInfo const* spellInfo, WeaponAttackType attackType, bool positive, uint32& procAttacker, uint32& procVictim);
 uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
 
 struct RedirectThreatInfo
@@ -1536,7 +1536,7 @@ public:
     [[nodiscard]] float GetUnitBlockChance()    const;
     [[nodiscard]] float GetUnitMissChance(WeaponAttackType attType)     const;
     float GetUnitCriticalChance(WeaponAttackType attackType, const Unit* victim) const;
-    int32 GetMechanicResistChance(const SpellInfo* spell);
+    int32 GetMechanicResistChance(SpellInfo const* spell);
     [[nodiscard]] bool CanUseAttackType(uint8 attacktype) const
     {
         switch (attacktype)
@@ -1570,7 +1570,7 @@ public:
     uint32 GetDefenseSkillValue(Unit const* target = nullptr) const;
     uint32 GetWeaponSkillValue(WeaponAttackType attType, Unit const* target = nullptr) const;
     [[nodiscard]] float GetWeaponProcChance() const;
-    float GetPPMProcChance(uint32 WeaponSpeed, float PPM,  const SpellInfo* spellProto) const;
+    float GetPPMProcChance(uint32 WeaponSpeed, float PPM,  SpellInfo const* spellProto) const;
 
     MeleeHitOutcome RollMeleeOutcomeAgainst (const Unit* victim, WeaponAttackType attType) const;
     MeleeHitOutcome RollMeleeOutcomeAgainst (const Unit* victim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance) const;
@@ -2147,7 +2147,7 @@ public:
     void CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex = 0);
 
     void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType blockType = SPELL_BLOCK_TYPE_ALL);
-    void ApplySpellDispelImmunity(const SpellInfo* spellProto, DispelType type, bool apply);
+    void ApplySpellDispelImmunity(SpellInfo const* spellProto, DispelType type, bool apply);
     virtual bool IsImmunedToSpell(SpellInfo const* spellInfo);
     // redefined in Creature
     [[nodiscard]] bool IsImmunedToDamage(SpellSchoolMask meleeSchoolMask) const;
@@ -2346,7 +2346,7 @@ public:
 
     [[nodiscard]] bool CanApplyResilience() const { return m_applyResilience; }
 
-    void PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result);
+    void PetSpellFail(SpellInfo const* spellInfo, Unit* target, uint32 result);
 
     int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
 

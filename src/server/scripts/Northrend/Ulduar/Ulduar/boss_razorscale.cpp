@@ -213,7 +213,7 @@ public:
                 pInstance->SetData(TYPE_RAZORSCALE, DONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (!caster || !pInstance)
                 return;

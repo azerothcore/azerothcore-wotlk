@@ -384,7 +384,7 @@ public:
             return false;
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             uint8 pos = urand(0, 4);
             switch (spellInfo->Id)

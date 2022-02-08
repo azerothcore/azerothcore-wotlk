@@ -264,7 +264,7 @@ public:
         uint32 timer;
         ObjectGuid _targetGUID;
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHOOT && roll_chance_i(7))
                 me->CastSpell(me, SPELL_DEATHS_DOOR, true);

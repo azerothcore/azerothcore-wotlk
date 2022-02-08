@@ -101,10 +101,10 @@ public:
     void MoveInLineOfSight(Unit* who) override;
 
     // Called when hit by a spell
-    void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+    void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
 
     // Called when spell hits a target
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override;
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override;
 
     // Called at any Damage from any attacker (before damage apply)
     void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
@@ -271,7 +271,7 @@ public:
     void OnGameEvent(bool start, uint16 eventId) override;
     void OnStateChanged(uint32 state, Unit* unit) override;
     void EventInform(uint32 eventId) override;
-    void SpellHit(Unit* unit, const SpellInfo* spellInfo) override;
+    void SpellHit(Unit* unit, SpellInfo const* spellInfo) override;
 
     // Called when a summoned unit dies
     void SummonedCreatureDies(Creature* summon, Unit* killer) override;

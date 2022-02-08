@@ -2167,7 +2167,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
                 continue;
 
             // Xinef: Single Target splits require LoS
-            const SpellInfo* splitSpellInfo = (*itr)->GetSpellInfo();
+            SpellInfo const* splitSpellInfo = (*itr)->GetSpellInfo();
             if (!splitSpellInfo->Effects[(*itr)->GetEffIndex()].IsAreaAuraEffect() && !splitSpellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT))
                 if (!caster->IsWithinLOSInMap(victim) || !caster->IsWithinDist(victim, splitSpellInfo->GetMaxRange(splitSpellInfo->IsPositive(), caster)))
                     continue;
@@ -2791,7 +2791,7 @@ bool Unit::isBlockCritical()
     return false;
 }
 
-int32 Unit::GetMechanicResistChance(const SpellInfo* spell)
+int32 Unit::GetMechanicResistChance(SpellInfo const* spell)
 {
     if (!spell)
         return 0;
@@ -4050,7 +4050,7 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
     Unit* caster = aura->GetCaster();
 
     // Update target aura state flag
-    const SpellInfo* spellInfo = aura->GetSpellInfo();
+    SpellInfo const* spellInfo = aura->GetSpellInfo();
     if (AuraStateType aState = spellInfo->GetAuraState())
     {
         if (aState != AURA_STATE_CONFLAGRATE)
@@ -12707,7 +12707,7 @@ void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, 
     }
 }
 
-void Unit::ApplySpellDispelImmunity(const SpellInfo* spellProto, DispelType type, bool apply)
+void Unit::ApplySpellDispelImmunity(SpellInfo const* spellProto, DispelType type, bool apply)
 {
     ApplySpellImmune(spellProto->Id, IMMUNITY_DISPEL, type, apply);
 
@@ -12742,7 +12742,7 @@ float Unit::GetWeaponProcChance() const
     return 0;
 }
 
-float Unit::GetPPMProcChance(uint32 WeaponSpeed, float PPM, const SpellInfo* spellProto) const
+float Unit::GetPPMProcChance(uint32 WeaponSpeed, float PPM, SpellInfo const* spellProto) const
 {
     // proc per minute chance calculation
     if (PPM <= 0)
@@ -15375,7 +15375,7 @@ bool InitTriggerAuraData()
     return true;
 }
 
-void createProcFlags(const SpellInfo* spellInfo, WeaponAttackType attackType, bool positive, uint32& procAttacker, uint32& procVictim)
+void createProcFlags(SpellInfo const* spellInfo, WeaponAttackType attackType, bool positive, uint32& procAttacker, uint32& procVictim)
 {
     if (spellInfo)
     {
@@ -19666,7 +19666,7 @@ bool CharmInfo::IsReturning()
     return _isReturning;
 }
 
-void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
+void Unit::PetSpellFail(SpellInfo const* spellInfo, Unit* target, uint32 result)
 {
     CharmInfo* charmInfo = GetCharmInfo();
     if (!charmInfo || GetTypeId() != TYPEID_UNIT)

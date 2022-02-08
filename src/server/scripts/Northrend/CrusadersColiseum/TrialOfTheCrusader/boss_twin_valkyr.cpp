@@ -747,7 +747,7 @@ public:
             if( !count || !GetOwner() )
                 return;
 
-            if( const SpellInfo* se = GetAura()->GetSpellInfo() )
+            if( SpellInfo const* se = GetAura()->GetSpellInfo() )
                 if( Unit* owner = GetOwner()->ToUnit() )
                 {
                     uint32 auraId = 0;

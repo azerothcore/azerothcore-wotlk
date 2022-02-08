@@ -2426,7 +2426,7 @@ public:
         void CalculateDamage(SpellEffIndex /*effIndex*/)
         {
             PreventHitEffect(EFFECT_0);
-            const SpellInfo* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
+            SpellInfo const* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
             if (!si)
                 return;
             SpellCastTargets targets;

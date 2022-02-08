@@ -343,7 +343,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
     void MoveInLineOfSight(Unit*  /*who*/) override {}
     void EnterCombat(Unit*) override {}
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_REPORT_DEATH)
         {
@@ -733,7 +733,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
         who->CastSpell(who, SPELL_REPORT_DEATH, true);
     }
 
-    void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
         {

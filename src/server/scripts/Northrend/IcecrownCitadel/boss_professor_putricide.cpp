@@ -895,8 +895,8 @@ public:
         // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
         void HandleScript(SpellEffIndex  /*effIndex*/)
         {
-            const SpellInfo* s1 = sSpellMgr->GetSpellInfo(70346);
-            const SpellInfo* s2 = sSpellMgr->GetSpellInfo(72456);
+            SpellInfo const* s1 = sSpellMgr->GetSpellInfo(70346);
+            SpellInfo const* s2 = sSpellMgr->GetSpellInfo(72456);
             if (s1 && s2)
                 if (Unit* target = GetHitUnit())
                 {

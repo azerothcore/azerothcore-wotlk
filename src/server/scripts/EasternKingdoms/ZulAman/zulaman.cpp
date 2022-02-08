@@ -633,7 +633,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell) override
+        void SpellHit(Unit*, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
             {
