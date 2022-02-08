@@ -82,7 +82,7 @@ public:
         {
             // All gossip menus only have one option. Conditions are handled in db.
             player->PrepareQuestMenu(me->GetGUID());
-            player->SendPreparedQuest(me);
+            player->SendPreparedQuest(me->GetGUID());
         }
     };
 };

@@ -111,7 +111,7 @@ bool Player::HasQuest(uint32 questId) const
     return false;
 }
 
-void Player::SendPreparedQuest(WorldObject* source)
+void Player::SendPreparedQuest(ObjectGuid guid)
 {
     QuestMenu& questMenu = PlayerTalkClass->GetQuestMenu();
     if (questMenu.Empty())
@@ -127,24 +127,25 @@ void Player::SendPreparedQuest(WorldObject* source)
         if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
         {
             if (qmi0.QuestIcon == 4)
-                PlayerTalkClass->SendQuestGiverRequestItems(quest, source->GetGUID(), CanRewardQuest(quest, false), true);
+                PlayerTalkClass->SendQuestGiverRequestItems(quest, guid, CanRewardQuest(quest, false), true);
                 // Send completable on repeatable and autoCompletable quest if player don't have quest
                 /// @todo verify if check for !quest->IsDaily() is really correct (possibly not)
             else
             {
-                if (!source->hasQuest(questId) && !source->hasInvolvedQuest(questId))
+                Object* object = ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+                if (!object || (!object->hasQuest(questId) && !object->hasInvolvedQuest(questId)))
                 {
                     PlayerTalkClass->SendCloseGossip();
                     return;
                 }
 
                 if (quest->IsAutoAccept() && CanAddQuest(quest, true) && CanTakeQuest(quest, true))
-                    AddQuestAndCheckCompletion(quest, source);
+                    AddQuestAndCheckCompletion(quest, object);
 
                 if (quest->IsAutoComplete() || !quest->GetQuestMethod())
-                    PlayerTalkClass->SendQuestGiverRequestItems(quest, source->GetGUID(), CanCompleteRepeatableQuest(quest), true);
+                    PlayerTalkClass->SendQuestGiverRequestItems(quest, guid, CanCompleteRepeatableQuest(quest), true);
                 else
-                    PlayerTalkClass->SendQuestGiverQuestDetails(quest, source->GetGUID(), true);
+                    PlayerTalkClass->SendQuestGiverQuestDetails(quest, guid, true);
             }
         }
     }
@@ -157,7 +158,7 @@ void Player::SendPreparedQuest(WorldObject* source)
         std::string title = "";
 
         // need pet case for some quests
-        Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, source->GetGUID());
+        Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, guid);
         if (creature)
         {
             uint32 textid = GetGossipTextId(creature);
@@ -192,7 +193,7 @@ void Player::SendPreparedQuest(WorldObject* source)
             }
         }
 
-        PlayerTalkClass->SendQuestGiverQuestList(qe, title, source);
+        PlayerTalkClass->SendQuestGiverQuestList(qe, title, guid);
     }
 }
 

@@ -217,7 +217,7 @@ void Player::SendPreparedGossip(WorldObject* source)
         // in case no gossip flag and quest menu not empty, open quest menu (client expect gossip menu with this flag)
         if (!source->ToCreature()->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && !PlayerTalkClass->GetQuestMenu().Empty())
         {
-            SendPreparedQuest(source);
+            SendPreparedQuest(source->GetGUID());
             return;
         }
     }
@@ -226,7 +226,7 @@ void Player::SendPreparedGossip(WorldObject* source)
         // probably need to find a better way here
         if (!PlayerTalkClass->GetGossipMenu().GetMenuId() && !PlayerTalkClass->GetQuestMenu().Empty())
         {
-            SendPreparedQuest(source);
+            SendPreparedQuest(source->GetGUID());
             return;
         }
     }
@@ -319,7 +319,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             break;
         case GOSSIP_OPTION_QUESTGIVER:
             PrepareQuestMenu(guid);
-            SendPreparedQuest(source);
+            SendPreparedQuest(source->GetGUID());
             break;
         case GOSSIP_OPTION_VENDOR:
         case GOSSIP_OPTION_ARMORER:

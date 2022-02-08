@@ -1497,7 +1497,7 @@ public:
         if (creature->IsQuestGiver())
         {
             player->PrepareQuestMenu(creature->GetGUID());
-            player->SendPreparedQuest(creature);
+            player->SendPreparedQuest(creature->GetGUID());
         }
 
         if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)

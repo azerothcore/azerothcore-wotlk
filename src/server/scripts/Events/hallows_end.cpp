@@ -473,7 +473,7 @@ bool OnGossipHello(Player* player, Creature* creature)
         }
     }
 
-    player->SendPreparedQuest(creature);
+    player->SendPreparedQuest(creature->GetGUID());
     return true;
 }
 
