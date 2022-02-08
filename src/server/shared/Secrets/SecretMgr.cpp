@@ -110,10 +110,10 @@ void SecretMgr::AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std
     Optional<std::string> oldDigest;
     {
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SECRET_DIGEST);
-        stmt->setUInt32(0, i);
+        stmt->SetData(0, i);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
         if (result)
-            oldDigest = result->Fetch()->GetString();
+            oldDigest = result->Fetch()->Get<std::string>();
     }
 
     Optional<BigNumber> currentValue = GetHexFromConfig(info.configKey, info.bits);
@@ -182,8 +182,8 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
                 if (fields[1].IsNull())
                     continue;
 
-                uint32 id = fields[0].GetUInt32();
-                std::vector<uint8> totpSecret = fields[1].GetBinary();
+                uint32 id = fields[0].Get<uint32>();
+                std::vector<uint8> totpSecret = fields[1].Get<Binary>();
 
                 if (hadOldSecret)
                 {
@@ -199,8 +199,8 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
                     Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(totpSecret, newSecret->ToByteArray<Acore::Crypto::AES::KEY_SIZE_BYTES>());
 
                 auto* updateStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
-                updateStmt->setBinary(0, totpSecret);
-                updateStmt->setUInt32(1, id);
+                updateStmt->SetData(0, totpSecret);
+                updateStmt->SetData(1, id);
                 trans->Append(updateStmt);
             } while (result->NextRow());
 
@@ -213,7 +213,7 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
     if (hadOldSecret)
     {
         auto* deleteStmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_SECRET_DIGEST);
-        deleteStmt->setUInt32(0, i);
+        deleteStmt->SetData(0, i);
         trans->Append(deleteStmt);
     }
 
@@ -226,8 +226,8 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
             return std::string("Failed to hash new secret");
 
         auto* insertStmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_SECRET_DIGEST);
-        insertStmt->setUInt32(0, i);
-        insertStmt->setString(1, *hash);
+        insertStmt->SetData(0, i);
+        insertStmt->SetData(1, *hash);
         trans->Append(insertStmt);
     }
 

@@ -50,7 +50,7 @@ void ExtractMMaps(std::set<uint32>& mapIds, uint32 threads)
             continue;
         }
 
-        std::string name = (*itr)->GetString(1);
+        std::string name = (*itr)->Get<std::string>(1);
         WDT wdt("World\\maps\\" + name + "\\" + name + ".wdt");
         if (!wdt.IsValid)
         {
@@ -121,7 +121,7 @@ void ExtractGameobjectModels()
     DBC* dbc = MPQHandler->GetDBC("GameObjectDisplayInfo");
     for (std::vector<Record*>::iterator itr = dbc->Records.begin(); itr != dbc->Records.end(); ++itr)
     {
-        std::string path = (*itr)->GetString(1);
+        std::string path = (*itr)->Get<std::string>(1);
         std::string fileName = Utils::GetPlainName(path.c_str());
         std::string extension = Utils::GetExtension(fileName);
         // Convert the extension to lowercase

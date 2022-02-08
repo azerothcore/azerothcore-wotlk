@@ -576,7 +576,7 @@ void Unit::UpdateSplinePosition()
         pos.m_positionX = loc.x;
         pos.m_positionY = loc.y;
         pos.m_positionZ = loc.z;
-        pos.m_orientation = loc.orientation;
+        pos.SetOrientation(loc.orientation);
 
         if (TransportBase* transport = GetDirectTransport())
             transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
@@ -14383,7 +14383,7 @@ float Unit::GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spell
 {
     if (!spellInfo->RangeEntry)
         return 0;
-    if (spellInfo->RangeEntry->maxRangeFriend == spellInfo->RangeEntry->maxRangeHostile)
+    if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
         return spellInfo->GetMaxRange();
     if (target == nullptr)
         return spellInfo->GetMaxRange(true);
@@ -14394,7 +14394,7 @@ float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spell
 {
     if (!spellInfo->RangeEntry)
         return 0;
-    if (spellInfo->RangeEntry->minRangeFriend == spellInfo->RangeEntry->minRangeHostile)
+    if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
         return spellInfo->GetMinRange();
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
@@ -15588,14 +15588,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         StartReactiveTimer(REACTIVE_OVERPOWER);
                     }
                 }
+
                 // Wolverine Bite
-                if (procExtra & PROC_EX_CRITICAL_HIT)
+                if ((procExtra & PROC_HIT_CRITICAL) && IsHunterPet())
                 {
-                    if (GetTypeId() == TYPEID_UNIT && IsPet())
-                    {
-                        ModifyAuraState(AURA_STATE_DEFENSE, true);
-                        StartReactiveTimer( REACTIVE_DEFENSE );
-                    }
+                    AddComboPoints(target, 1);
+                    StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
                 }
             }
         }
@@ -16367,6 +16365,10 @@ void Unit::UpdateReactives(uint32 p_time)
                     break;
                 case REACTIVE_OVERPOWER:
                     if (getClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
+                        ClearComboPoints();
+                    break;
+                case REACTIVE_WOLVERINE_BITE:
+                    if (IsHunterPet())
                         ClearComboPoints();
                     break;
                 default:
