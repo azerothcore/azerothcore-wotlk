@@ -6221,7 +6221,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
             type = TYPEID_GAMEOBJECT;
             break;
         default:
-            continue;
+            break;
         }
 
         std::string localeName = fields[2].Get<std::string>();
