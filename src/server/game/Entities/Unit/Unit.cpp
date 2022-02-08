@@ -12961,11 +12961,11 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
     if (who->GetTypeId() == TYPEID_PLAYER)
         SetContestedPvP(who->ToPlayer());
 
-    Player* me = GetCharmerOrOwnerPlayerOrPlayerItself();
-    if (me && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !me->duel || me->duel->Opponent != who))
+    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (player && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !player->duel || player->duel->Opponent != who))
     {
-        me->UpdatePvP(true);
-        me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+        player->UpdatePvP(true);
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     }
 }
 
@@ -12988,11 +12988,11 @@ void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
     if (who->GetTypeId() == TYPEID_PLAYER)
         SetContestedPvP(who->ToPlayer());
 
-    Player* me = GetCharmerOrOwnerPlayerOrPlayerItself();
-    if (me && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !me->duel || me->duel->Opponent != who))
+    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (player && who->IsPvP() && (who->GetTypeId() != TYPEID_PLAYER || !player->duel || player->duel->Opponent != who))
     {
-        me->UpdatePvP(true);
-        me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+        player->UpdatePvP(true);
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     }
 }
 
