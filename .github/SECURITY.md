@@ -61,6 +61,7 @@ Versions of macOS:
 
 | macOS Version | Supported          |
 | ------------- | ------------------ |
+| 11            | :white_check_mark: |
 | 10.15         | :white_check_mark: |
 
 **Note**: We do NOT support any repacks that may or may not have been made based on AzerothCore. Nor do we support any of the releases that are made under AzerothCore.
