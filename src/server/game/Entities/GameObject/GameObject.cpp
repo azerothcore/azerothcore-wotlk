@@ -131,8 +131,8 @@ void GameObject::RemoveFromOwner()
         return;
     }
 
-    LOG_FATAL("entities.gameobject", "Delete GameObject (%s Entry: %u SpellId %u LinkedGO %u) that lost references to owner %s GO list. Crash possible later.",
-        GetGUID().ToString().c_str(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString().c_str());
+    LOG_FATAL("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list. Crash possible later.",
+        GetGUID().ToString(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString());
 
     SetOwnerGUID(ObjectGuid::Empty);
 }
@@ -251,7 +251,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
     m_stationaryPosition.Relocate(x, y, z, ang);
     if (!IsPositionValid())
     {
-        LOG_ERROR("entities.gameobject", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
+        LOG_ERROR("entities.gameobject", "Gameobject (GUID: {} Entry: {}) not created. Suggested coordinates isn't valid (X: {} Y: {})", guidlow, name_id, x, y);
         return false;
     }
 
@@ -270,7 +270,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(name_id);
     if (!goinfo)
     {
-        LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry: %u) not created: non-existing entry in `gameobject_template`. Map: %u (X: %f Y: %f Z: %f)", guidlow, name_id, map->GetId(), x, y, z);
+        LOG_ERROR("sql.sql", "Gameobject (GUID: {} Entry: {}) not created: non-existing entry in `gameobject_template`. Map: {} (X: {} Y: {} Z: {})", guidlow, name_id, map->GetId(), x, y, z);
         return false;
     }
 
@@ -280,7 +280,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (goinfo->type >= MAX_GAMEOBJECT_TYPE)
     {
-        LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry: %u) not created: non-existing GO type '%u' in `gameobject_template`. It will crash client if created.", guidlow, name_id, goinfo->type);
+        LOG_ERROR("sql.sql", "Gameobject (GUID: {} Entry: {}) not created: non-existing GO type '{}' in `gameobject_template`. It will crash client if created.", guidlow, name_id, goinfo->type);
         return false;
     }
 
@@ -1017,33 +1017,33 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     uint8 index = 0;
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
-    stmt->setUInt32(0, m_spawnId);
+    stmt->SetData(0, m_spawnId);
     trans->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GAMEOBJECT);
-    stmt->setUInt32(index++, m_spawnId);
-    stmt->setUInt32(index++, GetEntry());
-    stmt->setUInt16(index++, uint16(mapid));
-    stmt->setUInt8(index++, spawnMask);
-    stmt->setUInt32(index++, GetPhaseMask());
-    stmt->setFloat(index++, GetPositionX());
-    stmt->setFloat(index++, GetPositionY());
-    stmt->setFloat(index++, GetPositionZ());
-    stmt->setFloat(index++, GetOrientation());
-    stmt->setFloat(index++, m_localRotation.x);
-    stmt->setFloat(index++, m_localRotation.y);
-    stmt->setFloat(index++, m_localRotation.z);
-    stmt->setFloat(index++, m_localRotation.w);
-    stmt->setInt32(index++, int32(m_respawnDelayTime));
-    stmt->setUInt8(index++, GetGoAnimProgress());
-    stmt->setUInt8(index++, uint8(GetGoState()));
+    stmt->SetData(index++, m_spawnId);
+    stmt->SetData(index++, GetEntry());
+    stmt->SetData(index++, uint16(mapid));
+    stmt->SetData(index++, spawnMask);
+    stmt->SetData(index++, GetPhaseMask());
+    stmt->SetData(index++, GetPositionX());
+    stmt->SetData(index++, GetPositionY());
+    stmt->SetData(index++, GetPositionZ());
+    stmt->SetData(index++, GetOrientation());
+    stmt->SetData(index++, m_localRotation.x);
+    stmt->SetData(index++, m_localRotation.y);
+    stmt->SetData(index++, m_localRotation.z);
+    stmt->SetData(index++, m_localRotation.w);
+    stmt->SetData(index++, int32(m_respawnDelayTime));
+    stmt->SetData(index++, GetGoAnimProgress());
+    stmt->SetData(index++, uint8(GetGoState()));
     trans->Append(stmt);
 
     if (saveAddon && !sObjectMgr->GetGameObjectAddon(m_spawnId))
     {
         index = 0;
         stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GAMEOBJECT_ADDON);
-        stmt->setUInt32(index++, m_spawnId);
+        stmt->SetData(index++, m_spawnId);
         trans->Append(stmt);
     }
 
@@ -1056,7 +1056,7 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
 
     if (!data)
     {
-        LOG_ERROR("sql.sql", "Gameobject (GUID: %u) not found in table `gameobject`, can't load. ", spawnId);
+        LOG_ERROR("sql.sql", "Gameobject (GUID: {}) not found in table `gameobject`, can't load. ", spawnId);
         return false;
     }
 
@@ -1121,11 +1121,11 @@ void GameObject::DeleteFromDB()
     sObjectMgr->DeleteGOData(m_spawnId);
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
-    stmt->setUInt32(0, m_spawnId);
+    stmt->SetData(0, m_spawnId);
     WorldDatabase.Execute(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_EVENT_GAMEOBJECT);
-    stmt->setUInt32(0, m_spawnId);
+    stmt->SetData(0, m_spawnId);
     WorldDatabase.Execute(stmt);
 }
 
@@ -1585,7 +1585,7 @@ void GameObject::Use(Unit* user)
 
                     if (info->goober.eventId)
                     {
-                        LOG_DEBUG("maps.script", "Goober ScriptStart id %u for GO entry %u (spawnId %u).", info->goober.eventId, GetEntry(), m_spawnId);
+                        LOG_DEBUG("maps.script", "Goober ScriptStart id {} for GO entry {} (spawnId {}).", info->goober.eventId, GetEntry(), m_spawnId);
                         GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                         EventInform(info->goober.eventId);
                     }
@@ -1686,7 +1686,7 @@ void GameObject::Use(Unit* user)
 
                             //provide error, no fishable zone or area should be 0
                             if (!zone_skill)
-                                LOG_ERROR("sql.sql", "Fishable areaId %u are not properly defined in `skill_fishing_base_level`.", subzone);
+                                LOG_ERROR("sql.sql", "Fishable areaId {} are not properly defined in `skill_fishing_base_level`.", subzone);
 
                             int32 skill = player->GetSkillValue(SKILL_FISHING);
 
@@ -1702,7 +1702,7 @@ void GameObject::Use(Unit* user)
 
                             int32 roll = irand(1, 100);
 
-                            LOG_DEBUG("entities.gameobject", "Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
+                            LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
@@ -1982,8 +1982,8 @@ void GameObject::Use(Unit* user)
             }
         default:
             if (GetGoType() >= MAX_GAMEOBJECT_TYPE)
-                LOG_ERROR("entities.gameobject", "GameObject::Use(): unit (%s, name: %s) tries to use object (%s, name: %s) of unknown type (%u)",
-                               user->GetGUID().ToString().c_str(), user->GetName().c_str(), GetGUID().ToString().c_str(),  GetGOInfo()->name.c_str(), GetGoType());
+                LOG_ERROR("entities.gameobject", "GameObject::Use(): unit ({}, name: {}) tries to use object ({}, name: {}) of unknown type ({})",
+                               user->GetGUID().ToString(), user->GetName(), GetGUID().ToString(),  GetGOInfo()->name, GetGoType());
             break;
     }
 
@@ -1994,9 +1994,9 @@ void GameObject::Use(Unit* user)
     if (!spellInfo)
     {
         if (user->GetTypeId() != TYPEID_PLAYER || !sOutdoorPvPMgr->HandleCustomSpell(user->ToPlayer(), spellId, this))
-            LOG_ERROR("entities.gameobject", "WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u)", spellId, GetEntry(), GetGoType());
+            LOG_ERROR("entities.gameobject", "WORLD: unknown spell id {} at use action for gameobject (Entry: {} GoType: {})", spellId, GetEntry(), GetGoType());
         else
-            LOG_DEBUG("outdoorpvp", "WORLD: %u non-dbc spell was handled by OutdoorPvP", spellId);
+            LOG_DEBUG("outdoorpvp", "WORLD: {} non-dbc spell was handled by OutdoorPvP", spellId);
         return;
     }
 

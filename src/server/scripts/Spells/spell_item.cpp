@@ -1093,7 +1093,7 @@ class spell_item_draenic_pale_ale : public SpellScript
         for (uint8 count = 0; count < GetEffectValue(); ++count)
         {
             Position pos = *GetCaster();
-            GetCaster()->GetClosePoint(pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation, radius, M_PI - 1.2f + 0.3f * urand(0, 8));
+            GetCaster()->GetClosePoint(pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.GetOrientation(), radius, M_PI - 1.2f + 0.3f * urand(0, 8));
             Creature* summon = GetCaster()->SummonCreature(GetSpellInfo()->Effects[effIndex].MiscValue, pos, TEMPSUMMON_TIMED_DESPAWN, GetSpellInfo()->GetDuration());
             if (!summon)
                 continue;

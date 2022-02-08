@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.bugreport
+-- Дамп структуры для таблица acore_characters.bugreport
 DROP TABLE IF EXISTS `bugreport`;
 CREATE TABLE IF NOT EXISTS `bugreport` (
   `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `bugreport` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Debug System';
 
--- Дамп данных таблицы _acore_characters.bugreport: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.bugreport: ~0 rows (приблизительно)
 DELETE FROM `bugreport`;
 /*!40000 ALTER TABLE `bugreport` DISABLE KEYS */;
 /*!40000 ALTER TABLE `bugreport` ENABLE KEYS */;
