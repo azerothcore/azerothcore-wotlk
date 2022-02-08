@@ -89,6 +89,9 @@ public:
 
     static bool HandleInstanceUnbindCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, Variant<uint16, EXACT_SEQUENCE("all")> mapArg, Optional<uint8> difficultyArg)
     {
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
         // Character name must be provided when using this from console.
         if (!player && !handler->GetSession())
         {
@@ -97,8 +100,7 @@ public:
             return false;
         }
 
-        if (!player)
-            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        auto connectedPlayer = player->GetConnectedPlayer()
 
         uint16 counter = 0;
         uint16 mapId = 0;
@@ -116,13 +118,13 @@ public:
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
             {
                 InstanceSave const* save = itr->second.save;
-                if (player->GetConnectedPlayer() && (itr->first != player->GetConnectedPlayer()->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty())))
+                if (itr->first != connectedPlayer->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                     uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
                     std::string timeleft = secsToTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
-                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player->GetConnectedPlayer());
+                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, connectedPlayer);
                     itr = m_boundInstances.begin();
                     counter++;
                 }
