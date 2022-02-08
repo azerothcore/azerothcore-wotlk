@@ -7190,9 +7190,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].MiscValue = 126;
     });
 
-    // Magic Broom
-    ApplySpellFix({ 47977 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({
+        47977, // Magic Broom
+        65917, // Magic Rooster
+        }, [](SpellInfo* spellInfo)
     {
+        // First two effects apply auras, which shouldn't be there
+        // due to NO_TARGET applying aura on current caster (core bug)
+        // Just wipe effect data, to mimic blizz-behavior
         spellInfo->Effects[EFFECT_0].Effect = 0;
         spellInfo->Effects[EFFECT_1].Effect = 0;
     });
