@@ -11097,7 +11097,7 @@ bool Player::IsAlwaysDetectableFor(WorldObject const* seer) const
         return false;
     }
 
-    if (const Player* seerPlayer = seer->ToPlayer())
+    if (Player const* seerPlayer = seer->ToPlayer())
     {
         if (IsGroupVisibleFor(seerPlayer))
         {

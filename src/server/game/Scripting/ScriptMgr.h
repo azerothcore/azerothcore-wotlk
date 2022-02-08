@@ -1137,13 +1137,13 @@ public:
     virtual void OnPlayerJoinArena(Player* /*player*/) { }
 
     //Called when trying to get a team ID of a slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomGetArenaTeamId(const Player* /*player*/, uint8 /*slot*/, uint32& /*teamID*/) const { }
+    virtual void GetCustomGetArenaTeamId(Player const* /*player*/, uint8 /*slot*/, uint32& /*teamID*/) const { }
 
     //Called when trying to get players personal rating of an arena slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomArenaPersonalRating(const Player* /*player*/, uint8 /*slot*/, uint32& /*rating*/) const { }
+    virtual void GetCustomArenaPersonalRating(Player const* /*player*/, uint8 /*slot*/, uint32& /*rating*/) const { }
 
     //Called after the normal slots (0..2) for arena have been evaluated so that custom arena teams could modify it if nececasry
-    virtual void OnGetMaxPersonalArenaRatingRequirement(const Player* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
+    virtual void OnGetMaxPersonalArenaRatingRequirement(Player const* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
@@ -2213,9 +2213,9 @@ public: /* PlayerScript */
     void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
-    void GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const;
-    void GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const;
-    void OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const;
+    void GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const;
+    void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
+    void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);

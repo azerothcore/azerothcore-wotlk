@@ -9502,7 +9502,7 @@ void Unit::setPowerType(Powers new_powertype)
             break;
     }
 
-    if (const Player* player = ToPlayer())
+    if (Player const* player = ToPlayer())
         if (player->NeedSendSpectatorData())
         {
             ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "PWT", new_powertype);
@@ -13475,7 +13475,7 @@ bool Unit::IsAlwaysDetectableFor(WorldObject const* seer) const
         return true;
 
     if (Player* ownerPlayer = GetSpellModOwner())
-        if (const Player* seerPlayer = seer->ToPlayer())
+        if (Player const* seerPlayer = seer->ToPlayer())
         {
             if (ownerPlayer->IsGroupVisibleFor(seerPlayer))
                 return true;

@@ -70,7 +70,7 @@ struct npc_brewfest_keg_thrower : public ScriptedAI
         }
     }
 
-    bool CanBeSeen(const Player* player) override
+    bool CanBeSeen(Player const* player) override
     {
         if (player->GetMountID() == RAM_DISPLAY_ID)
             return true;
