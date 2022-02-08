@@ -2371,6 +2371,8 @@ public:
     void SendCinematicStart(uint32 CinematicSequenceId);
     void SendMovieStart(uint32 MovieId);
 
+    [[nodiscard]] uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
+
     [[nodiscard]] uint16 GetMaxSkillValueForLevel() const;
     bool IsFFAPvP();
     bool IsPvP();
