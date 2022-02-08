@@ -47,7 +47,7 @@ namespace Movement
             if (splineflags.final_angle)
                 c.orientation = facing.angle;
             else if (splineflags.final_point)
-                c.orientation = atan2(facing.f.y - c.y, facing.f.x - c.x);
+                c.orientation = std::atan2(facing.f.y - c.y, facing.f.x - c.x);
             //nothing to do for MoveSplineFlag::Final_Target flag
         }
         else
@@ -56,7 +56,7 @@ namespace Movement
             {
                 Vector3 hermite;
                 spline.evaluate_derivative(point_Idx, u, hermite);
-                c.orientation = atan2(hermite.y, hermite.x);
+                c.orientation = std::atan2(hermite.y, hermite.x);
             }
 
             if (splineflags.orientationInversed)
@@ -107,14 +107,16 @@ namespace Movement
 
     struct CommonInitializer
     {
-        CommonInitializer(float _velocity) : velocityInv(1000.f / _velocity), time(minimal_duration) {}
-        float velocityInv;
-        int32 time;
+        CommonInitializer(float _velocity) : velocityInv(1000.f / _velocity), _time(minimal_duration) {}
+
         inline int32 operator()(Spline<int32>& s, int32 i)
         {
-            time += (s.SegLength(i) * velocityInv);
-            return time;
+            _time += (s.SegLength(i) * velocityInv);
+            return _time;
         }
+
+        float velocityInv;
+        int32 _time;
     };
 
     void MoveSpline::init_spline(const MoveSplineInitArgs& args)
@@ -202,9 +204,9 @@ namespace Movement
         if (!(exp)) \
         { \
             if (unit) \
-                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for %s", #exp, unit->GetGUID().ToString().c_str()); \
+                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '{}' failed for {}", #exp, unit->GetGUID().ToString()); \
             else \
-                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for cyclic spline continuation", #exp); \
+                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '{}' failed for cyclic spline continuation", #exp); \
             return false;\
         }
         CHECK(path.size() > 1);
@@ -227,7 +229,7 @@ namespace Movement
             for (uint32 i = 1; i < path.size() - 1; ++i)
             {
                 offset = path[i] - middle;
-                if (fabs(offset.x) >= MAX_OFFSET || fabs(offset.y) >= MAX_OFFSET || fabs(offset.z) >= MAX_OFFSET)
+                if (std::fabs(offset.x) >= MAX_OFFSET || std::fabs(offset.y) >= MAX_OFFSET || std::fabs(offset.z) >= MAX_OFFSET)
                 {
                     LOG_ERROR("movement", "MoveSplineInitArgs::_checkPathBounds check failed");
                     return false;

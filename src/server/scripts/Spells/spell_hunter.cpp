@@ -277,6 +277,17 @@ class spell_hun_taming_the_beast : public AuraScript
 {
     PrepareAuraScript(spell_hun_taming_the_beast);
 
+    void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (Creature* creature = target->ToCreature())
+            {
+                creature->DeleteThreatList();
+            }
+        }
+    }
+
     void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
@@ -286,6 +297,7 @@ class spell_hun_taming_the_beast : public AuraScript
 
     void Register() override
     {
+        OnEffectApply += AuraEffectApplyFn(spell_hun_taming_the_beast::HandleOnEffectApply, EFFECT_0, SPELL_AURA_MOD_CHARM, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_hun_taming_the_beast::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_MOD_CHARM, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -948,7 +960,20 @@ class spell_hun_tame_beast : public SpellScript
                 return SPELL_FAILED_DONT_REPORT;
             }
 
-            if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->IsPetDismissed() || player->GetCharmGUID())
+            PetStable const* petStable = player->GetPetStable();
+            if (petStable)
+            {
+                if (petStable->CurrentPet)
+                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+
+                if (petStable->GetUnslottedHunterPet())
+                {
+                    caster->SendTameFailure(PET_TAME_TOO_MANY);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+            }
+
+            if (player->GetCharmGUID())
             {
                 player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                 return SPELL_FAILED_DONT_REPORT;
@@ -1241,6 +1266,40 @@ class spell_hun_intimidation : public AuraScript
     }
 };
 
+// 19574 - Bestial Wrath
+class spell_hun_bestial_wrath : public SpellScript
+{
+    PrepareSpellScript(spell_hun_bestial_wrath);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        {
+            return SPELL_FAILED_NO_VALID_TARGETS;
+        }
+
+        Pet* pet = caster->ToPlayer()->GetPet();
+        if (!pet)
+        {
+            return SPELL_FAILED_NO_PET;
+        }
+
+        if (!pet->IsAlive())
+        {
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_PET_IS_DEAD);
+            return SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_hun_bestial_wrath::CheckCast);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1270,4 +1329,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_volley_trigger);
     RegisterSpellScript(spell_hun_lock_and_load);
     RegisterSpellScript(spell_hun_intimidation);
+    RegisterSpellScript(spell_hun_bestial_wrath);
 }

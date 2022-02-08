@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -1013,10 +1014,10 @@ public:
             }
             else if (unit->GetTypeId() == TYPEID_UNIT && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
             {
-                if (time(nullptr) > (m_conspeedatoryAttempt + DAY))
+                if (GameTime::GetGameTime().count() > (m_conspeedatoryAttempt + DAY))
                 {
                     DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21597 /*CON-SPEED-ATORY_TIMED_CRITERIA*/);
-                    m_conspeedatoryAttempt = time(nullptr);
+                    m_conspeedatoryAttempt = GameTime::GetGameTime().count();
                     SaveToDB();
                 }
             }
