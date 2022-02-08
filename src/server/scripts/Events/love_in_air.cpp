@@ -423,7 +423,7 @@ public:
         }
     };
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
         creature->AI()->DoAction(ACTION_START_EVENT);
         CloseGossipMenuFor(player);
