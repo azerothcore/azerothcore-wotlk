@@ -17,6 +17,7 @@
 
 #include "SpellInfo.h"
 #include "DBCStores.h"
+#include "DBCStructure.h"
 #include "GameGraveyard.h"
 #include "SpellMgr.h"
 
