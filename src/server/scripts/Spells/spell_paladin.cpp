@@ -146,7 +146,7 @@ class spell_pal_seal_of_command : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        if (const SpellValue* spellValue = GetSpellValue())
+        if (SpellValue const* spellValue = GetSpellValue())
             if (spellValue->MaxAffectedTargets == 1)
                 targets.clear();
     }
