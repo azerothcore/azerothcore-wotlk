@@ -18,6 +18,7 @@
 #ifndef ACore_game_Position_h__
 #define ACore_game_Position_h__
 
+#include <cmath>
 #include "Common.h"
 #include "G3D/Vector3.h"
 
