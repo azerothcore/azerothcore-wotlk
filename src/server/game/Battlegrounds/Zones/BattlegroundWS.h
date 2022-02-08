@@ -19,6 +19,7 @@
 #define __BATTLEGROUNDWS_H
 
 #include "Battleground.h"
+#include "EventMap.h"
 
 enum BG_WS_Events
 {
