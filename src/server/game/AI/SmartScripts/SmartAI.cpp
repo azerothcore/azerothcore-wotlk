@@ -1101,7 +1101,7 @@ void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMONED_UNIT_DIES, summon);
 }
 
-int SmartGameObjectAI::Permissible(const GameObject* g)
+int SmartGameObjectAI::Permissible(GameObject const* g)
 {
     if (g->GetAIName() == "SmartGameObjectAI")
         return PERMIT_BASE_SPECIAL;

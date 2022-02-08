@@ -61,7 +61,7 @@ struct GameObjectAIFactory : public SelectableGameObjectAI
 
     GameObjectAI* Create(void*) const;
 
-    int Permit(const GameObject* g) const { return REAL_GO_AI::Permissible(g); }
+    int Permit(GameObject const* g) const { return REAL_GO_AI::Permissible(g); }
 };
 
 template<class REAL_GO_AI>

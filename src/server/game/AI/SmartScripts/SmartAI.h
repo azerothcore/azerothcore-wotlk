@@ -258,7 +258,7 @@ public:
     void InitializeAI() override;
     void Reset() override;
     SmartScript* GetScript() { return &mScript; }
-    static int32 Permissible(const GameObject* g);
+    static int32 Permissible(GameObject const* g);
 
     bool GossipHello(Player* player, bool reportUse) override;
     bool GossipSelect(Player* player, uint32 sender, uint32 action) override;
