@@ -563,16 +563,9 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet)
 {
-    LOG_DEBUG("network", "WORLD: Received MSG_RANDOM_ROLL");
-
     uint32 minimum, maximum;
     minimum = packet.Min;
     maximum = packet.Max;
-
-    /** error handling **/
-    if (minimum > maximum || maximum > 10000)                // < 32768 for urand call
-        return;
-    /********************/
 
     GetPlayer()->DoRandomRoll(minimum, maximum);
 }
