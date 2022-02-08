@@ -39,43 +39,6 @@ EndContentData */
 #include "SpellInfo.h"
 
 /*######
-## npc_beaten_corpse
-######*/
-
-#define GOSSIP_CORPSE "Examine corpse in detail..."
-
-enum BeatenCorpse
-{
-    QUEST_LOST_IN_BATTLE    = 4921
-};
-
-class npc_beaten_corpse : public CreatureScript
-{
-public:
-    npc_beaten_corpse() : CreatureScript("npc_beaten_corpse") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            SendGossipMenuFor(player, 3558, creature->GetGUID());
-            player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_COMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, 3557, creature->GetGUID());
-        return true;
-    }
-};
-
-/*######
 # npc_gilthares
 ######*/
 
@@ -661,7 +624,6 @@ public:
 
 void AddSC_the_barrens()
 {
-    new npc_beaten_corpse();
     new npc_gilthares();
     new npc_taskmaster_fizzule();
     new npc_twiggy_flathead();
