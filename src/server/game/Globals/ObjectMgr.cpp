@@ -6186,8 +6186,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (std::size_t i = 0; i < _questGreetingLocaleStore.size(); ++i)
-        _questGreetingLocaleStore[i].clear();
+    _questGreetingLocaleStore.clear();                              // need for reload case
 
     //                                               0     1      2       3
     QueryResult result = WorldDatabase.Query("SELECT ID, Type, Locale, Greeting FROM quest_greeting_locale");
@@ -6197,7 +6196,6 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         return;
     }
 
-    uint32 count = 0;
     do
     {
         Field* fields = result->Fetch();
@@ -6212,6 +6210,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
                 LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: creature template entry {} does not exist.", id);
                 continue;
             }
+            type = TYPEID_UNIT;
             break;
         case 1: // GameObject
             if (!sObjectMgr->GetGameObjectTemplate(id))
@@ -6219,6 +6218,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
                 LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: gameobject template entry {} does not exist.", id);
                 continue;
             }
+            type = TYPEID_GAMEOBJECT;
             break;
         default:
             continue;
@@ -6230,9 +6230,8 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         if (locale == LOCALE_enUS)
             continue;
 
-        QuestGreetingLocale& data = _questGreetingLocaleStore[type][id];
+        QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(id, type)];
         AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
-        ++count;
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", uint32(_questGreetingLocaleStore.size()), GetMSTimeDiffToNow(oldMSTime));
