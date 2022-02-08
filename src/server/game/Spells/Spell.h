@@ -171,7 +171,7 @@ public:
     void SetSpeed(float speed) { m_speed = speed; }
 
     float GetDist2d() const { return m_src._position.GetExactDist2d(&m_dst._position); }
-    float GetSpeedXY() const { return m_speed * cos(m_elevation); }
+    float GetSpeedXY() const { return m_speed * std::cos(m_elevation); }
     float GetSpeedZ() const { return m_speed * std::sin(m_elevation); }
 
     void Update(Unit* caster);

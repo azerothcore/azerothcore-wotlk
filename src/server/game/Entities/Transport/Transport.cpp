@@ -877,8 +877,8 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         // pussywizard: PathRotation in db is only simple orientation rotation, so don't use sophisticated and not working code
         // reminder: WorldRotation only influences model rotation, not the path
         float sign = GetFloatValue(GAMEOBJECT_PARENTROTATION + 2) >= 0.0f ? 1.0f : -1.0f;
-        float pathRotAngle = sign * 2.0f * acos(GetFloatValue(GAMEOBJECT_PARENTROTATION + 3));
-        float cs = cos(pathRotAngle), sn = std::sin(pathRotAngle);
+        float pathRotAngle = sign * 2.0f * std::cos(GetFloatValue(GAMEOBJECT_PARENTROTATION + 3));
+        float cs = std::cos(pathRotAngle), sn = std::sin(pathRotAngle);
         float nx = pos.x * cs - pos.y * sn;
         float ny = pos.x * sn + pos.y * cs;
         pos.x = nx;
@@ -893,9 +893,9 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         float percRot;
         m_goValue.Transport.AnimationInfo->GetAnimRotation(progress, currRot, nextRot, percRot);
         float signCurr = currRot.z >= 0.0f ? 1.0f : -1.0f;
-        float oriRotAngleCurr = signCurr * 2.0f * acos(currRot.w);
+        float oriRotAngleCurr = signCurr * 2.0f * std::cos(currRot.w);
         float signNext = nextRot.z >= 0.0f ? 1.0f : -1.0f;
-        float oriRotAngleNext = signNext * 2.0f * acos(nextRot.w);
+        float oriRotAngleNext = signNext * 2.0f * std::cos(nextRot.w);
         float oriRotAngle = oriRotAngleCurr + percRot * (oriRotAngleNext - oriRotAngleCurr);
 
         // check if position is valid

@@ -163,7 +163,7 @@ public:
                     for (uint8 i = 0; i < 4; ++i)
                     {
                         float o = rand_norm() * 2.0f * M_PI;
-                        float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
+                        float x = me->GetPositionX() + 5.0f * _spikesCount * std::cos(o);
                         float y = me->GetPositionY() + 5.0f * _spikesCount * std::sin(o);
                         float h = me->GetMapHeight(x, y, me->GetPositionZ());
 

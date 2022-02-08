@@ -68,8 +68,8 @@ void Position::GetPositionOffsetTo(const Position& endPos, Position& retOffset) 
     float dx = endPos.GetPositionX() - GetPositionX();
     float dy = endPos.GetPositionY() - GetPositionY();
 
-    retOffset.m_positionX = dx * cos(GetOrientation()) + dy * std::sin(GetOrientation());
-    retOffset.m_positionY = dy * cos(GetOrientation()) - dx * std::sin(GetOrientation());
+    retOffset.m_positionX = dx * std::cos(GetOrientation()) + dy * std::sin(GetOrientation());
+    retOffset.m_positionY = dy * std::cos(GetOrientation()) - dx * std::sin(GetOrientation());
     retOffset.m_positionZ = endPos.GetPositionZ() - GetPositionZ();
     retOffset.m_orientation = endPos.GetOrientation() - GetOrientation();
 }

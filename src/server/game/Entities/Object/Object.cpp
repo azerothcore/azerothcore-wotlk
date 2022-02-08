@@ -1507,7 +1507,7 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
     float new_dist = (float)rand_norm() * static_cast<float>(distance);
 
-    rand_x = pos.m_positionX + new_dist * cos(angle);
+    rand_x = pos.m_positionX + new_dist * std::cos(angle);
     rand_y = pos.m_positionY + new_dist * std::sin(angle);
     rand_z = pos.m_positionZ;
 
@@ -2700,7 +2700,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
 {
     angle += GetOrientation();
     float destx, desty, destz, ground, floor;
-    destx = pos.m_positionX + dist * cos(angle);
+    destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
 
     // Prevent invalid coordinates here, position is unchanged
@@ -2721,7 +2721,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         // do not allow too big z changes
         if (std::fabs(pos.m_positionZ - destz) > 6.0f)
         {
-            destx -= step * cos(angle);
+            destx -= step * std::cos(angle);
             desty -= step * std::sin(angle);
             ground = GetMapHeight(destx, desty, MAX_HEIGHT);
             floor = GetMapHeight(destx, desty, pos.m_positionZ);
@@ -2782,7 +2782,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 {
     angle += GetOrientation();
     float destx, desty, destz;
-    destx = pos.m_positionX + dist * cos(angle);
+    destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
     destz = pos.m_positionZ;
 

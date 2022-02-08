@@ -136,7 +136,7 @@ struct ObjectPosSelector
     UsedPosList::value_type const* nextUsedPos(UsedPosType uptype);
 
     // angle from used pos to next possible free pos
-    float GetAngle(UsedPos const& usedPos) const { return acos(m_dist / (usedPos.dist + usedPos.size + m_size)); }
+    float GetAngle(UsedPos const& usedPos) const { return std::cos(m_dist / (usedPos.dist + usedPos.size + m_size)); }
 
     float m_center_x;
     float m_center_y;
