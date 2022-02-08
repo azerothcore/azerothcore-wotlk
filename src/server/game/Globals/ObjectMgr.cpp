@@ -6199,7 +6199,8 @@ void ObjectMgr::LoadQuestGreetingsLocales()
 {
     uint32 oldMSTime = getMSTime();
 
-    _questGreetingLocaleStore.clear();                              // need for reload case
+    for (std::size_t i = 0; i < _questGreetingLocaleStore.size(); ++i)
+        _questGreetingLocaleStore[i].clear();
 
     //                                               0     1      2       3
     QueryResult result = WorldDatabase.Query("SELECT ID, Type, Locale, Greeting FROM quest_greeting_locale");
@@ -6243,7 +6244,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         if (locale == LOCALE_enUS)
             continue;
 
-        QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(id, type)];
+        QuestGreetingLocale& data = _questGreetingLocaleStore[type][id];
         AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
     } while (result->NextRow());
 
