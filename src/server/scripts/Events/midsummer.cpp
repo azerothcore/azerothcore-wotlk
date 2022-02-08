@@ -170,11 +170,8 @@ struct npc_midsummer_torch_target : public ScriptedAI
         for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
         {
             Position pos;
-            pos.Relocate(posVec.at(num));
-            me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-            me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
-
-            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
+            pos.Relocate(*itr);
+            posVec.push_back(pos);
         }
     }
 
@@ -186,7 +183,7 @@ struct npc_midsummer_torch_target : public ScriptedAI
         Position pos;
         pos.Relocate(posVec.at(num));
         me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-        me->m_last_notify_mstime = World::GetGameTimeMS() + 10000;
+        me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
 
         me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
     }
@@ -250,7 +247,7 @@ class spell_midsummer_ribbon_pole : public AuraScript
 {
     PrepareAuraScript(spell_midsummer_ribbon_pole)
 
-    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
         if (Unit* target = GetTarget())
@@ -266,6 +263,7 @@ class spell_midsummer_ribbon_pole : public AuraScript
             if (Aura* aur = target->GetAura(SPELL_RIBBON_POLE_XP))
                 aur->SetDuration(std::min(aur->GetDuration() + 3 * MINUTE * IN_MILLISECONDS, 60 * MINUTE * IN_MILLISECONDS));
             else
+            {
                 target->CastSpell(target, SPELL_RIBBON_POLE_XP, true);
 
                 // Achievement
