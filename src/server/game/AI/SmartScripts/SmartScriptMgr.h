@@ -618,12 +618,12 @@ enum SMART_ACTION
     SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    // TODO: NOT SUPPORTED YET
     // SMART_ACTION_INVOKER_CAST                    = 134,    // TODO: solve name conflicts
-
-    SMART_ACTION_TC_END                             = 135,    // placeholder
+    SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry, cinematic
     SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
 
     SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
 
+    SMART_ACTION_TC_END                             = 199,    // placeholder
     // AC-only SmartActions:
 
     SMART_ACTION_AC_START                           = 200,    // placeholder
@@ -685,6 +685,7 @@ struct SmartAction
         {
             uint32 sound;
             SAIBool onlySelf;
+            uint32 distance;
         } sound;
 
         struct
@@ -694,6 +695,7 @@ struct SmartAction
             uint32 sound3;
             uint32 sound4;
             SAIBool onlySelf;
+            uint32 distance;
         } randomSound;
 
         struct
@@ -1316,6 +1318,11 @@ struct SmartAction
         {
             uint32 percent;
         } setHealthPct;
+
+        struct
+        {
+            uint32 entry;
+        } cinematic;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
