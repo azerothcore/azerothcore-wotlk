@@ -5736,7 +5736,7 @@ ReputationRank Player::GetReputationRank(uint32 faction) const
 }
 
 // Calculate total reputation percent player gain with quest/creature level
-int32 Player::CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus)
+float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, float rep, int32 faction, bool noQuestBonus)
 {
     float percent = 100.0f;
 
@@ -5746,7 +5746,7 @@ int32 Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
     if (source == REPUTATION_SOURCE_KILL)
         repMod += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction);
 
-    percent += rep > 0 ? repMod : -repMod;
+    percent += rep > 0.f ? repMod : -repMod;
 
     float rate;
     switch (source)
@@ -5844,24 +5844,26 @@ void Player::RewardReputation(Unit* victim, float rate)
 
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
-        int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->getLevel(), Rep->RepValue1, ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
-        donerep1 = int32(donerep1 * rate);
+        float donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->getLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
+        donerep1 *= rate;
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
-        uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
         if (factionEntry1)
-            GetReputationMgr().ModifyReputation(factionEntry1, donerep1, bool(current_reputation_rank1 > Rep->ReputationMaxCap1));
+        {
+            GetReputationMgr().ModifyReputation(factionEntry1, donerep1, false, static_cast<ReputationRank>(Rep->ReputationMaxCap1));
+        }
     }
 
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
-        int32 donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->getLevel(), Rep->RepValue2, ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
-        donerep2 = int32(donerep2 * rate);
+        float donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->getLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
+        donerep2 *= rate;
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
-        uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
         if (factionEntry2)
-            GetReputationMgr().ModifyReputation(factionEntry2, donerep2, bool(current_reputation_rank2 > Rep->ReputationMaxCap2));
+        {
+            GetReputationMgr().ModifyReputation(factionEntry2, donerep2, false, static_cast<ReputationRank>(Rep->ReputationMaxCap2));
+        }
     }
 }
 
@@ -5873,11 +5875,11 @@ void Player::RewardReputation(Quest const* quest)
         if (!quest->RewardFactionId[i])
             continue;
 
-        int32 rep = 0;
+        float rep = 0.f;
 
         if (quest->RewardFactionValueIdOverride[i])
         {
-            rep = quest->RewardFactionValueIdOverride[i] / 100;
+            rep = quest->RewardFactionValueIdOverride[i] / 100.f;
         }
         else
         {
@@ -5885,11 +5887,11 @@ void Player::RewardReputation(Quest const* quest)
             if (QuestFactionRewEntry const* questFactionRewEntry = sQuestFactionRewardStore.LookupEntry(row))
             {
                 uint32 field = std::abs(quest->RewardFactionValueId[i]);
-                rep = questFactionRewEntry->QuestRewFactionValue[field];
+                rep = static_cast<float>(questFactionRewEntry->QuestRewFactionValue[field]);
             }
         }
 
-        if (!rep)
+        if (rep == 0.f)
             continue;
 
         if (quest->IsDaily())
@@ -5914,7 +5916,9 @@ void Player::RewardReputation(Quest const* quest)
         }
 
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
-            GetReputationMgr().ModifyReputation(factionEntry, rep, false, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
+        {
+            GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
+        }
     }
 }
 
@@ -14795,7 +14799,7 @@ uint8 Player::GetMostPointsTalentTree() const
     return maxIndex;
 }
 
-void Player::SetReputation(uint32 factionentry, uint32 value)
+void Player::SetReputation(uint32 factionentry, float value)
 {
     GetReputationMgr().SetReputation(sFactionStore.LookupEntry(factionentry), value);
 }
@@ -15335,7 +15339,7 @@ void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans)
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES);
         stmt->SetData(0, GetSession()->GetAccountId());
         stmt->SetData(1, itr->first);
-        stmt->SetData(2, itr->second);
+        stmt->SetData(2, (int64)itr->second);
         trans->Append(stmt);
     }
 }
