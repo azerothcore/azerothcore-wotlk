@@ -30,6 +30,7 @@
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
+#include "Position.h"
 #include "SharedDefines.h"
 #include "Timer.h"
 #include <bitset>
