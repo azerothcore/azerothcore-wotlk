@@ -445,7 +445,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr2>::ToString(SpellAttr2 value)
         case SPELL_ATTR2_IGNORE_WEAPONSKILL: return { "SPELL_ATTR2_IGNORE_WEAPONSKILL", "Unknown attribute 27@Attr2", "" };
         case SPELL_ATTR2_NOT_AN_ACTION: return { "SPELL_ATTR2_NOT_AN_ACTION", "Unknown attribute 28@Attr2", "" };
         case SPELL_ATTR2_CANT_CRIT: return { "SPELL_ATTR2_CANT_CRIT", "Cannot critically strike", "" };
-        case SPELL_ATTR2_ACTIVE_THREAT: return { "SPELL_ATTR2_ACTIVE_THREAT", "Allow triggered spell to trigger (type 1)", "Without this attribute, any triggered spell will be unable to trigger other auras' procs" };
+        case SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC: return { "SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC", "Allow triggered spell to trigger (type 1)", "Without this attribute, any triggered spell will be unable to trigger other auras' procs" };
         case SPELL_ATTR2_RETAIN_ITEM_CAST: return { "SPELL_ATTR2_RETAIN_ITEM_CAST", "Food buff (client only)", "" };
         default: throw std::out_of_range("value");
     }
@@ -489,7 +489,7 @@ AC_API_EXPORT SpellAttr2 EnumUtils<SpellAttr2>::FromIndex(size_t index)
         case 27: return SPELL_ATTR2_IGNORE_WEAPONSKILL;
         case 28: return SPELL_ATTR2_NOT_AN_ACTION;
         case 29: return SPELL_ATTR2_CANT_CRIT;
-        case 30: return SPELL_ATTR2_ACTIVE_THREAT;
+        case 30: return SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC;
         case 31: return SPELL_ATTR2_RETAIN_ITEM_CAST;
         default: throw std::out_of_range("index");
     }
@@ -530,7 +530,7 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr2>::ToIndex(SpellAttr2 value)
         case SPELL_ATTR2_IGNORE_WEAPONSKILL: return 27;
         case SPELL_ATTR2_NOT_AN_ACTION: return 28;
         case SPELL_ATTR2_CANT_CRIT: return 29;
-        case SPELL_ATTR2_ACTIVE_THREAT: return 30;
+        case SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC: return 30;
         case SPELL_ATTR2_RETAIN_ITEM_CAST: return 31;
         default: throw std::out_of_range("value");
     }
@@ -553,7 +553,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr3>::ToString(SpellAttr3 value)
         case SPELL_ATTR3_NO_AVOIDANCE: return { "SPELL_ATTR3_NO_AVOIDANCE", "Unknown attribute 6@Attr3", "" };
         case SPELL_ATTR3_DOT_STACKING_RULE: return { "SPELL_ATTR3_DOT_STACKING_RULE", "Stack separately for each caster", "" };
         case SPELL_ATTR3_ONLY_ON_PLAYER: return { "SPELL_ATTR3_ONLY_ON_PLAYER", "Can only target players", "" };
-        case SPELL_ATTR3_NOT_A_PROC: return { "SPELL_ATTR3_NOT_A_PROC", "Allow triggered spell to trigger (type 2)", "Without this attribute, any triggered spell will be unable to trigger other auras' procs" };
+        case SPELL_ATTR3_TRIGGERED_CAN_TRIGGER_PROC_2: return { "SPELL_ATTR3_TRIGGERED_CAN_TRIGGER_PROC_2", "Allow triggered spell to trigger (type 2)", "Without this attribute, any triggered spell will be unable to trigger other auras' procs" };
         case SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON: return { "SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON", "Require main hand weapon", "" };
         case SPELL_ATTR3_ONLY_BATTLEGROUNDS: return { "SPELL_ATTR3_ONLY_BATTLEGROUNDS", "Can only be cast in battleground", "" };
         case SPELL_ATTR3_ONLY_ON_GHOSTS: return { "SPELL_ATTR3_ONLY_ON_GHOSTS", "Can only target ghost players", "" };
@@ -563,14 +563,14 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr3>::ToString(SpellAttr3 value)
         case SPELL_ATTR3_SUPRESS_CASTER_PROCS: return { "SPELL_ATTR3_SUPRESS_CASTER_PROCS", "Cannot trigger procs", "" };
         case SPELL_ATTR3_SUPRESS_TARGET_PROCS: return { "SPELL_ATTR3_SUPRESS_TARGET_PROCS", "No initial aggro", "" };
         case SPELL_ATTR3_ALWAYS_HIT: return { "SPELL_ATTR3_ALWAYS_HIT", "Ignore hit result", "Spell cannot miss, or be dodged/parried/blocked" };
-        case SPELL_ATTR3_INSTANT_TARGET_PROCS: return { "SPELL_ATTR3_INSTANT_TARGET_PROCS", "Cannot trigger spells during aura proc", "" };
+        case SPELL_ATTR3_DISABLE_PROC: return { "SPELL_ATTR3_DISABLE_PROC", "Cannot trigger spells during aura proc", "" };
         case SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD: return { "SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD", "Persists through death", "" };
         case SPELL_ATTR3_ONLY_PROC_OUTDOORS: return { "SPELL_ATTR3_ONLY_PROC_OUTDOORS", "Unknown attribute 21@Attr3", "" };
         case SPELL_ATTR3_CASTING_CANCELS_AUTOREPEAT: return { "SPELL_ATTR3_CASTING_CANCELS_AUTOREPEAT", "Requires equipped Wand (Mainline: Do Not Trigger Target Stand)", "" };
         case SPELL_ATTR3_NO_DAMAGE_HISTORY: return { "SPELL_ATTR3_NO_DAMAGE_HISTORY", "Unknown attribute 23@Attr3", "" };
         case SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON: return { "SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON", "Requires offhand weapon", "" };
         case SPELL_ATTR3_TREAT_AS_PERIODIC: return { "SPELL_ATTR3_TREAT_AS_PERIODIC", "Treat as periodic effect", "" };
-        case SPELL_ATTR3_CAN_PROC_FROM_PROCS: return { "SPELL_ATTR3_CAN_PROC_FROM_PROCS", "Can trigger from triggered spells", "" };
+        case SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED: return { "SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED", "Can trigger from triggered spells", "" };
         case SPELL_ATTR3_ONLY_PROC_ON_CASTER: return { "SPELL_ATTR3_ONLY_PROC_ON_CASTER", "Drain Soul", "" };
         case SPELL_ATTR3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS: return { "SPELL_ATTR3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS", "Unknown attribute 28@Attr3", "" };
         case SPELL_ATTR3_IGNORE_CASTER_MODIFIERS: return { "SPELL_ATTR3_IGNORE_CASTER_MODIFIERS", "Damage dealt is unaffected by modifiers", "" };
@@ -597,7 +597,7 @@ AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(size_t index)
         case 6: return SPELL_ATTR3_NO_AVOIDANCE;
         case 7: return SPELL_ATTR3_DOT_STACKING_RULE;
         case 8: return SPELL_ATTR3_ONLY_ON_PLAYER;
-        case 9: return SPELL_ATTR3_NOT_A_PROC;
+        case 9: return SPELL_ATTR3_TRIGGERED_CAN_TRIGGER_PROC_2;
         case 10: return SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON;
         case 11: return SPELL_ATTR3_ONLY_BATTLEGROUNDS;
         case 12: return SPELL_ATTR3_ONLY_ON_GHOSTS;
@@ -607,14 +607,14 @@ AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(size_t index)
         case 16: return SPELL_ATTR3_SUPRESS_CASTER_PROCS;
         case 17: return SPELL_ATTR3_SUPRESS_TARGET_PROCS;
         case 18: return SPELL_ATTR3_ALWAYS_HIT;
-        case 19: return SPELL_ATTR3_INSTANT_TARGET_PROCS;
+        case 19: return SPELL_ATTR3_DISABLE_PROC;
         case 20: return SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
         case 21: return SPELL_ATTR3_ONLY_PROC_OUTDOORS;
         case 22: return SPELL_ATTR3_CASTING_CANCELS_AUTOREPEAT;
         case 23: return SPELL_ATTR3_NO_DAMAGE_HISTORY;
         case 24: return SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON;
         case 25: return SPELL_ATTR3_TREAT_AS_PERIODIC;
-        case 26: return SPELL_ATTR3_CAN_PROC_FROM_PROCS;
+        case 26: return SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED;
         case 27: return SPELL_ATTR3_ONLY_PROC_ON_CASTER;
         case 28: return SPELL_ATTR3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS;
         case 29: return SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
@@ -638,7 +638,7 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
         case SPELL_ATTR3_NO_AVOIDANCE: return 6;
         case SPELL_ATTR3_DOT_STACKING_RULE: return 7;
         case SPELL_ATTR3_ONLY_ON_PLAYER: return 8;
-        case SPELL_ATTR3_NOT_A_PROC: return 9;
+        case SPELL_ATTR3_TRIGGERED_CAN_TRIGGER_PROC_2: return 9;
         case SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON: return 10;
         case SPELL_ATTR3_ONLY_BATTLEGROUNDS: return 11;
         case SPELL_ATTR3_ONLY_ON_GHOSTS: return 12;
@@ -648,14 +648,14 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
         case SPELL_ATTR3_SUPRESS_CASTER_PROCS: return 16;
         case SPELL_ATTR3_SUPRESS_TARGET_PROCS: return 17;
         case SPELL_ATTR3_ALWAYS_HIT: return 18;
-        case SPELL_ATTR3_INSTANT_TARGET_PROCS: return 19;
+        case SPELL_ATTR3_DISABLE_PROC: return 19;
         case SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD: return 20;
         case SPELL_ATTR3_ONLY_PROC_OUTDOORS: return 21;
         case SPELL_ATTR3_CASTING_CANCELS_AUTOREPEAT: return 22;
         case SPELL_ATTR3_NO_DAMAGE_HISTORY: return 23;
         case SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON: return 24;
         case SPELL_ATTR3_TREAT_AS_PERIODIC: return 25;
-        case SPELL_ATTR3_CAN_PROC_FROM_PROCS: return 26;
+        case SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED: return 26;
         case SPELL_ATTR3_ONLY_PROC_ON_CASTER: return 27;
         case SPELL_ATTR3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS: return 28;
         case SPELL_ATTR3_IGNORE_CASTER_MODIFIERS: return 29;

@@ -99,7 +99,7 @@ class spell_mage_burning_determination : public AuraScript
             return false;
 
         // Xinef: immuned effect should just eat charge
-        if (eventInfo.GetHitMask() & PROC_EX_IMMUNE)
+        if (eventInfo.GetHitMask() & PROC_HIT_IMMUNE)
         {
             eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
             return false;
