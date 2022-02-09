@@ -18,7 +18,7 @@
 #ifndef ACORE_AREA_BOUNDARY_H
 #define ACORE_AREA_BOUNDARY_H
 
-//#include "Position.h"
+#include "Position.h"
 
 class AC_GAME_API AreaBoundary
 {
