@@ -1267,6 +1267,26 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
     return AttributesEx2 & SPELL_ATTR2_AUTO_REPEAT;
 }
 
+bool SpellInfo::IsAffected(uint32 familyName, flag96 const& familyFlags) const
+{
+    if (!familyName)
+    {
+        return true;
+    }
+
+    if (familyName != SpellFamilyName)
+    {
+        return false;
+    }
+
+    if (familyFlags && !(familyFlags & SpellFamilyFlags))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool SpellInfo::IsAffectedBySpellMods() const
 {
     return !(AttributesEx3 & SPELL_ATTR3_IGNORE_CASTER_MODIFIERS);
@@ -1291,15 +1311,7 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
         return true;
     }
 
-    // False if affect_spell == nullptr or spellFamily not equal
-    if (affectSpell->SpellFamilyName != SpellFamilyName)
-        return false;
-
-    // true
-    if (mod->mask & SpellFamilyFlags)
-        return true;
-
-    return false;
+    return IsAffected(affectSpell->SpellFamilyName, mod->mask);
 }
 
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
