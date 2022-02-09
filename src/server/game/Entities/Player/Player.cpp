@@ -6109,7 +6109,19 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
 void Player::SetHonorPoints(uint32 value)
 {
     if (value > sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS))
+    {
+        if (int32 copperPerPoint = sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT))
+        {
+            // Only convert points on login, not when awarded honor points.
+            if (isBeingLoaded())
+            {
+                int32 excessPoints = value - sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS);
+                ModifyMoney(excessPoints * copperPerPoint);
+            }
+        }
+
         value = sWorld->getIntConfig(CONFIG_MAX_HONOR_POINTS);
+    }
     SetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, value);
     if (value)
         AddKnownCurrency(ITEM_HONOR_POINTS_ID);
@@ -15339,7 +15351,7 @@ void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans)
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES);
         stmt->SetData(0, GetSession()->GetAccountId());
         stmt->SetData(1, itr->first);
-        stmt->SetData(2, itr->second);
+        stmt->SetData(2, (int64)itr->second);
         trans->Append(stmt);
     }
 }
