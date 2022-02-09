@@ -178,7 +178,7 @@ DamageInfo::DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEff
 
 void DamageInfo::ModifyDamage(int32 amount)
 {
-    amount = std::min(amount, int32(GetDamage()));
+    amount = std::max(amount, -static_cast<int32>(GetDamage()));
     m_damage += amount;
 }
 
@@ -2398,7 +2398,8 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
         Unit::DealDamageMods(victim, damageInfo.damage, &damageInfo.absorb);
         SendAttackStateUpdate(&damageInfo);
 
-        TriggerAurasProcOnEvent(damageInfo);
+        DamageInfo dmgInfo(damageInfo);
+        ProcSkillsAndAuras(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, PROC_SPELL_TYPE_NONE, PROC_SPELL_PHASE_NONE, dmgInfo.GetHitMask(), nullptr, &dmgInfo, nullptr);
 
         DealMeleeDamage(&damageInfo, true);
 
@@ -7326,7 +7327,7 @@ void Unit::SendHealSpellLog(HealInfo& healInfo, bool critical /*= false*/)
     // we guess size
     WorldPacket data(SMSG_SPELLHEALLOG, (8 + 8 + 4 + 4 + 4 + 4 + 1 + 1));
     data << healInfo.GetTarget()->GetPackGUID();
-    data << GetPackGUID();
+    data << healInfo.GetHealer()->GetPackGUID();
     data << uint32(healInfo.GetSpellInfo()->Id);
     data << uint32(healInfo.GetHeal());
     data << uint32(healInfo.GetHeal() - healInfo.GetEffectiveHeal());

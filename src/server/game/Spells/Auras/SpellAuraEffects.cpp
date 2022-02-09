@@ -1147,26 +1147,51 @@ bool AuraEffect::CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventIn
     SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
     switch (GetAuraType())
     {
+        case SPELL_AURA_MOD_CONFUSE:
+        case SPELL_AURA_MOD_FEAR:
+        case SPELL_AURA_MOD_STUN:
+        case SPELL_AURA_MOD_ROOT:
+        case SPELL_AURA_TRANSFORM:
+        {
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return false;
+            }
+
+            // Spell own damage at apply won't break CC
+            if (spellInfo && spellInfo == eventInfo.GetSpellInfo())
+            {
+                Aura* aura = GetBase();
+                // called from spellcast, should not have ticked yet
+                if (aura->GetDuration() == aura->GetMaxDuration())
+                {
+                    return false;
+                }
+            }
+            break;
+        }
+        break;
         case SPELL_AURA_MECHANIC_IMMUNITY:
         case SPELL_AURA_MOD_MECHANIC_RESISTANCE:
             // Compare mechanic
             if (!spellInfo || static_cast<int32>(spellInfo->Mechanic) != GetMiscValue())
             {
-                result = false;
+                return false;
             }
             break;
         case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
             // Skip melee hits and instant cast spells
             if (!spellInfo || !spellInfo->CalcCastTime())
             {
-                result = false;
+                return false;
             }
             break;
         case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
             // Compare casters
             if (GetCasterGUID() != eventInfo.GetActor()->GetGUID())
             {
-                result = false;
+                return false;
             }
             break;
         case SPELL_AURA_MOD_POWER_COST_SCHOOL:
@@ -1175,16 +1200,30 @@ bool AuraEffect::CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventIn
             if (!spellInfo || (!spellInfo->ManaCost && !spellInfo->ManaCostPercentage) || // Cost Check
                 !(spellInfo->GetSchoolMask() & GetMiscValue())) // School Check
             {
-                result = false;
+                return false;
             }
             break;
         case SPELL_AURA_REFLECT_SPELLS_SCHOOL:
             // Skip melee hits and spells with wrong school
             if (!spellInfo || !(spellInfo->GetSchoolMask() & GetMiscValue()))
             {
-                result = false;
+                return false;
             }
             break;
+        case SPELL_AURA_PROC_TRIGGER_SPELL:
+        case SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE:
+        {
+            // Don't proc extra attacks while already processing extra attack spell
+            uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
+            if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
+            {
+                if (aurApp->GetTarget()->m_extraAttacks && triggeredSpellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
+                {
+                    return false;
+                }
+            }
+            break;
+        }
         default:
             break;
     }
@@ -6914,23 +6953,16 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
 
 void AuraEffect::HandleBreakableCCAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
-    DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-    if (!damageInfo)
-        return;
+    int32 const damageLeft = GetAmount() - static_cast<int32>(eventInfo.GetDamageInfo()->GetDamage());
 
-    // aura own damage at apply won't break CC
-    if (eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST)
+    if (damageLeft <= 0)
     {
-        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
-            if (spellInfo == GetSpellInfo())
-                return;
-    }
-
-    int32 damageLeft = GetAmount();
-    if (damageLeft < int32(damageInfo->GetDamage()))
         aurApp->GetTarget()->RemoveAura(aurApp);
+    }
     else
-        SetAmount(damageLeft - damageInfo->GetDamage());
+    {
+        SetAmount(damageLeft);
+    }
 }
 
 void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
