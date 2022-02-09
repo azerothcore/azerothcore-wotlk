@@ -15339,7 +15339,7 @@ void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans)
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES);
         stmt->SetData(0, GetSession()->GetAccountId());
         stmt->SetData(1, itr->first);
-        stmt->SetData(2, itr->second);
+        stmt->SetData(2, (int64)itr->second);
         trans->Append(stmt);
     }
 }
