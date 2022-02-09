@@ -869,6 +869,14 @@ StartPlayerMoney = 0
 MaxHonorPoints = 75000
 
 #
+#    MaxHonorPointsMoneyPerPoint
+#        Description: Convert excess honor points into money if players got more points than allowed after changing the honor cap.
+#                     Honor points will be converted into copper according to the value set in this config.
+#        Default: 0 - Disabled
+
+MaxHonorPointsMoneyPerPoint = 0
+
+#
 #    StartHonorPoints
 #        Description: Amount of honor points that characters have after creation.
 #        Default:     0
