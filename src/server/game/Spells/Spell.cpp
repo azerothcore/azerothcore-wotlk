@@ -6681,7 +6681,7 @@ SpellCastResult Spell::CheckRange(bool strict)
         if (m_spellInfo->RangeEntry->ID == 1)
             return SPELL_CAST_OK;
 
-        range_type = m_spellInfo->RangeEntry->type;
+        range_type = m_spellInfo->RangeEntry->Flags;
     }
 
     Unit* target = m_targets.GetUnitTarget();
@@ -8689,7 +8689,7 @@ namespace Acore
         }
         else if (_spellInfo->HasAttribute(SPELL_ATTR0_CU_CONE_LINE))
         {
-            if (!_caster->HasInLine(target, _caster->GetObjectSize()))
+            if (!_caster->HasInLine(target, _caster->GetObjectSize() + target->GetObjectSize()))
                 return false;
         }
         else
@@ -8709,7 +8709,7 @@ namespace Acore
     bool WorldObjectSpellTrajTargetCheck::operator()(WorldObject* target)
     {
         // return all targets on missile trajectory (0 - size of a missile)
-        if (!_caster->HasInLine(target, 0))
+        if (!_caster->HasInLine(target, target->GetObjectSize()))
             return false;
         return WorldObjectSpellAreaTargetCheck::operator ()(target);
     }
