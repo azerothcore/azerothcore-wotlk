@@ -1009,71 +1009,6 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
-bool Position::operator==(Position const& a) const
-{
-    return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&
-        G3D::fuzzyEq(a.m_positionY, m_positionY) &&
-        G3D::fuzzyEq(a.m_positionZ, m_positionZ) &&
-        G3D::fuzzyEq(a.m_orientation, m_orientation));
-}
-
-void Position::RelocatePolarOffset(float angle, float dist, float z /*= 0.0f*/)
-{
-    SetOrientation(GetOrientation() + angle);
-
-    m_positionX = GetPositionX() + dist * std::cos(GetOrientation());
-    m_positionY = GetPositionY() + dist * std::sin(GetOrientation());
-    m_positionZ = GetPositionZ() + z;
-}
-
-bool Position::HasInLine(WorldObject const* target, float width) const
-{
-    if (!HasInArc(M_PI, target))
-        return false;
-    width += target->GetObjectSize();
-    float angle = GetRelativeAngle(target);
-
-    return std::fabs(std::sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
-}
-
-std::string Position::ToString() const
-{
-    std::stringstream sstr;
-    sstr << "X: " << m_positionX << " Y: " << m_positionY << " Z: " << m_positionZ << " O: " << m_orientation;
-    return sstr.str();
-}
-
-ByteBuffer& operator>>(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer)
-{
-    float x, y, z, o;
-    buf >> x >> y >> z >> o;
-    streamer.m_pos->Relocate(x, y, z, o);
-    return buf;
-}
-ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer)
-{
-    float x, y, z;
-    streamer.m_pos->GetPosition(x, y, z);
-    buf << x << y << z;
-    return buf;
-}
-
-ByteBuffer& operator>>(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer)
-{
-    float x, y, z;
-    buf >> x >> y >> z;
-    streamer.m_pos->Relocate(x, y, z);
-    return buf;
-}
-
-ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer)
-{
-    float x, y, z, o;
-    streamer.m_pos->GetPosition(x, y, z, o);
-    buf << x << y << z << o;
-    return buf;
-}
-
 void MovementInfo::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");
@@ -1528,122 +1463,6 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
     return distsq < maxdist * maxdist;
 }
 
-void Position::RelocateOffset(const Position& offset)
-{
-    m_positionX = GetPositionX() + (offset.GetPositionX() * cos(GetOrientation()) + offset.GetPositionY() * std::sin(GetOrientation() + M_PI));
-    m_positionY = GetPositionY() + (offset.GetPositionY() * cos(GetOrientation()) + offset.GetPositionX() * std::sin(GetOrientation()));
-    m_positionZ = GetPositionZ() + offset.GetPositionZ();
-    m_orientation = GetOrientation() + offset.GetOrientation();
-}
-
-void Position::GetPositionOffsetTo(const Position& endPos, Position& retOffset) const
-{
-    float dx = endPos.GetPositionX() - GetPositionX();
-    float dy = endPos.GetPositionY() - GetPositionY();
-
-    retOffset.m_positionX = dx * cos(GetOrientation()) + dy * std::sin(GetOrientation());
-    retOffset.m_positionY = dy * cos(GetOrientation()) - dx * std::sin(GetOrientation());
-    retOffset.m_positionZ = endPos.GetPositionZ() - GetPositionZ();
-    retOffset.m_orientation = endPos.GetOrientation() - GetOrientation();
-}
-
-float Position::GetAngle(const Position* obj) const
-{
-    if (!obj)
-        return 0;
-
-    return GetAngle(obj->GetPositionX(), obj->GetPositionY());
-}
-
-// Return angle in range 0..2*pi
-float Position::GetAngle(const float x, const float y) const
-{
-    return getAngle(GetPositionX(), GetPositionY(), x, y);
-}
-
-void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos) const
-{
-    float dx = GetPositionX() - x;
-    float dy = GetPositionY() - y;
-
-    if (std::fabs(dx) < 0.001f && std::fabs(dy) < 0.001f)
-    {
-        float angle = (float)rand_norm() * static_cast<float>(2 * M_PI);
-        vcos = cos(angle);
-        vsin = std::sin(angle);
-    }
-    else
-    {
-        float dist = sqrt((dx * dx) + (dy * dy));
-        vcos = dx / dist;
-        vsin = dy / dist;
-    }
-}
-
-bool Position::IsWithinBox(const Position& center, float xradius, float yradius, float zradius) const
-{
-    // rotate the WorldObject position instead of rotating the whole cube, that way we can make a simplified
-    // is-in-cube check and we have to calculate only one point instead of 4
-
-    // 2PI = 360*, keep in mind that ingame orientation is counter-clockwise
-    double rotation = 2 * M_PI - center.GetOrientation();
-    double sinVal = std::sin(rotation);
-    double cosVal = std::cos(rotation);
-
-    float BoxDistX = GetPositionX() - center.GetPositionX();
-    float BoxDistY = GetPositionY() - center.GetPositionY();
-
-    float rotX = float(center.GetPositionX() + BoxDistX * cosVal - BoxDistY * sinVal);
-    float rotY = float(center.GetPositionY() + BoxDistY * cosVal + BoxDistX * sinVal);
-
-    // box edges are parallel to coordiante axis, so we can treat every dimension independently :D
-    float dz = GetPositionZ() - center.GetPositionZ();
-    float dx = rotX - center.GetPositionX();
-    float dy = rotY - center.GetPositionY();
-    if ((std::fabs(dx) > xradius) ||
-        (std::fabs(dy) > yradius) ||
-        (std::fabs(dz) > zradius))
-    {
-        return false;
-    }
-    return true;
-}
-
-bool Position::HasInArc(float arc, const Position* obj, float targetRadius) const
-{
-    // always have self in arc
-    if (obj == this)
-        return true;
-
-    // move arc to range 0.. 2*pi
-    arc = Position::NormalizeOrientation(arc);
-
-    float angle = GetAngle(obj);
-    angle -= m_orientation;
-
-    // move angle to range -pi ... +pi
-    angle = Position::NormalizeOrientation(angle);
-    if (angle > M_PI)
-        angle -= 2.0f * M_PI;
-
-    float lborder = -1 * (arc / 2.0f);                      // in range -pi..0
-    float rborder = (arc / 2.0f);                           // in range 0..pi
-
-    // pussywizard: take into consideration target size
-    if (targetRadius > 0.0f)
-    {
-        float distSq = GetExactDist2dSq(obj);
-        // pussywizard: at least a part of target's model is in every direction
-        if (distSq < targetRadius * targetRadius)
-            return true;
-        float angularRadius = 2.0f * atan(targetRadius / (2.0f * sqrt(distSq)));
-        lborder -= angularRadius;
-        rborder += angularRadius;
-    }
-
-    return ((angle >= lborder) && (angle <= rborder));
-}
-
 bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, float size) const
 {
     if (!obj1 || !obj2)
@@ -1795,11 +1614,6 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
         if (groundZ)
             *groundZ = ground_z;
     }
-}
-
-bool Position::IsPositionValid() const
-{
-    return Acore::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
 }
 
 float WorldObject::GetGridActivationRange() const
@@ -2884,7 +2698,7 @@ void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float&
 
 void WorldObject::MovePosition(Position& pos, float dist, float angle)
 {
-    angle += m_orientation;
+    angle += GetOrientation();
     float destx, desty, destz, ground, floor;
     destx = pos.m_positionX + dist * cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
@@ -2924,7 +2738,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     Acore::NormalizeMapCoord(pos.m_positionX);
     Acore::NormalizeMapCoord(pos.m_positionY);
     UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-    pos.m_orientation = m_orientation;
+    pos.SetOrientation(GetOrientation());
 }
 
 Position WorldObject::GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY)
