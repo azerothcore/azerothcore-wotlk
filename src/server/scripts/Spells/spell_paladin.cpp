@@ -218,11 +218,6 @@ class spell_pal_sacred_shield_base : public AuraScript
         }
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0;
-    }
-
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
@@ -278,7 +273,6 @@ class spell_pal_sacred_shield_base : public AuraScript
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_sacred_shield_base::CalculateAmount, EFFECT_0, SPELL_AURA_DUMMY);
-        DoCheckProc += AuraCheckProcFn(spell_pal_sacred_shield_base::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_pal_sacred_shield_base::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
@@ -1041,7 +1035,7 @@ class spell_pal_seal_of_righteousness : public AuraScript
             return false;
         }
 
-        return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (damageInfo->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
+        return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (damageInfo->GetDamage() || (eventInfo.GetHitMask() & PROC_HIT_ABSORB));
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

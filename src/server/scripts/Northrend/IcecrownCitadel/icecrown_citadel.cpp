@@ -950,7 +950,7 @@ public:
                     }
                     else
                     {
-                        Unit::DealHeal(me, me, me->CountPctFromMaxHealth(3));
+                        me->ModifyHealth(me->CountPctFromMaxHealth(5));
                         _events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
                     }
                     break;

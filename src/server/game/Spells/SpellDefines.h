@@ -72,38 +72,38 @@ enum SpellAuraInterruptFlags
     AURA_INTERRUPT_FLAG_NOT_VICTIM = (AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE | AURA_INTERRUPT_FLAG_DIRECT_DAMAGE),
 };
 
-enum SpellModOp
+enum SpellModOp : uint8
 {
-    SPELLMOD_DAMAGE                 = 0,
-    SPELLMOD_DURATION               = 1,
-    SPELLMOD_THREAT                 = 2,
-    SPELLMOD_EFFECT1                = 3,
-    SPELLMOD_CHARGES                = 4,
-    SPELLMOD_RANGE                  = 5,
-    SPELLMOD_RADIUS                 = 6,
-    SPELLMOD_CRITICAL_CHANCE        = 7,
-    SPELLMOD_ALL_EFFECTS            = 8,
-    SPELLMOD_NOT_LOSE_CASTING_TIME  = 9,
-    SPELLMOD_CASTING_TIME           = 10,
-    SPELLMOD_COOLDOWN               = 11,
-    SPELLMOD_EFFECT2                = 12,
-    SPELLMOD_IGNORE_ARMOR           = 13,
-    SPELLMOD_COST                   = 14,
-    SPELLMOD_CRIT_DAMAGE_BONUS      = 15,
-    SPELLMOD_RESIST_MISS_CHANCE     = 16,
-    SPELLMOD_JUMP_TARGETS           = 17,
-    SPELLMOD_CHANCE_OF_SUCCESS      = 18,
-    SPELLMOD_ACTIVATION_TIME        = 19,
-    SPELLMOD_DAMAGE_MULTIPLIER      = 20,
-    SPELLMOD_GLOBAL_COOLDOWN        = 21,
-    SPELLMOD_DOT                    = 22,
-    SPELLMOD_EFFECT3                = 23,
-    SPELLMOD_BONUS_MULTIPLIER       = 24,
+    SPELLMOD_DAMAGE                    = 0,
+    SPELLMOD_DURATION                  = 1,
+    SPELLMOD_THREAT                    = 2,
+    SPELLMOD_EFFECT1                   = 3,
+    SPELLMOD_CHARGES                   = 4,
+    SPELLMOD_RANGE                     = 5,
+    SPELLMOD_RADIUS                    = 6,
+    SPELLMOD_CRITICAL_CHANCE           = 7,
+    SPELLMOD_ALL_EFFECTS               = 8,
+    SPELLMOD_NOT_LOSE_CASTING_TIME     = 9,
+    SPELLMOD_CASTING_TIME              = 10,
+    SPELLMOD_COOLDOWN                  = 11,
+    SPELLMOD_EFFECT2                   = 12,
+    SPELLMOD_IGNORE_ARMOR              = 13,
+    SPELLMOD_COST                      = 14,
+    SPELLMOD_CRIT_DAMAGE_BONUS         = 15,
+    SPELLMOD_RESIST_MISS_CHANCE        = 16,
+    SPELLMOD_JUMP_TARGETS              = 17,
+    SPELLMOD_CHANCE_OF_SUCCESS         = 18,
+    SPELLMOD_ACTIVATION_TIME           = 19,
+    SPELLMOD_DAMAGE_MULTIPLIER         = 20,
+    SPELLMOD_GLOBAL_COOLDOWN           = 21,
+    SPELLMOD_DOT                       = 22,
+    SPELLMOD_EFFECT3                   = 23,
+    SPELLMOD_BONUS_MULTIPLIER          = 24,
     // spellmod 25
-    SPELLMOD_PROC_PER_MINUTE        = 26,
-    SPELLMOD_VALUE_MULTIPLIER       = 27,
-    SPELLMOD_RESIST_DISPEL_CHANCE   = 28,
-    SPELLMOD_CRIT_DAMAGE_BONUS_2    = 29, //one not used spell
+    SPELLMOD_PROC_PER_MINUTE           = 26,
+    SPELLMOD_VALUE_MULTIPLIER          = 27,
+    SPELLMOD_RESIST_DISPEL_CHANCE      = 28,
+    SPELLMOD_CRIT_DAMAGE_BONUS_2       = 29, //one not used spell
     SPELLMOD_SPELL_COST_REFUND_ON_FAIL = 30
 };
 
@@ -143,7 +143,7 @@ enum TriggerCastFlags
     TRIGGERED_IGNORE_CASTER_AURASTATE               = 0x00000800,   //! Will ignore caster aura states including combat requirements and death state
     TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE   = 0x00002000,   //! Will ignore mounted/on vehicle restrictions
     TRIGGERED_IGNORE_CASTER_AURAS                   = 0x00010000,   //! Will ignore caster aura restrictions or requirements
-    TRIGGERED_DISALLOW_PROC_EVENTS                  = 0x00020000,   //! Disallows proc events from triggered spell (default)
+    // reuse 0x00020000
     TRIGGERED_DONT_REPORT_CAST_ERROR                = 0x00040000,   //! Will return SPELL_FAILED_DONT_REPORT in CheckCast functions
     TRIGGERED_FULL_MASK                             = 0x0007FFFF,   //! Used when doing CastSpell with triggered == true
     TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT      = 0x00080000,   //! Will ignore equipped item requirements
