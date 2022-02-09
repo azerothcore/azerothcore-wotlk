@@ -2470,9 +2470,9 @@ public:
                     break;
                 case EVENT_EMERGENCY_BOT_CHECK:
                     events.RepeatEvent(15000); // just in case, will be rescheduled
-                    if( Creature* flame = me->FindNearestCreature(NPC_FLAMES_SPREAD, 150.0f, true) )
+                    if (Creature* flame = me->FindNearestCreature(NPC_FLAMES_SPREAD, 150.0f, true))
                     {
-                        me->m_orientation = me->GetAngle(flame->GetPositionX(), flame->GetPositionY());
+                        me->SetOrientation(me->GetAngle(flame->GetPositionX(), flame->GetPositionY()));
                         float dist = me->GetExactDist2d(flame);
                         if (dist <= 5.0f)
                             events.ScheduleEvent(EVENT_EMERGENCY_BOT_ATTACK, 0);

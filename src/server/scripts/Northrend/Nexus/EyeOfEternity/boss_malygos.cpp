@@ -487,7 +487,7 @@ public:
                         pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
                         pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
                         pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
-                        pos.m_orientation = pos.GetAngle(&CenterPos);
+                        pos.SetOrientation(pos.GetAngle(&CenterPos));
 
                         if (Creature* vp = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
                         {
@@ -506,7 +506,7 @@ public:
                                         plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
                                         plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
                                         plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
-                                        plrpos.m_orientation = plrpos.GetAngle(&CenterPos);
+                                        plrpos.SetOrientation(plrpos.GetAngle(&CenterPos));
 
                                         if (Creature* c = me->SummonCreature(NPC_VORTEX, plrpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
                                         {
@@ -880,7 +880,7 @@ public:
             pos.m_positionX = CenterPos.GetPositionX() + VORTEX_RADIUS * cos(angle);
             pos.m_positionY = CenterPos.GetPositionY() + VORTEX_RADIUS * std::sin(angle);
             pos.m_positionZ = CenterPos.GetPositionZ() + h;
-            pos.m_orientation = pos.GetAngle(&CenterPos);
+            pos.SetOrientation(pos.GetAngle(&CenterPos));
             me->SetPosition(pos);
             timer = 0;
             despawnTimer = 9500;
