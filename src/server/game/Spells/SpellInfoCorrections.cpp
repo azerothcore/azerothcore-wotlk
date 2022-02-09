@@ -4148,6 +4148,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
     });
 
+    // Improved Blessing Protection (Nefarian Class Call)
+    ApplySpellFix({ 23415 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ENEMY);
+    });
+
     // Bestial Wrath
     ApplySpellFix({ 19574 }, [](SpellInfo* spellInfo)
     {
