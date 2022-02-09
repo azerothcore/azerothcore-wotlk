@@ -782,7 +782,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVPSTATS_BATTLEGROUND);
         stmt->SetData(0, battlegroundId);
-        stmt->SetData(1, GetWinner());
+        stmt->SetData(1, GetPvPTeamId(GetWinner()));
         stmt->SetData(2, GetUniqueBracketId());
         stmt->SetData(3, GetBgTypeID(true));
         CharacterDatabase.Execute(stmt);
