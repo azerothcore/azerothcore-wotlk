@@ -240,8 +240,9 @@ public:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && !u->HasAura(SPELL_BURNING_ADRENALINE) && u != me->GetVictim(); }))
                             {
                                 me->CastSpell(target, SPELL_BURNING_ADRENALINE, true);
-                                _burningAdrenalineCast++;
                             }
+
+                            _burningAdrenalineCast++;
                         }
                         else
                         {
@@ -249,6 +250,7 @@ public:
                             _burningAdrenalineCast = 0;
                         }
                         events.ScheduleEvent(EVENT_BURNINGADRENALINE, 15000);
+                        break;
                     }
                 }
             }
@@ -301,6 +303,11 @@ public:
 class spell_vael_burning_adrenaline : public AuraScript
 {
     PrepareAuraScript(spell_vael_burning_adrenaline);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BURNING_ADRENALINE_EXPLOSION, SPELL_BURNING_ADRENALINE_INSTAKILL });
+    }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
