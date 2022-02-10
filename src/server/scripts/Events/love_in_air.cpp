@@ -774,7 +774,7 @@ void AddSC_event_love_in_the_air()
     RegisterCreatureAI(npc_love_in_air_snivel_real);
 
     // Boss
-    new npc_love_in_air_hummel;
+    new npc_love_in_air_hummel();
     RegisterCreatureAI(npc_love_in_air_hummel_helper);
 
     // Spells

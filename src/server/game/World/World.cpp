@@ -844,6 +844,13 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_MAX_HONOR_POINTS] = 0;
     }
 
+    m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT] = sConfigMgr->GetOption<int32>("MaxHonorPointsMoneyPerPoint", 0);
+    if (int32(m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT]) < 0)
+    {
+        LOG_ERROR("server.loading", "MaxHonorPointsMoneyPerPoint ({}) can't be negative. Set to 0.", m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT]);
+        m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT] = 0;
+    }
+
     m_int_configs[CONFIG_START_HONOR_POINTS] = sConfigMgr->GetOption<int32>("StartHonorPoints", 0);
     if (int32(m_int_configs[CONFIG_START_HONOR_POINTS]) < 0 || int32(m_int_configs[CONFIG_START_HONOR_POINTS]) > int32(m_int_configs[CONFIG_MAX_HONOR_POINTS]))
     {
