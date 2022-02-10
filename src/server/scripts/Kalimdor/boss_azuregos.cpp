@@ -181,7 +181,7 @@ class spell_arcane_vacuum : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_ARCANE_VACUUM, SPELL_ARCANE_VACUUM_TP });
+        return ValidateSpellInfo({ SPELL_ARCANE_VACUUM_TP });
     }
 
     void HandleOnHit()
