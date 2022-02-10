@@ -1,3 +1,19 @@
+-- DB update 2022_02_09_00 -> 2022_02_10_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_09_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_09_00 2022_02_10_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1643155057631411400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643155057631411400');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 6109;
@@ -105,3 +121,13 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 15000;
 INSERT INTO `gossip_menu_option` (`MenuID`,`OptionID`,`OptionIcon`,`OptionText`,`OptionBroadcastTextID`,`OptionType`,`OptionNpcFlag`,`ActionMenuID`,`ActionPoiID`,`BoxCoded`,`BoxMoney`,`BoxText`,`BoxBroadcastTextID`,`VerifiedBuild`) VALUES
 (15000, 0, 0, 'I am a treasure hunter in search of powerful artifacts. Give them to me and you will not be harmed.', 11016, 1, 1, 0, 0, 0, 0, '', 0, 12340);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_10_00' WHERE sql_rev = '1643155057631411400';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
