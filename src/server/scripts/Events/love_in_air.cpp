@@ -24,6 +24,7 @@
 #include "PassiveAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellScript.h"
 
 ///////////////////////////////////////
@@ -295,127 +296,155 @@ enum HummelSay
     SAY_HUMMEL_5 = 5
 };
 
-struct npc_love_in_air_hummel : public ScriptedAI
+class npc_love_in_air_hummel : public CreatureScript
 {
-    npc_love_in_air_hummel(Creature* creature) : ScriptedAI(creature), summons(me) { }
+public:
+    npc_love_in_air_hummel() : CreatureScript("npc_love_in_air_hummel") { }
 
-    SummonList summons;
-    EventMap events;
-    uint32 speachTimer;
-
-    bool CanBeSeen(Player const* player) override
+    struct npc_love_in_air_hummelAI : public ScriptedAI
     {
-        if (player->IsGameMaster())
+        npc_love_in_air_hummelAI(Creature* creature) : ScriptedAI(creature), summons(me) { speachTimer = 0; }
+
+        SummonList summons;
+        EventMap events;
+        uint32 speachTimer;
+
+        bool CanBeSeen(Player const* player) override
         {
-            return true;
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO;
         }
 
-        Group const* group = player->GetGroup();
-        return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO;
-    }
-
-    void Reset() override
-    {
-        speachTimer = 0;
-        me->SetFaction(FACTION_FRIENDLY);
-        summons.DespawnAll();
-        events.Reset();
-        me->SummonCreature(NPC_APOTHECARY_FRYE, -205.449f, 2219.56f, 79.7633f, 0.7f);
-        me->SummonCreature(NPC_APOTHECARY_BAXTER, -209.602f, 2215.42f, 79.7633f, 0.723503f);
-    }
-
-    void DoAction(int32 param) override
-    {
-        if (param == ACTION_START_EVENT)
-            speachTimer = 1;
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        me->AI()->Talk(SAY_HUMMEL_5);
-        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-        if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
-            sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO, me->FindMap());
-    }
-
-    void JustSummoned(Creature* cr) override
-    {
-        summons.Summon(cr);
-        cr->SetFaction(FACTION_FRIENDLY);
-        cr->SetControlled(true, UNIT_STATE_STUNNED);
-        cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (speachTimer)
+        void Reset() override
         {
-            speachTimer += diff;
-            if (speachTimer < 10000)
+            speachTimer = 0;
+            me->SetFaction(FACTION_FRIENDLY);
+            summons.DespawnAll();
+            events.Reset();
+            me->SummonCreature(NPC_APOTHECARY_FRYE, -205.449f, 2219.56f, 79.7633f, 0.7f);
+            me->SummonCreature(NPC_APOTHECARY_BAXTER, -209.602f, 2215.42f, 79.7633f, 0.723503f);
+        }
+
+        void DoAction(int32 param) override
+        {
+            if (param == ACTION_START_EVENT)
+                speachTimer = 1;
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_HUMMEL_5);
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO, me->FindMap());
+        }
+
+        void JustSummoned(Creature* cr) override
+        {
+            summons.Summon(cr);
+            cr->SetFaction(FACTION_FRIENDLY);
+            cr->SetControlled(true, UNIT_STATE_STUNNED);
+            cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (speachTimer)
             {
-                me->AI()->Talk(SAY_HUMMEL_0);
-                speachTimer = 10000;
-            }
-            else if (speachTimer >= 16000 && speachTimer < 20000)
-            {
-                me->AI()->Talk(SAY_HUMMEL_1);
-                speachTimer = 20000;
-            }
-            else if (speachTimer >= 26000 && speachTimer < 30000)
-            {
-                me->AI()->Talk(SAY_HUMMEL_2);
-                speachTimer = 0;
-                me->SetFaction(FACTION_MONSTER_2);
-                me->SetInCombatWithZone();
-                if (Unit* target = SelectTargetFromPlayerList(40.0f))
+                speachTimer += diff;
+                if (speachTimer < 10000)
                 {
-                    AttackStart(target);
-                    events.ScheduleEvent(EVENT_CALL_BAXTER, 10000);
-                    events.ScheduleEvent(EVENT_CALL_FRYE, 20000);
-                    events.ScheduleEvent(EVENT_SPELL_PERFUME_SPRAY, 7000);
-                    events.ScheduleEvent(EVENT_SPELL_CHAIN_REACTION, 12000);
+                    Talk(SAY_HUMMEL_0);
+                    speachTimer = 10000;
                 }
-                else
-                    EnterEvadeMode();
+                else if (speachTimer >= 16000 && speachTimer < 20000)
+                {
+                    Talk(SAY_HUMMEL_1);
+                    speachTimer = 20000;
+                }
+                else if (speachTimer >= 26000 && speachTimer < 30000)
+                {
+                    Talk(SAY_HUMMEL_2);
+                    speachTimer = 0;
+                    me->SetFaction(FACTION_MONSTER_2);
+                    me->SetInCombatWithZone();
+                    if (Unit* target = SelectTargetFromPlayerList(40.0f))
+                    {
+                        AttackStart(target);
+                        events.ScheduleEvent(EVENT_CALL_BAXTER, 10000);
+                        events.ScheduleEvent(EVENT_CALL_FRYE, 20000);
+                        events.ScheduleEvent(EVENT_SPELL_PERFUME_SPRAY, 7000);
+                        events.ScheduleEvent(EVENT_SPELL_CHAIN_REACTION, 12000);
+                    }
+                    else
+                        EnterEvadeMode();
+                }
+                return;
             }
-            return;
-        }
 
-        if (!UpdateVictim())
-            return;
+            if (!UpdateVictim())
+                return;
 
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-        switch (events.ExecuteEvent())
-        {
-            case EVENT_CALL_BAXTER:
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_CALL_BAXTER:
                 {
                     EntryCheckPredicate pred(NPC_APOTHECARY_BAXTER);
                     summons.DoAction(ACTION_RELEASE_HELPER, pred);
 
                     break;
                 }
-            case EVENT_CALL_FRYE:
+                case EVENT_CALL_FRYE:
                 {
                     EntryCheckPredicate pred(NPC_APOTHECARY_FRYE);
                     summons.DoAction(ACTION_RELEASE_HELPER, pred);
 
                     break;
                 }
-            case EVENT_SPELL_PERFUME_SPRAY:
-                me->CastSpell(me->GetVictim(), SPELL_ALLURING_PERFUME_SPRAY, false);
-                events.RepeatEvent(6000);
-                break;
-            case EVENT_SPELL_CHAIN_REACTION:
-                me->CastSpell(me->GetVictim(), SPELL_CHAIN_REACTION, false);
-                events.RepeatEvent(12000);
-                break;
+                case EVENT_SPELL_PERFUME_SPRAY:
+                    DoCastVictim(SPELL_ALLURING_PERFUME_SPRAY);
+                    events.RepeatEvent(6000);
+                    break;
+                case EVENT_SPELL_CHAIN_REACTION:
+                    DoCastVictim(SPELL_CHAIN_REACTION);
+                    events.RepeatEvent(12000);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        creature->AI()->DoAction(ACTION_START_EVENT);
+        CloseGossipMenuFor(player);
+        return true;
+    }
+
+    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* _Quest, uint32 /*slot*/) override
+    {
+        if (_Quest->GetQuestId() == QUEST_YOUVE_BEEN_SERVED)
+        {
+            creature->AI()->DoAction(ACTION_START_EVENT);
         }
 
-        DoMeleeAttackIfReady();
+        return true;
     }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_love_in_air_hummelAI(creature);
+    };
 };
 
 enum HummelHelperSay
@@ -482,11 +511,11 @@ struct npc_love_in_air_hummel_helper : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_SPELL_PERFUME_SPRAY:
-                me->CastSpell(me->GetVictim(), SPELL_COLOGNE_SPRAY, false);
+                DoCastVictim(SPELL_COLOGNE_SPRAY);
                 events.RepeatEvent(6000);
                 break;
             case EVENT_SPELL_CHAIN_REACTION:
-                me->CastSpell(me->GetVictim(), SPELL_CHAIN_REACTION, false);
+                DoCastVictim(SPELL_CHAIN_REACTION);
                 events.RepeatEvent(12000);
                 break;
             case EVENT_SPELL_THROW:
@@ -745,7 +774,7 @@ void AddSC_event_love_in_the_air()
     RegisterCreatureAI(npc_love_in_air_snivel_real);
 
     // Boss
-    RegisterCreatureAI(npc_love_in_air_hummel);
+    new npc_love_in_air_hummel();
     RegisterCreatureAI(npc_love_in_air_hummel_helper);
 
     // Spells
