@@ -20,6 +20,7 @@
 
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
 
 #define ShadowfangKeepScriptName "instance_shadowfang_keep"
 
