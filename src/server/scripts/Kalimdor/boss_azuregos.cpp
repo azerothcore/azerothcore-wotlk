@@ -179,6 +179,11 @@ class spell_arcane_vacuum : public SpellScript
 {
     PrepareSpellScript(spell_arcane_vacuum);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ARCANE_VACUUM, SPELL_ARCANE_VACUUM_TP });
+    }
+
     void HandleOnHit()
     {
         Unit* caster = GetCaster();
@@ -199,6 +204,11 @@ class spell_arcane_vacuum : public SpellScript
 class spell_mark_of_frost_freeze : public SpellScript
 {
     PrepareSpellScript(spell_mark_of_frost_freeze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MARK_OF_FROST, SPELL_AURA_OF_FROST, SPELL_MARK_OF_FROST_AURA });
+    }
 
     void HandleOnHit()
     {
