@@ -153,7 +153,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 
                 for (; itrNext != finalPath.end(); ++itr, ++itrNext)
                 {
-                    distDiff = sqrt(((*itr).x - (*itrNext).x) * ((*itr).x - (*itrNext).x) + ((*itr).y - (*itrNext).y) * ((*itr).y - (*itrNext).y));
+                    distDiff = std::sqrt(((*itr).x - (*itrNext).x) * ((*itr).x - (*itrNext).x) + ((*itr).y - (*itrNext).y) * ((*itr).y - (*itrNext).y));
                     zDiff = std::fabs((*itr).z - (*itrNext).z);
 
                     // Xinef: tree climbing, cut as much as we can
