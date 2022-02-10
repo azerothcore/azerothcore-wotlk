@@ -3049,7 +3049,7 @@ void Player::ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell, bool temp
                 break;
             }
         }
-        
+
         /*// xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
         else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
             continue;
@@ -3071,6 +3071,5 @@ void Player::ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell, bool temp
     else
         diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
     basevalue = T((float)basevalue + diff);
-    return;
 }
 #endif
