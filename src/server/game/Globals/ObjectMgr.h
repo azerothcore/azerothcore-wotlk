@@ -1019,7 +1019,7 @@ public:
     void LoadInstanceTemplate();
     void LoadInstanceEncounters();
     void LoadMailLevelRewards();
-    void LoadMailServerTemplate();
+    void LoadMailServerTemplates();
     void LoadVehicleTemplateAccessories();
     void LoadVehicleAccessories();
 
@@ -1148,7 +1148,7 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] ServerMailContainer const& GetServerMailStore(uint32 id) const { return _serverMailStore; }
+    [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
 
     [[nodiscard]] BroadcastText const* GetBroadcastText(uint32 id) const
     {

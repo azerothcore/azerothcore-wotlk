@@ -1133,7 +1133,7 @@ public:
     static bool HandleReloadMailServerTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading `server_mail_template` table");
-        sObjectMgr->LoadMailServerTemplate();
+        sObjectMgr->LoadMailServerTemplates();
         handler->SendGlobalGMSysMessage("DB table `server_mail_template` reloaded.");
         return true;
     }

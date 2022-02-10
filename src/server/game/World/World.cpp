@@ -1813,7 +1813,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadMailLevelRewards();
 
     LOG_INFO("server.loading", "Load Mail Server Template...");
-    sObjectMgr->LoadMailServerTemplate();
+    sObjectMgr->LoadMailServerTemplates();
 
     // Loot tables
     LoadLootTables();

@@ -9663,7 +9663,7 @@ void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint3
     }
 }
 
-void ObjectMgr::LoadMailServerTemplate()
+void ObjectMgr::LoadMailServerTemplates()
 {
     uint32 oldMSTime = getMSTime();
 
@@ -9684,9 +9684,11 @@ void ObjectMgr::LoadMailServerTemplate()
     {
         Field* fields = result->Fetch();
 
-        ServerMail servMail;
+        uint32 id = fields[0].Get<uint32>();
 
-        servMail.id          = fields[0].Get<uint32>();
+        ServerMail& servMail = _serverMailStore[id];
+
+        servMail.id          = id;
         servMail.reqLevel    = fields[1].Get<uint8>();
         servMail.reqPlayTime = fields[2].Get<uint32>();
         servMail.moneyA      = fields[3].Get<uint32>();
@@ -9734,8 +9736,6 @@ void ObjectMgr::LoadMailServerTemplate()
             LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountH {} with no ItemH, set to 0", servMail.itemCountH);
             servMail.itemCountH = 0;
         }
-
-        _serverMailStore[servMail.id] = servMail;
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));

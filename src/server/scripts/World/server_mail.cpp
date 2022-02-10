@@ -27,35 +27,13 @@ public:
     // CHARACTER_LOGIN = 8
     void OnLogin(Player* player) override
     {
-        //                                                    0     1           2              3         4         5        6             7       8             9          10      11
-        QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `itemA`, `itemCountA`, `itemH`,`itemCountH`, `subject`, `body`, `active` FROM `mail_server_template`");
-        if (!result)
-            return;
-
-        do
+        for (auto const& servMail : sObjectMgr->GetAllServerMailStore())
         {
-            Field* fields = result->Fetch();
-
-            ServerMail servMail;
-
-            servMail.id          = fields[0].Get<uint32>();
-            servMail.reqLevel    = fields[1].Get<uint8>();
-            servMail.reqPlayTime = fields[2].Get<uint32>();
-            servMail.moneyA      = fields[3].Get<uint32>();
-            servMail.moneyH      = fields[4].Get<uint32>();
-            servMail.itemA       = fields[5].Get<uint32>();
-            servMail.itemCountA  = fields[6].Get<uint32>();
-            servMail.itemH       = fields[7].Get<uint32>();
-            servMail.itemCountH  = fields[8].Get<uint32>();
-            servMail.subject     = fields[9].Get<std::string>();
-            servMail.body        = fields[10].Get<std::string>();
-            servMail.active      = fields[11].Get<uint8>();
-
-            if (CharacterDatabase.Query("SELECT mailId from mail_server_character where guid = {} and mailId = {}", player->GetGUID().GetCounter(), servMail.id))
+            if (CharacterDatabase.Query("SELECT mailId from mail_server_character where guid = {} and mailId = {}", player->GetGUID().GetCounter(), servMail.second.id))
                 continue;
 
-            sObjectMgr->SendServerMail(player, servMail.id, servMail.reqLevel, servMail.reqPlayTime, servMail.moneyA, servMail.moneyH, servMail.itemA, servMail.itemCountA, servMail.itemH, servMail.itemCountH, servMail.subject, servMail.body, servMail.active);
-        } while (result->NextRow());
+            sObjectMgr->SendServerMail(player, servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
+        }
     }
 };
 
