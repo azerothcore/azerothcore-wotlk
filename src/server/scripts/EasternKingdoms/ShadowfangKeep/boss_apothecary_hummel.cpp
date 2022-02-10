@@ -275,6 +275,7 @@ public:
                 creature->AI()->DoAction(ACTION_START_EVENT);
             }
         }
+        return true;
     }
 
     CreatureAI* GetAI(Creature* creature) const override
