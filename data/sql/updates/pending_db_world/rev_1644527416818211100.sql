@@ -34,10 +34,17 @@ INSERT INTO `creature_addon` (`guid`, `mount`, `bytes1`) VALUES
 (285024, 0, 1),
 (285025, 0, 1);
 
-DELETE FROM `waypoints` WHERE `entry` = 285020;
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
-(285020, 1, -1851.5, -4161.39, 8.0422, 100, 5000, "Dwarven Farmer - Hidden Farm"),
-(285020, 2, -1849.24, -4170.83, 6.40288, 0, 0, "Dwarven Farmer - Hidden Farm"),
-(285020, 3, -1843.77, -4176.64, 5.19335, 0, 0, "Dwarven Farmer - Hidden Farm"),
-(285020, 4, -1827.66, -4188.65, 3.6245, 0, 0, "Dwarven Farmer - Hidden Farm"),
-(285020, 5, -1821.43, -4200.03, 3.37323, 100, 5000, "Dwarven Farmer - Hidden Farm");
+SET @NPC := 285020;
+SET @PATH := @NPC * 10;
+
+DELETE FROM `creature_addon` WHERE `guid` = @NPC;
+INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES
+(@NPC, @PATH);
+
+DELETE FROM `waypoint_data` WHERE `id` = @PATH;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
+(@PATH, 1, -1851.5, -4161.39, 8.0422, 100, 5000),
+(@PATH, 2, -1849.24, -4170.83, 6.40288, 0, 0),
+(@PATH, 3, -1843.77, -4176.64, 5.19335, 0, 0),
+(@PATH, 4, -1827.66, -4188.65, 3.6245, 0, 0),
+(@PATH, 5, -1821.43, -4200.03, 3.37323, 100, 5000);
