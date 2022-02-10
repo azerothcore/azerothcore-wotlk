@@ -220,7 +220,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_bMustDelayTeleport = false;
     m_bHasDelayedTeleport = false;
     teleportStore_options = 0;
-    m_CanTeleport = false;
+    m_canTeleport = false;
 
     m_trade = nullptr;
 
