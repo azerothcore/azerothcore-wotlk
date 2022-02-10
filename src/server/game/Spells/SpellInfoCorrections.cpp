@@ -4141,6 +4141,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[1] = 0x00020000;
     });
 
+    // Arcane Vacuum
+    ApplySpellFix({ 21147 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(4); // 30 yards
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
+    });
+
     // Focused Assault
     // Brutal Assault
     ApplySpellFix({ 46392, 46393 }, [](SpellInfo* spellInfo)
