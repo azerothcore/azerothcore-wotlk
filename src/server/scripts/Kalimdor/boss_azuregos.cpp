@@ -207,7 +207,7 @@ class spell_mark_of_frost_freeze : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_MARK_OF_FROST, SPELL_AURA_OF_FROST, SPELL_MARK_OF_FROST_AURA });
+        return ValidateSpellInfo({ SPELL_MARK_OF_FROST, SPELL_AURA_OF_FROST });
     }
 
     void HandleOnHit()
