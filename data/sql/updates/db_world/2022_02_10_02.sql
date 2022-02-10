@@ -1,3 +1,19 @@
+-- DB update 2022_02_10_01 -> 2022_02_10_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_10_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_10_01 2022_02_10_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1642981864918755200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1642981864918755200');
 
 DELETE FROM `creature_text` WHERE `CreatureID` IN (4949, 10719) AND `GroupID` IN (0, 1);
@@ -15,3 +31,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10719, 0, 1, 0, 1, 0, 100, 0, 2000, 2000, 0, 0, 0, 1, 0, 13, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Herald of Thrall - Out of Combat - Say Line 0'),
 (10719, 0, 2, 0, 1, 0, 100, 0, 13000, 13000, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Herald of Thrall - Out of Combat - Say Line 1'),
 (10719, 0, 3, 0, 1, 0, 100, 0, 15000, 15000, 0, 0, 0, 11, 16609, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Herald of Thrall - Out of Combat - Cast \'Warchief`s Blessing\'');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_10_02' WHERE sql_rev = '1642981864918755200';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
