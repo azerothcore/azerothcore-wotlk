@@ -61,7 +61,7 @@ INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 SET @CGUID := 146562;
 SET @OGUID := 9743;
 
-DELETE FROM `creature` WHERE `guid` IN(208794,208793,208792);
+DELETE FROM `creature` WHERE `guid` = 244573;
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+62;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (@CGUID+1, 36530, 0, 0, 33, 0, 0, 1, 1, 0, -217.8004, 2183.503, 79.8493, 0, 7200, 0, 0, 0, 0, 0, 0, 0, 0, '', 23420), -- [DND] Valentine Boss - Vial Bunny (Area: Shadowfang Keep)
@@ -223,7 +223,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@OGUID+93, 181018, 33, 0, 0, 1, 1, -248.9913, 2299.535, 82.2632, 4.380776, 0, 0, -0.8141155, 0.580703, 7200, 255, 1, '', 23420), -- Hanging, Tall/Thin, Medium - Val (Area: Shadowfang Keep)
 (@OGUID+94, 181019, 33, 0, 0, 1, 1, -268.6615, 2295.618, 77.50943, 0.6283169, 0, 0, 0.3090162, 0.9510568, 7200, 255, 1, '', 23420); -- Standing, Interior, Medium - Val (Area: Shadowfang Keep)
 
-DELETE FROM `game_event_creature` WHERE `guid` IN(208792,208793,208794);
+DELETE FROM `game_event_creature` WHERE `guid` = 244573;
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+62 AND `eventEntry`=8;
 INSERT INTO `game_event_creature` SELECT 8, creature.guid FROM `creature` WHERE creature.guid BETWEEN @CGUID+0 AND @CGUID+14;
 
