@@ -808,7 +808,7 @@ GraveyardStruct const* BattlegroundSA::GetClosestGraveyard(Player* player)
             continue;
         }
 
-        float dist = sqrt(pow(ret->x - x, 2) * pow(ret->y - y, 2));
+        float dist = std::sqrt(pow(ret->x - x, 2) * pow(ret->y - y, 2));
         if (dist < mindist)
         {
             mindist = dist;
