@@ -499,6 +499,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ(), plrMover->GetCollisionHeight()));
     }
 
+    if (plrMover)//Hook for OnPlayerMove
+    {
+        sScriptMgr->OnPlayerMove(plrMover, movementInfo, opcode);
+    }
+
     bool jumpopcode = false;
     if (opcode == MSG_MOVE_JUMP)
     {
