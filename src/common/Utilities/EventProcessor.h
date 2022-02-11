@@ -21,7 +21,6 @@
 #include "Define.h"
 #include "Duration.h"
 #include "Random.h"
-
 #include "advstd.h"
 #include <map>
 #include <type_traits>

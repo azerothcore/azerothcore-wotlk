@@ -684,7 +684,7 @@ void Battleground::RewardReputationToTeam(uint32 factionId, uint32 reputation, T
         {
             uint32 realFactionId = GetRealRepFactionForPlayer(factionId, itr->second);
 
-            uint32 repGain = reputation;
+            float repGain = static_cast<float>(reputation);
             AddPct(repGain, itr->second->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
             AddPct(repGain, itr->second->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, realFactionId));
             if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(realFactionId))
@@ -782,7 +782,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVPSTATS_BATTLEGROUND);
         stmt->SetData(0, battlegroundId);
-        stmt->SetData(1, GetWinner());
+        stmt->SetData(1, GetPvPTeamId(GetWinner()));
         stmt->SetData(2, GetUniqueBracketId());
         stmt->SetData(3, GetBgTypeID(true));
         CharacterDatabase.Execute(stmt);
