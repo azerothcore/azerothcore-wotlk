@@ -2445,6 +2445,9 @@ public:
     void SetMap(Map* map) override;
     void ResetMap() override;
 
+    bool CanTeleport() { return m_canTeleport; }
+    void SetCanTeleport(bool value) { m_canTeleport = value; }
+
     bool isAllowedToLoot(const Creature* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
@@ -2898,6 +2901,7 @@ private:
     uint32 m_DelayedOperations;
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
+    bool m_canTeleport;
 
     std::unique_ptr<PetStable> m_petStable;
 
