@@ -19,6 +19,7 @@
 #define __BATTLEGROUNDEY_H
 
 #include "Battleground.h"
+#include "EventMap.h"
 #include "Language.h"
 
 enum BG_EY_Events

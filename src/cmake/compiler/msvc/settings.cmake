@@ -107,6 +107,12 @@ target_compile_options(acore-compile-option-interface
     /wd4351  # C4351: new behavior: elements of array 'x' will be default initialized
     /wd4091) # C4091: 'typedef ': ignored on left of '' when no variable is declared
 
+# Define NOMINMAX
+target_compile_definitions(acore-compile-option-interface
+  INTERFACE
+    -DNOMINMAX)
+message(STATUS "MSVC: Enable NOMINMAX")
+
 if(NOT WITH_WARNINGS)
   target_compile_options(acore-warning-interface
     INTERFACE
