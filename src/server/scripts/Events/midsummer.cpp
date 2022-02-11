@@ -46,168 +46,146 @@ public:
     }
 };
 
-class npc_midsummer_bonfire : public CreatureScript
+struct npc_midsummer_bonfire : public ScriptedAI
 {
-public:
-    npc_midsummer_bonfire() : CreatureScript("npc_midsummer_bonfire") { }
-
-    struct npc_midsummer_bonfireAI : public ScriptedAI
+    npc_midsummer_bonfire(Creature* creature) : ScriptedAI(creature)
     {
-        npc_midsummer_bonfireAI(Creature* c) : ScriptedAI(c)
+        me->IsAIEnabled = true;
+        goGUID.Clear();
+        if (GameObject* go = me->SummonGameObject(GO_MIDSUMMER_BONFIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
         {
-            me->IsAIEnabled = true;
-            goGUID.Clear();
-            if (GameObject* go = me->SummonGameObject(GO_MIDSUMMER_BONFIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
+            goGUID = go->GetGUID();
+            me->RemoveGameObject(go, false);
+        }
+    }
+
+    ObjectGuid goGUID;
+
+    void SpellHit(Unit*, SpellInfo const* spellInfo) override
+    {
+        if (!goGUID)
+            return;
+
+        // Extinguish fire
+        if (spellInfo->Id == SPELL_STAMP_OUT_BONFIRE)
+        {
+            if (GameObject* go = ObjectAccessor::GetGameObject(*me, goGUID))
+                go->SetPhaseMask(2, true);
+        }
+        else if (spellInfo->Id == SPELL_LIGHT_BONFIRE)
+        {
+            if (GameObject* go = ObjectAccessor::GetGameObject(*me, goGUID))
             {
-                goGUID = go->GetGUID();
-                me->RemoveGameObject(go, false);
+                go->SetPhaseMask(1, true);
+                go->SendCustomAnim(1);
             }
         }
-
-        ObjectGuid goGUID;
-
-        void SpellHit(Unit*, SpellInfo const* spellInfo) override
-        {
-            if (!goGUID)
-                return;
-
-            // Extinguish fire
-            if (spellInfo->Id == SPELL_STAMP_OUT_BONFIRE)
-            {
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, goGUID))
-                    go->SetPhaseMask(2, true);
-            }
-            else if (spellInfo->Id == SPELL_LIGHT_BONFIRE)
-            {
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, goGUID))
-                {
-                    go->SetPhaseMask(1, true);
-                    go->SendCustomAnim(1);
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_midsummer_bonfireAI(creature);
     }
 };
 
-class npc_midsummer_torch_target : public CreatureScript
+struct npc_midsummer_torch_target : public ScriptedAI
 {
-public:
-    npc_midsummer_torch_target() : CreatureScript("npc_midsummer_torch_target") { }
-
-    struct npc_midsummer_torch_targetAI : public ScriptedAI
+    npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
     {
-        npc_midsummer_torch_targetAI(Creature* c) : ScriptedAI(c)
-        {
-            teleTimer = 0;
-            startTimer = 1;
-            posVec.clear();
-            playerGUID.Clear();
-            me->CastSpell(me, 43313, true);
-            counter = 0;
-            maxCount = 0;
-        }
+        teleTimer = 0;
+        startTimer = 1;
+        posVec.clear();
+        playerGUID.Clear();
+        me->CastSpell(me, 43313, true);
+        counter = 0;
+        maxCount = 0;
+    }
 
-        ObjectGuid playerGUID;
-        uint32 startTimer;
-        uint32 teleTimer;
-        std::vector<Position> posVec;
-        uint8 counter;
-        uint8 maxCount;
+    ObjectGuid playerGUID;
+    uint32 startTimer;
+    uint32 teleTimer;
+    std::vector<Position> posVec;
+    uint8 counter;
+    uint8 maxCount;
 
-        void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
-        {
-            playerGUID = guid;
-            maxCount = cnt;
-        }
+    void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
+    {
+        playerGUID = guid;
+        maxCount = cnt;
+    }
 
-        bool CanBeSeen(Player const* seer) override
-        {
-            return seer->GetGUID() == playerGUID;
-        }
+    bool CanBeSeen(Player const* seer) override
+    {
+        return seer->GetGUID() == playerGUID;
+    }
 
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+    {
+        if (posVec.empty())
+            return;
+        // Triggered spell from torch
+        if (spellInfo->Id == 46054 && caster->GetTypeId() == TYPEID_PLAYER)
         {
-            if (posVec.empty())
+            me->CastSpell(me, 45724, true); // hit visual anim
+            if (++counter >= maxCount)
+            {
+                caster->CastSpell(caster, (caster->ToPlayer()->GetTeamId() ? 46651 : 45719), true); // quest complete spell
+                me->DespawnOrUnsummon(1);
                 return;
-            // Triggered spell from torch
-            if (spellInfo->Id == 46054 && caster->GetTypeId() == TYPEID_PLAYER)
-            {
-                me->CastSpell(me, 45724, true); // hit visual anim
-                if (++counter >= maxCount)
-                {
-                    caster->CastSpell(caster, (caster->ToPlayer()->GetTeamId() ? 46651 : 45719), true); // quest complete spell
-                    me->DespawnOrUnsummon(1);
-                    return;
-                }
+            }
 
-                teleTimer = 1;
+            teleTimer = 1;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (startTimer)
+        {
+            startTimer += diff;
+            if (startTimer >= 200)
+            {
+                startTimer = 0;
+                FillPositions();
+                SelectPosition();
             }
         }
-
-        void UpdateAI(uint32 diff) override
+        if (teleTimer)
         {
-            if (startTimer)
+            teleTimer += diff;
+            if (teleTimer >= 750 && teleTimer < 10000)
             {
-                startTimer += diff;
-                if (startTimer >= 200)
-                {
-                    startTimer = 0;
-                    FillPositions();
-                    SelectPosition();
-                }
+                teleTimer = 10000;
+                SelectPosition();
             }
-            if (teleTimer)
+            else if (teleTimer >= 10500)
             {
-                teleTimer += diff;
-                if (teleTimer >= 750 && teleTimer < 10000)
-                {
-                    teleTimer = 10000;
-                    SelectPosition();
-                }
-                else if (teleTimer >= 10500)
-                {
-                    if (Player* plr = ObjectAccessor::GetPlayer(*me, playerGUID))
-                        plr->UpdateTriggerVisibility();
+                if (Player* plr = ObjectAccessor::GetPlayer(*me, playerGUID))
+                    plr->UpdateTriggerVisibility();
 
-                    teleTimer = 0;
-                }
+                teleTimer = 0;
             }
         }
+    }
 
-        void FillPositions()
+    void FillPositions()
+    {
+        std::list<GameObject*> gobjList;
+        me->GetGameObjectListWithEntryInGrid(gobjList, 187708 /*TORCH_GO*/, 30.0f);
+        for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
         {
-            std::list<GameObject*> gobjList;
-            me->GetGameObjectListWithEntryInGrid(gobjList, 187708 /*TORCH_GO*/, 30.0f);
-            for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
-            {
-                Position pos;
-                pos.Relocate(*itr);
-                posVec.push_back(pos);
-            }
-        }
-
-        void SelectPosition()
-        {
-            if (posVec.empty())
-                return;
-            int8 num = urand(0, posVec.size() - 1);
             Position pos;
-            pos.Relocate(posVec.at(num));
-            me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-            me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
-
-            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
+            pos.Relocate(*itr);
+            posVec.push_back(pos);
         }
-    };
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void SelectPosition()
     {
-        return new npc_midsummer_torch_targetAI(creature);
+        if (posVec.empty())
+            return;
+        int8 num = urand(0, posVec.size() - 1);
+        Position pos;
+        pos.Relocate(posVec.at(num));
+        me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
+        me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
+
+        me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
     }
 };
 
@@ -222,48 +200,37 @@ enum CrabDisguise
     SPELL_FADE_DIGUISE = 47693,
 };
 
-class spell_gen_crab_disguise : public SpellScriptLoader
+class spell_gen_crab_disguise : public AuraScript
 {
-public:
-    spell_gen_crab_disguise() : SpellScriptLoader("spell_gen_crab_disguise") { }
+    PrepareAuraScript(spell_gen_crab_disguise);
 
-    class spell_gen_crab_disguise_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_gen_crab_disguise_AuraScript);
+        return ValidateSpellInfo({ SPELL_CRAB_DISGUISE });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_CRAB_DISGUISE });
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
-                caster->SetFaction(FACTION_BLACKFATHOM);
-            }
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                caster->CastSpell(caster, SPELL_FADE_DIGUISE, true);
-                caster->RestoreFaction();
-            }
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectRemoveFn(spell_gen_crab_disguise_AuraScript::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_crab_disguise_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_gen_crab_disguise_AuraScript();
+        if (Unit* caster = GetCaster())
+        {
+            caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
+            caster->SetFaction(FACTION_BLACKFATHOM);
+        }
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->CastSpell(caster, SPELL_FADE_DIGUISE, true);
+            caster->RestoreFaction();
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectRemoveFn(spell_gen_crab_disguise::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_crab_disguise::OnRemove, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -276,108 +243,85 @@ enum RibbonPole
     NPC_RIBBON_POLE_DEBUG_TARGET        = 17066,
 };
 
-class spell_midsummer_ribbon_pole : public SpellScriptLoader
+class spell_midsummer_ribbon_pole : public AuraScript
 {
-public:
-    spell_midsummer_ribbon_pole() : SpellScriptLoader("spell_midsummer_ribbon_pole") { }
+    PrepareAuraScript(spell_midsummer_ribbon_pole)
 
-    class spell_midsummer_ribbon_pole_AuraScript : public AuraScript
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_midsummer_ribbon_pole_AuraScript)
-
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+        PreventDefaultAction();
+        if (Unit* target = GetTarget())
         {
-            PreventDefaultAction();
-            if (Unit* target = GetTarget())
+            Creature* cr = target->FindNearestCreature(NPC_RIBBON_POLE_DEBUG_TARGET, 10.0f);
+            if (!cr)
             {
-                Creature* cr = target->FindNearestCreature(NPC_RIBBON_POLE_DEBUG_TARGET, 10.0f);
-                if (!cr)
-                {
-                    target->RemoveAura(SPELL_RIBBON_POLE_CHANNEL_VISUAL);
-                    SetDuration(1);
-                    return;
-                }
+                target->RemoveAura(SPELL_RIBBON_POLE_CHANNEL_VISUAL);
+                SetDuration(1);
+                return;
+            }
 
-                if (Aura* aur = target->GetAura(SPELL_RIBBON_POLE_XP))
-                    aur->SetDuration(std::min(aur->GetDuration() + 3 * MINUTE * IN_MILLISECONDS, 60 * MINUTE * IN_MILLISECONDS));
-                else
-                    target->CastSpell(target, SPELL_RIBBON_POLE_XP, true);
-
-                if (roll_chance_i(5))
-                {
-                    cr->Relocate(cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ() - 6.5f);
-                    cr->CastSpell(cr, SPELL_RIBBON_POLE_FIREWORKS, true);
-                    cr->Relocate(cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ() + 6.5f);
-                }
+            if (Aura* aur = target->GetAura(SPELL_RIBBON_POLE_XP))
+                aur->SetDuration(std::min(aur->GetDuration() + 3 * MINUTE * IN_MILLISECONDS, 60 * MINUTE * IN_MILLISECONDS));
+            else
+            {
+                target->CastSpell(target, SPELL_RIBBON_POLE_XP, true);
 
                 // Achievement
                 if ((GameTime::GetGameTime().count() - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
                     target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
             }
-        }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* ar = GetTarget();
-            ar->CastSpell(ar, SPELL_RIBBON_POLE_CHANNEL_VISUAL, true);
+            // Achievement
+            if ((time(nullptr) - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_midsummer_ribbon_pole_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_midsummer_ribbon_pole_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_midsummer_ribbon_pole_AuraScript();
+        Unit* ar = GetTarget();
+        ar->CastSpell(ar, SPELL_RIBBON_POLE_CHANNEL_VISUAL, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_midsummer_ribbon_pole::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_midsummer_ribbon_pole::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_midsummer_torch_quest : public SpellScriptLoader
+class spell_midsummer_torch_quest : public AuraScript
 {
-public:
-    spell_midsummer_torch_quest() : SpellScriptLoader("spell_midsummer_torch_quest") { }
+    PrepareAuraScript(spell_midsummer_torch_quest)
 
-    class spell_midsummer_torch_quest_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_midsummer_torch_quest_AuraScript)
+        torchGUID.Clear();
+        return true;
+    }
 
-        bool Load() override
-        {
-            torchGUID.Clear();
-            return true;
-        }
+    ObjectGuid torchGUID;
 
-        ObjectGuid torchGUID;
-
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* ar = GetTarget();
-            if (Creature* cr = ar->SummonCreature(25535, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
-            {
-                torchGUID = cr->GetGUID();
-                CAST_AI(npc_midsummer_torch_target::npc_midsummer_torch_targetAI, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == 45716 ? 8 : 20));
-            }
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* cr = ObjectAccessor::GetCreature(*GetTarget(), torchGUID))
-                cr->DespawnOrUnsummon(1);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_midsummer_torch_quest_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_midsummer_torch_quest_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_midsummer_torch_quest_AuraScript();
+        Unit* ar = GetTarget();
+        if (Creature* cr = ar->SummonCreature(25535, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
+        {
+            torchGUID = cr->GetGUID();
+            CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == 45716 ? 8 : 20));
+        }
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* cr = ObjectAccessor::GetCreature(*GetTarget(), torchGUID))
+            cr->DespawnOrUnsummon(1);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_midsummer_torch_quest::HandleEffectApply, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_midsummer_torch_quest::HandleEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -391,124 +335,113 @@ enum flingTorch
     SPELL_TORCH_COUNTER             = 45693,
 };
 
-class spell_midsummer_fling_torch : public SpellScriptLoader
+class spell_midsummer_fling_torch : public SpellScript
 {
-public:
-    spell_midsummer_fling_torch() : SpellScriptLoader("spell_midsummer_fling_torch") {}
+    PrepareSpellScript(spell_midsummer_fling_torch);
 
-    class spell_midsummer_fling_torch_SpellScript : public SpellScript
+    bool handled;
+    bool Load() override { handled = false; return true; }
+
+    SpellCastResult CheckCast()
     {
-        PrepareSpellScript(spell_midsummer_fling_torch_SpellScript);
-
-        bool handled;
-        bool Load() override { handled = false; return true; }
-
-        SpellCastResult CheckCast()
+        GetCaster()->GetCreaturesWithEntryInRange(_crList, 100.0f, NPC_TORCH_TARGET);
+        if (_crList.empty())
         {
-            GetCaster()->GetCreaturesWithEntryInRange(_crList, 100.0f, NPC_TORCH_TARGET);
-            if (_crList.empty())
-            {
-                return SPELL_FAILED_NOT_HERE;
-            }
-
-            return SPELL_CAST_OK;
+            return SPELL_FAILED_NOT_HERE;
         }
 
-        void ThrowNextTorch(Unit* caster)
-        {
-            uint8 rand = urand(0, _crList.size() - 1);
-            Position pos;
-            pos.Relocate(0.0f, 0.0f, 0.0f);
-            for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr, --rand)
-            {
-                if (caster->GetDistance(*itr) < 5)
-                {
-                    if (!rand)
-                        rand++;
-                    continue;
-                }
-
-                if (!rand)
-                {
-                    pos.Relocate(*itr);
-                    break;
-                }
-            }
-
-            // we have any pos
-            if (pos.GetPositionX())
-                caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLING_TORCH, true);
-        }
-
-        void HandleFinish()
-        {
-            Unit* caster = GetCaster();
-            if (!caster || !caster->ToPlayer()) // caster cant be null, but meh :p
-                return;
-
-            if (GetSpellInfo()->Id != SPELL_FLING_TORCH_DUMMY)
-            {
-                if (!handled)
-                    if (const WorldLocation* loc = GetExplTargetDest())
-                    {
-                        caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_MISSED_TORCH, true);
-                        caster->RemoveAurasDueToSpell(SPELL_TORCH_COUNTER);
-                    }
-                return;
-            }
-
-            ThrowNextTorch(caster);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* target = GetHitPlayer())
-            {
-                if (target->GetGUID() != GetCaster()->GetGUID())
-                    return;
-
-                handled = true;
-                if (Aura* aur = target->GetAura(SPELL_TORCH_COUNTER))
-                {
-                    aur->ModStackAmount(1);
-                    uint8 count = 4;
-                    if (target->GetQuestStatus(target->GetTeamId() ? 11925 : 11924) == QUEST_STATUS_INCOMPLETE) // More Torch Catching quests
-                        count = 10;
-
-                    if (aur->GetStackAmount() >= count)
-                    {
-                        //target->CastSpell(target, 46711, true); // Set Flag: all torch returning quests are complete
-                        target->CastSpell(target, (target->GetTeamId() ? 46654 : 46081), true); // Quest completion
-                        aur->SetDuration(1);
-                        return;
-                    }
-                }
-                else
-                    target->CastSpell(target, SPELL_TORCH_COUNTER, true);
-
-                ThrowNextTorch(GetCaster());
-            }
-        }
-
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_midsummer_fling_torch_SpellScript::HandleFinish);
-            if (m_scriptSpellId == 45671)
-            {
-                OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch_SpellScript::CheckCast);
-                OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        }
-
-    private:
-        std::list<Creature*> _crList;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_midsummer_fling_torch_SpellScript();
+        return SPELL_CAST_OK;
     }
+
+    void ThrowNextTorch(Unit* caster)
+    {
+        uint8 rand = urand(0, _crList.size() - 1);
+        Position pos;
+        pos.Relocate(0.0f, 0.0f, 0.0f);
+        for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr, --rand)
+        {
+            if (caster->GetDistance(*itr) < 5)
+            {
+                if (!rand)
+                    rand++;
+                continue;
+            }
+
+            if (!rand)
+            {
+                pos.Relocate(*itr);
+                break;
+            }
+        }
+
+        // we have any pos
+        if (pos.GetPositionX())
+            caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLING_TORCH, true);
+    }
+
+    void HandleFinish()
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->ToPlayer()) // caster cant be null, but meh :p
+            return;
+
+        if (GetSpellInfo()->Id != SPELL_FLING_TORCH_DUMMY)
+        {
+            if (!handled)
+                if (const WorldLocation* loc = GetExplTargetDest())
+                {
+                    caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_MISSED_TORCH, true);
+                    caster->RemoveAurasDueToSpell(SPELL_TORCH_COUNTER);
+                }
+            return;
+        }
+
+        ThrowNextTorch(caster);
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Player* target = GetHitPlayer())
+        {
+            if (target->GetGUID() != GetCaster()->GetGUID())
+                return;
+
+            handled = true;
+            if (Aura* aur = target->GetAura(SPELL_TORCH_COUNTER))
+            {
+                aur->ModStackAmount(1);
+                uint8 count = 4;
+                if (target->GetQuestStatus(target->GetTeamId() ? 11925 : 11924) == QUEST_STATUS_INCOMPLETE) // More Torch Catching quests
+                    count = 10;
+
+                if (aur->GetStackAmount() >= count)
+                {
+                    //target->CastSpell(target, 46711, true); // Set Flag: all torch returning quests are complete
+                    target->CastSpell(target, (target->GetTeamId() ? 46654 : 46081), true); // Quest completion
+                    aur->SetDuration(1);
+                    return;
+                }
+            }
+            else
+                target->CastSpell(target, SPELL_TORCH_COUNTER, true);
+
+            ThrowNextTorch(GetCaster());
+        }
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_midsummer_fling_torch::HandleFinish);
+        if (m_scriptSpellId == 45671)
+        {
+            OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch::CheckCast);
+            OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    }
+
+private:
+    std::list<Creature*> _crList;
 };
 
 enum eJuggle
@@ -523,65 +456,54 @@ enum eJuggle
     QUEST_CHECK                 = 11937,
 };
 
-class spell_midsummer_juggling_torch : public SpellScriptLoader
+class spell_midsummer_juggling_torch : public SpellScript
 {
-public:
-    spell_midsummer_juggling_torch() : SpellScriptLoader("spell_midsummer_juggling_torch") {}
+    PrepareSpellScript(spell_midsummer_juggling_torch);
 
-    class spell_midsummer_juggling_torch_SpellScript : public SpellScript
+    bool handled;
+    bool Load() override { handled = false; return true; }
+    void HandleFinish()
     {
-        PrepareSpellScript(spell_midsummer_juggling_torch_SpellScript);
+        Unit* caster = GetCaster();
+        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+            return;
 
-        bool handled;
-        bool Load() override { handled = false; return true; }
-        void HandleFinish()
+        if (const WorldLocation* loc = GetExplTargetDest())
         {
-            Unit* caster = GetCaster();
-            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
-                return;
+            if (loc->GetExactDist(caster) < 3.0f)
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SELF, true);
+            else if (loc->GetExactDist(caster) < 10.0f)
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SLOW, true);
+            else if (loc->GetExactDist(caster) < 25.0f)
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_MED, true);
+            else
+                caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_FAST, true);
+        }
+        else
+            caster->CastSpell(caster, SPELL_JUGGLE_SELF, true);
+    }
 
-            if (const WorldLocation* loc = GetExplTargetDest())
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Unit* caster = GetCaster();
+        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        if (Player* target = GetHitPlayer())
+            if (!handled && target->GetQuestRewardStatus(target->GetTeamId() == TEAM_ALLIANCE ? 11657 : 11923))
             {
-                if (loc->GetExactDist(caster) < 3.0f)
-                    caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SELF, true);
-                else if (loc->GetExactDist(caster) < 10.0f)
-                    caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_SLOW, true);
-                else if (loc->GetExactDist(caster) < 25.0f)
-                    caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_MED, true);
-                else
-                    caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_JUGGLE_FAST, true);
+                handled = true;
+                caster->CastSpell(target, SPELL_GIVE_TORCH, true);
             }
-            else
-                caster->CastSpell(caster, SPELL_JUGGLE_SELF, true);
-        }
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* caster = GetCaster();
-            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            if (Player* target = GetHitPlayer())
-                if (!handled && target->GetQuestRewardStatus(target->GetTeamId() == TEAM_ALLIANCE ? 11657 : 11923))
-                {
-                    handled = true;
-                    caster->CastSpell(target, SPELL_GIVE_TORCH, true);
-                }
-        }
-
-        void Register() override
-        {
-            if (m_scriptSpellId == SPELL_TORCH_CHECK)
-                OnEffectHitTarget += SpellEffectFn(spell_midsummer_juggling_torch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            else
-                AfterCast += SpellCastFn(spell_midsummer_juggling_torch_SpellScript::HandleFinish);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_midsummer_juggling_torch_SpellScript();
+        if (m_scriptSpellId == SPELL_TORCH_CHECK)
+            OnEffectHitTarget += SpellEffectFn(spell_midsummer_juggling_torch::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        else
+            AfterCast += SpellCastFn(spell_midsummer_juggling_torch::HandleFinish);
     }
 };
 
@@ -589,13 +511,13 @@ void AddSC_event_midsummer_scripts()
 {
     // NPCs
     new go_midsummer_bonfire();
-    new npc_midsummer_bonfire();
-    new npc_midsummer_torch_target();
+    RegisterCreatureAI(npc_midsummer_bonfire);
+    RegisterCreatureAI(npc_midsummer_torch_target);
 
     // Spells
-    new spell_gen_crab_disguise();
-    new spell_midsummer_ribbon_pole();
-    new spell_midsummer_torch_quest();
-    new spell_midsummer_fling_torch();
-    new spell_midsummer_juggling_torch();
+    RegisterSpellScript(spell_gen_crab_disguise);
+    RegisterSpellScript(spell_midsummer_ribbon_pole);
+    RegisterSpellScript(spell_midsummer_torch_quest);
+    RegisterSpellScript(spell_midsummer_fling_torch);
+    RegisterSpellScript(spell_midsummer_juggling_torch);
 }
