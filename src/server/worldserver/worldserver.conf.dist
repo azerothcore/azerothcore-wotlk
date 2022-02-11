@@ -869,6 +869,14 @@ StartPlayerMoney = 0
 MaxHonorPoints = 75000
 
 #
+#    MaxHonorPointsMoneyPerPoint
+#        Description: Convert excess honor points into money if players got more points than allowed after changing the honor cap.
+#                     Honor points will be converted into copper according to the value set in this config.
+#        Default: 0 - Disabled
+
+MaxHonorPointsMoneyPerPoint = 0
+
+#
 #    StartHonorPoints
 #        Description: Amount of honor points that characters have after creation.
 #        Default:     0
@@ -1802,10 +1810,11 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                     divided by "," without spaces.
 #                     It is implied that you do not use for these NPC dialogs data from "gossip_menu" table.
 #                     Server will skip these IDs during the definitions validation process.
-#        Example:     Creatures.CustomIDs = "190010,55005,999991" - Npc for Transmog, Guild-zone and 1v1-arena modules
+#        Example:     Creatures.CustomIDs = "190010,55005,999991,25462,98888" - Npcs for Transmog, Guild-zone, 1v1-arena modules
+#                                                                               Skip Dk Module, Racial Trait Swap Modules
 #        Default:     ""
 
-Creatures.CustomIDs = "190010"
+Creatures.CustomIDs = "190010,55005,999991,25462,98888"
 
 #
 ###################################################################################################

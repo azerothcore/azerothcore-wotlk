@@ -4879,7 +4879,7 @@ void Spell::EffectReputation(SpellEffIndex effIndex)
         return;
     }
 
-    int32  repChange = damage;
+    float repChange = static_cast<float>(damage);
 
     uint32 factionId = m_spellInfo->Effects[effIndex].MiscValue;
 
@@ -4888,7 +4888,6 @@ void Spell::EffectReputation(SpellEffIndex effIndex)
         return;
 
     repChange = player->CalculateReputationGain(REPUTATION_SOURCE_SPELL, 0, repChange, factionId);
-
     player->GetReputationMgr().ModifyReputation(factionEntry, repChange);
 }
 

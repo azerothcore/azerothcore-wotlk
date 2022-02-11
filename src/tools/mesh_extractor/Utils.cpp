@@ -170,7 +170,7 @@ Vector3 Utils::GetLiquidVert(const IDefinition& def, Vector3 basePosition, float
 
 float Utils::Distance( float x, float y )
 {
-    return sqrt(x * x + y * y);
+    return std::sqrt(x * x + y * y);
 }
 
 std::string Utils::Replace( std::string str, const std::string& oldStr, const std::string& newStr )
