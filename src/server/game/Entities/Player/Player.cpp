@@ -57,6 +57,7 @@
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -220,6 +221,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_bMustDelayTeleport = false;
     m_bHasDelayedTeleport = false;
     teleportStore_options = 0;
+    m_canTeleport = false;
 
     m_trade = nullptr;
 
@@ -1463,6 +1465,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         // near teleport, triggering send MSG_MOVE_TELEPORT_ACK from client at landing
         if (!GetSession()->PlayerLogout())
         {
+            SetCanTeleport(true);
             Position oldPos = GetPosition();
             Relocate(x, y, z, orientation);
             SendTeleportAckPacket();
@@ -1565,6 +1568,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             if (!GetSession()->PlayerLogout())
             {
+                SetCanTeleport(true);
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
                 data << uint32(mapid);
                 if (m_transport)
@@ -2107,6 +2111,12 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTy
     {
         if (go->GetGoType() == type)
         {
+            // Players cannot interact with gameobjects that use the "Point" icon
+            if (go->GetGOInfo()->IconName == "Point")
+            {
+                return nullptr;
+            }
+
             if (go->IsWithinDistInMap(this))
             {
                 return go;
@@ -15687,6 +15697,25 @@ void Player::RemoveRestFlag(RestFlag restFlag)
         _restTime = 0;
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
     }
+}
+
+uint32 Player::DoRandomRoll(uint32 minimum, uint32 maximum)
+{
+    ASSERT(minimum <= maximum || maximum <= 10000);
+
+    uint32 roll = urand(minimum, maximum);
+
+    WorldPackets::Misc::RandomRoll randomRoll;
+    randomRoll.Min = minimum;
+    randomRoll.Max = maximum;
+    randomRoll.Result = roll;
+    randomRoll.Roller = GetGUID();
+    if (Group* group = GetGroup())
+        group->BroadcastPacket(randomRoll.Write(), false);
+    else
+        SendDirectMessage(randomRoll.Write());
+
+    return roll;
 }
 
 void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
