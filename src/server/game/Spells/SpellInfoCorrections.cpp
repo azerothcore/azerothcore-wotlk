@@ -3752,9 +3752,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].MiscValue = 126;
     });
 
-    // Magic Broom
-    ApplySpellFix({ 47977 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({
+        47977, // Magic Broom
+        65917  // Magic Rooster
+        }, [](SpellInfo* spellInfo)
     {
+        // First two effects apply auras, which shouldn't be there
+        // due to NO_TARGET applying aura on current caster (core bug)
+        // Just wipe effect data, to mimic blizz-behavior
         spellInfo->Effects[EFFECT_0].Effect = 0;
         spellInfo->Effects[EFFECT_1].Effect = 0;
     });
@@ -4141,6 +4146,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[1] = 0x00020000;
     });
 
+    // Arcane Vacuum
+    ApplySpellFix({ 21147 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(4); // 30 yards
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
+    });
+
     // Focused Assault
     // Brutal Assault
     ApplySpellFix({ 46392, 46393 }, [](SpellInfo* spellInfo)
@@ -4152,6 +4164,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 19574 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx4 |= SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
+    });
+
+    // Shadowflame
+    ApplySpellFix({ 22539 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
     });
 
     // PX-238 Winter Wondervolt
