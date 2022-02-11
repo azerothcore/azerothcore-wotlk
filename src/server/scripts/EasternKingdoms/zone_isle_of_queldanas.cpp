@@ -319,7 +319,7 @@ public:
                             case EVENT_SPAWN_WAVE_1:
                                 {
                                     Position spawnPos = c->GetPosition();
-                                    spawnPos.m_orientation = 5.80f;
+                                    spawnPos.SetOrientation(5.80f);
                                     spawnPos.m_positionX += 5.0f * cos(4.5f);
                                     spawnPos.m_positionY += 5.0f * std::sin(4.5f);
                                     for (uint8 i = 0; i < 5; ++i)
@@ -333,7 +333,7 @@ public:
                             case EVENT_SPAWN_WAVE_2:
                                 {
                                     Position spawnPos = c->GetPosition();
-                                    spawnPos.m_orientation = 5.80f;
+                                    spawnPos.SetOrientation(5.80f);
                                     spawnPos.m_positionX += 7.0f * cos(4.0f);
                                     spawnPos.m_positionY += 7.0f * std::sin(4.0f);
                                     for (uint8 i = 0; i < 3; ++i)
@@ -348,7 +348,7 @@ public:
                             case EVENT_SPAWN_WAVE_3:
                                 {
                                     Position spawnPos = c->GetPosition();
-                                    spawnPos.m_orientation = 5.80f;
+                                    spawnPos.SetOrientation(5.80f);
                                     spawnPos.m_positionX += 8.0f * cos(4.0f);
                                     spawnPos.m_positionY += 8.0f * std::sin(4.0f);
                                     for (uint8 i = 0; i < 3; ++i)
