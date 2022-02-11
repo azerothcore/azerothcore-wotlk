@@ -53,7 +53,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         init.MoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ());
         init.SetWalk(true);
         init.Launch();
-        if (creature->GetFormation() && creature->GetFormation()->getLeader() == creature)
+        if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
             creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), false);
         return;
     }
@@ -153,7 +153,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 
                 for (; itrNext != finalPath.end(); ++itr, ++itrNext)
                 {
-                    distDiff = sqrt(((*itr).x - (*itrNext).x) * ((*itr).x - (*itrNext).x) + ((*itr).y - (*itrNext).y) * ((*itr).y - (*itrNext).y));
+                    distDiff = std::sqrt(((*itr).x - (*itrNext).x) * ((*itr).x - (*itrNext).x) + ((*itr).y - (*itrNext).y) * ((*itr).y - (*itrNext).y));
                     zDiff = std::fabs((*itr).z - (*itrNext).z);
 
                     // Xinef: tree climbing, cut as much as we can
@@ -223,7 +223,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         _preComputedPaths.erase(pathIdx);
 
     //Call for creature group update
-    if (creature->GetFormation() && creature->GetFormation()->getLeader() == creature)
+    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
         creature->GetFormation()->LeaderMoveTo(finalPoint.x, finalPoint.y, finalPoint.z, false);
 }
 
