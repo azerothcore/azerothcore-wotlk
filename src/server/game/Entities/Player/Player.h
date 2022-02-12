@@ -1645,7 +1645,7 @@ public:
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
-    void SetReputation(uint32 factionentry, uint32 value);
+    void SetReputation(uint32 factionentry, float value);
     [[nodiscard]] uint32 GetReputation(uint32 factionentry) const;
     std::string const& GetGuildName();
     [[nodiscard]] uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
@@ -2056,7 +2056,7 @@ public:
     void RewardReputation(Unit* victim, float rate);
     void RewardReputation(Quest const* quest);
 
-    int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
+    float CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, float rep, int32 faction, bool noQuestBonus = false);
 
     void UpdateSkillsForLevel();
     void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
@@ -2371,6 +2371,8 @@ public:
     void SendCinematicStart(uint32 CinematicSequenceId);
     void SendMovieStart(uint32 MovieId);
 
+    uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
+
     [[nodiscard]] uint16 GetMaxSkillValueForLevel() const;
     bool IsFFAPvP();
     bool IsPvP();
@@ -2442,6 +2444,9 @@ public:
     // Set map to player and add reference
     void SetMap(Map* map) override;
     void ResetMap() override;
+
+    bool CanTeleport() { return m_canTeleport; }
+    void SetCanTeleport(bool value) { m_canTeleport = value; }
 
     bool isAllowedToLoot(const Creature* creature);
 
@@ -2896,6 +2901,7 @@ private:
     uint32 m_DelayedOperations;
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
+    bool m_canTeleport;
 
     std::unique_ptr<PetStable> m_petStable;
 
