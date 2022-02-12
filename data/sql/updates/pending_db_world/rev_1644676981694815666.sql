@@ -40,3 +40,4 @@ INSERT INTO player_factionchange_quests (alliance_id, horde_id) VALUES
 (9005, 9012), #Saving the Best for Last (Warlock)
 (9006, 9013), #Saving the Best for Last (Warrior)
 (10498, 9011); #Saving the Best for Last (Shaman)
+
