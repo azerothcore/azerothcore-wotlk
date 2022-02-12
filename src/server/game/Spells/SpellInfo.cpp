@@ -2844,3 +2844,50 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         delete cur;
     }
 }
+
+bool SpellInfo::CheckElixirStacking(Unit const* caster) const
+{
+    if (!caster)
+    {
+        return true;
+    }
+
+    // xinef: check spell group
+    uint32 groupId = sSpellMgr->GetSpellGroup(Id);
+    if (groupId != SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS)
+    {
+        return true;
+    }
+
+    SpellGroupSpecialFlags sFlag = sSpellMgr->GetSpellGroupSpecialFlags(Id);
+    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!Effects[i].IsAura())
+        {
+            continue;
+        }
+
+        Unit::AuraApplicationMap const& Auras = caster->GetAppliedAuras();
+        for (Unit::AuraApplicationMap::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
+        {
+            // xinef: aura is not groupped or in different group
+            uint32 auraGroup = sSpellMgr->GetSpellGroup(itr->first);
+            if (auraGroup != groupId)
+            {
+                continue;
+            }
+
+            // Cannot apply guardian/battle elixir if flask is present
+            if (sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE || sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN)
+            {
+                SpellGroupSpecialFlags sAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(itr->first);
+                if ((sAuraFlag & SPELL_GROUP_SPECIAL_FLAG_FLASK) == SPELL_GROUP_SPECIAL_FLAG_FLASK)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
