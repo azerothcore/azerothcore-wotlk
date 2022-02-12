@@ -651,7 +651,10 @@ void Creature::Update(uint32 diff)
                         m_groupLootTimer = 0;
                         lootingGroupLowGUID = 0;
                     }
-                    else m_groupLootTimer -= diff;
+                    else
+                    {
+                        m_groupLootTimer -= diff;
+                    }
                 }
                 else if (m_corpseRemoveTime <= GameTime::GetGameTime().count())
                 {
