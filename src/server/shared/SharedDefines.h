@@ -3400,6 +3400,18 @@ enum ResponseCodes
     CHAR_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME            = 0x67
 };
 
+enum PvPTeamId
+{
+    PVP_TEAM_HORDE       = 0, // Battleground: Horde,    Arena: Green
+    PVP_TEAM_ALLIANCE    = 1, // Battleground: Alliance, Arena: Gold
+    PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
+};
+
+inline PvPTeamId GetPvPTeamId(TeamId teamId)
+{
+    return teamId == TEAM_ALLIANCE ? PVP_TEAM_ALLIANCE : PVP_TEAM_HORDE;
+}
+
 // indexes of BattlemasterList.dbc
 enum BattlegroundTypeId
 {

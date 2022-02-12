@@ -46,13 +46,6 @@ int main()
 }
 " CLANG_HAVE_PROPER_CHARCONV)
 
-if (NOT CLANG_HAVE_PROPER_CHARCONV)
-  message(STATUS "Clang: Detected from_chars bug for 64-bit integers, workaround enabled")
-  target_compile_definitions(acore-compile-option-interface
-  INTERFACE
-    -DACORE_NEED_CHARCONV_WORKAROUND)
-endif()
-
 if(WITH_WARNINGS)
   target_compile_options(acore-warning-interface
     INTERFACE
