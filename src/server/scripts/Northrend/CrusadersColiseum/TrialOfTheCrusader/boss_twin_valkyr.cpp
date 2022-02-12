@@ -246,7 +246,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if (!victim || !victim->IsInWorld())
             return;
 
-        float allowedDist = sqrt(MELEE_RANGE * MELEE_RANGE + 6.0f * 6.0f);
+        float allowedDist = std::sqrt(MELEE_RANGE * MELEE_RANGE + 6.0f * 6.0f);
         if (!me->IsWithinMeleeRange(victim, allowedDist))
             return;
 

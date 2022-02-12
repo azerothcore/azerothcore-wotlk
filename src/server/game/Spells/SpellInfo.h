@@ -216,7 +216,7 @@ class SpellImplicitTargetInfo
 private:
     Targets _target;
 public:
-    SpellImplicitTargetInfo() {}
+    SpellImplicitTargetInfo() : _target(Targets(0)) {}
     SpellImplicitTargetInfo(uint32 target);
 
     bool IsArea() const;
@@ -536,6 +536,8 @@ public:
 
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
+
+    bool CheckElixirStacking(Unit const* caster) const;
 
 private:
     std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }

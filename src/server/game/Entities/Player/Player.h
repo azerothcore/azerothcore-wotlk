@@ -2370,6 +2370,8 @@ public:
     void SendCinematicStart(uint32 CinematicSequenceId);
     void SendMovieStart(uint32 MovieId);
 
+    uint32 DoRandomRoll(uint32 minimum, uint32 maximum);
+
     [[nodiscard]] uint16 GetMaxSkillValueForLevel() const;
     bool IsFFAPvP();
     bool IsPvP();
@@ -2441,6 +2443,9 @@ public:
     // Set map to player and add reference
     void SetMap(Map* map) override;
     void ResetMap() override;
+
+    bool CanTeleport() { return m_canTeleport; }
+    void SetCanTeleport(bool value) { m_canTeleport = value; }
 
     bool isAllowedToLoot(const Creature* creature);
 
@@ -2895,6 +2900,7 @@ private:
     uint32 m_DelayedOperations;
     bool m_bMustDelayTeleport;
     bool m_bHasDelayedTeleport;
+    bool m_canTeleport;
 
     std::unique_ptr<PetStable> m_petStable;
 

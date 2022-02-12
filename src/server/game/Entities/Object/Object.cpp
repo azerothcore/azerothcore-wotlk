@@ -1481,7 +1481,7 @@ bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, 
     float A = (obj2->GetPositionY() - obj1->GetPositionY()) / (obj2->GetPositionX() - obj1->GetPositionX());
     float B = -1;
     float C = obj1->GetPositionY() - A * obj1->GetPositionX();
-    float dist = std::fabs(A * GetPositionX() + B * GetPositionY() + C) / sqrt(A * A + B * B);
+    float dist = std::fabs(A * GetPositionX() + B * GetPositionY() + C) / std::sqrt(A * A + B * B);
     return dist <= size;
 }
 
