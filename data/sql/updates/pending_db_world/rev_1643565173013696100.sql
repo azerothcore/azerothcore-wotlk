@@ -2,6 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1643565173013696100');
 
 DELETE FROM `creature_addon` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (14262,14263,14264,14024,12458,12465));
 DELETE FROM `creature_formations` WHERE `memberGUID` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (14262,14263,14264,14024,12458,12465));
+DELETE FROM `linked_respawn` WHERE `linkType`=0 AND `linkedGUID` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (14262,14263,14264,14024,12458,12465));
 
 SET @CGUID := 2000009;
 DELETE FROM `creature` WHERE `id1` IN (14262,14263,14264,14024,12458,12465);
