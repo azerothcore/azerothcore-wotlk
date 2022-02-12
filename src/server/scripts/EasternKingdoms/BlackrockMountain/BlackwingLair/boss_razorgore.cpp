@@ -85,6 +85,13 @@ public:
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
         }
 
+        void EnterCombat(Unit* /*victim*/) override
+        {
+            _EnterCombat();
+
+            instance->SetData(DATA_EGG_EVENT, IN_PROGRESS);
+        }
+
         void DoChangePhase()
         {
             events.ScheduleEvent(EVENT_CLEAVE, 15000);
