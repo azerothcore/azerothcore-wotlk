@@ -429,7 +429,6 @@ class spell_gen_brood_power : public SpellScript
     }
 };
 
-
 void AddSC_boss_chromaggus()
 {
     new boss_chromaggus();
