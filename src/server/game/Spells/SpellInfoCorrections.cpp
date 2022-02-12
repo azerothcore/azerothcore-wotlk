@@ -4166,10 +4166,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
     });
 
+    // Shadowflame
+    ApplySpellFix({ 22539 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     // PX-238 Winter Wondervolt
     ApplySpellFix({ 26157, 26272, 26273, 26274 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Mechanic = 0;
+    });
+
+    // Calm Dragonkin
+    ApplySpellFix({ 19872 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_EXCLUDE_CASTER;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
