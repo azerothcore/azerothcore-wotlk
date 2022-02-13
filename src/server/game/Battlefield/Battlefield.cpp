@@ -408,8 +408,8 @@ void Battlefield::AskToLeaveQueue(Player* player)
 // Called in WorldSession::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
-    // Player leaving Wintergrasp, trigger Hearthstone spell.
-    player->CastSpell(player, 8690, true);
+    // Player leaving Wintergrasp, teleports to Icecrown just north of Wintergrasp.
+    player->TeleportTo(571, 5804.1499f, 624.7710f, 647.7670f, 1.6400f);
 }
 
 // Called in WorldSession::HandleBfEntryInviteResponse
