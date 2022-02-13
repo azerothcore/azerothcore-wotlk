@@ -71,7 +71,7 @@ bool BattlefieldWG::SetupBattlefield()
 
     m_Data32.resize(BATTLEFIELD_WG_DATA_MAX);
 
-    m_saveTimer = 60000;
+    m_saveTimer = 90000;
 
     // Init GraveYards
     SetGraveyardNumber(BATTLEFIELD_WG_GRAVEYARD_MAX);
@@ -971,10 +971,10 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
         // If all three south towers are destroyed (ie. all attack towers), remove ten minutes from battle time
         if (GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT) == 3)
         {
-            if (int32(m_Timer - 600000) < 0)
+            if (int32(m_Timer - 599999) < 0)
                 m_Timer = 0;
             else
-                m_Timer -= 600000;
+                m_Timer -= 599999;
             SendInitWorldStatesToAll();
         }
     }
