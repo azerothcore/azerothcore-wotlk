@@ -71,7 +71,7 @@ bool BattlefieldWG::SetupBattlefield()
 
     m_Data32.resize(BATTLEFIELD_WG_DATA_MAX);
 
-    m_saveTimer = 90000;
+    m_saveTimer = 60000;
 
     // Init GraveYards
     SetGraveyardNumber(BATTLEFIELD_WG_GRAVEYARD_MAX);
@@ -240,16 +240,6 @@ void BattlefieldWG::OnBattleStart()
         {
             ShowNpc(creature, true);
             creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
-        }
-    }
-
-    // Rebuild all wall
-    for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
-    {
-        if (*itr)
-        {
-            (*itr)->Rebuild();
-            (*itr)->UpdateTurretAttack(false);
         }
     }
 
