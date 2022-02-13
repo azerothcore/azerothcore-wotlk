@@ -204,7 +204,7 @@ bool BattlefieldWG::Update(uint32 diff)
     {
         if (m_tenacityUpdateTimer <= diff)
         {
-            m_tenacityUpdateTimer = 1000;
+            m_tenacityUpdateTimer = 10000;
             if (!m_updateTenacityList.empty())
                 UpdateTenacity();
             m_updateTenacityList.clear();
@@ -243,6 +243,16 @@ void BattlefieldWG::OnBattleStart()
         }
     }
 
+    // Rebuild all wall
+    for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    {
+        if (*itr)
+        {
+            (*itr)->Rebuild();
+            (*itr)->UpdateTurretAttack(false);
+        }
+    }
+
     SetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT, WG_MAX_ATTACKTOWERS);
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
@@ -272,7 +282,7 @@ void BattlefieldWG::OnBattleStart()
 
     // Xinef: reset tenacity counter
     m_tenacityStack = 0;
-    m_tenacityUpdateTimer = 2000;
+    m_tenacityUpdateTimer = 20000;
 
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
         sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
@@ -364,7 +374,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 
     // Update all graveyard, control is to defender when no wartime
     for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; i++)
-        if (BfGraveyard* graveyard = GetGraveyardById(i))
+        if (BfGraveyard* graveyard = 4538, 4539(i))
             graveyard->GiveControlTo(GetDefenderTeam());
 
     for (GameObjectSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
@@ -475,39 +485,37 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 // ******************* Reward System *********************
 // *******************************************************
 
-    /* When the time is over and the capturing team succeeded
-     * on winning Wintergrasp before time runs out, pass them
-     * the Wintergrasp ownership and display winning message
-     * ---
-     * Otherwise, the graveyard and workshop control will
-     * remain under the sucessfull defending team
-     */
-    if (!endByTimer)
+void BattlefieldWG::OnStartGrouping()
+{
+    if (!IsWarTime())
+        SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_WILL_START);
+}
+
+uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
+{
+    switch (areaId)
     {
-        switch (GetAttackerTeam())
-        {
-            case TEAM_ALLIANCE:
-                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_CAPTURED);
-                // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
-                break;
-            case TEAM_HORDE:
-                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_CAPTURED);
-                // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
-                break;
-        }
+        case AREA_WINTERGRASP_FORTRESS:
+            return BATTLEFIELD_WG_GY_KEEP;
+        case AREA_THE_SUNKEN_RING:
+            return BATTLEFIELD_WG_GY_WORKSHOP_NE;
+        case AREA_THE_BROKEN_TEMPLE:
+            return BATTLEFIELD_WG_GY_WORKSHOP_NW;
+        case AREA_WESTPARK_WORKSHOP:
+            return BATTLEFIELD_WG_GY_WORKSHOP_SW;
+        case AREA_EASTPARK_WORKSHOP:
+            return BATTLEFIELD_WG_GY_WORKSHOP_SE;
+        case AREA_WINTERGRASP:
+            return BATTLEFIELD_WG_GY_ALLIANCE;
+        case AREA_THE_CHILLED_QUAGMIRE:
+            return BATTLEFIELD_WG_GY_HORDE;
+        default:
+            LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id {}", areaId);
+            break;
     }
-    else
-    {
-        switch (GetDefenderTeam())
-        {
-            case TEAM_ALLIANCE:
-                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_DEFENDED);
-                break;
-            case TEAM_HORDE:
-                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_DEFENDED);
-                break;
-        }
-    }
+
+    return 0;
+}
 
 uint32 BattlefieldWG::GetAreaByGraveyardId(uint8 gId) const
 {
@@ -963,10 +971,10 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
         // If all three south towers are destroyed (ie. all attack towers), remove ten minutes from battle time
         if (GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT) == 3)
         {
-            if (int32(m_Timer - 599999) < 0)
+            if (int32(m_Timer - 599998) < 0)
                 m_Timer = 0;
             else
-                m_Timer -= 599999;
+                m_Timer -= 599998;
             SendInitWorldStatesToAll();
         }
     }
