@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_gameobject_quest
+-- Дамп структуры для таблица acore_world.game_event_gameobject_quest
 DROP TABLE IF EXISTS `game_event_gameobject_quest`;
 CREATE TABLE IF NOT EXISTS `game_event_gameobject_quest` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`quest`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_gameobject_quest: 78 rows
+-- Дамп данных таблицы acore_world.game_event_gameobject_quest: 78 rows
 DELETE FROM `game_event_gameobject_quest`;
 /*!40000 ALTER TABLE `game_event_gameobject_quest` DISABLE KEYS */;
 INSERT INTO `game_event_gameobject_quest` (`eventEntry`, `id`, `quest`) VALUES

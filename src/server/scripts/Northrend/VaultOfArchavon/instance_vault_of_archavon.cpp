@@ -17,6 +17,7 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -78,7 +79,7 @@ public:
                         if (bf->GetTimer() <= (16 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() >= (15 * MINUTE * IN_MILLISECONDS))
                         {
                             Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
                                         player->TextEmote("This instance will reset in 15 minutes.", nullptr, true);
@@ -102,7 +103,7 @@ public:
                         else if (bf->GetTimer() <= (2 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() > (MINUTE * IN_MILLISECONDS))
                         {
                             Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
                                         player->TextEmote("This instance is about to reset. Prepare to be removed.", nullptr, true);
@@ -115,7 +116,7 @@ public:
                                         cr->AI()->EnterEvadeMode();
 
                             Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.isEmpty())
+                            if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
                                         player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
@@ -190,13 +191,13 @@ public:
                 switch (type)
                 {
                     case EVENT_ARCHAVON:
-                        ArchavonDeath = time(nullptr);
+                        ArchavonDeath = GameTime::GetGameTime().count();
                         break;
                     case EVENT_EMALON:
-                        EmalonDeath = time(nullptr);
+                        EmalonDeath = GameTime::GetGameTime().count();
                         break;
                     case EVENT_KORALON:
-                        KoralonDeath = time(nullptr);
+                        KoralonDeath = GameTime::GetGameTime().count();
                         break;
                     default:
                         return;

@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_creature_quest
+-- Дамп структуры для таблица acore_world.game_event_creature_quest
 DROP TABLE IF EXISTS `game_event_creature_quest`;
 CREATE TABLE IF NOT EXISTS `game_event_creature_quest` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event.',
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_creature_quest: 225 rows
+-- Дамп данных таблицы acore_world.game_event_creature_quest: 215 rows
 DELETE FROM `game_event_creature_quest`;
 /*!40000 ALTER TABLE `game_event_creature_quest` DISABLE KEYS */;
 INSERT INTO `game_event_creature_quest` (`eventEntry`, `id`, `quest`) VALUES
@@ -233,16 +233,6 @@ INSERT INTO `game_event_creature_quest` (`eventEntry`, `id`, `quest`) VALUES
 	(10, 33533, 13959),
 	(10, 34365, 13926),
 	(10, 34365, 13927),
-	(51, 34435, 13952),
-	(51, 34476, 14174),
-	(51, 34477, 14175),
-	(51, 34478, 14167),
-	(51, 34479, 14170),
-	(51, 34480, 14176),
-	(51, 34481, 14168),
-	(51, 34482, 14177),
-	(51, 34483, 14171),
-	(51, 34484, 14169),
 	(61, 39654, 25445),
 	(61, 40184, 25444),
 	(61, 40184, 25446),

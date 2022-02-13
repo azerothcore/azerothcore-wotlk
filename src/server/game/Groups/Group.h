@@ -269,8 +269,8 @@ public:
     void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);
     // ignore: GUID of player that will be ignored
-    void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
-    void BroadcastReadyCheck(WorldPacket* packet);
+    void BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
+    void BroadcastReadyCheck(WorldPacket const* packet);
     void OfflineReadyCheck();
 
     /*********************************************************/
@@ -309,13 +309,9 @@ public:
     bool IsLfgHeroic() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_HEROIC); }
 
     // Difficulty Change
-    uint32 GetDifficultyChangePreventionTime() const { return _difficultyChangePreventionTime > time(nullptr) ? _difficultyChangePreventionTime - time(nullptr) : 0; }
+    uint32 GetDifficultyChangePreventionTime() const;
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
-    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
-    {
-        _difficultyChangePreventionTime = time(nullptr) + MINUTE;
-        _difficultyChangePreventionType = type;
-    }
+    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
 
 protected:
     void _homebindIfInstance(Player* player);

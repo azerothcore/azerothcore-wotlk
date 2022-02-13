@@ -593,7 +593,7 @@ public:
                     //Play random sound to the zone
                     Map::PlayerList const& PlayerList = map->GetPlayers();
 
-                    if (!PlayerList.isEmpty())
+                    if (!PlayerList.IsEmpty())
                     {
                         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
                         {

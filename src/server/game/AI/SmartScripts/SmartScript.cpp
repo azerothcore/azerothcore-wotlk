@@ -256,52 +256,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
-        case SMART_ACTION_MUSIC:
-        {
-            ObjectVector targets;
-
-            if (e.action.music.type > 0)
-            {
-                if (me && me->FindMap())
-                {
-                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
-
-                    if (!players.isEmpty())
-                    {
-                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-                            if (Player* player = i->GetSource())
-                            {
-                                if (player->GetZoneId() == me->GetZoneId())
-                                {
-                                    if (e.action.music.type > 1)
-                                    {
-                                        if (player->GetAreaId() == me->GetAreaId())
-                                            targets.push_back(player);
-                                    }
-                                    else
-                                        targets.push_back(player);
-                                }
-                            }
-                    }
-                }
-            }
-            else
-                GetTargets(targets, e);
-
-            if (!targets.empty())
-            {
-                for (WorldObject* target : targets)
-                {
-                    if (IsUnit(target))
-                    {
-                        target->SendPlayMusic(e.action.music.sound, e.action.music.onlySelf > 0);
-                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_MUSIC: target: {} ({}), sound: {}, onlySelf: {}, type: {}",
-                                       target->GetName(), target->GetGUID().ToString(), e.action.music.sound, e.action.music.onlySelf, e.action.music.type);
-                    }
-                }
-            }
-            break;
-        }
         case SMART_ACTION_RANDOM_MUSIC:
         {
             ObjectVector targets;
@@ -835,6 +789,27 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
 
             me->CombatStop(true);
+            break;
+        }
+        case SMART_ACTION_CALL_GROUPEVENTHAPPENS:
+        {
+            if (!unit)
+                break;
+
+            // If invoker was pet or charm
+            Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (player && GetBaseObject())
+            {
+                player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
+                LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_GROUPEVENTHAPPENS: Player {}, group credit for quest {}",
+                             unit->GetGUID().GetCounter(), e.action.quest.quest);
+            }
+
+            // Special handling for vehicles
+            if (Vehicle* vehicle = unit->GetVehicleKit())
+                for (auto & Seat : vehicle->Seats)
+                    if (Player* player = ObjectAccessor::GetPlayer(*unit, Seat.second.Passenger.Guid))
+                        player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
             break;
         }
         case SMART_ACTION_CALL_GROUPEVENTHAPPENS:
@@ -2658,6 +2633,17 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
+        case SMART_ACTION_PLAY_CINEMATIC:
+        {
+            for (WorldObject* target : targets)
+            {
+                if (!IsPlayer(target))
+                    continue;
+
+                target->ToPlayer()->SendCinematicStart(e.action.cinematic.entry);
+            }
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -3403,7 +3389,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 uint32 count = me->GetVictim()->GetAuraCount(e.event.aura.spell);
                 if (count < e.event.aura.count)
                     return;
-                ProcessTimedAction(e, e.event.aura.repeatMin, e.event.aura.repeatMax);
+                ProcessTimedAction(e, e.event.aura.repeatMin, e.event.aura.repeatMax, me->GetVictim());
                 break;
             }
         //no params
