@@ -1711,7 +1711,7 @@ public:
     static bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
     bool HasSpellMod(SpellModifier* mod, Spell* spell);
     template <SpellModOp op, class T>
-    void ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell = nullptr, bool temporaryPet = false) const;
+    void ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell = nullptr) const;
     void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
     void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
     static void ApplyModToSpell(SpellModifier* mod, Spell* spell);
@@ -2951,7 +2951,7 @@ void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
 
 // "the bodies of template functions must be made available in a header file"
 template <SpellModOp op, class T>
-void Player::ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell, bool temporaryPet) const
+void Player::ApplySpellMod(uint32 spellId, T& basevalue, Spell* spell) const
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)

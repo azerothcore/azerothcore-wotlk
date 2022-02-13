@@ -38,6 +38,7 @@ enum PaladinSpells
     SPELL_PALADIN_HOLY_SHOCK_R1                  = 20473,
     SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE           = 25912,
     SPELL_PALADIN_HOLY_SHOCK_R1_HEALING          = 25914,
+    SPELL_PALADIN_ILLUMINATION_ENERGIZE          = 20272,
 
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_DRUID   = 37878,
     SPELL_PALADIN_BLESSING_OF_LOWER_CITY_PALADIN = 37879,
@@ -830,6 +831,51 @@ class spell_pal_holy_shock : public SpellScript
     }
 };
 
+// -20210 - Illumination
+class spell_pal_illumination : public AuraScript
+{
+    PrepareAuraScript(spell_pal_illumination);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_HOLY_SHOCK_R1_HEALING, SPELL_PALADIN_ILLUMINATION_ENERGIZE, SPELL_PALADIN_HOLY_SHOCK_R1 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        // this script is valid only for the Holy Shock procs of illumination
+        if (eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetSpellInfo())
+        {
+            SpellInfo const* originalSpell = nullptr;
+
+            // if proc comes from the Holy Shock heal, need to get mana cost of original spell - else it's the original heal itself
+            if (eventInfo.GetHealInfo()->GetSpellInfo()->SpellFamilyFlags[1] & 0x00010000)
+            {
+                originalSpell = sSpellMgr->GetSpellInfo(sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1, eventInfo.GetHealInfo()->GetSpellInfo()->GetRank()));
+            }
+            else
+            {
+                originalSpell = eventInfo.GetHealInfo()->GetSpellInfo();
+            }
+
+            if (originalSpell && aurEff->GetSpellInfo())
+            {
+                Unit* target = eventInfo.GetActor(); // Paladin is the target of the energize
+
+                uint32 bp = CalculatePct(originalSpell->CalcPowerCost(target, originalSpell->GetSchoolMask()), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+                target->CastCustomSpell(SPELL_PALADIN_ILLUMINATION_ENERGIZE, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pal_illumination::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 53407 - Judgement of Justice
 // 20271 - Judgement of Light
 // 53408 - Judgement of Wisdom
@@ -1083,6 +1129,7 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellAndAuraScriptPair(spell_pal_hand_of_sacrifice, spell_pal_hand_of_sacrifice_aura);
     RegisterSpellScript(spell_pal_hand_of_salvation);
     RegisterSpellScript(spell_pal_holy_shock);
+    RegisterSpellScript(spell_pal_illumination);
     RegisterSpellScriptWithArgs(spell_pal_judgement, "spell_pal_judgement_of_justice", SPELL_PALADIN_JUDGEMENT_OF_JUSTICE);
     RegisterSpellScriptWithArgs(spell_pal_judgement, "spell_pal_judgement_of_light", SPELL_PALADIN_JUDGEMENT_OF_LIGHT);
     RegisterSpellScriptWithArgs(spell_pal_judgement, "spell_pal_judgement_of_wisdom", SPELL_PALADIN_JUDGEMENT_OF_WISDOM);

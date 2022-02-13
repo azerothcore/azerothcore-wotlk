@@ -30,6 +30,7 @@
 
 enum PriestSpells
 {
+    SPELL_PRIEST_BLESSED_RECOVERY_R1                = 27813,
     SPELL_PRIEST_DIVINE_AEGIS                       = 47753,
     SPELL_PRIEST_EMPOWERED_RENEW                    = 63544,
     SPELL_PRIEST_GLYPH_OF_CIRCLE_OF_HEALING         = 55675,
@@ -134,6 +135,41 @@ class spell_pri_shadowfiend_scaling : public AuraScript
         }
 
         OnEffectApply += AuraEffectApplyFn(spell_pri_shadowfiend_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// -27811 - Blessed Recovery
+class spell_pri_blessed_recovery : public AuraScript
+{
+    PrepareAuraScript(spell_pri_blessed_recovery);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PRIEST_BLESSED_RECOVERY_R1 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* dmgInfo = eventInfo.GetDamageInfo();
+        if (!dmgInfo || !dmgInfo->GetDamage())
+            return;
+
+        Unit* target = eventInfo.GetActionTarget();
+        uint32 triggerSpell = sSpellMgr->GetSpellWithRank(SPELL_PRIEST_BLESSED_RECOVERY_R1, aurEff->GetSpellInfo()->GetRank());
+        SpellInfo const* triggerInfo = sSpellMgr->AssertSpellInfo(triggerSpell);
+
+        int32 bp = CalculatePct(static_cast<int32>(dmgInfo->GetDamage()), aurEff->GetAmount());
+
+        ASSERT(triggerInfo->GetMaxTicks() > 0);
+        bp /= triggerInfo->GetMaxTicks();
+
+        target->CastCustomSpell(triggerSpell, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pri_blessed_recovery::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -837,6 +873,7 @@ class spell_pri_mind_control : public AuraScript
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
+    RegisterSpellScript(spell_pri_blessed_recovery);
     RegisterSpellScript(spell_pri_circle_of_healing);
     RegisterSpellScript(spell_pri_divine_aegis);
     RegisterSpellScript(spell_pri_divine_hymn);
