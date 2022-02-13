@@ -44,12 +44,12 @@ Battlefield::Battlefield()
     m_ZoneId = 0;
     m_Map = nullptr;
     m_MapId = 0;
-    m_MaxPlayer = 0;
+    m_MaxPlayer = 200;
     m_MinPlayer = 0;
     m_MinLevel = 0;
     m_BattleTime = 0;
     m_NoWarBattleTime = 0;
-    m_RestartAfterCrash = 0;
+    m_RestartAfterCrash = 900;
     m_TimeForAcceptInvite = 20;
     m_uiKickDontAcceptTimer = 1000;
 
