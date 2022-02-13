@@ -258,7 +258,7 @@ void Battlefield::InvitePlayersInZoneToWar()
     {
         if (*itr)
         {
-            (*itr)->Rebuild(true);
+            (*itr)->Rebuild();
             (*itr)->UpdateTurretAttack(false);
         }
     }
