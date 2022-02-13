@@ -409,7 +409,7 @@ void Battlefield::AskToLeaveQueue(Player* player)
 void Battlefield::PlayerAskToLeave(Player* player)
 {
     // Player leaving Wintergrasp, teleports to Icecrown just north of Wintergrasp.
-    player->TeleportTo(571, 5728.117ff, 2714.346f, 697.733f, 1.6400f);
+    player->TeleportTo(571, 5728.117188ff, 2714.345947f, 697.732971f, 1.6400f);
 }
 
 // Called in WorldSession::HandleBfEntryInviteResponse
