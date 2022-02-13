@@ -475,37 +475,39 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 // ******************* Reward System *********************
 // *******************************************************
 
-void BattlefieldWG::OnStartGrouping()
-{
-    if (!IsWarTime())
-        SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_WILL_START);
-}
-
-uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
-{
-    switch (areaId)
+    /* When the time is over and the capturing team succeeded
+     * on winning Wintergrasp before time runs out, pass them
+     * the Wintergrasp ownership and display winning message
+     * ---
+     * Otherwise, the graveyard and workshop control will
+     * remain under the sucessfull defending team
+     */
+    if (!endByTimer)
     {
-        case AREA_WINTERGRASP_FORTRESS:
-            return BATTLEFIELD_WG_GY_KEEP;
-        case AREA_THE_SUNKEN_RING:
-            return BATTLEFIELD_WG_GY_WORKSHOP_NE;
-        case AREA_THE_BROKEN_TEMPLE:
-            return BATTLEFIELD_WG_GY_WORKSHOP_NW;
-        case AREA_WESTPARK_WORKSHOP:
-            return BATTLEFIELD_WG_GY_WORKSHOP_SW;
-        case AREA_EASTPARK_WORKSHOP:
-            return BATTLEFIELD_WG_GY_WORKSHOP_SE;
-        case AREA_WINTERGRASP:
-            return BATTLEFIELD_WG_GY_ALLIANCE;
-        case AREA_THE_CHILLED_QUAGMIRE:
-            return BATTLEFIELD_WG_GY_HORDE;
-        default:
-            LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id {}", areaId);
-            break;
+        switch (GetAttackerTeam())
+        {
+            case TEAM_ALLIANCE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_CAPTURED);
+                // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
+                break;
+            case TEAM_HORDE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_CAPTURED);
+                // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
+                break;
+        }
     }
-
-    return 0;
-}
+    else
+    {
+        switch (GetDefenderTeam())
+        {
+            case TEAM_ALLIANCE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_DEFENDED);
+                break;
+            case TEAM_HORDE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_DEFENDED);
+                break;
+        }
+    }
 
 uint32 BattlefieldWG::GetAreaByGraveyardId(uint8 gId) const
 {
