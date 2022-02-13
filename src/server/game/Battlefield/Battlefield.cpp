@@ -252,6 +252,17 @@ void Battlefield::InvitePlayersInQueueToWar()
 
 void Battlefield::InvitePlayersInZoneToWar()
 {
+    
+        // Rebuild all wall
+    for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
+    {
+        if (*itr)
+        {
+            (*itr)->Rebuild(true);
+            (*itr)->UpdateTurretAttack(false);
+        }
+    }
+
     for (uint8 team = 0; team < BG_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
