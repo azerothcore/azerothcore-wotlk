@@ -49,7 +49,7 @@ Battlefield::Battlefield()
     m_MinLevel = 0;
     m_BattleTime = 0;
     m_NoWarBattleTime = 0;
-    m_RestartAfterCrash = 0;
+    m_RestartAfterCrash = 1;
     m_TimeForAcceptInvite = 20;
     m_uiKickDontAcceptTimer = 1000;
 
