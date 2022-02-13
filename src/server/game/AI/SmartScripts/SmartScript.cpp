@@ -256,6 +256,52 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
+        case SMART_ACTION_MUSIC:
+        {
+            ObjectVector targets;
+
+            if (e.action.music.type > 0)
+            {
+                if (me && me->FindMap())
+                {
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+
+                    if (!players.isEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                            if (Player* player = i->GetSource())
+                            {
+                                if (player->GetZoneId() == me->GetZoneId())
+                                {
+                                    if (e.action.music.type > 1)
+                                    {
+                                        if (player->GetAreaId() == me->GetAreaId())
+                                            targets.push_back(player);
+                                    }
+                                    else
+                                        targets.push_back(player);
+                                }
+                            }
+                    }
+                }
+            }
+            else
+                GetTargets(targets, e);
+
+            if (!targets.empty())
+            {
+                for (WorldObject* target : targets)
+                {
+                    if (IsUnit(target))
+                    {
+                        target->SendPlayMusic(e.action.music.sound, e.action.music.onlySelf > 0);
+                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_MUSIC: target: {} ({}), sound: {}, onlySelf: {}, type: {}",
+                                       target->GetName(), target->GetGUID().ToString(), e.action.music.sound, e.action.music.onlySelf, e.action.music.type);
+                    }
+                }
+            }
+            break;
+        }
         case SMART_ACTION_RANDOM_MUSIC:
         {
             ObjectVector targets;
