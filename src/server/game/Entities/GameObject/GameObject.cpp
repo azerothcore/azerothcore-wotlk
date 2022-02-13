@@ -741,6 +741,7 @@ void GameObject::Update(uint32 diff)
                             {
                                 m_groupLootTimer -= diff;
                             }
+                            break;
                         }
                     case GAMEOBJECT_TYPE_TRAP:
                     {
