@@ -252,17 +252,6 @@ void Battlefield::InvitePlayersInQueueToWar()
 
 void Battlefield::InvitePlayersInZoneToWar()
 {
-    
-        // Rebuild all wall
-    for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
-    {
-        if (*itr)
-        {
-            (*itr)->Rebuild();
-            (*itr)->UpdateTurretAttack(false);
-        }
-    }
-
     for (uint8 team = 0; team < BG_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
@@ -419,8 +408,8 @@ void Battlefield::AskToLeaveQueue(Player* player)
 // Called in WorldSession::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
-    // Player leaving Wintergrasp, teleports to Icecrown just north of Wintergrasp.
-    player->TeleportTo(571, 5728.117188f, 2714.345947f, 697.732971f, 0.0000f);
+    // Player leaving Wintergrasp, trigger Hearthstone spell.
+    player->CastSpell(player, 8690, true);
 }
 
 // Called in WorldSession::HandleBfEntryInviteResponse
