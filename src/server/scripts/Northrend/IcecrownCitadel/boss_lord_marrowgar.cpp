@@ -505,7 +505,7 @@ public:
 
             if (caster->IsWithinLOS(nx, ny, z))
             {
-                caster->m_orientation = angle;
+                caster->SetOrientation(angle);
                 caster->CastSpell(nx, ny, z, uint32(GetEffectValue()), true);
             }
         }
@@ -602,7 +602,7 @@ public:
                 float ny = y + 2.5f * std::sin((M_PI / 4) + (i * (M_PI / 2)));
                 if (caster->IsWithinLOS(nx, ny, z))
                 {
-                    caster->m_orientation = (M_PI / 4) + (i * (M_PI / 2));
+                    caster->SetOrientation((M_PI / 4) + (i * (M_PI / 2)));
                     caster->CastSpell(nx, ny, z, uint32(GetEffectValue() + i), true);
                 }
             }

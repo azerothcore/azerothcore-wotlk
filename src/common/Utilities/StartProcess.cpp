@@ -77,8 +77,8 @@ namespace Acore
 
         if (!secure)
         {
-            LOG_TRACE(logger, "Starting process \"%s\" with arguments: \"%s\".",
-                executable.c_str(), boost::algorithm::join(argsVector, " ").c_str());
+            LOG_TRACE(logger, "Starting process \"{}\" with arguments: \"{}\".",
+                executable, boost::algorithm::join(argsVector, " "));
         }
 
         // prepare file with only read permission (boost process opens with read_write)
@@ -119,12 +119,12 @@ namespace Acore
 
         auto outInfo = MakeACLogSink([&](std::string const& msg)
         {
-            LOG_INFO(logger, "%s", msg.c_str());
+            LOG_INFO(logger, "{}", msg);
         });
 
         auto outError = MakeACLogSink([&](std::string const& msg)
         {
-            LOG_ERROR(logger, "%s", msg.c_str());
+            LOG_ERROR(logger, "{}", msg);
         });
 
         copy(outStream, outInfo);
@@ -136,8 +136,8 @@ namespace Acore
 
         if (!secure)
         {
-            LOG_TRACE(logger, ">> Process \"%s\" finished with return value %i.",
-                executable.c_str(), result);
+            LOG_TRACE(logger, ">> Process \"{}\" finished with return value {}.",
+                executable, result);
         }
 
         return result;
@@ -171,7 +171,6 @@ namespace Acore
 
         std::atomic<bool> was_terminated;
 
-        // Workaround for missing move support in boost < 1.57
         Optional<std::shared_ptr<std::future<int>>> result;
         Optional<std::reference_wrapper<child>> my_child;
 

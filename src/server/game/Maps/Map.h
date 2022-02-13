@@ -30,6 +30,7 @@
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
+#include "Position.h"
 #include "SharedDefines.h"
 #include "Timer.h"
 #include <bitset>
@@ -605,6 +606,9 @@ public:
     // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
     void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);
+
+    // Do whatever you want to all the players in map [including GameMasters], i.e.: param exec = [&](Player* p) { p->Whatever(); }
+    void DoForAllPlayers(std::function<void(Player*)> exec);
 
     GridMap* GetGrid(float x, float y);
     void EnsureGridCreated(const GridCoord&);

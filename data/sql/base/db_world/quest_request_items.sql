@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.quest_request_items
+-- Дамп структуры для таблица acore_world.quest_request_items
 DROP TABLE IF EXISTS `quest_request_items`;
 CREATE TABLE IF NOT EXISTS `quest_request_items` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `EmoteOnComplete` SMALLINT unsigned NOT NULL DEFAULT 0,
   `EmoteOnIncomplete` SMALLINT unsigned NOT NULL DEFAULT 0,
   `CompletionText` text DEFAULT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `quest_request_items` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.quest_request_items: 7 757 rows
+-- Дамп данных таблицы acore_world.quest_request_items: 7 757 rows
 DELETE FROM `quest_request_items`;
 /*!40000 ALTER TABLE `quest_request_items` DISABLE KEYS */;
 INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES

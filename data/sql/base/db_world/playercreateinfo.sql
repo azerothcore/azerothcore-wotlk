@@ -12,13 +12,13 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.playercreateinfo
+-- Дамп структуры для таблица acore_world.playercreateinfo
 DROP TABLE IF EXISTS `playercreateinfo`;
 CREATE TABLE IF NOT EXISTS `playercreateinfo` (
   `race` TINYINT unsigned NOT NULL DEFAULT 0,
   `class` TINYINT unsigned NOT NULL DEFAULT 0,
   `map` SMALLINT unsigned NOT NULL DEFAULT 0,
-  `zone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `zone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo` (
   PRIMARY KEY (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.playercreateinfo: 62 rows
+-- Дамп данных таблицы acore_world.playercreateinfo: 62 rows
 DELETE FROM `playercreateinfo`;
 /*!40000 ALTER TABLE `playercreateinfo` DISABLE KEYS */;
 INSERT INTO `playercreateinfo` (`race`, `class`, `map`, `zone`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES

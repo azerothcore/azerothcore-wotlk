@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_glyphs
+-- Дамп структуры для таблица acore_characters.character_glyphs
 DROP TABLE IF EXISTS `character_glyphs`;
 CREATE TABLE IF NOT EXISTS `character_glyphs` (
   `guid` INT unsigned NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `character_glyphs` (
   PRIMARY KEY (`guid`,`talentGroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.character_glyphs: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_glyphs: ~0 rows (приблизительно)
 DELETE FROM `character_glyphs`;
 /*!40000 ALTER TABLE `character_glyphs` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_glyphs` ENABLE KEYS */;
