@@ -535,6 +535,8 @@ public:
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
 
+    bool CheckElixirStacking(Unit const* caster) const;
+
 private:
     std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }
     SpellEffectInfo& _GetEffect(SpellEffIndex index) { ASSERT(index < Effects.size()); return Effects[index]; }
