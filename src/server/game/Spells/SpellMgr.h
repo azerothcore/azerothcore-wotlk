@@ -340,7 +340,9 @@ enum SpellGroupSpecialFlags
     SPELL_GROUP_SPECIAL_FLAG_PRIORITY4                  = 0x800,
     SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK           = 0x1000,
     SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_SAME_SPELL   = 0x2000,
-    SPELL_GROUP_SPECIAL_FLAG_MAX                        = 0x4000
+    SPELL_GROUP_SPECIAL_FLAG_MAX                        = 0x4000,
+
+    SPELL_GROUP_SPECIAL_FLAG_FLASK                      = SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE | SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN
 };
 
 enum SpellGroupStackFlags
@@ -356,6 +358,11 @@ enum SpellGroupStackFlags
     // Internal use
     SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST     = 0x100,
     SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST       = 0x200,
+};
+
+enum SpellGroupIDs
+{
+    SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS     = 1
 };
 
 struct SpellStackInfo
@@ -759,8 +766,8 @@ public:
     void LoadSpellInfoStore();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
-    void LoadSpellCustomAttr();
-    void LoadDbcDataCorrections();
+    void LoadSpellInfoCustomAttributes();
+    void LoadSpellInfoCorrections();
     void LoadSpellSpecificAndAuraState();
 
 private:

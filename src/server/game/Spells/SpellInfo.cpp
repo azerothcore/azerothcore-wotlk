@@ -2275,8 +2275,8 @@ float SpellInfo::GetMinRange(bool positive) const
     if (!RangeEntry)
         return 0.0f;
     if (positive)
-        return RangeEntry->minRangeFriend;
-    return RangeEntry->minRangeHostile;
+        return RangeEntry->RangeMin[1];
+    return RangeEntry->RangeMin[0];
 }
 
 float SpellInfo::GetMaxRange(bool positive, Unit* caster, Spell* spell) const
@@ -2285,9 +2285,9 @@ float SpellInfo::GetMaxRange(bool positive, Unit* caster, Spell* spell) const
         return 0.0f;
     float range;
     if (positive)
-        range = RangeEntry->maxRangeFriend;
+        range = RangeEntry->RangeMax[1];
     else
-        range = RangeEntry->maxRangeHostile;
+        range = RangeEntry->RangeMax[0];
     if (caster)
         if (Player* modOwner = caster->GetSpellModOwner())
             modOwner->ApplySpellMod(Id, SPELLMOD_RANGE, range, spell);
@@ -2843,4 +2843,51 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         }
         delete cur;
     }
+}
+
+bool SpellInfo::CheckElixirStacking(Unit const* caster) const
+{
+    if (!caster)
+    {
+        return true;
+    }
+
+    // xinef: check spell group
+    uint32 groupId = sSpellMgr->GetSpellGroup(Id);
+    if (groupId != SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS)
+    {
+        return true;
+    }
+
+    SpellGroupSpecialFlags sFlag = sSpellMgr->GetSpellGroupSpecialFlags(Id);
+    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!Effects[i].IsAura())
+        {
+            continue;
+        }
+
+        Unit::AuraApplicationMap const& Auras = caster->GetAppliedAuras();
+        for (Unit::AuraApplicationMap::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
+        {
+            // xinef: aura is not groupped or in different group
+            uint32 auraGroup = sSpellMgr->GetSpellGroup(itr->first);
+            if (auraGroup != groupId)
+            {
+                continue;
+            }
+
+            // Cannot apply guardian/battle elixir if flask is present
+            if (sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE || sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN)
+            {
+                SpellGroupSpecialFlags sAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(itr->first);
+                if ((sAuraFlag & SPELL_GROUP_SPECIAL_FLAG_FLASK) == SPELL_GROUP_SPECIAL_FLAG_FLASK)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }

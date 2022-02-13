@@ -19,23 +19,21 @@
 #include "Errors.h"
 #include "MySQLConnection.h"
 #include "QueryResult.h"
-#include <cstdlib>
-#include <cstring>
 
 /*! Basic, ad-hoc queries. */
-BasicStatementTask::BasicStatementTask(char const* sql, bool async) :
-m_result(nullptr)
+BasicStatementTask::BasicStatementTask(std::string_view sql, bool async) : m_result(nullptr)
 {
-    m_sql = strdup(sql);
+    m_sql = std::string(sql);
     m_has_result = async; // If the operation is async, then there's a result
+
     if (async)
         m_result = new QueryResultPromise();
 }
 
 BasicStatementTask::~BasicStatementTask()
 {
-    free((void*)m_sql);
-    if (m_has_result && m_result != nullptr)
+    m_sql.clear();
+    if (m_has_result && m_result)
         delete m_result;
 }
 

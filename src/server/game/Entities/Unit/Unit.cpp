@@ -576,7 +576,7 @@ void Unit::UpdateSplinePosition()
         pos.m_positionX = loc.x;
         pos.m_positionY = loc.y;
         pos.m_positionZ = loc.z;
-        pos.m_orientation = loc.orientation;
+        pos.SetOrientation(loc.orientation);
 
         if (TransportBase* transport = GetDirectTransport())
             transport->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
@@ -3004,19 +3004,21 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
     }
 
     SpellSchoolMask schoolMask = spellInfo->GetSchoolMask();
-    // PvP - PvE spell misschances per leveldif > 2
-    int32 lchance = victim->GetTypeId() == TYPEID_PLAYER ? 7 : 11;
     int32 thisLevel = getLevelForTarget(victim);
     if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsTrigger())
         thisLevel = std::max<int32>(thisLevel, spellInfo->SpellLevel);
-    int32 leveldif = int32(victim->getLevelForTarget(this)) - thisLevel;
+    int32 levelDiff = int32(victim->getLevelForTarget(this)) - thisLevel;
+
+    int32 MISS_CHANCE_MULTIPLIER = sWorld->getRate(
+            victim->GetTypeId() == TYPEID_PLAYER
+            ? RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER
+            : RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE
+    );
 
     // Base hit chance from attacker and victim levels
-    int32 modHitChance;
-    if (leveldif < 3)
-        modHitChance = 96 - leveldif;
-    else
-        modHitChance = 94 - (leveldif - 2) * lchance;
+    int32 modHitChance = levelDiff < 3
+            ? 96 - levelDiff
+            : 94 - (levelDiff - 2) * MISS_CHANCE_MULTIPLIER;
 
     // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
     if (Player* modOwner = GetSpellModOwner())
@@ -12324,8 +12326,12 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
     uint32 effect = spellInfo->Effects[index].Effect;
     SpellImmuneList const& effectList = m_spellImmune[IMMUNITY_EFFECT];
     for (SpellImmuneList::const_iterator itr = effectList.begin(); itr != effectList.end(); ++itr)
-        if (itr->type == effect && (itr->spellId != 62692 || spellInfo->Effects[index].MiscValue == POWER_MANA))
+    {
+        if (itr->type == effect && (itr->spellId != 62692 || (spellInfo->Effects[index].MiscValue == POWER_MANA && !CanRestoreMana(spellInfo))))
+        {
             return true;
+        }
+    }
 
     if (uint32 mechanic = spellInfo->Effects[index].Mechanic)
     {
@@ -12339,10 +12345,18 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
     {
         SpellImmuneList const& list = m_spellImmune[IMMUNITY_STATE];
         for (SpellImmuneList::const_iterator itr = list.begin(); itr != list.end(); ++itr)
-            if (itr->type == aura && (itr->spellId != 64848 || spellInfo->Effects[index].MiscValue == POWER_MANA))
+        {
+            if (itr->type == aura && (itr->spellId != 64848 || (spellInfo->Effects[index].MiscValue == POWER_MANA && !CanRestoreMana(spellInfo))))
+            {
                 if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
+                {
                     if (itr->blockType == SPELL_BLOCK_TYPE_ALL || spellInfo->IsPositive()) // xinef: added for pet scaling
+                    {
                         return true;
+                    }
+                }
+            }
+        }
 
         if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
         {
@@ -13181,7 +13195,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             || (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
             || (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
             // check if this is a world trigger cast - GOs are using world triggers to cast their spells, so we need to ignore their immunity flag here, this is a temp workaround, needs removal when go cast is implemented properly
-            || (GetEntry() != WORLD_TRIGGER && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC)))
+            || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC)))
         return false;
 
     // CvC case - can attack each other only when one of them is hostile
@@ -14383,7 +14397,7 @@ float Unit::GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spell
 {
     if (!spellInfo->RangeEntry)
         return 0;
-    if (spellInfo->RangeEntry->maxRangeFriend == spellInfo->RangeEntry->maxRangeHostile)
+    if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
         return spellInfo->GetMaxRange();
     if (target == nullptr)
         return spellInfo->GetMaxRange(true);
@@ -14394,7 +14408,7 @@ float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spell
 {
     if (!spellInfo->RangeEntry)
         return 0;
-    if (spellInfo->RangeEntry->minRangeFriend == spellInfo->RangeEntry->minRangeHostile)
+    if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
         return spellInfo->GetMinRange();
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
@@ -15588,14 +15602,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         StartReactiveTimer(REACTIVE_OVERPOWER);
                     }
                 }
+
                 // Wolverine Bite
-                if (procExtra & PROC_EX_CRITICAL_HIT)
+                if ((procExtra & PROC_HIT_CRITICAL) && IsHunterPet())
                 {
-                    if (GetTypeId() == TYPEID_UNIT && IsPet())
-                    {
-                        ModifyAuraState(AURA_STATE_DEFENSE, true);
-                        StartReactiveTimer( REACTIVE_DEFENSE );
-                    }
+                    AddComboPoints(target, 1);
+                    StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
                 }
             }
         }
@@ -16367,6 +16379,10 @@ void Unit::UpdateReactives(uint32 p_time)
                     break;
                 case REACTIVE_OVERPOWER:
                     if (getClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
+                        ClearComboPoints();
+                    break;
+                case REACTIVE_WOLVERINE_BITE:
+                    if (IsHunterPet())
                         ClearComboPoints();
                     break;
                 default:
@@ -20451,4 +20467,28 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
+}
+
+bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
+{
+    // Aura of Despair exceptions
+    switch (spellInfo->Id)
+    {
+        case 30824: // Shamanistic Rage
+        case 31786: // Spiritual Attunement
+        case 31930: // Judgements of the Wise
+        case 34075: // Aspect of the Viper
+        case 34720: // Thrill of the hunt
+        case 47755: // Rapture
+        case 63337: // Saronite Vapors (regenerate mana)
+        case 63375: // Improved stormstrike
+        case 64372: // Lifebloom
+            return true;
+        case 54428: // Divine Plea - only with talent Guarded by the Light
+            return HasSpell(53583);
+        default:
+            break;
+    }
+
+    return false;
 }
