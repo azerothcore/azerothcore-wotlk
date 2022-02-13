@@ -22,6 +22,7 @@
  */
 
 #include "Battleground.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -1092,7 +1093,7 @@ class spell_item_draenic_pale_ale : public SpellScript
         for (uint8 count = 0; count < GetEffectValue(); ++count)
         {
             Position pos = *GetCaster();
-            GetCaster()->GetClosePoint(pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation, radius, M_PI - 1.2f + 0.3f * urand(0, 8));
+            GetCaster()->GetClosePoint(pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.GetOrientation(), radius, M_PI - 1.2f + 0.3f * urand(0, 8));
             Creature* summon = GetCaster()->SummonCreature(GetSpellInfo()->Effects[effIndex].MiscValue, pos, TEMPSUMMON_TIMED_DESPAWN, GetSpellInfo()->GetDuration());
             if (!summon)
                 continue;
@@ -2716,11 +2717,13 @@ class spell_item_crystal_prison_dummy_dnd : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         if (Creature* target = GetHitCreature())
+        {
             if (target->isDead() && !target->IsPet())
             {
-                GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime() - time(nullptr)));
+                GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime() - GameTime::GetGameTime().count()));
                 target->DespawnOrUnsummon();
             }
+        }
     }
 
     void Register() override

@@ -972,7 +972,7 @@ private:
     GlobalCooldownList m_GlobalCooldowns;
 };
 
-enum ActiveStates
+enum ActiveStates : uint8
 {
     ACT_PASSIVE  = 0x01,                                    // 0x01 - passive
     ACT_DISABLED = 0x81,                                    // 0x80 - castable
@@ -1163,12 +1163,14 @@ struct AttackPosition {
 
 enum ReactiveType
 {
-    REACTIVE_DEFENSE      = 0,
-    REACTIVE_HUNTER_PARRY = 1,
-    REACTIVE_OVERPOWER    = 2
+    REACTIVE_DEFENSE        = 0,
+    REACTIVE_HUNTER_PARRY   = 1,
+    REACTIVE_OVERPOWER      = 2,
+    REACTIVE_WOLVERINE_BITE = 3,
+
+    MAX_REACTIVE
 };
 
-#define MAX_REACTIVE 3
 #define SUMMON_SLOT_PET     0
 #define SUMMON_SLOT_TOTEM   1
 #define MAX_TOTEM_SLOT      5
@@ -1219,12 +1221,9 @@ public:
         _posOwner.Relocate(c._posOwner);
         _posTarget.Relocate(c._posTarget);
     }
-    /* requried as of C++ 11 */
-#if __cplusplus >= 201103L
     MMapTargetData(MMapTargetData&&) = default;
     MMapTargetData& operator=(const MMapTargetData&) = default;
     MMapTargetData& operator=(MMapTargetData&&) = default;
-#endif
     [[nodiscard]] bool PosChanged(const Position& o, const Position& t) const
     {
         return _posOwner.GetExactDistSq(&o) > 0.5f * 0.5f || _posTarget.GetExactDistSq(&t) > 0.5f * 0.5f;
@@ -1492,8 +1491,8 @@ public:
     static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr);
     static int32 DealHeal(Unit* healer, Unit* victim, uint32 addhealth);
 
-    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr);
-    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr);
+    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr, uint32 procPhase = 2 /*PROC_SPELL_PHASE_HIT*/);
+    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr, uint32 procPhase = 2 /*PROC_SPELL_PHASE_HIT*/);
 
     void GetProcAurasTriggeredOnEvent(std::list<AuraApplication*>& aurasTriggeringProc, std::list<AuraApplication*>* procAuras, ProcEventInfo eventInfo);
     void TriggerAurasProcOnEvent(CalcDamageInfo& damageInfo);
@@ -2378,6 +2377,8 @@ public:
     void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
     virtual void ProcessTerrainStatusUpdate();
 
+    [[nodiscard]] bool CanRestoreMana(SpellInfo const* spellInfo) const;
+
 protected:
     explicit Unit (bool isWorldObject);
 
@@ -2464,7 +2465,7 @@ private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
     bool HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
     bool HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, bool* handled);
-    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
+    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, uint32 procPhase);
     bool HandleOverrideClassScriptAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 cooldown);
     bool HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura);
     bool HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura);
@@ -2480,7 +2481,7 @@ protected:
     void SetFeared(bool apply);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
-    void SetRooted(bool apply);
+    void SetRooted(bool apply, bool isStun = false);
 
     uint32 m_rootTimes;
 

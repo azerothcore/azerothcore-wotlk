@@ -18,6 +18,7 @@
 #include "LFGQueue.h"
 #include "Containers.h"
 #include "DBCStores.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
@@ -29,22 +30,26 @@
 
 namespace lfg
 {
+    LfgQueueData::LfgQueueData() :
+        joinTime(time_t(GameTime::GetGameTime().count())), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED),
+        healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED) { }
+
     void LFGQueue::AddToQueue(ObjectGuid guid, bool failedProposal)
     {
-        LOG_DEBUG("lfg", "ADD AddToQueue: %s, failed proposal: %u", guid.ToString().c_str(), failedProposal ? 1 : 0);
+        LOG_DEBUG("lfg", "ADD AddToQueue: {}, failed proposal: {}", guid.ToString(), failedProposal ? 1 : 0);
         LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
         if (itQueue == QueueDataStore.end())
         {
-            LOG_ERROR("lfg", "LFGQueue::AddToQueue: Queue data not found for [%s]", guid.ToString().c_str());
+            LOG_ERROR("lfg", "LFGQueue::AddToQueue: Queue data not found for [{}]", guid.ToString());
             return;
         }
-        LOG_DEBUG("lfg", "AddToQueue success: %s", guid.ToString().c_str());
+        LOG_DEBUG("lfg", "AddToQueue success: {}", guid.ToString());
         AddToNewQueue(guid, failedProposal);
     }
 
     void LFGQueue::RemoveFromQueue(ObjectGuid guid, bool partial)
     {
-        LOG_DEBUG("lfg", "REMOVE RemoveFromQueue: %s, partial: %u", guid.ToString().c_str(), partial ? 1 : 0);
+        LOG_DEBUG("lfg", "REMOVE RemoveFromQueue: {}, partial: {}", guid.ToString(), partial ? 1 : 0);
         RemoveFromNewQueue(guid);
         RemoveFromCompatibles(guid);
 
@@ -55,13 +60,13 @@ namespace lfg
             {
                 if (itr->second.bestCompatible.hasGuid(guid))
                 {
-                    LOG_DEBUG("lfg", "CLEAR bestCompatible: %s, because of: %s", itr->second.bestCompatible.toString().c_str(), guid.ToString().c_str());
+                    LOG_DEBUG("lfg", "CLEAR bestCompatible: {}, because of: {}", itr->second.bestCompatible.toString(), guid.ToString());
                     itr->second.bestCompatible.clear();
                 }
             }
             else
             {
-                LOG_DEBUG("lfg", "CLEAR bestCompatible SELF: %s, because of: %s", itr->second.bestCompatible.toString().c_str(), guid.ToString().c_str());
+                LOG_DEBUG("lfg", "CLEAR bestCompatible SELF: {}, because of: {}", itr->second.bestCompatible.toString(), guid.ToString());
                 //itr->second.bestCompatible.clear(); // don't clear here, because UpdateQueueTimers will try to find with every diff update
                 itDelete = itr;
             }
@@ -70,10 +75,10 @@ namespace lfg
         // xinef: partial
         if (!partial && itDelete != QueueDataStore.end())
         {
-            LOG_DEBUG("lfg", "ERASE QueueDataStore for: %s", guid.ToString().c_str());
-            LOG_DEBUG("lfg", "ERASE QueueDataStore for: %s, itDelete: %u,%u,%u", guid.ToString().c_str(), itDelete->second.dps, itDelete->second.healers, itDelete->second.tanks);
+            LOG_DEBUG("lfg", "ERASE QueueDataStore for: {}", guid.ToString());
+            LOG_DEBUG("lfg", "ERASE QueueDataStore for: {}, itDelete: {},{},{}", guid.ToString(), itDelete->second.dps, itDelete->second.healers, itDelete->second.tanks);
             QueueDataStore.erase(itDelete);
-            LOG_DEBUG("lfg", "ERASE QueueDataStore for: %s SUCCESS", guid.ToString().c_str());
+            LOG_DEBUG("lfg", "ERASE QueueDataStore for: {} SUCCESS", guid.ToString());
         }
     }
 
@@ -81,34 +86,34 @@ namespace lfg
     {
         if (front)
         {
-            LOG_DEBUG("lfg", "ADD AddToNewQueue at FRONT: %s", guid.ToString().c_str());
+            LOG_DEBUG("lfg", "ADD AddToNewQueue at FRONT: {}", guid.ToString());
             restoredAfterProposal.push_back(guid);
             newToQueueStore.push_front(guid);
         }
         else
         {
-            LOG_DEBUG("lfg", "ADD AddToNewQueue at the END: %s", guid.ToString().c_str());
+            LOG_DEBUG("lfg", "ADD AddToNewQueue at the END: {}", guid.ToString());
             newToQueueStore.push_back(guid);
         }
     }
 
     void LFGQueue::RemoveFromNewQueue(ObjectGuid guid)
     {
-        LOG_DEBUG("lfg", "REMOVE RemoveFromNewQueue: %s", guid.ToString().c_str());
+        LOG_DEBUG("lfg", "REMOVE RemoveFromNewQueue: {}", guid.ToString());
         newToQueueStore.remove(guid);
         restoredAfterProposal.remove(guid);
     }
 
     void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
     {
-        LOG_DEBUG("lfg", "JOINED AddQueueData: %s", guid.ToString().c_str());
+        LOG_DEBUG("lfg", "JOINED AddQueueData: {}", guid.ToString());
         QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap);
         AddToQueue(guid);
     }
 
     void LFGQueue::RemoveQueueData(ObjectGuid guid)
     {
-        LOG_DEBUG("lfg", "LEFT RemoveQueueData: %s", guid.ToString().c_str());
+        LOG_DEBUG("lfg", "LEFT RemoveQueueData: {}", guid.ToString());
         LfgQueueDataContainer::iterator it = QueueDataStore.find(guid);
         if (it != QueueDataStore.end())
             QueueDataStore.erase(it);
@@ -144,11 +149,11 @@ namespace lfg
 
     void LFGQueue::RemoveFromCompatibles(ObjectGuid guid)
     {
-        LOG_DEBUG("lfg", "COMPATIBLES REMOVE for: %s", guid.ToString().c_str());
+        LOG_DEBUG("lfg", "COMPATIBLES REMOVE for: {}", guid.ToString());
         for (LfgCompatibleContainer::iterator it = CompatibleList.begin(); it != CompatibleList.end(); ++it)
             if (it->hasGuid(guid))
             {
-                LOG_DEBUG("lfg", "Removed Compatible: %s, because of: %s", it->toString().c_str(), guid.ToString().c_str());
+                LOG_DEBUG("lfg", "Removed Compatible: {}, because of: {}", it->toString(), guid.ToString());
                 it->clear(); // set to 0, this will be removed while iterating in FindNewGroups
             }
         for (LfgCompatibleContainer::iterator itr = CompatibleTempList.begin(); itr != CompatibleTempList.end(); )
@@ -156,7 +161,7 @@ namespace lfg
             LfgCompatibleContainer::iterator it = itr++;
             if (it->hasGuid(guid))
             {
-                LOG_DEBUG("lfg", "Erased Temp Compatible: %s, because of: %s", it->toString().c_str(), guid.ToString().c_str());
+                LOG_DEBUG("lfg", "Erased Temp Compatible: {}, because of: {}", it->toString(), guid.ToString());
                 CompatibleTempList.erase(it);
             }
         }
@@ -164,7 +169,7 @@ namespace lfg
 
     void LFGQueue::AddToCompatibles(Lfg5Guids const& key)
     {
-        LOG_DEBUG("lfg", "COMPATIBLES ADD: %s", key.toString().c_str());
+        LOG_DEBUG("lfg", "COMPATIBLES ADD: {}", key.toString());
         CompatibleTempList.push_back(key);
     }
 
@@ -177,7 +182,7 @@ namespace lfg
             ++newGroupsProcessed;
             ObjectGuid newGuid = newToQueueStore.front();
             bool pushCompatiblesToFront = (std::find(restoredAfterProposal.begin(), restoredAfterProposal.end(), newGuid) != restoredAfterProposal.end());
-            LOG_DEBUG("lfg", "newToQueueStore: %s, front: %u", newGuid.ToString().c_str(), pushCompatiblesToFront ? 1 : 0);
+            LOG_DEBUG("lfg", "newToQueueStore: {}, front: {}", newGuid.ToString(), pushCompatiblesToFront ? 1 : 0);
             RemoveFromNewQueue(newGuid);
 
             FindNewGroups(newGuid);
@@ -197,7 +202,7 @@ namespace lfg
         uint64 foundMask = 0;
         uint32 foundCount = 0;
 
-        LOG_DEBUG("lfg", "FIND NEW GROUPS for: %s", newGuid.ToString().c_str());
+        LOG_DEBUG("lfg", "FIND NEW GROUPS for: {}", newGuid.ToString());
 
         // we have to take into account that FindNewGroups is called every X minutes if number of compatibles is low!
         // build set of already present compatibles for this guid
@@ -241,7 +246,7 @@ namespace lfg
 
     LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles)
     {
-        LOG_DEBUG("lfg", "CHECK CheckCompatibility: %s, new guid: %s", checkWith.toString().c_str(), newGuid.ToString().c_str());
+        LOG_DEBUG("lfg", "CHECK CheckCompatibility: {}, new guid: {}", checkWith.toString(), newGuid.ToString());
         Lfg5Guids check(checkWith, false); // here newGuid is at front
         Lfg5Guids strGuids(checkWith, false); // here guids are sorted
         check.force_insert_front(newGuid);
@@ -266,7 +271,7 @@ namespace lfg
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
             if (itQueue == QueueDataStore.end())
             {
-                LOG_ERROR("lfg", "LFGQueue::CheckCompatibility: [%s] is not queued but listed as queued!", guid.ToString().c_str());
+                LOG_ERROR("lfg", "LFGQueue::CheckCompatibility: [{}] is not queued but listed as queued!", guid.ToString());
                 RemoveFromQueue(guid);
                 return LFG_COMPATIBILITY_PENDING;
             }
@@ -320,7 +325,7 @@ namespace lfg
                         if (itRoles->first == itPlayer->first)
                         {
                             // pussywizard: LFG this means that this player was in two different LfgQueueData (in QueueDataStore), and at least one of them is a group guid, because we do checks so there aren't 2 same guids in current CHECK
-                            //LOG_ERROR("lfg", "LFGQueue::CheckCompatibility: ERROR! Player multiple times in queue! [%s]", itRoles->first.ToString().c_str());
+                            //LOG_ERROR("lfg", "LFGQueue::CheckCompatibility: ERROR! Player multiple times in queue! [{}]", itRoles->first.ToString());
                             break;
                         }
                         else if (sLFGMgr->HasIgnore(itRoles->first, itPlayer->first))
@@ -402,13 +407,13 @@ namespace lfg
         }
 
         proposal.queues = strGuids;
-        proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(proposal.group) != LFG_STATE_DUNGEON;
+        proposal.isNew = numLfgGroups != 1;
 
         if (!sLFGMgr->AllQueued(check)) // can't create proposal
             return LFG_COMPATIBILITY_PENDING;
 
         // Create a new proposal
-        proposal.cancelTime = time(nullptr) + LFG_TIME_PROPOSAL;
+        proposal.cancelTime = GameTime::GetGameTime().count() + LFG_TIME_PROPOSAL;
         proposal.state = LFG_PROPOSAL_INITIATING;
         proposal.leader.Clear();
         proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(proposalDungeons);
@@ -464,7 +469,7 @@ namespace lfg
 
     void LFGQueue::UpdateQueueTimers(uint32 diff)
     {
-        time_t currTime = time(nullptr);
+        time_t currTime = GameTime::GetGameTime().count();
         bool sendQueueStatus = false;
 
         if (m_QueueStatusTimer > LFG_QUEUEUPDATE_INTERVAL)
@@ -581,7 +586,7 @@ namespace lfg
 
     void LFGQueue::UpdateBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue, Lfg5Guids const& key)
     {
-        LOG_DEBUG("lfg", "UpdateBestCompatibleInQueue: %s", key.toString().c_str());
+        LOG_DEBUG("lfg", "UpdateBestCompatibleInQueue: {}", key.toString());
         LfgQueueData& queueData = itrQueue->second;
 
         uint8 storedSize = queueData.bestCompatible.size();
