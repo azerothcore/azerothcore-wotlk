@@ -62,6 +62,7 @@ struct AC_GAME_API BattlegroundScore
 
 protected:
     BattlegroundScore(ObjectGuid playerGuid) : PlayerGuid(playerGuid) { }
+    virtual ~BattlegroundScore() = default;
 
     virtual void UpdateScore(uint32 type, uint32 value)
     {
