@@ -185,9 +185,9 @@ public:
     [[nodiscard]] Creature const* ToCreature() const { if (GetTypeId() == TYPEID_UNIT) return (Creature const*)((Creature*)this); else return nullptr; }
 
     Unit* ToUnit() { if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Unit*>(this); else return nullptr; }
-    [[nodiscard]] Unit const* ToUnit() const { if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER) return (const Unit*)((Unit*)this); else return nullptr; }
+    [[nodiscard]] Unit const* ToUnit() const { if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER) return (Unit const*)((Unit*)this); else return nullptr; }
     GameObject* ToGameObject() { if (GetTypeId() == TYPEID_GAMEOBJECT) return reinterpret_cast<GameObject*>(this); else return nullptr; }
-    [[nodiscard]] GameObject const* ToGameObject() const { if (GetTypeId() == TYPEID_GAMEOBJECT) return (const GameObject*)((GameObject*)this); else return nullptr; }
+    [[nodiscard]] GameObject const* ToGameObject() const { if (GetTypeId() == TYPEID_GAMEOBJECT) return (GameObject const*)((GameObject*)this); else return nullptr; }
 
     Corpse* ToCorpse() { if (GetTypeId() == TYPEID_CORPSE) return reinterpret_cast<Corpse*>(this); else return nullptr; }
     [[nodiscard]] Corpse const* ToCorpse() const { if (GetTypeId() == TYPEID_CORPSE) return (const Corpse*)((Corpse*)this); else return nullptr; }
@@ -392,7 +392,7 @@ public:
     void GetNearPoint2D(float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
     void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0, Position const* startPos = nullptr) const;
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
-    bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = nullptr, bool force = false) const;
+    bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, WorldObject const* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
     Position GetNearPosition(float dist, float angle);
     void MovePositionToFirstCollision(Position& pos, float dist, float angle);
@@ -401,8 +401,8 @@ public:
     Position GetFirstCollisionPosition(float dist, float angle);
     Position GetRandomNearPosition(float radius);
 
-    void GetContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
-    void GetChargeContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
+    void GetContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
+    void GetChargeContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
 
     [[nodiscard]] float GetObjectSize() const;
 
@@ -433,15 +433,15 @@ public:
 
     [[nodiscard]] virtual std::string const& GetNameForLocaleIdx(LocaleConstant /*locale_idx*/) const { return m_name; }
 
-    float GetDistance(const WorldObject* obj) const;
+    float GetDistance(WorldObject const* obj) const;
     [[nodiscard]] float GetDistance(const Position& pos) const;
     [[nodiscard]] float GetDistance(float x, float y, float z) const;
-    float GetDistance2d(const WorldObject* obj) const;
+    float GetDistance2d(WorldObject const* obj) const;
     [[nodiscard]] float GetDistance2d(float x, float y) const;
-    float GetDistanceZ(const WorldObject* obj) const;
+    float GetDistanceZ(WorldObject const* obj) const;
 
-    bool IsSelfOrInSameMap(const WorldObject* obj) const;
-    bool IsInMap(const WorldObject* obj) const;
+    bool IsSelfOrInSameMap(WorldObject const* obj) const;
+    bool IsInMap(WorldObject const* obj) const;
     [[nodiscard]] bool IsWithinDist3d(float x, float y, float z, float dist) const;
     bool IsWithinDist3d(const Position* pos, float dist) const;
     [[nodiscard]] bool IsWithinDist2d(float x, float y, float dist) const;
@@ -460,7 +460,7 @@ public:
     bool isInFront(WorldObject const* target, float arc = M_PI) const;
     bool isInBack(WorldObject const* target, float arc = M_PI) const;
 
-    bool IsInBetween(const WorldObject* obj1, const WorldObject* obj2, float size = 0) const;
+    bool IsInBetween(WorldObject const* obj1, WorldObject const* obj2, float size = 0) const;
 
     virtual void CleanupsBeforeDelete(bool finalCleanup = true);  // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
@@ -481,7 +481,7 @@ public:
 
     [[nodiscard]] float GetGridActivationRange() const;
     [[nodiscard]] float GetVisibilityRange() const;
-    virtual float GetSightRange(const WorldObject* target = nullptr) const;
+    virtual float GetSightRange(WorldObject const* target = nullptr) const;
     //bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false) const;
     bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false, bool checkAlert = false) const;
 
@@ -663,13 +663,13 @@ namespace Acore
     class ObjectDistanceOrderPred
     {
     public:
-        ObjectDistanceOrderPred(const WorldObject* pRefObj, bool ascending = true) : m_refObj(pRefObj), m_ascending(ascending) {}
-        bool operator()(const WorldObject* pLeft, const WorldObject* pRight) const
+        ObjectDistanceOrderPred(WorldObject const* pRefObj, bool ascending = true) : m_refObj(pRefObj), m_ascending(ascending) {}
+        bool operator()(WorldObject const* pLeft, WorldObject const* pRight) const
         {
             return m_ascending ? m_refObj->GetDistanceOrder(pLeft, pRight) : !m_refObj->GetDistanceOrder(pLeft, pRight);
         }
     private:
-        const WorldObject* m_refObj;
+        WorldObject const* m_refObj;
         const bool m_ascending;
     };
 }

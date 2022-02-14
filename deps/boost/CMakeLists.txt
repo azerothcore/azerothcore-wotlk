@@ -27,7 +27,7 @@ include (CheckCXXSourceCompiles)
 
 if (WIN32)
   # On windows the requirements are higher according to the wiki.
-  set(BOOST_REQUIRED_VERSION 1.70)
+  set(BOOST_REQUIRED_VERSION 1.74)
 else()
   set(BOOST_REQUIRED_VERSION 1.67)
 endif()

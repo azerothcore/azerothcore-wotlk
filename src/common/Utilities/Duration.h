@@ -35,7 +35,22 @@ using Minutes = std::chrono::minutes;
 /// Hours shorthand typedef.
 using Hours = std::chrono::hours;
 
-#if __cplusplus > 201703L
+// Workaround for GCC and Clang 10 in C++20
+#if defined(__GNUC__) && (!defined(__clang__) || (__clang_major__ == 10))
+/// Days shorthand typedef.
+using Days = std::chrono::duration<__INT64_TYPE__, std::ratio<86400>>;
+
+/// Weeks shorthand typedef.
+using Weeks = std::chrono::duration<__INT64_TYPE__, std::ratio<604800>>;
+
+/// Years shorthand typedef.
+using Years = std::chrono::duration<__INT64_TYPE__, std::ratio<31556952>>;
+
+/// Months shorthand typedef.
+using Months = std::chrono::duration<__INT64_TYPE__, std::ratio<2629746>>;
+
+#else
+
 /// Days shorthand typedef.
 using Days = std::chrono::days;
 
@@ -47,19 +62,8 @@ using Years = std::chrono::years;
 
 /// Months shorthand typedef.
 using Months = std::chrono::months;
-#else
-/// Days shorthand typedef. (delete after start support c++20)
-using Days = std::chrono::duration<int, std::ratio_multiply<std::ratio<24>, Hours::period>>;
 
-/// Weeks shorthand typedef. (delete after start support c++20)
-using Weeks = std::chrono::duration<int, std::ratio_multiply<std::ratio<7>, Days::period>>;
-
-/// Years shorthand typedef. (delete after start support c++20)
-using Years = std::chrono::duration<int, std::ratio_multiply<std::ratio<146097, 400>, Days::period>>;
-
-/// Months shorthand typedef. (delete after start support c++20)
-using Months = std::chrono::duration<int, std::ratio_divide<Years::period, std::ratio<12>>>;
-#endif
+#endif // GCC_VERSION
 
 /// time_point shorthand typedefs
 using TimePoint = std::chrono::steady_clock::time_point;
