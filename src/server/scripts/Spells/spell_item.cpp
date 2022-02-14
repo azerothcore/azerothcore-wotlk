@@ -3391,7 +3391,9 @@ class spell_item_goblin_bomb : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
+        {
             caster->CastSpell(caster, roll_chance_i(95) ? SPELL_SUMMON_GOBLIN_BOMB : SPELL_MALFUNCTION_EXPLOSION, true, GetCastItem());
+        }
     }
 
     void Register() override
