@@ -68,10 +68,12 @@ enum ApothecaryMisc
     QUEST_YOUVE_BEEN_SERVED = 14488,
     NPC_APOTHECARY_FRYE     = 36272,
     NPC_APOTHECARY_BAXTER   = 36565,
+    NPC_CRAZED_APOTHECARY   = 36568,
     NPC_VIAL_BUNNY          = 36530,
     NPC_CROWN_APOTHECARY    = 36885,
     PHASE_ALL               = 0,
-    PHASE_INTRO             = 1
+    PHASE_INTRO             = 1,
+    PHASE_COMBAT            = 2
 };
 
 Position const BaxterMovePos = { -221.4115f, 2206.825f, 79.93151f, 0.0f };
@@ -116,14 +118,19 @@ public:
         void EnterEvadeMode() override
         {
             summons.DespawnAll();
+            std::list<Creature*> valentineAdds;
+            me->GetCreatureListWithEntryInGrid(valentineAdds, NPC_CRAZED_APOTHECARY, 200.f);
+            for (Creature* crea : valentineAdds)
+            {
+                crea->DespawnOrUnsummon();
+            }
             _EnterEvadeMode();
         }
 
         void DoAction(int32 action) override
         {
-            if (action == ACTION_START_EVENT && events.IsInPhase(PHASE_ALL))
+            if (action == ACTION_START_EVENT && _phase == PHASE_ALL)
             {
-                events.SetPhase(PHASE_INTRO);
                 _phase = PHASE_INTRO;
                 _scheduler.Schedule(1ms, [this](TaskContext /*context*/)
                 {
@@ -140,6 +147,7 @@ public:
                 .Schedule(12s, [this](TaskContext context)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    _phase = PHASE_COMBAT;
                     DoZoneInCombat();
 
                     context.Schedule(6s, [this](TaskContext /*context*/) // Call Baxter
