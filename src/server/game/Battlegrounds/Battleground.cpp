@@ -814,7 +814,6 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
     WorldPacket pvpLogData;
     BuildPvPLogDataPacket(pvpLogData);
 
-    uint8 aliveWinners = GetAlivePlayersCountByTeam(GetTeamId(winnerTeamId));
     for (auto const& [playerGuid, player] : m_Players)
     {
         TeamId bgTeamId = player->GetBgTeamId();
