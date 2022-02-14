@@ -692,8 +692,6 @@ private:
 
     // Arena team ids by team
     uint32 m_ArenaTeamIds[PVP_TEAMS_COUNT];
-
-    int32 m_ArenaTeamRatingChanges[PVP_TEAMS_COUNT];
     uint32 m_ArenaTeamMMR[PVP_TEAMS_COUNT];
 
     // Limits
