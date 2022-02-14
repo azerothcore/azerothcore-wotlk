@@ -50,7 +50,6 @@ ALTER TABLE `spell_proc`
   (-31641, 'spell_mage_blazing_speed'),                   -- Mage Blazing Speed
   (-20210, 'spell_pal_illumination'),                     -- Paladin Illumination (for Holy Shock)
   (-27811, 'spell_pri_blessed_recovery'),                 -- Priest Blessed Recovery
-  (70805, 'spell_rog_t10_2p_bonus'),                      -- Rogue T10 2P bonus
   (-30881, 'spell_sha_nature_guardian'),                  -- Shaman Nature's Guardian
   (-324, 'spell_sha_lightning_shield'),                   -- Shaman Lightning Shield
   (-30299, 'spell_warl_nether_protection');               -- Warlock Nether protection
