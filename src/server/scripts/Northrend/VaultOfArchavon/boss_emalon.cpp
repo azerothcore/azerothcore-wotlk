@@ -125,7 +125,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_NEXT_MINION, 4000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             // restore minions health
             if (spellInfo->Id == SPELL_OVERCHARGE)

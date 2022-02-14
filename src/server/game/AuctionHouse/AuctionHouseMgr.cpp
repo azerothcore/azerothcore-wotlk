@@ -848,13 +848,13 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 
                     if (propRefID < 0)
                     {
-                        const ItemRandomSuffixEntry* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
+                        ItemRandomSuffixEntry const* itemRandEntry = sItemRandomSuffixStore.LookupEntry(-item->GetItemRandomPropertyId());
                         if (itemRandEntry)
                             suffix = &itemRandEntry->Name;
                     }
                     else
                     {
-                        const ItemRandomPropertiesEntry* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
+                        ItemRandomPropertiesEntry const* itemRandEntry = sItemRandomPropertiesStore.LookupEntry(item->GetItemRandomPropertyId());
                         if (itemRandEntry)
                             suffix = &itemRandEntry->Name;
                     }
