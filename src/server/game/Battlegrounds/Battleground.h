@@ -436,7 +436,7 @@ public:
 
     void UpdateWorldState(uint32 variable, uint32 value);
 
-    virtual void EndBattleground(PvPTeamId winnerTeamId);
+    void EndBattleground(PvPTeamId winnerTeamId);
 
     // deprecated, need delete
     virtual void EndBattleground(TeamId winnerTeamId)
