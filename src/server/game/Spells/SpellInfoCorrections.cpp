@@ -4064,6 +4064,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
     });
 
+    // Nefarius Corruption
     ApplySpellFix({ 23642 }, [](SpellInfo* spellInfo)
         {
             spellInfo->MaxAffectedTargets = 1;
