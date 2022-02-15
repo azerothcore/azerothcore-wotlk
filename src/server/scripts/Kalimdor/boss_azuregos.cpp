@@ -141,6 +141,8 @@ public:
                         p->RemoveAurasDueToSpell(SPELL_FROST_BREATH);
                     }
                 });
+
+            me->SetRespawnTime(urand(2 * DAY, 3 * DAY));
         }
 
         void UpdateAI(uint32 diff) override

@@ -60,7 +60,7 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
 
     Player* GetOwner() const { return ObjectAccessor::GetPlayer(*me, ownerGUID); }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_STEAL_ESSENCE_VISUAL && target == me)
         {
@@ -740,7 +740,7 @@ struct npc_pet_gen_fetch_ball : public NullCreatureAI
         me->CastSpell(me, 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/, true);
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/)
         {

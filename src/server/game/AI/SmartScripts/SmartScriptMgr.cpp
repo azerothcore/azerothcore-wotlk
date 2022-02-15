@@ -477,9 +477,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             LOG_ERROR("sql.sql", "SmartAIMgr: EntryOrGuid {} using event({}) has an action type that is not supported on 3.3.5a ({}), skipped.",
                              e.entryOrGuid, e.event_id, e.GetActionType());
             return false;
-        case SMART_ACTION_SET_CORPSE_DELAY:
-        case SMART_ACTION_DISABLE_EVADE:
-        case SMART_ACTION_GO_SET_GO_STATE:
         case SMART_ACTION_SET_CAN_FLY:
         case SMART_ACTION_REMOVE_AURAS_BY_TYPE:
         case SMART_ACTION_REMOVE_MOVEMENT:
