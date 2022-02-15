@@ -5943,7 +5943,11 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             return;
                         // Brood Affliction: Bronze
                         case 23170:
-                            triggerSpellId = 23171;
+                            // Only 10% chance of triggering spell
+                            if (roll_chance_f(10.f))
+                            {
+                                triggerSpellId = 23171;
+                            }
                             break;
                         // Restoration
                         case 24379:
