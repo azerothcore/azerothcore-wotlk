@@ -561,7 +561,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
         uint32 value = ((uint32*)&e.event.raw)[index];
         if (value != 0)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has unused event_param{} with value {}, it must be 0, skipped.",
+            LOG_ERROR("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} has unused event_param{} with value {}, it must be 0, skipped.",
                          e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
             valid = false;
         }
@@ -737,7 +737,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
         uint32 value = ((uint32*)&e.action.raw)[index];
         if (value != 0)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused action_param%zu with value %u, it must be 0, skipped.",
+            LOG_ERROR("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} has unused event_param{} with value {}, it must be 0, skipped.",
                          e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
             valid = false;
         }
@@ -800,7 +800,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
         uint32 value = ((uint32*)&e.target.raw)[index];
         if (value != 0)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused target_param%zu with value %u, it must be 0, skipped.",
+            LOG_ERROR("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} has unused event_param{} with value {}, it must be 0, skipped.",
                          e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
             valid = false;
         }
