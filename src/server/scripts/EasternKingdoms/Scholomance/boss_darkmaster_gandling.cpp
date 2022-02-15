@@ -293,7 +293,7 @@ public:
         }
 
         // used for shadow portal
-        void SpellHitTarget(Unit* target, const SpellInfo* spellinfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellinfo) override
         {
             uint32 room = 0;
             if (spellinfo && spellinfo->Id == SPELL_SHADOW_PORTAL && target && me->GetVictim())

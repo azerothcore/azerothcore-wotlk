@@ -448,7 +448,7 @@ public:
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
