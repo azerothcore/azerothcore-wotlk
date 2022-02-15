@@ -134,6 +134,11 @@ namespace WorldPackets
         class GuildSetGuildMaster;
         class SaveGuildEmblem;
     }
+
+    namespace Misc
+    {
+        class RandomRollClient;
+    }
 }
 
 enum AccountDataType
@@ -888,7 +893,7 @@ public:                                                 // opcodes handlers
     void HandleWardenDataOpcode(WorldPacket& recvData);
     void HandleWorldTeleportOpcode(WorldPacket& recvData);
     void HandleMinimapPingOpcode(WorldPacket& recvData);
-    void HandleRandomRollOpcode(WorldPacket& recvData);
+    void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
     void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
     void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
