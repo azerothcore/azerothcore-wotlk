@@ -674,10 +674,9 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     {
         if (GetPlayer()->InBattleground()) // currently in battleground
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG) && GetPlayer()->isUsingLfg())
         {
-            if (GetPlayer()->isUsingLfg()) // using lfg system
-                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+            err = ERR_LFG_CANT_USE_BATTLEGROUND;
         }
 
         if (err <= 0)
