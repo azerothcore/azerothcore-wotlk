@@ -41,7 +41,7 @@ enum class SelectTargetMethod
 // default predicate function to select target based on distance, player and/or aura criteria
 struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
 {
-    const Unit* me;
+    Unit const* me;
     float m_dist;
     bool m_playerOnly;
     int32 m_aura;
@@ -167,7 +167,7 @@ struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
     }
 
 private:
-    const Unit* _me;
+    Unit const* _me;
     float _dist;
     bool _playerOnly;
     bool _inLos;

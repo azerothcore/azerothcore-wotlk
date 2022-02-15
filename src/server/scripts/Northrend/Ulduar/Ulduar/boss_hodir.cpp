@@ -314,7 +314,7 @@ public:
                 me->RemoveAura(SPELL_ICICLE_BOSS_AURA);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -552,7 +552,7 @@ public:
             summons.Despawn(s);
         }
 
-        bool CanAIAttack(const Unit* t) const override
+        bool CanAIAttack(Unit const* t) const override
         {
             if (t->GetTypeId() == TYPEID_PLAYER)
                 return !t->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER);
@@ -730,7 +730,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -777,7 +777,7 @@ public:
             events.ScheduleEvent(EVENT_PRIEST_SMITE, 2100);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -829,7 +829,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -873,7 +873,7 @@ public:
             events.ScheduleEvent(EVENT_DRUID_STARLIGHT, 10000);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -926,7 +926,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -970,7 +970,7 @@ public:
             events.ScheduleEvent(EVENT_SHAMAN_STORM_CLOUD, 10000);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -979,7 +979,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && spell->Id == SPELL_SHAMAN_STORM_CLOUD)
                 if (Aura* a = target->GetAura(SPELL_SHAMAN_STORM_CLOUD, me->GetGUID()))
@@ -1026,7 +1026,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1071,7 +1071,7 @@ public:
             events.ScheduleEvent(EVENT_MAGE_MELT_ICE, 1000);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if(spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
             {
@@ -1141,7 +1141,7 @@ public:
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
         void EnterEvadeMode() override {}
-        bool CanAIAttack(const Unit* t) const override { return t->GetEntry() == NPC_HODIR; }
+        bool CanAIAttack(Unit const* t) const override { return t->GetEntry() == NPC_HODIR; }
 
         void JustDied(Unit* /*killer*/) override
         {
