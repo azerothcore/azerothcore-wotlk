@@ -1024,6 +1024,19 @@ UPDATE `smart_scripts` SET `action_param1`=0 WHERE `entryorguid`=11016 AND `sour
 
 UPDATE `smart_scripts` SET `event_param1`=0, `event_param2` = 0 WHERE `entryorguid`=3694 AND `source_type`=0 AND `id` IN(6,8);
 
+UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=4855 AND `source_type`=0 AND `id`=1;
+UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=5267 AND `source_type`=0 AND `id`=2;
+UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=7320 AND `source_type`=0 AND `id`=2;
+UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=9096 AND `source_type`=0 AND `id`=4;
+UPDATE `smart_scripts` SET `event_param3`=0 WHERE `entryorguid`=9096 AND `source_type`=0 AND `id`=4;
+UPDATE `smart_scripts` SET `event_param4`=0 WHERE `entryorguid`=9096 AND `source_type`=0 AND `id`=4;
+UPDATE `smart_scripts` SET `event_param1`=0 WHERE `entryorguid`=11486 AND `source_type`=0 AND `id`=1;
+UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=11486 AND `source_type`=0 AND `id`=1;
+UPDATE `smart_scripts` SET `event_param3`=0 WHERE `entryorguid`=11486 AND `source_type`=0 AND `id`=1;
+UPDATE `smart_scripts` SET `event_param4`=0 WHERE `entryorguid`=11486 AND `source_type`=0 AND `id`=1;
+UPDATE `smart_scripts` SET `event_param4`=0 WHERE `entryorguid`=17664 AND `source_type`=0 AND `id`=23;
+UPDATE `smart_scripts` SET `event_param2`=0 WHERE `entryorguid`=17664 AND `source_type`=0 AND `id`=23;
+
 -- ???
 DELETE FROM `smart_scripts` WHERE `entryorguid`=31279 AND `source_type`=0 AND `id`=11;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=30945 AND `source_type`=0 AND `id`=9;
