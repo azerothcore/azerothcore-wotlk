@@ -258,7 +258,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* pSpell) override
+        void SpellHit(Unit* caster, SpellInfo const* pSpell) override
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {
@@ -809,7 +809,7 @@ public:
                         else
                         {
                             me->GetMotionMaster()->MovePoint(1, anchorX, anchorY, me->GetPositionZ());
-                            //LOG_DEBUG("scripts.ai", "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
+                            //LOG_DEBUG("scripts.ai", "npc_unworthy_initiateAI: move to {} {} {}", anchorX, anchorY, me->GetPositionZ());
                             phase = PHASE_EQUIPING;
                             wait_timer = 0;
                         }

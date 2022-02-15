@@ -200,16 +200,16 @@ inline void MarkDependentColumn(TableStruct& tableStruct, std::string const& col
     auto itr = FindColumnByName(tableStruct, columnName);
     if (itr == tableStruct.TableFields.end())
     {
-        LOG_FATAL("server.loading", "Column `%s` declared in table `%s` marked as dependent but doesn't exist, PlayerDump will not work properly, please update table definitions",
-            columnName.c_str(), tableStruct.TableName.c_str());
+        LOG_FATAL("server.loading", "Column `{}` declared in table `{}` marked as dependent but doesn't exist, PlayerDump will not work properly, please update table definitions",
+            columnName, tableStruct.TableName);
         ABORT();
         return;
     }
 
     if (itr->IsDependentField)
     {
-        LOG_FATAL("server.loading", "Attempt to mark column `%s` in table `%s` as dependent column but already marked! please check your code.",
-            columnName.c_str(), tableStruct.TableName.c_str());
+        LOG_FATAL("server.loading", "Attempt to mark column `{}` in table `{}` as dependent column but already marked! please check your code.",
+            columnName, tableStruct.TableName);
         ABORT();
         return;
     }
@@ -225,8 +225,8 @@ inline void MarkWhereField(TableStruct& tableStruct, std::string const& whereFie
     auto whereFieldItr = FindColumnByName(tableStruct, whereField);
     if (whereFieldItr == tableStruct.TableFields.end())
     {
-        LOG_FATAL("server.loading", "Column name `%s` set as 'WHERE' column for table `%s` doesn't exist. PlayerDump won't work properly",
-            whereField.c_str(), tableStruct.TableName.c_str());
+        LOG_FATAL("server.loading", "Column name `{}` set as 'WHERE' column for table `{}` doesn't exist. PlayerDump won't work properly",
+            whereField, tableStruct.TableName);
         ABORT();
         return;
     }
@@ -259,14 +259,14 @@ void PlayerDump::InitializeTables()
         TableStruct t;
         t.TableName = dumpTable.Name;
 
-        QueryResult result = CharacterDatabase.PQuery("DESC %s", dumpTable.Name);
+        QueryResult result = CharacterDatabase.Query("DESC {}", dumpTable.Name);
         // prepared statement is correct (checked at startup) so table must exist
         ASSERT(result);
 
         int32 i = 0;
         do
         {
-            std::string columnName = (*result)[0].GetString();
+            std::string columnName = (*result)[0].Get<std::string>();
             t.FieldIndices.emplace(columnName, i++);
 
             TableField f;
@@ -352,7 +352,7 @@ void PlayerDump::InitializeTables()
             MarkDependentColumn(t, "guid", GUID_TYPE_PET);
             break;
         default:
-            LOG_FATAL("server.loading", "Wrong dump table type %u, probably added a new table type without updating code", uint32(dumpTable.Type));
+            LOG_FATAL("server.loading", "Wrong dump table type {}, probably added a new table type without updating code", uint32(dumpTable.Type));
             ABORT();
             return;
         }
@@ -365,7 +365,7 @@ void PlayerDump::InitializeTables()
     {
         if (tableStruct.WhereFieldName.empty())
         {
-            LOG_FATAL("server.loading", "Table `%s` defined in player dump doesn't have a WHERE query field", tableStruct.TableName.c_str());
+            LOG_FATAL("server.loading", "Table `{}` defined in player dump doesn't have a WHERE query field", tableStruct.TableName);
             ABORT();
         }
     }
@@ -375,7 +375,7 @@ void PlayerDump::InitializeTables()
 
     ASSERT(CharacterTables.size() == DUMP_TABLE_COUNT);
 
-    LOG_INFO("server.loading", ">> Initialized tables for PlayerDump in %u ms.", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Initialized tables for PlayerDump in {} ms.", GetMSTimeDiffToNow(oldMSTime));
 }
 
 // Low level functions
@@ -435,7 +435,7 @@ inline bool ValidateFields(TableStruct const& ts, std::string const& str, size_t
     s = str.find("` (`");
     if (s == std::string::npos)
     {
-        LOG_ERROR("misc", "LoadPlayerDump: (line " SZFMTD ") dump format not recognized.", lineNumber);
+        LOG_ERROR("misc", "LoadPlayerDump: (line {}) dump format not recognized.", lineNumber);
         return false;
     }
     s += 4;
@@ -444,7 +444,7 @@ inline bool ValidateFields(TableStruct const& ts, std::string const& str, size_t
     std::string::size_type e = str.find('`', s);
     if (e == std::string::npos || valPos == std::string::npos)
     {
-        LOG_ERROR("misc", "LoadPlayerDump: (line " SZFMTD ") unexpected end of line", lineNumber);
+        LOG_ERROR("misc", "LoadPlayerDump: (line {}) unexpected end of line", lineNumber);
         return false;
     }
 
@@ -454,7 +454,7 @@ inline bool ValidateFields(TableStruct const& ts, std::string const& str, size_t
         int32 columnIndex = GetColumnIndexByName(ts, column);
         if (columnIndex == -1)
         {
-            LOG_ERROR("misc", "LoadPlayerDump: (line " SZFMTD ") unknown column name `%s` for table `%s`, aborting due to incompatible DB structure.", lineNumber, column.c_str(), ts.TableName.c_str());
+            LOG_ERROR("misc", "LoadPlayerDump: (line {}) unknown column name `{}` for table `{}`, aborting due to incompatible DB structure.", lineNumber, column, ts.TableName);
             return false;
         }
 
@@ -538,11 +538,11 @@ inline void AppendTableDump(StringTransaction& trans, TableStruct const& tableSt
 
         for (uint32 i = 0; i < fieldSize;)
         {
-            char const* cString = fields[i].GetCString();
+            std::string cString = fields[i].Get<std::string>();
             ++i;
 
             // null pointer -> we have null
-            if (!cString)
+            if (cString.empty())
                 ss << "'NULL'";
             else
             {
@@ -604,7 +604,7 @@ void PlayerDumpWriter::PopulateGuids(ObjectGuid::LowType guid)
         }
 
         std::string whereStr = GenerateWhereStr(baseTable.PlayerGuid, guid);
-        QueryResult result = CharacterDatabase.PQuery("SELECT %s FROM %s WHERE %s", baseTable.PrimaryKey, baseTable.TableName, whereStr.c_str());
+        QueryResult result = CharacterDatabase.Query("SELECT {} FROM {} WHERE {}", baseTable.PrimaryKey, baseTable.TableName, whereStr);
         if (!result)
             continue;
 
@@ -613,19 +613,19 @@ void PlayerDumpWriter::PopulateGuids(ObjectGuid::LowType guid)
             switch (baseTable.StoredType)
             {
             case GUID_TYPE_ITEM:
-                if (ObjectGuid::LowType itemLowGuid = (*result)[0].GetUInt32())
+                if (ObjectGuid::LowType itemLowGuid = (*result)[0].Get<uint32>())
                     _items.insert(itemLowGuid);
                 break;
             case GUID_TYPE_MAIL:
-                if (ObjectGuid::LowType mailLowGuid = (*result)[0].GetUInt32())
+                if (ObjectGuid::LowType mailLowGuid = (*result)[0].Get<uint32>())
                     _mails.insert(mailLowGuid);
                 break;
             case GUID_TYPE_PET:
-                if (ObjectGuid::LowType petLowGuid = (*result)[0].GetUInt32())
+                if (ObjectGuid::LowType petLowGuid = (*result)[0].Get<uint32>())
                     _pets.insert(petLowGuid);
                 break;
             case GUID_TYPE_EQUIPMENT_SET:
-                if (uint64 eqSetId = (*result)[0].GetUInt64())
+                if (uint64 eqSetId = (*result)[0].Get<uint64>())
                     _itemSets.insert(eqSetId);
                 break;
             default:
@@ -671,7 +671,7 @@ bool PlayerDumpWriter::AppendTable(StringTransaction& trans, ObjectGuid::LowType
         break;
     }
 
-    QueryResult result = CharacterDatabase.PQuery("SELECT * FROM %s WHERE %s", dumpTable.Name, whereStr.c_str());
+    QueryResult result = CharacterDatabase.Query("SELECT * FROM {} WHERE {}", dumpTable.Name, whereStr);
     switch (dumpTable.Type)
     {
     case DTT_CHARACTER:
@@ -681,7 +681,7 @@ bool PlayerDumpWriter::AppendTable(StringTransaction& trans, ObjectGuid::LowType
             int32 index = GetColumnIndexByName(tableStruct, "deleteInfos_Account");
             ASSERT(index != -1); // checked at startup
 
-            if ((*result)[index].GetUInt32())
+            if ((*result)[index].Get<uint32>())
                 return false;
         }
         break;
@@ -773,7 +773,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     if (guid && guid < sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
-        stmt->setUInt32(0, guid);
+        stmt->SetData(0, guid);
 
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
             guid = sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed();                     // use first free if exists
@@ -790,7 +790,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
-        stmt->setString(0, name);
+        stmt->SetData(0, name);
 
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
             name.clear();                                       // use the one from the dump
@@ -843,7 +843,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
         std::string tn = GetTableName(line);
         if (tn.empty())
         {
-            LOG_ERROR("misc", "LoadPlayerDump: (line " SZFMTD ") Can't extract table name!", lineNumber);
+            LOG_ERROR("misc", "LoadPlayerDump: (line {}) Can't extract table name!", lineNumber);
             return DUMP_FILE_BROKEN;
         }
 
@@ -860,7 +860,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
 
         if (i == DUMP_TABLE_COUNT)
         {
-            LOG_ERROR("misc", "LoadPlayerDump: (line " SZFMTD ") Unknown table: `%s`!", lineNumber, tn.c_str());
+            LOG_ERROR("misc", "LoadPlayerDump: (line {}) Unknown table: `{}`!", lineNumber, tn);
             return DUMP_FILE_BROKEN;
         }
 

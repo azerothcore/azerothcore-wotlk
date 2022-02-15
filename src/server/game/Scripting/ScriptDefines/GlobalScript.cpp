@@ -30,7 +30,7 @@ void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, Object
     });
 }
 
-void ScriptMgr::OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display)
+void ScriptMgr::OnGlobalMirrorImageDisplayItem(Item const* item, uint32& display)
 {
     ExecuteScript<GlobalScript>([&](GlobalScript* script)
     {
@@ -143,13 +143,21 @@ bool ScriptMgr::OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Un
 {
     auto ret = IsValidBoolScript<GlobalScript>([&](GlobalScript* script)
     {
-        return !script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val);
+        return script->OnSpellHealingBonusTakenNegativeModifiers(target, caster, spellInfo, val);
     });
 
     if (ret && *ret)
     {
-        return false;
+        return true;
     }
 
-    return true;
+    return false;
+}
+
+void ScriptMgr::OnLoadSpellCustomAttr(SpellInfo* spell)
+{
+    ExecuteScript<GlobalScript>([&](GlobalScript* script)
+    {
+        script->OnLoadSpellCustomAttr(spell);
+    });
 }

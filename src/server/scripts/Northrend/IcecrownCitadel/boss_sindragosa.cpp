@@ -354,7 +354,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return me->IsVisible() && target->GetEntry() != NPC_CROK_SCOURGEBANE;
         }
@@ -947,7 +947,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 

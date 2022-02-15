@@ -216,7 +216,7 @@ class SpellImplicitTargetInfo
 private:
     Targets _target;
 public:
-    SpellImplicitTargetInfo() {}
+    SpellImplicitTargetInfo() : _target(Targets(0)) {}
     SpellImplicitTargetInfo(uint32 target);
 
     bool IsArea() const;
@@ -310,8 +310,10 @@ private:
     static std::array<StaticData, TOTAL_SPELL_EFFECTS> _data;
 };
 
-class SpellInfo
+class AC_GAME_API SpellInfo
 {
+friend class SpellMgr;
+
 public:
     uint32 Id;
     SpellCategoryEntry const* CategoryEntry;
@@ -479,7 +481,7 @@ public:
     // xinef: aura stacking
     bool IsStrongerAuraActive(Unit const* caster, Unit const* target) const;
     bool IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const;
-    bool ValidateAttribute6SpellDamageMods(const Unit* caster, const AuraEffect* auraEffect, bool isDot) const;
+    bool ValidateAttribute6SpellDamageMods(Unit const* caster, const AuraEffect* auraEffect, bool isDot) const;
 
     SpellSchoolMask GetSchoolMask() const;
     uint32 GetAllEffectsMechanicMask() const;
@@ -518,15 +520,26 @@ public:
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
 
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS> const& GetEffects() const { return Effects; }
+    SpellEffectInfo const& GetEffect(SpellEffIndex index) const { ASSERT(index < Effects.size()); return Effects[index]; }
+
     // loading helpers
     void _InitializeExplicitTargetMask();
     bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
     bool _IsPositiveSpell() const;
     static bool _IsPositiveTarget(uint32 targetA, uint32 targetB);
+
     AuraStateType LoadAuraState() const;
     SpellSpecificType LoadSpellSpecific() const;
+
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
+
+    bool CheckElixirStacking(Unit const* caster) const;
+
+private:
+    std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }
+    SpellEffectInfo& _GetEffect(SpellEffIndex index) { ASSERT(index < Effects.size()); return Effects[index]; }
 };
 
 #endif // _SPELLINFO_H

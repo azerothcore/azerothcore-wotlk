@@ -26,7 +26,7 @@
 // AggressorAI
 /////////////////
 
-int AggressorAI::Permissible(const Creature* creature)
+int AggressorAI::Permissible(Creature const* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
     if (!creature->IsCivilian() && !creature->IsNeutralToAll())
@@ -169,7 +169,7 @@ void CasterAI::UpdateAI(uint32 diff)
 ArcherAI::ArcherAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        LOG_ERROR("entities.unit.ai", "ArcherAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "ArcherAI set for creature (entry = {}) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -218,7 +218,7 @@ void ArcherAI::UpdateAI(uint32 /*diff*/)
 TurretAI::TurretAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        LOG_ERROR("entities.unit.ai", "TurretAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "TurretAI set for creature (entry = {}) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -226,7 +226,7 @@ TurretAI::TurretAI(Creature* c) : CreatureAI(c)
     me->m_SightDistance = me->m_CombatDistance;
 }
 
-bool TurretAI::CanAIAttack(const Unit* /*who*/) const
+bool TurretAI::CanAIAttack(Unit const* /*who*/) const
 {
     // TODO: use one function to replace it
     if (!me->IsWithinCombatRange(me->GetVictim(), me->m_CombatDistance)
@@ -292,7 +292,7 @@ void VehicleAI::LoadConditions()
 {
     conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE, me->GetEntry());
     if (!conditions.empty())
-        LOG_DEBUG("condition", "VehicleAI::LoadConditions: loaded %u conditions", uint32(conditions.size()));
+        LOG_DEBUG("condition", "VehicleAI::LoadConditions: loaded {} conditions", uint32(conditions.size()));
 }
 
 void VehicleAI::CheckConditions(uint32 diff)

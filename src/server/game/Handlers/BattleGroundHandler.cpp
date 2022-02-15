@@ -35,7 +35,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (%s)", guid.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from ({})", guid.ToString());
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
@@ -154,8 +154,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     {
         if (GetPlayer()->InBattleground()) // currently in battleground
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
-            err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+        {
+            if (GetPlayer()->isUsingLfg()) // using lfg system
+                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
         else if (!_player->CanJoinToBattleground()) // has deserter debuff
             err = ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
@@ -479,8 +482,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
                     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
                     {
                         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                        stmt->setUInt32(0, _player->GetGUID().GetCounter());
-                        stmt->setUInt8(1, BG_DESERTION_TYPE_LEAVE_QUEUE);
+                        stmt->SetData(0, _player->GetGUID().GetCounter());
+                        stmt->SetData(1, BG_DESERTION_TYPE_LEAVE_QUEUE);
                         CharacterDatabase.Execute(stmt);
                     }
 
@@ -672,8 +675,11 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     {
         if (GetPlayer()->InBattleground()) // currently in battleground
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (GetPlayer()->isUsingLfg()) // using lfg system
-            err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+        {
+            if (GetPlayer()->isUsingLfg()) // using lfg system
+                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
 
         if (err <= 0)
         {
@@ -809,7 +815,7 @@ void WorldSession::HandleReportPvPAFK(WorldPacket& recvData)
         return;
     }
 
-    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: %s reported %s", _player->GetName().c_str(), reportedPlayer->GetName().c_str());
+    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: {} reported {}", _player->GetName(), reportedPlayer->GetName());
 
     reportedPlayer->ReportedAfkBy(_player);
 }
