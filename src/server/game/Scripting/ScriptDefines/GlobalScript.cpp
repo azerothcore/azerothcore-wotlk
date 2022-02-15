@@ -30,7 +30,7 @@ void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, Object
     });
 }
 
-void ScriptMgr::OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display)
+void ScriptMgr::OnGlobalMirrorImageDisplayItem(Item const* item, uint32& display)
 {
     ExecuteScript<GlobalScript>([&](GlobalScript* script)
     {

@@ -253,7 +253,7 @@ public:
     void SetInTrade(bool b = true) { mb_in_trade = b; }
     [[nodiscard]] bool IsInTrade() const { return mb_in_trade; }
 
-    bool HasEnchantRequiredSkill(const Player* player) const;
+    bool HasEnchantRequiredSkill(Player const* player) const;
     [[nodiscard]] uint32 GetEnchantRequiredLevel() const;
 
     bool IsFitToSpellRequirements(SpellInfo const* spellInfo) const;
