@@ -626,10 +626,9 @@ namespace lfg
                             {
                                 joinData.result = LFG_JOIN_PARTY_DESERTER;
                             }
-                            else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
+                            else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG) && (plrg->InBattleground() || plrg->InArena() || plrg->InBattlegroundQueue()))
                             {
-                                if (plrg->InBattleground() || plrg->InArena() || plrg->InBattlegroundQueue())
-                                    joinData.result = LFG_JOIN_USING_BG_SYSTEM;
+                                joinData.result = LFG_JOIN_USING_BG_SYSTEM;
                             }
 
                             ++memberCount;
