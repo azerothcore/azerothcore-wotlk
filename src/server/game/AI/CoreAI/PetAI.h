@@ -49,7 +49,7 @@ public:
     explicit PetAI(Creature* c);
 
     void UpdateAI(uint32) override;
-    static int Permissible(const Creature*);
+    static int Permissible(Creature const*);
 
     void KilledUnit(Unit* /*victim*/) override;
     void AttackStart(Unit* target) override;
@@ -65,7 +65,7 @@ public:
     void MoveInLineOfSight(Unit* /*who*/) override {} // CreatureAI interferes with returning pets
     void MoveInLineOfSight_Safe(Unit* /*who*/) {} // CreatureAI interferes with returning pets
     void EnterEvadeMode() override {} // For fleeing, pets don't use this type of Evade mechanic
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
 
     void PetStopAttack() override;
 
@@ -86,7 +86,7 @@ private:
     Unit* SelectNextTarget(bool allowAutoSelect) const;
     void HandleReturnMovement();
     void DoAttack(Unit* target, bool chase);
-    bool CanAttack(Unit* target, const SpellInfo* spellInfo = nullptr);
+    bool CanAttack(Unit* target, SpellInfo const* spellInfo = nullptr);
     void ClearCharmInfoFlags();
 };
 #endif

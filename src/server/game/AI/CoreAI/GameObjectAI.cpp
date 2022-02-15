@@ -18,7 +18,7 @@
 #include "GameObjectAI.h"
 
 //GameObjectAI::GameObjectAI(GameObject* g) : go(g) {}
-int GameObjectAI::Permissible(const GameObject* go)
+int GameObjectAI::Permissible(GameObject const* go)
 {
     if (go->GetAIName() == "GameObjectAI")
         return PERMIT_BASE_SPECIAL;
