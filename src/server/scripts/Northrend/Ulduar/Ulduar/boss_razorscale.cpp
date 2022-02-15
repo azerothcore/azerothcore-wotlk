@@ -213,7 +213,7 @@ public:
                 pInstance->SetData(TYPE_RAZORSCALE, DONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (!caster || !pInstance)
                 return;
@@ -973,7 +973,7 @@ public:
             timer2 = 6000;
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }
@@ -1022,7 +1022,7 @@ public:
             timer2 = 2000;
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }
@@ -1078,7 +1078,7 @@ public:
             timer2 = 6000;
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }

@@ -256,8 +256,8 @@ public:
     void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
     void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
-    bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
-    bool _IsTargetAcceptable(const Unit* target) const;
+    bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
+    bool _IsTargetAcceptable(Unit const* target) const;
     [[nodiscard]] bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
 
     // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone

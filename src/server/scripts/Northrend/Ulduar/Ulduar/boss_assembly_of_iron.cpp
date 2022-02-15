@@ -322,7 +322,7 @@ public:
                 me->CastSpell(me, SPELL_ELECTRICAL_CHARGE, true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
@@ -491,7 +491,7 @@ public:
             Talk(SAY_MOLGEIM_SLAY);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
@@ -711,13 +711,13 @@ public:
             Talk(SAY_BRUNDIR_SLAY);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CHAIN_LIGHTNING || spellInfo->Id == uint32(RAID_MODE(61916, 63482))) // Lightning Whirl triggered
                 _stunnedAchievement = false;

@@ -416,7 +416,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }
@@ -505,7 +505,7 @@ public:
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -569,7 +569,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if( spell->Id == SPELL_SPIKE_FAIL )
             {
@@ -640,7 +640,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if( !target || !spell )
                 return;
@@ -713,7 +713,7 @@ public:
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }

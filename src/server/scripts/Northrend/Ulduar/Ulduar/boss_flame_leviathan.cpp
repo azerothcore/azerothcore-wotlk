@@ -240,7 +240,7 @@ public:
         }
 
         void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
         void JustDied(Unit*) override;
         void KilledUnit(Unit* who) override;
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
@@ -608,7 +608,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ScheduleEvents()
     events.RescheduleEvent(EVENT_PURSUE, 0);
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo)
 {
     if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
     {
@@ -1183,7 +1183,7 @@ public:
             damage = 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
                 me->CastSpell(me, SPELL_BLAZE, true);

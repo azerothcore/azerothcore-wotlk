@@ -877,7 +877,7 @@ public:
         uint16 timer1;
         uint16 timer2;
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == 70827 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_DONT_LOOK_UP, 0);
@@ -1112,7 +1112,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetEntry() == NPC_FALLEN_WARRIOR;
         }
@@ -1181,7 +1181,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if ((spell->Id == SPELL_TELEPORT_JAINA || spell->Id == SPELL_TELEPORT_SYLVANAS) && target && target->GetTypeId() == TYPEID_PLAYER)
             {
