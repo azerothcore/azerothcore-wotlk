@@ -36,7 +36,9 @@ enum DataTypes
 
 enum SKCreatures
 {
-    NPC_DND_CRAZED_APOTHECARY_GENERATOR = 36212
+    NPC_DND_CRAZED_APOTHECARY_GENERATOR = 36212,
+    NPC_APOTHECARY_HUMMEL               = 36296,
+    NPC_CRAZED_APOTHECARY               = 36568
 };
 
 enum GameObjects

@@ -68,7 +68,6 @@ enum ApothecaryMisc
     QUEST_YOUVE_BEEN_SERVED = 14488,
     NPC_APOTHECARY_FRYE     = 36272,
     NPC_APOTHECARY_BAXTER   = 36565,
-    NPC_CRAZED_APOTHECARY   = 36568,
     NPC_VIAL_BUNNY          = 36530,
     NPC_CROWN_APOTHECARY    = 36885,
     PHASE_ALL               = 0,
@@ -110,21 +109,15 @@ public:
             _deadCount = 0;
             _isDead = false;
             _phase = PHASE_ALL;
+            summons.DespawnAll();
             me->SetFaction(FACTION_FRIENDLY);
             me->SummonCreatureGroup(1);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
-        void EnterEvadeMode() override
+        void JustSummoned(Creature* summon) override
         {
-            summons.DespawnAll();
-            std::list<Creature*> valentineAdds;
-            me->GetCreatureListWithEntryInGrid(valentineAdds, NPC_CRAZED_APOTHECARY, 200.f);
-            for (Creature* crea : valentineAdds)
-            {
-                crea->DespawnOrUnsummon();
-            }
-            _EnterEvadeMode();
+            summons.Summon(summon);
         }
 
         void DoAction(int32 action) override

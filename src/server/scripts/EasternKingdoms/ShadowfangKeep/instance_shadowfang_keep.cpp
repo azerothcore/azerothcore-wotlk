@@ -51,6 +51,15 @@ public:
                 case NPC_DND_CRAZED_APOTHECARY_GENERATOR:
                     _crazedApothecaryGeneratorGUIDs.push_back(creature->GetGUID());
                     break;
+                case NPC_APOTHECARY_HUMMEL:
+                    _apothecaryHummel = creature->GetGUID();
+                    break;
+                case NPC_CRAZED_APOTHECARY:
+                    if (Creature* hummel = instance->GetCreature(_apothecaryHummel))
+                    {
+                        hummel->AI()->JustSummoned(creature);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -132,6 +141,7 @@ public:
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
         GuidVector _crazedApothecaryGeneratorGUIDs;
+        ObjectGuid _apothecaryHummel;
     };
 };
 
