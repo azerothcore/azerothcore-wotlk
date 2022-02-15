@@ -546,7 +546,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
                 //case SMART_EVENT_SCENE_COMPLETE: return sizeof(SmartEvent::raw);
             case SMART_EVENT_SUMMONED_UNIT_DIES: return sizeof(SmartEvent::summoned);
             default:
-                LOG_WARN("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u is using an event with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
+                LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                 return sizeof(SmartEvent::raw);
         }
@@ -561,7 +561,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
         uint32 value = ((uint32*)&e.event.raw)[index];
         if (value != 0)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has unused event_param{} with value {}, it must be 0, skipped.",
+            LOG_ERROR("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} has unused event_param{} with value {}, it must be 0, skipped.",
                          e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
             valid = false;
         }
@@ -722,7 +722,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_HEALTH_PCT: return sizeof(SmartAction::setHealthPct);
                 //case SMART_ACTION_CREATE_CONVERSATION: return sizeof(SmartAction::raw);
             default:
-                LOG_WARN("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
+                LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                 return sizeof(SmartAction::raw);
         }
@@ -737,7 +737,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
         uint32 value = ((uint32*)&e.action.raw)[index];
         if (value != 0)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused action_param%zu with value %u, it must be 0, skipped.",
+            LOG_ERROR("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} has unused action_param{} with value {}, it must be 0, skipped.",
                          e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
             valid = false;
         }
@@ -785,7 +785,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_VEHICLE_PASSENGER: return sizeof(SmartTarget::vehicle);
             // case SMART_TARGET_CLOSEST_UNSPAWNED_GAMEOBJECT: return sizeof(SmartTarget::goClosest);
             default:
-                LOG_WARN("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u is using a target with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
+                LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                 return sizeof(SmartTarget::raw);
         }
@@ -800,7 +800,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
         uint32 value = ((uint32*)&e.target.raw)[index];
         if (value != 0)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has unused target_param%zu with value %u, it must be 0, skipped.",
+            LOG_ERROR("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} has unused target_param{} with value {}, it must be 0, skipped.",
                          e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), index + 1, value);
             valid = false;
         }
