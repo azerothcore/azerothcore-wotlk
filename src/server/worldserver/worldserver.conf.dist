@@ -1810,11 +1810,11 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                     divided by "," without spaces.
 #                     It is implied that you do not use for these NPC dialogs data from "gossip_menu" table.
 #                     Server will skip these IDs during the definitions validation process.
-#        Example:     Creatures.CustomIDs = "190010,55005,999991,25462,98888" - Npcs for Transmog, Guild-zone, 1v1-arena modules
-#                                                                               Skip Dk Module, Racial Trait Swap Modules
+#        Example:     Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014" - Npcs for Transmog, Guild-zone, 1v1-arena, Skip Dk,
+#                                                                                      Racial Trait Swap, NPC - All Mounts Modules
 #        Default:     ""
 
-Creatures.CustomIDs = "190010,55005,999991,25462,98888"
+Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014"
 
 #
 ###################################################################################################
