@@ -32,7 +32,7 @@ public:
     void MoveInLineOfSight(Unit* who) override;
     void AttackStart(Unit* victim) override;
     void EnterEvadeMode() override;
-    void SpellHit(Unit* /*caster*/, const SpellInfo* /*spellInfo*/) override;
+    void SpellHit(Unit* /*caster*/, SpellInfo const* /*spellInfo*/) override;
     void DoAction(int32 param) override;
 
     void UpdateAI(uint32 diff) override;

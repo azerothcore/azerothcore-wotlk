@@ -73,8 +73,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_MAGIC_REFLECTION                  = 1,
-    EVENT_DAMAGE_REFLECTION,
+    EVENT_SHIELD_REFLECTION                 = 1,
     EVENT_TELEPORT_RANDOM,
     EVENT_TELEPORT_TARGET,
     EVENT_AEGIS_OF_RAGNAROS,
@@ -127,6 +126,7 @@ struct MajordomoAddData
     uint32 creatureEntry;
     Position spawnPos;
 
+    MajordomoAddData() { }
     MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
 };
 
@@ -172,7 +172,7 @@ public:
                         if (summon)
                         {
                             static_minionsGUIDS.insert(summon->GetGUID());
-                            majordomoSummonsData.push_back(MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition()));
+                            majordomoSummonsData[summon->GetGUID().GetCounter()] = MajordomoAddData(summon->GetGUID(), summon->GetEntry(), summon->GetPosition());
                         }
                     }
                 }
@@ -197,18 +197,19 @@ public:
                 events.SetPhase(PHASE_COMBAT);
                 instance->SetBossState(DATA_MAJORDOMO_EXECUTUS, NOT_STARTED);
 
-                for (auto summon : majordomoSummonsData)
+                for (auto const& summon : majordomoSummonsData)
                 {
-                    if (ObjectAccessor::GetCreature(*me, summon.guid))
+                    if (ObjectAccessor::GetCreature(*me, summon.second.guid))
                     {
                         continue;
                     }
 
-                    if (Creature* spawn = me->SummonCreature(summon.creatureEntry, summon.spawnPos))
+                    if (Creature* spawn = me->SummonCreature(summon.second.creatureEntry, summon.second.spawnPos))
                     {
-                        static_minionsGUIDS.erase(summon.guid); // Erase the guid from the previous, no longer existing, spawn.
+                        static_minionsGUIDS.erase(summon.second.guid); // Erase the guid from the previous, no longer existing, spawn.
                         static_minionsGUIDS.insert(spawn->GetGUID());
-                        summon.guid = spawn->GetGUID();
+                        majordomoSummonsData.erase(summon.second.guid.GetCounter());
+                        majordomoSummonsData[spawn->GetGUID().GetCounter()] = MajordomoAddData(spawn->GetGUID(), spawn->GetEntry(), spawn->GetPosition());
                     }
                 }
             }
@@ -245,10 +246,9 @@ public:
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
 
-            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 15000, PHASE_COMBAT, PHASE_COMBAT);
-            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_SHIELD_REFLECTION, 30000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_RANDOM, 25000, PHASE_COMBAT, PHASE_COMBAT);
+            events.ScheduleEvent(EVENT_TELEPORT_TARGET, 15000, PHASE_COMBAT, PHASE_COMBAT);
 
             aliveMinionsGUIDS.clear();
             aliveMinionsGUIDS = static_minionsGUIDS;
@@ -334,15 +334,16 @@ public:
                     {
                         switch (eventId)
                         {
-                            case EVENT_MAGIC_REFLECTION:
+                            case EVENT_SHIELD_REFLECTION:
                             {
-                                DoCastSelf(SPELL_MAGIC_REFLECTION);
-                                events.RepeatEvent(30000);
-                                break;
-                            }
-                            case EVENT_DAMAGE_REFLECTION:
-                            {
-                                DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                if (rand_chance() <= 50.f)
+                                {
+                                    DoCastSelf(SPELL_MAGIC_REFLECTION);
+                                }
+                                else
+                                {
+                                    DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                                }
                                 events.RepeatEvent(30000);
                                 break;
                             }
@@ -354,7 +355,7 @@ public:
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
                                 }
 
-                                events.RepeatEvent(15000);
+                                events.RepeatEvent(30000);
                                 break;
                             }
                             case EVENT_TELEPORT_TARGET:
@@ -521,7 +522,7 @@ public:
     private:
         GuidSet static_minionsGUIDS;    // contained data should be changed on encounter completion
         GuidSet aliveMinionsGUIDS;      // used for calculations
-        std::list<MajordomoAddData> majordomoSummonsData;
+        std::unordered_map<uint32, MajordomoAddData> majordomoSummonsData;
     };
 
     bool OnGossipHello(Player* player, Creature* creature) override

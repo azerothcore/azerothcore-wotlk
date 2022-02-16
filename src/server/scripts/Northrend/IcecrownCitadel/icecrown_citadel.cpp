@@ -1025,7 +1025,7 @@ public:
                 if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
                     if (crusader->IsAlive())
                     {
-                        if (crusader->GetEntry() == crusader->GetCreatureData()->id)
+                        if (crusader->GetEntry() == crusader->GetCreatureData()->id1)
                         {
                             crusader->m_Events.AddEvent(new CaptainSurviveTalk(*crusader), crusader->m_Events.CalculateTime(delay));
                             delay += 6000;
@@ -1207,7 +1207,7 @@ public:
     void Reset() override
     {
         me->SetCorpseDelay(DAY); // leave corpse for a long time so svalna can resurrect
-        IsUndead = (me->GetCreatureData() && me->GetCreatureData()->id != me->GetEntry());
+        IsUndead = (me->GetCreatureData() && me->GetCreatureData()->id1 != me->GetEntry());
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -1766,7 +1766,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void SpellHitTarget(Unit* c, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* c, SpellInfo const* spell) override
         {
             if (spell->Id == 71306 && c->GetTypeId() == TYPEID_UNIT) // Twisted Winds
             {
@@ -2856,7 +2856,7 @@ public:
             return target->GetExactDist(4357.0f, 2769.0f, 356.0f) < 170.0f;
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == 71906 || spell->Id == 71942)
             {

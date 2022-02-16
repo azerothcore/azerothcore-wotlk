@@ -42,6 +42,7 @@ EndContentData */
 #include "CreatureTextMgr.h"
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
@@ -119,9 +120,7 @@ public:
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
 
                         if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
                         {
@@ -219,6 +218,8 @@ enum riggleBassbait
     QUEST_MASTER_ANGLER                 = 8193,
 
     DATA_ANGLER_FINISHED                = 1,
+
+    GAME_EVENT_FISHING                  = 62
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -232,7 +233,7 @@ public:
         {
             events.Reset();
             events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
-            finished = false;
+            finished = sWorld->getWorldState(GAME_EVENT_FISHING) == 1;
             startWarning = false;
             finishWarning = false;
         }
@@ -253,7 +254,10 @@ public:
         void DoAction(int32 param) override
         {
             if (param == DATA_ANGLER_FINISHED)
+            {
                 finished = true;
+                sWorld->setWorldState(GAME_EVENT_FISHING, 1);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -263,14 +267,14 @@ public:
             {
                 case EVENT_RIGGLE_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
-                        tm strdate;
-                        localtime_r(&curtime, &strdate);
+                        tm strdate = Acore::Time::TimeBreakdown();
+
                         if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
                             startWarning = true;
                         }
+
                         if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
                         {
                             sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
@@ -517,14 +521,14 @@ public:
             }
 
             if (!SpawnAssoc)
-                LOG_ERROR("sql.sql", "TCSR: Creature template entry %u has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
+                LOG_ERROR("sql.sql", "TCSR: Creature template entry {} has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
             else
             {
                 CreatureTemplate const* spawnedTemplate = sObjectMgr->GetCreatureTemplate(SpawnAssoc->spawnedCreatureEntry);
 
                 if (!spawnedTemplate)
                 {
-                    LOG_ERROR("sql.sql", "TCSR: Creature template entry %u does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
+                    LOG_ERROR("sql.sql", "TCSR: Creature template entry {} does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
                     SpawnAssoc = nullptr;
                     return;
                 }
@@ -544,7 +548,7 @@ public:
                 SpawnedGUID = summoned->GetGUID();
             else
             {
-                LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature %u", SpawnAssoc->spawnedCreatureEntry);
+                LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature {}", SpawnAssoc->spawnedCreatureEntry);
                 SpawnAssoc = nullptr;
             }
 
@@ -2241,7 +2245,7 @@ public:
                     break;
             }
 
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
             if (spellInfo && spellInfo->Effects[0].Effect == SPELL_EFFECT_SUMMON_OBJECT_WILD)
                 return spellInfo->Effects[0].MiscValue;

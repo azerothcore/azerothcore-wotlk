@@ -138,7 +138,7 @@ public:
         void EnterCombatSelfFunction()
         {
             Map::PlayerList const& PlList = me->GetMap()->GetPlayers();
-            if (PlList.isEmpty())
+            if (PlList.IsEmpty())
                 return;
 
             for (const auto& i : PlList)
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_ICEBOLT_CAST)
             {

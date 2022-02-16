@@ -145,7 +145,7 @@ public:
         void IchoronDoCastToAllHostilePlayers(uint32 spellId, bool triggered)
         {
             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-            if (PlayerList.isEmpty())
+            if (PlayerList.IsEmpty())
                 return;
 
             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -320,7 +320,7 @@ public:
         InstanceScript* pInstance;
         uint32 uiRangeCheck_Timer;
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_CREATE_GLOBULE_VISUAL)
                 me->CastSpell(me, SPELL_WATER_GLOBULE, true);

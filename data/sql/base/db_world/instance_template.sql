@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.instance_template
+-- Дамп структуры для таблица acore_world.instance_template
 DROP TABLE IF EXISTS `instance_template`;
 CREATE TABLE IF NOT EXISTS `instance_template` (
   `map` SMALLINT unsigned NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `instance_template` (
   PRIMARY KEY (`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.instance_template: 84 rows
+-- Дамп данных таблицы acore_world.instance_template: 85 rows
 DELETE FROM `instance_template`;
 /*!40000 ALTER TABLE `instance_template` DISABLE KEYS */;
 INSERT INTO `instance_template` (`map`, `parent`, `script`, `allowMount`) VALUES
@@ -109,7 +109,8 @@ INSERT INTO `instance_template` (`map`, `parent`, `script`, `allowMount`) VALUES
 	(650, 571, 'instance_trial_of_the_champion', 0),
 	(658, 0, 'instance_pit_of_saron', 1),
 	(668, 0, 'instance_halls_of_reflection', 1),
-	(724, 0, 'instance_ruby_sanctum', 1);
+	(724, 0, 'instance_ruby_sanctum', 1),
+	(44, 0, '', 0);
 /*!40000 ALTER TABLE `instance_template` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
