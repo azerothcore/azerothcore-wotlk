@@ -68,7 +68,6 @@ public:
         }
 
         bg->SetStartDelayTime(startTime);
-
         return true;
     };
 
@@ -92,11 +91,17 @@ public:
 
         if (winner)
         {
+            if (winner > TEAM_NEUTRAL)
+            {
+                handler->SendSysMessage(Acore::StringFormatFmt("> Incorrect set winner team '{}'", *winner));
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
             winnerTeam = static_cast<TeamId>(*winner);
         }
 
         bg->EndBattleground(winnerTeam);
-
         return true;
     };
 };
