@@ -28,7 +28,7 @@
 #include "SpellMgr.h"
 #include "Util.h"
 
-int PetAI::Permissible(const Creature* creature)
+int PetAI::Permissible(Creature const* creature)
 {
     if (creature->IsPet())
         return PERMIT_BASE_SPECIAL;
@@ -68,7 +68,7 @@ void PetAI::_stopAttack()
 {
     if (!me->IsAlive())
     {
-        LOG_DEBUG("entities.unit.ai", "Creature stoped attacking cuz his dead [%s]", me->GetGUID().ToString().c_str());
+        LOG_DEBUG("entities.unit.ai", "Creature stoped attacking cuz his dead [{}]", me->GetGUID().ToString());
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop();
@@ -164,7 +164,7 @@ void PetAI::UpdateAI(uint32 diff)
 
         if (_needToStop())
         {
-            LOG_DEBUG("entities.unit.ai", "Pet AI stopped attacking [%s]", me->GetGUID().ToString().c_str());
+            LOG_DEBUG("entities.unit.ai", "Pet AI stopped attacking [{}]", me->GetGUID().ToString());
             _stopAttack();
             return;
         }
@@ -252,8 +252,10 @@ void PetAI::UpdateAI(uint32 diff)
                 if (spellInfo->CanBeUsedInCombat())
                 {
                     // Check if we're in combat or commanded to attack (exlude auras with infinity duration)
-                    if (!me->IsInCombat() && !me->GetCharmInfo()->IsCommandAttack() && spellInfo->GetMaxDuration() != -1)
+                    if (!me->IsInCombat() && spellInfo->GetMaxDuration() != -1 && !me->IsPetInCombat())
+                    {
                         continue;
+                    }
                 }
 
                 Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE);
@@ -565,7 +567,7 @@ void PetAI::HandleReturnMovement()
     me->ClearInPetCombat();
 }
 
-void PetAI::SpellHit(Unit* caster, const SpellInfo* spellInfo)
+void PetAI::SpellHit(Unit* caster, SpellInfo const* spellInfo)
 {
     // Xinef: taunt behavior code
     if (spellInfo->HasAura(SPELL_AURA_MOD_TAUNT) && !me->HasReactState(REACT_PASSIVE))
@@ -651,7 +653,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
     }
 }
 
-bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
+bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
 {
     // Evaluates wether a pet can attack a specific target based on CommandState, ReactState and other flags
     // IMPORTANT: The order in which things are checked is important, be careful if you add or remove checks
@@ -680,7 +682,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     // pussywizard: TEMP!
     if (!me->GetCharmInfo())
     {
-        LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %s", me->GetEntry(), me->GetOwnerGUID().ToString().c_str());
+        LOG_INFO("misc", "PetAI::CanAttack (A1) - {}, {}", me->GetEntry(), me->GetOwnerGUID().ToString());
         return false;
     }
 

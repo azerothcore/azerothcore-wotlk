@@ -21,12 +21,12 @@
 
 #include "WeatherMgr.h"
 #include "Log.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Weather.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "MiscPackets.h"
 #include <memory>
 
 namespace WeatherMgr
@@ -105,41 +105,41 @@ namespace WeatherMgr
         {
             Field* fields = result->Fetch();
 
-            uint32 zone_id = fields[0].GetUInt32();
+            uint32 zone_id = fields[0].Get<uint32>();
 
             WeatherData& wzc = mWeatherZoneMap[zone_id];
 
             for (uint8 season = 0; season < WEATHER_SEASONS; ++season)
             {
-                wzc.data[season].rainChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 1].GetUInt8();
-                wzc.data[season].snowChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 2].GetUInt8();
-                wzc.data[season].stormChance = fields[season * (MAX_WEATHER_TYPE - 1) + 3].GetUInt8();
+                wzc.data[season].rainChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 1].Get<uint8>();
+                wzc.data[season].snowChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 2].Get<uint8>();
+                wzc.data[season].stormChance = fields[season * (MAX_WEATHER_TYPE - 1) + 3].Get<uint8>();
 
                 if (wzc.data[season].rainChance > 100)
                 {
                     wzc.data[season].rainChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone %u season %u has wrong rain chance > 100%%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong rain chance > 100%", zone_id, season);
                 }
 
                 if (wzc.data[season].snowChance > 100)
                 {
                     wzc.data[season].snowChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone %u season %u has wrong snow chance > 100%%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong snow chance > 100%", zone_id, season);
                 }
 
                 if (wzc.data[season].stormChance > 100)
                 {
                     wzc.data[season].stormChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone %u season %u has wrong storm chance > 100%%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong storm chance > 100%", zone_id, season);
                 }
             }
 
-            wzc.ScriptId = sObjectMgr->GetScriptId(fields[13].GetCString());
+            wzc.ScriptId = sObjectMgr->GetScriptId(fields[13].Get<std::string>());
 
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded %u weather definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} weather definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
 

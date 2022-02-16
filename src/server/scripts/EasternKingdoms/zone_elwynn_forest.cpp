@@ -17,12 +17,10 @@
 
 #include "Common.h"
 #include "CreatureGroups.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
-#include "MotionMaster.h"
-#include "ObjectAccessor.h"
 #include "GameEventMgr.h"
+#include "ObjectAccessor.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum COG_Paths
 {
@@ -229,7 +227,7 @@ struct npc_cameron : public ScriptedAI
                     _childrenGUIDs.push_back(jose->GetGUID());
 
                 // If Formation was disbanded, remake.
-                if (!me->GetFormation()->isFormed())
+                if (!me->GetFormation()->IsFormed())
                     for (auto guid : _childrenGUIDs)
                         if (Creature* child = ObjectAccessor::GetCreature(*me, guid))
                             child->SearchFormation();

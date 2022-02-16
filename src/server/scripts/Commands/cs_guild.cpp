@@ -48,6 +48,7 @@ public:
             { "invite",         SEC_GAMEMASTER,     true,  &HandleGuildInviteCommand,           "" },
             { "uninvite",       SEC_GAMEMASTER,     true,  &HandleGuildUninviteCommand,         "" },
             { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" },
+            { "rename",         SEC_GAMEMASTER,     true,  &HandleGuildRenameCommand,           "" },
             { "info",           SEC_GAMEMASTER,     true,  &HandleGuildInfoCommand,             "" }
         };
         static ChatCommandTable commandTable =
@@ -206,6 +207,55 @@ public:
         return targetGuild->ChangeMemberRank(player->GetGUID(), rank);
     }
 
+    static bool HandleGuildRenameCommand(ChatHandler* handler, char const* _args)
+    {
+        if (!*_args)
+            return false;
+
+        char *args = (char *)_args;
+
+        char const* oldGuildStr = handler->extractQuotedArg(args);
+        if (!oldGuildStr)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        char const* newGuildStr = handler->extractQuotedArg(strtok(nullptr, ""));
+        if (!newGuildStr)
+        {
+            handler->SendSysMessage(LANG_INSERT_GUILD_NAME);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Guild* guild = sGuildMgr->GetGuildByName(oldGuildStr);
+        if (!guild)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_COULDNOTFIND, oldGuildStr);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (sGuildMgr->GetGuildByName(newGuildStr))
+        {
+            handler->PSendSysMessage(LANG_GUILD_RENAME_ALREADY_EXISTS, newGuildStr);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!guild->SetName(newGuildStr))
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->PSendSysMessage(LANG_GUILD_RENAME_DONE, oldGuildStr, newGuildStr);
+        return true;
+    }
+
     static bool HandleGuildInfoCommand(ChatHandler* handler, char const* args)
     {
         Guild* guild = nullptr;
@@ -231,14 +281,7 @@ public:
             handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
         }
 
-        // Format creation date
-        char createdDateStr[20];
-        time_t createdDate = guild->GetCreatedDate();
-        tm localTm;
-        localtime_r(&createdDate, &localTm);
-        strftime(createdDateStr, 20, "%Y-%m-%d %H:%M:%S", &localTm);
-
-        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, createdDateStr); // Creation Date
+        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, Acore::Time::TimeToHumanReadable(Seconds(guild->GetCreatedDate())).c_str()); // Creation Date
         handler->PSendSysMessage(LANG_GUILD_INFO_MEMBER_COUNT, guild->GetMemberCount()); // Number of Members
         handler->PSendSysMessage(LANG_GUILD_INFO_BANK_GOLD, guild->GetTotalBankMoney() / 100 / 100); // Bank Gold (in gold coins)
         handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the day
