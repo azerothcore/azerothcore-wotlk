@@ -1568,7 +1568,7 @@ public:
             changeTimer = time;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_ARTHAS_CRUSADER_STRIKE)
             {

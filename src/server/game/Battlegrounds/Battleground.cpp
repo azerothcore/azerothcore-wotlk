@@ -315,7 +315,7 @@ inline void Battleground::_CheckSafePositions(uint32 diff)
             GetTeamStartLoc(itr->second->GetBgTeamId(), x, y, z, o);
             if (pos.GetExactDistSq(x, y, z) > maxDist)
             {
-                LOG_DEBUG("bg.battleground", "BATTLEGROUND: Sending %s back to start location (map: %u) (possible exploit)", itr->second->GetName().c_str(), GetMapId());
+                LOG_DEBUG("bg.battleground", "BATTLEGROUND: Sending {} back to start location (map: {}) (possible exploit)", itr->second->GetName(), GetMapId());
                 itr->second->TeleportTo(GetMapId(), x, y, z, o);
             }
         }
@@ -451,7 +451,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         if (!FindBgMap())
         {
-            LOG_ERROR("bg.battleground", "Battleground::_ProcessJoin: map (map id: %u, instance id: %u) is not created!", m_MapId, m_InstanceID);
+            LOG_ERROR("bg.battleground", "Battleground::_ProcessJoin: map (map id: {}, instance id: {}) is not created!", m_MapId, m_InstanceID);
             EndNow();
             return;
         }
@@ -684,7 +684,7 @@ void Battleground::RewardReputationToTeam(uint32 factionId, uint32 reputation, T
         {
             uint32 realFactionId = GetRealRepFactionForPlayer(factionId, itr->second);
 
-            uint32 repGain = reputation;
+            float repGain = static_cast<float>(reputation);
             AddPct(repGain, itr->second->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
             AddPct(repGain, itr->second->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, realFactionId));
             if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(realFactionId))
@@ -777,14 +777,14 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         if (result)
         {
             Field* fields = result->Fetch();
-            battlegroundId = fields[0].GetUInt64() + 1;
+            battlegroundId = fields[0].Get<uint64>() + 1;
         }
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVPSTATS_BATTLEGROUND);
-        stmt->setUInt64(0, battlegroundId);
-        stmt->setUInt8(1, GetWinner());
-        stmt->setUInt8(2, GetUniqueBracketId());
-        stmt->setUInt8(3, GetBgTypeID(true));
+        stmt->SetData(0, battlegroundId);
+        stmt->SetData(1, GetPvPTeamId(GetWinner()));
+        stmt->SetData(2, GetUniqueBracketId());
+        stmt->SetData(3, GetBgTypeID(true));
         CharacterDatabase.Execute(stmt);
     }
 
@@ -820,34 +820,34 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
                 CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
-                stmt2->setUInt32(0, fightId);
-                stmt2->setUInt8(1, m_ArenaType);
-                stmt2->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
-                stmt2->setUInt32(3, winnerArenaTeam->GetId());
-                stmt2->setUInt32(4, loserArenaTeam->GetId());
-                stmt2->setUInt16(5, (uint16)winnerTeamRating);
-                stmt2->setUInt16(6, (uint16)winnerMatchmakerRating);
-                stmt2->setInt16(7, (int16)winnerChange);
-                stmt2->setUInt16(8, (uint16)loserTeamRating);
-                stmt2->setUInt16(9, (uint16)loserMatchmakerRating);
-                stmt2->setInt16(10, (int16)loserChange);
-                stmt2->setUInt32(11, currOnline);
+                stmt2->SetData(0, fightId);
+                stmt2->SetData(1, m_ArenaType);
+                stmt2->SetData(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
+                stmt2->SetData(3, winnerArenaTeam->GetId());
+                stmt2->SetData(4, loserArenaTeam->GetId());
+                stmt2->SetData(5, (uint16)winnerTeamRating);
+                stmt2->SetData(6, (uint16)winnerMatchmakerRating);
+                stmt2->SetData(7, (int16)winnerChange);
+                stmt2->SetData(8, (uint16)loserTeamRating);
+                stmt2->SetData(9, (uint16)loserMatchmakerRating);
+                stmt2->SetData(10, (int16)loserChange);
+                stmt2->SetData(11, currOnline);
                 trans->Append(stmt2);
 
                 uint8 memberId = 0;
                 for (Battleground::ArenaLogEntryDataMap::const_iterator itr = ArenaLogEntries.begin(); itr != ArenaLogEntries.end(); ++itr)
                 {
                     stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
-                    stmt2->setUInt32(0, fightId);
-                    stmt2->setUInt8(1, ++memberId);
-                    stmt2->setString(2, itr->second.Name);
-                    stmt2->setUInt32(3, itr->second.Guid);
-                    stmt2->setUInt32(4, itr->second.ArenaTeamId);
-                    stmt2->setUInt32(5, itr->second.Acc);
-                    stmt2->setString(6, itr->second.IP);
-                    stmt2->setUInt32(7, itr->second.DamageDone);
-                    stmt2->setUInt32(8, itr->second.HealingDone);
-                    stmt2->setUInt32(9, itr->second.KillingBlows);
+                    stmt2->SetData(0, fightId);
+                    stmt2->SetData(1, ++memberId);
+                    stmt2->SetData(2, itr->second.Name);
+                    stmt2->SetData(3, itr->second.Guid);
+                    stmt2->SetData(4, itr->second.ArenaTeamId);
+                    stmt2->SetData(5, itr->second.Acc);
+                    stmt2->SetData(6, itr->second.IP);
+                    stmt2->SetData(7, itr->second.DamageDone);
+                    stmt2->SetData(8, itr->second.HealingDone);
+                    stmt2->SetData(9, itr->second.KillingBlows);
                     trans->Append(stmt2);
                 }
 
@@ -879,34 +879,34 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
                 CharacterDatabasePreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
-                stmt3->setUInt32(0, fightId);
-                stmt3->setUInt8(1, m_ArenaType);
-                stmt3->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
-                stmt3->setUInt32(3, winnerArenaTeam->GetId());
-                stmt3->setUInt32(4, loserArenaTeam->GetId());
-                stmt3->setUInt16(5, (uint16)winnerTeamRating);
-                stmt3->setUInt16(6, (uint16)winnerMatchmakerRating);
-                stmt3->setInt16(7, (int16)winnerChange);
-                stmt3->setUInt16(8, (uint16)loserTeamRating);
-                stmt3->setUInt16(9, (uint16)loserMatchmakerRating);
-                stmt3->setInt16(10, (int16)loserChange);
-                stmt3->setUInt32(11, currOnline);
+                stmt3->SetData(0, fightId);
+                stmt3->SetData(1, m_ArenaType);
+                stmt3->SetData(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
+                stmt3->SetData(3, winnerArenaTeam->GetId());
+                stmt3->SetData(4, loserArenaTeam->GetId());
+                stmt3->SetData(5, (uint16)winnerTeamRating);
+                stmt3->SetData(6, (uint16)winnerMatchmakerRating);
+                stmt3->SetData(7, (int16)winnerChange);
+                stmt3->SetData(8, (uint16)loserTeamRating);
+                stmt3->SetData(9, (uint16)loserMatchmakerRating);
+                stmt3->SetData(10, (int16)loserChange);
+                stmt3->SetData(11, currOnline);
                 trans->Append(stmt3);
 
                 uint8 memberId = 0;
                 for (Battleground::ArenaLogEntryDataMap::const_iterator itr = ArenaLogEntries.begin(); itr != ArenaLogEntries.end(); ++itr)
                 {
                     stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
-                    stmt3->setUInt32(0, fightId);
-                    stmt3->setUInt8(1, ++memberId);
-                    stmt3->setString(2, itr->second.Name);
-                    stmt3->setUInt32(3, itr->second.Guid);
-                    stmt3->setUInt32(4, itr->second.ArenaTeamId);
-                    stmt3->setUInt32(5, itr->second.Acc);
-                    stmt3->setString(6, itr->second.IP);
-                    stmt3->setUInt32(7, itr->second.DamageDone);
-                    stmt3->setUInt32(8, itr->second.HealingDone);
-                    stmt3->setUInt32(9, itr->second.KillingBlows);
+                    stmt3->SetData(0, fightId);
+                    stmt3->SetData(1, ++memberId);
+                    stmt3->SetData(2, itr->second.Name);
+                    stmt3->SetData(3, itr->second.Guid);
+                    stmt3->SetData(4, itr->second.ArenaTeamId);
+                    stmt3->SetData(5, itr->second.Acc);
+                    stmt3->SetData(6, itr->second.IP);
+                    stmt3->SetData(7, itr->second.DamageDone);
+                    stmt3->SetData(8, itr->second.HealingDone);
+                    stmt3->SetData(9, itr->second.KillingBlows);
                     trans->Append(stmt3);
                 }
 
@@ -1015,20 +1015,20 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVPSTATS_PLAYER);
             BattlegroundScoreMap::const_iterator score = PlayerScores.find(player->GetGUID());
 
-            stmt->setUInt32(0, battlegroundId);
-            stmt->setUInt32(1, player->GetGUID().GetCounter());
-            stmt->setBool(2, bgTeamId == winnerTeamId);
-            stmt->setUInt32(3, score->second->GetKillingBlows());
-            stmt->setUInt32(4, score->second->GetDeaths());
-            stmt->setUInt32(5, score->second->GetHonorableKills());
-            stmt->setUInt32(6, score->second->GetBonusHonor());
-            stmt->setUInt32(7, score->second->GetDamageDone());
-            stmt->setUInt32(8, score->second->GetHealingDone());
-            stmt->setUInt32(9, score->second->GetAttr1());
-            stmt->setUInt32(10, score->second->GetAttr2());
-            stmt->setUInt32(11, score->second->GetAttr3());
-            stmt->setUInt32(12, score->second->GetAttr4());
-            stmt->setUInt32(13, score->second->GetAttr5());
+            stmt->SetData(0, battlegroundId);
+            stmt->SetData(1, player->GetGUID().GetCounter());
+            stmt->SetData(2, bgTeamId == winnerTeamId);
+            stmt->SetData(3, score->second->GetKillingBlows());
+            stmt->SetData(4, score->second->GetDeaths());
+            stmt->SetData(5, score->second->GetHonorableKills());
+            stmt->SetData(6, score->second->GetBonusHonor());
+            stmt->SetData(7, score->second->GetDamageDone());
+            stmt->SetData(8, score->second->GetHealingDone());
+            stmt->SetData(9, score->second->GetAttr1());
+            stmt->SetData(10, score->second->GetAttr2());
+            stmt->SetData(11, score->second->GetAttr3());
+            stmt->SetData(12, score->second->GetAttr4());
+            stmt->SetData(13, score->second->GetAttr5());
 
             CharacterDatabase.Execute(stmt);
         }
@@ -1167,7 +1167,7 @@ void Battleground::Init()
 
     if (m_BgInvitedPlayers[TEAM_ALLIANCE] > 0 || m_BgInvitedPlayers[TEAM_HORDE] > 0)
     {
-        LOG_ERROR("bg.battleground", "Battleground::Reset: one of the counters is not 0 (alliance: %u, horde: %u) for BG (map: %u, instance id: %u)!", m_BgInvitedPlayers[TEAM_ALLIANCE], m_BgInvitedPlayers[TEAM_HORDE], m_MapId, m_InstanceID);
+        LOG_ERROR("bg.battleground", "Battleground::Reset: one of the counters is not 0 (alliance: {}, horde: {}) for BG (map: {}, instance id: {})!", m_BgInvitedPlayers[TEAM_ALLIANCE], m_BgInvitedPlayers[TEAM_HORDE], m_MapId, m_InstanceID);
         ABORT();
     }
 
@@ -1266,7 +1266,7 @@ void Battleground::AddPlayer(Player* player)
     sScriptMgr->OnBattlegroundAddPlayer(this, player);
 
     // Log
-    LOG_DEBUG("bg.battleground", "BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
+    LOG_DEBUG("bg.battleground", "BATTLEGROUND: Player {} joined the battle.", player->GetName());
 }
 
 // this method adds player to his team's bg group, or sets his correct group if player is already in bg group
@@ -1274,7 +1274,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId)
 {
     if (player->GetGroup() && (player->GetGroup()->isBGGroup() || player->GetGroup()->isBFGroup()))
     {
-        LOG_INFO("misc", "Battleground::AddOrSetPlayerToCorrectBgGroup - player is already in %s group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
+        LOG_INFO("misc", "Battleground::AddOrSetPlayerToCorrectBgGroup - player is already in {} group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
         return;
     }
 
@@ -1443,7 +1443,7 @@ void Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, 
             }
             break;
         default:
-            LOG_ERROR("bg.battleground", "Battleground::UpdatePlayerScore: unknown score type (%u) for BG (map: %u, instance id: %u)!",
+            LOG_ERROR("bg.battleground", "Battleground::UpdatePlayerScore: unknown score type ({}) for BG (map: {}, instance id: {})!",
                            type, m_MapId, m_InstanceID);
             break;
     }
@@ -1511,9 +1511,9 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
     if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, GetBgMap(),
                     PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, goState))
     {
-        LOG_ERROR("sql.sql", "Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("sql.sql", "Battleground::AddObject: cannot create gameobject (entry: {}) for BG (map: {}, instance id: {})!",
                          entry, m_MapId, m_InstanceID);
-        LOG_ERROR("bg.battleground", "Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("bg.battleground", "Battleground::AddObject: cannot create gameobject (entry: {}) for BG (map: {}, instance id: {})!",
                        entry, m_MapId, m_InstanceID);
         delete go;
         return false;
@@ -1564,8 +1564,8 @@ void Battleground::DoorClose(uint32 type)
         }
     }
     else
-        LOG_ERROR("bg.battleground", "Battleground::DoorClose: door gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
-                       type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
+        LOG_ERROR("bg.battleground", "Battleground::DoorClose: door gameobject (type: {}, {}) not found for BG (map: {}, instance id: {})!",
+                       type, BgObjects[type].ToString(), m_MapId, m_InstanceID);
 }
 
 void Battleground::DoorOpen(uint32 type)
@@ -1576,16 +1576,16 @@ void Battleground::DoorOpen(uint32 type)
         obj->SetGoState(GO_STATE_ACTIVE);
     }
     else
-        LOG_ERROR("bg.battleground", "Battleground::DoorOpen: door gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
-                       type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
+        LOG_ERROR("bg.battleground", "Battleground::DoorOpen: door gameobject (type: {}, {}) not found for BG (map: {}, instance id: {})!",
+                       type, BgObjects[type].ToString(), m_MapId, m_InstanceID);
 }
 
 GameObject* Battleground::GetBGObject(uint32 type)
 {
     GameObject* obj = GetBgMap()->GetGameObject(BgObjects[type]);
     if (!obj)
-        LOG_ERROR("bg.battleground", "Battleground::GetBGObject: gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
-                       type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
+        LOG_ERROR("bg.battleground", "Battleground::GetBGObject: gameobject (type: {}, {}) not found for BG (map: {}, instance id: {})!",
+                       type, BgObjects[type].ToString(), m_MapId, m_InstanceID);
     return obj;
 }
 
@@ -1593,8 +1593,8 @@ Creature* Battleground::GetBGCreature(uint32 type)
 {
     Creature* creature = GetBgMap()->GetCreature(BgCreatures[type]);
     if (!creature)
-        LOG_ERROR("bg.battleground", "Battleground::GetBGCreature: creature (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
-                       type, BgCreatures[type].ToString().c_str(), m_MapId, m_InstanceID);
+        LOG_ERROR("bg.battleground", "Battleground::GetBGCreature: creature (type: {}, {}) not found for BG (map: {}, instance id: {})!",
+                       type, BgCreatures[type].ToString(), m_MapId, m_InstanceID);
     return creature;
 }
 
@@ -1643,7 +1643,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     Creature* creature = new Creature();
     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
     {
-        LOG_ERROR("bg.battleground", "Battleground::AddCreature: cannot create creature (entry: %u) for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("bg.battleground", "Battleground::AddCreature: cannot create creature (entry: {}) for BG (map: {}, instance id: {})!",
                        entry, m_MapId, m_InstanceID);
         delete creature;
         return nullptr;
@@ -1654,7 +1654,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
     if (!cinfo)
     {
-        LOG_ERROR("bg.battleground", "Battleground::AddCreature: creature template (entry: %u) does not exist for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("bg.battleground", "Battleground::AddCreature: creature template (entry: {}) does not exist for BG (map: {}, instance id: {})!",
                        entry, m_MapId, m_InstanceID);
         delete creature;
         return nullptr;
@@ -1693,8 +1693,8 @@ bool Battleground::DelCreature(uint32 type)
         return true;
     }
 
-    LOG_ERROR("bg.battleground", "Battleground::DelCreature: creature (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
-                   type, BgCreatures[type].ToString().c_str(), m_MapId, m_InstanceID);
+    LOG_ERROR("bg.battleground", "Battleground::DelCreature: creature (type: {}, {}) not found for BG (map: {}, instance id: {})!",
+                   type, BgCreatures[type].ToString(), m_MapId, m_InstanceID);
 
     BgCreatures[type].Clear();
     return false;
@@ -1713,8 +1713,8 @@ bool Battleground::DelObject(uint32 type)
         return true;
     }
 
-    LOG_ERROR("bg.battleground", "Battleground::DelObject: gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
-                   type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
+    LOG_ERROR("bg.battleground", "Battleground::DelObject: gameobject (type: {}, {}) not found for BG (map: {}, instance id: {})!",
+                   type, BgObjects[type].ToString(), m_MapId, m_InstanceID);
 
     BgObjects[type].Clear();
     return false;
@@ -1738,7 +1738,7 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
         //creature->CastSpell(creature, SPELL_SPIRIT_HEAL_CHANNEL, true);
         return true;
     }
-    LOG_ERROR("bg.battleground", "Battleground::AddSpiritGuide: cannot create spirit guide (type: %u, entry: %u) for BG (map: %u, instance id: %u)!",
+    LOG_ERROR("bg.battleground", "Battleground::AddSpiritGuide: cannot create spirit guide (type: {}, entry: {}) for BG (map: {}, instance id: {})!",
                    type, entry, m_MapId, m_InstanceID);
     EndNow();
     return false;
@@ -1948,8 +1948,8 @@ int32 Battleground::GetObjectType(ObjectGuid guid)
         if (BgObjects[i] == guid)
             return i;
 
-    LOG_ERROR("bg.battleground", "Battleground::GetObjectType: player used gameobject (%s) which is not in internal data for BG (map: %u, instance id: %u), cheating?",
-                   guid.ToString().c_str(), m_MapId, m_InstanceID);
+    LOG_ERROR("bg.battleground", "Battleground::GetObjectType: player used gameobject ({}) which is not in internal data for BG (map: {}, instance id: {}), cheating?",
+                   guid.ToString(), m_MapId, m_InstanceID);
 
     return -1;
 }
@@ -2005,7 +2005,7 @@ uint32 Battleground::GetTeamScore(TeamId teamId) const
     if (teamId == TEAM_ALLIANCE || teamId == TEAM_HORDE)
         return m_TeamScores[teamId];
 
-    LOG_ERROR("bg.battleground", "GetTeamScore with wrong Team %u for BG %u", teamId, GetBgTypeID());
+    LOG_ERROR("bg.battleground", "GetTeamScore with wrong Team {} for BG {}", teamId, GetBgTypeID());
     return 0;
 }
 

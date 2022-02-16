@@ -615,7 +615,7 @@ public:
             DoCast(SPELL_OMEN_SUMMON_SPOTLIGHT);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ELUNE_CANDLE)
             {
@@ -671,6 +671,7 @@ public:
         {
             events.Reset();
             events.ScheduleEvent(EVENT_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void UpdateAI(uint32 diff) override

@@ -93,22 +93,22 @@ public:
         if (sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_STATS);
-            stmt->setUInt32(0, player->GetGUID().GetCounter());
+            stmt->SetData(0, player->GetGUID().GetCounter());
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
             if (result)
             {
                 Field* fields = result->Fetch();
-                uint32 MaxHealth = fields[0].GetUInt32();
-                uint32 Strength = fields[1].GetUInt32();
-                uint32 Agility = fields[2].GetUInt32();
-                uint32 Stamina = fields[3].GetUInt32();
-                uint32 Intellect = fields[4].GetUInt32();
-                uint32 Spirit = fields[5].GetUInt32();
-                uint32 Armor = fields[6].GetUInt32();
-                uint32 AttackPower = fields[7].GetUInt32();
-                uint32 SpellPower = fields[8].GetUInt32();
-                uint32 Resilience = fields[9].GetUInt32();
+                uint32 MaxHealth = fields[0].Get<uint32>();
+                uint32 Strength = fields[1].Get<uint32>();
+                uint32 Agility = fields[2].Get<uint32>();
+                uint32 Stamina = fields[3].Get<uint32>();
+                uint32 Intellect = fields[4].Get<uint32>();
+                uint32 Spirit = fields[5].Get<uint32>();
+                uint32 Armor = fields[6].Get<uint32>();
+                uint32 AttackPower = fields[7].Get<uint32>();
+                uint32 SpellPower = fields[8].Get<uint32>();
+                uint32 Resilience = fields[9].Get<uint32>();
 
                 handler->PSendSysMessage("Health: |cff00ffff%u|r - Stamina: |cff00ffff%u|r", MaxHealth, Stamina);
                 handler->PSendSysMessage("Strength: |cff00ffff%u|r - Agility: |cff00ffff%u|r", Strength, Agility);

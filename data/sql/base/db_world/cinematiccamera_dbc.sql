@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.cinematiccamera_dbc
+-- Дамп структуры для таблица acore_world.cinematiccamera_dbc
 DROP TABLE IF EXISTS `cinematiccamera_dbc`;
 CREATE TABLE IF NOT EXISTS `cinematiccamera_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `cinematiccamera_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
 
--- Дамп данных таблицы _acore_world.cinematiccamera_dbc: 0 rows
+-- Дамп данных таблицы acore_world.cinematiccamera_dbc: 0 rows
 DELETE FROM `cinematiccamera_dbc`;
 /*!40000 ALTER TABLE `cinematiccamera_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `cinematiccamera_dbc` ENABLE KEYS */;

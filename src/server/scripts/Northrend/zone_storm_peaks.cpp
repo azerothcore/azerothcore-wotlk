@@ -147,7 +147,7 @@ public:
                 me->SetControlled(true, UNIT_STATE_STUNNED);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_STORM_HAMMER)
             {
@@ -413,7 +413,7 @@ public:
                 setCharm = true;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (!playerGUID && spellInfo->Id == SPELL_SPEAR_OF_HODIR)
             {
@@ -789,7 +789,7 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != SPELL_ICE_LANCE)
                 return;
@@ -1067,21 +1067,40 @@ public:
     }
 };
 
+enum CollapsingCave
+{
+    SPELL_COLLAPSING_CAVE = 55486
+};
+
+// 55693 - Remove Collapsing Cave Aura
+class spell_q12823_remove_collapsing_cave_aura : public SpellScript
+{
+    PrepareSpellScript(spell_q12823_remove_collapsing_cave_aura);
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_COLLAPSING_CAVE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12823_remove_collapsing_cave_aura::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_storm_peaks()
 {
-    // Ours
     new npc_frosthound();
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     new npc_wild_wyrm();
     new spell_q13003_thursting_hodirs_spear();
     new spell_q13007_iron_colossus();
-
-    // Theirs
     new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();
     new npc_icefang();
     new npc_hyldsmeet_protodrake();
     new spell_close_rift();
+    RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }

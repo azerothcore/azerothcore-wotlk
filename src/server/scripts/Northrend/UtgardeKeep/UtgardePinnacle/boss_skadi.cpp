@@ -321,7 +321,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == 47593) // SPELL_FLAME_VISUAL trigger
                 target->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);

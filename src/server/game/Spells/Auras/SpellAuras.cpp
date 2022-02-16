@@ -18,6 +18,7 @@
 #include "ArenaSpectator.h"
 #include "CellImpl.h"
 #include "Common.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -80,11 +81,11 @@ AuraApplication::AuraApplication(Unit* target, Unit* caster, Aura* aura, uint8 e
             _slot = slot;
             GetTarget()->SetVisibleAura(slot, this);
             SetNeedClientUpdate();
-            LOG_DEBUG("spells.aura", "Aura: %u Effect: %d put to unit visible auras slot: %u", GetBase()->GetId(), GetEffectMask(), slot);
+            LOG_DEBUG("spells.aura", "Aura: {} Effect: {} put to unit visible auras slot: {}", GetBase()->GetId(), GetEffectMask(), slot);
         }
         else
         {
-            LOG_ERROR("spells.aura", "Aura: %u Effect: %d could not find empty unit visible slot", GetBase()->GetId(), GetEffectMask());
+            LOG_ERROR("spells.aura", "Aura: {} Effect: {} could not find empty unit visible slot", GetBase()->GetId(), GetEffectMask());
         }
     }
     _InitFlags(caster, effMask);
@@ -163,7 +164,7 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
     ASSERT(aurEff);
     ASSERT(HasEffect(effIndex) == (!apply));
     ASSERT((1 << effIndex) & _effectsToApply);
-    LOG_DEBUG("spells.aura", "AuraApplication::_HandleEffect: %u, apply: %u: amount: %u", aurEff->GetAuraType(), apply, aurEff->GetAmount());
+    LOG_DEBUG("spells.aura", "AuraApplication::_HandleEffect: {}, apply: {}: amount: {}", aurEff->GetAuraType(), apply, aurEff->GetAmount());
 
     if (apply)
     {
@@ -286,7 +287,7 @@ void AuraApplication::ClientUpdate(bool remove)
     BuildUpdatePacket(data, remove);
 
     if (GetSlot() < MAX_AURAS)
-        if (const Player* plr = GetTarget()->ToPlayer())
+        if (Player const* plr = GetTarget()->ToPlayer())
             if (Aura* aura = GetBase())
                 if (plr->NeedSendSpectatorData() && ArenaSpectator::ShouldSendAura(aura, GetEffectMask(), GetTarget()->GetGUID(), remove))
                     ArenaSpectator::SendCommand_Aura(plr->FindMap(), plr->GetGUID(), "AUR", aura->GetCasterGUID(), aura->GetSpellInfo()->Id, aura->GetSpellInfo()->IsPositive(), aura->GetSpellInfo()->Dispel, aura->GetDuration(), aura->GetMaxDuration(), (aura->GetCharges() > 1 ? aura->GetCharges() : aura->GetStackAmount()), remove);
@@ -407,7 +408,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
 
 Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID /*= ObjectGuid::Empty*/) :
     m_spellInfo(spellproto), m_casterGuid(casterGUID ? casterGUID : caster->GetGUID()),
-    m_castItemGuid(itemGUID ? itemGUID : castItem ? castItem->GetGUID() : ObjectGuid::Empty), m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(time(nullptr)),
+    m_castItemGuid(itemGUID ? itemGUID : castItem ? castItem->GetGUID() : ObjectGuid::Empty), m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(GameTime::GetGameTime().count()),
     m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
     m_casterLevel(caster ? caster->getLevel() : m_spellInfo->SpellLevel), m_procCharges(0), m_stackAmount(1),
     m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false), m_triggeredByAuraSpellInfo(nullptr)
@@ -522,8 +523,8 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
     // TODO: Figure out why this happens
     if (itr == m_applications.end())
     {
-        LOG_ERROR("spells.aura", "Aura::_UnapplyForTarget, target:%s, caster:%s, spell:%u was not found in owners application map!",
-                       target->GetGUID().ToString().c_str(), caster ? caster->GetGUID().ToString().c_str() : "", auraApp->GetBase()->GetSpellInfo()->Id);
+        LOG_ERROR("spells.aura", "Aura::_UnapplyForTarget, target:{}, caster:{}, spell:{} was not found in owners application map!",
+                       target->GetGUID().ToString(), caster ? caster->GetGUID().ToString() : "", auraApp->GetBase()->GetSpellInfo()->Id);
         ABORT();
     }
 
@@ -714,9 +715,9 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             if (!GetOwner()->IsSelfOrInSameMap(itr->first))
             {
                 //TODO: There is a crash caused by shadowfiend load addon
-                LOG_FATAL("spells.aura", "Aura %u: Owner %s (map %u) is not in the same map as target %s (map %u).", GetSpellInfo()->Id,
-                               GetOwner()->GetName().c_str(), GetOwner()->IsInWorld() ? GetOwner()->GetMap()->GetId() : uint32(-1),
-                               itr->first->GetName().c_str(), itr->first->IsInWorld() ? itr->first->GetMap()->GetId() : uint32(-1));
+                LOG_FATAL("spells.aura", "Aura {}: Owner {} (map {}) is not in the same map as target {} (map {}).", GetSpellInfo()->Id,
+                               GetOwner()->GetName(), GetOwner()->IsInWorld() ? GetOwner()->GetMap()->GetId() : uint32(-1),
+                               itr->first->GetName(), itr->first->IsInWorld() ? itr->first->GetMap()->GetId() : uint32(-1));
                 ABORT();
             }
             itr->first->_CreateAuraApplication(this, itr->second);
@@ -936,6 +937,28 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
         {
             aurEff->CalculatePeriodic(caster, periodicReset, false);
             aurEff->CalculatePeriodicData();
+        }
+    }
+}
+
+// xinef: dot's rolling function
+void Aura::RefreshTimersWithMods()
+{
+    Unit* caster = GetCaster();
+    m_maxDuration = CalcMaxDuration();
+    if ((caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo)) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
+    {
+        m_maxDuration = int32(m_maxDuration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+    }
+
+    // xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
+    RefreshDuration();
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (AuraEffect* aurEff = m_effects[i])
+        {
+            aurEff->CalculatePeriodic(caster, false, false);
         }
     }
 }
@@ -1161,7 +1184,7 @@ void Aura::UnregisterSingleTarget()
     Unit* caster = GetCaster();
     if (!caster)
     {
-        LOG_INFO("spells", "Aura::UnregisterSingleTarget: (A1) - %u, %u, %u, %s", GetId(), GetOwner()->GetTypeId(), GetOwner()->GetEntry(), GetOwner()->GetName().c_str());
+        LOG_INFO("spells", "Aura::UnregisterSingleTarget: (A1) - {}, {}, {}, {}", GetId(), GetOwner()->GetTypeId(), GetOwner()->GetEntry(), GetOwner()->GetName());
         LOG_ERROR("spells", "Aura::UnregisterSingleTarget: No caster was found."); //ASSERT(caster);
     }
     else
@@ -1409,7 +1432,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                     spellId = 57531;
                                     break;
                                 default:
-                                    LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Arcane Potency (%d) found", aurEff->GetId());
+                                    LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Arcane Potency ({}) found", aurEff->GetId());
                             }
                             if (spellId)
                                 caster->CastSpell(caster, spellId, true);
@@ -1534,7 +1557,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 spellId = 50508;
                                 break;
                             default:
-                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever/Ebon Plague (%d) found", aurEff->GetId());
+                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever/Ebon Plague ({}) found", aurEff->GetId());
                         }
                         caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                     }
@@ -1660,7 +1683,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 spellId = 60946;
                                 break;
                             default:
-                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Improved Fear (%d) found", aurEff->GetId());
+                                LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Improved Fear ({}) found", aurEff->GetId());
                         }
                         if (spellId)
                             caster->CastSpell(target, spellId, true);
@@ -1783,7 +1806,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Remove Vanish on stealth remove
                     if (GetId() == 1784)
+                    {
                         target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, ObjectGuid::Empty);
+                        target->RemoveAurasDueToSpell(18461);
+                    }
                     break;
                 }
 
@@ -2005,9 +2031,14 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
         // xinef: check priority before effect mask
         SpellGroupSpecialFlags thisAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(GetId());
         SpellGroupSpecialFlags existingAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(existingSpellInfo->Id);
-        if (thisAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && existingAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1)
+        if (thisAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && thisAuraFlag <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4 &&
+            existingAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && existingAuraFlag <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4)
+        {
             if (thisAuraFlag < existingAuraFlag)
+            {
                 return false;
+            }
+        }
 
         // xinef: forced strongest aura in group by flag
         if (stackFlags & SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST)
@@ -2112,7 +2143,7 @@ bool Aura::IsProcOnCooldown() const
 {
     /*if (m_procCooldown)
     {
-        if (m_procCooldown > time(nullptr))
+        if (m_procCooldown > GameTime::GetGameTime().count())
             return true;
     }*/
     return false;
@@ -2120,7 +2151,7 @@ bool Aura::IsProcOnCooldown() const
 
 void Aura::AddProcCooldown(uint32 /*msec*/)
 {
-    //m_procCooldown = time(nullptr) + msec;
+    //m_procCooldown = GameTime::GetGameTime().count() + msec;
 }
 
 void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo)
@@ -2286,7 +2317,7 @@ void Aura::LoadScripts()
             m_loadedScripts.erase(bitr);
             continue;
         }
-        LOG_DEBUG("spells.aura", "Aura::LoadScripts: Script `%s` for aura `%u` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
+        LOG_DEBUG("spells.aura", "Aura::LoadScripts: Script `{}` for aura `{}` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
         (*itr)->Register();
         ++itr;
     }
