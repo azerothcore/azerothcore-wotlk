@@ -34,10 +34,10 @@ constexpr std::array<std::string_view, MAX_ITEM_QUALITY> itemQualityToString =
 
 using namespace Acore::ChatCommands;
 
-class bg_commandscript : public CommandScript
+class bag_commandscript : public CommandScript
 {
 public:
-    bg_commandscript() : CommandScript("bg_commandscript") { }
+    bag_commandscript() : CommandScript("bag_commandscript") { }
 
     ChatCommandTable GetCommands() const override
     {
@@ -156,5 +156,5 @@ public:
 
 void AddSC_bag_commandscript()
 {
-    new bg_commandscript();
+    new bag_commandscript();
 }
