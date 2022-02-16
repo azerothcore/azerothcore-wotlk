@@ -20,6 +20,8 @@
 
 #include "DatabaseEnvFwd.h"
 #include "Define.h"
+#include "Field.h"
+#include <tuple>
 #include <vector>
 
 class AC_DATABASE_API ResultSet
@@ -36,6 +38,22 @@ public:
     [[nodiscard]] Field* Fetch() const { return _currentRow; }
     Field const& operator[](std::size_t index) const;
 
+    template<typename... Ts>
+    inline std::tuple<Ts...> FetchTuple()
+    {
+        AssertRows(sizeof...(Ts));
+
+        std::tuple<Ts...> theTuple = {};
+
+        std::apply([this](Ts&... args)
+        {
+            uint8 index{ 0 };
+            ((args = _currentRow[index].Get<Ts>(), index++), ...);
+        }, theTuple);
+
+        return theTuple;
+    }
+
 protected:
     std::vector<QueryResultFieldMetadata> _fieldMetadata;
     uint64 _rowCount;
@@ -44,6 +62,8 @@ protected:
 
 private:
     void CleanUp();
+    void AssertRows(std::size_t sizeRows);
+
     MySQLResult* _result;
     MySQLField* _fields;
 
@@ -64,6 +84,22 @@ public:
     [[nodiscard]] Field* Fetch() const;
     Field const& operator[](std::size_t index) const;
 
+    template<typename... Ts>
+    inline std::tuple<Ts...> FetchTuple()
+    {
+        AssertRows(sizeof...(Ts));
+
+        std::tuple<Ts...> theTuple = {};
+
+        std::apply([this](Ts&... args)
+        {
+            uint8 index{ 0 };
+            ((args = m_rows[uint32(m_rowPosition) * m_fieldCount + index].Get<Ts>(), index++), ...);
+        }, theTuple);
+
+        return theTuple;
+    }
+
 protected:
     std::vector<QueryResultFieldMetadata> m_fieldMetadata;
     std::vector<Field> m_rows;
@@ -78,6 +114,8 @@ private:
 
     void CleanUp();
     bool _NextRow();
+
+    void AssertRows(std::size_t sizeRows);
 
     PreparedResultSet(PreparedResultSet const& right) = delete;
     PreparedResultSet& operator=(PreparedResultSet const& right) = delete;

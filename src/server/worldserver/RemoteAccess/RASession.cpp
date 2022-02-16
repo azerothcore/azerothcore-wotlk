@@ -27,7 +27,6 @@
 #include "World.h"
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/read_until.hpp>
-#include <memory>
 #include <thread>
 
 using boost::asio::ip::tcp;
@@ -58,7 +57,7 @@ void RASession::Start()
     if (username.empty())
         return;
 
-    LOG_INFO("commands.ra", "Accepting RA connection from user %s (IP: %s)", username.c_str(), GetRemoteIpAddress().c_str());
+    LOG_INFO("commands.ra", "Accepting RA connection from user {} (IP: {})", username, GetRemoteIpAddress());
 
     Send("Password: ");
 
@@ -73,7 +72,7 @@ void RASession::Start()
         return;
     }
 
-    LOG_INFO("commands.ra", "User %s (IP: %s) authenticated correctly to RA", username.c_str(), GetRemoteIpAddress().c_str());
+    LOG_INFO("commands.ra", "User {} (IP: {}) authenticated correctly to RA", username, GetRemoteIpAddress());
 
     // Authentication successful, send the motd
     Send(std::string(std::string(Motd::GetMotd()) + "\r\n").c_str());
@@ -127,25 +126,25 @@ bool RASession::CheckAccessLevel(const std::string& user)
     Utf8ToUpperOnlyLatin(safeUser);
 
     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
-    stmt->setString(0, safeUser);
+    stmt->SetData(0, safeUser);
 
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
     {
-        LOG_INFO("commands.ra", "User %s does not exist in database", user.c_str());
+        LOG_INFO("commands.ra", "User {} does not exist in database", user);
         return false;
     }
 
     Field* fields = result->Fetch();
 
-    if (fields[1].GetUInt8() < sConfigMgr->GetOption<int32>("Ra.MinLevel", 3))
+    if (fields[1].Get<uint8>() < sConfigMgr->GetOption<int32>("Ra.MinLevel", 3))
     {
-        LOG_INFO("commands.ra", "User %s has no privilege to login", user.c_str());
+        LOG_INFO("commands.ra", "User {} has no privilege to login", user);
         return false;
     }
-    else if (fields[2].GetInt32() != -1)
+    else if (fields[2].Get<int32>() != -1)
     {
-        LOG_INFO("commands.ra", "User %s has to be assigned on all realms (with RealmID = '-1')", user.c_str());
+        LOG_INFO("commands.ra", "User {} has to be assigned on all realms (with RealmID = '-1')", user);
         return false;
     }
 
@@ -164,18 +163,18 @@ bool RASession::CheckPassword(const std::string& user, const std::string& pass)
 
     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
 
-    stmt->setString(0, safe_user);
+    stmt->SetData(0, safe_user);
 
     if (PreparedQueryResult result = LoginDatabase.Query(stmt))
     {
-        Acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>();
-        Acore::Crypto::SRP6::Verifier verifier = (*result)[1].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>();
+        Acore::Crypto::SRP6::Salt salt = (*result)[0].Get<Binary, Acore::Crypto::SRP6::SALT_LENGTH>();
+        Acore::Crypto::SRP6::Verifier verifier = (*result)[1].Get<Binary, Acore::Crypto::SRP6::VERIFIER_LENGTH>();
 
         if (Acore::Crypto::SRP6::CheckLogin(safe_user, safe_pass, salt, verifier))
             return true;
     }
 
-    LOG_INFO("commands.ra", "Wrong password for user: %s", user.c_str());
+    LOG_INFO("commands.ra", "Wrong password for user: {}", user);
     return false;
 }
 
@@ -184,7 +183,7 @@ bool RASession::ProcessCommand(std::string& command)
     if (command.length() == 0)
         return true;
 
-    LOG_INFO("commands.ra", "Received command: %s", command.c_str());
+    LOG_INFO("commands.ra", "Received command: {}", command);
 
     // handle quit, exit and logout commands to terminate connection
     if (command == "quit" || command == "exit" || command == "logout")

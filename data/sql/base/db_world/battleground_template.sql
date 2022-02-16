@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.battleground_template
+-- Дамп структуры для таблица acore_world.battleground_template
 DROP TABLE IF EXISTS `battleground_template`;
 CREATE TABLE IF NOT EXISTS `battleground_template` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `MinPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
   `MaxPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
   `MinLvl` TINYINT unsigned NOT NULL DEFAULT 0,
   `MaxLvl` TINYINT unsigned NOT NULL DEFAULT 0,
-  `AllianceStartLoc` mediumint(8) unsigned NOT NULL,
+  `AllianceStartLoc` MEDIUMINT unsigned NOT NULL,
   `AllianceStartO` float NOT NULL,
-  `HordeStartLoc` mediumint(8) unsigned NOT NULL,
+  `HordeStartLoc` MEDIUMINT unsigned NOT NULL,
   `HordeStartO` float NOT NULL,
   `StartMaxDist` float NOT NULL DEFAULT 0,
   `Weight` TINYINT unsigned NOT NULL DEFAULT 1,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `battleground_template` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.battleground_template: 13 rows
+-- Дамп данных таблицы acore_world.battleground_template: 13 rows
 DELETE FROM `battleground_template`;
 /*!40000 ALTER TABLE `battleground_template` DISABLE KEYS */;
 INSERT INTO `battleground_template` (`ID`, `MinPlayersPerTeam`, `MaxPlayersPerTeam`, `MinLvl`, `MaxLvl`, `AllianceStartLoc`, `AllianceStartO`, `HordeStartLoc`, `HordeStartO`, `StartMaxDist`, `Weight`, `ScriptName`, `Comment`) VALUES
