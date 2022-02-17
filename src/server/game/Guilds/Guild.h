@@ -280,7 +280,7 @@ public:
     void SetRights(uint8 _rights) { rights = _rights; }
 
     uint8 GetTabId() const { return tabId; }
-    int32 GetSlots() const { return slots; }
+    uint32 GetSlots() const { return slots; }
     uint8 GetRights() const { return rights; }
 
 private:
