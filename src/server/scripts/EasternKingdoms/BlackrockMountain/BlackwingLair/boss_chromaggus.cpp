@@ -247,12 +247,13 @@ public:
                             break;
                     case EVENT_AFFLICTION:
                         {
+                            uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource()->ToPlayer())
                                 {
-                                    DoCast(player, RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN), true);
+                                    DoCast(player, afflictionSpellID, true);
 
                                         if (player->HasAura(SPELL_BROODAF_BLUE) &&
                                             player->HasAura(SPELL_BROODAF_BLACK) &&
