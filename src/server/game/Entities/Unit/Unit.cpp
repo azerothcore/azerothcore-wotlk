@@ -20099,6 +20099,11 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                         appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
                     }
 
+                    if (!target->CanSeeVendor(creature))
+                    {
+                        appendValue &= ~UNIT_NPC_FLAG_VENDOR_MASK;
+                    }
+
                     if (!creature->IsValidTrainerForPlayer(target, &appendValue))
                     {
                         appendValue &= ~UNIT_NPC_FLAG_TRAINER;
