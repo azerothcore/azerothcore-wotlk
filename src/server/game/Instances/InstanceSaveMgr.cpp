@@ -789,5 +789,11 @@ void InstanceSaveMgr::UnbindAllFor(InstanceSave* save)
 {
     GuidList& pList = save->m_playerList;
     while (!pList.empty())
+    {
+        // Clear summons to the instance we are about to reset
+        Player* player = ObjectAccessor::FindConnectedPlayer(*(pList.begin()));
+        player->ClearSummonsToMapId(save->GetMapId());
+
         PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::FindConnectedPlayer(*(pList.begin())));
+    }
 }

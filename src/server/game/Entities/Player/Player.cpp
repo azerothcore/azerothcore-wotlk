@@ -1321,6 +1321,39 @@ void Player::SendTeleportAckPacket()
     GetSession()->SendPacket(&data);
 }
 
+void Player::ExpireSummonTimer()
+{
+    this->m_summon_expire = 0;
+}
+
+// Attempts to set summon position to instance door
+void Player::SetSummonToInstanceDoor(uint32 mapid)
+{
+    int32 mapEntrance;
+    float x, y, z;
+    MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
+    mEntry->GetEntrancePos(mapEntrance, x, y);
+
+    Map* map = sMapMgr->FindBaseMap(mapEntrance);
+    z = map->GetGridHeight(x, y) + 2.0f;
+
+    this->SetSummonPoint(mapEntrance, x, y, z);
+}
+
+// Used to notify client, their summon has been invalidated
+void Player::ClearSummonsToMapId(uint32 mapid)
+{
+    if (this->m_summon_mapid == mapid)
+    {
+        ExpireSummonTimer();
+        //this->SetSummonToInstanceDoor(mapid);
+
+        WorldPacket data(SMSG_SUMMON_CANCEL, 4);
+        data << uint32(mapid);
+        GetSession()->SendPacket(&data);
+    }
+}
+
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/, bool newInstance /*= false*/)
 {
     // for except kick by antispeedhack

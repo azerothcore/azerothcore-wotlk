@@ -1059,6 +1059,8 @@ public:
         return GetSession()->GetSessionDbLocaleIndex() == LOCALE_esES || GetSession()->GetSessionDbLocaleIndex() == LOCALE_esMX;
     }
 
+    void ClearSummonsToMapId(uint32 mapid);
+
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr, bool newInstance = false);
     bool TeleportTo(WorldLocation const& loc, uint32 options = 0, Unit* target = nullptr)
     {
@@ -1957,6 +1959,12 @@ public:
     void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
 
     void SendTeleportAckPacket();
+
+    void ExpireSummonTimer();
+
+    void SetSummonToInstanceDoor(uint32 mapid);
+
+    MapEntry const* GetActiveSummonMap();
 
     [[nodiscard]] Corpse* GetCorpse() const;
     void SpawnCorpseBones(bool triggerSave = true);
