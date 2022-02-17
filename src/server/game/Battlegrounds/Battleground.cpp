@@ -2017,5 +2017,5 @@ void Battleground::RewardXPAtKill(Player* killer, Player* victim)
 
 uint8 Battleground::GetUniqueBracketId() const
 {
-    return GetMinLevel() / 10;
+    return GetMaxLevel() / 10;
 }
