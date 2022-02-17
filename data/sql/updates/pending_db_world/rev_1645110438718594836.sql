@@ -5,7 +5,7 @@ UPDATE `creature` SET `position_x`=-599.2371, `position_y`=-4291.6836, `position
 UPDATE `creature` SET `position_x`=-596.62146, `position_y`=-4292.42, `position_z`=37.848602, `orientation`=4.701281, `MovementType`=0 WHERE `guid`=3256 AND `id1`=10682;
 
 -- removes gossip_menu_id as npc does not have gossip and does not give xp on kill
-UPDATE `creature_template` SET `gossip_menu_id`='0', `npcflag`='0', `flags_extra`='32832' WHERE  `entry`=10676;
+UPDATE `creature_template` SET `gossip_menu_id`=0, `npcflag`=0, `flags_extra`=32832 WHERE  `entry`=10676;
 
 -- removes exsisting dumped waypoints that was no way sniff related or based
 -- will remove 176 rows on first run dealing with the bad waypoints associated with the npcs
