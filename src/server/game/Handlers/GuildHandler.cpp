@@ -185,6 +185,13 @@ void WorldSession::HandleGuildRankOpcode(WorldPackets::Guild::GuildSetRankPermis
 
     LOG_DEBUG("guild", "CMSG_GUILD_RANK [{}]: Rank: {} ({})", GetPlayerInfo(), packet.RankName, packet.RankID);
 
+    // For some reason the client is sending -1 for guildmaster rights, that's ilegal for us because we expect unsigned int.
+    // Probably core handling for this should be changed.
+    if (packet.Flags <= 0)
+    {
+        packet.Flags = GUILD_BANK_RIGHT_FULL;
+    }
+
     guild->HandleSetRankInfo(this, packet.RankID, packet.RankName, packet.Flags, packet.WithdrawGoldLimit, rightsAndSlots);
 }
 
