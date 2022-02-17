@@ -325,21 +325,24 @@ typedef std::unordered_map<uint32, SpellBonusEntry>     SpellBonusMap;
 
 enum SpellGroupSpecialFlags
 {
-    SPELL_GROUP_SPECIAL_FLAG_NONE                   = 0x000,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE          = 0x001,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN        = 0x002,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE        = 0x004,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH       = 0x008,
-    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX    = 0x00F,
-    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST       = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK    = 0x020,
-    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK      = 0x040,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1              = 0x100,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2              = 0x200,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3              = 0x400,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4              = 0x800,
-    SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK       = 0x1000,
-    SPELL_GROUP_SPECIAL_FLAG_MAX                    = 0x2000
+    SPELL_GROUP_SPECIAL_FLAG_NONE                       = 0x000,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE              = 0x001,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN            = 0x002,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE            = 0x004,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH           = 0x008,
+    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX        = 0x00F,
+    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST           = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
+    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK        = 0x020,
+    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK          = 0x040,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1                  = 0x100,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2                  = 0x200,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3                  = 0x400,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4                  = 0x800,
+    SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK           = 0x1000,
+    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_SAME_SPELL   = 0x2000,
+    SPELL_GROUP_SPECIAL_FLAG_MAX                        = 0x4000,
+
+    SPELL_GROUP_SPECIAL_FLAG_FLASK                      = SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE | SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN
 };
 
 enum SpellGroupStackFlags
@@ -355,6 +358,11 @@ enum SpellGroupStackFlags
     // Internal use
     SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST     = 0x100,
     SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST       = 0x200,
+};
+
+enum SpellGroupIDs
+{
+    SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS     = 1
 };
 
 struct SpellStackInfo
@@ -758,8 +766,8 @@ public:
     void LoadSpellInfoStore();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
-    void LoadSpellCustomAttr();
-    void LoadDbcDataCorrections();
+    void LoadSpellInfoCustomAttributes();
+    void LoadSpellInfoCorrections();
     void LoadSpellSpecificAndAuraState();
 
 private:

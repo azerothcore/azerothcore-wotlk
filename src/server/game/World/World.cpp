@@ -566,6 +566,10 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_HONOR]                                = sConfigMgr->GetOption<float>("Rate.Honor", 1.0f);
     rate_values[RATE_ARENA_POINTS]                         = sConfigMgr->GetOption<float>("Rate.ArenaPoints", 1.0f);
     rate_values[RATE_INSTANCE_RESET_TIME]                  = sConfigMgr->GetOption<float>("Rate.InstanceResetTime", 1.0f);
+
+    rate_values[RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE] = sConfigMgr->GetOption<float>("Rate.MissChanceMultiplier.TargetCreature", 11.0f);
+    rate_values[RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER]   = sConfigMgr->GetOption<float>("Rate.MissChanceMultiplier.TargetPlayer", 7.0f);
+
     rate_values[RATE_TALENT]                               = sConfigMgr->GetOption<float>("Rate.Talent", 1.0f);
     if (rate_values[RATE_TALENT] < 0.0f)
     {
@@ -842,6 +846,13 @@ void World::LoadConfigSettings(bool reload)
     {
         LOG_ERROR("server.loading", "MaxHonorPoints ({}) can't be negative. Set to 0.", m_int_configs[CONFIG_MAX_HONOR_POINTS]);
         m_int_configs[CONFIG_MAX_HONOR_POINTS] = 0;
+    }
+
+    m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT] = sConfigMgr->GetOption<int32>("MaxHonorPointsMoneyPerPoint", 0);
+    if (int32(m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT]) < 0)
+    {
+        LOG_ERROR("server.loading", "MaxHonorPointsMoneyPerPoint ({}) can't be negative. Set to 0.", m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT]);
+        m_int_configs[CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT] = 0;
     }
 
     m_int_configs[CONFIG_START_HONOR_POINTS] = sConfigMgr->GetOption<int32>("StartHonorPoints", 0);
@@ -1283,7 +1294,7 @@ void World::LoadConfigSettings(bool reload)
     LOG_INFO("server.loading", "WORLD: VMap support included. LineOfSight:{}, getHeight:{}, indoorCheck:{} PetLOS:{}", enableLOS, enableHeight, enableIndoor, enablePetLOS);
 
     m_bool_configs[CONFIG_PET_LOS]            = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
-    m_bool_configs[CONFIG_START_ALL_SPELLS]   = sConfigMgr->GetOption<bool>("PlayerStart.AllSpells", false);
+    m_bool_configs[CONFIG_START_CUSTOM_SPELLS] = sConfigMgr->GetOption<bool>("PlayerStart.CustomSpells", false);
     m_int_configs[CONFIG_HONOR_AFTER_DUEL]    = sConfigMgr->GetOption<int32>("HonorPointsAfterDuel", 0);
     m_bool_configs[CONFIG_START_ALL_EXPLORED] = sConfigMgr->GetOption<bool>("PlayerStart.MapsExplored", false);
     m_bool_configs[CONFIG_START_ALL_REP]      = sConfigMgr->GetOption<bool>("PlayerStart.AllReputation", false);
@@ -1503,7 +1514,7 @@ void World::SetInitialWorldSettings()
 
     uint32 realm_zone = getIntConfig(CONFIG_REALM_ZONE);
 
-    LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realm.Id.Realm);      // One-time query
+    LoginDatabase.Execute("UPDATE realmlist SET icon = {}, timezone = {} WHERE id = '{}'", server_type, realm_zone, realm.Id.Realm);      // One-time query
 
     ///- Custom Hook for loading DB items
     sScriptMgr->OnLoadCustomDatabaseTable();
@@ -1530,14 +1541,14 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Game Graveyard...");
     sGraveyard->LoadGraveyardFromDB();
 
-    LOG_INFO("server.loading", "Loading spell dbc data corrections...");
-    sSpellMgr->LoadDbcDataCorrections();
-
     LOG_INFO("server.loading", "Initializing PlayerDump tables...");
     PlayerDump::InitializeTables();
 
     LOG_INFO("server.loading", "Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();
+
+    LOG_INFO("server.loading", "Loading SpellInfo data corrections...");
+    sSpellMgr->LoadSpellInfoCorrections();
 
     LOG_INFO("server.loading", "Loading Spell Rank Data...");
     sSpellMgr->LoadSpellRanks();
@@ -1548,8 +1559,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading SkillLineAbilityMultiMap Data...");
     sSpellMgr->LoadSkillLineAbilityMap();
 
-    LOG_INFO("server.loading", "Loading spell custom attributes...");
-    sSpellMgr->LoadSpellCustomAttr();
+    LOG_INFO("server.loading", "Loading SpellInfo custom attributes...");
+    sSpellMgr->LoadSpellInfoCustomAttributes();
 
     LOG_INFO("server.loading", "Loading GameObject models...");
     LoadGameObjectModelList(m_dataPath);
@@ -1966,7 +1977,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initialize game time and timers");
     LOG_INFO("server.loading", " ");
 
-    LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES (%u, %u, 0, '%s')",
+    LoginDatabase.Execute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES ({}, {}, 0, '{}')",
                            realm.Id.Realm, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
@@ -2169,7 +2180,7 @@ void World::LoadAutobroadcasts()
 
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
-    stmt->setInt32(0, realmId);
+    stmt->SetData(0, realmId);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     if (!result)
@@ -2183,10 +2194,10 @@ void World::LoadAutobroadcasts()
     do
     {
         Field* fields = result->Fetch();
-        uint8 id = fields[0].GetUInt8();
+        uint8 id = fields[0].Get<uint8>();
 
-        m_Autobroadcasts[id] = fields[2].GetString();
-        m_AutobroadcastsWeights[id] = fields[1].GetUInt8();
+        m_Autobroadcasts[id] = fields[2].Get<std::string>();
+        m_AutobroadcastsWeights[id] = fields[1].Get<uint8>();
 
         ++count;
     } while (result->NextRow());
@@ -2331,8 +2342,8 @@ void World::Update(uint32 diff)
             m_timers[WUPDATE_CLEANDB].Reset();
 
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_OLD_LOGS);
-            stmt->setUInt32(0, sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME));
-            stmt->setUInt32(1, uint32(currentGameTime.count()));
+            stmt->SetData(0, sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME));
+            stmt->SetData(1, uint32(currentGameTime.count()));
             LoginDatabase.Execute(stmt);
         }
     }
@@ -2392,10 +2403,10 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_UPTIME].Reset();
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
-        stmt->setUInt32(0, uint32(GameTime::GetUptime().count()));
-        stmt->setUInt16(1, uint16(GetMaxPlayerCount()));
-        stmt->setUInt32(2, realm.Id.Realm);
-        stmt->setUInt32(3, uint32(GameTime::GetStartTime().count()));
+        stmt->SetData(0, uint32(GameTime::GetUptime().count()));
+        stmt->SetData(1, uint16(GetMaxPlayerCount()));
+        stmt->SetData(2, realm.Id.Realm);
+        stmt->SetData(3, uint32(GameTime::GetStartTime().count()));
         LoginDatabase.Execute(stmt);
     }
 
@@ -2999,7 +3010,7 @@ void World::SendAutoBroadcast()
 void World::UpdateRealmCharCount(uint32 accountId)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_COUNT);
-    stmt->setUInt32(0, accountId);
+    stmt->SetData(0, accountId);
     _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&World::_UpdateRealmCharCount, this, std::placeholders::_1)));
 }
 
@@ -3008,20 +3019,20 @@ void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
     if (resultCharCount)
     {
         Field* fields = resultCharCount->Fetch();
-        uint32 accountId = fields[0].GetUInt32();
-        uint8 charCount = uint8(fields[1].GetUInt64());
+        uint32 accountId = fields[0].Get<uint32>();
+        uint8 charCount = uint8(fields[1].Get<uint64>());
 
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS_BY_REALM);
-        stmt->setUInt32(0, accountId);
-        stmt->setUInt32(1, realm.Id.Realm);
+        stmt->SetData(0, accountId);
+        stmt->SetData(1, realm.Id.Realm);
         trans->Append(stmt);
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_REALM_CHARACTERS);
-        stmt->setUInt8(0, charCount);
-        stmt->setUInt32(1, accountId);
-        stmt->setUInt32(2, realm.Id.Realm);
+        stmt->SetData(0, charCount);
+        stmt->SetData(1, accountId);
+        stmt->SetData(2, realm.Id.Realm);
         trans->Append(stmt);
 
         LoginDatabase.CommitTransaction(trans);
@@ -3124,11 +3135,11 @@ void World::ResetDailyQuests()
 void World::LoadDBAllowedSecurityLevel()
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_REALMLIST_SECURITY_LEVEL);
-    stmt->setInt32(0, int32(realm.Id.Realm));
+    stmt->SetData(0, int32(realm.Id.Realm));
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     if (result)
-        SetPlayerSecurityLimit(AccountTypes(result->Fetch()->GetUInt8()));
+        SetPlayerSecurityLimit(AccountTypes(result->Fetch()->Get<uint8>()));
 }
 
 void World::SetPlayerSecurityLimit(AccountTypes _sec)
@@ -3174,7 +3185,7 @@ void World::ResetMonthlyQuests()
 void World::ResetEventSeasonalQuests(uint16 event_id)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_SEASONAL);
-    stmt->setUInt16(0, event_id);
+    stmt->SetData(0, event_id);
     CharacterDatabase.Execute(stmt);
 
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -3229,10 +3240,10 @@ void World::LoadDBVersion()
     {
         Field* fields = result->Fetch();
 
-        m_DBVersion = fields[0].GetString();
+        m_DBVersion = fields[0].Get<std::string>();
 
         // will be overwrite by config values if different and non-0
-        m_int_configs[CONFIG_CLIENTCACHE_VERSION] = fields[1].GetUInt32();
+        m_int_configs[CONFIG_CLIENTCACHE_VERSION] = fields[1].Get<uint32>();
     }
 
     if (m_DBVersion.empty())
@@ -3249,19 +3260,19 @@ void World::LoadDBRevision()
     {
         Field* fields = resultWorld->Fetch();
 
-        m_WorldDBRevision = fields[0].GetString();
+        m_WorldDBRevision = fields[0].Get<std::string>();
     }
     if (resultCharacter)
     {
         Field* fields = resultCharacter->Fetch();
 
-        m_CharacterDBRevision = fields[0].GetString();
+        m_CharacterDBRevision = fields[0].Get<std::string>();
     }
     if (resultAuth)
     {
         Field* fields = resultAuth->Fetch();
 
-        m_AuthDBRevision = fields[0].GetString();
+        m_AuthDBRevision = fields[0].Get<std::string>();
     }
 
     if (m_WorldDBRevision.empty())
@@ -3305,7 +3316,7 @@ void World::LoadWorldStates()
     do
     {
         Field* fields = result->Fetch();
-        m_worldstates[fields[0].GetUInt32()] = fields[1].GetUInt32();
+        m_worldstates[fields[0].Get<uint32>()] = fields[1].Get<uint32>();
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} world states in {} ms", m_worldstates.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -3319,15 +3330,15 @@ void World::setWorldState(uint32 index, uint64 timeValue)
     if (it != m_worldstates.end())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WORLDSTATE);
-        stmt->setUInt32(0, uint32(timeValue));
-        stmt->setUInt32(1, index);
+        stmt->SetData(0, uint32(timeValue));
+        stmt->SetData(1, index);
         CharacterDatabase.Execute(stmt);
     }
     else
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_WORLDSTATE);
-        stmt->setUInt32(0, index);
-        stmt->setUInt32(1, uint32(timeValue));
+        stmt->SetData(0, index);
+        stmt->SetData(1, uint32(timeValue));
         CharacterDatabase.Execute(stmt);
     }
 

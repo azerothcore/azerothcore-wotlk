@@ -26,12 +26,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-// Cleanup bad characters
-void cleanStr(std::string& str)
-{
-    str.erase(remove(str.begin(), str.end(), '|'), str.end());
-}
-
 void WorldSession::HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query)
 {
     LOG_DEBUG("guild", "CMSG_GUILD_QUERY [{}]: Guild: {}", GetPlayerInfo(), query.GuildId);
