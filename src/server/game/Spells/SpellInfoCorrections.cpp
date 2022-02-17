@@ -4161,6 +4161,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
     });
 
+    // Azuregos' reflect
+    ApplySpellFix({ 22067 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Dispel = DISPEL_NONE;
+    });
+
     // Focused Assault
     // Brutal Assault
     ApplySpellFix({ 46392, 46393 }, [](SpellInfo* spellInfo)
