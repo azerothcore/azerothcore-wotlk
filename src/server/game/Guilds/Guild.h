@@ -685,6 +685,8 @@ public:
     std::string const& GetMOTD() const { return m_motd; }
     std::string const& GetInfo() const { return m_info; }
 
+    bool SetName(std::string_view const& name);
+
     // Handle client commands
     void HandleRoster(WorldSession* session);
     void HandleQuery(WorldSession* session);
@@ -814,7 +816,7 @@ private:
     inline void _DeleteMemberFromDB(ObjectGuid::LowType lowguid) const
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBER);
-        stmt->setUInt32(0, lowguid);
+        stmt->SetData(0, lowguid);
         CharacterDatabase.Execute(stmt);
     }
 

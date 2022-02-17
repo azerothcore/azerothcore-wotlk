@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.groups
+-- Дамп структуры для таблица acore_characters.groups
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE IF NOT EXISTS `groups` (
   `guid` INT unsigned NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
   KEY `leaderGuid` (`leaderGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Groups';
 
--- Дамп данных таблицы _acore_characters.groups: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.groups: ~0 rows (приблизительно)
 DELETE FROM `groups`;
 /*!40000 ALTER TABLE `groups` DISABLE KEYS */;
 /*!40000 ALTER TABLE `groups` ENABLE KEYS */;

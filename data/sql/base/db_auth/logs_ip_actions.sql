@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.logs_ip_actions
+-- Дамп структуры для таблица acore_auth.logs_ip_actions
 DROP TABLE IF EXISTS `logs_ip_actions`;
 CREATE TABLE IF NOT EXISTS `logs_ip_actions` (
   `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Identifier',
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `logs_ip_actions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Used to log ips of individual actions';
 
--- Дамп данных таблицы _acore_auth.logs_ip_actions: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.logs_ip_actions: ~0 rows (приблизительно)
 DELETE FROM `logs_ip_actions`;
 /*!40000 ALTER TABLE `logs_ip_actions` DISABLE KEYS */;
 /*!40000 ALTER TABLE `logs_ip_actions` ENABLE KEYS */;

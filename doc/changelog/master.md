@@ -1,3 +1,126 @@
+## 6.0.0-dev.1 | Commit: [de13bf426e162ee10cbd5470cec74122d1d4afa0
+](https://github.com/azerothcore/azerothcore-wotlk/commit/de13bf426e162ee10cbd5470cec74122d1d4afa0
+
+
+## How to upgrade
+- `PrepareStatment`
+
+```diff
+- setNull(...)
++ SetData(...)
+```
+```diff
+- setBool(...)
++ SetData(...)
+```
+```diff
+- setUInt8(...)
++ SetData(...)
+```
+```diff
+- setInt8(...)
++ SetData(...)
+```
+```diff
+- setUInt16(...)
++ SetData(...)
+```
+```diff
+- setInt16(...)
++ SetData(...)
+```
+```diff
+- setUInt32(...)
++ SetData(...)
+```
+```diff
+- setUInt64(...)
++ SetData(...)
+```
+```diff
+- setInt64(...)
++ SetData(...)
+```
+```diff
+- setFloat(...)
++ SetData(...)
+```
+```diff
+- setDouble(...)
++ SetData(...)
+```
+```diff
+- setString(...)
++ SetData(...)
+```
+```diff
+- setStringView(...)
++ SetData(...)
+```
+```diff
+- setBinary(...)
++ SetData(...)
+```
+
+- `Fields`
+
+```diff
+- GetBool()
++ Get<bool>()
+```
+```diff
+- GetUInt8()
++ Get<uint8>()
+```
+```diff
+- GetInt8()
++ Get<int8>()
+```
+```diff
+- GetUInt16()
++ Get<uint16>()
+```
+```diff
+- GetInt16()
++ Get<int16>()
+```
+```diff
+- GetUInt32()
++ Get<uint32>()
+```
+```diff
+- GetInt32()
++ Get<int32>()
+```
+```diff
+- GetUInt64()
++ Get<uint64>()
+```
+```diff
+- GetInt64()
++ Get<int64>()
+```
+```diff
+- GetFloat()
++ Get<float>()
+```
+```diff
+- GetDouble()
++ Get<double>()
+```
+```diff
+- GetString()
++ Get<std::string>()
+```
+```diff
+- GetStringView()
++ Get<std::string_view>()
+```
+```diff
+- GetBinary()
++ Get<Binary>()
+```
+
 ## 5.0.0-dev.1 | Commit: [8b7df23f064f8c1c41aea222342b53f109c4e3b9
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/8b7df23f064f8c1c41aea222342b53f109c4e3b9
 

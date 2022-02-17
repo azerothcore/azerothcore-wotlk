@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.autobroadcast
+-- Дамп структуры для таблица acore_auth.autobroadcast
 DROP TABLE IF EXISTS `autobroadcast`;
 CREATE TABLE IF NOT EXISTS `autobroadcast` (
   `realmid` INT NOT NULL DEFAULT -1,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `autobroadcast` (
   PRIMARY KEY (`id`,`realmid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_auth.autobroadcast: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.autobroadcast: ~0 rows (приблизительно)
 DELETE FROM `autobroadcast`;
 /*!40000 ALTER TABLE `autobroadcast` DISABLE KEYS */;
 /*!40000 ALTER TABLE `autobroadcast` ENABLE KEYS */;

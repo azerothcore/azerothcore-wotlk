@@ -435,7 +435,7 @@ public:
             uint32 entry = Acore::StringTo<uint32>(entryStr).value_or(0);
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
-            stmt->setUInt32(0, entry);
+            stmt->SetData(0, entry);
             PreparedQueryResult result = WorldDatabase.Query(stmt);
 
             if (!result)
@@ -451,7 +451,7 @@ public:
                 continue;
             }
 
-            LOG_INFO("server.loading", "Reloading creature template entry %u", entry);
+            LOG_INFO("server.loading", "Reloading creature template entry {}", entry);
 
             Field* fields = result->Fetch();
 
