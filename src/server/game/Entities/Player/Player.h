@@ -1250,7 +1250,7 @@ public:
     InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
     InventoryResult CanUseItem(Item* pItem, bool not_loading = true) const;
     [[nodiscard]] bool HasItemTotemCategory(uint32 TotemCategory) const;
-    bool IsTotemCategoryCompatiableWith(const ItemTemplate* pProto, uint32 requiredTotemCategoryId) const;
+    bool IsTotemCategoryCompatiableWith(ItemTemplate const* pProto, uint32 requiredTotemCategoryId) const;
     InventoryResult CanUseItem(ItemTemplate const* pItem) const;
     [[nodiscard]] InventoryResult CanUseAmmo(uint32 item) const;
     InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
@@ -1277,7 +1277,7 @@ public:
     void SetAmmo(uint32 item);
     void RemoveAmmo();
     [[nodiscard]] float GetAmmoDPS() const { return m_ammoDPS; }
-    bool CheckAmmoCompatibility(const ItemTemplate* ammo_proto) const;
+    bool CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const;
     void QuickEquipItem(uint16 pos, Item* pItem);
     void VisualizeItem(uint8 slot, Item* pItem);
     void SetVisibleItemSlot(uint8 slot, Item* pItem);
@@ -2448,7 +2448,7 @@ public:
     bool CanTeleport() { return m_canTeleport; }
     void SetCanTeleport(bool value) { m_canTeleport = value; }
 
-    bool isAllowedToLoot(const Creature* creature);
+    bool isAllowedToLoot(Creature const* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
     [[nodiscard]] uint8 GetRunesState() const { return m_runes->runeState; }
@@ -2490,6 +2490,7 @@ public:
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
 
     [[nodiscard]] uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
     void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
@@ -2575,7 +2576,7 @@ public:
     void ResetFarSightDistance();
     [[nodiscard]] Optional<float> GetFarSightDistance() const;
 
-    float GetSightRange(const WorldObject* target = nullptr) const override;
+    float GetSightRange(WorldObject const* target = nullptr) const override;
 
     std::string GetPlayerName();
 

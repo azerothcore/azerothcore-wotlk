@@ -107,7 +107,7 @@ public:
             }
         }
 
-        bool IsValidDedicatedInsanityItem(const ItemTemplate* item)
+        bool IsValidDedicatedInsanityItem(ItemTemplate const* item)
         {
             if (!item) // should not happen, but checked in GetAverageItemLevel()
                 return true;

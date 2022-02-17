@@ -196,7 +196,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override { return me->IsVisible(); }
+        bool CanAIAttack(Unit const*  /*target*/) const override { return me->IsVisible(); }
 
         void JustReachedHome() override
         {
