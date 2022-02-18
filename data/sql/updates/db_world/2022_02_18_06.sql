@@ -1,3 +1,19 @@
+-- DB update 2022_02_18_05 -> 2022_02_18_06
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_18_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_18_05 2022_02_18_06 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1645221497531808185'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645221497531808185');
 
 -- Fix Gan'arg Sapper, Maiden of Pain, Z'kral, and Urga'zz spawns, Hellfire Peninsula
@@ -254,3 +270,13 @@ DELETE FROM `waypoint_data` WHERE `id` IN (817120);
 UPDATE `creature_template` SET `BaseAttackTime`=2000 WHERE `entry` IN (18827);
 -- Update addon
 UPDATE `creature_template_addon` SET `bytes2`=1 WHERE `entry` IN (18827,19408,18974,18976);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_18_06' WHERE sql_rev = '1645221497531808185';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
