@@ -1595,7 +1595,7 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) override;
+    void BuildObjectivesBlock(WorldPacket& data) final override;
 
     uint32 GraveyardsAssaulted = 0;
     uint32 GraveyardsDefended = 0;
