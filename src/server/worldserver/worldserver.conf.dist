@@ -1810,11 +1810,11 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                     divided by "," without spaces.
 #                     It is implied that you do not use for these NPC dialogs data from "gossip_menu" table.
 #                     Server will skip these IDs during the definitions validation process.
-#        Example:     Creatures.CustomIDs = "190010,55005,999991,25462,98888" - Npcs for Transmog, Guild-zone, 1v1-arena modules
-#                                                                               Skip Dk Module, Racial Trait Swap Modules
+#        Example:     Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014" - Npcs for Transmog, Guild-zone, 1v1-arena, Skip Dk,
+#                                                                                      Racial Trait Swap, NPC - All Mounts Modules
 #        Default:     ""
 
-Creatures.CustomIDs = "190010,55005,999991,25462,98888"
+Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014"
 
 #
 ###################################################################################################
@@ -3215,15 +3215,13 @@ ItemDelete.ItemLevel = 80
 PlayerStart.AllReputation = 0
 
 #
-#    PlayerStart.AllSpells
-#        Description: If enabled, players will start with all their class spells (not talents).
-#                     You must populate playercreateinfo_spell_custom table with the spells you
-#                     want, or this will not work! The table has data for all classes / races up
-#                     to TBC expansion.
+#    PlayerStart.CustomSpells
+#        Description: If enabled, players will start with custom spells defined in
+#                     playercreateinfo_spell_custom table.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.AllSpells = 0
+PlayerStart.CustomSpells = 0
 
 #
 #    PlayerStart.MapsExplored

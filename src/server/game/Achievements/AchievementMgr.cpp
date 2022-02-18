@@ -325,7 +325,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             return !target->HealthAbovePct(health.percent);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD:
             if (target && !target->IsAlive())
-                if (const Player* player = target->ToPlayer())
+                if (Player const* player = target->ToPlayer())
                     if (player->GetDeathTimer() != 0)
                         // flag set == must be same team, not set == different team
                         return (player->GetTeamId() == source->GetTeamId()) == (player_dead.own_team_flag != 0);
@@ -442,7 +442,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             }
 
-            TeamId winnerTeam = bg->GetWinner();
+            TeamId winnerTeam = GetTeamId(bg->GetWinner());
             if (winnerTeam == TEAM_NEUTRAL)
             {
                 return false;
