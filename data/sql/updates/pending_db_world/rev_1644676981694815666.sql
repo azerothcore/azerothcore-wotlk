@@ -1,83 +1,43 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1644676981694815666');
 
-DELETE FROM `player_factionchange_quests`
-WHERE (`alliance_id` = 8905 AND `horde_id` = 8913) #An Earnest Proposition (Druid)
-OR (`alliance_id` = 8906 AND `horde_id` = 8914) #An Earnest Proposition (Hunter)
-OR (`alliance_id` = 8907 AND `horde_id` = 8915) #An Earnest Proposition (Mage)
-OR (`alliance_id` = 8908 AND `horde_id` = 10493) #An Earnest Proposition (Paladin)
-OR (`alliance_id` = 8909 AND `horde_id` = 8916) #An Earnest Proposition (Priest)
-OR (`alliance_id` = 8910 AND `horde_id` = 8917) #An Earnest Proposition (Rogue)
-OR (`alliance_id` = 8911 AND `horde_id` = 8919) #An Earnest Proposition (Warlock)
-OR (`alliance_id` = 8912 AND `horde_id` = 8920) #An Earnest Proposition (Warrior)
-OR (`alliance_id` = 10492 AND `horde_id` = 8918) #An Earnest Proposition (Shaman)
-OR (`alliance_id` = 8922 AND `horde_id` = 8923) #A Supernatural Device
-OR (`alliance_id` = 8977 AND `horde_id` = 8978) #Return to Deliana/Return to Mokvar
-OR (`alliance_id` = 8926 AND `horde_id` = 8927) #Just Compensation (Druid)
-OR (`alliance_id` = 8931 AND `horde_id` = 8938) #Just Compensation (Hunter)
-OR (`alliance_id` = 8932 AND `horde_id` = 8939) #Just Compensation (Mage)
-OR (`alliance_id` = 8933 AND `horde_id` = 10495) #Just Compensation (Paladin)
-OR (`alliance_id` = 8934 AND `horde_id` = 8940) #Just Compensation (Priest)
-OR (`alliance_id` = 8935 AND `horde_id` = 8941) #Just Compensation (Rogue)
-OR (`alliance_id` = 8936 AND `horde_id` = 8943) #Just Compensation (Warlock)
-OR (`alliance_id` = 8937 AND `horde_id` = 8944) #Just Compensation (Warrior)
-OR (`alliance_id` = 10494 AND `horde_id` = 8942) #Just Compensation (Shaman)
-OR (`alliance_id` = 8929 AND `horde_id` = 8930) #In Search of Anthion
-OR (`alliance_id` = 8951 AND `horde_id` = 9016) #Anthion's Parting Words (Druid)
-OR (`alliance_id` = 8952 AND `horde_id` = 9017) #Anthion's Parting Words (Hunter)
-OR (`alliance_id` = 8953 AND `horde_id` = 9018) #Anthion's Parting Words (Mage)
-OR (`alliance_id` = 8954 AND `horde_id` = 10497) #Anthion's Parting Words (Paladin)
-OR (`alliance_id` = 8955 AND `horde_id` = 9019) #Anthion's Parting Words (Priest)
-OR (`alliance_id` = 8956 AND `horde_id` = 9020) #Anthion's Parting Words (Rogue)
-OR (`alliance_id` = 8958 AND `horde_id` = 9021) #Anthion's Parting Words (Warlock)
-OR (`alliance_id` = 8959 AND `horde_id` = 9022) #Anthion's Parting Words (Warrior)
-OR (`alliance_id` = 10496 AND `horde_id` = 8957) #Anthion's Parting Words (Shaman)
-OR (`alliance_id` = 8999 AND `horde_id` = 9007) #Saving the Best for Last (Druid)
-OR (`alliance_id` = 9000 AND `horde_id` = 9008) #Saving the Best for Last (Hunter)
-OR (`alliance_id` = 9001 AND `horde_id` = 9014) #Saving the Best for Last (Mage)
-OR (`alliance_id` = 9002 AND `horde_id` = 10499) #Saving the Best for Last (Paladin)
-OR (`alliance_id` = 9003 AND `horde_id` = 9009) #Saving the Best for Last (Priest)
-OR (`alliance_id` = 9004 AND `horde_id` = 9010) #Saving the Best for Last (Rogue)
-OR (`alliance_id` = 9005 AND `horde_id` = 9012) #Saving the Best for Last (Warlock)
-OR (`alliance_id` = 9006 AND `horde_id` = 9013) #Saving the Best for Last (Warrior)
-OR (`alliance_id` = 10498 AND `horde_id` = 9011); #Saving the Best for Last (Shaman)
-
+DELETE FROM `player_factionchange_quests` WHERE `alliance_id` IN (8905, 8906, 8907, 8908, 8909, 8910, 8911, 8912, 8922, 8926, 8929, 8931, 8932, 8933, 8934, 8935, 8936, 8937, 8951, 8952, 8953, 8954, 8955, 8956, 8958, 8959, 8977, 8999, 9000, 9001, 9002, 9003, 9004, 9005, 9006, 10492, 10494, 10496, 10498);
 INSERT INTO `player_factionchange_quests` (`alliance_id`, `horde_id`) VALUES
-(8905, 8913), #An Earnest Proposition (Druid)
-(8906, 8914), #An Earnest Proposition (Hunter)
-(8907, 8915), #An Earnest Proposition (Mage)
-(8908, 10493), #An Earnest Proposition (Paladin)
-(8909, 8916), #An Earnest Proposition (Priest)
-(8910, 8917), #An Earnest Proposition (Rogue)
-(8911, 8919), #An Earnest Proposition (Warlock)
-(8912, 8920), #An Earnest Proposition (Warrior)
-(10492, 8918), #An Earnest Proposition (Shaman)
-(8922, 8923), #A Supernatural Device
-(8977, 8978), #Return to Deliana/Return to Mokvar
-(8926, 8927), #Just Compensation (Druid)
-(8931, 8938), #Just Compensation (Hunter)
-(8932, 8939), #Just Compensation (Mage)
-(8933, 10495), #Just Compensation (Paladin)
-(8934, 8940), #Just Compensation (Priest)
-(8935, 8941), #Just Compensation (Rogue)
-(8936, 8943), #Just Compensation (Warlock)
-(8937, 8944), #Just Compensation (Warrior)
-(10494, 8942), #Just Compensation (Shaman)
-(8929, 8930), #In Search of Anthion
-(8951, 9016), #Anthion's Parting Words (Druid)
-(8952, 9017), #Anthion's Parting Words (Hunter)
-(8953, 9018), #Anthion's Parting Words (Mage)
-(8954, 10497), #Anthion's Parting Words (Paladin)
-(8955, 9019), #Anthion's Parting Words (Priest)
-(8956, 9020), #Anthion's Parting Words (Rogue)
-(8958, 9021), #Anthion's Parting Words (Warlock)
-(8959, 9022), #Anthion's Parting Words (Warrior)
-(10496, 8957), #Anthion's Parting Words (Shaman)
-(8999, 9007), #Saving the Best for Last (Druid)
-(9000, 9008), #Saving the Best for Last (Hunter)
-(9001, 9014), #Saving the Best for Last (Mage)
-(9002, 10499), #Saving the Best for Last (Paladin)
-(9003, 9009), #Saving the Best for Last (Priest)
-(9004, 9010), #Saving the Best for Last (Rogue)
-(9005, 9012), #Saving the Best for Last (Warlock)
-(9006, 9013), #Saving the Best for Last (Warrior)
-(10498, 9011); #Saving the Best for Last (Shaman)
+(8905, 8913),
+(8906, 8914),
+(8907, 8915),
+(8908, 10493),
+(8909, 8916),
+(8910, 8917),
+(8911, 8919),
+(8912, 8920),
+(8922, 8923),
+(8926, 8927),
+(8929, 8930),
+(8931, 8938),
+(8932, 8939),
+(8933, 10495),
+(8934, 8940),
+(8935, 8941),
+(8936, 8943),
+(8937, 8944),
+(8951, 9016),
+(8952, 9017),
+(8953, 9018),
+(8954, 10497),
+(8955, 9019),
+(8956, 9020),
+(8958, 9021),
+(8959, 9022),
+(8977, 8978),
+(8999, 9007),
+(9000, 9008),
+(9001, 9014),
+(9002, 10499),
+(9003, 9009),
+(9004, 9010),
+(9005, 9012),
+(9006, 9013),
+(10492, 8918),
+(10494, 8942),
+(10496, 8957),
+(10498, 9011);
