@@ -1960,7 +1960,7 @@ public:
 
     void SendTeleportAckPacket();
 
-    void ExpireSummonTimer();
+    void ExpireSummonTimer(uint32 mapid);
 
     void SetSummonToInstanceDoor(uint32 mapid);
 
