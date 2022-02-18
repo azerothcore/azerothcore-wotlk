@@ -69,7 +69,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell) override
+        void SpellHit(Unit* unit, SpellInfo const* spell) override
         {
             if (spellhit)
                 return;

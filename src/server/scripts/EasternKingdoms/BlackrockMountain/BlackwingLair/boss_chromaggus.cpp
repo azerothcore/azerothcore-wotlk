@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "blackwing_lair.h"
 
 enum Emotes
@@ -32,14 +33,6 @@ enum Emotes
 
 enum Spells
 {
-    // These spells are actually called elemental shield
-    // What they do is decrease all damage by 75% then they increase
-    // One school of damage by 1100%
-    SPELL_FIRE_VULNERABILITY                               = 22277,
-    SPELL_FROST_VULNERABILITY                              = 22278,
-    SPELL_SHADOW_VULNERABILITY                             = 22279,
-    SPELL_NATURE_VULNERABILITY                             = 22280,
-    SPELL_ARCANE_VULNERABILITY                             = 22281,
     // Other spells
     SPELL_INCINERATE                                       = 23308,   //Incinerate 23308, 23309
     SPELL_TIMELAPSE                                        = 23310,   //Time lapse 23310, 23311(old threat mod that was removed in 2.01)
@@ -54,6 +47,8 @@ enum Spells
     SPELL_BROODAF_BRONZE                                   = 23170,   //Bronze Affliction  23170
     SPELL_BROODAF_GREEN                                    = 23169,   //Brood Affliction Green 23169
     SPELL_CHROMATIC_MUT_1                                  = 23174,   //Spell cast on player if they get all 5 debuffs
+
+    SPELL_ELEMENTAL_SHIELD                                 = 22276,
     SPELL_FRENZY                                           = 28371,   //The frenzy spell may be wrong
     SPELL_ENRAGE                                           = 28747
 };
@@ -191,7 +186,6 @@ public:
 
         void Initialize()
         {
-            CurrentVurln_Spell = 0;     // We use this to store our last vulnerabilty spell so we can remove it later
             Enraged = false;
         }
 
@@ -237,14 +231,8 @@ public:
                 {
                     case EVENT_SHIMMER:
                         {
-                            // Remove old vulnerabilty spell
-                            if (CurrentVurln_Spell)
-                                me->RemoveAurasDueToSpell(CurrentVurln_Spell);
-
                             // Cast new random vulnerabilty on self
-                            uint32 spell = RAND(SPELL_FIRE_VULNERABILITY, SPELL_FROST_VULNERABILITY, SPELL_SHADOW_VULNERABILITY, SPELL_NATURE_VULNERABILITY, SPELL_ARCANE_VULNERABILITY);
-                            DoCast(me, spell);
-                            CurrentVurln_Spell = spell;
+                            DoCast(me, SPELL_ELEMENTAL_SHIELD);
                             Talk(EMOTE_SHIMMER);
                             events.ScheduleEvent(EVENT_SHIMMER, 45000);
                             break;
@@ -259,12 +247,13 @@ public:
                             break;
                     case EVENT_AFFLICTION:
                         {
+                            uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource()->ToPlayer())
                                 {
-                                    DoCast(player, RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN), true);
+                                    DoCast(player, afflictionSpellID, true);
 
                                         if (player->HasAura(SPELL_BROODAF_BLUE) &&
                                             player->HasAura(SPELL_BROODAF_BLACK) &&
@@ -302,7 +291,6 @@ public:
     private:
         uint32 Breath1_Spell;
         uint32 Breath2_Spell;
-        uint32 CurrentVurln_Spell;
         bool Enraged;
     };
 
@@ -356,8 +344,96 @@ class go_chromaggus_lever : public GameObjectScript
         }
 };
 
+enum ElementalShieldSpells
+{
+    SPELL_FIRE_ELEMENTAL_SHIELD     = 22277,
+    SPELL_FROST_ELEMENTAL_SHIELD    = 22278,
+    SPELL_SHADOW_ELEMENTAL_SHIELD   = 22279,
+    SPELL_NATURE_ELEMENTAL_SHIELD   = 22280,
+    SPELL_ARCANE_ELEMENTAL_SHIELD   = 22281,
+
+    SPELL_RED_BROOD_POWER           = 22283,
+    SPELL_BLUE_BROOD_POWER          = 22285,
+    SPELL_BRONZE_BROOD_POWER        = 22286,
+    SPELL_BLACK_BROOD_POWER         = 22287,
+    SPELL_GREEN_BROOD_POWER         = 22288
+
+};
+
+class spell_gen_elemental_shield : public SpellScript
+{
+    PrepareSpellScript(spell_gen_elemental_shield);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FIRE_ELEMENTAL_SHIELD,
+                SPELL_FROST_ELEMENTAL_SHIELD,
+                SPELL_SHADOW_ELEMENTAL_SHIELD,
+                SPELL_NATURE_ELEMENTAL_SHIELD,
+                SPELL_ARCANE_ELEMENTAL_SHIELD
+            });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            for (uint32 spell = SPELL_FIRE_ELEMENTAL_SHIELD; spell <= SPELL_ARCANE_ELEMENTAL_SHIELD; ++spell)
+            {
+                caster->RemoveAurasDueToSpell(spell);
+            }
+
+            caster->CastSpell(caster, SPELL_FIRE_ELEMENTAL_SHIELD + urand(0, 4), true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_elemental_shield::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_gen_brood_power : public SpellScript
+{
+    PrepareSpellScript(spell_gen_brood_power);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_RED_BROOD_POWER,
+                SPELL_BLUE_BROOD_POWER,
+                SPELL_BRONZE_BROOD_POWER,
+                SPELL_BLACK_BROOD_POWER,
+                SPELL_GREEN_BROOD_POWER
+            });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            for (uint32 spell = SPELL_RED_BROOD_POWER; spell <= SPELL_GREEN_BROOD_POWER; ++spell)
+            {
+                caster->RemoveAurasDueToSpell(spell);
+            }
+
+            caster->CastSpell(caster, RAND(SPELL_RED_BROOD_POWER, SPELL_BLUE_BROOD_POWER, SPELL_BRONZE_BROOD_POWER, SPELL_BLACK_BROOD_POWER, SPELL_GREEN_BROOD_POWER), true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_brood_power::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_chromaggus()
 {
     new boss_chromaggus();
     new go_chromaggus_lever();
+    RegisterSpellScript(spell_gen_elemental_shield);
+    RegisterSpellScript(spell_gen_brood_power);
 }

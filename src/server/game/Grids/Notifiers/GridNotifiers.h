@@ -880,7 +880,7 @@ namespace Acore
         AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck(Unit const* funit, float range)
             : i_funit(funit), i_range(range) {}
 
-        bool operator()(const Unit* u)
+        bool operator()(Unit const* u)
         {
             return u->IsAlive()
                    && i_funit->IsWithinDistInMap(u, i_range)
@@ -1354,7 +1354,7 @@ namespace Acore
     class AllGameObjectsWithEntryInRange
     {
     public:
-        AllGameObjectsWithEntryInRange(const WorldObject* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
+        AllGameObjectsWithEntryInRange(WorldObject const* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
         bool operator() (GameObject* go)
         {
             if (go->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(go, m_fRange, false))
@@ -1363,7 +1363,7 @@ namespace Acore
             return false;
         }
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
     };
@@ -1371,7 +1371,7 @@ namespace Acore
     class AllCreaturesOfEntryInRange
     {
     public:
-        AllCreaturesOfEntryInRange(const WorldObject* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
+        AllCreaturesOfEntryInRange(WorldObject const* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
         bool operator() (Unit* unit)
         {
             if (unit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(unit, m_fRange, false))
@@ -1381,7 +1381,7 @@ namespace Acore
         }
 
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
     };
@@ -1496,13 +1496,13 @@ namespace Acore
     class AllWorldObjectsInRange
     {
     public:
-        AllWorldObjectsInRange(const WorldObject* object, float maxRange) : m_pObject(object), m_fRange(maxRange) {}
+        AllWorldObjectsInRange(WorldObject const* object, float maxRange) : m_pObject(object), m_fRange(maxRange) {}
         bool operator() (WorldObject* go)
         {
             return m_pObject->IsWithinDist(go, m_fRange, false) && m_pObject->InSamePhase(go);
         }
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         float m_fRange;
     };
 
@@ -1557,14 +1557,14 @@ namespace Acore
     class AllWorldObjectsInExactRange
     {
     public:
-        AllWorldObjectsInExactRange(const WorldObject* object, float range, bool equals) : _object(object), _range(range), _equals(equals) { }
+        AllWorldObjectsInExactRange(WorldObject const* object, float range, bool equals) : _object(object), _range(range), _equals(equals) { }
         bool operator() (WorldObject const* object)
         {
             return (_object->GetExactDist2d(object) > _range) == _equals;
         }
 
     private:
-        const WorldObject* _object;
+        WorldObject const* _object;
         float _range;
         bool _equals;
     };

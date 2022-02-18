@@ -1728,7 +1728,7 @@ public:
                 PlayerGUID = who->GetGUID();
         }
 
-        //void SpellHit(Unit* /*caster*/, const SpellInfo* /*spell*/)
+        //void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/)
         //{
         //    DoCast(me, SPELL_DE_MATERIALIZE);
         //}

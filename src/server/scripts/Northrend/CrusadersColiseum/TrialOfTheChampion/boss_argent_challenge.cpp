@@ -137,7 +137,7 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == 66905 && me->GetHealth() == 1) // hammer throw back damage (15k)
                 me->CastSpell(me, 68197, true);
