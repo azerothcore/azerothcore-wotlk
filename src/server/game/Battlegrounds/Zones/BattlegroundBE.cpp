@@ -16,7 +16,6 @@
  */
 
 #include "BattlegroundBE.h"
-#include "Language.h"
 #include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
@@ -24,20 +23,6 @@
 BattlegroundBE::BattlegroundBE()
 {
     BgObjects.resize(BG_BE_OBJECT_MAX);
-
-    StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
-    StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
-    StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
-    StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    //we must set messageIds
-    StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_ARENA_HAS_BEGUN;
-}
-
-BattlegroundBE::~BattlegroundBE()
-{
 }
 
 void BattlegroundBE::StartingEventCloseDoors()
@@ -56,39 +41,6 @@ void BattlegroundBE::StartingEventOpenDoors()
 
     for (uint32 i = BG_BE_OBJECT_BUFF_1; i <= BG_BE_OBJECT_BUFF_2; ++i)
         SpawnBGObject(i, 60);
-}
-
-void BattlegroundBE::AddPlayer(Player* player)
-{
-    Battleground::AddPlayer(player);
-    PlayerScores[player->GetGUID()] = new BattlegroundScore(player);
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundBE::RemovePlayer(Player* /*player*/)
-{
-    if (GetStatus() == STATUS_WAIT_LEAVE)
-        return;
-
-    Battleground::UpdateArenaWorldState();
-    CheckArenaWinConditions();
-}
-
-void BattlegroundBE::HandleKillPlayer(Player* player, Player* killer)
-{
-    if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
-    if (!killer)
-    {
-        LOG_ERROR("bg.battleground", "Killer player not found");
-        return;
-    }
-
-    Battleground::HandleKillPlayer(player, killer);
-
-    Battleground::UpdateArenaWorldState();
-    CheckArenaWinConditions();
 }
 
 bool BattlegroundBE::HandlePlayerUnderMap(Player* player)
@@ -137,14 +89,8 @@ void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
 
 void BattlegroundBE::FillInitialWorldStates(WorldPacket& data)
 {
-    data << uint32(0x9f3) << uint32(1);           // 9
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundBE::Init()
-{
-    //call parent's class reset
-    Battleground::Init();
+    data << uint32(0x9f3) << uint32(1); // 9
+    Arena::FillInitialWorldStates(data);
 }
 
 bool BattlegroundBE::SetupBattleground()
@@ -166,9 +112,4 @@ bool BattlegroundBE::SetupBattleground()
     }
 
     return true;
-}
-
-void BattlegroundBE::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
-{
-    Battleground::UpdatePlayerScore(player, type, value, doAddHonor);
 }
