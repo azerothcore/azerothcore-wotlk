@@ -1,3 +1,19 @@
+-- DB update 2022_02_18_02 -> 2022_02_18_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_18_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_18_02 2022_02_18_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1645110438718594836'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645110438718594836');
 
 -- update to propper start points
@@ -181,3 +197,13 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (1067605, 7, -579.3559, -4238.155, 38.11686, 0, 0, "Raider Jhash"),
 (1067605, 8, -576.72754, -4251.9297, 38.06095, 0, 0, "Raider Jhash"),
 (1067605, 9, -580.829, -4268.681, 38.098602, 0, 0, "Raider Jhash");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_18_03' WHERE sql_rev = '1645110438718594836';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
