@@ -1506,8 +1506,8 @@ bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32
     SetZoneScript();
     if (GetZoneScript() && data)
     {
-        Entry = GetZoneScript()->GetCreatureEntry(guidlow, data);
-        if (!Entry)
+        uint32 FirstEntry = GetZoneScript()->GetCreatureEntry(guidlow, data);
+        if (!FirstEntry)
             return false;
     }
 
