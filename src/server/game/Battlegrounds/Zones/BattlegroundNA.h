@@ -18,7 +18,7 @@
 #ifndef __BATTLEGROUNDNA_H
 #define __BATTLEGROUNDNA_H
 
-#include "Battleground.h"
+#include "Arena.h"
 
 enum BattlegroundNAObjectTypes
 {
@@ -33,7 +33,7 @@ enum BattlegroundNAObjectTypes
     BG_NA_OBJECT_MAX            = 8
 };
 
-enum BattlegroundNAObjects
+enum BattlegroundNAGameObjects
 {
     BG_NA_OBJECT_TYPE_DOOR_1    = 183978,
     BG_NA_OBJECT_TYPE_DOOR_2    = 183980,
@@ -43,23 +43,19 @@ enum BattlegroundNAObjects
     BG_NA_OBJECT_TYPE_BUFF_2    = 184664
 };
 
-class BattlegroundNA : public Battleground
+class AC_GAME_API BattlegroundNA : public Arena
 {
 public:
     BattlegroundNA();
-    ~BattlegroundNA() override;
 
     /* inherited from BattlegroundClass */
-    void AddPlayer(Player* player) override;
     void StartingEventCloseDoors() override;
     void StartingEventOpenDoors() override;
 
-    void RemovePlayer(Player* player) override;
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
     bool SetupBattleground() override;
-    void Init() override;
     void FillInitialWorldStates(WorldPacket& d) override;
-    void HandleKillPlayer(Player* player, Player* killer) override;
     bool HandlePlayerUnderMap(Player* player) override;
 };
+
 #endif
