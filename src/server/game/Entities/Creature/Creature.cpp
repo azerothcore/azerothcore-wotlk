@@ -426,7 +426,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     // Load creature equipment
     if (!data || data->equipmentId == 0)                    // use default from the template
-        LoadEquipment();
+        LoadEquipment(0);                                   // 0 means no equipment for creature table
     else
     {
         m_originalEquipmentId = data->equipmentId;
@@ -993,12 +993,12 @@ void Creature::Motion_Initialize()
 {
     if (!m_formation)
         GetMotionMaster()->Initialize();
-    else if (m_formation->getLeader() == this)
+    else if (m_formation->GetLeader() == this)
     {
         m_formation->FormationReset(false, true);
         GetMotionMaster()->Initialize();
     }
-    else if (m_formation->isFormed())
+    else if (m_formation->IsFormed())
         GetMotionMaster()->MoveIdle(); //wait the order of leader
     else
         GetMotionMaster()->Initialize();
@@ -1506,8 +1506,8 @@ bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32
     SetZoneScript();
     if (GetZoneScript() && data)
     {
-        Entry = GetZoneScript()->GetCreatureEntry(guidlow, data);
-        if (!Entry)
+        uint32 FirstEntry = GetZoneScript()->GetCreatureEntry(guidlow, data);
+        if (!FirstEntry)
             return false;
     }
 
@@ -1849,7 +1849,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         }
 
         //Dismiss group if is leader
-        if (m_formation && m_formation->getLeader() == this)
+        if (m_formation && m_formation->GetLeader() == this)
             m_formation->FormationReset(true, false);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
@@ -2308,7 +2308,7 @@ void Creature::CallForHelp(float radius, Unit* target /*= nullptr*/)
     Cell::VisitGridObjects(this, worker, radius);
 }
 
-bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
+bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /*= true*/) const
 {
     // is it true?
     if (!HasReactState(REACT_AGGRESSIVE))
@@ -2368,7 +2368,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
 
 // use this function to avoid having hostile creatures attack
 // friendlies and other mobs they shouldn't attack
-bool Creature::_IsTargetAcceptable(const Unit* target) const
+bool Creature::_IsTargetAcceptable(Unit const* target) const
 {
     ASSERT(target);
 
@@ -2385,8 +2385,8 @@ bool Creature::_IsTargetAcceptable(const Unit* target) const
             return false;
     }
 
-    const Unit* myVictim = getAttackerForHelper();
-    const Unit* targetVictim = target->getAttackerForHelper();
+    Unit const* myVictim = getAttackerForHelper();
+    Unit const* targetVictim = target->getAttackerForHelper();
 
     // if I'm already fighting target, or I'm hostile towards the target, the target is acceptable
     if (myVictim == target || targetVictim == this || IsHostileTo(target))

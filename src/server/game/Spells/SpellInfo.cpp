@@ -1725,7 +1725,7 @@ bool SpellInfo::IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const
     return matchCount * 2 == auraCount;
 }
 
-bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const AuraEffect* auraEffect, bool isDot) const
+bool SpellInfo::ValidateAttribute6SpellDamageMods(Unit const* caster, const AuraEffect* auraEffect, bool isDot) const
 {
     // Xinef: no attribute
     if (!(AttributesEx6 & SPELL_ATTR6_IGNORE_CASTER_DAMAGE_MODIFIERS))
@@ -1735,7 +1735,7 @@ bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const Aura
     // Xinef: Scourge Strike - Trigger
     if (Id == 70890 && auraEffect)
     {
-        const SpellInfo* auraInfo = auraEffect->GetSpellInfo();
+        SpellInfo const* auraInfo = auraEffect->GetSpellInfo();
         return auraInfo->SpellIconID == 3086 ||
                (auraInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (auraInfo->SpellFamilyFlags & flag96(8388608, 64, 16) || auraInfo->SpellIconID == 235 || auraInfo->SpellIconID == 154));
     }
@@ -2843,4 +2843,51 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         }
         delete cur;
     }
+}
+
+bool SpellInfo::CheckElixirStacking(Unit const* caster) const
+{
+    if (!caster)
+    {
+        return true;
+    }
+
+    // xinef: check spell group
+    uint32 groupId = sSpellMgr->GetSpellGroup(Id);
+    if (groupId != SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS)
+    {
+        return true;
+    }
+
+    SpellGroupSpecialFlags sFlag = sSpellMgr->GetSpellGroupSpecialFlags(Id);
+    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!Effects[i].IsAura())
+        {
+            continue;
+        }
+
+        Unit::AuraApplicationMap const& Auras = caster->GetAppliedAuras();
+        for (Unit::AuraApplicationMap::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
+        {
+            // xinef: aura is not groupped or in different group
+            uint32 auraGroup = sSpellMgr->GetSpellGroup(itr->first);
+            if (auraGroup != groupId)
+            {
+                continue;
+            }
+
+            // Cannot apply guardian/battle elixir if flask is present
+            if (sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE || sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN)
+            {
+                SpellGroupSpecialFlags sAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(itr->first);
+                if ((sAuraFlag & SPELL_GROUP_SPECIAL_FLAG_FLASK) == SPELL_GROUP_SPECIAL_FLAG_FLASK)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
