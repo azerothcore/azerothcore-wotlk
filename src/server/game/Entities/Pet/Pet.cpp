@@ -87,7 +87,7 @@ void Pet::AddToWorld()
                 SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAreaMapBounds(4812);
                 for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
                     if ((itr->second->raceMask & plr->getRaceMask()) && !HasAura(itr->second->spellId))
-                        if (const SpellInfo* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
+                        if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
                             if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
                                 AddAura(itr->second->spellId, this);
             }

@@ -91,7 +91,7 @@ public:
             summon->CastSpell(summon, SPELL_FOCUS_FIRE_VISUAL, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_FOCUS_CAST)
                 target->CastSpell(target, DUNGEON_MODE(SPELL_FIERY_BLAST_N, SPELL_FIERY_BLAST_H), false);

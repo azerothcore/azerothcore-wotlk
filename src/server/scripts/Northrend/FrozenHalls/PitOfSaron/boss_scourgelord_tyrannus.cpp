@@ -214,7 +214,7 @@ public:
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             switch (who->GetEntry())
             {
