@@ -4064,6 +4064,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
     });
 
+    // Nefarius Corruption
+    ApplySpellFix({ 23642 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
+    });
+
     // Conflagration, Horseman's Cleave
     ApplySpellFix({ 42380, 42587 }, [](SpellInfo* spellInfo)
     {
