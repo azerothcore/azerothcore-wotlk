@@ -77,7 +77,7 @@ public:
         _outCommand(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...), std::to_string(account));
     }
 
-//    void outCharDump(std::string_view str, uint32 account_id, uint64 guid, std::string_view name);
+/*    void outCharDump(std::string_view str, uint32 account_id, uint64 guid, std::string_view name); */
 
     void SetRealmId(uint32 id);
 
@@ -168,8 +168,8 @@ private:
 #define LOG_TRACE(filterType__, ...) \
     LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_TRACE, __VA_ARGS__)
 
-//#define LOG_CHAR_DUMP(message__, accountId__, guid__, name__) \
-//    sLog->outCharDump(message__, accountId__, guid__, name__)
+/* #define LOG_CHAR_DUMP(message__, accountId__, guid__, name__) \
+    sLog->outCharDump(message__, accountId__, guid__, name__) */
 
 #define LOG_GM(accountId__, ...) \
     sLog->outCommand(accountId__, __VA_ARGS__)
