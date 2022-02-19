@@ -68,10 +68,10 @@ void LoadSkillDiscoveryTable()
     {
         Field* fields = result->Fetch();
 
-        uint32 spellId         = fields[0].GetUInt32();
-        int32  reqSkillOrSpell = fields[1].GetInt32();
-        uint32 reqSkillValue   = fields[2].GetUInt16();
-        float  chance          = fields[3].GetFloat();
+        uint32 spellId         = fields[0].Get<uint32>();
+        int32  reqSkillOrSpell = fields[1].Get<int32>();
+        uint32 reqSkillValue   = fields[2].Get<uint16>();
+        float  chance          = fields[3].Get<float>();
 
         if (chance <= 0)                                    // chance
         {

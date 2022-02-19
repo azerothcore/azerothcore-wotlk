@@ -201,7 +201,7 @@ struct npc_pilgrims_bounty_chair : public VehicleAI
         }
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         Unit* charm = target->GetCharm();
         if (!charm || !charm->ToCreature())
@@ -210,7 +210,7 @@ struct npc_pilgrims_bounty_chair : public VehicleAI
         charm->ToCreature()->AI()->DoAction(spellInfo->Id);
     }
 
-    void SpellHit(Unit*  /*target*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*target*/, SpellInfo const* spellInfo) override
     {
         switch (spellInfo->Id)
         {
@@ -281,7 +281,7 @@ struct npc_pilgrims_bounty_plate : public NullCreatureAI
 {
     npc_pilgrims_bounty_plate(Creature* creature) : NullCreatureAI(creature) { }
 
-    void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         switch (spellInfo->Id)
         {

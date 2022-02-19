@@ -59,10 +59,10 @@ void RealmList::LoadBuildInfo()
         {
             Field* fields = result->Fetch();
             RealmBuildInfo& build = _builds.emplace_back();
-            build.MajorVersion = fields[0].GetUInt32();
-            build.MinorVersion = fields[1].GetUInt32();
-            build.BugfixVersion = fields[2].GetUInt32();
-            std::string hotfixVersion = fields[3].GetString();
+            build.MajorVersion = fields[0].Get<uint32>();
+            build.MinorVersion = fields[1].Get<uint32>();
+            build.BugfixVersion = fields[2].Get<uint32>();
+            std::string hotfixVersion = fields[3].Get<std::string>();
 
             if (hotfixVersion.length() < build.HotfixVersion.size())
             {
@@ -73,15 +73,15 @@ void RealmList::LoadBuildInfo()
                 std::fill(hotfixVersion.begin(), hotfixVersion.end(), '\0');
             }
 
-            build.Build = fields[4].GetUInt32();
-            std::string windowsHash = fields[5].GetString();
+            build.Build = fields[4].Get<uint32>();
+            std::string windowsHash = fields[5].Get<std::string>();
 
             if (windowsHash.length() == build.WindowsHash.size() * 2)
             {
                 HexStrToByteArray(windowsHash, build.WindowsHash);
             }
 
-            std::string macHash = fields[6].GetString();
+            std::string macHash = fields[6].Get<std::string>();
 
             if (macHash.length() == build.MacHash.size() * 2)
             {
@@ -154,12 +154,12 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
             try
             {
                 Field* fields = result->Fetch();
-                uint32 realmId = fields[0].GetUInt32();
-                std::string name = fields[1].GetString();
-                std::string externalAddressString = fields[2].GetString();
-                std::string localAddressString = fields[3].GetString();
-                std::string localSubmaskString = fields[4].GetString();
-                uint16 port = fields[5].GetUInt16();
+                uint32 realmId = fields[0].Get<uint32>();
+                std::string name = fields[1].Get<std::string>();
+                std::string externalAddressString = fields[2].Get<std::string>();
+                std::string localAddressString = fields[3].Get<std::string>();
+                std::string localSubmaskString = fields[4].Get<std::string>();
+                uint16 port = fields[5].Get<uint16>();
 
                 Optional<boost::asio::ip::tcp::endpoint> externalAddress = _resolver->Resolve(boost::asio::ip::tcp::v4(), externalAddressString, "");
                 if (!externalAddress)
@@ -182,7 +182,7 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
                     continue;
                 }
 
-                uint8 icon = fields[6].GetUInt8();
+                uint8 icon = fields[6].Get<uint8>();
 
                 if (icon == REALM_TYPE_FFA_PVP)
                 {
@@ -194,11 +194,11 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
                     icon = REALM_TYPE_NORMAL;
                 }
 
-                RealmFlags flag = RealmFlags(fields[7].GetUInt8());
-                uint8 timezone = fields[8].GetUInt8();
-                uint8 allowedSecurityLevel = fields[9].GetUInt8();
-                float pop = fields[10].GetFloat();
-                uint32 build = fields[11].GetUInt32();
+                RealmFlags flag = RealmFlags(fields[7].Get<uint8>());
+                uint8 timezone = fields[8].Get<uint8>();
+                uint8 allowedSecurityLevel = fields[9].Get<uint8>();
+                float pop = fields[10].Get<float>();
+                uint32 build = fields[11].Get<uint32>();
 
                 RealmHandle id{ realmId };
 

@@ -119,8 +119,8 @@ public:
 
         {
             uint16 dbPort = 0;
-            if (QueryResult res = LoginDatabase.PQuery("SELECT port FROM realmlist WHERE id = %u", realm.Id.Realm))
-                dbPort = (*res)[0].GetUInt16();
+            if (QueryResult res = LoginDatabase.Query("SELECT port FROM realmlist WHERE id = {}", realm.Id.Realm))
+                dbPort = (*res)[0].Get<uint16>();
 
             if (dbPort)
                 dbPortOutput = Acore::StringFormatFmt("Realmlist (Realm Id: {}) configured in port {}", realm.Id.Realm, dbPort);
@@ -221,7 +221,10 @@ public:
         handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
 
-        handler->SendSysMessage("> List enable modules:");
+        if (Acore::Module::GetEnableModulesList().empty())
+            handler->SendSysMessage("No modules enabled");
+        else
+            handler->SendSysMessage("> List enable modules:");
 
         for (auto const& modName : Acore::Module::GetEnableModulesList())
         {

@@ -16,6 +16,7 @@
  */
 
 #include "QueryCallback.h"
+#include "Duration.h"
 #include "Errors.h"
 
 template<typename T, typename... Args>
@@ -66,13 +67,15 @@ public:
 
     QueryCallbackData(std::function<void(QueryCallback&, QueryResult)>&& callback) : _string(std::move(callback)), _isPrepared(false) { }
     QueryCallbackData(std::function<void(QueryCallback&, PreparedQueryResult)>&& callback) : _prepared(std::move(callback)), _isPrepared(true) { }
-    QueryCallbackData(QueryCallbackData&& right)
+
+    QueryCallbackData(QueryCallbackData&& right) noexcept
     {
         _isPrepared = right._isPrepared;
         ConstructActiveMember(this);
         MoveFrom(this, std::move(right));
     }
-    QueryCallbackData& operator=(QueryCallbackData&& right)
+
+    QueryCallbackData& operator=(QueryCallbackData&& right) noexcept
     {
         if (this != &right)
         {
@@ -82,10 +85,13 @@ public:
                 _isPrepared = right._isPrepared;
                 ConstructActiveMember(this);
             }
+
             MoveFrom(this, std::move(right));
         }
+
         return *this;
     }
+
     ~QueryCallbackData() { DestroyActiveMember(this); }
 
 private:
@@ -105,19 +111,19 @@ private:
 };
 
 // Not using initialization lists to work around segmentation faults when compiling with clang without precompiled headers
-QueryCallback::QueryCallback(std::future<QueryResult>&& result)
+QueryCallback::QueryCallback(QueryResultFuture&& result)
 {
     _isPrepared = false;
     Construct(_string, std::move(result));
 }
 
-QueryCallback::QueryCallback(std::future<PreparedQueryResult>&& result)
+QueryCallback::QueryCallback(PreparedQueryResultFuture&& result)
 {
     _isPrepared = true;
     Construct(_prepared, std::move(result));
 }
 
-QueryCallback::QueryCallback(QueryCallback&& right)
+QueryCallback::QueryCallback(QueryCallback&& right) noexcept
 {
     _isPrepared = right._isPrepared;
     ConstructActiveMember(this);
@@ -125,7 +131,7 @@ QueryCallback::QueryCallback(QueryCallback&& right)
     _callbacks = std::move(right._callbacks);
 }
 
-QueryCallback& QueryCallback::operator=(QueryCallback&& right)
+QueryCallback& QueryCallback::operator=(QueryCallback&& right) noexcept
 {
     if (this != &right)
     {
@@ -135,9 +141,11 @@ QueryCallback& QueryCallback::operator=(QueryCallback&& right)
             _isPrepared = right._isPrepared;
             ConstructActiveMember(this);
         }
+
         MoveFrom(this, std::move(right));
         _callbacks = std::move(right._callbacks);
     }
+
     return *this;
 }
 
@@ -198,7 +206,7 @@ bool QueryCallback::InvokeIfReady()
 
     if (!_isPrepared)
     {
-        if (_string.valid() && _string.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        if (_string.valid() && _string.wait_for(0s) == std::future_status::ready)
         {
             QueryResultFuture f(std::move(_string));
             std::function<void(QueryCallback&, QueryResult)> cb(std::move(callback._string));
@@ -208,7 +216,7 @@ bool QueryCallback::InvokeIfReady()
     }
     else
     {
-        if (_prepared.valid() && _prepared.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        if (_prepared.valid() && _prepared.wait_for(0s) == std::future_status::ready)
         {
             PreparedQueryResultFuture f(std::move(_prepared));
             std::function<void(QueryCallback&, PreparedQueryResult)> cb(std::move(callback._prepared));
