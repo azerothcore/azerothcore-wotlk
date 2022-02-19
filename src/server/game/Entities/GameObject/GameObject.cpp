@@ -741,8 +741,8 @@ void GameObject::Update(uint32 diff)
                             {
                                 m_groupLootTimer -= diff;
                             }
-                            break;
                         }
+                        break;
                     case GAMEOBJECT_TYPE_TRAP:
                     {
                         GameObjectTemplate const* goInfo = GetGOInfo();
