@@ -1930,8 +1930,11 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
             return ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
 
         // check if someone in party is using dungeon system
-        if (member->isUsingLfg())
+        lfg::LfgState lfgState = sLFGMgr->GetState(member->GetGUID());
+        if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG)))
+        {
             return ERR_LFG_CANT_USE_BATTLEGROUND;
+        }
 
         // pussywizard: prevent joining when any member is in bg/arena
         if (member->InBattleground())

@@ -438,6 +438,9 @@ public:
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
             player->GetSession()->SendPacket(&data);
 
+            // Remove from LFG queues
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
+
             player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
             sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
         }

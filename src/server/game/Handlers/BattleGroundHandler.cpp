@@ -152,26 +152,38 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     // check if player can queue:
     if (!joinAsGroup)
     {
+        lfg::LfgState lfgState = sLFGMgr->GetState(GetPlayer()->GetGUID());
         if (GetPlayer()->InBattleground()) // currently in battleground
-            err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
         {
-            if (GetPlayer()->isUsingLfg()) // using lfg system
-                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+            err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
+        }
+        else if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))) // using lfg system
+        {
+            err = ERR_LFG_CANT_USE_BATTLEGROUND;
         }
         else if (!_player->CanJoinToBattleground()) // has deserter debuff
+        {
             err = ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
+        }
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
+        {
             err = ERR_IN_RANDOM_BG;
+        }
         else if (_player->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB) // already in queue, so can't queue for random
+        {
             err = ERR_IN_NON_RANDOM_BG;
+        }
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
-                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
-                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
+            _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
+            _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
+        {
             err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
+        }
         // don't let Death Knights join BG queues when they are not allowed to be teleported yet
         else if (_player->getClass() == CLASS_DEATH_KNIGHT && _player->GetMapId() == 609 && !_player->IsGameMaster() && !_player->HasSpell(50977))
+        {
             err = ERR_BATTLEGROUND_NONE;
+        }
 
         if (err <= 0)
         {
@@ -467,8 +479,10 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
                 sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
                 SendPacket(&data);
 
-                _player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), queueSlot, true, bgTypeId == BATTLEGROUND_RB, teamId);
+                // Remove from LFG queues
+                sLFGMgr->LeaveAllLfgQueues(_player->GetGUID(), false);
 
+                _player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), queueSlot, true, bgTypeId == BATTLEGROUND_RB, teamId);
                 sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
             }
             break;
@@ -673,12 +687,14 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     // check if player can queue:
     if (!asGroup)
     {
+        lfg::LfgState lfgState = sLFGMgr->GetState(GetPlayer()->GetGUID());
         if (GetPlayer()->InBattleground()) // currently in battleground
-            err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        else if (!sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))
         {
-            if (GetPlayer()->isUsingLfg()) // using lfg system
-                err = ERR_LFG_CANT_USE_BATTLEGROUND;
+            err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
+        }
+        else if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))) // using lfg system
+        {
+            err = ERR_LFG_CANT_USE_BATTLEGROUND;
         }
 
         if (err <= 0)
