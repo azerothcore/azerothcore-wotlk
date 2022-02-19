@@ -393,7 +393,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             uint32 serpentStings[12] = { 1978, 13549, 13550, 13551, 13552, 13553, 13554, 13555, 25295, 27016, 49000, 49001 };
 
@@ -774,7 +774,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             if (!InNormalForm())
             {
@@ -984,7 +984,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             if (InNormalForm())
             {
@@ -1155,7 +1155,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             if (InNormalForm())
             {

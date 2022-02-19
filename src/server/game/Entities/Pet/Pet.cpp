@@ -87,7 +87,7 @@ void Pet::AddToWorld()
                 SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAreaMapBounds(4812);
                 for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
                     if ((itr->second->raceMask & plr->getRaceMask()) && !HasAura(itr->second->spellId))
-                        if (const SpellInfo* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
+                        if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
                             if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
                                 AddAura(itr->second->spellId, this);
             }
@@ -723,7 +723,7 @@ void Pet::Update(uint32 diff)
                         if (!spellInfo)
                             return;
                         float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
-                        if (spellInfo->RangeEntry->type == SPELL_RANGE_MELEE)
+                        if (spellInfo->RangeEntry->Flags == SPELL_RANGE_MELEE)
                             max_range -= 2 * MIN_MELEE_REACH;
 
                         if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)

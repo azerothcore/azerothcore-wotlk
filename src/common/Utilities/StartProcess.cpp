@@ -171,7 +171,6 @@ namespace Acore
 
         std::atomic<bool> was_terminated;
 
-        // Workaround for missing move support in boost < 1.57
         Optional<std::shared_ptr<std::future<int>>> result;
         Optional<std::reference_wrapper<child>> my_child;
 

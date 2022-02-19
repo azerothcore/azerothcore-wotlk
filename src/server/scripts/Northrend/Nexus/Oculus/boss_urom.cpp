@@ -232,7 +232,7 @@ public:
             Talk(SAY_PLAYER_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
