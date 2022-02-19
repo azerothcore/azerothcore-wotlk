@@ -369,9 +369,9 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) final override;
+    void BuildObjectivesBlock(WorldPacket& data) final;
 
-    uint32 GetAttr1() const final override { return FlagCaptures; }
+    uint32 GetAttr1() const override { return FlagCaptures; }
 
     uint32 FlagCaptures = 0;
 };

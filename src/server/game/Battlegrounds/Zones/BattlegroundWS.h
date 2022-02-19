@@ -205,10 +205,10 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) final override;
+    void BuildObjectivesBlock(WorldPacket& data) final;
 
-    uint32 GetAttr1() const final override { return FlagCaptures; }
-    uint32 GetAttr2() const final override { return FlagReturns; }
+    uint32 GetAttr1() const override { return FlagCaptures; }
+    uint32 GetAttr2() const override { return FlagReturns; }
 
     uint32 FlagCaptures = 0;
     uint32 FlagReturns = 0;

@@ -426,7 +426,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     // Load creature equipment
     if (!data || data->equipmentId == 0)                    // use default from the template
-        LoadEquipment();
+        LoadEquipment(0);                                   // 0 means no equipment for creature table
     else
     {
         m_originalEquipmentId = data->equipmentId;
@@ -1506,8 +1506,8 @@ bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32
     SetZoneScript();
     if (GetZoneScript() && data)
     {
-        Entry = GetZoneScript()->GetCreatureEntry(guidlow, data);
-        if (!Entry)
+        uint32 FirstEntry = GetZoneScript()->GetCreatureEntry(guidlow, data);
+        if (!FirstEntry)
             return false;
     }
 
