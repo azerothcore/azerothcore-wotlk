@@ -314,7 +314,7 @@ bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /*
     return true;
 }
 
-void Log::outCharDump(std::string_view str, uint32 accountId, uint64 guid, std::string_view name)
+/*void Log::outCharDump(std::string_view str, uint32 accountId, uint64 guid, std::string_view name)
 {
     if (str.empty() || !ShouldLog("entities.player.dump", LOG_LEVEL_INFO))
     {
@@ -327,7 +327,7 @@ void Log::outCharDump(std::string_view str, uint32 accountId, uint64 guid, std::
     msg->param1 = Acore::StringFormatFmt("{}_{}", guid, name);
 
     write(std::move(msg));
-}
+}*/
 
 void Log::SetRealmId(uint32 id)
 {
