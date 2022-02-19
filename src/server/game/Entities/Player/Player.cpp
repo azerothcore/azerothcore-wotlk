@@ -3063,7 +3063,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
                     return false;
                     //ABORT();
                 }
-                else if (const SpellInfo* learnSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
+                else if (SpellInfo const* learnSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
                     _addSpell(learnSpell->Id, SPEC_MASK_ALL, true);
             }
 
@@ -3679,7 +3679,7 @@ bool Player::resetTalents(bool noResetCost)
 
         // xinef: check if talent learns spell to spell book
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID);
-        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
 
         bool removed = false;
         if (talentInfo->addToSpellBook)
@@ -7279,7 +7279,15 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         }
 
         if (HasSpellCooldown(spellInfo->Id))
+        {
             continue;
+        }
+
+        if (!spellInfo->CheckElixirStacking(this))
+        {
+            Spell::SendCastResult(this, spellInfo, cast_count, SPELL_FAILED_AURA_BOUNCED);
+            continue;
+        }
 
         Spell* spell = new Spell(this, spellInfo, (count > 0) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
         spell->m_CastItem = item;
@@ -7496,7 +7504,7 @@ void Player::_ApplyAmmoBonuses()
         UpdateDamagePhysical(RANGED_ATTACK);
 }
 
-bool Player::CheckAmmoCompatibility(const ItemTemplate* ammo_proto) const
+bool Player::CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const
 {
     if (!ammo_proto)
         return false;
@@ -9561,7 +9569,7 @@ class SpellModPred
 {
 public:
     SpellModPred() {}
-    bool operator() (const SpellModifier* a, const SpellModifier* b) const
+    bool operator() (SpellModifier const* a, SpellModifier const* b) const
     {
         if (a->type != b->type)
             return a->type == SPELLMOD_FLAT;
@@ -9572,7 +9580,7 @@ class MageSpellModPred
 {
 public:
     MageSpellModPred() {}
-    bool operator() (const SpellModifier* a, const SpellModifier* b) const
+    bool operator() (SpellModifier const* a, SpellModifier const* b) const
     {
         if (a->type != b->type)
             return a->type == SPELLMOD_FLAT;
@@ -9714,7 +9722,7 @@ void Player::RemoveSpellMods(Spell* spell)
     if (spell->m_appliedMods.empty())
         return;
 
-    const SpellInfo* const spellInfo = spell->m_spellInfo;
+    SpellInfo const* const spellInfo = spell->m_spellInfo;
 
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
@@ -9739,7 +9747,7 @@ void Player::RemoveSpellMods(Spell* spell)
             // MAGE T8P4 BONUS
             if( spellInfo->SpellFamilyName == SPELLFAMILY_MAGE )
             {
-                const SpellInfo* sp = mod->ownerAura->GetSpellInfo();
+                SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
                 // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
                 if( sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938 )
                     if( AuraEffect* aurEff = GetAuraEffectDummy(64869) )
@@ -11119,7 +11127,7 @@ bool Player::IsAlwaysDetectableFor(WorldObject const* seer) const
         return false;
     }
 
-    if (const Player* seerPlayer = seer->ToPlayer())
+    if (Player const* seerPlayer = seer->ToPlayer())
     {
         if (IsGroupVisibleFor(seerPlayer))
         {
@@ -11483,7 +11491,7 @@ void Player::resetSpells()
 
 void Player::LearnCustomSpells()
 {
-    if (!sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS))
+    if (!sWorld->getBoolConfig(CONFIG_START_CUSTOM_SPELLS))
     {
         return;
     }
@@ -12354,7 +12362,7 @@ bool Player::IsAtRecruitAFriendDistance(WorldObject const* pOther) const
 {
     if (!pOther)
         return false;
-    const WorldObject* player = GetCorpse();
+    WorldObject const* player = GetCorpse();
     if (!player || IsAlive())
         player = this;
 
@@ -13548,7 +13556,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if (spellId == 0)
         return;
 
-    const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 
@@ -13796,6 +13804,20 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
     }
 
     return false;
+}
+
+bool Player::CanSeeVendor(Creature const* creature) const
+{
+    if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR))
+        return true;
+
+    ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(creature->GetEntry(), 0);
+    if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void Player::BuildPlayerTalentsInfoData(WorldPacket* data)
@@ -15807,7 +15829,7 @@ Optional<float> Player::GetFarSightDistance() const
     return _farSightDistance;
 }
 
-float Player::GetSightRange(const WorldObject* target) const
+float Player::GetSightRange(WorldObject const* target) const
 {
     float sightRange = WorldObject::GetSightRange(target);
     if (_farSightDistance)

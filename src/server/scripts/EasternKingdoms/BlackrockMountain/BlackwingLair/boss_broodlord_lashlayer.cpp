@@ -103,7 +103,7 @@ public:
                         break;
                     case EVENT_BLASTWAVE:
                         DoCastVictim(SPELL_BLASTWAVE);
-                        events.ScheduleEvent(EVENT_BLASTWAVE, 8000, 16000);
+                        events.ScheduleEvent(EVENT_BLASTWAVE, 20000, 35000);
                         break;
                     case EVENT_MORTALSTRIKE:
                         DoCastVictim(SPELL_MORTALSTRIKE);

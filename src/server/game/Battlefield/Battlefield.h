@@ -57,7 +57,7 @@ enum BattlefieldSounds
 
 constexpr auto BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL = 1000;
 
-const uint32 BattlefieldFactions[BG_TEAMS_COUNT] =
+const uint32 BattlefieldFactions[PVP_TEAMS_COUNT] =
 {
     1732, // Alliance
     1735  // Horde
@@ -372,11 +372,11 @@ protected:
     BfCapturePointVector m_capturePoints;
 
     // Players info maps
-    GuidUnorderedSet m_players[BG_TEAMS_COUNT];             // Players in zone
-    GuidUnorderedSet m_PlayersInQueue[BG_TEAMS_COUNT];      // Players in the queue
-    GuidUnorderedSet m_PlayersInWar[BG_TEAMS_COUNT];        // Players in WG combat
-    PlayerTimerMap m_InvitedPlayers[BG_TEAMS_COUNT];
-    PlayerTimerMap m_PlayersWillBeKick[BG_TEAMS_COUNT];
+    GuidUnorderedSet m_players[PVP_TEAMS_COUNT];             // Players in zone
+    GuidUnorderedSet m_PlayersInQueue[PVP_TEAMS_COUNT];      // Players in the queue
+    GuidUnorderedSet m_PlayersInWar[PVP_TEAMS_COUNT];        // Players in WG combat
+    PlayerTimerMap m_InvitedPlayers[PVP_TEAMS_COUNT];
+    PlayerTimerMap m_PlayersWillBeKick[PVP_TEAMS_COUNT];
 
     // Variables that must exist for each battlefield
     uint32 m_TypeId;                                        // See enum BattlefieldTypes
@@ -403,7 +403,7 @@ protected:
     uint32 m_StartGroupingTimer;                            // Timer for invite players in area 15 minute before start battle
     bool m_StartGrouping;                                   // bool for know if all players in area has been invited
 
-    GuidUnorderedSet m_Groups[BG_TEAMS_COUNT];              // Contain different raid group
+    GuidUnorderedSet m_Groups[PVP_TEAMS_COUNT];              // Contain different raid group
 
     std::vector<uint64> m_Data64;
     std::vector<uint32> m_Data32;

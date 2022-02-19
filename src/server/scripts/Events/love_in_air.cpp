@@ -459,9 +459,15 @@ class spell_gen_aura_service_uniform : public AuraScript
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
             if (target->getGender() == GENDER_MALE)
+            {
                 target->SetDisplayId(MODEL_GOBLIN_MALE);
+            }
             else
+            {
                 target->SetDisplayId(MODEL_GOBLIN_FEMALE);
+            }
+
+            target->RemoveAurasByType(SPELL_AURA_MOUNTED);
         }
     }
 

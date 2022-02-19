@@ -29,15 +29,17 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+void BattlegroundICScore::BuildObjectivesBlock(WorldPacket& data)
+{
+    data << uint32(2); // Objectives Count
+    data << uint32(BasesAssaulted);
+    data << uint32(BasesDefended);
+}
+
 BattlegroundIC::BattlegroundIC()
 {
     BgObjects.resize(MAX_NORMAL_GAMEOBJECTS_SPAWNS + MAX_AIRSHIPS_SPAWNS + MAX_HANGAR_TELEPORTERS_SPAWNS + MAX_FORTRESS_TELEPORTERS_SPAWNS + MAX_HANGAR_TELEPORTER_EFFECTS_SPAWNS + MAX_FORTRESS_TELEPORTER_EFFECTS_SPAWNS);
     BgCreatures.resize(MAX_NORMAL_NPCS_SPAWNS + MAX_WORKSHOP_SPAWNS + MAX_DOCKS_SPAWNS + MAX_SPIRIT_GUIDES_SPAWNS + MAX_HANGAR_NPCS_SPAWNS);
-
-    StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_IC_START_TWO_MINUTES;
-    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_IC_START_ONE_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_IC_START_HALF_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_IC_HAS_BEGUN;
 
     for (uint8 i = 0; i < 2; ++i)
         factionReinforcements[i] = MAX_REINFORCEMENTS;
@@ -58,10 +60,6 @@ BattlegroundIC::BattlegroundIC()
     gunshipHorde = nullptr;
     gunshipAlliance = nullptr;
     respawnMap.clear();
-}
-
-BattlegroundIC::~BattlegroundIC()
-{
 }
 
 void BattlegroundIC::DoAction(uint32 action, ObjectGuid guid)
@@ -246,7 +244,14 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                 UpdateNodeWorldState(&nodePoint[i]);
                 HandleCapturedNodes(&nodePoint[i], false);
 
-                SendMessage2ToAll(LANG_BG_IC_TEAM_HAS_TAKEN_NODE, CHAT_MSG_BG_SYSTEM_NEUTRAL, nullptr, (nodePoint[i].faction == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE), nodePoint[i].string);
+                if (nodePoint[i].faction == TEAM_ALLIANCE)
+                {
+                    SendBroadcastText(ICNodes[i].TextAllianceTaken, CHAT_MSG_BG_SYSTEM_ALLIANCE);
+                }
+                else
+                {
+                    SendBroadcastText(ICNodes[i].TextHordeTaken, CHAT_MSG_BG_SYSTEM_HORDE);
+                }
 
                 nodePoint[i].needChange = false;
                 nodePoint[i].timer = BANNER_STATE_CHANGE_TIME;
@@ -270,10 +275,6 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
         resourceTimer = IC_RESOURCE_TIME;
     }
     else resourceTimer -= diff;
-}
-
-void BattlegroundIC::StartingEventCloseDoors()
-{
 }
 
 void BattlegroundIC::StartingEventOpenDoors()
@@ -320,7 +321,7 @@ bool BattlegroundIC::IsResourceGlutAllowed(TeamId teamId) const
 void BattlegroundIC::AddPlayer(Player* player)
 {
     Battleground::AddPlayer(player);
-    PlayerScores[player->GetGUID()] = new BattlegroundICScore(player);
+    PlayerScores.emplace(player->GetGUID().GetCounter(), new BattlegroundICScore(player->GetGUID()));
 
     if (nodePoint[NODE_TYPE_QUARRY].nodeState == (player->GetTeamId() == TEAM_ALLIANCE ? NODE_STATE_CONTROLLED_A : NODE_STATE_CONTROLLED_H))
         player->CastSpell(player, SPELL_QUARRY, true);
@@ -364,26 +365,22 @@ void BattlegroundIC::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundIC::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
+bool BattlegroundIC::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
-    BattlegroundScoreMap::iterator itr = PlayerScores.find(player->GetGUID());
-    if (itr == PlayerScores.end())
-        return;
+    if (!Battleground::UpdatePlayerScore(player, type, value, doAddHonor))
+        return false;
 
     switch (type)
     {
         case SCORE_BASES_ASSAULTED:
-            ((BattlegroundICScore*)itr->second)->BasesAssaulted += value;
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, IC_OBJECTIVE_ASSAULT_BASE);
             break;
         case SCORE_BASES_DEFENDED:
-            ((BattlegroundICScore*)itr->second)->BasesDefended += value;
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, IC_OBJECTIVE_DEFEND_BASE);
             break;
-        default:
-            Battleground::UpdatePlayerScore(player, type, value, doAddHonor);
-            break;
     }
+
+    return true;
 }
 
 void BattlegroundIC::FillInitialWorldStates(WorldPacket& data)
@@ -553,12 +550,6 @@ void BattlegroundIC::HandleKillPlayer(Player* player, Player* killer)
         EndBattleground(killer->GetTeamId());
 }
 
-void BattlegroundIC::EndBattleground(TeamId winnerTeamId)
-{
-    SendMessage2ToAll(LANG_BG_IC_TEAM_WINS, CHAT_MSG_BG_SYSTEM_NEUTRAL, nullptr, (winnerTeamId == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE));
-    Battleground::EndBattleground(winnerTeamId);
-}
-
 void BattlegroundIC::EventPlayerClickedOnFlag(Player* player, GameObject* gameObject)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
@@ -621,8 +612,15 @@ void BattlegroundIC::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
 
                 UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
 
-                SendMessage2ToAll(LANG_BG_IC_TEAM_ASSAULTED_NODE_1, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, point.string);
-                SendMessage2ToAll(LANG_BG_IC_TEAM_ASSAULTED_NODE_2, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, point.string, (player->GetTeamId() == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE));
+                if (nodePoint[i].faction == TEAM_ALLIANCE)
+                {
+                    SendBroadcastText(ICNodes[i].TextAssaulted, CHAT_MSG_BG_SYSTEM_ALLIANCE, player);
+                }
+                else
+                {
+                    SendBroadcastText(ICNodes[i].TextAssaulted, CHAT_MSG_BG_SYSTEM_HORDE, player);
+                }
+
                 HandleContestedNodes(&point);
             }
             else if (nextBanner == point.banners[BANNER_A_CONTROLLED] || nextBanner == point.banners[BANNER_H_CONTROLLED])
@@ -630,7 +628,16 @@ void BattlegroundIC::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
             {
                 point.timer = BANNER_STATE_CHANGE_TIME;
                 point.needChange = false;
-                SendMessage2ToAll(LANG_BG_IC_TEAM_DEFENDED_NODE, CHAT_MSG_BG_SYSTEM_NEUTRAL, player, point.string);
+
+                if (nodePoint[i].faction == TEAM_ALLIANCE)
+                {
+                    SendBroadcastText(ICNodes[i].TextDefended, CHAT_MSG_BG_SYSTEM_ALLIANCE, player);
+                }
+                else
+                {
+                    SendBroadcastText(ICNodes[i].TextDefended, CHAT_MSG_BG_SYSTEM_HORDE, player);
+                }
+
                 HandleCapturedNodes(&point, true);
                 UpdatePlayerScore(player, SCORE_BASES_DEFENDED, 1);
             }
@@ -926,33 +933,41 @@ void BattlegroundIC::DestroyGate(Player*  /*player*/, GameObject* go)
         UpdateWorldState(uws_open, 1);
     }
 
+    uint32 textId;
+    ChatMsg msgType;
     TeamId teamId = TEAM_ALLIANCE;
-    uint32 lang_entry = 0;
+
     switch (go->GetEntry())
     {
         case GO_HORDE_GATE_1:
-            lang_entry = LANG_BG_IC_NORTH_GATE_DESTROYED;
+            textId = BG_IC_TEXT_FRONT_GATE_HORDE_DESTROYED;
+            msgType = CHAT_MSG_BG_SYSTEM_ALLIANCE;
             break;
         case GO_HORDE_GATE_2:
-            lang_entry = LANG_BG_IC_EAST_GATE_DESTROYED;
+            textId = BG_IC_TEXT_WEST_GATE_HORDE_DESTROYED;
+            msgType = CHAT_MSG_BG_SYSTEM_ALLIANCE;
             break;
         case GO_HORDE_GATE_3:
-            lang_entry = LANG_BG_IC_WEST_GATE_DESTROYED;
+            textId = BG_IC_TEXT_EAST_GATE_HORDE_DESTROYED;
+            msgType = CHAT_MSG_BG_SYSTEM_ALLIANCE;
             break;
         case GO_ALLIANCE_GATE_1:
+            textId = BG_IC_TEXT_WEST_GATE_ALLIANCE_DESTROYED;
+            msgType = CHAT_MSG_BG_SYSTEM_HORDE;
             teamId = TEAM_HORDE;
-            lang_entry = LANG_BG_IC_WEST_GATE_DESTROYED;
             break;
         case GO_ALLIANCE_GATE_2:
+            textId = BG_IC_TEXT_EAST_GATE_ALLIANCE_DESTROYED;
+            msgType = CHAT_MSG_BG_SYSTEM_HORDE;
             teamId = TEAM_HORDE;
-            lang_entry = LANG_BG_IC_EAST_GATE_DESTROYED;
             break;
         case GO_ALLIANCE_GATE_3:
+            textId = BG_IC_TEXT_FRONT_GATE_ALLIANCE_DESTROYED;
+            msgType = CHAT_MSG_BG_SYSTEM_HORDE;
             teamId = TEAM_HORDE;
-            lang_entry = LANG_BG_IC_SOUTH_GATE_DESTROYED;
             break;
         default:
-            break;
+            return;
     }
 
     if (teamId == TEAM_ALLIANCE)
@@ -967,11 +982,7 @@ void BattlegroundIC::DestroyGate(Player*  /*player*/, GameObject* go)
     }
 
     TurnBosses(true);
-    SendMessage2ToAll(lang_entry, CHAT_MSG_BG_SYSTEM_NEUTRAL, nullptr, (teamId == TEAM_ALLIANCE ? LANG_BG_IC_HORDE_KEEP : LANG_BG_IC_ALLIANCE_KEEP));
-}
-
-void BattlegroundIC::EventPlayerDamagedGO(Player* /*player*/, GameObject* /*go*/, uint32 /*eventType*/)
-{
+    SendBroadcastText(textId, msgType);
 }
 
 GraveyardStruct const* BattlegroundIC::GetClosestGraveyard(Player* player)
