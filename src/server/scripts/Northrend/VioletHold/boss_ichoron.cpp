@@ -320,7 +320,7 @@ public:
         InstanceScript* pInstance;
         uint32 uiRangeCheck_Timer;
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_CREATE_GLOBULE_VISUAL)
                 me->CastSpell(me, SPELL_WATER_GLOBULE, true);

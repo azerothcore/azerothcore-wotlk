@@ -5334,7 +5334,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
     // Spectator check
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        if (((const Player*)m_caster)->IsSpectator() && m_spellInfo->Id != SPECTATOR_SPELL_BINDSIGHT)
+        if (((Player const*)m_caster)->IsSpectator() && m_spellInfo->Id != SPECTATOR_SPELL_BINDSIGHT)
             return SPELL_FAILED_NOT_HERE;
 
     SpellCastResult res = SPELL_CAST_OK;

@@ -800,7 +800,7 @@ bool Item::CanBeTraded(bool mail, bool trade) const
     return true;
 }
 
-bool Item::HasEnchantRequiredSkill(const Player* player) const
+bool Item::HasEnchantRequiredSkill(Player const* player) const
 {
     // Check all enchants for required skill
     for (uint32 enchant_slot = PERM_ENCHANTMENT_SLOT; enchant_slot < MAX_ENCHANTMENT_SLOT; ++enchant_slot)

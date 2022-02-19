@@ -63,7 +63,7 @@ public:
     virtual void OnGameEvent(bool /*start*/, uint16 /*eventId*/) {}
     virtual void OnStateChanged(uint32 /*state*/, Unit* /*unit*/) {}
     virtual void EventInform(uint32 /*eventId*/) {}
-    virtual void SpellHit(Unit* /*unit*/, const SpellInfo* /*spellInfo*/) {}
+    virtual void SpellHit(Unit* /*unit*/, SpellInfo const* /*spellInfo*/) {}
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 
     virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) { }

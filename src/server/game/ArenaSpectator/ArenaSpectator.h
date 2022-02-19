@@ -91,7 +91,7 @@ namespace ArenaSpectator
         if (!targetGUID.IsPlayer())
             return;
 
-        if (const SpellInfo* si = sSpellMgr->GetSpellInfo(id))
+        if (SpellInfo const* si = sSpellMgr->GetSpellInfo(id))
             if (si->SpellIconID == 1)
                 return;
 

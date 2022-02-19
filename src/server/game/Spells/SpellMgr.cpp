@@ -2853,10 +2853,10 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 
         for (uint8 j = 0; j < MAX_TALENT_RANK; j++)
             if (uint32 spellId = talentInfo->RankID[j])
-                if (const SpellInfo* spellInfo = GetSpellInfo(spellId))
+                if (SpellInfo const* spellInfo = GetSpellInfo(spellId))
                     for (uint8 k = 0; k < MAX_SPELL_EFFECTS; ++k)
                         if (spellInfo->Effects[k].Effect == SPELL_EFFECT_LEARN_SPELL)
-                            if (const SpellInfo* learnSpell = GetSpellInfo(spellInfo->Effects[k].TriggerSpell))
+                            if (SpellInfo const* learnSpell = GetSpellInfo(spellInfo->Effects[k].TriggerSpell))
                                 if (learnSpell->IsRanked() && !learnSpell->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)))
                                     mTalentSpellAdditionalSet.insert(learnSpell->Id);
     }
