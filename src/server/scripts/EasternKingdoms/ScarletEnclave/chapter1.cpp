@@ -258,7 +258,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* pSpell) override
+        void SpellHit(Unit* caster, SpellInfo const* pSpell) override
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {

@@ -463,13 +463,13 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 
         if( my_trade->GetMoney() >= 10 * GOLD )
         {
-            CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"goods\", NOW(), %u)",
-                GetAccountId(), _player->GetGUID().GetCounter(), _player->GetName().c_str(), GetRemoteAddress().c_str(), trader->GetSession()->GetAccountId(), trader->GetName().c_str(), my_trade->GetMoney(), 6);
+            CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
+                GetAccountId(), _player->GetGUID().GetCounter(), _player->GetName(), GetRemoteAddress(), trader->GetSession()->GetAccountId(), trader->GetName(), my_trade->GetMoney(), 6);
         }
         if( his_trade->GetMoney() >= 10 * GOLD )
         {
-            CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"goods\", NOW(), %u)",
-                trader->GetSession()->GetAccountId(), trader->GetGUID().GetCounter(), trader->GetName().c_str(), trader->GetSession()->GetRemoteAddress().c_str(), GetAccountId(), _player->GetName().c_str(), his_trade->GetMoney(), 6);
+            CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
+                trader->GetSession()->GetAccountId(), trader->GetGUID().GetCounter(), trader->GetName(), trader->GetSession()->GetRemoteAddress(), GetAccountId(), _player->GetName(), his_trade->GetMoney(), 6);
         }
 
         // update money

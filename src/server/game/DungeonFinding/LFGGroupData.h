@@ -68,6 +68,7 @@ namespace lfg
         LfgGuidSet m_Players;                              ///< Players in group
         // Dungeon
         uint32 m_Dungeon;                                  ///< Dungeon entry
+        bool _isLFGGroup;
         // Vote Kick
         uint8 m_KicksLeft;                                 ///< Number of kicks left
     };

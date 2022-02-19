@@ -94,7 +94,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
         // TODO: find correct opcode
         if (_player->getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         {
-            SendNotification(LANG_ARENA_ONE_TOOLOW, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
+            SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", _player->GetName(), ERR_ARENA_TEAM_TARGET_TOO_LOW_S);
             return;
         }
 
@@ -202,8 +202,8 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     {
         LOG_DEBUG("network", "Invalid petition: {}", petition->petitionGuid.ToString());
 
-        trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
-        trans->PAppend("DELETE FROM petition_sign WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
+        trans->Append("DELETE FROM petition WHERE petitionguid = {}", petition->petitionGuid.GetCounter());
+        trans->Append("DELETE FROM petition_sign WHERE petitionguid = {}", petition->petitionGuid.GetCounter());
 
         // xinef: clear petition store
         sPetitionMgr->RemovePetition(petition->petitionGuid);
@@ -212,10 +212,10 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     // xinef: petition pointer is invalid from now on
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
-    stmt->setUInt32(0, _player->GetGUID().GetCounter());
-    stmt->setUInt32(1, charter->GetGUID().GetCounter());
-    stmt->setString(2, name);
-    stmt->setUInt8(3, uint8(type));
+    stmt->SetData(0, _player->GetGUID().GetCounter());
+    stmt->SetData(1, charter->GetGUID().GetCounter());
+    stmt->SetData(2, name);
+    stmt->SetData(3, uint8(type));
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
@@ -373,8 +373,8 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETITION_NAME);
 
-    stmt->setString(0, newName);
-    stmt->setUInt32(1, petitionGuid.GetCounter());
+    stmt->SetData(0, newName);
+    stmt->SetData(1, petitionGuid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 
@@ -495,10 +495,10 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
 
-    stmt->setUInt32(0, petition->ownerGuid.GetCounter());
-    stmt->setUInt32(1, petitionGuid.GetCounter());
-    stmt->setUInt32(2, playerGuid.GetCounter());
-    stmt->setUInt32(3, GetAccountId());
+    stmt->SetData(0, petition->ownerGuid.GetCounter());
+    stmt->SetData(1, petitionGuid.GetCounter());
+    stmt->SetData(2, playerGuid.GetCounter());
+    stmt->SetData(3, GetAccountId());
 
     CharacterDatabase.Execute(stmt);
 
@@ -787,11 +787,11 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_GUID);
-    stmt->setUInt32(0, petitionGuid.GetCounter());
+    stmt->SetData(0, petitionGuid.GetCounter());
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE_BY_GUID);
-    stmt->setUInt32(0, petitionGuid.GetCounter());
+    stmt->SetData(0, petitionGuid.GetCounter());
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);

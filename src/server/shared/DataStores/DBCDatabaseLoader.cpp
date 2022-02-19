@@ -52,7 +52,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 
     // Resize index table
     // database query *MUST* contain ORDER BY `index_field` DESC clause
-    uint32 indexTableSize = std::max(records, (*result)[_sqlIndexPos].GetUInt32() + 1);
+    uint32 indexTableSize = std::max(records, (*result)[_sqlIndexPos].Get<uint32>() + 1);
     if (indexTableSize > records)
     {
         char** tmpIdxTable = new char* [indexTableSize];
@@ -70,7 +70,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     do
     {
         Field* fields = result->Fetch();
-        uint32 indexValue = fields[_sqlIndexPos].GetUInt32();
+        uint32 indexValue = fields[_sqlIndexPos].Get<uint32>();
         char* dataValue = indexTable[indexValue];
 
         // If exist in DBC file override from DB
@@ -86,20 +86,20 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
             switch (*dbcFormat)
             {
                 case FT_FLOAT:
-                    *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetFloat();
+                    *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<float>();
                     dataOffset += sizeof(float);
                     break;
                 case FT_IND:
                 case FT_INT:
-                    *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt32();
+                    *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint32>();
                     dataOffset += sizeof(uint32);
                     break;
                 case FT_BYTE:
-                    *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].GetUInt8();
+                    *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint8>();
                     dataOffset += sizeof(uint8);
                     break;
                 case FT_STRING:
-                    *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].GetString());
+                    *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].Get<std::string>());
                     dataOffset += sizeof(char*);
                     break;
                 case FT_SORT:

@@ -46,7 +46,7 @@ void GroupMgr::InitGroupIds()
     QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM `groups`");
     if (result)
     {
-        uint32 maxId = (*result)[0].GetUInt32();
+        uint32 maxId = (*result)[0].Get<uint32>();
         _groupIds.resize(maxId + 1);
     }
 }
@@ -170,10 +170,10 @@ void GroupMgr::LoadGroups()
             do
             {
                 Field* fields = result->Fetch();
-                Group* group = GetGroupByGUID(fields[0].GetUInt32());
+                Group* group = GetGroupByGUID(fields[0].Get<uint32>());
 
                 if (group)
-                    group->LoadMemberFromDB(fields[1].GetUInt32(), fields[2].GetUInt8(), fields[3].GetUInt8(), fields[4].GetUInt8());
+                    group->LoadMemberFromDB(fields[1].Get<uint32>(), fields[2].Get<uint8>(), fields[3].Get<uint8>(), fields[4].Get<uint8>());
 
                 ++count;
             } while (result->NextRow());

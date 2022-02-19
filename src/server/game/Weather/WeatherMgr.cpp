@@ -105,15 +105,15 @@ namespace WeatherMgr
         {
             Field* fields = result->Fetch();
 
-            uint32 zone_id = fields[0].GetUInt32();
+            uint32 zone_id = fields[0].Get<uint32>();
 
             WeatherData& wzc = mWeatherZoneMap[zone_id];
 
             for (uint8 season = 0; season < WEATHER_SEASONS; ++season)
             {
-                wzc.data[season].rainChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 1].GetUInt8();
-                wzc.data[season].snowChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 2].GetUInt8();
-                wzc.data[season].stormChance = fields[season * (MAX_WEATHER_TYPE - 1) + 3].GetUInt8();
+                wzc.data[season].rainChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 1].Get<uint8>();
+                wzc.data[season].snowChance  = fields[season * (MAX_WEATHER_TYPE - 1) + 2].Get<uint8>();
+                wzc.data[season].stormChance = fields[season * (MAX_WEATHER_TYPE - 1) + 3].Get<uint8>();
 
                 if (wzc.data[season].rainChance > 100)
                 {
@@ -134,7 +134,7 @@ namespace WeatherMgr
                 }
             }
 
-            wzc.ScriptId = sObjectMgr->GetScriptId(fields[13].GetCString());
+            wzc.ScriptId = sObjectMgr->GetScriptId(fields[13].Get<std::string>());
 
             ++count;
         } while (result->NextRow());

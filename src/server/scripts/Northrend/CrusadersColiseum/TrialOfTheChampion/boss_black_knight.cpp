@@ -187,7 +187,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -410,7 +410,7 @@ public:
             events.RescheduleEvent(2, urand(3000, 4000)); // claw
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
             {
@@ -419,7 +419,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             switch(spell->Id)
             {
