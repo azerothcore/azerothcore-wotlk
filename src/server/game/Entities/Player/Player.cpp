@@ -11491,7 +11491,7 @@ void Player::resetSpells()
 
 void Player::LearnCustomSpells()
 {
-    if (!sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS))
+    if (!sWorld->getBoolConfig(CONFIG_START_CUSTOM_SPELLS))
     {
         return;
     }
@@ -13804,6 +13804,20 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
     }
 
     return false;
+}
+
+bool Player::CanSeeVendor(Creature const* creature) const
+{
+    if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR))
+        return true;
+
+    ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(creature->GetEntry(), 0);
+    if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void Player::BuildPlayerTalentsInfoData(WorldPacket* data)

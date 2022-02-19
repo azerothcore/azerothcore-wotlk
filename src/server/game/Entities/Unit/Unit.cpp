@@ -8522,6 +8522,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
                     }
                 }
+                else if (auraSpellInfo->Id == 71761) // Deep Freeze Immunity State (only permanent)
+                {
+                    Creature* creature = victim->ToCreature();
+                    if (!creature || !creature->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
+                        return false;
+                }
                 break;
             case SPELLFAMILY_WARLOCK:
                 {
@@ -14243,7 +14249,7 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32& castTime, Spell* 
         case SPELL_DAMAGE_CLASS_MELEE:
             break; // no known cases
         case SPELL_DAMAGE_CLASS_MAGIC:
-            castTime = int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
+            castTime = CanInstantCast() ? 0 : int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
             break;
         case SPELL_DAMAGE_CLASS_RANGED:
             castTime = int32(float(castTime) * m_modAttackSpeedPct[RANGED_ATTACK]);
@@ -20097,6 +20103,11 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     if (!target->CanSeeSpellClickOn(creature))
                     {
                         appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
+                    }
+
+                    if (!target->CanSeeVendor(creature))
+                    {
+                        appendValue &= ~UNIT_NPC_FLAG_VENDOR_MASK;
                     }
 
                     if (!creature->IsValidTrainerForPlayer(target, &appendValue))
