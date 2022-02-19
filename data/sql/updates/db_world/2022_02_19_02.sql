@@ -1,3 +1,19 @@
+-- DB update 2022_02_19_01 -> 2022_02_19_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_19_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_19_01 2022_02_19_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1644449176407387800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1644449176407387800');
 
 UPDATE `creature_template` SET `gossip_menu_id`=4013 WHERE `entry`=3407;
@@ -20,3 +36,13 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (4013, 2, 0, "I wish to know about Dual Talent Specialization.", 33762, 20, 1, 10371, 0, 0, 0, "", 0, 0);
 
 UPDATE `gossip_menu_option` SET `OptionText`="I seek training in the ways of the Hunter.", `OptionBroadcastTextID`=7643 WHERE `MenuID`=4506 AND `OptionID`=0;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_19_02' WHERE sql_rev = '1644449176407387800';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
