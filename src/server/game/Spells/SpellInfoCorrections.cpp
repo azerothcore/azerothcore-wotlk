@@ -4154,7 +4154,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[1] = 0x00020000;
     });
 
-    // Mana Storm
+    // Manastorm
     ApplySpellFix({ 21097 }, [](SpellInfo* spellInfo)
     {
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
