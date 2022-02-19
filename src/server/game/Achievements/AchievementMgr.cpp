@@ -442,7 +442,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             }
 
-            TeamId winnerTeam = bg->GetWinner();
+            TeamId winnerTeam = GetTeamId(bg->GetWinner());
             if (winnerTeam == TEAM_NEUTRAL)
             {
                 return false;
