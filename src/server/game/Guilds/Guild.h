@@ -279,9 +279,9 @@ public:
     void SetSlots(uint32 _slots) { slots = _slots; }
     void SetRights(uint8 _rights) { rights = _rights; }
 
-    int8 GetTabId() const { return tabId; }
-    int32 GetSlots() const { return slots; }
-    int8 GetRights() const { return rights; }
+    uint8 GetTabId() const { return tabId; }
+    uint32 GetSlots() const { return slots; }
+    uint8 GetRights() const { return rights; }
 
 private:
     uint8  tabId;
