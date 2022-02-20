@@ -1,5 +1,9 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645326770688077000');
 
+ALTER TABLE `quest_request_items` CHANGE `VerifiedBuild` `VerifiedBuild` INT(11) DEFAULT 0 NOT NULL;
+ALTER TABLE `quest_details` CHANGE `VerifiedBuild` `VerifiedBuild` INT(11) DEFAULT 0 NOT NULL;
+ALTER TABLE `quest_offer_reward` CHANGE `VerifiedBuild` `VerifiedBuild` INT(11) DEFAULT 0 NOT NULL;
+
 /* Sample for Helbrim */
 DELETE FROM `quest_details` WHERE `ID`=1358;
 INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES (1358,1,0,0,0,0,0,0,0,0);
