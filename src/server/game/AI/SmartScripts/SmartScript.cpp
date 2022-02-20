@@ -3744,10 +3744,10 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     break;
                 }
 
-                //my addition
+                // xinef: my addition
                 if (e.target.unitGUID.getFromHashMap)
                 {
-                    if (target = ObjectAccessor::GetCreature(scriptTrigger ? *scriptTrigger : *GetBaseObject(), MAKE_NEW_GUID(e.target.unitGUID.dbGuid, e.target.unitGUID.entry, HIGHGUID_UNIT)))
+                    if ((target = ObjectAccessor::GetCreature(scriptTrigger ? *scriptTrigger : *GetBaseObject(), ObjectGuid::Create<HighGuid::Unit>(e.target.unitGUID.entry, e.target.unitGUID.dbGuid))))
                         l->push_back(target);
                 }
                 else
@@ -3767,10 +3767,10 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     break;
                 }
 
-                //my addition
+                // xinef: my addition
                 if (e.target.goGUID.getFromHashMap)
                 {
-                    if (target = ObjectAccessor::GetGameObject(scriptTrigger ? *scriptTrigger : *GetBaseObject(), MAKE_NEW_GUID(e.target.goGUID.dbGuid, e.target.goGUID.entry, HIGHGUID_GAMEOBJECT)))
+                    if ((target = ObjectAccessor::GetGameObject(scriptTrigger ? *scriptTrigger : *GetBaseObject(), ObjectGuid::Create<HighGuid::GameObject>(e.target.goGUID.entry, e.target.goGUID.dbGuid))))
                         l->push_back(target);
                 }
                 else
