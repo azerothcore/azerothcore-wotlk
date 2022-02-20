@@ -3737,28 +3737,48 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             }
         case SMART_TARGET_CREATURE_GUID:
             {
+                Creature* target = nullptr;
                 if (!scriptTrigger && !baseObject)
                 {
                     LOG_ERROR("scripts.ai.sai", "SMART_TARGET_CREATURE_GUID can not be used without invoker");
                     break;
                 }
 
-                Creature* target = FindCreatureNear(scriptTrigger ? scriptTrigger : GetBaseObject(), e.target.unitGUID.dbGuid);
-                if (target && (!e.target.unitGUID.entry || target->GetEntry() == e.target.unitGUID.entry))
-                    l->push_back(target);
+                //my addition
+                if (e.target.unitGUID.getFromHashMap)
+                {
+                    if (target = ObjectAccessor::GetCreature(scriptTrigger ? *scriptTrigger : *GetBaseObject(), MAKE_NEW_GUID(e.target.unitGUID.dbGuid, e.target.unitGUID.entry, HIGHGUID_UNIT)))
+                        l->push_back(target);
+                }
+                else
+                {
+                    target = FindCreatureNear(scriptTrigger ? scriptTrigger : GetBaseObject(), e.target.unitGUID.dbGuid);
+                    if (target && (!e.target.unitGUID.entry || target->GetEntry() == e.target.unitGUID.entry))
+                        l->push_back(target);
+                }
                 break;
             }
         case SMART_TARGET_GAMEOBJECT_GUID:
             {
+                GameObject* target = nullptr;
                 if (!scriptTrigger && !GetBaseObject())
                 {
                     LOG_ERROR("scripts.ai.sai", "SMART_TARGET_GAMEOBJECT_GUID can not be used without invoker");
                     break;
                 }
 
-                GameObject* target = FindGameObjectNear(scriptTrigger ? scriptTrigger : GetBaseObject(), e.target.goGUID.dbGuid);
-                if (target && (!e.target.goGUID.entry || target->GetEntry() == e.target.goGUID.entry))
-                    l->push_back(target);
+                //my addition
+                if (e.target.goGUID.getFromHashMap)
+                {
+                    if (target = ObjectAccessor::GetGameObject(scriptTrigger ? *scriptTrigger : *GetBaseObject(), MAKE_NEW_GUID(e.target.goGUID.dbGuid, e.target.goGUID.entry, HIGHGUID_GAMEOBJECT)))
+                        l->push_back(target);
+                }
+                else
+                {
+                    target = FindGameObjectNear(scriptTrigger ? scriptTrigger : GetBaseObject(), e.target.goGUID.dbGuid);
+                    if (target && (!e.target.goGUID.entry || target->GetEntry() == e.target.goGUID.entry))
+                        l->push_back(target);
+                }
                 break;
             }
         case SMART_TARGET_PLAYER_RANGE:
