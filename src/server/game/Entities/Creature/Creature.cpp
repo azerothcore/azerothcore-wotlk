@@ -3249,7 +3249,22 @@ void Creature::UpdateMovementFlags()
     if (!isInAir)
         RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
-    SetSwim(CanSwim() && IsInWater());
+    bool Swim = false;
+    LiquidData const& liquidData = GetLiquidData();
+    switch (liquidData.Status)
+    {
+        case LIQUID_MAP_WATER_WALK:
+        case LIQUID_MAP_IN_WATER:
+            Swim = GetPositionZ() - liquidData.DepthLevel > GetCollisionHeight() * 0.75f; // Shallow water at ~75% of collision height
+            break;
+        case LIQUID_MAP_UNDER_WATER:
+            Swim = true;
+            break;
+        default:
+            break;
+    }
+
+    SetSwim(CanSwim() && Swim);
 }
 
 void Creature::SetObjectScale(float scale)
