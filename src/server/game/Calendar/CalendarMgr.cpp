@@ -255,7 +255,7 @@ void CalendarMgr::UpdateEvent(CalendarEvent* calendarEvent)
     stmt->SetData(5, calendarEvent->GetDungeonId());
     stmt->SetData(6, uint32(calendarEvent->GetEventTime()));
     stmt->SetData(7, calendarEvent->GetFlags());
-    stmt->SetData(8, calendarEvent->GetTimeZoneTime()); // correct?
+    stmt->SetData(8, (int64)calendarEvent->GetTimeZoneTime()); // correct?
     CharacterDatabase.Execute(stmt);
 }
 

@@ -178,7 +178,7 @@ struct NotOnSameSide
 public:
     explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) { }
 
-    bool operator() (const Unit* pTarget)
+    bool operator() (Unit const* pTarget)
     {
         return (m_inLiveSide != IN_LIVE_SIDE(pTarget));
     }
@@ -384,7 +384,7 @@ public:
             return false;
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
             uint8 pos = urand(0, 4);
             switch (spellInfo->Id)

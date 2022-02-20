@@ -1016,7 +1016,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             {
                 for (auto const& itr : factionsList)
                 {
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999, false);
+                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999.f, false);
                 }
             };
 

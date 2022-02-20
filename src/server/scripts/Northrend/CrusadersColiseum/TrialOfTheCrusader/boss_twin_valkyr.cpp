@@ -246,7 +246,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if (!victim || !victim->IsInWorld())
             return;
 
-        float allowedDist = sqrt(MELEE_RANGE * MELEE_RANGE + 6.0f * 6.0f);
+        float allowedDist = std::sqrt(MELEE_RANGE * MELEE_RANGE + 6.0f * 6.0f);
         if (!me->IsWithinMeleeRange(victim, allowedDist))
             return;
 
@@ -747,7 +747,7 @@ public:
             if( !count || !GetOwner() )
                 return;
 
-            if( const SpellInfo* se = GetAura()->GetSpellInfo() )
+            if( SpellInfo const* se = GetAura()->GetSpellInfo() )
                 if( Unit* owner = GetOwner()->ToUnit() )
                 {
                     uint32 auraId = 0;
@@ -895,15 +895,15 @@ public:
         {
             if (Unit* target = GetTarget())
                 if (target->GetDisplayId() != 11686)
-                    if (Creature* me = target->ToCreature())
-                        if (Player* p = me->SelectNearestPlayer(2.75f))
-                            if (me->GetExactDist2d(p) <= 2.75f)
+                    if (Creature* creature = target->ToCreature())
+                        if (Player* player = creature->SelectNearestPlayer(2.75f))
+                            if (creature->GetExactDist2d(player) <= 2.75f)
                             {
-                                me->AI()->DoAction(1); // despawning = true;
-                                me->GetMotionMaster()->MoveIdle();
-                                me->CastSpell((Unit*)nullptr, me->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
-                                me->SetDisplayId(11686);
-                                me->DespawnOrUnsummon(1500);
+                                creature->AI()->DoAction(1); // despawning = true;
+                                creature->GetMotionMaster()->MoveIdle();
+                                creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
+                                creature->SetDisplayId(11686);
+                                creature->DespawnOrUnsummon(1500);
                             }
         }
 
