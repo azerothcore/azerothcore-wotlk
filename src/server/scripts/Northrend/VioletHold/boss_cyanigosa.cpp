@@ -95,7 +95,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (!target || !spell)
                 return;

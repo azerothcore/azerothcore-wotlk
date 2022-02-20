@@ -47,7 +47,7 @@ char const* ChatHandler::GetAcoreString(uint32 entry) const
 bool ChatHandler::IsAvailable(uint32 securityLevel) const
 {
     // check security level only for simple  command (without child commands)
-    return m_session->GetSecurity() >= AccountTypes(securityLevel);
+    return IsConsole() ? true : m_session->GetSecurity() >= AccountTypes(securityLevel);
 }
 
 bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)

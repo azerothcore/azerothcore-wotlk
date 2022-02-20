@@ -1460,7 +1460,7 @@ public:
             summons.Despawn(s);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target && target->IsAlive() && spell->Id == SPELL_LICH_KING_ZAP_PLAYER)
                 Unit::DealDamage(me, target, 10000);
