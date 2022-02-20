@@ -302,7 +302,7 @@ public:
                 SetGate(room, CLOSED);
                 SpawnMobsInRoom(room);
                 DoCast(target, GandlingPortalSpells[room], true); // needs triggered somehow.
-                
+
                 auto victim = me->GetVictim();
                 if (victim && (target->GetGUID() == victim->GetGUID()))
                 {
