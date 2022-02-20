@@ -27,6 +27,16 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+void BattlegroundAVScore::BuildObjectivesBlock(WorldPacket& data)
+{
+    data << uint32(5); // Objectives Count
+    data << uint32(GraveyardsAssaulted);
+    data << uint32(GraveyardsDefended);
+    data << uint32(TowersAssaulted);
+    data << uint32(TowersDefended);
+    data << uint32(MinesCaptured);
+}
+
 BattlegroundAV::BattlegroundAV()
 {
     BgObjects.resize(BG_AV_OBJECT_MAX);
@@ -49,14 +59,9 @@ BattlegroundAV::BattlegroundAV()
     for (BG_AV_Nodes i = BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i)
         InitNode(i, TEAM_NEUTRAL, false);
 
-    StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_BG_AV_START_TWO_MINUTES;
-    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_AV_START_ONE_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_AV_START_HALF_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AV_HAS_BEGUN;
-}
-
-BattlegroundAV::~BattlegroundAV()
-{
+    StartMessageIds[BG_STARTING_EVENT_SECOND] = BG_AV_TEXT_START_ONE_MINUTE;
+    StartMessageIds[BG_STARTING_EVENT_THIRD] = BG_AV_TEXT_START_HALF_MINUTE;
+    StartMessageIds[BG_STARTING_EVENT_FOURTH] = BG_AV_TEXT_BATTLE_HAS_BEGUN;
 }
 
 void BattlegroundAV::HandleKillPlayer(Player* player, Player* killer)
@@ -268,7 +273,15 @@ void BattlegroundAV::UpdateScore(TeamId teamId, int16 points)
         }
         else if (!m_IsInformedNearVictory[teamId] && m_Team_Scores[teamId] < SEND_MSG_NEAR_LOSE)
         {
-            SendMessageToAll(teamId == TEAM_HORDE ? LANG_BG_AV_H_NEAR_LOSE : LANG_BG_AV_A_NEAR_LOSE, teamId == TEAM_HORDE ? CHAT_MSG_BG_SYSTEM_HORDE : CHAT_MSG_BG_SYSTEM_ALLIANCE);
+            if (teamId == TEAM_ALLIANCE)
+            {
+                SendBroadcastText(BG_AV_TEXT_ALLIANCE_NEAR_LOSE, CHAT_MSG_BG_SYSTEM_ALLIANCE);
+            }
+            else
+            {
+                SendBroadcastText(BG_AV_TEXT_HORDE_NEAR_LOSE, CHAT_MSG_BG_SYSTEM_HORDE);
+            }
+
             PlaySoundToAll(AV_SOUND_NEAR_VICTORY);
             m_IsInformedNearVictory[teamId] = true;
         }
@@ -456,8 +469,7 @@ void BattlegroundAV::StartingEventOpenDoors()
 void BattlegroundAV::AddPlayer(Player* player)
 {
     Battleground::AddPlayer(player);
-    //create score and add it to map, default values are set in constructor
-    PlayerScores[player->GetGUID()] = new BattlegroundAVScore(player);
+    PlayerScores.emplace(player->GetGUID().GetCounter(), new BattlegroundAVScore(player->GetGUID()));
 }
 
 void BattlegroundAV::EndBattleground(TeamId winnerTeamId)
@@ -542,43 +554,30 @@ void BattlegroundAV::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundAV::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
+bool BattlegroundAV::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
-    auto itr = PlayerScores.find(player->GetGUID());
-    if (itr == PlayerScores.end())
-        return;
+    if (!Battleground::UpdatePlayerScore(player, type, value, doAddHonor))
+        return false;
 
     switch (type)
     {
         case SCORE_GRAVEYARDS_ASSAULTED:
-            ((BattlegroundAVScore*)itr->second)->GraveyardsAssaulted += value;
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, AV_OBJECTIVE_ASSAULT_GRAVEYARD);
             break;
         case SCORE_GRAVEYARDS_DEFENDED:
-            ((BattlegroundAVScore*)itr->second)->GraveyardsDefended += value;
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, AV_OBJECTIVE_DEFEND_GRAVEYARD);
             break;
         case SCORE_TOWERS_ASSAULTED:
-            ((BattlegroundAVScore*)itr->second)->TowersAssaulted += value;
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, AV_OBJECTIVE_ASSAULT_TOWER);
             break;
         case SCORE_TOWERS_DEFENDED:
-            ((BattlegroundAVScore*)itr->second)->TowersDefended += value;
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, AV_OBJECTIVE_DEFEND_TOWER);
             break;
-        case SCORE_MINES_CAPTURED:
-            ((BattlegroundAVScore*)itr->second)->MinesCaptured += value;
-            break;
-        case SCORE_LEADERS_KILLED:
-            ((BattlegroundAVScore*)itr->second)->LeadersKilled += value;
-            break;
-        case SCORE_SECONDARY_OBJECTIVES:
-            ((BattlegroundAVScore*)itr->second)->SecondaryObjectives += value;
-            break;
         default:
-            Battleground::UpdatePlayerScore(player, type, value, doAddHonor);
             break;
     }
+
+    return true;
 }
 
 void BattlegroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)

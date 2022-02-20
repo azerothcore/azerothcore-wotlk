@@ -127,7 +127,7 @@ public:
                 damage = 0;
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell) override
+        void SpellHit(Unit*, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_TRANSFORM_SPLIT2)
                 EnterPhase(PHASE_HUMAN);

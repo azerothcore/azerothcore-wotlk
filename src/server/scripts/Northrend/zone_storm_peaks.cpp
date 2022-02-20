@@ -147,7 +147,7 @@ public:
                 me->SetControlled(true, UNIT_STATE_STUNNED);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_STORM_HAMMER)
             {
@@ -413,7 +413,7 @@ public:
                 setCharm = true;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (!playerGUID && spellInfo->Id == SPELL_SPEAR_OF_HODIR)
             {
@@ -789,7 +789,7 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != SPELL_ICE_LANCE)
                 return;

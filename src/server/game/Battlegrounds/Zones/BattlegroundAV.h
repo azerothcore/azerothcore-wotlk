@@ -19,6 +19,7 @@
 #define __BATTLEGROUNDAV_H
 
 #include "Battleground.h"
+#include "BattlegroundScore.h"
 
 #define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
 #define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
@@ -50,6 +51,16 @@
 #define BG_AV_REP_SURVIVING_CAPTAIN     125
 
 #define AV_EVENT_START_BATTLE           9166 // Achievement: The Alterac Blitz
+
+enum BG_AV_BroadcastTexts
+{
+    BG_AV_TEXT_START_ONE_MINUTE     = 10638,
+    BG_AV_TEXT_START_HALF_MINUTE    = 10639,
+    BG_AV_TEXT_BATTLE_HAS_BEGUN     = 10640,
+
+    BG_AV_TEXT_ALLIANCE_NEAR_LOSE   = 23210,
+    BG_AV_TEXT_HORDE_NEAR_LOSE      = 23211
+};
 
 enum BG_AV_Sounds
 {
@@ -1341,6 +1352,7 @@ enum BG_AV_BUFF
     AV_BUFF_A_CAPTAIN = 23693, //the buff which the alliance captain does
     AV_BUFF_H_CAPTAIN = 22751 //the buff which the horde captain does
 };
+
 enum BG_AV_States
 {
     POINT_NEUTRAL              =  0,
@@ -1551,17 +1563,47 @@ struct BG_AV_NodeInfo
 
 inline BG_AV_Nodes& operator++(BG_AV_Nodes& i) { return i = BG_AV_Nodes(i + 1); }
 
-struct BattlegroundAVScore : public BattlegroundScore
+struct BattlegroundAVScore final : public BattlegroundScore
 {
-    explicit BattlegroundAVScore(Player* player) : BattlegroundScore(player), GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) { }
-    ~BattlegroundAVScore() override { }
-    uint32 GraveyardsAssaulted;
-    uint32 GraveyardsDefended;
-    uint32 TowersAssaulted;
-    uint32 TowersDefended;
-    uint32 MinesCaptured;
-    uint32 LeadersKilled;
-    uint32 SecondaryObjectives;
+    friend class BattlegroundAV;
+
+protected:
+    explicit BattlegroundAVScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+
+    void UpdateScore(uint32 type, uint32 value) override
+    {
+        switch (type)
+        {
+        case SCORE_GRAVEYARDS_ASSAULTED:
+            GraveyardsAssaulted += value;
+            break;
+        case SCORE_GRAVEYARDS_DEFENDED:
+            GraveyardsDefended += value;
+            break;
+        case SCORE_TOWERS_ASSAULTED:
+            TowersAssaulted += value;
+            break;
+        case SCORE_TOWERS_DEFENDED:
+            TowersDefended += value;
+            break;
+        case SCORE_MINES_CAPTURED:
+            MinesCaptured += value;
+            break;
+        default:
+            BattlegroundScore::UpdateScore(type, value);
+            break;
+        }
+    }
+
+    void BuildObjectivesBlock(WorldPacket& data) final;
+
+    uint32 GraveyardsAssaulted = 0;
+    uint32 GraveyardsDefended = 0;
+    uint32 TowersAssaulted = 0;
+    uint32 TowersDefended = 0;
+    uint32 MinesCaptured = 0;
+    //uint32 LeadersKilled;
+    //uint32 SecondaryObjectives;
 
     uint32 GetAttr1() const final { return GraveyardsAssaulted; }
     uint32 GetAttr2() const final { return GraveyardsDefended; }
@@ -1570,11 +1612,11 @@ struct BattlegroundAVScore : public BattlegroundScore
     uint32 GetAttr5() const final { return MinesCaptured; }
 };
 
-class BattlegroundAV : public Battleground
+class AC_GAME_API BattlegroundAV : public Battleground
 {
 public:
     BattlegroundAV();
-    ~BattlegroundAV() override;
+    ~BattlegroundAV() override = default;
 
     /* inherited from BattlegroundClass */
     void AddPlayer(Player* player) override;
@@ -1588,7 +1630,7 @@ public:
 
     /*general stuff*/
     void UpdateScore(TeamId teamId, int16 points);
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
+    bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
     /*handlestuff*/ //these are functions which get called from extern
     void EventPlayerClickedOnFlag(Player* source, GameObject* gameObject) override;
