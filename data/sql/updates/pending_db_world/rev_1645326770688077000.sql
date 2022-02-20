@@ -3116,9 +3116,8 @@ INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `Emot
 
 /* In Nightmares */
 DELETE FROM `quest_details` WHERE `ID` IN (3370,3369);
-INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES 
-(3370,1,1,1,0,0,0,0,0,0),
-(3369,1,1,1,0,0,0,0,0,0);
+INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES (3370,1,1,1,0,0,0,0,0,0);
+INSERT INTO `quest_details` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `VerifiedBuild`) VALUES (3369,1,1,1,0,0,0,0,0,0);
 
 /* Rat Catching */
 DELETE FROM `quest_details` WHERE `ID`=416;
