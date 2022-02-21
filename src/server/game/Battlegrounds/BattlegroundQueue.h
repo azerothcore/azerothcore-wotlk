@@ -25,7 +25,7 @@
 #include <array>
 #include <deque>
 
-#define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
+constexpr auto COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME = 10;
 
 struct GroupQueueInfo                                       // stores information about the group in queue (also used when joined as solo!)
 {
@@ -61,17 +61,16 @@ enum BattlegroundQueueGroupTypes
     BG_QUEUE_MAX = 10
 };
 
-class Battleground;
 class BattlegroundQueue
 {
 public:
     BattlegroundQueue();
     ~BattlegroundQueue();
 
-    void BattlegroundQueueUpdate(uint32 diff, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId);
+    void BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId);
     void UpdateEvents(uint32 diff);
 
-    void FillPlayersToBG(Battleground* bg, int32 aliFree, int32 hordeFree, BattlegroundBracketId bracket_id);
+    void FillPlayersToBG(Battleground* bg, BattlegroundBracketId bracket_id);
     bool CheckPremadeMatch(BattlegroundBracketId bracket_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
     bool CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
     bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
@@ -176,9 +175,8 @@ private:
 class BGQueueRemoveEvent : public BasicEvent
 {
 public:
-    BGQueueRemoveEvent(ObjectGuid pl_guid, uint32 bgInstanceGUID, BattlegroundQueueTypeId bgQueueTypeId, uint32 removeTime)
-        : m_PlayerGuid(pl_guid), m_BgInstanceGUID(bgInstanceGUID), m_RemoveTime(removeTime), m_BgQueueTypeId(bgQueueTypeId)
-    {}
+    BGQueueRemoveEvent(ObjectGuid pl_guid, uint32 bgInstanceGUID, BattlegroundTypeId BgTypeId, BattlegroundQueueTypeId bgQueueTypeId, uint32 removeTime) :
+        m_PlayerGuid(pl_guid), m_BgInstanceGUID(bgInstanceGUID), m_BgTypeId(BgTypeId), m_RemoveTime(removeTime), m_BgQueueTypeId(bgQueueTypeId) { }
 
     ~BGQueueRemoveEvent() override = default;
 
@@ -188,6 +186,7 @@ private:
     ObjectGuid m_PlayerGuid;
     uint32 m_BgInstanceGUID;
     uint32 m_RemoveTime;
+    BattlegroundTypeId m_BgTypeId;
     BattlegroundQueueTypeId m_BgQueueTypeId;
 };
 

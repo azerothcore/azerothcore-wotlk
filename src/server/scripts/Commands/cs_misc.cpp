@@ -411,7 +411,7 @@ public:
             return false;
         }
 
-        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, 80, 80, ArenaType(hcnt >= 2 ? hcnt : 2), false);
+        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, GetBattlegroundBracketById(bgt->GetMapId(), bgt->GetBracketId()), ArenaType(hcnt >= 2 ? hcnt : 2), false);
         if (!bg)
         {
             handler->PSendSysMessage("Couldn't create arena map!");

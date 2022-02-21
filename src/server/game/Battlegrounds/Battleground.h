@@ -306,6 +306,7 @@ public:
     // Get methods:
     [[nodiscard]] std::string GetName() const         { return m_Name; }
     [[nodiscard]] BattlegroundTypeId GetBgTypeID(bool GetRandom = false) const { return GetRandom ? m_RandomTypeID : m_RealTypeID; }
+    [[nodiscard]] BattlegroundBracketId GetBracketId() const { return m_BracketId; }
     [[nodiscard]] uint32 GetInstanceID() const        { return m_InstanceID; }
     [[nodiscard]] BattlegroundStatus GetStatus() const { return m_Status; }
     [[nodiscard]] uint32 GetClientInstanceID() const  { return m_ClientInstanceID; }
@@ -331,6 +332,7 @@ public:
     void SetName(std::string_view name) { m_Name = std::string(name); }
     void SetBgTypeID(BattlegroundTypeId TypeID) { m_RealTypeID = TypeID; }
     void SetRandomTypeID(BattlegroundTypeId TypeID) { m_RandomTypeID = TypeID; }
+    void SetBracket(PvPDifficultyEntry const* bracketEntry);
     void SetInstanceID(uint32 InstanceID) { m_InstanceID = InstanceID; }
     void SetStatus(BattlegroundStatus Status) { m_Status = Status; }
     void SetClientInstanceID(uint32 InstanceID) { m_ClientInstanceID = InstanceID; }
@@ -350,6 +352,9 @@ public:
 
     void SetMaxPlayersPerTeam(uint32 MaxPlayers) { m_MaxPlayersPerTeam = MaxPlayers; }
     void SetMinPlayersPerTeam(uint32 MinPlayers) { m_MinPlayersPerTeam = MinPlayers; }
+
+    void AddToBGFreeSlotQueue();        // this queue will be useful when more battlegrounds instances will be available
+    void RemoveFromBGFreeSlotQueue();   // this method could delete whole BG instance, if another free is available
 
     void DecreaseInvitedCount(TeamId teamId)    { if (m_BgInvitedPlayers[teamId]) --m_BgInvitedPlayers[teamId]; }
     void IncreaseInvitedCount(TeamId teamId)    { ++m_BgInvitedPlayers[teamId]; }
@@ -632,7 +637,9 @@ private:
     uint32 m_ValidStartPositionTimer;
     int32 m_EndTime;                                    // it is set to 120000 when bg is ending and it decreases itself
     uint32 m_LastResurrectTime;
+    BattlegroundBracketId m_BracketId{ BG_BRACKET_ID_FIRST };
     uint8  m_ArenaType;                                 // 2=2v2, 3=3v3, 5=5v5
+    bool   _InBGFreeSlotQueue{ false };                // used to make sure that BG is only once inserted into the BattlegroundMgr.BGFreeSlotQueue[bgTypeId] deque
     bool   m_SetDeleteThis;                             // used for safe deletion of the bg after end / all players leave
     bool   m_IsArena;
     PvPTeamId m_WinnerId;

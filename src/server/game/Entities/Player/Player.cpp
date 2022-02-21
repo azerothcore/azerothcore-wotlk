@@ -11859,7 +11859,7 @@ Battleground* Player::GetBattleground(bool create) const
     if (GetBattlegroundId() == 0)
         return nullptr;
 
-    Battleground* bg = sBattlegroundMgr->GetBattleground(GetBattlegroundId());
+    Battleground* bg = sBattlegroundMgr->GetBattleground(GetBattlegroundId(), GetBattlegroundTypeId());
     return (create || (bg && bg->FindBgMap()) ? bg : nullptr);
 }
 
@@ -11876,12 +11876,12 @@ void Player::SetBattlegroundId(uint32 id, BattlegroundTypeId bgTypeId, uint32 qu
 {
     // if leaving current bg (and was invited) - decrease invited count for current one
     if (m_bgData.bgInstanceID && m_bgData.isInvited)
-        if (Battleground* bg = sBattlegroundMgr->GetBattleground(m_bgData.bgInstanceID))
+        if (Battleground* bg = sBattlegroundMgr->GetBattleground(m_bgData.bgInstanceID, m_bgData.bgTypeID))
             bg->DecreaseInvitedCount(m_bgData.bgTeamId);
 
     // if entering new bg (and is invited) - increase invited count for new one
     if (id && invited)
-        if (Battleground* bg = sBattlegroundMgr->GetBattleground(id))
+        if (Battleground* bg = sBattlegroundMgr->GetBattleground(id, bgTypeId))
             bg->IncreaseInvitedCount(teamId);
 
     m_bgData.bgInstanceID = id;
