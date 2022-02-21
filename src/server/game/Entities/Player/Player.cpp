@@ -5575,7 +5575,7 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId) const
     WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
     data << uint32(CinematicSequenceId);
     SendDirectMessage(&data);
-    if (const CinematicSequencesEntry const* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
+    if (const CinematicSequencesEntry* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
     {
         _cinematicMgr->SetActiveCinematicCamera(sequence->cinematicCamera);
     }
