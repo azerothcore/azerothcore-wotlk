@@ -6,7 +6,8 @@ UPDATE `creature` SET `MovementType`='2' WHERE  `guid`=43101;
 
 -- link guid to waypoint
 DELETE FROM `creature_addon` WHERE `guid`=43101;
-INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES (43101, 926800, 0, 0, 0, 0, 3, NULL);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES 
+(43101, 926800, 0, 0, 0, 0, 3, NULL);
 
 -- waypoints are transferred to waypoint_data
 DELETE FROM `waypoint_data` WHERE `id`=926800;
