@@ -386,7 +386,7 @@ void MapMgr::InitInstanceIds()
     QueryResult result = CharacterDatabase.Query("SELECT MAX(id) FROM instance");
     if (result)
     {
-        uint32 maxId = (*result)[0].GetUInt32();
+        uint32 maxId = (*result)[0].Get<uint32>();
         _instanceIds.resize(maxId + 1);
     }
 }

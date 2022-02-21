@@ -438,6 +438,9 @@ public:
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
             player->GetSession()->SendPacket(&data);
 
+            // Remove from LFG queues
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
+
             player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
             sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
         }
@@ -1981,7 +1984,7 @@ public:
 
             // Query informations from the DB
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
-            stmt->setUInt32(0, lowguid);
+            stmt->SetData(0, lowguid);
             PreparedQueryResult charInfoResult = CharacterDatabase.Query(stmt);
 
             if (!charInfoResult)
@@ -1990,17 +1993,17 @@ public:
             }
 
             Field* fields      = charInfoResult->Fetch();
-            totalPlayerTime    = fields[0].GetUInt32();
-            level              = fields[1].GetUInt8();
-            money              = fields[2].GetUInt32();
-            accId              = fields[3].GetUInt32();
-            raceid             = fields[4].GetUInt8();
-            classid            = fields[5].GetUInt8();
-            mapId              = fields[6].GetUInt16();
-            areaId             = fields[7].GetUInt16();
-            gender             = fields[8].GetUInt8();
-            uint32 health      = fields[9].GetUInt32();
-            uint32 playerFlags = fields[10].GetUInt32();
+            totalPlayerTime    = fields[0].Get<uint32>();
+            level              = fields[1].Get<uint8>();
+            money              = fields[2].Get<uint32>();
+            accId              = fields[3].Get<uint32>();
+            raceid             = fields[4].Get<uint8>();
+            classid            = fields[5].Get<uint8>();
+            mapId              = fields[6].Get<uint16>();
+            areaId             = fields[7].Get<uint16>();
+            gender             = fields[8].Get<uint8>();
+            uint32 health      = fields[9].Get<uint32>();
+            uint32 playerFlags = fields[10].Get<uint32>();
 
             if (!health || playerFlags & PLAYER_FLAGS_GHOST)
             {
@@ -2014,23 +2017,23 @@ public:
 
         // Query the prepared statement for login data
         loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
-        loginStmt->setInt32(0, int32(realm.Id.Realm));
-        loginStmt->setUInt32(1, accId);
+        loginStmt->SetData(0, int32(realm.Id.Realm));
+        loginStmt->SetData(1, accId);
 
         PreparedQueryResult accInfoResult = LoginDatabase.Query(loginStmt);
         if (accInfoResult)
         {
             Field* fields = accInfoResult->Fetch();
-            userName      = fields[0].GetString();
-            security      = fields[1].GetUInt8();
+            userName      = fields[0].Get<std::string>();
+            security      = fields[1].Get<uint8>();
 
             // Only fetch these fields if commander has sufficient rights)
             if (!handler->GetSession() || handler->GetSession()->GetSecurity() >= AccountTypes(security))
             {
-                eMail     = fields[2].GetString();
-                regMail   = fields[3].GetString();
-                lastIp    = fields[4].GetString();
-                lastLogin = fields[5].GetString();
+                eMail     = fields[2].Get<std::string>();
+                regMail   = fields[3].Get<std::string>();
+                lastIp    = fields[4].Get<std::string>();
+                lastLogin = fields[5].Get<std::string>();
 
                 if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
                 {
@@ -2047,12 +2050,12 @@ public:
                 lastLogin = handler->GetAcoreString(LANG_UNAUTHORIZED);
             }
 
-            muteTime      = fields[6].GetUInt64();
-            muteReason    = fields[7].GetString();
-            muteBy        = fields[8].GetString();
-            failedLogins  = fields[9].GetUInt32();
-            locked        = fields[10].GetUInt8();
-            OS            = fields[11].GetString();
+            muteTime      = fields[6].Get<uint64>();
+            muteReason    = fields[7].Get<std::string>();
+            muteBy        = fields[8].Get<std::string>();
+            failedLogins  = fields[9].Get<uint32>();
+            locked        = fields[10].Get<uint8>();
+            OS            = fields[11].Get<std::string>();
         }
 
         // Creates a chat link to the character. Returns nameLink
@@ -2060,61 +2063,61 @@ public:
 
         // Returns banType, banTime, bannedBy, banreason
         LoginDatabasePreparedStatement* banQuery = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
-        banQuery->setUInt32(0, accId);
+        banQuery->SetData(0, accId);
 
         PreparedQueryResult accBannedResult = LoginDatabase.Query(banQuery);
         if (!accBannedResult)
         {
             banType = handler->GetAcoreString(LANG_CHARACTER);
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_BANS);
-            stmt->setUInt32(0, lowguid);
+            stmt->SetData(0, lowguid);
             accBannedResult = CharacterDatabase.Query(stmt);
         }
 
         if (accBannedResult)
         {
             Field* fields = accBannedResult->Fetch();
-            banTime       = int64(fields[1].GetUInt64() ? 0 : fields[0].GetUInt32());
-            bannedBy      = fields[2].GetString();
-            banReason     = fields[3].GetString();
+            banTime       = int64(fields[1].Get<uint64>() ? 0 : fields[0].Get<uint32>());
+            bannedBy      = fields[2].Get<std::string>();
+            banReason     = fields[3].Get<std::string>();
         }
 
         // Can be used to query data from World database
         WorldDatabasePreparedStatement* xpQuery = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
-        xpQuery->setUInt8(0, level);
+        xpQuery->SetData(0, level);
 
         PreparedQueryResult xpResult = WorldDatabase.Query(xpQuery);
         if (xpResult)
         {
             Field* fields = xpResult->Fetch();
-            xptotal       = fields[0].GetUInt32();
+            xptotal       = fields[0].Get<uint32>();
         }
 
         // Can be used to query data from Characters database
         CharacterDatabasePreparedStatement* charXpQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
-        charXpQuery->setUInt32(0, lowguid);
+        charXpQuery->SetData(0, lowguid);
 
         PreparedQueryResult charXpResult = CharacterDatabase.Query(charXpQuery);
         if (charXpResult)
         {
             Field* fields = charXpResult->Fetch();
-            xp = fields[0].GetUInt32();
-            ObjectGuid::LowType gguid = fields[1].GetUInt32();
+            xp = fields[0].Get<uint32>();
+            ObjectGuid::LowType gguid = fields[1].Get<uint32>();
 
             if (gguid != 0)
             {
                 CharacterDatabasePreparedStatement* guildQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
-                guildQuery->setUInt32(0, lowguid);
+                guildQuery->SetData(0, lowguid);
 
                 PreparedQueryResult guildInfoResult = CharacterDatabase.Query(guildQuery);
                 if (guildInfoResult)
                 {
                     Field* guildInfoFields  = guildInfoResult->Fetch();
-                    guildId        = guildInfoFields[0].GetUInt32();
-                    guildName      = guildInfoFields[1].GetString();
-                    guildRank      = guildInfoFields[2].GetString();
-                    note           = guildInfoFields[3].GetString();
-                    officeNote     = guildInfoFields[4].GetString();
+                    guildId        = guildInfoFields[0].Get<uint32>();
+                    guildName      = guildInfoFields[1].Get<std::string>();
+                    guildRank      = guildInfoFields[2].Get<std::string>();
+                    note           = guildInfoFields[3].Get<std::string>();
+                    officeNote     = guildInfoFields[4].Get<std::string>();
                 }
             }
         }
@@ -2306,14 +2309,14 @@ public:
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
         CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
-        mailQuery->setUInt32(0, lowguid);
+        mailQuery->SetData(0, lowguid);
 
         PreparedQueryResult mailInfoResult = CharacterDatabase.Query(mailQuery);
         if (mailInfoResult)
         {
             Field* fields         = mailInfoResult->Fetch();
-            uint32 readmail       = uint32(fields[0].GetDouble());
-            uint32 totalmail      = uint32(fields[1].GetUInt64());
+            uint32 readmail       = uint32(fields[0].Get<double>());
+            uint32 totalmail      = uint32(fields[1].Get<uint64>());
 
             // Output XXI. LANG_INFO_CHR_MAILS if at least one mail is given
             if (totalmail >= 1)
@@ -2412,7 +2415,7 @@ public:
             // Target is online, mute will be in effect right away.
             int64 muteTime = GameTime::GetGameTime().count() + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
-            stmt->setInt64(0, muteTime);
+            stmt->SetData(0, muteTime);
             std::string nameLink = handler->playerLink(player->GetName());
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
@@ -2425,19 +2428,19 @@ public:
         else
         {
             // Target is offline, mute will be in effect starting from the next login.
-            stmt->setInt32(0, -int32(notSpeakTime * MINUTE));
+            stmt->SetData(0, -int32(notSpeakTime * MINUTE));
         }
 
-        stmt->setString(1, muteReasonStr);
-        stmt->setString(2, muteBy);
-        stmt->setUInt32(3, accountId);
+        stmt->SetData(1, muteReasonStr);
+        stmt->SetData(2, muteBy);
+        stmt->SetData(3, accountId);
         LoginDatabase.Execute(stmt);
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
-        stmt->setUInt32(0, accountId);
-        stmt->setUInt32(1, notSpeakTime);
-        stmt->setString(2, muteBy);
-        stmt->setString(3, muteReasonStr);
+        stmt->SetData(0, accountId);
+        stmt->SetData(1, notSpeakTime);
+        stmt->SetData(2, muteBy);
+        stmt->SetData(3, muteReasonStr);
         LoginDatabase.Execute(stmt);
 
         std::string nameLink = handler->playerLink(player->GetName());
@@ -2504,10 +2507,10 @@ public:
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-        stmt->setInt64(0, 0);
-        stmt->setString(1, "");
-        stmt->setString(2, "");
-        stmt->setUInt32(3, accountId);
+        stmt->SetData(0, 0);
+        stmt->SetData(1, "");
+        stmt->SetData(2, "");
+        stmt->SetData(3, accountId);
         LoginDatabase.Execute(stmt);
 
         if (playerTarget)
@@ -2544,7 +2547,7 @@ public:
     static bool HandleMuteInfoHelper(ChatHandler* handler, uint32 accountId, char const* accountName)
     {
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
-        stmt->setUInt16(0, accountId);
+        stmt->SetData(0, accountId);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
         if (!result)
@@ -2557,7 +2560,7 @@ public:
         do
         {
             Field* fields = result->Fetch();
-            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, Acore::Time::TimeToHumanReadable(Seconds(fields[0].GetUInt32())).c_str(), fields[1].GetUInt32(), fields[2].GetCString(), fields[3].GetCString());
+            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, Acore::Time::TimeToHumanReadable(Seconds(fields[0].Get<uint32>())).c_str(), fields[1].Get<uint32>(), fields[2].Get<std::string>().c_str(), fields[3].Get<std::string>().c_str());
         } while (result->NextRow());
 
         return true;
@@ -2869,7 +2872,7 @@ public:
         else if (!creatureTarget && target && !target->IsConnected())
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
-            stmt->setUInt32(0, target->GetGUID().GetCounter());
+            stmt->SetData(0, target->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);
             handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, target->GetName().c_str());
             return true;

@@ -570,10 +570,10 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     }
 
     // xinef: sync query
-    if (QueryResult result = CharacterDatabase.PQuery("SELECT flags FROM character_social WHERE guid = %u AND friend = %u", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
+    if (QueryResult result = CharacterDatabase.Query("SELECT flags FROM character_social WHERE guid = {} AND friend = {}", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
     {
         Field* fields = result->Fetch();
-        if (fields[0].GetUInt8() & SOCIAL_FLAG_IGNORED)
+        if (fields[0].Get<uint8>() & SOCIAL_FLAG_IGNORED)
         {
             sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_IGNORING_YOU_S, name.c_str());
             return;
@@ -793,7 +793,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     uint8 toggleExtendOn;
     recvData >> mapId >> difficulty >> toggleExtendOn;
 
-    const MapEntry* entry = sMapStore.LookupEntry(mapId);
+    MapEntry const* entry = sMapStore.LookupEntry(mapId);
     if (!entry || !entry->IsRaid())
         return;
 
@@ -805,9 +805,9 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
 
     // update in db
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
-    stmt->setUInt8(0, toggleExtendOn ? 1 : 0);
-    stmt->setUInt32(1, GetPlayer()->GetGUID().GetCounter());
-    stmt->setUInt32(2, instanceBind->save->GetInstanceId());
+    stmt->SetData(0, toggleExtendOn ? 1 : 0);
+    stmt->SetData(1, GetPlayer()->GetGUID().GetCounter());
+    stmt->SetData(2, instanceBind->save->GetInstanceId());
     CharacterDatabase.Execute(stmt);
 
     SendCalendarRaidLockoutUpdated(instanceBind->save, (bool)toggleExtendOn);

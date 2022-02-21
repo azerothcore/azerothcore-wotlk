@@ -19,6 +19,7 @@
 #define MiscPackets_h__
 
 #include "Packet.h"
+#include "ObjectGuid.h"
 #include "Weather.h"
 
 enum WeatherState : uint32;
@@ -38,6 +39,30 @@ namespace WorldPackets
             bool Abrupt = false;
             float Intensity = 0.0f;
             WeatherState WeatherID = WeatherState(0);
+        };
+
+        class RandomRollClient final : public ClientPacket
+        {
+        public:
+            RandomRollClient(WorldPacket&& packet) : ClientPacket(MSG_RANDOM_ROLL, std::move(packet)) { }
+
+            void Read() override;
+
+            uint32 Min = 0;
+            uint32 Max = 0;
+        };
+
+        class RandomRoll final : public ServerPacket
+        {
+        public:
+            RandomRoll() : ServerPacket(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 Min = 0;
+            uint32 Max = 0;
+            uint32 Result = 0;
+            ObjectGuid Roller;
         };
     }
 }

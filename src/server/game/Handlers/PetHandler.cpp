@@ -903,23 +903,23 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
         if (sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME);
-            stmt->setUInt32(0, pet->GetCharmInfo()->GetPetNumber());
+            stmt->SetData(0, pet->GetCharmInfo()->GetPetNumber());
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_ADD_CHAR_PET_DECLINEDNAME);
-            stmt->setUInt32(0, _player->GetGUID().GetCounter());
+            stmt->SetData(0, _player->GetGUID().GetCounter());
 
             for (uint8 i = 0; i < 5; i++)
-                stmt->setString(i + 1, declinedname.name[i]);
+                stmt->SetData(i + 1, declinedname.name[i]);
 
             trans->Append(stmt);
         }
     }
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_NAME);
-    stmt->setString(0, name);
-    stmt->setUInt32(1, _player->GetGUID().GetCounter());
-    stmt->setUInt32(2, pet->GetCharmInfo()->GetPetNumber());
+    stmt->SetData(0, name);
+    stmt->SetData(1, _player->GetGUID().GetCounter());
+    stmt->SetData(2, pet->GetCharmInfo()->GetPetNumber());
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
