@@ -343,7 +343,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_IS_BEHIND_TARGET:
         case SMART_EVENT_INSTANCE_PLAYER_ENTER:
         case SMART_EVENT_TRANSPORT_ADDCREATURE:
-        case SMART_EVENT_UPDATE_OOC:
             return true;
         default:
             return false;
