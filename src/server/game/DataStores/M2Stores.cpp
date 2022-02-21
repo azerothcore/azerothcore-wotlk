@@ -37,7 +37,7 @@ G3D::Vector3 TranslateLocation(G3D::Vector4 const* DBCPosition, G3D::Vector3 con
     float x = basePosition->x + splineVector->x;
     float y = basePosition->y + splineVector->y;
     float z = basePosition->z + splineVector->z;
-    float const distance = sqrt((x * x) + (y * y));
+    float const distance = std::sqrt((x * x) + (y * y));
     float angle = std::atan2(x, y) - DBCPosition->w;
 
     if (angle < 0)
