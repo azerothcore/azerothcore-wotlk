@@ -134,7 +134,7 @@ public:
 private:
     bool CreateBattleground(CreateBattlegroundData& data);
     uint32 GetNextClientVisibleInstanceId();
-    BattlegroundTypeId GetRandomBG(BattlegroundTypeId id);
+    BattlegroundTypeId GetRandomBG(BattlegroundTypeId id, uint32 minLevel);
 
     typedef std::map<BattlegroundTypeId, Battleground*> BattlegroundTemplateContainer;
     BattlegroundTemplateContainer m_BattlegroundTemplates;
