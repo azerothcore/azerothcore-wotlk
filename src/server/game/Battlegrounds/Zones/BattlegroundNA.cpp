@@ -16,28 +16,12 @@
  */
 
 #include "BattlegroundNA.h"
-#include "Language.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "WorldPacket.h"
 
 BattlegroundNA::BattlegroundNA()
 {
     BgObjects.resize(BG_NA_OBJECT_MAX);
-
-    StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_1M;
-    StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
-    StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
-    StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    //we must set messageIds
-    StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
-    StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
-    StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_ARENA_HAS_BEGUN;
-}
-
-BattlegroundNA::~BattlegroundNA()
-{
 }
 
 void BattlegroundNA::StartingEventCloseDoors()
@@ -53,39 +37,6 @@ void BattlegroundNA::StartingEventOpenDoors()
 
     for (uint32 i = BG_NA_OBJECT_BUFF_1; i <= BG_NA_OBJECT_BUFF_2; ++i)
         SpawnBGObject(i, 60);
-}
-
-void BattlegroundNA::AddPlayer(Player* player)
-{
-    Battleground::AddPlayer(player);
-    PlayerScores[player->GetGUID()] = new BattlegroundScore(player);
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundNA::RemovePlayer(Player* /*player*/)
-{
-    if (GetStatus() == STATUS_WAIT_LEAVE)
-        return;
-
-    Battleground::UpdateArenaWorldState();
-    CheckArenaWinConditions();
-}
-
-void BattlegroundNA::HandleKillPlayer(Player* player, Player* killer)
-{
-    if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
-    if (!killer)
-    {
-        LOG_ERROR("bg.battleground", "BattlegroundNA: Killer player not found");
-        return;
-    }
-
-    Battleground::HandleKillPlayer(player, killer);
-
-    Battleground::UpdateArenaWorldState();
-    CheckArenaWinConditions();
 }
 
 bool BattlegroundNA::HandlePlayerUnderMap(Player* player)
@@ -116,13 +67,7 @@ void BattlegroundNA::HandleAreaTrigger(Player* player, uint32 trigger)
 void BattlegroundNA::FillInitialWorldStates(WorldPacket& data)
 {
     data << uint32(0xa11) << uint32(1);           // 9
-    Battleground::UpdateArenaWorldState();
-}
-
-void BattlegroundNA::Init()
-{
-    //call parent's class reset
-    Battleground::Init();
+    Arena::FillInitialWorldStates(data);
 }
 
 bool BattlegroundNA::SetupBattleground()
