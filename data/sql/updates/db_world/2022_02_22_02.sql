@@ -1,3 +1,19 @@
+-- DB update 2022_02_22_01 -> 2022_02_22_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_02_22_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_02_22_01 2022_02_22_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1645326770688077000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645326770688077000');
 
 ALTER TABLE `quest_request_items` CHANGE `VerifiedBuild` `VerifiedBuild` INT(11) DEFAULT 0 NOT NULL;
@@ -5774,3 +5790,13 @@ UPDATE `quest_offer_reward` SET `Emote1`=2 WHERE `ID` = 8779;
 DELETE FROM `quest_offer_reward` WHERE `ID`=8807;
 INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `Emote2`, `Emote3`, `Emote4`, `EmoteDelay1`, `EmoteDelay2`, `EmoteDelay3`, `EmoteDelay4`, `RewardText`, `VerifiedBuild`) VALUES
 (8807,2,0,0,0,0,0,0,0,"Why, yes... these will be of tremendous aid!  These materials are awfully hard to come by in the desert, $n.  Thank you.",0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_02_22_02' WHERE sql_rev = '1645326770688077000';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
