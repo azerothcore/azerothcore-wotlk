@@ -857,16 +857,30 @@ public:
         {
             PreventHitEffect(effIndex);
 
-            uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
-            int32 duration = GetSpellInfo()->GetDuration();
-            if (!GetOriginalCaster() || !properties)
-                return;
-
-            if (TempSummon* summon = GetCaster()->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, GetOriginalCaster(), GetSpellInfo()->Id))
+            if (Unit* caster = GetCaster())
             {
-                summon->SetCreatorGUID(GetOriginalCaster()->GetGUID());
-                summon->HandleSpellClick(GetCaster());
+                Unit* originalCaster = GetOriginalCaster();
+                if (!originalCaster)
+                {
+                    return;
+                }
+
+                SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
+                if (!properties)
+                {
+                    return;
+                }
+
+                uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
+                int32 duration = GetSpellInfo()->GetDuration();
+                if (TempSummon* summon = caster->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, originalCaster, GetSpellInfo()->Id))
+                {
+                    if (summon->IsInMap(caster))
+                    {
+                        summon->SetCreatorGUID(originalCaster->GetGUID());
+                        summon->HandleSpellClick(caster);
+                    }
+                }
             }
         }
 
