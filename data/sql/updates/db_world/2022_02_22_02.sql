@@ -16,9 +16,9 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '164532677068807700
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645326770688077000');
 
-ALTER TABLE `quest_request_items` CHANGE `VerifiedBuild` `VerifiedBuild` INT(11) DEFAULT 0 NOT NULL;
-ALTER TABLE `quest_details` CHANGE `VerifiedBuild` `VerifiedBuild` INT(11) DEFAULT 0 NOT NULL;
-ALTER TABLE `quest_offer_reward` CHANGE `VerifiedBuild` `VerifiedBuild` INT(11) DEFAULT 0 NOT NULL;
+ALTER TABLE `quest_request_items` CHANGE `VerifiedBuild` `VerifiedBuild` INT DEFAULT 0 NOT NULL;
+ALTER TABLE `quest_details` CHANGE `VerifiedBuild` `VerifiedBuild` INT DEFAULT 0 NOT NULL;
+ALTER TABLE `quest_offer_reward` CHANGE `VerifiedBuild` `VerifiedBuild` INT DEFAULT 0 NOT NULL;
 
 /* Sample for Helbrim */
 DELETE FROM `quest_details` WHERE `ID`=1358;
