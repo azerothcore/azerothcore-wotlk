@@ -1,0 +1,3 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645536335125857423');
+
+UPDATE `creature` SET `id2`=19149 WHERE `guid` IN (68474,68475,68476,68477,68478);
