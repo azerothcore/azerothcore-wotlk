@@ -117,7 +117,6 @@ public:
                 {
                     Talk(SAY_TELEPORT);
                     DoCastAOE(SPELL_ARCANE_VACUUM);
-                    DoResetThreat();
                     context.Repeat(30s);
                 })
                 .Schedule(15s, 30s, [this](TaskContext context)
@@ -192,6 +191,7 @@ class spell_arcane_vacuum : public SpellScript
         Unit* hitUnit = GetHitUnit();
         if (caster && hitUnit && hitUnit->ToPlayer())
         {
+            caster->getThreatMgr().modifyThreatPercent(hitUnit, -100);
             caster->CastSpell(hitUnit, SPELL_ARCANE_VACUUM_TP, true);
         }
     }
