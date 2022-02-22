@@ -573,10 +573,7 @@ bool BattlegroundAV::UpdatePlayerScore(Player* player, uint32 type, uint32 value
         case SCORE_TOWERS_DEFENDED:
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, AV_OBJECTIVE_DEFEND_TOWER);
             break;
-        case SCORE_MINES_CAPTURED:
-            break;
         default:
-            Battleground::UpdatePlayerScore(player, type, value, doAddHonor);
             break;
     }
 
