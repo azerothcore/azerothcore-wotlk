@@ -2197,7 +2197,12 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     summon->SetHomePosition(pos);
 
     summon->InitStats(duration);
-    AddToMap(summon->ToCreature(), summon->GetOwnerGUID().IsPlayer() || (summoner && summoner->GetTransport()));
+    if (!AddToMap(summon->ToCreature(), summon->GetOwnerGUID().IsPlayer() || (summoner && summoner->GetTransport())))
+    {
+        delete summon;
+        return nullptr;
+    }
+
     summon->InitSummon();
 
     //ObjectAccessor::UpdateObjectVisibility(summon);
