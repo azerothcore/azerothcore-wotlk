@@ -21,6 +21,7 @@
 #include "CombatAI.h"
 #include "GameGraveyard.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
@@ -294,7 +295,7 @@ public:
         else
         {
             uint32 timer = wintergrasp->GetTimer() / 1000;
-            player->SendUpdateWorldState(4354, time(nullptr) + timer);
+            player->SendUpdateWorldState(4354, GameTime::GetGameTime().count() + timer);
             if (timer < 15 * MINUTE)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
@@ -856,16 +857,30 @@ public:
         {
             PreventHitEffect(effIndex);
 
-            uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
-            int32 duration = GetSpellInfo()->GetDuration();
-            if (!GetOriginalCaster() || !properties)
-                return;
-
-            if (TempSummon* summon = GetCaster()->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, GetOriginalCaster(), GetSpellInfo()->Id))
+            if (Unit* caster = GetCaster())
             {
-                summon->SetCreatorGUID(GetOriginalCaster()->GetGUID());
-                summon->HandleSpellClick(GetCaster());
+                Unit* originalCaster = GetOriginalCaster();
+                if (!originalCaster)
+                {
+                    return;
+                }
+
+                SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
+                if (!properties)
+                {
+                    return;
+                }
+
+                uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
+                int32 duration = GetSpellInfo()->GetDuration();
+                if (TempSummon* summon = caster->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, originalCaster, GetSpellInfo()->Id))
+                {
+                    if (summon->IsInMap(caster))
+                    {
+                        summon->SetCreatorGUID(originalCaster->GetGUID());
+                        summon->HandleSpellClick(caster);
+                    }
+                }
             }
         }
 

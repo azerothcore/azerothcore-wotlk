@@ -494,7 +494,7 @@ struct npc_soh_fire_trigger : public NullCreatureAI
         me->SetDisableGravity(true);
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_START_FIRE)
         {
@@ -882,7 +882,7 @@ struct npc_hallows_end_train_fire : public NullCreatureAI
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_WATER_SPLASH && caster->ToPlayer())
         {
@@ -983,7 +983,7 @@ struct boss_headless_horseman : public ScriptedAI
             (*itr)->ToCreature()->DespawnOrUnsummon(500);
 
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
-        if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
+        if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
             sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
     }
 
@@ -998,7 +998,7 @@ struct boss_headless_horseman : public ScriptedAI
         health = param;
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
         {
@@ -1007,7 +1007,7 @@ struct boss_headless_horseman : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
         {
@@ -1228,7 +1228,7 @@ struct boss_headless_horseman_head : public ScriptedAI
     uint32 timer;
     bool handled;
 
-    void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo) override
+    void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
         {
@@ -1239,7 +1239,7 @@ struct boss_headless_horseman_head : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         switch (spellInfo->Id)
         {
@@ -1356,7 +1356,7 @@ struct boss_headless_horseman_pumpkin : public ScriptedAI
         me->CastSpell(me, SPELL_PUMPKIN_VISUAL, true);
     }
 
-    void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_SPROUTING)
         {

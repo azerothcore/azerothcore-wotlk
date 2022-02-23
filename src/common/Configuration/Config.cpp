@@ -19,8 +19,8 @@
 #include "Log.h"
 #include "StringConvert.h"
 #include "StringFormat.h"
-#include "Util.h"
 #include "Tokenize.h"
+#include "Util.h"
 #include <fstream>
 #include <mutex>
 #include <unordered_map>
@@ -63,7 +63,7 @@ namespace
         }
         else
         {
-            FMT_LOG_ERROR("server.loading", message);
+            LOG_ERROR("server.loading", message);
         }
     }
 
@@ -79,7 +79,7 @@ namespace
                 PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
 
 #ifdef CONFIG_ABORT_INCORRECT_OPTIONS
-                ABORT_MSG("> Core can't start if found incorrect options");
+                ABORT("> Core can't start if found incorrect options");
 #endif
 
                 return;
@@ -255,7 +255,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            FMT_LOG_ERROR("server.loading", "> Config: Missing property {} in all config files, at least the .dist file must contain: \"{} = {}\"",
+            LOG_ERROR("server.loading", "> Config: Missing property {} in all config files, at least the .dist file must contain: \"{} = {}\"",
                 name, name, Acore::ToString(def));
         }
 
@@ -267,7 +267,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            FMT_LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
+            LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
                 name, Acore::ToString(def));
         }
 
@@ -285,7 +285,7 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            FMT_LOG_ERROR("server.loading", "> Config: Missing option {}, add \"{} = {}\"",
+            LOG_ERROR("server.loading", "> Config: Missing option {}, add \"{} = {}\"",
                 name, name, def);
         }
 
@@ -311,7 +311,7 @@ bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool s
     {
         if (showLogs)
         {
-            FMT_LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
+            LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
                 name, def ? "true" : "false");
         }
 
@@ -402,8 +402,8 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
 
     if (isNeedPrintInfo)
     {
-        FMT_LOG_INFO("server.loading", " ");
-        FMT_LOG_INFO("server.loading", "Loading modules configuration...");
+        LOG_INFO("server.loading", " ");
+        LOG_INFO("server.loading", "Loading modules configuration...");
     }
 
     // Start loading module configs
@@ -425,7 +425,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
 
         if (!isReload && !isExistDistConfig)
         {
-            FMT_LOG_FATAL("server.loading", "> ConfigMgr::LoadModulesConfigs: Not found original config '{}'. Stop loading", distFileName);
+            LOG_FATAL("server.loading", "> ConfigMgr::LoadModulesConfigs: Not found original config '{}'. Stop loading", distFileName);
             ABORT();
         }
 
@@ -447,23 +447,23 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
         if (!_moduleConfigFiles.empty())
         {
             // Print modules configurations
-            FMT_LOG_INFO("server.loading", " ");
-            FMT_LOG_INFO("server.loading", "Using modules configuration:");
+            LOG_INFO("server.loading", " ");
+            LOG_INFO("server.loading", "Using modules configuration:");
 
             for (auto const& itr : _moduleConfigFiles)
             {
-                FMT_LOG_INFO("server.loading", "> {}", itr);
+                LOG_INFO("server.loading", "> {}", itr);
             }
         }
         else
         {
-            FMT_LOG_INFO("server.loading", "> Not found modules config files");
+            LOG_INFO("server.loading", "> Not found modules config files");
         }
     }
 
     if (isNeedPrintInfo)
     {
-        FMT_LOG_INFO("server.loading", " ");
+        LOG_INFO("server.loading", " ");
     }
 
     return true;

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.account_tutorial
+-- Дамп структуры для таблица acore_characters.account_tutorial
 DROP TABLE IF EXISTS `account_tutorial`;
 CREATE TABLE IF NOT EXISTS `account_tutorial` (
   `accountId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `account_tutorial` (
   PRIMARY KEY (`accountId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.account_tutorial: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.account_tutorial: ~0 rows (приблизительно)
 DELETE FROM `account_tutorial`;
 /*!40000 ALTER TABLE `account_tutorial` DISABLE KEYS */;
 /*!40000 ALTER TABLE `account_tutorial` ENABLE KEYS */;

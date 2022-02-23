@@ -165,7 +165,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 
                 float angle = me->GetAngle(&victimPos) + angleOffset;
                 float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
-                float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * sin(angle);
+                float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * std::sin(angle);
                 me->GetMotionMaster()->MovePoint(POINT_ORB, x, y, me->GetPositionZ());
 
                 moveTimer = 0;
@@ -328,7 +328,7 @@ struct boss_taldaram : public BossAI
         me->InterruptNonMeleeSpells(true);
     }
 
-    void SpellHitTarget(Unit* /*target*/, const SpellInfo *spellInfo) override
+    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
         {

@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_group
+-- Дамп структуры для таблица acore_world.spell_group
 DROP TABLE IF EXISTS `spell_group`;
 CREATE TABLE IF NOT EXISTS `spell_group` (
   `id` INT unsigned NOT NULL DEFAULT 0,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `spell_group` (
   PRIMARY KEY (`id`,`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Spell System';
 
--- Дамп данных таблицы _acore_world.spell_group: 342 rows
+-- Дамп данных таблицы acore_world.spell_group: 347 rows
 DELETE FROM `spell_group`;
 /*!40000 ALTER TABLE `spell_group` DISABLE KEYS */;
 INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
@@ -366,7 +366,12 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1112, 8221, 0),
 	(1112, 8222, 0),
 	(1113, 57055, 0),
-	(1113, 56648, 0);
+	(1113, 56648, 0),
+	(1023, 16878, 0),
+	(1023, 24752, 0),
+	(1023, 39233, 0),
+	(1024, 23947, 0),
+	(1024, 23948, 0);
 /*!40000 ALTER TABLE `spell_group` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

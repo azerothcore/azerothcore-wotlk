@@ -26,95 +26,9 @@
 #include <cctype>
 #include <cstdarg>
 #include <ctime>
-#include <iomanip>
 #include <sstream>
 #include <string>
 #include <utf8.h>
-
-Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
-{
-    m_str = new char[src.length() + 1];
-    memcpy(m_str, src.c_str(), src.length() + 1);
-
-    if (vectorReserve)
-    {
-        m_storage.reserve(vectorReserve);
-    }
-
-    char* posold = m_str;
-    char* posnew = m_str;
-
-    for (;;)
-    {
-        if (*posnew == sep)
-        {
-            m_storage.push_back(posold);
-            posold = posnew + 1;
-
-            *posnew = '\0';
-        }
-        else if (*posnew == '\0')
-        {
-            // Hack like, but the old code accepted these kind of broken strings,
-            // so changing it would break other things
-            if (posold != posnew)
-            {
-                m_storage.push_back(posold);
-            }
-
-            break;
-        }
-
-        ++posnew;
-    }
-}
-
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-struct tm* localtime_r(time_t const* time, struct tm* result)
-{
-    localtime_s(result, time);
-    return result;
-}
-#endif
-
-tm TimeBreakdown(time_t time)
-{
-    tm timeLocal;
-    localtime_r(&time, &timeLocal);
-    return timeLocal;
-}
-
-time_t LocalTimeToUTCTime(time_t time)
-{
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-    return time + _timezone;
-#elif defined(__FreeBSD__)
-    struct tm tm;
-
-    gmtime_r(&time, &tm);
-    tm.tm_isdst = -1;
-    return mktime(&tm);
-#else
-    return time + timezone;
-#endif
-}
-
-time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime)
-{
-    tm timeLocal = TimeBreakdown(time);
-    timeLocal.tm_hour = 0;
-    timeLocal.tm_min = 0;
-    timeLocal.tm_sec = 0;
-    time_t midnightLocal = mktime(&timeLocal);
-    time_t hourLocal = midnightLocal + hour * HOUR;
-
-    if (onlyAfterTime && hourLocal <= time)
-    {
-        hourLocal += DAY;
-    }
-
-    return hourLocal;
-}
 
 void stripLineInvisibleChars(std::string& str)
 {
@@ -286,36 +200,6 @@ uint32 TimeStringToSecs(const std::string& timestring)
     }
 
     return secs;
-}
-
-std::string TimeToTimestampStr(time_t t)
-{
-    tm aTm;
-    localtime_r(&t, &aTm);
-    //       YYYY   year
-    //       MM     month (2 digits 01-12)
-    //       DD     day (2 digits 01-31)
-    //       HH     hour (2 digits 00-23)
-    //       MM     minutes (2 digits 00-59)
-    //       SS     seconds (2 digits 00-59)
-    char buf[20];
-    int ret = snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
-
-    if (ret < 0)
-    {
-        return std::string("ERROR");
-    }
-
-    return std::string(buf);
-}
-
-std::string TimeToHumanReadable(time_t t)
-{
-    tm time;
-    localtime_r(&t, &time);
-    char buf[30];
-    strftime(buf, 30, "%c", &time);
-    return std::string(buf);
 }
 
 /// Check if the string is a valid ip address representation

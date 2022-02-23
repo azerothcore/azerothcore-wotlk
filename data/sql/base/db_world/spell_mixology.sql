@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_mixology
+-- Дамп структуры для таблица acore_world.spell_mixology
 DROP TABLE IF EXISTS `spell_mixology`;
 CREATE TABLE IF NOT EXISTS `spell_mixology` (
-  `entry` mediumint(8) unsigned NOT NULL,
+  `entry` MEDIUMINT unsigned NOT NULL,
   `pctMod` float NOT NULL DEFAULT 30 COMMENT 'bonus multiplier',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
--- Дамп данных таблицы _acore_world.spell_mixology: 21 rows
+-- Дамп данных таблицы acore_world.spell_mixology: 21 rows
 DELETE FROM `spell_mixology`;
 /*!40000 ALTER TABLE `spell_mixology` DISABLE KEYS */;
 INSERT INTO `spell_mixology` (`entry`, `pctMod`) VALUES

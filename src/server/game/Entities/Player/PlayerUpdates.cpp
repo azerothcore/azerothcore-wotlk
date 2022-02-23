@@ -20,6 +20,7 @@
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "Formulas.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "Guild.h"
@@ -57,7 +58,7 @@ void Player::Update(uint32 p_time)
     sScriptMgr->OnBeforePlayerUpdate(this, p_time);
 
     // undelivered mail
-    if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(nullptr))
+    if (m_nextMailDelivereTime && m_nextMailDelivereTime <= GameTime::GetGameTime().count())
     {
         SendNewMail();
         ++unReadMails;
@@ -82,7 +83,7 @@ void Player::Update(uint32 p_time)
     Unit::Update(p_time);
     SetMustDelayTeleport(false);
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime().count();
 
     UpdatePvPFlag(now);
     UpdateFFAPvPFlag(now);
@@ -132,10 +133,10 @@ void Player::Update(uint32 p_time)
         GetSession()->m_muteTime = 0;
         LoginDatabasePreparedStatement* stmt =
             LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-        stmt->setInt64(0, 0); // Set the mute time to 0
-        stmt->setString(1, "");
-        stmt->setString(2, "");
-        stmt->setUInt32(3, GetSession()->GetAccountId());
+        stmt->SetData(0, 0); // Set the mute time to 0
+        stmt->SetData(1, "");
+        stmt->SetData(2, "");
+        stmt->SetData(3, GetSession()->GetAccountId());
         LoginDatabase.Execute(stmt);
     }
 
@@ -239,7 +240,7 @@ void Player::Update(uint32 p_time)
     {
         if (now > lastTick && _restTime > 0) // freeze update
         {
-            time_t currTime = time(nullptr);
+            time_t currTime = GameTime::GetGameTime().count();
             time_t timeDiff = currTime - _restTime;
             if (timeDiff >= 10) // freeze update
             {
@@ -266,8 +267,8 @@ void Player::Update(uint32 p_time)
 
     if (!IsPositionValid()) // pussywizard: will crash below at eg. GetZoneAndAreaId
     {
-        LOG_INFO("misc", "Player::Update - invalid position (%.1f, %.1f, %.1f)! Map: %u, MapId: %u, %s",
-            GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUID().ToString().c_str());
+        LOG_INFO("misc", "Player::Update - invalid position ({0:.1f}, {0:.1f}, {0:.1f})! Map: {}, MapId: {}, {}",
+            GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUID().ToString());
         GetSession()->KickPlayer("Invalid position");
         return;
     }
@@ -322,7 +323,7 @@ void Player::Update(uint32 p_time)
         {
             // m_nextSave reset in SaveToDB call
             SaveToDB(false, false);
-            FMT_LOG_DEBUG("entities.player", "Player::Update: Player '{}' ({}) saved", GetName(), GetGUID().ToString());
+            LOG_DEBUG("entities.player", "Player::Update: Player '{}' ({}) saved", GetName(), GetGUID().ToString());
         }
         else
         {
@@ -434,32 +435,32 @@ void Player::UpdateMirrorTimers()
 void Player::UpdateNextMailTimeAndUnreads()
 {
     // Update the next delivery time and unread mails
-    time_t cTime = time(nullptr);
+    time_t cTime = GameTime::GetGameTime().count();
     // Get the next delivery time
     CharacterDatabasePreparedStatement* stmtNextDeliveryTime =
         CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
-    stmtNextDeliveryTime->setUInt32(0, GetGUID().GetCounter());
-    stmtNextDeliveryTime->setUInt32(1, uint32(cTime));
+    stmtNextDeliveryTime->SetData(0, GetGUID().GetCounter());
+    stmtNextDeliveryTime->SetData(1, uint32(cTime));
     PreparedQueryResult resultNextDeliveryTime =
         CharacterDatabase.Query(stmtNextDeliveryTime);
     if (resultNextDeliveryTime)
     {
         Field* fields          = resultNextDeliveryTime->Fetch();
-        m_nextMailDelivereTime = time_t(fields[0].GetUInt32());
+        m_nextMailDelivereTime = time_t(fields[0].Get<uint32>());
     }
 
     // Get unread mails count
     CharacterDatabasePreparedStatement* stmtUnreadAmount =
         CharacterDatabase.GetPreparedStatement(
             CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
-    stmtUnreadAmount->setUInt32(0, GetGUID().GetCounter());
-    stmtUnreadAmount->setUInt32(1, uint32(cTime));
+    stmtUnreadAmount->SetData(0, GetGUID().GetCounter());
+    stmtUnreadAmount->SetData(1, uint32(cTime));
     PreparedQueryResult resultUnreadAmount =
         CharacterDatabase.Query(stmtUnreadAmount);
     if (resultUnreadAmount)
     {
         Field* fields = resultUnreadAmount->Fetch();
-        unReadMails   = uint8(fields[0].GetUInt64());
+        unReadMails   = uint8(fields[0].Get<uint64>());
     }
 }
 
@@ -725,7 +726,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
                                uint32 RedLevel, uint32 Multiplicator)
 {
     LOG_DEBUG("entities.player.skills",
-              "UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)",
+              "UpdateGatherSkill(SkillId {} SkillLevel {} RedLevel {})",
               SkillId, SkillValue, RedLevel);
 
     uint32 gathering_skill_gain =
@@ -784,7 +785,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
 
 bool Player::UpdateCraftSkill(uint32 spellid)
 {
-    LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid %d", spellid);
+    LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid {}", spellid);
 
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
 
@@ -873,7 +874,7 @@ static const size_t bonusSkillLevelsSize =
 bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
 {
     LOG_DEBUG("entities.player.skills",
-              "UpdateSkillPro(SkillId %d, Chance %3.1f%%)", SkillId,
+              "UpdateSkillPro(SkillId {}, Chance {:3.1f}%)", SkillId,
               Chance / 10.0f);
     if (!SkillId)
         return false;
@@ -881,7 +882,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     if (Chance <= 0) // speedup in 0 chance case
     {
         LOG_DEBUG("entities.player.skills",
-                  "Player::UpdateSkillPro Chance=%3.1f%% missed",
+                  "Player::UpdateSkillPro Chance={:3.1f}% missed",
                   Chance / 10.0f);
         return false;
     }
@@ -924,13 +925,13 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL,
                                   SkillId);
         LOG_DEBUG("entities.player.skills",
-                  "Player::UpdateSkillPro Chance=%3.1f%% taken",
+                  "Player::UpdateSkillPro Chance={:3.1f}% taken",
                   Chance / 10.0f);
         return true;
     }
 
     LOG_DEBUG("entities.player.skills",
-              "Player::UpdateSkillPro Chance=%3.1f%% missed", Chance / 10.0f);
+              "Player::UpdateSkillPro Chance={:3.1f}% missed", Chance / 10.0f);
     return false;
 }
 
@@ -1126,8 +1127,8 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
 void Player::UpdateHonorFields()
 {
     /// called when rewarding honor and at each save
-    time_t now   = time_t(time(nullptr));
-    time_t today = time_t(time(nullptr) / DAY) * DAY;
+    time_t now   = time_t(GameTime::GetGameTime().count());
+    time_t today = time_t(GameTime::GetGameTime().count() / DAY) * DAY;
 
     if (m_lastHonorUpdateTime < today)
     {
@@ -1365,9 +1366,9 @@ void Player::UpdateHomebindTime(uint32 time)
         GetSession()->SendPacket(&data);
         LOG_DEBUG(
             "maps",
-            "PLAYER: Player '%s' (%s) will be teleported to homebind in 60 "
+            "PLAYER: Player '{}' ({}) will be teleported to homebind in 60 "
             "seconds",
-            GetName().c_str(), GetGUID().ToString().c_str());
+            GetName(), GetGUID().ToString());
     }
 }
 
@@ -1384,7 +1385,7 @@ void Player::UpdatePvPState()
     {
         if (IsPvP() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) &&
             pvpInfo.EndTimer == 0)
-            pvpInfo.EndTimer = time(nullptr); // start toggle-off
+            pvpInfo.EndTimer = GameTime::GetGameTime().count(); // start toggle-off
     }
 }
 
@@ -1450,7 +1451,7 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/)
                 !pvpInfo.FFAPvPEndTimer)
             {
                 pvpInfo.FFAPvPEndTimer =
-                    sWorld->GetGameTime() +
+                    GameTime::GetGameTime().count() +
                     sWorld->getIntConfig(CONFIG_FFA_PVP_TIMER);
             }
         }
@@ -1466,7 +1467,7 @@ void Player::UpdatePvP(bool state, bool _override)
     }
     else
     {
-        pvpInfo.EndTimer = time(nullptr);
+        pvpInfo.EndTimer = GameTime::GetGameTime().count();
         SetPvP(state);
     }
 
@@ -1958,7 +1959,7 @@ void Player::UpdateCorpseReclaimDelay()
         (!pvp && !sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE)))
         return;
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime().count();
 
     if (now < m_deathExpireTime)
     {
@@ -2234,11 +2235,11 @@ void Player::UpdateSpecCount(uint8 count)
              itr != m_actionButtons.end(); ++itr)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
-            stmt->setUInt32(0, GetGUID().GetCounter());
-            stmt->setUInt8(1, 1);
-            stmt->setUInt8(2, itr->first);
-            stmt->setUInt32(3, itr->second.GetAction());
-            stmt->setUInt8(4, uint8(itr->second.GetType()));
+            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(1, 1);
+            stmt->SetData(2, itr->first);
+            stmt->SetData(3, itr->second.GetAction());
+            stmt->SetData(4, uint8(itr->second.GetType()));
             trans->Append(stmt);
         }
     }
@@ -2249,8 +2250,8 @@ void Player::UpdateSpecCount(uint8 count)
 
         stmt = CharacterDatabase.GetPreparedStatement(
             CHAR_DEL_CHAR_ACTION_EXCEPT_SPEC);
-        stmt->setUInt8(0, m_activeSpec);
-        stmt->setUInt32(1, GetGUID().GetCounter());
+        stmt->SetData(0, m_activeSpec);
+        stmt->SetData(1, GetGUID().GetCounter());
         trans->Append(stmt);
 
         m_activeSpec = 0;

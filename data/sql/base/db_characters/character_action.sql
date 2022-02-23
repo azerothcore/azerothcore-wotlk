@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_action
+-- Дамп структуры для таблица acore_characters.character_action
 DROP TABLE IF EXISTS `character_action`;
 CREATE TABLE IF NOT EXISTS `character_action` (
   `guid` INT unsigned NOT NULL DEFAULT 0,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `character_action` (
   PRIMARY KEY (`guid`,`spec`,`button`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.character_action: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_action: ~0 rows (приблизительно)
 DELETE FROM `character_action`;
 /*!40000 ALTER TABLE `character_action` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_action` ENABLE KEYS */;

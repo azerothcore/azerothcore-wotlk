@@ -1722,7 +1722,7 @@ public:
             if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
             {
                 float angle = dest->GetAngle(GetCaster());
-                Position offset = {6.0f * cos(angle), 6.0f * sin(angle), 10.0f, 0.0f};
+                Position offset = {6.0f * cos(angle), 6.0f * std::sin(angle), 10.0f, 0.0f};
                 dest->RelocateOffset(offset);
                 GetCaster()->UpdateAllowedPositionZ(dest->GetPositionX(), dest->GetPositionY(), dest->m_positionZ);
             }
@@ -1762,7 +1762,7 @@ public:
                 for (uint8 i = 6; i > 0; --i)
                 {
                     float destX = summoner->GetPositionX() + cos(angle + a * M_PI) * i * 10.0f;
-                    float destY = summoner->GetPositionY() + sin(angle + a * M_PI) * i * 10.0f;
+                    float destY = summoner->GetPositionY() + std::sin(angle + a * M_PI) * i * 10.0f;
                     if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY, summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                     {
                         float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());

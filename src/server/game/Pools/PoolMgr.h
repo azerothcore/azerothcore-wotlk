@@ -72,7 +72,7 @@ public:
     explicit PoolGroup() : poolId(0) { }
     void SetPoolId(uint32 pool_id) { poolId = pool_id; }
     ~PoolGroup() {};
-    bool isEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
+    bool IsEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
     void AddEntry(PoolObject& poolitem, uint32 maxentries);
     bool CheckPool() const;
     void DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType guid = 0);

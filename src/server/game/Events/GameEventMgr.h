@@ -22,6 +22,7 @@
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include <map>
+#include <unordered_map>
 
 #define max_ge_check_delay DAY  // 1 day in seconds
 
@@ -54,7 +55,7 @@ typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventCon
 
 struct GameEventData
 {
-    GameEventData()  { }
+    GameEventData()  = default;
     uint32 eventId;
     time_t start{1};           // occurs after this time
     time_t end{0};             // occurs before this time
@@ -161,6 +162,7 @@ private:
     typedef std::list<GuidNPCFlagPair> NPCFlagList;
     typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
     typedef std::vector<uint32> GameEventBitmask;
+    typedef std::unordered_map<uint32, std::vector<uint32>> GameEventSeasonalQuestsMap;
     GameEventQuestMap mGameEventCreatureQuests;
     GameEventQuestMap mGameEventGameObjectQuests;
     GameEventNPCVendorMap mGameEventVendors;
@@ -174,6 +176,7 @@ private:
     GameEventNPCFlagMap mGameEventNPCFlags;
     ActiveEvents m_ActiveEvents;
     bool isSystemInit;
+    GameEventSeasonalQuestsMap _gameEventSeasonalQuestsMap;
 public:
     GameEventGuidMap  mGameEventCreatureGuids;
     GameEventGuidMap  mGameEventGameobjectGuids;

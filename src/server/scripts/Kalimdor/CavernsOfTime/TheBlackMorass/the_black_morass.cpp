@@ -108,12 +108,12 @@ public:
             groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f, creature->GetPositionY(), creature->GetPositionZ()));
             airArray.push_back(G3D::Vector3(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ()));
             for (uint8 i = 0; i < 10; ++i)
-                groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 8.0f * sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ()));
+                groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 8.0f * std::sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ()));
 
             for (uint8 i = 0; i < 40; ++i)
-                airArray.push_back(G3D::Vector3(creature->GetPositionX() + i * 0.25f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + i * 0.25f * sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
+                airArray.push_back(G3D::Vector3(creature->GetPositionX() + i * 0.25f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + i * 0.25f * std::sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
             for (uint8 i = 40; i < 80; ++i)
-                airArray.push_back(G3D::Vector3(creature->GetPositionX() + 10.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 10.0f * sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
+                airArray.push_back(G3D::Vector3(creature->GetPositionX() + 10.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 10.0f * std::sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ() + i / 4.0f));
         }
 
         InstanceScript* instance;
@@ -331,7 +331,7 @@ public:
                     if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
                     {
                         float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
-                        summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
+                        summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * std::sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
                         summon->GetMotionMaster()->MoveTargetedHome();
                         summon->SetReactState(REACT_DEFENSIVE);
                     }

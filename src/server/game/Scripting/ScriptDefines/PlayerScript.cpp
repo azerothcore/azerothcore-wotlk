@@ -154,12 +154,19 @@ void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
     });
 }
 
-void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
+bool ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
 {
-    ExecuteScript<PlayerScript>([&](PlayerScript* script)
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+        {
+            return !script->OnReputationChange(player, factionID, standing, incremental);
+        });
+
+    if (ret && *ret)
     {
-        script->OnReputationChange(player, factionID, standing, incremental);
-    });
+        return false;
+    }
+
+    return true;
 }
 
 void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased)
@@ -535,7 +542,7 @@ void ScriptMgr::OnPlayerJoinArena(Player* player)
     });
 }
 
-void ScriptMgr::GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const
+void ScriptMgr::GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
@@ -543,7 +550,7 @@ void ScriptMgr::GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32
     });
 }
 
-void ScriptMgr::GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const
+void ScriptMgr::GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {
@@ -551,7 +558,7 @@ void ScriptMgr::GetCustomArenaPersonalRating(const Player* player, uint8 slot, u
     });
 }
 
-void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const
+void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const
 {
     ExecuteScript<PlayerScript>([&](PlayerScript* script)
     {

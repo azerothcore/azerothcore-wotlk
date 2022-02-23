@@ -86,6 +86,92 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS)) // SKIP
 };
 
+enum class CreatureGroundMovementType : uint8
+{
+    None,
+    Run,
+    Hover,
+
+    Max
+};
+
+enum class CreatureFlightMovementType : uint8
+{
+    None,
+    DisableGravity,
+    CanFly,
+
+    Max
+};
+
+enum class CreatureChaseMovementType : uint8
+{
+    Run,
+    CanWalk,
+    AlwaysWalk,
+
+    Max
+};
+
+enum class CreatureRandomMovementType : uint8
+{
+    Walk,
+    CanRun,
+    AlwaysRun,
+
+    Max
+};
+
+struct CreatureMovementData
+{
+    CreatureMovementData();
+
+    CreatureGroundMovementType Ground;
+    CreatureFlightMovementType Flight;
+    bool                       Swim;
+    bool                       Rooted;
+    CreatureChaseMovementType  Chase;
+    CreatureRandomMovementType Random;
+    uint32                     InteractionPauseTimer;
+
+    bool IsGroundAllowed() const
+    {
+        return Ground != CreatureGroundMovementType::None;
+    }
+
+    bool IsSwimAllowed() const
+    {
+        return Swim;
+    }
+
+    bool IsFlightAllowed() const
+    {
+        return Flight != CreatureFlightMovementType::None;
+    }
+
+    bool IsRooted() const
+    {
+        return Rooted;
+    }
+
+    CreatureChaseMovementType GetChase() const
+    {
+        return Chase;
+    }
+
+    CreatureRandomMovementType GetRandom() const
+    {
+        return Random;
+    }
+
+    uint32 GetInteractionPauseTimer() const
+    {
+        return InteractionPauseTimer;
+    }
+
+    std::string ToString() const;
+};
+
 // from `creature_template` table
 struct CreatureTemplate
 {
@@ -107,6 +193,8 @@ struct CreatureTemplate
     uint32  npcflag;
     float   speed_walk;
     float   speed_run;
+    float   speed_swim;
+    float   speed_flight;
     float   detection_range;                                // Detection Range for Line of Sight aggro
     float   scale;
     uint32  rank;
@@ -138,7 +226,7 @@ struct CreatureTemplate
     uint32  maxgold;
     std::string AIName;
     uint32  MovementType;
-    uint32  InhabitType;
+    CreatureMovementData  Movement;
     float   HoverHeight;
     float   ModHealth;
     float   ModMana;
@@ -270,8 +358,10 @@ typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfo
 // from `creature` table
 struct CreatureData
 {
-    CreatureData()  { }
-    uint32 id{0};                                              // entry in creature_template
+    CreatureData() = default;
+    uint32 id1{0};                                             // entry in creature_template
+    uint32 id2{0};                                             // entry in creature_template
+    uint32 id3{0};                                             // entry in creature_template
     uint16 mapid{0};
     uint32 phaseMask{0};
     uint32 displayid{0};
@@ -395,8 +485,7 @@ struct VendorItemData
 
 struct VendorItemCount
 {
-    explicit VendorItemCount(uint32 _item, uint32 _count)
-        : itemId(_item), count(_count), lastIncrementTime(time(nullptr)) {}
+    explicit VendorItemCount(uint32 _item, uint32 _count);
 
     uint32 itemId;
     uint32 count;
@@ -429,7 +518,7 @@ typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
 
 struct TrainerSpellData
 {
-    TrainerSpellData()  {}
+    TrainerSpellData()  = default;
     ~TrainerSpellData() { spellList.clear(); }
 
     TrainerSpellMap spellList;
@@ -440,11 +529,11 @@ struct TrainerSpellData
 
 struct CreatureSpellCooldown
 {
-    CreatureSpellCooldown() : category(0), end(0) { }
+    CreatureSpellCooldown()  = default;
     CreatureSpellCooldown(uint16 categoryId, uint32 endTime) : category(categoryId), end(endTime) { }
 
-    uint16 category;
-    uint32 end;
+    uint16 category{0};
+    uint32 end{0};
 };
 
 typedef std::map<uint32, CreatureSpellCooldown> CreatureSpellCooldowns;

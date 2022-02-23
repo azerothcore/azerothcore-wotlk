@@ -18,7 +18,7 @@
 #ifndef __BATTLEGROUNDBE_H
 #define __BATTLEGROUNDBE_H
 
-#include "Battleground.h"
+#include "Arena.h"
 
 enum BattlegroundBEObjectTypes
 {
@@ -33,7 +33,7 @@ enum BattlegroundBEObjectTypes
     BG_BE_OBJECT_MAX            = 8
 };
 
-enum BattlegroundBEObjects
+enum BattlegroundBEGameObjects
 {
     BG_BE_OBJECT_TYPE_DOOR_1    = 183971,
     BG_BE_OBJECT_TYPE_DOOR_2    = 183973,
@@ -43,26 +43,19 @@ enum BattlegroundBEObjects
     BG_BE_OBJECT_TYPE_BUFF_2    = 184664
 };
 
-class BattlegroundBE : public Battleground
+class AC_GAME_API BattlegroundBE : public Arena
 {
 public:
     BattlegroundBE();
-    ~BattlegroundBE() override;
 
     /* inherited from BattlegroundClass */
-    void AddPlayer(Player* player) override;
     void StartingEventCloseDoors() override;
     void StartingEventOpenDoors() override;
 
-    void RemovePlayer(Player* player) override;
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
     bool SetupBattleground() override;
-    void Init() override;
     void FillInitialWorldStates(WorldPacket& d) override;
-    void HandleKillPlayer(Player* player, Player* killer) override;
     bool HandlePlayerUnderMap(Player* player) override;
-
-    /* Scorekeeping */
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 };
+
 #endif

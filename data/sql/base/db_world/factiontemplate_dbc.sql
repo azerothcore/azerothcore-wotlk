@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.factiontemplate_dbc
+-- Дамп структуры для таблица acore_world.factiontemplate_dbc
 DROP TABLE IF EXISTS `factiontemplate_dbc`;
 CREATE TABLE IF NOT EXISTS `factiontemplate_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `factiontemplate_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.factiontemplate_dbc: 841 rows
+-- Дамп данных таблицы acore_world.factiontemplate_dbc: 841 rows
 DELETE FROM `factiontemplate_dbc`;
 /*!40000 ALTER TABLE `factiontemplate_dbc` DISABLE KEYS */;
 INSERT INTO `factiontemplate_dbc` (`ID`, `Faction`, `Flags`, `FactionGroup`, `FriendGroup`, `EnemyGroup`, `Enemies_1`, `Enemies_2`, `Enemies_3`, `Enemies_4`, `Friend_1`, `Friend_2`, `Friend_3`, `Friend_4`) VALUES

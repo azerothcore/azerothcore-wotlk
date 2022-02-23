@@ -157,7 +157,7 @@ public:
                             medivh->AI()->DoAction(ACTION_OUTRO);
 
                         Map::PlayerList const& players = instance->GetPlayers();
-                        if (!players.isEmpty())
+                        if (!players.IsEmpty())
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                 if (Player* player = itr->GetSource())
                                 {

@@ -477,7 +477,7 @@ public:
 
                 float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
                 float elevation = GetSpell()->m_targets.GetElevation();
-                float speedZ = std::max(10.0f, float(50.0f * sin(elevation)));
+                float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
                 float speedXY = dist * 10.0f / speedZ;
 
                 player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);

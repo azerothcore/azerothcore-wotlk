@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_banned
+-- Дамп структуры для таблица acore_characters.character_banned
 DROP TABLE IF EXISTS `character_banned`;
 CREATE TABLE IF NOT EXISTS `character_banned` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `character_banned` (
   PRIMARY KEY (`guid`,`bandate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Ban List';
 
--- Дамп данных таблицы _acore_characters.character_banned: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_banned: ~0 rows (приблизительно)
 DELETE FROM `character_banned`;
 /*!40000 ALTER TABLE `character_banned` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_banned` ENABLE KEYS */;

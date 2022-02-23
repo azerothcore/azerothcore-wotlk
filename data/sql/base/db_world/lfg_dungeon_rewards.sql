@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.lfg_dungeon_rewards
+-- Дамп структуры для таблица acore_world.lfg_dungeon_rewards
 DROP TABLE IF EXISTS `lfg_dungeon_rewards`;
 CREATE TABLE IF NOT EXISTS `lfg_dungeon_rewards` (
   `dungeonId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Dungeon entry from dbc',
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `lfg_dungeon_rewards` (
   PRIMARY KEY (`dungeonId`,`maxLevel`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.lfg_dungeon_rewards: 15 rows
+-- Дамп данных таблицы acore_world.lfg_dungeon_rewards: 15 rows
 DELETE FROM `lfg_dungeon_rewards`;
 /*!40000 ALTER TABLE `lfg_dungeon_rewards` DISABLE KEYS */;
 INSERT INTO `lfg_dungeon_rewards` (`dungeonId`, `maxLevel`, `firstQuestId`, `otherQuestId`) VALUES
