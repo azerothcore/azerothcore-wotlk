@@ -1554,7 +1554,7 @@ UPDATE `quest_template_locale` SET `Details`="杀死纳克萨玛斯城中的敌�
 UPDATE `quest_template_locale` SET `Details`="杀死纳克萨玛斯城中的敌军首领之后，你会在他们的尸体上发现阵亡英雄的遗骸。将那些被亵渎的遗物、板甲碎片和其它材料交给我，也许我能试着移除护甲上的诅咒，重新为你打造一件精良的护甲。" WHERE `ID`=9049 AND `locale` = "zhCN";
 UPDATE `quest_template_locale` SET `Details`="杀死纳克萨玛斯城中的敌军首领之后，你会在他们的尸体上发现阵亡英雄的遗骸。将那些被亵渎的遗物、板甲碎片和其它材料交给我，也许我能试着移除护甲上的诅咒，重新为你打造一件精良的护甲。" WHERE `ID`=9050 AND `locale` = "zhCN";
 UPDATE `quest_template_locale` SET `Details`="这正是我所担心的，看来毒素的力量还是太弱了，无法对这样强大的生物产生影响。$b$b我们必须造出一种更强力的毒素，你需要前往阿塔哈卡神庙的底部，揭开那个祭坛的秘密，并从那里的守卫身上取一些腐烂的藤蔓来。神庙很危险，我建议你带些朋友一起去。$b$b完成之后回到我这里来吧。" WHERE `ID`=9053 AND `locale` = "zhCN";
-UPDATE `quest_template_locale` SET `Title`="The "Chow" Quest (123)aa" WHERE `ID`=9065 AND `locale` = "zhCN";
+UPDATE `quest_template_locale` SET `Title`="The \"Chow\" Quest (123)aa" WHERE `ID`=9065 AND `locale` = "zhCN";
 UPDATE `quest_template_locale` SET `Details`="$Tpunk;!  Kill Kobold Vermin, 2 of em." WHERE `ID`=9065 AND `locale` = "zhCN";
 UPDATE `quest_template_locale` SET `Objectives`="Kill Kobold Vermin, 2 of em." WHERE `ID`=9065 AND `locale` = "zhCN";
 UPDATE `quest_template_locale` SET `Details`="你可以将为了防守这片土地而倒下的勇士护甲带来给我吗?$B$B护甲已被亵渎，无疑是正被恶魔使用；不过，只要有被战争破坏的护甲碎片，被亵渎的护甲就可以复原并再次被批上战场。$B$B将死者的遗物和净化材料带来给我，碎地者护甲就会是你的。$B$B寻找纳克萨玛斯。" WHERE `ID`=9068 AND `locale` = "zhCN";
