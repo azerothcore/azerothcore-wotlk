@@ -1717,6 +1717,9 @@ public:
 
     // Runs on stop event
     virtual void OnStop(uint16 /*EventID*/) { }
+
+    // Runs on event check
+    virtual void OnEventCheck(uint16 /*EventID*/) { }
 };
 
 class MailScript : public ScriptObject
@@ -2437,6 +2440,7 @@ public: /* SpellSC */
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);
     void OnGameEventStop(uint16 EventID);
+    void OnGameEventCheck(uint16 EventID);
 
 public: /* MailScript */
     void OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver const& receiver, MailSender const& sender, MailCheckMask& checked, uint32& deliver_delay, uint32& custom_expiration, bool& deleteMailItemsFromDB, bool& sendMail);
