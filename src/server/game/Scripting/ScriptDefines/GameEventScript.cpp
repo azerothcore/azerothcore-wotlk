@@ -33,3 +33,11 @@ void ScriptMgr::OnGameEventStop(uint16 EventID)
         script->OnStop(EventID);
     });
 }
+
+void ScriptMgr::OnGameEventCheck(uint16 EventID)
+{
+    ExecuteScript<GameEventScript>([&](GameEventScript* script)
+    {
+        script->OnEventCheck(EventID);
+    });
+}
