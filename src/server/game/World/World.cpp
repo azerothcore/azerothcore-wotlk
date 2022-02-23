@@ -971,8 +971,6 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ENABLE_LOGIN_AFTER_DC]            = sConfigMgr->GetOption<bool>("EnableLoginAfterDC", true); // pussywizard
     m_bool_configs[CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS] = sConfigMgr->GetOption<bool>("DontCacheRandomMovementPaths", true); // pussywizard
 
-    m_int_configs[CONFIG_REMOVED_INSTANCE_SUMMON_MAX_DIST] = sConfigMgr->GetOption<int32>("CheatPortalMaxDistanceOutsideDungeon", 50); // Dep
-    m_int_configs[CONFIG_REMOVED_INSTANCE_SUMMON_HEIGHT_OFFSET] = sConfigMgr->GetOption<int32>("CheatPortalMaxHeightOutsideDungeon", 4); // 0 disable both
     m_int_configs[CONFIG_SKILL_CHANCE_ORANGE] = sConfigMgr->GetOption<int32>("SkillChance.Orange", 100);
     m_int_configs[CONFIG_SKILL_CHANCE_YELLOW] = sConfigMgr->GetOption<int32>("SkillChance.Yellow", 75);
     m_int_configs[CONFIG_SKILL_CHANCE_GREEN]  = sConfigMgr->GetOption<int32>("SkillChance.Green", 25);

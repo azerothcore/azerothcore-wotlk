@@ -3530,21 +3530,6 @@ DontCacheRandomMovementPaths = 0
 
 MoveMaps.Enable = 1
 
-#
-#    CheatPortalMaxDistanceOutsideDungeon
-#		Default 50: If you accepted summon inside a dungeon and it's been reset.
-#				   	This is the distance you're allowed to accept it from the door, to the door.
-#
-#
-#	 CheatPortalMaxHeightOutsideDungeon
-#       Default 4: How many yards above the Map should you spawn teleport to
-#					from such a summon.
-#					
-#        To disable set setting: 0 - (Disabled)
-#
-
-CheatPortalMaxDistanceOutsideDungeon = 50
-CheatPortalMaxHeightOutsideDungeon = 4
 
 #
 #     Minigob.Manabonk.Enable
