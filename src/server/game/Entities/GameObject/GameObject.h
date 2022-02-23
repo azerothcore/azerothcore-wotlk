@@ -720,7 +720,7 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    explicit GameObjectData()  { }
+    explicit GameObjectData()  = default;
     uint32 id{0};                                              // entry in gamobject_template
     uint16 mapid{0};
     uint32 phaseMask{0};
@@ -821,14 +821,7 @@ public:
     [[nodiscard]] uint32 GetSpellId() const { return m_spellId;}
 
     [[nodiscard]] time_t GetRespawnTime() const { return m_respawnTime; }
-    [[nodiscard]] time_t GetRespawnTimeEx() const
-    {
-        time_t now = time(nullptr);
-        if (m_respawnTime > now)
-            return m_respawnTime;
-        else
-            return now;
-    }
+    [[nodiscard]] time_t GetRespawnTimeEx() const;
 
     void SetRespawnTime(int32 respawn);
     void SetRespawnDelay(int32 respawn);
@@ -895,7 +888,7 @@ public:
     [[nodiscard]] bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
     uint32 lootingGroupLowGUID;                         // used to find group which is looting
-    void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
+    void SetLootGenerationTime();
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
     [[nodiscard]] GameObject* GetLinkedTrap();
@@ -1027,6 +1020,8 @@ protected:
     uint32 m_lootGenerationTime;
 
     ObjectGuid m_linkedTrap;
+
+    ObjectGuid _lootStateUnitGUID;
 
 private:
     void CheckRitualList();

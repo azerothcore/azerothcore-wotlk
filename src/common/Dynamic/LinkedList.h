@@ -29,10 +29,10 @@ class LinkedListElement
 private:
     friend class LinkedListHead;
 
-    LinkedListElement* iNext;
-    LinkedListElement* iPrev;
+    LinkedListElement* iNext{nullptr};
+    LinkedListElement* iPrev{nullptr};
 public:
-    LinkedListElement(): iNext(nullptr), iPrev(nullptr) { }
+    LinkedListElement() = default;
     ~LinkedListElement() { delink(); }
 
     [[nodiscard]] bool hasNext() const { return (iNext && iNext->iNext != nullptr); }

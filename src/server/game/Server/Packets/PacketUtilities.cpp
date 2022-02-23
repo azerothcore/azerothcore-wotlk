@@ -66,5 +66,5 @@ WorldPackets::PacketArrayMaxCapacityException::PacketArrayMaxCapacityException(s
 
 void WorldPackets::CheckCompactArrayMaskOverflow(std::size_t index, std::size_t limit)
 {
-    ASSERT(index < limit, "Attempted to insert " SZFMTD " values into CompactArray but it can only hold " SZFMTD, index, limit);
+    ASSERT(index < limit, "Attempted to insert {} values into CompactArray but it can only hold {}", index, limit);
 }

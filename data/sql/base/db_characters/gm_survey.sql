@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.gm_survey
+-- Дамп структуры для таблица acore_characters.gm_survey
 DROP TABLE IF EXISTS `gm_survey`;
 CREATE TABLE IF NOT EXISTS `gm_survey` (
   `surveyId` INT unsigned NOT NULL AUTO_INCREMENT,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `gm_survey` (
   PRIMARY KEY (`surveyId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.gm_survey: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.gm_survey: ~0 rows (приблизительно)
 DELETE FROM `gm_survey`;
 /*!40000 ALTER TABLE `gm_survey` DISABLE KEYS */;
 /*!40000 ALTER TABLE `gm_survey` ENABLE KEYS */;

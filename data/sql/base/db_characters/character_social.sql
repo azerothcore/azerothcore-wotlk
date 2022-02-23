@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_social
+-- Дамп структуры для таблица acore_characters.character_social
 DROP TABLE IF EXISTS `character_social`;
 CREATE TABLE IF NOT EXISTS `character_social` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `character_social` (
   KEY `friend` (`friend`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.character_social: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_social: ~0 rows (приблизительно)
 DELETE FROM `character_social`;
 /*!40000 ALTER TABLE `character_social` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_social` ENABLE KEYS */;

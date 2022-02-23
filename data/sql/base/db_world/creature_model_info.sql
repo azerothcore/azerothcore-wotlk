@@ -12,18 +12,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.creature_model_info
+-- Дамп структуры для таблица acore_world.creature_model_info
 DROP TABLE IF EXISTS `creature_model_info`;
 CREATE TABLE IF NOT EXISTS `creature_model_info` (
-  `DisplayID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `DisplayID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BoundingRadius` float NOT NULL DEFAULT 0,
   `CombatReach` float NOT NULL DEFAULT 0,
   `Gender` TINYINT unsigned NOT NULL DEFAULT 2,
-  `DisplayID_Other_Gender` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `DisplayID_Other_Gender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`DisplayID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Creature System (Model related info)';
 
--- Дамп данных таблицы _acore_world.creature_model_info: 24 143 rows
+-- Дамп данных таблицы acore_world.creature_model_info: 24 143 rows
 DELETE FROM `creature_model_info`;
 /*!40000 ALTER TABLE `creature_model_info` DISABLE KEYS */;
 INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `Gender`, `DisplayID_Other_Gender`) VALUES
@@ -23944,7 +23944,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(31004, 1.125, 2.25, 2, 0),
 	(31005, 0.31, 8, 0, 0),
 	(31006, 0.31, 8, 0, 0),
-	(31007, 0, 0, 2, 31248),
+	(31007, 0, 0, 2, 0),
 	(31008, 0, 0, 0, 0),
 	(31011, 0.612, 3, 0, 0),
 	(31012, 0.306, 1.5, 0, 0),
@@ -24023,7 +24023,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 	(31196, 0, 6.5, 2, 0),
 	(31197, 0, 0, 0, 31182),
 	(31201, 0, 0, 0, 0),
-	(31248, 0, 0, 2, 31007),
+	(31248, 0, 0, 2, 0),
 	(31286, 0.612, 3, 0, 0),
 	(31299, 0, 0, 0, 31300),
 	(31300, 0, 0, 0, 31299),

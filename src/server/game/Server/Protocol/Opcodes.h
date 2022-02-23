@@ -1374,7 +1374,7 @@ class OpcodeHandler
 {
 public:
     OpcodeHandler(char const* name, SessionStatus status) : Name(name), Status(status) { }
-    virtual ~OpcodeHandler() { }
+    virtual ~OpcodeHandler() = default;
 
     char const* Name;
     SessionStatus Status;

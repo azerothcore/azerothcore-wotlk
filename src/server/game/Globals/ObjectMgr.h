@@ -531,7 +531,7 @@ struct PetLevelInfo
 
 struct MailLevelReward
 {
-    MailLevelReward()  {}
+    MailLevelReward()  = default;
     MailLevelReward(uint32 _raceMask, uint32 _mailTemplateId, uint32 _senderEntry) : raceMask(_raceMask), mailTemplateId(_mailTemplateId), senderEntry(_senderEntry) {}
 
     uint32 raceMask{0};
@@ -622,7 +622,7 @@ struct QuestPOIPoint
     int32 x{0};
     int32 y{0};
 
-    QuestPOIPoint()  {}
+    QuestPOIPoint()  = default;
     QuestPOIPoint(int32 _x, int32 _y) : x(_x), y(_y) {}
 };
 
@@ -637,7 +637,7 @@ struct QuestPOI
     uint32 Unk4{0};
     std::vector<QuestPOIPoint> points;
 
-    QuestPOI()  {}
+    QuestPOI()  = default;
     QuestPOI(uint32 id, int32 objIndex, uint32 mapId, uint32 areaId, uint32 floorId, uint32 unk3, uint32 unk4) : Id(id), ObjectiveIndex(objIndex), MapId(mapId), AreaId(areaId), FloorId(floorId), Unk3(unk3), Unk4(unk4) {}
 };
 
@@ -1153,7 +1153,7 @@ public:
             return &itr->second;
         return nullptr;
     }
-    CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
+    [[nodiscard]] CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
     [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
@@ -1170,7 +1170,7 @@ public:
         return itr->second;
     }
 
-    GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
+    [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);

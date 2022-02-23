@@ -312,14 +312,6 @@ struct SmartEvent
 
         struct
         {
-            uint32 spell;
-            uint32 count;
-            uint32 repeatMin;
-            uint32 repeatMax;
-        } targetAura;
-
-        struct
-        {
             uint32 type;
             uint32 id;
         } movementInform;
@@ -381,12 +373,6 @@ struct SmartEvent
             uint32 sender;
             uint32 action;
         } gossip;
-
-        struct
-        {
-            uint32 spell;
-            uint32 effIndex;
-        } dummy;
 
         struct
         {
@@ -618,12 +604,12 @@ enum SMART_ACTION
     SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // TODO: NOT SUPPORTED YET
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    // TODO: NOT SUPPORTED YET
     // SMART_ACTION_INVOKER_CAST                    = 134,    // TODO: solve name conflicts
-
-    SMART_ACTION_TC_END                             = 135,    // placeholder
+    SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry, cinematic
     SMART_ACTION_SET_MOVEMENT_SPEED                 = 136,    // movementType, speedInteger, speedFraction
 
     SMART_ACTION_SET_HEALTH_PCT                     = 142,    // percent
 
+    SMART_ACTION_TC_END                             = 199,    // placeholder
     // AC-only SmartActions:
 
     SMART_ACTION_AC_START                           = 200,    // placeholder
@@ -672,6 +658,12 @@ struct SmartAction
 
         struct
         {
+            uint32 textGroupID;
+            uint32 duration;
+        } simpleTalk;
+
+        struct
+        {
             uint32 factionID;
         } faction;
 
@@ -685,6 +677,7 @@ struct SmartAction
         {
             uint32 sound;
             SAIBool onlySelf;
+            uint32 distance;
         } sound;
 
         struct
@@ -694,6 +687,7 @@ struct SmartAction
             uint32 sound3;
             uint32 sound4;
             SAIBool onlySelf;
+            uint32 distance;
         } randomSound;
 
         struct
@@ -788,23 +782,9 @@ struct SmartAction
 
         struct
         {
-            uint32 flag1;
-            uint32 flag2;
-            uint32 flag3;
-            uint32 flag4;
-            uint32 flag5;
-            uint32 flag6;
-        } addUnitFlag;
-
-        struct
-        {
-            uint32 flag1;
-            uint32 flag2;
-            uint32 flag3;
-            uint32 flag4;
-            uint32 flag5;
-            uint32 flag6;
-        } removeUnitFlag;
+            uint32 threatINC;
+            uint32 threatDEC;
+        } threat;
 
         struct
         {
@@ -826,6 +806,11 @@ struct SmartAction
             uint32 inc;
             uint32 dec;
         } incEventPhase;
+
+        struct
+        {
+            uint32 spell;
+        } addAura;
 
         struct
         {
@@ -1048,6 +1033,11 @@ struct SmartAction
 
         struct
         {
+            uint32 flag;
+        } flag;
+
+        struct
+        {
             uint32 byte1;
             uint32 type;
         } setunitByte;
@@ -1057,11 +1047,6 @@ struct SmartAction
             uint32 byte1;
             uint32 type;
         } delunitByte;
-
-        struct
-        {
-            uint32 seat;
-        } enterVehicle;
 
         struct
         {
@@ -1078,6 +1063,12 @@ struct SmartAction
             uint32 entry5;
             uint32 entry6;
         } randTimedActionList;
+
+        struct
+        {
+            uint32 idMin;
+            uint32 idMax;
+        } randRangeTimedActionList;
 
         struct
         {
@@ -1145,7 +1136,7 @@ struct SmartAction
 
         struct
         {
-            uint32 regenHealth;
+            SAIBool regenHealth;
         } setHealthRegen;
 
         struct
@@ -1316,6 +1307,11 @@ struct SmartAction
         {
             uint32 percent;
         } setHealthPct;
+
+        struct
+        {
+            uint32 entry;
+        } cinematic;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1487,8 +1483,10 @@ struct SmartTarget
 
         struct
         {
-            uint32 map;
-        } position;
+            uint32 entry;
+            uint32 dist;
+            SAIBool dead;
+        } unitClosest;
 
         struct
         {
@@ -1497,17 +1495,20 @@ struct SmartTarget
 
         struct
         {
-            uint32 entry;
-            uint32 dist;
-            SAIBool dead;
-        } closest;
+            uint32 seatMask;
+        } vehicle;
+
+        struct
+        {
+            uint32 maxDist;
+        } threatList;
 
         struct
         {
             uint32 entry;
             uint32 dist;
             uint32 onlySpawned;
-        } closestGameobject;
+        } goClosest;
 
         struct
         {
@@ -1543,11 +1544,6 @@ struct SmartTarget
             uint32 param3;
             uint32 param4;
         } raw;
-
-        struct
-        {
-            uint32 seat;
-        } vehicle;
     };
 };
 
@@ -1809,7 +1805,7 @@ public:
                 if (WorldObject* obj = ObjectAccessor::GetWorldObject(*m_baseObject, *itr))
                     m_objectList->push_back(obj);
                 //else
-                //    LOG_DEBUG("scripts.ai", "SmartScript::mTargetStorage stores a guid to an invalid object: %s", (*itr).ToString().c_str());
+                //    LOG_DEBUG("scripts.ai", "SmartScript::mTargetStorage stores a guid to an invalid object: {}", (*itr).ToString());
             }
         }
 
@@ -1876,7 +1872,7 @@ public:
         else
         {
             if (entry > 0) //first search is for guid (negative), do not drop error if not found
-                LOG_DEBUG("sql.sql", "SmartAIMgr::GetScript: Could not load Script for Entry %d ScriptType %u.", entry, uint32(type));
+                LOG_DEBUG("sql.sql", "SmartAIMgr::GetScript: Could not load Script for Entry {} ScriptType {}.", entry, uint32(type));
             return temp;
         }
     }
@@ -1894,7 +1890,7 @@ private:
     {
         if (target < SMART_TARGET_NONE || target >= SMART_TARGET_END)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses invalid Target type %d, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), target);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid Target type {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), target);
             return false;
         }
         return true;
@@ -1904,7 +1900,7 @@ private:
     {
         if (max < min)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses min/max params wrong (%u/%u), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), min, max);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses min/max params wrong ({}/{}), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), min, max);
             return false;
         }
         return true;
@@ -1914,7 +1910,7 @@ private:
     {
         if (pct < -100 || pct > 100)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u has invalid Percent set (%d), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), pct);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid Percent set ({}), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), pct);
             return false;
         }
         return true;
@@ -1924,7 +1920,7 @@ private:
     {
         if (!data)
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u Parameter can not be nullptr, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} Parameter can not be nullptr, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             return false;
         }
         return true;
@@ -1934,7 +1930,7 @@ private:
     {
         if (!sObjectMgr->GetCreatureTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Creature entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Creature entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1944,7 +1940,7 @@ private:
     {
         if (!sObjectMgr->GetQuestTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Quest entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Quest entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1954,7 +1950,7 @@ private:
     {
         if (!sObjectMgr->GetGameObjectTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent GameObject entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent GameObject entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1964,7 +1960,7 @@ private:
     {
         if (!sSpellMgr->GetSpellInfo(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Spell entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1974,7 +1970,7 @@ private:
     {
         if (!sObjectMgr->GetItemTemplate(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Item entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Item entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1984,7 +1980,7 @@ private:
     {
         if (!sEmotesTextStore.LookupEntry(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Text Emote entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Text Emote entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -1994,7 +1990,7 @@ private:
     {
         if (!sEmotesStore.LookupEntry(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Emote entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Emote entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -2004,7 +2000,7 @@ private:
     {
         if (!sObjectMgr->GetAreaTrigger(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent AreaTrigger entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent AreaTrigger entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
@@ -2014,13 +2010,16 @@ private:
     {
         if (!sSoundEntriesStore.LookupEntry(entry))
         {
-            LOG_ERROR("sql.sql", "SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Sound entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
+            LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Sound entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;
         }
         return true;
     }
 
-    //bool IsTextValid(SmartScriptHolder const& e, uint32 id);
+    static bool IsTextValid(SmartScriptHolder const& e, uint32 id);
+    static bool CheckUnusedEventParams(SmartScriptHolder const& e);
+    static bool CheckUnusedActionParams(SmartScriptHolder const& e);
+    static bool CheckUnusedTargetParams(SmartScriptHolder const& e);
 };
 
 #define sSmartScriptMgr SmartAIMgr::instance()

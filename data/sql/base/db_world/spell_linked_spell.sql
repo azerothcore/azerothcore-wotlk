@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_linked_spell
+-- Дамп структуры для таблица acore_world.spell_linked_spell
 DROP TABLE IF EXISTS `spell_linked_spell`;
 CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
-  `spell_trigger` mediumint(9) NOT NULL,
-  `spell_effect` mediumint(9) NOT NULL DEFAULT 0,
+  `spell_trigger` MEDIUMINT NOT NULL,
+  `spell_effect` MEDIUMINT NOT NULL DEFAULT 0,
   `type` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` text NOT NULL,
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Spell System';
 
--- Дамп данных таблицы _acore_world.spell_linked_spell: 567 rows
+-- Дамп данных таблицы acore_world.spell_linked_spell: 569 rows
 DELETE FROM `spell_linked_spell`;
 /*!40000 ALTER TABLE `spell_linked_spell` DISABLE KEYS */;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
@@ -147,7 +147,6 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(-25345, -36032, 0, 'Arcane Missiles Rank 8'),
 	(-24924, 25023, 0, 'Hallow\'s End Candy'),
 	(-24919, 49867, 0, 'Nauseous Stun - trigger vomit'),
-	(-24869, 24870, 0, 'Bobbing Apple, Bread of the Dead, Winter Veil Cookie'),
 	(-24832, 24731, 0, 'Cannon Prep Remove - Link Cannon Fire'),
 	(-24743, 24731, 0, 'Cannon Prep Remove - Link Cannon Fire'),
 	(-21178, -57339, 0, 'Bear Form (Passive2) - Tank Class Passive Threat Remove'),
@@ -592,7 +591,10 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(19512, -19502, 1, 'Apply Salve - Sickly Critter Aura removed'),
 	(13278, 13493, 0, 'Gnomish Death Ray'),
 	(17770, 29940, 0, 'Wolfshead Helm Energy'),
-	(17500, 17499, 0, 'Malown\'s Slam - trigger Surge of Strenght');
+	(17500, 17499, 0, 'Malown\'s Slam - trigger Surge of Strenght'),
+	(58984, 59646, 0, 'Shadowmeld: Sanctuary'),
+	(58984, 62196, 0, 'Shadowmeld: Force deselect'),
+	(20482, 20483, 1, 'Firesworn Eruption Trigger - On Hit - Trigger Massive Eruption');
 /*!40000 ALTER TABLE `spell_linked_spell` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

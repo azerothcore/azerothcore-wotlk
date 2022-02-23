@@ -159,7 +159,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr0>::ToString(SpellAttr0 value)
     {
         case SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE: return { "SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE", "Unknown attribute 0@Attr0", "" };
         case SPELL_ATTR0_USES_RANGED_SLOT: return { "SPELL_ATTR0_USES_RANGED_SLOT", "Treat as ranged attack", "Use ammo, ranged attack range modifiers, ranged haste, etc." };
-        case SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE: return { "SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE", "On next melee (type 1)", "Both \042on next swing\042 attributes have identical handling in server & client" };
+        case SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE: return { "SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE", "On next melee (type 1)", R"(Both "on next swing" attributes have identical handling in server & client)" };
         case SPELL_ATTR0_DO_NOT_LOG_IMMUNE_MISSES: return { "SPELL_ATTR0_DO_NOT_LOG_IMMUNE_MISSES", "Replenishment (client only)", "" };
         case SPELL_ATTR0_IS_ABILITY: return { "SPELL_ATTR0_IS_ABILITY", "Treat as ability", "Cannot be reflected, not affected by cast speed modifiers, etc." };
         case SPELL_ATTR0_IS_TRADESKILL: return { "SPELL_ATTR0_IS_TRADESKILL", "Trade skill recipe", "Displayed in recipe list, not affected by cast speed modifiers" };
@@ -167,7 +167,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr0>::ToString(SpellAttr0 value)
         case SPELL_ATTR0_DO_NOT_DISPLAY: return { "SPELL_ATTR0_DO_NOT_DISPLAY", "Hidden in UI (client only)", "Not visible in spellbook or aura bar (Spellbook, Aura Icon, Combat Log)" };
         case SPELL_ATTR0_DO_NOT_LOG: return { "SPELL_ATTR0_DO_NOT_LOG", "Hidden in combat log (client only)", "Spell will not appear in combat logs" };
         case SPELL_ATTR0_HELD_ITEM_ONLY: return { "SPELL_ATTR0_HELD_ITEM_ONLY", "Auto-target mainhand item (client only)", "Client will automatically select main-hand item as cast target" };
-        case SPELL_ATTR0_ON_NEXT_SWING: return { "SPELL_ATTR0_ON_NEXT_SWING", "On next melee (type 2)", "Both \042on next swing\042 attributes have identical handling in server & client" };
+        case SPELL_ATTR0_ON_NEXT_SWING: return { "SPELL_ATTR0_ON_NEXT_SWING", "On next melee (type 2)", R"(Both "on next swing" attributes have identical handling in server & client)" };
         case SPELL_ATTR0_WEARER_CASTS_PROC_TRIGGER: return { "SPELL_ATTR0_WEARER_CASTS_PROC_TRIGGER", "Unknown attribute 11@Attr0", "" };
         case SPELL_ATTR0_SERVER_ONLY: return { "SPELL_ATTR0_SERVER_ONLY", "Only usable during daytime (unused)", "" };
         case SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP: return { "SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP", "Only usable during nighttime (unused)", "" };
@@ -288,11 +288,11 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr1>::ToString(SpellAttr1 value)
     {
         case SPELL_ATTR1_DISMISS_PET_FIRST: return { "SPELL_ATTR1_DISMISS_PET_FIRST", "Dismiss Pet on cast", "Without this attribute, summoning spells will fail if caster already has a pet" };
         case SPELL_ATTR1_USE_ALL_MANA: return { "SPELL_ATTR1_USE_ALL_MANA", "Drain all power", "Ignores listed power cost and drains entire pool instead" };
-        case SPELL_ATTR1_IS_CHANNELED: return { "SPELL_ATTR1_IS_CHANNELED", "Channeled (type 1)", "Both \042channeled\042 attributes have identical handling in server & client" };
+        case SPELL_ATTR1_IS_CHANNELED: return { "SPELL_ATTR1_IS_CHANNELED", "Channeled (type 1)", R"(Both "channeled" attributes have identical handling in server & client)" };
         case SPELL_ATTR1_NO_REDIRECTION: return { "SPELL_ATTR1_NO_REDIRECTION", "Ignore redirection effects", "Spell will not be attracted by SPELL_MAGNET auras (Grounding Totem)" };
         case SPELL_ATTR1_NO_SKILL_INCREASE: return { "SPELL_ATTR1_NO_SKILL_INCREASE", "Unknown attribute 4@Attr1", "stealth and whirlwind" };
         case SPELL_ATTR1_ALLOW_WHILE_STEALTHED: return { "SPELL_ATTR1_ALLOW_WHILE_STEALTHED", "Does not break stealth", "" };
-        case SPELL_ATTR1_IS_SELF_CHANNELED: return { "SPELL_ATTR1_IS_SELF_CHANNELED", "Channeled (type 2)", "Both \042channeled\042 attributes have identical handling in server & client" };
+        case SPELL_ATTR1_IS_SELF_CHANNELED: return { "SPELL_ATTR1_IS_SELF_CHANNELED", "Channeled (type 2)", R"(Both "channeled" attributes have identical handling in server & client)" };
         case SPELL_ATTR1_NO_REFLECTION: return { "SPELL_ATTR1_NO_REFLECTION", "Ignore reflection effects", "Spell will pierce through Spell Reflection and similar" };
         case SPELL_ATTR1_ONLY_PEACEFUL_TARGETS: return { "SPELL_ATTR1_ONLY_PEACEFUL_TARGETS", "Target cannot be in combat", "" };
         case SPELL_ATTR1_INITIATE_COMBAT: return { "SPELL_ATTR1_INITIATE_COMBAT", "Enables Auto-Attack (client only)", "Caster will begin auto-attacking the target on cast" };

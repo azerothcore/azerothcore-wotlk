@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.guild_bank_tab
+-- Дамп структуры для таблица acore_characters.guild_bank_tab
 DROP TABLE IF EXISTS `guild_bank_tab`;
 CREATE TABLE IF NOT EXISTS `guild_bank_tab` (
   `guildid` INT unsigned NOT NULL DEFAULT 0,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `guild_bank_tab` (
   KEY `guildid_key` (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.guild_bank_tab: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.guild_bank_tab: ~0 rows (приблизительно)
 DELETE FROM `guild_bank_tab`;
 /*!40000 ALTER TABLE `guild_bank_tab` DISABLE KEYS */;
 /*!40000 ALTER TABLE `guild_bank_tab` ENABLE KEYS */;

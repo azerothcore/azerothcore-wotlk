@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.waypoint_scripts
+-- Дамп структуры для таблица acore_world.waypoint_scripts
 DROP TABLE IF EXISTS `waypoint_scripts`;
 CREATE TABLE IF NOT EXISTS `waypoint_scripts` (
   `id` INT unsigned NOT NULL DEFAULT 0,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `waypoint_scripts` (
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.waypoint_scripts: 688 rows
+-- Дамп данных таблицы acore_world.waypoint_scripts: 698 rows
 DELETE FROM `waypoint_scripts`;
 /*!40000 ALTER TABLE `waypoint_scripts` DISABLE KEYS */;
 INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES
@@ -716,11 +716,21 @@ INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2
 	(1377500, 3, 1, 69, 1, 0, 0, 0, 0, 0, 934),
 	(1377500, 235, 1, 0, 1, 0, 0, 0, 0, 0, 935),
 	(11730800, 1, 1, 36, 0, 0, 0, 0, 0, 0, 937),
-	(188700, 2, 0, 2, 0, 4285, 0, 0, 0, 0, 902),
-	(188700, 2, 1, 16, 0, 0, 0, 0, 0, 0, 903),
-	(188701, 2, 1, 69, 1, 0, 0, 0, 0, 0, 904),
+	(188701, 5, 1, 26, 1, 0, 0, 0, 0, 0, 906),
 	(188701, 2, 0, 2, 0, 4286, 0, 0, 0, 0, 905),
-	(188701, 5, 1, 26, 1, 0, 0, 0, 0, 0, 906);
+	(188701, 2, 1, 69, 1, 0, 0, 0, 0, 0, 904),
+	(188700, 2, 1, 16, 0, 0, 0, 0, 0, 0, 903),
+	(188700, 2, 0, 2, 0, 4285, 0, 0, 0, 0, 902),
+	(457490, 11, 1, 1, 0, 0, 0, 0, 0, 0, 45749),
+	(849301, 0, 16, 6596, 2, 0, 0, 0, 0, 0, 201194),
+	(849910, 0, 16, 6596, 2, 0, 0, 0, 0, 0, 201200),
+	(2, 3, 1, 7, 0, 0, 0, 0, 0, 0, 2),
+	(188702, 2, 0, 0, 0, 4287, 0, 0, 0, 0, 907),
+	(5, 0, 0, 0, 0, 1119, 0, 0, 0, 0, 7),
+	(6, 1, 0, 0, 0, 16099, 0, 0, 0, 0, 16),
+	(6, 1, 1, 6, 0, 0, 0, 0, 0, 0, 17),
+	(6, 7, 0, 0, 0, 16100, 0, 0, 0, 0, 18),
+	(6, 7, 1, 1, 0, 0, 0, 0, 0, 0, 19);
 /*!40000 ALTER TABLE `waypoint_scripts` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

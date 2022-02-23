@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "blackrock_depths.h"
 
-#define MAX_ENCOUNTER 6
+constexpr auto MAX_ENCOUNTER = 6;
 
 enum Timers
 {
@@ -446,7 +447,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            LOG_DEBUG("scripts.ai", "Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+            LOG_DEBUG("scripts.ai", "Instance Blackrock Depths: SetData update (Type: {} Data {})", type, data);
 
             switch (type)
             {
@@ -462,7 +463,7 @@ public:
                         {
                             TempSummonGrimstone->RemoveFromWorld();
                             TempSummonGrimstone = nullptr;
-                            timeRingFail = time(nullptr);
+                            timeRingFail = GameTime::GetGameTime().count();
                         }
                         SetData(TYPE_RING_OF_LAW, NOT_STARTED);
                         break;

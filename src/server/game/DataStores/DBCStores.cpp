@@ -198,7 +198,7 @@ uint32 DBCFileCount = 0;
 
 static bool LoadDBC_assert_print(uint32 fsize, uint32 rsize, const std::string& filename)
 {
-    LOG_ERROR("dbc", "Size of '%s' set by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
+    LOG_ERROR("dbc", "Size of '{}' set by format string ({}) not equal size of C++ structure ({}).", filename, fsize, rsize);
 
     // ASSERT must fail after function call
     return false;
@@ -457,7 +457,7 @@ void LoadDBCStores(const std::string& dataPath)
             if (spellDiff->SpellID[x] <= 0 || !sSpellStore.LookupEntry(spellDiff->SpellID[x]))
             {
                 if (spellDiff->SpellID[x] > 0) //don't show error if spell is <= 0, not all modes have spells and there are unknown negative values
-                    LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell %i at field id: %u at spellid %i does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->SpellID[x], spellDiff->ID, x);
+                    LOG_ERROR("sql.sql", "spelldifficulty_dbc: spell {} at field id: {} at spellid {} does not exist in SpellStore (spell.dbc), loaded as 0", spellDiff->SpellID[x], spellDiff->ID, x);
 
                 newEntry.SpellID[x] = 0; // spell was <= 0 or invalid, set to 0
             }
@@ -610,7 +610,7 @@ void LoadDBCStores(const std::string& dataPath)
     // error checks
     if (bad_dbc_files.size() >= DBCFileCount)
     {
-        LOG_ERROR("dbc", "Incorrect DataDir value in worldserver.conf or ALL required *.dbc files (%d) not found by path: %sdbc", DBCFileCount, dataPath.c_str());
+        LOG_ERROR("dbc", "Incorrect DataDir value in worldserver.conf or ALL required *.dbc files ({}) not found by path: {}dbc", DBCFileCount, dataPath);
         exit(1);
     }
     else if (!bad_dbc_files.empty())
@@ -619,7 +619,7 @@ void LoadDBCStores(const std::string& dataPath)
         for (StoreProblemList::iterator i = bad_dbc_files.begin(); i != bad_dbc_files.end(); ++i)
             str += *i + "\n";
 
-        LOG_ERROR("dbc", "Some required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFileCount, str.c_str());
+        LOG_ERROR("dbc", "Some required *.dbc files ({} from {}) not found or not compatible:\n{}", (uint32)bad_dbc_files.size(), DBCFileCount, str);
         exit(1);
     }
 
@@ -637,7 +637,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     LoadM2Cameras(dataPath);
 
-    LOG_INFO("server.loading", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Initialized {} data stores in {} ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -648,7 +648,7 @@ G3D::Vector3 TranslateLocation(G3D::Vector4 const* DBCPosition, G3D::Vector3 con
     float x = basePosition->x + splineVector->x;
     float y = basePosition->y + splineVector->y;
     float z = basePosition->z + splineVector->z;
-    float const distance = sqrt((x * x) + (y * y));
+    float const distance = std::sqrt((x * x) + (y * y));
     float angle = std::atan2(x, y) - DBCPosition->w;
 
     if (angle < 0)
@@ -858,7 +858,7 @@ void LoadM2Cameras(const std::string& dataPath)
             // Reject if not at least the size of the header
             if (static_cast<uint32>(fileSize) < sizeof(M2Header))
             {
-                LOG_ERROR("dbc", "Camera file %s is damaged. File is smaller than header size", filename.c_str());
+                LOG_ERROR("dbc", "Camera file {} is damaged. File is smaller than header size", filename);
                 m2file.close();
                 continue;
             }
@@ -872,7 +872,7 @@ void LoadM2Cameras(const std::string& dataPath)
             // Check file has correct magic (MD20)
             if (strcmp(fileCheck, "MD20"))
             {
-                LOG_ERROR("dbc", "Camera file %s is damaged. File identifier not found", filename.c_str());
+                LOG_ERROR("dbc", "Camera file {} is damaged. File identifier not found", filename);
                 m2file.close();
                 continue;
             }
@@ -892,7 +892,7 @@ void LoadM2Cameras(const std::string& dataPath)
 
             if (header->ofsCameras + sizeof(M2Camera) > static_cast<uint32>(fileSize))
             {
-                LOG_ERROR("dbc", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
+                LOG_ERROR("dbc", "Camera file {} is damaged. Camera references position beyond file end", filename);
                 continue;
             }
 
@@ -900,11 +900,11 @@ void LoadM2Cameras(const std::string& dataPath)
             M2Camera const* cam = reinterpret_cast<M2Camera const*>(buffer.data() + header->ofsCameras);
             if (!readCamera(cam, fileSize, header, dbcentry))
             {
-                LOG_ERROR("dbc", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
+                LOG_ERROR("dbc", "Camera file {} is damaged. Camera references position beyond file end", filename);
             }
         }
     }
-    LOG_INFO("server.loading", ">> Loaded %u cinematic waypoint sets in %u ms", (uint32)sFlyByCameraStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} cinematic waypoint sets in {} ms", (uint32)sFlyByCameraStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 SimpleFactionsList const* GetFactionTeamList(uint32 faction)

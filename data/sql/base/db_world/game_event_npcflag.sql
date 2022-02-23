@@ -12,16 +12,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_event_npcflag
+-- Дамп структуры для таблица acore_world.game_event_npcflag
 DROP TABLE IF EXISTS `game_event_npcflag`;
 CREATE TABLE IF NOT EXISTS `game_event_npcflag` (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `guid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `guid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `npcflag` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.game_event_npcflag: 5 rows
+-- Дамп данных таблицы acore_world.game_event_npcflag: 5 rows
 DELETE FROM `game_event_npcflag`;
 /*!40000 ALTER TABLE `game_event_npcflag` DISABLE KEYS */;
 INSERT INTO `game_event_npcflag` (`eventEntry`, `guid`, `npcflag`) VALUES

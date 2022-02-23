@@ -42,7 +42,7 @@ enum ConnectionFlags
 
 struct AC_DATABASE_API MySQLConnectionInfo
 {
-    explicit MySQLConnectionInfo(std::string const& infoString);
+    explicit MySQLConnectionInfo(std::string_view infoString);
 
     std::string user;
     std::string password;
@@ -54,7 +54,9 @@ struct AC_DATABASE_API MySQLConnectionInfo
 
 class AC_DATABASE_API MySQLConnection
 {
-template <class T> friend class DatabaseWorkerPool;
+template <class T>
+friend class DatabaseWorkerPool;
+
 friend class PingOperation;
 
 public:
@@ -67,11 +69,11 @@ public:
 
     bool PrepareStatements();
 
-    bool Execute(char const* sql);
+    bool Execute(std::string_view sql);
     bool Execute(PreparedStatementBase* stmt);
-    ResultSet* Query(char const* sql);
+    ResultSet* Query(std::string_view sql);
     PreparedResultSet* Query(PreparedStatementBase* stmt);
-    bool _Query(char const* sql, MySQLResult** pResult, MySQLField** pFields, uint64* pRowCount, uint32* pFieldCount);
+    bool _Query(std::string_view sql, MySQLResult** pResult, MySQLField** pFields, uint64* pRowCount, uint32* pFieldCount);
     bool _Query(PreparedStatementBase* stmt, MySQLPreparedStatement** mysqlStmt, MySQLResult** pResult, uint64* pRowCount, uint32* pFieldCount);
 
     void BeginTransaction();
@@ -91,27 +93,27 @@ protected:
     /// Called by parent databasepool. Will let other threads access this connection
     void Unlock();
 
-    uint32 GetServerVersion() const;
+    [[nodiscard]] uint32 GetServerVersion() const;
     MySQLPreparedStatement* GetPreparedStatement(uint32 index);
-    void PrepareStatement(uint32 index, std::string const& sql, ConnectionFlags flags);
+    void PrepareStatement(uint32 index, std::string_view sql, ConnectionFlags flags);
 
     virtual void DoPrepareStatements() = 0;
 
     typedef std::vector<std::unique_ptr<MySQLPreparedStatement>> PreparedStatementContainer;
 
-    PreparedStatementContainer           m_stmts;         //! PreparedStatements storage
-    bool                                 m_reconnecting;  //! Are we reconnecting?
-    bool                                 m_prepareError;  //! Was there any error while preparing statements?
+    PreparedStatementContainer m_stmts; //! PreparedStatements storage
+    bool m_reconnecting;  //! Are we reconnecting?
+    bool m_prepareError;  //! Was there any error while preparing statements?
 
 private:
     bool _HandleMySQLErrno(uint32 errNo, uint8 attempts = 5);
 
     ProducerConsumerQueue<SQLOperation*>* m_queue;      //! Queue shared with other asynchronous connections.
     std::unique_ptr<DatabaseWorker> m_worker;           //! Core worker task.
-    MySQLHandle*          m_Mysql;                      //! MySQL Handle.
-    MySQLConnectionInfo&  m_connectionInfo;             //! Connection info (used for logging)
-    ConnectionFlags       m_connectionFlags;            //! Connection flags (for preparing relevant statements)
-    std::mutex            m_Mutex;
+    MySQLHandle* m_Mysql;                               //! MySQL Handle.
+    MySQLConnectionInfo& m_connectionInfo;              //! Connection info (used for logging)
+    ConnectionFlags m_connectionFlags;                  //! Connection flags (for preparing relevant statements)
+    std::mutex m_Mutex;
 
     MySQLConnection(MySQLConnection const& right) = delete;
     MySQLConnection& operator=(MySQLConnection const& right) = delete;

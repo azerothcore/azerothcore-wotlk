@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -353,7 +354,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return me->IsVisible() && target->GetEntry() != NPC_CROK_SCOURGEBANE;
         }
@@ -946,11 +947,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
-            uint32 currMSTime = World::GetGameTimeMS();
+            uint32 currMSTime = GameTime::GetGameTimeMS().count();
             std::map<uint32, uint32>::iterator itr = _lastMSTimeForSpell.find(spellInfo->Id);
             if (itr != _lastMSTimeForSpell.end())
             {
