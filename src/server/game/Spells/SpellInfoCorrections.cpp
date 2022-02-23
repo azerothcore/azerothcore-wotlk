@@ -4064,6 +4064,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
     });
 
+    // Nefarius Corruption
+    ApplySpellFix({ 23642 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
+    });
+
     // Conflagration, Horseman's Cleave
     ApplySpellFix({ 42380, 42587 }, [](SpellInfo* spellInfo)
     {
@@ -4146,11 +4154,23 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[1] = 0x00020000;
     });
 
+    // Manastorm
+    ApplySpellFix({ 21097 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     // Arcane Vacuum
     ApplySpellFix({ 21147 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(4); // 30 yards
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
+    });
+
+    // Reflection
+    ApplySpellFix({ 22067 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Dispel = DISPEL_NONE;
     });
 
     // Focused Assault
@@ -4176,6 +4196,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 26157, 26272, 26273, 26274 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Mechanic = 0;
+    });
+
+    // Calm Dragonkin
+    ApplySpellFix({ 19872 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_EXCLUDE_CASTER;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

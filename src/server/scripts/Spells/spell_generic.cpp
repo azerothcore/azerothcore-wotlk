@@ -1683,13 +1683,8 @@ class spell_gen_pet_summoned : public SpellScript
         {
             PetType newPetType = (player->getClass() == CLASS_HUNTER) ? HUNTER_PET : SUMMON_PET;
             Pet* newPet = new Pet(player, newPetType);
-            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true))
+            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100))
             {
-                // revive the pet if it is dead
-                if (newPet->getDeathState() != ALIVE && newPet->getDeathState() != JUST_RESPAWNED)
-                    newPet->setDeathState(JUST_RESPAWNED);
-
-                newPet->SetFullHealth();
                 newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
 
                 switch (newPet->GetEntry())

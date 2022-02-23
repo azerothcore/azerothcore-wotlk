@@ -398,7 +398,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override // for banana(51932), orange(51931), papaya(51933)
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override // for banana(51932), orange(51931), papaya(51933)
         {
             if (running)
             {

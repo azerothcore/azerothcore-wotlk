@@ -481,7 +481,7 @@ public:
     // xinef: aura stacking
     bool IsStrongerAuraActive(Unit const* caster, Unit const* target) const;
     bool IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const;
-    bool ValidateAttribute6SpellDamageMods(const Unit* caster, const AuraEffect* auraEffect, bool isDot) const;
+    bool ValidateAttribute6SpellDamageMods(Unit const* caster, const AuraEffect* auraEffect, bool isDot) const;
 
     SpellSchoolMask GetSchoolMask() const;
     uint32 GetAllEffectsMechanicMask() const;
@@ -534,6 +534,8 @@ public:
 
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
+
+    bool CheckElixirStacking(Unit const* caster) const;
 
 private:
     std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }
