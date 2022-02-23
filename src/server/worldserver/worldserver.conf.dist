@@ -3530,7 +3530,6 @@ DontCacheRandomMovementPaths = 0
 
 MoveMaps.Enable = 1
 
-
 #
 #     Minigob.Manabonk.Enable
 #        Description: Enable/ Disable Minigob Manabonk
