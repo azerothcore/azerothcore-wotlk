@@ -945,7 +945,7 @@ void WorldSession::HandlePetAbandon(WorldPackets::Pet::PetAbandon& packet)
 void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutocast& packet)
 {
     Creature* checkPet = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, packet.PetGUID);
-    if (!pet)
+    if (!checkPet)
     {
         LOG_ERROR("entities.pet", "WorldSession::HandlePetSpellAutocastOpcode: Pet %s not found.", packet.PetGUID.ToString().c_str());
         return;
