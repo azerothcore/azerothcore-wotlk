@@ -2294,9 +2294,16 @@ Rate.XP.Pet       = 1
 #    Rate.XP.BattlegroundKill
 #        Description: Experience rate for honorable kills in battlegrounds. Not affected by Rate.XP.Kill
 #                     Only works if Battleground.GiveXPForKills = 1
+#                     Can be overwritten for each BG by setting a value different than -1 on Rate.XP.BattlegroundKill???, where ??? is the name of the BG.
 #        Default:     1
 
-Rate.XP.BattlegroundKill = 1
+Rate.XP.BattlegroundKill     = 1
+Rate.XP.BattlegroundKillAV   = -1
+Rate.XP.BattlegroundKillWSG  = -1
+Rate.XP.BattlegroundKillAB   = -1
+Rate.XP.BattlegroundKillEOTS = -1
+Rate.XP.BattlegroundKillSOTA = -1
+Rate.XP.BattlegroundKillIC   = -1
 
 #
 #    Rate.RepairCost

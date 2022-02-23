@@ -93,7 +93,37 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
             xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 
-        xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL);
+        if (isBattleGround)
+        {
+            switch (player->GetMapId())
+            {
+                case 30:  // AV
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AV) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_AV) : sWorld->getRate(RATE_XP_BG_KILL);
+                    break;
+                case 489: // WSG
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_WSG) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_WSG) : sWorld->getRate(RATE_XP_BG_KILL);
+                    break;
+                case 529: // AB
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AB) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_AB) : sWorld->getRate(RATE_XP_BG_KILL);
+                    break;
+                case 566: // EOTS
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_EOTS) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_EOTS) : sWorld->getRate(RATE_XP_BG_KILL);
+                    break;
+                case 607: // SOTA
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_SOTA) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_SOTA) : sWorld->getRate(RATE_XP_BG_KILL);
+                    break;
+                case 628: // IC
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_IC) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_IC) : sWorld->getRate(RATE_XP_BG_KILL);
+                    break;
+                default: // should never happen but well...
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL);
+                    break;
+            }
+        }
+        else
+        {
+            xpMod *= sWorld->getRate(RATE_XP_KILL);
+        }
 
         // if players dealt less than 50% of the damage and were credited anyway (due to CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ), scale XP gained appropriately (linear scaling)
         if (creature && creature->m_PlayerDamageReq)
