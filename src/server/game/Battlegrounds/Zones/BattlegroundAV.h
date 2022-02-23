@@ -111,11 +111,14 @@ enum BG_AV_Sounds
 
 enum BG_AV_OTHER_VALUES
 {
-    AV_STATICCPLACE_MAX        = 123,
-    AV_NORTH_MINE              = 0,
-    AV_SOUTH_MINE              = 1,
-    AV_MINE_TICK_TIMER         = 45000,
-    AV_MINE_RECLAIM_TIMER      = 1200000 //TODO: get the right value.. this is currently 20 minutes
+    AV_STATICCPLACE_MAX         = 123,
+    AV_NORTH_MINE               = 0,
+    AV_SOUTH_MINE               = 1,
+    AV_MINE_TICK_TIMER          = 45000,
+    AV_MINE_RECLAIM_TIMER       = 1200000, //TODO: get the right value.. this is currently 20 minutes
+    BG_AV_QUEST_CREDIT_MINE     = 13796,
+    BG_AV_QUEST_CREDIT_TOWER    = 13778,
+    BG_AV_QUEST_CREDIT_GRAVEYARD = 13756
 };
 
 enum BG_AV_ObjectIds
