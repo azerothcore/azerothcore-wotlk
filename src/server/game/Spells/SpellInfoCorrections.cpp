@@ -4154,11 +4154,23 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].SpellClassMask[1] = 0x00020000;
     });
 
+    // Manastorm
+    ApplySpellFix({ 21097 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     // Arcane Vacuum
     ApplySpellFix({ 21147 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(4); // 30 yards
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
+    });
+
+    // Reflection
+    ApplySpellFix({ 22067 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Dispel = DISPEL_NONE;
     });
 
     // Focused Assault
