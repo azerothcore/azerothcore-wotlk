@@ -8522,6 +8522,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
                     }
                 }
+                else if (auraSpellInfo->Id == 71761) // Deep Freeze Immunity State (only permanent)
+                {
+                    Creature* creature = victim->ToCreature();
+                    if (!creature || !creature->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
+                        return false;
+                }
                 break;
             case SPELLFAMILY_WARLOCK:
                 {
