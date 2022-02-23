@@ -1960,9 +1960,9 @@ public:
 
     void SendTeleportAckPacket();
 
-    void ExpireSummonTimer(uint32 mapid);
+    void ExpireSummonTimer(int32 mapid);
 
-    void SetSummonToInstanceDoor(uint32 mapid);
+    bool SetSummonToInstanceDoor(uint32 mapid);
 
     MapEntry const* GetActiveSummonMap();
 

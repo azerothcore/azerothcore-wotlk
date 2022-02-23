@@ -1322,14 +1322,14 @@ void Player::SendTeleportAckPacket()
 }
 
 // Used to notify client, their summon has been invalidated
-void Player::ExpireSummonTimer(uint32 mapid = 0)
+void Player::ExpireSummonTimer(int32 mapid = -1)
 {
     // Set server summon timer to expired
     this->m_summon_expire = 0;
 
     // If no mapid passed, find it
     // Mapid is possibly used to differentiate between concurrent summons
-    if (!mapid)
+    if (mapid == -1)
         mapid = this->m_summon_mapid;
 
     // Notify client summon is canceled
@@ -1339,46 +1339,31 @@ void Player::ExpireSummonTimer(uint32 mapid = 0)
 }
 
 // Attempts to set summon position to instance door
-void Player::SetSummonToInstanceDoor(uint32 mapid)
+bool Player::SetSummonToInstanceDoor(uint32 mapid)
 {
-    int32 heightOffset = sConfigMgr->GetOption<int32>("CheatPortalMaxHeightOutsideDungeon", 4);
-
-    if (heightOffset < 0) // 0 or negative setting to disable
-        heightOffset = 0;
-
-    // Init all variables to keep gcc happy
-    int32 mapEntrance = 0;
+    uint32 outsideMapId = 0;
     float x = 0.0f, y = 0.0f, z = 0.0f;
 
-    // Save the last notify position
-    Position notifyPos = this->m_last_notify_position.GetPosition();
-    z = notifyPos.GetPositionZ();
+    const AreaTriggerTeleport* goBackTriggerTeleport = sObjectMgr->GetGoBackTrigger(mapid);
 
-    // Look up the instance door position 
-    MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
-    mEntry->GetEntrancePos(mapEntrance, x, y);
-
-    // Try to find a spot near entrance on land
-    Map* map = sMapMgr->FindBaseMap(mapEntrance);
-    float height = map->GetGridHeight(x, y);
-
-    // Attempt to correct if we are still in bad spawn pos
-    if (height > z) z = height;
-
-    // Calculate final 2D offset off the door
-    if (notifyPos.GetExactDist2d(x, y) < 50.0f)
+    if (!goBackTriggerTeleport)
     {
-        // We have a probable landing spot near the instance door
-        // Set summon point to the entrance
-        this->SetSummonPoint(mapEntrance, x, y, z + heightOffset);
+        return false;
     }
 
-    else
+    outsideMapId = goBackTriggerTeleport->target_mapId;
+    x = goBackTriggerTeleport->target_X;
+    y = goBackTriggerTeleport->target_Y;
+    z = goBackTriggerTeleport->target_Z;
+
+    if (!sMapMgr->IsValidMapCoord(outsideMapId, x, y, z))
     {
-        // Unable to find good position near instnace door.
-        // Signal player to to cancel summmon
-        this->ExpireSummonTimer(mapid);
+        // Area trigger results in invalid coordinates
+        return false;
     }
+
+    this->SetSummonPoint(outsideMapId, x, y, z);
+    return true;
 }
 
 // Invalidate summon for mapid because it's been reset
@@ -1386,15 +1371,11 @@ void Player::ClearSummonsToMapId(uint32 mapid)
 {
     if (this->m_summon_mapid == mapid)
     {
-        // Config set to 0 or negative to instantly cancel the summon in to reset instance
-        if (sConfigMgr->GetOption<int32>("CheatPortalMaxDistanceOutsideDungeon", 50) <= 0)
+        if (!this->SetSummonToInstanceDoor(mapid))
         {
+            // Unable to find dungeon entrance coordinates
+            // Invalidate summon instantly instead
             this->ExpireSummonTimer(mapid);
-        }
-
-        else
-        {
-            this->SetSummonToInstanceDoor(mapid);
         }
     }
 }
