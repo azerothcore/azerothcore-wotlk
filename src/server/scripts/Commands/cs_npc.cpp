@@ -477,13 +477,13 @@ public:
     //set tempfaction for creature
     static bool HandleNpcSetFactionTempIdCommand(ChatHandler* handler, uint32 tempfaction)
     {
-        Player* me = handler->GetSession()->GetPlayer();
-        Unit* SelectedCreature = me->GetSelectedUnit();
+        Player* player = handler->GetSession()->GetPlayer();
+        Unit* unit = player->GetSelectedUnit();
 
-        if (!SelectedCreature)
+        if (!unit)
             return false;
 
-        Creature* creature = SelectedCreature->ToCreature();
+        Creature* creature = unit->ToCreature();
 
         if (!creature)
             return false;
@@ -496,12 +496,12 @@ public:
     //set orginal faction for npc
     static bool HandleNpcSetOriginalFaction(ChatHandler* handler)
     {
-        Player* me = handler->GetSession()->GetPlayer();
+        Player* player = handler->GetSession()->GetPlayer();
 
-        if (!me)
+        if (!player)
             return false;
 
-        Creature* creature = me->GetSelectedUnit()->ToCreature();
+        Creature* creature = player->GetSelectedUnit()->ToCreature();
 
         if (!creature)
             return false;

@@ -89,6 +89,13 @@ public:
             return !(target->GetTypeId() == TYPEID_UNIT && !secondPhase);
         }
 
+        void EnterCombat(Unit* /*victim*/) override
+        {
+            _EnterCombat();
+
+            instance->SetData(DATA_EGG_EVENT, IN_PROGRESS);
+        }
+
         void DoChangePhase()
         {
             secondPhase = true;

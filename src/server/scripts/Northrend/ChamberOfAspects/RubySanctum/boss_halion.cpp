@@ -257,7 +257,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return me->GetHomePosition().GetExactDist2d(who) < 52.0f;
         }

@@ -573,7 +573,7 @@ public:
             BossAI::EnterEvadeMode();
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return me->IsVisible();
         }

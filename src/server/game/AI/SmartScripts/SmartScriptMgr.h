@@ -312,14 +312,6 @@ struct SmartEvent
 
         struct
         {
-            uint32 spell;
-            uint32 count;
-            uint32 repeatMin;
-            uint32 repeatMax;
-        } targetAura;
-
-        struct
-        {
             uint32 type;
             uint32 id;
         } movementInform;
@@ -381,12 +373,6 @@ struct SmartEvent
             uint32 sender;
             uint32 action;
         } gossip;
-
-        struct
-        {
-            uint32 spell;
-            uint32 effIndex;
-        } dummy;
 
         struct
         {
@@ -674,6 +660,12 @@ struct SmartAction
 
         struct
         {
+            uint32 textGroupID;
+            uint32 duration;
+        } simpleTalk;
+
+        struct
+        {
             uint32 factionID;
         } faction;
 
@@ -793,23 +785,9 @@ struct SmartAction
 
         struct
         {
-            uint32 flag1;
-            uint32 flag2;
-            uint32 flag3;
-            uint32 flag4;
-            uint32 flag5;
-            uint32 flag6;
-        } addUnitFlag;
-
-        struct
-        {
-            uint32 flag1;
-            uint32 flag2;
-            uint32 flag3;
-            uint32 flag4;
-            uint32 flag5;
-            uint32 flag6;
-        } removeUnitFlag;
+            uint32 threatINC;
+            uint32 threatDEC;
+        } threat;
 
         struct
         {
@@ -831,6 +809,11 @@ struct SmartAction
             uint32 inc;
             uint32 dec;
         } incEventPhase;
+
+        struct
+        {
+            uint32 spell;
+        } addAura;
 
         struct
         {
@@ -1053,6 +1036,11 @@ struct SmartAction
 
         struct
         {
+            uint32 flag;
+        } flag;
+
+        struct
+        {
             uint32 byte1;
             uint32 type;
         } setunitByte;
@@ -1062,11 +1050,6 @@ struct SmartAction
             uint32 byte1;
             uint32 type;
         } delunitByte;
-
-        struct
-        {
-            uint32 seat;
-        } enterVehicle;
 
         struct
         {
@@ -1083,6 +1066,12 @@ struct SmartAction
             uint32 entry5;
             uint32 entry6;
         } randTimedActionList;
+
+        struct
+        {
+            uint32 idMin;
+            uint32 idMax;
+        } randRangeTimedActionList;
 
         struct
         {
@@ -1150,7 +1139,7 @@ struct SmartAction
 
         struct
         {
-            uint32 regenHealth;
+            SAIBool regenHealth;
         } setHealthRegen;
 
         struct
@@ -1497,8 +1486,10 @@ struct SmartTarget
 
         struct
         {
-            uint32 map;
-        } position;
+            uint32 entry;
+            uint32 dist;
+            SAIBool dead;
+        } unitClosest;
 
         struct
         {
@@ -1507,17 +1498,20 @@ struct SmartTarget
 
         struct
         {
-            uint32 entry;
-            uint32 dist;
-            SAIBool dead;
-        } closest;
+            uint32 seatMask;
+        } vehicle;
+
+        struct
+        {
+            uint32 maxDist;
+        } threatList;
 
         struct
         {
             uint32 entry;
             uint32 dist;
             uint32 onlySpawned;
-        } closestGameobject;
+        } goClosest;
 
         struct
         {
@@ -1553,11 +1547,6 @@ struct SmartTarget
             uint32 param3;
             uint32 param4;
         } raw;
-
-        struct
-        {
-            uint32 seat;
-        } vehicle;
     };
 };
 
@@ -2030,7 +2019,10 @@ private:
         return true;
     }
 
-    //bool IsTextValid(SmartScriptHolder const& e, uint32 id);
+    static bool IsTextValid(SmartScriptHolder const& e, uint32 id);
+    static bool CheckUnusedEventParams(SmartScriptHolder const& e);
+    static bool CheckUnusedActionParams(SmartScriptHolder const& e);
+    static bool CheckUnusedTargetParams(SmartScriptHolder const& e);
 };
 
 #define sSmartScriptMgr SmartAIMgr::instance()

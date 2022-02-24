@@ -16,7 +16,8 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chat-tran
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-desertion-warnings.git modules/mod-desertion-warnings
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset.git modules/mod-duel-reset
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ip-tracker.git modules/mod-ip-tracker
-git clone --depth=1 --branch=main    https://github.com/azerothcore/mod-low-level-arena.git modules/mod-low-level-arena
+git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-low-level-arena.git modules/mod-low-level-arena
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-low-level-rbg modules/mod-low-level-rbg
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-multi-client-check.git modules/mod-multi-client-check
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvp-titles.git modules/mod-pvp-titles
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvpstats-announcer.git modules/mod-pvpstats-announcer
