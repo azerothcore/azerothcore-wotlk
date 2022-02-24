@@ -1001,7 +1001,14 @@ ConditionList ConditionMgr::GetConditionsForNpcVendorEvent(uint32 creatureId, ui
         if (i != (*itr).second.end())
         {
             cond = (*i).second;
-            LOG_DEBUG("condition", "GetConditionsForNpcVendorEvent: found conditions for creature entry {} item {}", creatureId, itemId);
+            if (itemId)
+            {
+                LOG_DEBUG("condition", "GetConditionsForNpcVendorEvent: found conditions for creature entry {} item {}", creatureId, itemId);
+            }
+            else
+            {
+                LOG_DEBUG("condition", "GetConditionsForNpcVendorEvent: found conditions for creature entry {}", creatureId);
+            }
         }
     }
     return cond;
@@ -1764,11 +1771,14 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "{} SourceEntry in `condition` table, does not exist in `creature_template`, ignoring.", cond->ToString());
             return false;
         }
-        ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(cond->SourceEntry);
-        if (!itemTemplate)
+        if (cond->SourceEntry)
         {
-            LOG_ERROR("sql.sql", "{} SourceEntry in `condition` table, does not exist in `item_template`, ignoring.", cond->ToString());
-            return false;
+            ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(cond->SourceEntry);
+            if (!itemTemplate)
+            {
+                LOG_ERROR("sql.sql", "{} SourceEntry in `condition` table, does not exist in `item_template`, ignoring.", cond->ToString());
+                return false;
+            }
         }
         break;
     }
@@ -1991,8 +2001,8 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     }
     case CONDITION_MAPID:
     {
-        MapEntry const* me = sMapStore.LookupEntry(cond->ConditionValue1);
-        if (!me)
+        MapEntry const* mapId = sMapStore.LookupEntry(cond->ConditionValue1);
+        if (!mapId)
         {
             LOG_ERROR("sql.sql", "{} has non existing map ({}), skipped", cond->ToString(true), cond->ConditionValue1);
             return false;

@@ -28,7 +28,7 @@
 #include "SpellMgr.h"
 #include "Util.h"
 
-int PetAI::Permissible(const Creature* creature)
+int PetAI::Permissible(Creature const* creature)
 {
     if (creature->IsPet())
         return PERMIT_BASE_SPECIAL;
@@ -567,7 +567,7 @@ void PetAI::HandleReturnMovement()
     me->ClearInPetCombat();
 }
 
-void PetAI::SpellHit(Unit* caster, const SpellInfo* spellInfo)
+void PetAI::SpellHit(Unit* caster, SpellInfo const* spellInfo)
 {
     // Xinef: taunt behavior code
     if (spellInfo->HasAura(SPELL_AURA_MOD_TAUNT) && !me->HasReactState(REACT_PASSIVE))
@@ -653,7 +653,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
     }
 }
 
-bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
+bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
 {
     // Evaluates wether a pet can attack a specific target based on CommandState, ReactState and other flags
     // IMPORTANT: The order in which things are checked is important, be careful if you add or remove checks
