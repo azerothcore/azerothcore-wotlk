@@ -43,6 +43,7 @@ struct GroupQueueInfo                                       // stores informatio
     uint32  ArenaMatchmakerRating;                          // if rated match, inited to the rating of the team
     uint32  OpponentsTeamRating;                            // for rated arena matches
     uint32  OpponentsMatchmakerRating;                      // for rated arena matches
+    uint32  PreviousOpponentsTeamId;                        // excluded from the current queue until the timer is met
 
     // pussywizard: for internal use
     uint8 _bracketId;
@@ -67,15 +68,15 @@ public:
     BattlegroundQueue();
     ~BattlegroundQueue();
 
-    void BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId);
+    void BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating);
     void UpdateEvents(uint32 diff);
 
     void FillPlayersToBG(Battleground* bg, BattlegroundBracketId bracket_id);
     bool CheckPremadeMatch(BattlegroundBracketId bracket_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
     bool CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
     bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
-    GroupQueueInfo* AddGroup(Player* leader, Group* group, PvPDifficultyEntry const* bracketEntry, bool isRated, bool isPremade, uint32 ArenaRating, uint32 MatchmakerRating, uint32 ArenaTeamId);
-    void RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 playerQueueSlot);
+    GroupQueueInfo* AddGroup(Player* leader, Group* group, BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated, bool isPremade, uint32 arenaRating, uint32 matchmakerRating, uint32 arenaTeamId = 0, uint32 opponentsArenaTeamId = 0);
+    void RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount);
     bool IsPlayerInvitedToRatedArena(ObjectGuid pl_guid);
     bool IsPlayerInvited(ObjectGuid pl_guid, uint32 bgInstanceGuid, uint32 removeTime);
     bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
@@ -88,7 +89,6 @@ public:
     void SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
     void SendExitMessageArenaQueue(GroupQueueInfo* ginfo);
 
-    void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
     void AddEvent(BasicEvent* Event, uint64 e_time);
 
     typedef std::map<ObjectGuid, GroupQueueInfo*> QueuedPlayersMap;
@@ -126,15 +126,10 @@ public:
     //one selection pool for horde, other one for alliance
     SelectionPool m_SelectionPools[PVP_TEAMS_COUNT];
 
-    ArenaType GetArenaType() { return m_arenaType; }
-    BattlegroundTypeId GetBGTypeID() { return m_bgTypeId; }
-
     void SetQueueAnnouncementTimer(uint32 bracketId, int32 timer, bool isCrossFactionBG = true);
     [[nodiscard]] int32 GetQueueAnnouncementTimer(uint32 bracketId) const;
 
 private:
-    BattlegroundTypeId m_bgTypeId;
-    ArenaType m_arenaType;
     uint32 m_WaitTimes[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];
     uint32 m_WaitTimeLastIndex[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];
 

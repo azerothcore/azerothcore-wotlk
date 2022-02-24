@@ -253,8 +253,21 @@ void Battleground::Update(uint32 diff)
 
     if (!GetPlayersSize())
     {
+        //BG is empty
+        // if there are no players invited, delete BG
+        // this will delete arena or bg object, where any player entered
+        // [[   but if you use battleground object again (more battles possible to be played on 1 instance)
+        //      then this condition should be removed and code:
+        //      if (!GetInvitedCount(TEAM_HORDE) && !GetInvitedCount(TEAM_ALLIANCE))
+        //          AddToFreeBGObjectsQueue(); // not yet implemented
+        //      should be used instead of current
+        // ]]
+        // Battleground Template instance cannot be updated, because it would be deleted
         if (!GetInvitedCount(TEAM_HORDE) && !GetInvitedCount(TEAM_ALLIANCE))
+        {
             m_SetDeleteThis = true;
+        }
+
         return;
     }
 
@@ -961,12 +974,16 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     // if the player was a match participant
     if (participant)
     {
-        WorldPacket data;
-
         player->ClearAfkReports();
 
+        WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
         player->GetSession()->SendPacket(&data);
+
+        BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetBgTypeID(), GetArenaType());
+
+        // this call is important, because player, when joins to battleground, this method is not called, so it must be called when leaving bg
+        player->RemoveBattlegroundQueueId(bgQueueTypeId);
 
         // remove from raid group if player is member
         if (Group* group = GetBgRaid(teamId))
@@ -983,9 +1000,14 @@ void Battleground::RemovePlayerAtLeave(Player* player)
             if (status == STATUS_IN_PROGRESS || status == STATUS_WAIT_JOIN)
                 player->ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
 
+        DecreaseInvitedCount(teamId);
+
         //we should update battleground queue, but only if bg isn't ending
         if (isBattleground() && GetStatus() < STATUS_WAIT_LEAVE)
         {
+            BattlegroundTypeId bgTypeId = GetBgTypeID();
+            BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetBgTypeID(), GetArenaType());
+
             // a player has left the battleground, so there are free slots -> add to queue
             AddToBGFreeSlotQueue();
             sBattlegroundMgr->ScheduleQueueUpdate(0, 0, bgQueueTypeId, bgTypeId, GetBracketId());

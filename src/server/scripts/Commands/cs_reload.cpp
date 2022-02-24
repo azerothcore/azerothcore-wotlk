@@ -213,7 +213,7 @@ public:
     static bool HandleReloadBattlegroundTemplate(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Battleground Templates...");
-        sBattlegroundMgr->CreateInitialBattlegrounds();
+        sBattlegroundMgr->LoadBattlegroundTemplates();
         handler->SendGlobalGMSysMessage("DB table `battleground_template` reloaded.");
         return true;
     }
