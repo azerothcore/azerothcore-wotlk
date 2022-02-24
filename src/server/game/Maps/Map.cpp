@@ -3657,7 +3657,6 @@ void Map::SendZoneDynamicInfo(Player* player)
     if (uint32 music = itr->second.MusicId)
         player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music).Write());
 
-
     if (WeatherState weatherId = itr->second.WeatherId)
     {
         WorldPackets::Misc::Weather weather(weatherId, itr->second.WeatherGrade);
