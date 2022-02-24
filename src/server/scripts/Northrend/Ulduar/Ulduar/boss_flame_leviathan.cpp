@@ -260,7 +260,6 @@ public:
 
             me->setActive(true);
             me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
-            TurnGates(true, false);
             TurnHealStations(false);
             ActivateTowers();
             if (m_pInstance)
@@ -368,11 +367,13 @@ public:
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SendMonsterMove(380.4f, -14.3f, 409.8f, 2000);
-                    me->UpdatePosition(380.4f, -14.3f, 409.8f, me->GetOrientation());
+                    //me->MonsterMoveWithSpeed(380.4f, -14.5f, 409.8f, 1000);
+					TurnGates(true, false);
+					me->MonsterMoveWithSpeed(322.39f, -14.5f, 409.8f, 100.0f);
+					me->UpdatePosition(322.39f, -14.5f, 409.8f, me->GetOrientation());
                     _speakTimer = 60000;
                 }
-                else if (_speakTimer > 61500)
+                else if (_speakTimer > 63500)
                 {
                     me->SetInCombatWithZone();
                     if (!me->GetVictim())
