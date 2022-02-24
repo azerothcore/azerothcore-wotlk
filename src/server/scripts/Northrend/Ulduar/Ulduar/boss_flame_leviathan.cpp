@@ -367,7 +367,6 @@ public:
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    //me->MonsterMoveWithSpeed(380.4f, -14.5f, 409.8f, 1000);
 					TurnGates(true, false);
 					me->MonsterMoveWithSpeed(322.39f, -14.5f, 409.8f, 100.0f);
 					me->UpdatePosition(322.39f, -14.5f, 409.8f, me->GetOrientation());
