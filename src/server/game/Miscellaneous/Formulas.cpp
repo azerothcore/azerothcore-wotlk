@@ -98,25 +98,22 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
             switch (player->GetMapId())
             {
                 case 30:  // AV
-                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AV) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_AV) : sWorld->getRate(RATE_XP_BG_KILL);
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AV);
                     break;
                 case 489: // WSG
-                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_WSG) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_WSG) : sWorld->getRate(RATE_XP_BG_KILL);
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_WSG);
                     break;
                 case 529: // AB
-                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AB) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_AB) : sWorld->getRate(RATE_XP_BG_KILL);
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AB);
                     break;
                 case 566: // EOTS
-                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_EOTS) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_EOTS) : sWorld->getRate(RATE_XP_BG_KILL);
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_EOTS);
                     break;
                 case 607: // SOTA
-                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_SOTA) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_SOTA) : sWorld->getRate(RATE_XP_BG_KILL);
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_SOTA);
                     break;
                 case 628: // IC
-                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_IC) >= 0.0f ? sWorld->getRate(RATE_XP_BG_KILL_IC) : sWorld->getRate(RATE_XP_BG_KILL);
-                    break;
-                default: // should never happen but well...
-                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL);
+                    xpMod *= sWorld->getRate(RATE_XP_BG_KILL_IC);
                     break;
             }
         }
