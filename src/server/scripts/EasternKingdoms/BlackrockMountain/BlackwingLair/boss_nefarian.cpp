@@ -34,20 +34,21 @@ enum Events
     EVENT_SHADOW_BOLT          = 2,
     EVENT_FEAR                 = 3,
     EVENT_MIND_CONTROL         = 4,
+    EVENT_SHADOWBLINK          = 5,
     // Nefarian
-    EVENT_SHADOWFLAME          = 5,
-    EVENT_VEILOFSHADOW         = 6,
-    EVENT_CLEAVE               = 7,
-    EVENT_TAILLASH             = 8,
-    EVENT_CLASSCALL            = 9,
+    EVENT_SHADOWFLAME          = 6,
+    EVENT_VEILOFSHADOW         = 7,
+    EVENT_CLEAVE               = 8,
+    EVENT_TAILLASH             = 9,
+    EVENT_CLASSCALL            = 10,
     // UBRS
-    EVENT_CHAOS_1              = 10,
-    EVENT_CHAOS_2              = 11,
-    EVENT_PATH_2               = 12,
-    EVENT_PATH_3               = 13,
-    EVENT_SUCCESS_1            = 14,
-    EVENT_SUCCESS_2            = 15,
-    EVENT_SUCCESS_3            = 16,
+    EVENT_CHAOS_1              = 11,
+    EVENT_CHAOS_2              = 12,
+    EVENT_PATH_2               = 13,
+    EVENT_PATH_3               = 14,
+    EVENT_SUCCESS_1            = 15,
+    EVENT_SUCCESS_2            = 16,
+    EVENT_SUCCESS_3            = 17,
 
     ACTION_RESET               = 0
 };
@@ -127,6 +128,7 @@ enum Spells
     SPELL_SHADOWBOLT_VOLLEY         = 22665,
     SPELL_SHADOW_COMMAND            = 22667,
     SPELL_FEAR                      = 22678,
+    SPELL_SHADOWBLINK               = 22664,
 
     SPELL_NEFARIANS_BARRIER         = 22663,
 
@@ -189,7 +191,7 @@ public:
 
         void Initialize()
         {
-            SpawnedAdds = 0;
+            KilledAdds = 0;
         }
 
         void Reset() override
@@ -207,6 +209,7 @@ public:
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetStandState(UNIT_STAND_STATE_SIT_HIGH_CHAIR);
                 me->RemoveAura(SPELL_NEFARIANS_BARRIER);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
         }
 
@@ -233,12 +236,15 @@ public:
             me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
             DoCast(me, SPELL_NEFARIANS_BARRIER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
+            SetCombatMovement(false);
+            DoCastSelf(SPELL_SHADOWBLINK);
             AttackStart(target);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
+            events.ScheduleEvent(EVENT_SHADOWBLINK, 40000);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -249,6 +255,7 @@ public:
                 summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->SetStandState(UNIT_STAND_STATE_DEAD);
+                ++KilledAdds;
             }
         }
 
@@ -319,7 +326,7 @@ public:
             }
 
             // Only do this if we haven't spawned nefarian yet
-            if (UpdateVictim() && SpawnedAdds <= 42)
+            if (UpdateVictim() && KilledAdds <= 42)
             {
                 events.Update(diff);
 
@@ -354,6 +361,10 @@ public:
                                 DoCast(target, SPELL_SHADOW_COMMAND);
                             events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
                             break;
+                        case EVENT_SHADOWBLINK:
+                            DoCastSelf(SPELL_SHADOWBLINK);
+                            events.ScheduleEvent(EVENT_SHADOWBLINK, urand(30000, 40000));
+                            break;
                         case EVENT_SPAWN_ADD:
                             for (uint8 i=0; i<2; ++i)
                             {
@@ -368,7 +379,7 @@ public:
                                     dragon->AI()->AttackStart(me->GetVictim());
                                 }
 
-                                if (++SpawnedAdds >= 42)
+                                if (KilledAdds >= 42)
                                 {
                                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianLoc[0]))
                                     {
@@ -412,7 +423,7 @@ public:
         }
 
         private:
-            uint32 SpawnedAdds;
+            uint32 KilledAdds;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -831,6 +842,11 @@ class spell_class_call_handler : public SpellScript
 {
     PrepareSpellScript(spell_class_call_handler);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_INFERNALS });
+    }
+
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         if (SpellInfo const* spellInfo = GetSpellInfo())
@@ -900,6 +916,11 @@ class aura_class_call_wild_magic : public AuraScript
 {
     PrepareAuraScript(aura_class_call_wild_magic);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_POLYMORPH });
+    }
+
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         if (!GetTarget())
@@ -919,6 +940,11 @@ class aura_class_call_wild_magic : public AuraScript
 class aura_class_call_siphon_blessing : public AuraScript
 {
     PrepareAuraScript(aura_class_call_siphon_blessing);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLESSING_PROTECTION });
+    }
 
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
@@ -978,6 +1004,11 @@ class aura_class_call_berserk : public AuraScript
 {
     PrepareAuraScript(aura_class_call_berserk);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_BERSERK });
+    }
+
     void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
@@ -995,6 +1026,11 @@ class aura_class_call_berserk : public AuraScript
 class spell_corrupted_totems : public SpellScript
 {
     PrepareSpellScript(spell_corrupted_totems);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CORRUPTED_FIRE_NOVA_TOTEM, SPELL_CORRUPTED_HEALING_TOTEM, SPELL_CORRUPTED_STONESKIN_TOTEM, SPELL_CORRUPTED_WINDFURY_TOTEM });
+    }
 
     void HandleDummy(SpellEffIndex effIndex)
     {
@@ -1015,6 +1051,47 @@ class spell_corrupted_totems : public SpellScript
     }
 };
 
+enum ShadowblinkRandomSpells
+{
+    SPELL_SHADOWBLINK_TRIGGERED_1 = 22668,
+    SPELL_SHADOWBLINK_TRIGGERED_2 = 22669,
+    SPELL_SHADOWBLINK_TRIGGERED_3 = 22670,
+    SPELL_SHADOWBLINK_TRIGGERED_4 = 22671,
+    SPELL_SHADOWBLINK_TRIGGERED_5 = 22672,
+    SPELL_SHADOWBLINK_TRIGGERED_6 = 22673,
+    SPELL_SHADOWBLINK_TRIGGERED_7 = 22674,
+    SPELL_SHADOWBLINK_TRIGGERED_8 = 22675,
+    SPELL_SHADOWBLINK_TRIGGERED_9 = 22676,
+};
+
+class spell_shadowblink : public SpellScript
+{
+    PrepareSpellScript(spell_shadowblink);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOWBLINK_TRIGGERED_1, SPELL_SHADOWBLINK_TRIGGERED_2, SPELL_SHADOWBLINK_TRIGGERED_3, SPELL_SHADOWBLINK_TRIGGERED_4, SPELL_SHADOWBLINK_TRIGGERED_5, SPELL_SHADOWBLINK_TRIGGERED_6, SPELL_SHADOWBLINK_TRIGGERED_7, SPELL_SHADOWBLINK_TRIGGERED_8, SPELL_SHADOWBLINK_TRIGGERED_9 });
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+        {
+            return;
+        }
+
+        std::list<uint32> spellList = { SPELL_SHADOWBLINK_TRIGGERED_1, SPELL_SHADOWBLINK_TRIGGERED_2, SPELL_SHADOWBLINK_TRIGGERED_3, SPELL_SHADOWBLINK_TRIGGERED_4, SPELL_SHADOWBLINK_TRIGGERED_5, SPELL_SHADOWBLINK_TRIGGERED_6, SPELL_SHADOWBLINK_TRIGGERED_7, SPELL_SHADOWBLINK_TRIGGERED_8, SPELL_SHADOWBLINK_TRIGGERED_9 };
+        uint32 spellId = Acore::Containers::SelectRandomContainerElement(spellList);
+        caster->CastSpell(caster, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_shadowblink::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_nefarian()
 {
     new boss_victor_nefarius();
@@ -1026,4 +1103,5 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(spell_class_call_polymorph);
     RegisterSpellScript(aura_class_call_berserk);
     RegisterSpellScript(spell_corrupted_totems);
+    RegisterSpellScript(spell_shadowblink);
 }
