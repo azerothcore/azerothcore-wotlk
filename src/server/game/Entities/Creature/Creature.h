@@ -275,6 +275,7 @@ public:
     [[nodiscard]] time_t const& GetRespawnTime() const { return m_respawnTime; }
     [[nodiscard]] time_t GetRespawnTimeEx() const;
     void SetRespawnTime(uint32 respawn);
+    void SaveRespawnTimeToDB();
     void Respawn(bool force = false);
     void SaveRespawnTime() override;
 
