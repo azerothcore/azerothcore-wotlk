@@ -368,9 +368,9 @@ public:
                 else if (_speakTimer > 41000 && _speakTimer < 60000)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-					TurnGates(true, false);
-					me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
-					me->UpdatePosition(homePos);
+                    TurnGates(true, false);
+                    me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
+                    me->UpdatePosition(homePos);
                     _speakTimer = 60000;
                 }
                 else if (_speakTimer > 63500)
