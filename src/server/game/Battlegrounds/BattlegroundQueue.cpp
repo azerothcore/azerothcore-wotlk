@@ -172,22 +172,18 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* group, Battle
     //add players from group to ginfo
     if (group)
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        group->DoForAllMembers([this, ginfo](Player* member)
         {
-            Player* member = itr->GetSource();
-            if (!member)
-                continue;
-
             ASSERT(m_QueuedPlayers.count(member->GetGUID()) == 0);
             m_QueuedPlayers[member->GetGUID()] = ginfo;
-            ginfo->Players.insert(member->GetGUID());
-        }
+            ginfo->Players.emplace(member->GetGUID());
+        });
     }
     else
     {
         ASSERT(m_QueuedPlayers.count(leader->GetGUID()) == 0);
         m_QueuedPlayers[leader->GetGUID()] = ginfo;
-        ginfo->Players.insert(leader->GetGUID());
+        ginfo->Players.emplace(leader->GetGUID());
     }
 
     //add GroupInfo to m_QueuedGroups
@@ -272,8 +268,8 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
             playerName = player->GetName();
         }
 
-        LOG_DEBUG("bg.battleground", "BattlegroundQueue: couldn't find player {} ({})", playerName, guid.ToString());
-        ABORT();
+        //LOG_DEBUG("bg.battleground", "BattlegroundQueue: couldn't find player {} ({})", playerName, guid.ToString());
+        ABORT("BattlegroundQueue: couldn't find player {} ({})", playerName, guid.ToString());
         return;
     }
 
@@ -284,19 +280,23 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 
     // find iterator
     auto group_itr = m_QueuedGroups[_bracketId][_groupType].end();
-    for (auto k = m_QueuedGroups[_bracketId][_groupType].begin(); k != m_QueuedGroups[_bracketId][_groupType].end(); ++k)
+
+    for (auto k = m_QueuedGroups[_bracketId][_groupType].begin(); k != m_QueuedGroups[_bracketId][_groupType].end(); k++)
         if ((*k) == groupInfo)
         {
             group_itr = k;
             break;
         }
 
-    //player can't be in queue without group, but just in case
+    // player can't be in queue without group, but just in case
     if (group_itr == m_QueuedGroups[_bracketId][_groupType].end())
     {
-        ABORT();
+        //LOG_ERROR("bg.battleground", "BattlegroundQueue: ERROR Cannot find groupinfo for {}", guid.ToString());
+        ABORT("BattlegroundQueue: ERROR Cannot find groupinfo for {}", guid.ToString());
         return;
     }
+
+    LOG_DEBUG("bg.battleground", "BattlegroundQueue: Removing {}, from bracket_id {}", guid.ToString(), _bracketId);
 
     // remove player from group queue info
     auto const& pitr = groupInfo->Players.find(guid);
@@ -842,7 +842,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
             }
             else if (!front1 && !front2)
                 return; // queues are empty
-
         }
 
         //set rating range
@@ -924,12 +923,14 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
             // now we must move team if we changed its faction to another faction queue, because then we will spam log by errors in Queue::RemovePlayer
             if (aTeam->teamId != TEAM_ALLIANCE)
             {
+                aTeam->_groupType = BG_QUEUE_PREMADE_ALLIANCE;
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].push_front(aTeam);
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].erase(itr_teams[TEAM_ALLIANCE]);
             }
 
             if (hTeam->teamId != TEAM_HORDE)
             {
+                hTeam->_groupType = BG_QUEUE_PREMADE_HORDE;
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].push_front(hTeam);
                 m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].erase(itr_teams[TEAM_HORDE]);
             }
@@ -1216,7 +1217,7 @@ void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg,
 
         // send status packet
         WorldPacket data;
-        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME, 0, ginfo->ArenaType, TEAM_NEUTRAL, bg->isRated(), ginfo->BgTypeId);
+        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME, 0, ginfo->ArenaType, TEAM_NEUTRAL, bg->isRated());
         player->GetSession()->SendPacket(&data);
 
         // pussywizard:

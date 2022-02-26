@@ -23,6 +23,7 @@
 #include "LootMgr.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
+#include <functional>
 
 class Battlefield;
 class Battleground;
@@ -312,6 +313,8 @@ public:
     uint32 GetDifficultyChangePreventionTime() const;
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
     void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
+
+    void DoForAllMembers(std::function<void(Player*)> const& worker);
 
 protected:
     void _homebindIfInstance(Player* player);

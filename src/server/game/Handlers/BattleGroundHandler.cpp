@@ -233,7 +233,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         }
 
         WorldPacket data;
-        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr++)
         {
             Player* member = itr->GetSource();
             if (!member)
@@ -634,6 +634,11 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
     // get arena type
     uint8 arenatype = 0;
+    uint32 ateamId = 0;
+    uint32 arenaRating = 0;
+    uint32 matchmakerRating = 0;
+    uint32 previousOpponents = 0;
+
     switch (arenaslot)
     {
         case 0:
@@ -666,7 +671,6 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     }
 
     BattlegroundTypeId bgTypeId = bgt->GetBgTypeID();
-    BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenatype);
 
     // expected bracket entry
     PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgt->GetMapId(), _player->getLevel());
@@ -694,11 +698,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
         return;
     }
 
-    uint32 ateamId = 0;
-    uint32 arenaRating = 0;
-    uint32 matchmakerRating = 0;
-    uint32 previousOpponents = 0;
-
+    BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenatype);
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
 
     // check if player can queue:
@@ -730,7 +730,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
         // check if has free queue slots
         if (!_player->HasFreeBattlegroundQueueId())
             return;
-        
+
         GroupQueueInfo* ginfo = bgQueue.AddGroup(_player, nullptr, bgTypeId, bracketEntry, arenatype, isRated != 0, false, arenaRating, matchmakerRating, ateamId, previousOpponents);
         uint32 avgWaitTime = bgQueue.GetAverageQueueWaitTime(ginfo);
         uint32 queueSlot = _player->AddBattlegroundQueueId(bgQueueTypeId);
@@ -779,6 +779,18 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
         err = grp->CanJoinBattlegroundQueue(bgt, bgQueueTypeId, arenatype, arenatype, (bool)isRated, arenaslot);
 
+        // Check queue group members
+        if (err)
+        {
+            grp->DoForAllMembers([&bgQueue, &err](Player* member)
+            {
+                if (bgQueue.IsPlayerInvitedToRatedArena(member->GetGUID()))
+                {
+                    err = ERR_BATTLEGROUND_JOIN_FAILED;
+                }
+            });
+        }
+
         uint32 avgWaitTime = 0;
         if (err > 0)
         {
@@ -786,7 +798,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
             if (isRated)
             {
-                LOG_DEBUG("bg.battleground", "Battleground: arena team id {}, leader %s queued with matchmaker rating {} for type %u", _player->GetArenaTeamId(arenaslot), _player->GetName(), matchmakerRating, arenatype);
+                LOG_DEBUG("bg.battleground", "Battleground: arena team id {}, leader {} queued with matchmaker rating {} for type {}", _player->GetArenaTeamId(arenaslot), _player->GetName(), matchmakerRating, arenatype);
                 bgt->SetRated(true);
             }
             else
