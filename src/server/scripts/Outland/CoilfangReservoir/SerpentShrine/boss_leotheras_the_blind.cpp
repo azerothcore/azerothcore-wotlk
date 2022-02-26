@@ -316,7 +316,7 @@ public:
                 damage = 0;
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetGUID() == ownerGUID;
         }

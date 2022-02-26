@@ -654,15 +654,6 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 
     // To prevent hook failure, place hook before removing reference from DB
     sScriptMgr->OnPlayerDelete(guid, initAccountId); // To prevent race conditioning, but as it also makes sense, we hand the accountId over for successful delete.
-    // Shouldn't interfere with character deletion though
-
-    if (sLog->ShouldLog("entities.player.dump", LogLevel::LOG_LEVEL_INFO)) // optimize GetPlayerDump call
-    {
-        std::string dump;
-        if (PlayerDumpWriter().GetDump(guid.GetCounter(), dump))
-            LOG_CHAR_DUMP(dump, accountId, guid.GetRawValue(), name);
-    }
-
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
     Player::DeleteFromDB(guid.GetCounter(), GetAccountId(), true, false);
 
@@ -1016,7 +1007,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             {
                 for (auto const& itr : factionsList)
                 {
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999, false);
+                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999.f, false);
                 }
             };
 

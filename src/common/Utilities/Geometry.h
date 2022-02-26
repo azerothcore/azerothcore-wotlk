@@ -41,7 +41,7 @@
 
 [[nodiscard]] inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX, 2.0f));
+    float floorDist = std::sqrt(pow(startY - destY, 2.0f) + pow(startX - destX, 2.0f));
     return atan(std::abs(destZ - startZ) / std::abs(floorDist));
 }
 

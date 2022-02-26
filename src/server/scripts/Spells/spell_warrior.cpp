@@ -795,6 +795,38 @@ class spell_warr_glyph_of_sunder_armor : public AuraScript
     }
 };
 
+// Spell 28845 - Cheat Death
+
+enum CheatDeath
+{
+    SPELL_CHEAT_DEATH_TRIGGER  = 28846
+};
+
+class spell_warr_t3_prot_8p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_warr_t3_prot_8p_bonus);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->GetHealthPct() <= 20.0f;
+    }
+
+    void HandleEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (Unit* target = eventInfo.GetActionTarget())
+        {
+            target->CastSpell(target, SPELL_CHEAT_DEATH_TRIGGER, true);
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warr_t3_prot_8p_bonus::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warr_t3_prot_8p_bonus::HandleEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 20230 - Retaliation
 class spell_warr_retaliation : public AuraScript
 {
@@ -854,4 +886,5 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_sweeping_strikes);
     RegisterSpellScript(spell_warr_vigilance);
     RegisterSpellScript(spell_warr_vigilance_trigger);
+    RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
 }

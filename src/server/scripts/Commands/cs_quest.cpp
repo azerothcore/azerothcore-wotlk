@@ -317,7 +317,7 @@ public:
                 {
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
-                        player->GetReputationMgr().SetReputation(factionEntry, repValue);
+                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue));
                     }
                 }
             }
@@ -331,7 +331,7 @@ public:
                 {
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
-                        player->GetReputationMgr().SetReputation(factionEntry, repValue2);
+                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue2));
                     }
                 }
             }

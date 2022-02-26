@@ -145,7 +145,7 @@ public:
                 pInstance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             switch( spell->Id )
             {
@@ -392,7 +392,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, urand(10000, 15000));
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo*  /*spell*/) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const*  /*spell*/) override
         {
             //if (caster && spell && spell->Id == 66287 /*control vehicle*/)
             //  caster->ClearUnitState(UNIT_STATE_ONVEHICLE);

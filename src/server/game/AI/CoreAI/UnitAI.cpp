@@ -149,7 +149,7 @@ void UnitAI::DoCast(uint32 spellId)
             break;
         case AITARGET_ENEMY:
             {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                 //float range = GetSpellMaxRange(spellInfo, false);
                 target = SelectTarget(SelectTargetMethod::Random, 0, spellInfo->GetMaxRange(false), playerOnly);
@@ -163,7 +163,7 @@ void UnitAI::DoCast(uint32 spellId)
             break;
         case AITARGET_DEBUFF:
             {
-                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
                 bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                 float range = spellInfo->GetMaxRange(false);
 
@@ -225,7 +225,7 @@ void UnitAI::FillAISpellInfo()
     AISpellInfo = new AISpellInfoType[sSpellMgr->GetSpellInfoStoreSize()];
 
     AISpellInfoType* AIInfo = AISpellInfo;
-    const SpellInfo* spellInfo;
+    SpellInfo const* spellInfo;
 
     for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i, ++AIInfo)
     {
@@ -316,7 +316,7 @@ bool SpellTargetSelector::operator()(Unit const* target) const
         return false;
 
     // copypasta from Spell::CheckRange
-    uint32 range_type = _spellInfo->RangeEntry ? _spellInfo->RangeEntry->type : 0;
+    uint32 range_type = _spellInfo->RangeEntry ? _spellInfo->RangeEntry->Flags : 0;
     float max_range = _caster->GetSpellMaxRangeForTarget(target, _spellInfo);
     float min_range = _caster->GetSpellMinRangeForTarget(target, _spellInfo);
 
