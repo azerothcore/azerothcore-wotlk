@@ -115,12 +115,12 @@ public:
 
     /*bool NoWorldObjectInGrid() const
     {
-        return i_objects.GetElements().isEmpty();
+        return i_objects.GetElements().IsEmpty();
     }
 
     bool NoGridObjectInGrid() const
     {
-        return i_container.GetElements().isEmpty();
+        return i_container.GetElements().IsEmpty();
     }*/
 private:
     TypeMapContainer<GRID_OBJECT_TYPES> i_container;

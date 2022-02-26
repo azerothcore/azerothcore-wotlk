@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.areatrigger_involvedrelation
+-- Дамп структуры для таблица acore_world.areatrigger_involvedrelation
 DROP TABLE IF EXISTS `areatrigger_involvedrelation`;
 CREATE TABLE IF NOT EXISTS `areatrigger_involvedrelation` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
--- Дамп данных таблицы _acore_world.areatrigger_involvedrelation: 59 rows
+-- Дамп данных таблицы acore_world.areatrigger_involvedrelation: 59 rows
 DELETE FROM `areatrigger_involvedrelation`;
 /*!40000 ALTER TABLE `areatrigger_involvedrelation` DISABLE KEYS */;
 INSERT INTO `areatrigger_involvedrelation` (`id`, `quest`) VALUES

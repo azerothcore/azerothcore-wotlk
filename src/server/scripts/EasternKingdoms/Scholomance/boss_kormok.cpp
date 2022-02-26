@@ -16,10 +16,10 @@
  */
 
 #include "ScriptMgr.h"
-#include "scholomance.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "TaskScheduler.h"
+#include "scholomance.h"
 
 enum Spells
 {

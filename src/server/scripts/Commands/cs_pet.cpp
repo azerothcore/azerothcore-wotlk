@@ -15,17 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "SpellMgr.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -67,42 +66,24 @@ public:
         // Creatures with family 0 crashes the server
         if (!creatrueTemplate->family)
         {
-            handler->PSendSysMessage("This creature cannot be tamed. (family id: 0).");
+            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (player->GetPetGUID())
+        if (player->IsExistPet())
         {
-            handler->PSendSysMessage("You already have a pet");
+            handler->SendSysMessage(LANG_YOU_ALREADY_HAVE_PET);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        // Everything looks OK, create new pet
-        Pet* pet = player->CreateTamedPetFrom(creatureTarget);
-
-        // "kill" original creature
-        creatureTarget->DespawnOrUnsummon();
-
-        uint8 level = (creatureTarget->getLevel() < (player->getLevel() - 5)) ? (player->getLevel() - 5) : player->getLevel();
-
-        // prepare visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
-
-        // add to world
-        pet->GetMap()->AddToMap(pet->ToCreature());
-
-        // visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
-
-        // caster have pet now
-        player->SetMinion(pet, true);
-
-        pet->InitTalentForLevel();
-
-        pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-        player->PetSpellInitialize();
+        if (!player->CreatePet(creatureTarget))
+        {
+            handler->PSendSysMessage(LANG_CREATURE_NON_TAMEABLE, creatrueTemplate->Entry);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         return true;
     }

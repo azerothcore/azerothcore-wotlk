@@ -19,13 +19,11 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Timer.h"
-
 #include <list>
 #include <openssl/md5.h>
 
 namespace AddonMgr
 {
-
     // Anonymous namespace ensures file scope of all the stuff inside it, even
     // if you add something more to this namespace somewhere else.
     namespace
@@ -55,15 +53,15 @@ namespace AddonMgr
         {
             Field* fields = result->Fetch();
 
-            std::string name = fields[0].GetString();
-            uint32 crc = fields[1].GetUInt32();
+            std::string name = fields[0].Get<std::string>();
+            uint32 crc = fields[1].Get<uint32>();
 
             m_knownAddons.push_back(SavedAddon(name, crc));
 
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", ">> Loaded %u known addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded {} known addons in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
 
         oldMSTime = getMSTime();
@@ -78,11 +76,11 @@ namespace AddonMgr
                 Field* fields = result->Fetch();
 
                 BannedAddon addon{};
-                addon.Id = fields[0].GetUInt32() + offset;
-                addon.Timestamp = uint32(fields[3].GetUInt64());
+                addon.Id = fields[0].Get<uint32>() + offset;
+                addon.Timestamp = uint32(fields[3].Get<uint64>());
 
-                std::string name = fields[1].GetString();
-                std::string version = fields[2].GetString();
+                std::string name = fields[1].Get<std::string>();
+                std::string version = fields[2].Get<std::string>();
 
                 MD5(reinterpret_cast<uint8 const*>(name.c_str()), name.length(), addon.NameMD5);
                 MD5(reinterpret_cast<uint8 const*>(version.c_str()), version.length(), addon.VersionMD5);
@@ -92,7 +90,7 @@ namespace AddonMgr
                 ++count2;
             } while (result->NextRow());
 
-            LOG_INFO("server.loading", ">> Loaded %u banned addons in %u ms", count2, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Loaded {} banned addons in {} ms", count2, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
         }
     }
@@ -103,8 +101,8 @@ namespace AddonMgr
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ADDON);
 
-        stmt->setString(0, name);
-        stmt->setUInt32(1, addon.CRC);
+        stmt->SetData(0, name);
+        stmt->SetData(1, addon.CRC);
 
         CharacterDatabase.Execute(stmt);
 

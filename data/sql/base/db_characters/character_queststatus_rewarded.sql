@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_queststatus_rewarded
+-- Дамп структуры для таблица acore_characters.character_queststatus_rewarded
 DROP TABLE IF EXISTS `character_queststatus_rewarded`;
 CREATE TABLE IF NOT EXISTS `character_queststatus_rewarded` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `character_queststatus_rewarded` (
   PRIMARY KEY (`guid`,`quest`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Player System';
 
--- Дамп данных таблицы _acore_characters.character_queststatus_rewarded: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_queststatus_rewarded: ~0 rows (приблизительно)
 DELETE FROM `character_queststatus_rewarded`;
 /*!40000 ALTER TABLE `character_queststatus_rewarded` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_queststatus_rewarded` ENABLE KEYS */;

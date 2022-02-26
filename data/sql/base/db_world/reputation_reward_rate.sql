@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.reputation_reward_rate
+-- Дамп структуры для таблица acore_world.reputation_reward_rate
 DROP TABLE IF EXISTS `reputation_reward_rate`;
 CREATE TABLE IF NOT EXISTS `reputation_reward_rate` (
-  `faction` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `faction` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `quest_rate` float NOT NULL DEFAULT 1,
   `quest_daily_rate` float NOT NULL DEFAULT 1,
   `quest_weekly_rate` float NOT NULL DEFAULT 1,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `reputation_reward_rate` (
   PRIMARY KEY (`faction`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.reputation_reward_rate: 14 rows
+-- Дамп данных таблицы acore_world.reputation_reward_rate: 14 rows
 DELETE FROM `reputation_reward_rate`;
 /*!40000 ALTER TABLE `reputation_reward_rate` DISABLE KEYS */;
 INSERT INTO `reputation_reward_rate` (`faction`, `quest_rate`, `quest_daily_rate`, `quest_weekly_rate`, `quest_monthly_rate`, `quest_repeatable_rate`, `creature_rate`, `spell_rate`) VALUES

@@ -91,10 +91,12 @@ public:
     explicit CreatureGroup(uint32 id) : m_leader(nullptr), m_groupID(id), m_Formed(false) {}
     ~CreatureGroup() {}
 
-    Creature* getLeader() const { return m_leader; }
+    Creature* GetLeader() const { return m_leader; }
     uint32 GetId() const { return m_groupID; }
-    bool isEmpty() const { return m_members.empty(); }
-    bool isFormed() const { return m_Formed; }
+
+    bool IsEmpty() const { return m_members.empty(); }
+    bool IsFormed() const { return m_Formed; }
+
     const CreatureGroupMemberType& GetMembers() const { return m_members; }
 
     void AddMember(Creature* member);

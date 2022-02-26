@@ -18,8 +18,8 @@
 #ifndef BankPackets_h__
 #define BankPackets_h__
 
-#include "Packet.h"
 #include "ObjectGuid.h"
+#include "Packet.h"
 
 namespace WorldPackets
 {

@@ -276,7 +276,7 @@ public:
             {
                 if (pInstance->GetBossState(BOSS_HORSEMAN) == DONE)
                 {
-                    if (!me->GetMap()->GetPlayers().isEmpty())
+                    if (!me->GetMap()->GetPlayers().IsEmpty())
                     {
                         if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                         {

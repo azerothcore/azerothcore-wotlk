@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Tokenize.h"
-#include "StringConvert.h"
 #include "Player.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 
 /*********************************************************/
 /***              PLAYER SETTINGS SYSTEM               ***/
@@ -38,10 +38,10 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
 
-            std::string source = fields[0].GetString();;
-            std::string data = fields[1].GetString();
+            std::string source = fields[0].Get<std::string>();;
+            std::string data = fields[1].Get<std::string>();
 
-            std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', true);
+            std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
             PlayerSettingVector setting;
             setting.resize(tokens.size());
@@ -50,9 +50,15 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
 
             for (auto token : tokens)
             {
+                if (token.empty())
+                {
+                    continue;
+                }
+
                 PlayerSetting set;
                 set.value = Acore::StringTo<uint32>(token).value();
-                setting[++count] = set;
+                setting[count] = set;
+                ++count;
             }
 
             m_charSettingsMap[source] = setting;
@@ -92,9 +98,9 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
         }
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_SETTINGS);
-        stmt->setUInt32(0, GetGUID().GetCounter());
-        stmt->setString(1, itr.first);
-        stmt->setString(2, data.str());
+        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(1, itr.first);
+        stmt->SetData(2, data.str());
         trans->Append(stmt);
     }
 }

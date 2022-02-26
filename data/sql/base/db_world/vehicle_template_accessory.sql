@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.vehicle_template_accessory
+-- Дамп структуры для таблица acore_world.vehicle_template_accessory
 DROP TABLE IF EXISTS `vehicle_template_accessory`;
 CREATE TABLE IF NOT EXISTS `vehicle_template_accessory` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `accessory_entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `accessory_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `seat_id` TINYINT NOT NULL DEFAULT 0,
   `minion` TINYINT unsigned NOT NULL DEFAULT 0,
   `description` text NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `vehicle_template_accessory` (
   PRIMARY KEY (`entry`,`seat_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED;
 
--- Дамп данных таблицы _acore_world.vehicle_template_accessory: 193 rows
+-- Дамп данных таблицы acore_world.vehicle_template_accessory: 193 rows
 DELETE FROM `vehicle_template_accessory`;
 /*!40000 ALTER TABLE `vehicle_template_accessory` DISABLE KEYS */;
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`) VALUES

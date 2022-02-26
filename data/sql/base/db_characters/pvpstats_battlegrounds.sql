@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.pvpstats_battlegrounds
+-- Дамп структуры для таблица acore_characters.pvpstats_battlegrounds
 DROP TABLE IF EXISTS `pvpstats_battlegrounds`;
 CREATE TABLE IF NOT EXISTS `pvpstats_battlegrounds` (
   `id` BIGINT unsigned NOT NULL AUTO_INCREMENT,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `pvpstats_battlegrounds` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Дамп данных таблицы _acore_characters.pvpstats_battlegrounds: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.pvpstats_battlegrounds: ~0 rows (приблизительно)
 DELETE FROM `pvpstats_battlegrounds`;
 /*!40000 ALTER TABLE `pvpstats_battlegrounds` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pvpstats_battlegrounds` ENABLE KEYS */;

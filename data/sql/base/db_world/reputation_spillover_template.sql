@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.reputation_spillover_template
+-- Дамп структуры для таблица acore_world.reputation_spillover_template
 DROP TABLE IF EXISTS `reputation_spillover_template`;
 CREATE TABLE IF NOT EXISTS `reputation_spillover_template` (
   `faction` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'faction entry',
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `reputation_spillover_template` (
   PRIMARY KEY (`faction`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Reputation spillover reputation gain';
 
--- Дамп данных таблицы _acore_world.reputation_spillover_template: 26 rows
+-- Дамп данных таблицы acore_world.reputation_spillover_template: 26 rows
 DELETE FROM `reputation_spillover_template`;
 /*!40000 ALTER TABLE `reputation_spillover_template` DISABLE KEYS */;
 INSERT INTO `reputation_spillover_template` (`faction`, `faction1`, `rate_1`, `rank_1`, `faction2`, `rate_2`, `rank_2`, `faction3`, `rate_3`, `rank_3`, `faction4`, `rate_4`, `rank_4`) VALUES

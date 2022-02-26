@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.character_declinedname
+-- Дамп структуры для таблица acore_characters.character_declinedname
 DROP TABLE IF EXISTS `character_declinedname`;
 CREATE TABLE IF NOT EXISTS `character_declinedname` (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `character_declinedname` (
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.character_declinedname: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.character_declinedname: ~0 rows (приблизительно)
 DELETE FROM `character_declinedname`;
 /*!40000 ALTER TABLE `character_declinedname` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_declinedname` ENABLE KEYS */;

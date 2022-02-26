@@ -12,15 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.areatrigger_tavern
+-- Дамп структуры для таблица acore_world.areatrigger_tavern
 DROP TABLE IF EXISTS `areatrigger_tavern`;
 CREATE TABLE IF NOT EXISTS `areatrigger_tavern` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
   `name` text DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
--- Дамп данных таблицы _acore_world.areatrigger_tavern: 113 rows
+-- Дамп данных таблицы acore_world.areatrigger_tavern: 113 rows
 DELETE FROM `areatrigger_tavern`;
 /*!40000 ALTER TABLE `areatrigger_tavern` DISABLE KEYS */;
 INSERT INTO `areatrigger_tavern` (`id`, `name`) VALUES

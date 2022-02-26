@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_group_stack_rules
+-- Дамп структуры для таблица acore_world.spell_group_stack_rules
 DROP TABLE IF EXISTS `spell_group_stack_rules`;
 CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
   `group_id` INT unsigned NOT NULL DEFAULT 0,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
   PRIMARY KEY (`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.spell_group_stack_rules: 37 rows
+-- Дамп данных таблицы acore_world.spell_group_stack_rules: 37 rows
 DELETE FROM `spell_group_stack_rules`;
 /*!40000 ALTER TABLE `spell_group_stack_rules` DISABLE KEYS */;
 INSERT INTO `spell_group_stack_rules` (`group_id`, `stack_rule`, `description`) VALUES

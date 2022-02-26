@@ -18,7 +18,6 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "TemporarySummon.h"
 #include "molten_core.h"
 

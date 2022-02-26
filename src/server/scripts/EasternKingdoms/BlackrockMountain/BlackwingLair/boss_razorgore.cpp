@@ -31,9 +31,9 @@ enum Say
 
 enum Spells
 {
-    SPELL_MINDCONTROL       = 42013,
-    SPELL_CHANNEL           = 45537,
+    SPELL_MINDCONTROL       = 19832,
     SPELL_EGG_DESTROY       = 19873,
+    SPELL_MIND_EXHAUSTION   = 23958,
 
     SPELL_CLEAVE            = 19632,
     SPELL_WARSTOMP          = 24375,
@@ -73,6 +73,7 @@ public:
         {
             _Reset();
 
+            _charmerGUID.Clear();
             secondPhase = false;
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
         }
@@ -81,35 +82,69 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
+        }
 
-            instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
+        bool CanAIAttack(Unit const* target) const override
+        {
+            return !(target->GetTypeId() == TYPEID_UNIT && !secondPhase);
+        }
+
+        void EnterCombat(Unit* /*victim*/) override
+        {
+            _EnterCombat();
+
+            instance->SetData(DATA_EGG_EVENT, IN_PROGRESS);
         }
 
         void DoChangePhase()
         {
+            secondPhase = true;
+            _charmerGUID.Clear();
+            me->RemoveAllAuras();
+            me->SetHealth(me->GetMaxHealth());
+
             events.ScheduleEvent(EVENT_CLEAVE, 15000);
             events.ScheduleEvent(EVENT_STOMP, 35000);
             events.ScheduleEvent(EVENT_FIREBALL, 7000);
             events.ScheduleEvent(EVENT_CONFLAGRATION, 12000);
+        }
 
-            secondPhase = true;
-            me->RemoveAllAuras();
-            me->SetHealth(me->GetMaxHealth());
+        void SetGUID(ObjectGuid const guid, int32 /*id*/) override
+        {
+            _charmerGUID = guid;
+        }
+
+        void OnCharmed(bool apply) override
+        {
+            if (!apply)
+            {
+                if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
+                {
+                    charmer->CastSpell(charmer, SPELL_MIND_EXHAUSTION, true);
+                }
+            }
         }
 
         void DoAction(int32 action) override
         {
             if (action == ACTION_PHASE_TWO)
+            {
                 DoChangePhase();
+            }
 
             if (action == TALK_EGG_BROKEN_RAND)
+            {
                 Talk(urand(SAY_EGGS_BROKEN1, SAY_EGGS_BROKEN3));
+            }
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!secondPhase)
-                damage = 0;
+            if (!secondPhase && damage >= me->GetHealth())
+            {
+                damage = me->GetHealth() - 1;
+                EnterEvadeMode();
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -152,6 +187,7 @@ public:
 
     private:
         bool secondPhase;
+        ObjectGuid _charmerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -168,9 +204,10 @@ public:
     bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
-            if (instance->GetData(DATA_EGG_EVENT) != DONE)
+            if (instance->GetData(DATA_EGG_EVENT) != DONE && !player->HasAura(SPELL_MIND_EXHAUSTION))
                 if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
                 {
+                    razor->AI()->SetGUID(player->GetGUID());
                     razor->Attack(player, true);
                     player->CastSpell(razor, SPELL_MINDCONTROL);
                 }
@@ -193,15 +230,16 @@ public:
             {
                 instance->SetData(DATA_EGG_EVENT, SPECIAL);
             }
-            if (GameObject* egg = GetCaster()->FindNearestGameObject(GO_EGG, 100))
-                {
-                    if (!egg)
-                        return;
 
-                    GetCaster()->GetAI()->DoAction(TALK_EGG_BROKEN_RAND);
+            if (Creature* razorgore = GetCaster()->ToCreature())
+            {
+                if (GameObject* egg = GetHitGObj())
+                {
+                    razorgore->AI()->DoAction(TALK_EGG_BROKEN_RAND);
                     egg->SetLootState(GO_READY);
                     egg->UseDoorOrButton(10000);
                 }
+            }
         }
 
         void Register() override

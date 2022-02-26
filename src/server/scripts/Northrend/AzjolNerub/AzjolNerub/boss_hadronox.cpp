@@ -18,7 +18,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "azjol_nerub.h"
 
 enum Spells

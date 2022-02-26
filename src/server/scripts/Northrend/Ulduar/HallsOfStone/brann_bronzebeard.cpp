@@ -338,7 +338,7 @@ public:
                 case ACTION_START_TRIBUNAL:
                     {
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        if (!PlayerList.isEmpty())
+                        if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             {
                                 me->SetFaction(i->GetSource()->GetFaction());

@@ -316,7 +316,7 @@ public:
                 creature->AI()->DoAction(ACTION_START_OUTRO);
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override
+        bool CanAIAttack(Unit const*  /*target*/) const override
         {
             return _introDone;
         }
@@ -348,7 +348,7 @@ public:
             if (!_frenzied && HealthBelowPct(31)) // AT 30%, not below
             {
                 _frenzied = true;
-                DoCast(me, SPELL_FRENZY);
+                DoCast(me, SPELL_FRENZY, true);
                 Talk(SAY_FRENZY);
             }
         }

@@ -189,7 +189,7 @@ public:
                                 {
                                     unit->SetVisible(false);
                                     Map::PlayerList const& PlayerList = map->GetPlayers();
-                                    if (PlayerList.isEmpty())
+                                    if (PlayerList.IsEmpty())
                                         return;
 
                                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -253,7 +253,7 @@ public:
                     break;
             }
 
-            // TC_LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event %u (Data=%u)", type, data);
+            // LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event {} (Data={})", type, data);
 
             if (data == DONE)
             {

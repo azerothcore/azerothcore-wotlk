@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.achievement_reward_locale
+-- Дамп структуры для таблица acore_world.achievement_reward_locale
 DROP TABLE IF EXISTS `achievement_reward_locale`;
 CREATE TABLE IF NOT EXISTS `achievement_reward_locale` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,
   `Subject` text DEFAULT NULL,
   `Text` text DEFAULT NULL,
   PRIMARY KEY (`ID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
--- Дамп данных таблицы _acore_world.achievement_reward_locale: ~229 rows (приблизительно)
+-- Дамп данных таблицы acore_world.achievement_reward_locale: ~229 rows (приблизительно)
 DELETE FROM `achievement_reward_locale`;
 /*!40000 ALTER TABLE `achievement_reward_locale` DISABLE KEYS */;
 INSERT INTO `achievement_reward_locale` (`ID`, `Locale`, `Subject`, `Text`) VALUES

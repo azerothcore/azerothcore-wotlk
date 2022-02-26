@@ -21,7 +21,6 @@
 #include "vmapexport.h"
 #include "wmo.h"
 #include <G3D/Quat.h>
-#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <limits>

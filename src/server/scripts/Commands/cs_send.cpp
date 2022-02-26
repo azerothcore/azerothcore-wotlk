@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
@@ -24,7 +23,7 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "ScriptMgr.h"
 #include "Tokenize.h"
 
 using namespace Acore::ChatCommands;

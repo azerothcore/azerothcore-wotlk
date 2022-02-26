@@ -342,7 +342,7 @@ public:
                         {
                             float o = (i * M_PI / 2) + (M_PI / 4);
                             float x = me->GetPositionX() + cos(o) * 15.0f;
-                            float y = me->GetPositionY() + sin(o) * 15.0f;
+                            float y = me->GetPositionY() + std::sin(o) * 15.0f;
                             if ((cr = me->SummonCreature((i % 2 == 0 ? NPC_KOLKAR_WAYLAYER : NPC_KOLKAR_AMBUSHER),
                                                          x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                                 cr->AI()->AttackStart(me);
@@ -367,7 +367,7 @@ public:
                         {
                             float o = i * 2 * M_PI / 3;
                             float x = me->GetPositionX() + cos(o) * 10.0f;
-                            float y = me->GetPositionY() + sin(o) * 10.0f;
+                            float y = me->GetPositionY() + std::sin(o) * 10.0f;
                             uint32 entry = NPC_LESSER_INFERNAL;
                             if (i)
                                 entry = i == 1 ? NPC_DOOMWARDER : NPC_NETHER;

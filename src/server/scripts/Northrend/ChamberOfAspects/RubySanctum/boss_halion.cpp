@@ -257,7 +257,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return me->GetHomePosition().GetExactDist2d(who) < 52.0f;
         }
@@ -494,7 +494,7 @@ public:
                 if (me->IsDamageEnoughForLootingAndReward())
                     halion->LowerPlayerDamageReq(halion->GetMaxHealth());
 
-                if (halion->IsAlive())
+                if (killer && halion->IsAlive())
                     Unit::Kill(killer, halion);
             }
 

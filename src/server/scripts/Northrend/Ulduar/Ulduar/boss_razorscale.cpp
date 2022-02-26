@@ -213,7 +213,7 @@ public:
                 pInstance->SetData(TYPE_RAZORSCALE, DONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (!caster || !pInstance)
                 return;
@@ -412,7 +412,7 @@ public:
                         for( int j = 0; j < 4; ++j )
                         {
                             float x = cords[i][0] + 4.0f * cos(j * M_PI / 2);
-                            float y = cords[i][1] + 4.0f * sin(j * M_PI / 2);
+                            float y = cords[i][1] + 4.0f * std::sin(j * M_PI / 2);
 
                             uint32 npc_entry = 0;
                             switch( opt )
@@ -850,7 +850,7 @@ public:
                                 if( me->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_STATE_WORK )
                                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_WORK);
 
-                                if (fabs(me->GetOrientation() - me->GetAngle(c)) > M_PI / 4)
+                                if (std::fabs(me->GetOrientation() - me->GetAngle(c)) > M_PI / 4)
                                     me->SetFacingToObject(c);
 
                                 c->AI()->SetData(2, 0);
@@ -878,7 +878,7 @@ public:
                                     if (!fs->AI()->GetData(2))
                                     {
                                         float a = rand_norm() * M_PI;
-                                        me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * sin(a), fs->GetPositionZ());
+                                        me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * std::sin(a), fs->GetPositionZ());
                                         fixingGUID = fs->GetGUID();
                                         return;
                                     }
@@ -973,7 +973,7 @@ public:
             timer2 = 6000;
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }
@@ -1022,7 +1022,7 @@ public:
             timer2 = 2000;
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }
@@ -1078,7 +1078,7 @@ public:
             timer2 = 6000;
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }

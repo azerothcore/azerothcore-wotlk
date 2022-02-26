@@ -52,7 +52,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         Acore::NormalizeMapCoord(wanderY);
 
         float new_z = unit->GetMapHeight(wanderX, wanderY, z);
-        if (new_z <= INVALID_HEIGHT || fabs(z - new_z) > 3.0f) // pussywizard
+        if (new_z <= INVALID_HEIGHT || std::fabs(z - new_z) > 3.0f) // pussywizard
         {
             i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
             i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx - 1][1] : y;

@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.pool_creature
+-- Дамп структуры для таблица acore_world.pool_creature
 DROP TABLE IF EXISTS `pool_creature`;
 CREATE TABLE IF NOT EXISTS `pool_creature` (
   `guid` INT unsigned NOT NULL DEFAULT 0,
-  `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `pool_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `chance` float NOT NULL DEFAULT 0,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`guid`),
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `pool_creature` (
   CHECK (`chance` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.pool_creature: 958 rows
+-- Дамп данных таблицы acore_world.pool_creature: 971 rows
 DELETE FROM `pool_creature`;
 /*!40000 ALTER TABLE `pool_creature` DISABLE KEYS */;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
@@ -985,7 +985,20 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 	(12596, 1107, 0, 'Lady Sathrah (7319) Spawn 1'),
 	(12605, 1107, 0, 'Lady Sathrah (7319) Spawn 2'),
 	(16400, 359, 0, 'Sister Riven Spawn 1'),
-	(29213, 359, 0, 'Sister Riven Spawn 2');
+	(29213, 359, 0, 'Sister Riven Spawn 2'),
+	(47302, 1550, 0, 'BRD Lyceum shadowforge flame keepers'),
+	(47303, 1550, 0, 'BRD Lyceum shadowforge flame keepers'),
+	(91119, 1550, 0, 'BRD Lyceum shadowforge flame keepers'),
+	(91120, 1550, 0, 'BRD Lyceum shadowforge flame keepers'),
+	(49818, 387, 0, 'Fel Rock, Lord Melenas Spawn 1 of 3'),
+	(49819, 387, 0, 'Fel Rock, Lord Melenas Spawn 2 of 3'),
+	(49850, 387, 0, 'Fel Rock, Lord Melenas Spawn 3 of 3'),
+	(24181, 388, 0, 'Un\'Goro Develsaur East Pool 1 of 2'),
+	(24182, 388, 0, 'Un\'Goro Develsaur East Pool 2 of 2'),
+	(24183, 389, 0, 'Un\'Goro Develsaur Center Pool 1 of 2'),
+	(24184, 389, 0, 'Un\'Goro Develsaur Center Pool 2 of 2'),
+	(24185, 390, 0, 'Un\'Goro Develsaur West Pool 1 of 2'),
+	(24186, 390, 0, 'Un\'Goro Develsaur West Pool 2 of 2');
 /*!40000 ALTER TABLE `pool_creature` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

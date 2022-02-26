@@ -1170,7 +1170,7 @@ struct BfWGGameObjectBuilding
 
         // Send warning message
         if (m_damagedText)                                       // tower damage + name
-            m_WG->SendWarningToAllInZone(m_damagedText);
+            m_WG->SendWarning(m_damagedText);
 
         for (GuidUnorderedSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
             if (Creature* creature = m_WG->GetCreature(*itr))
@@ -1193,7 +1193,7 @@ struct BfWGGameObjectBuilding
 
         // Warn players
         if (m_destroyedText)
-            m_WG->SendWarningToAllInZone(m_destroyedText);
+            m_WG->SendWarning(m_destroyedText);
 
         switch (m_Type)
         {
@@ -1467,7 +1467,7 @@ struct WGWorkshop
                 {
                     // Send warning message to all player to inform a faction attack to a workshop
                     // alliance / horde attacking a workshop
-                    bf->SendWarningToAllInZone(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
+                    bf->SendWarning(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
                     break;
                 }
             case TEAM_ALLIANCE:
@@ -1479,7 +1479,7 @@ struct WGWorkshop
 
                     // Warning message
                     if (!init)                              // workshop taken - alliance
-                        bf->SendWarningToAllInZone(team == TEAM_ALLIANCE ? WorkshopsData[workshopId].takenText : (WorkshopsData[workshopId].takenText + 2));
+                        bf->SendWarning(team == TEAM_ALLIANCE ? WorkshopsData[workshopId].takenText : (WorkshopsData[workshopId].takenText + 2));
 
                     // Found associate graveyard and update it
                     if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)

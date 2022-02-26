@@ -16,7 +16,6 @@
  */
 
 #include "LFGPlayerData.h"
-#include "LFGMgr.h"
 
 namespace lfg
 {
