@@ -1169,7 +1169,7 @@ void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg,
         ginfo->teamId = teamId;
 
     if (ginfo->IsInvitedToBGInstanceGUID)
-        return;   
+        return;
 
     // set invitation
     ginfo->IsInvitedToBGInstanceGUID = bg->GetInstanceID();

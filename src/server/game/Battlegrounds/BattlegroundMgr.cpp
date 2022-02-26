@@ -313,7 +313,7 @@ Battleground* BattlegroundMgr::GetBattleground(uint32 instanceId, BattlegroundTy
         if (auto bg = GetBgWithInstanceID(&itr->second))
             return bg;
     }
-    
+
     return nullptr;
 }
 
