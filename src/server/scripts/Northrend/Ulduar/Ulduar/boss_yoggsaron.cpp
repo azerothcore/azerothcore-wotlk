@@ -1932,10 +1932,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2046,10 +2046,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2080,7 +2080,7 @@ public:
                         NextStep(2000);
                         break;
                     case 2:
-                        PlaySound(GAR_2);
+                        Playsound(GAR_2);
                         NextStep(6500);
                         break;
                     case 3:
@@ -2092,7 +2092,7 @@ public:
                         NextStep(2500);
                         break;
                     case 5:
-                        PlaySound(YS_V1_2);
+                        Playsound(YS_V1_2);
                         NextStep(2500);
                         break;
                     case 6:
@@ -2166,10 +2166,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
