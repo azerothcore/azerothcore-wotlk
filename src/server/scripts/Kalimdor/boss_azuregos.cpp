@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptedCreature.h"
@@ -142,6 +143,7 @@ public:
                 });
 
             me->SetRespawnTime(urand(2 * DAY, 3 * DAY));
+            me->SaveRespawnTimeToDB();
         }
 
         void UpdateAI(uint32 diff) override
