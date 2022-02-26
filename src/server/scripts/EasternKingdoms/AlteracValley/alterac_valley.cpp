@@ -110,9 +110,27 @@ public:
             Reset();
         }
 
+        void EnterCombat(Unit* victim) override
+        {
+            // Boss should attack as well
+            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            {
+                if (Battleground* bg = bgMap->GetBG())
+                {
+                    if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
+                    {
+                        if (mainBoss->IsAIEnabled)
+                        {
+                            mainBoss->AI()->EnterCombat(victim);
+                        }
+                    }
+                }
+            }
+        }
+
         void EnterEvadeMode() override
         {
-            // Evade bosses
+            // Evade boss
             if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
             {
                 if (Battleground* bg = bgMap->GetBG())

@@ -65,9 +65,27 @@ public:
             YellTimer         = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* victim) override
         {
             Talk(YELL_AGGRO);
+
+            // Mini bosses should attack as well
+            if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
+            {
+                if (Battleground* bg = bgMap->GetBG())
+                {
+                    for (uint8 i = AV_CPLACE_H_MARSHAL_ICE; i <= AV_CPLACE_H_MARSHAL_WTOWER; ++i)
+                    {
+                        if (Creature* marshall = bg->GetBGCreature(i))
+                        {
+                            if (marshall->IsAIEnabled)
+                            {
+                                marshall->AI()->EnterCombat(victim);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         void JustRespawned() override
