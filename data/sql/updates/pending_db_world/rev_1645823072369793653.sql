@@ -341,6 +341,40 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,19,-1309.8844,6778.423,36.358932,0,0,0,0,100,0),
 (@PATH,20,-1306.7092,6814.6,36.38373,0,0,0,0,100,0);
 
+DELETE FROM `creature` WHERE `guid` IN (60920);
+INSERT INTO `creature` (`guid`,`id1`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
+(60920,17159,530,0,0,1,1,0,-1849.52,7550.6406,-6.9681034,5.19985,300,0,0,0,0,2,0,0,0,'',0);
+
+-- Pathing for Storm Rager Entry: 17159
+SET @NPC := 60920;
+SET @PATH := @NPC * 10;
+DELETE FROM `creature_addon` WHERE `guid`=@NPC;
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`visibilityDistanceType`,`auras`) VALUES (@NPC,@PATH,0,0,1,0,0, '');
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,-1849.52,7550.6406,-6.9681034,0,0,0,0,100,0),
+(@PATH,2,-1853.2834,7552.9756,-6.847986,0,0,0,0,100,0),
+(@PATH,3,-1875.6715,7547.3853,-6.85956,0,0,0,0,100,0),
+(@PATH,4,-1880.7166,7524.1504,-6.243207,0,0,0,0,100,0),
+(@PATH,5,-1881.9888,7485.1885,-7.2308702,0,0,0,0,100,0),
+(@PATH,6,-1875.4645,7452.9385,-11.417364,0,0,0,0,100,0),
+(@PATH,7,-1885.3041,7421.472,-16.672812,0,0,0,0,100,0),
+(@PATH,8,-1894.9048,7376.482,-18.00442,0,0,0,0,100,0),
+(@PATH,9,-1915.1211,7356.846,-20.655558,0,0,0,0,100,0),
+(@PATH,10,-1948.4939,7355.502,-29.476799,0,0,0,0,100,0),
+(@PATH,11,-1979.2734,7370.377,-34.236717,0,0,0,0,100,0),
+(@PATH,12,-2018.8828,7375.8457,-32.416527,0,0,0,0,100,0),
+(@PATH,13,-1979.2734,7370.377,-34.236717,0,0,0,0,100,0),
+(@PATH,14,-1948.4939,7355.502,-29.476799,0,0,0,0,100,0),
+(@PATH,15,-1915.1211,7356.846,-20.655558,0,0,0,0,100,0),
+(@PATH,16,-1894.9048,7376.482,-18.00442,0,0,0,0,100,0),
+(@PATH,17,-1885.3041,7421.472,-16.672812,0,0,0,0,100,0),
+(@PATH,18,-1875.4645,7452.9385,-11.417364,0,0,0,0,100,0),
+(@PATH,19,-1881.9888,7485.1885,-7.2308702,0,0,0,0,100,0),
+(@PATH,20,-1880.7166,7524.1504,-6.243207,0,0,0,0,100,0),
+(@PATH,21,-1875.6715,7547.3853,-6.85956,0,0,0,0,100,0),
+(@PATH,22,-1853.2834,7552.9756,-6.847986,0,0,0,0,100,0);
+
 -- Pathing for Storm Rager Entry: 17159
 SET @NPC := 60624;
 SET @PATH := @NPC * 10;
