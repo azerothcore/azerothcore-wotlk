@@ -31,7 +31,7 @@ public:
 
     // Nodes
     void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level);
-    void LoadTaxiMask(std::string const& data);
+    bool LoadTaxiMask(std::string_view data);
 
     [[nodiscard]] bool IsTaximaskNodeKnown(uint32 nodeidx) const
     {

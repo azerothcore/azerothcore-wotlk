@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.game_weather
+-- Дамп структуры для таблица acore_world.game_weather
 DROP TABLE IF EXISTS `game_weather`;
 CREATE TABLE IF NOT EXISTS `game_weather` (
-  `zone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `zone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `spring_rain_chance` TINYINT unsigned NOT NULL DEFAULT 25,
   `spring_snow_chance` TINYINT unsigned NOT NULL DEFAULT 25,
   `spring_storm_chance` TINYINT unsigned NOT NULL DEFAULT 25,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `game_weather` (
   PRIMARY KEY (`zone`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Weather System';
 
--- Дамп данных таблицы _acore_world.game_weather: 35 rows
+-- Дамп данных таблицы acore_world.game_weather: 35 rows
 DELETE FROM `game_weather`;
 /*!40000 ALTER TABLE `game_weather` DISABLE KEYS */;
 INSERT INTO `game_weather` (`zone`, `spring_rain_chance`, `spring_snow_chance`, `spring_storm_chance`, `summer_rain_chance`, `summer_snow_chance`, `summer_storm_chance`, `fall_rain_chance`, `fall_snow_chance`, `fall_storm_chance`, `winter_rain_chance`, `winter_snow_chance`, `winter_storm_chance`, `ScriptName`) VALUES

@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.acore_string
+-- Дамп структуры для таблица acore_world.acore_string
 DROP TABLE IF EXISTS `acore_string`;
 CREATE TABLE IF NOT EXISTS `acore_string` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `content_default` text NOT NULL,
   `locale_koKR` text DEFAULT NULL,
   `locale_frFR` text DEFAULT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `acore_string` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.acore_string: 1 202 rows
+-- Дамп данных таблицы acore_world.acore_string: 1 245 rows
 DELETE FROM `acore_string`;
 /*!40000 ALTER TABLE `acore_string` DISABLE KEYS */;
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
@@ -37,9 +37,15 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(3, '[SERVER] %s', NULL, NULL, '[SERVER]: %s', '[服务器] %s', NULL, '[SERVIDOR] %s', '[SERVIDOR] %s', NULL),
 	(4, '|cffff0000[Event Message]: %s|r', NULL, NULL, '|cffff0000[Ereignis-Nachricht]: %s|r', '|cffff0000[游戏广播]: %s|r', NULL, '|cffff0000[Mensaje de evento]: %s|r', '|cffff0000[Mensaje de evento]: %s|r', NULL),
 	(5, 'There is no help for that command', NULL, NULL, 'Es gibt keine Hilfe für diesen Befehl.', '没有这个命令的帮助信息。', NULL, 'No hay ayuda para ese comando', 'No hay ayuda para ese comando', NULL),
-	(6, 'There is no such command', NULL, NULL, 'Es gibt keinen solchen Befehl.', '没有这个命令。', NULL, 'No existe tal comando', 'No existe tal comando', NULL),
-	(7, 'There is no such subcommand', NULL, NULL, 'Es gibt keinen solchen Unterbefehl.', '没有这个子命令。', NULL, 'No existe este subcomando', 'No existe este subcomando', NULL),
-	(8, 'Command %s have subcommands:%s', NULL, NULL, 'Befehl %s hat Unterbefehle:%s', '命令 %s 包含子命令:%s', NULL, 'El comando %s tiene subcomandos: %s', 'El comando %s tiene subcomandos: %s', NULL),
+	(194, 'Command \'%.*s\' is ambiguous:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(195, '### USAGE: .%.*s ...', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(196, 'There is no detailed usage information associated with \'%.*s\'.\nThis should never occur for stock AzerothCore commands - if it does, report this as a bug.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(191, '|- %.*s', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(192, '|- %.*s ...', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(193, 'Subcommand \'%.*s%c%.*s\' does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(6, 'Command \'%.*s\' does not exist', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(7, 'Subcommand \'%.*s%c%.*s\' is ambiguous:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(8, 'Possible subcommands:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(9, 'Commands available to you:', NULL, NULL, 'Befehle, die für Euch verfügbar sind:', '你可以当前可以使用的命令:', NULL, 'Comandos disponibles:', 'Comandos disponibles:', NULL),
 	(10, 'Incorrect syntax.', NULL, NULL, 'Falsche Syntax.', '命令语法格式错误。', NULL, 'Incorrect syntax.', 'Incorrect syntax.', NULL),
 	(11, 'Your account level is: %i', NULL, NULL, 'Euer Accountlevel ist: %i', '你账号的等级为: %i', NULL, 'Su nivel de cuenta es: %i', 'Su nivel de cuenta es: %i', NULL),
@@ -436,10 +442,10 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(470, 'id: %d eff: %d amount: %d', NULL, NULL, 'id: %d eff: %d amount: %d', 'id: %d eff: %d 数量: %d', NULL, NULL, NULL, NULL),
 	(471, 'Quest %u not found.', NULL, NULL, 'Quest %u nicht gefunden.', '任务 %u 没有找到.', NULL, NULL, NULL, NULL),
 	(472, 'Quest %u started from item. For correct work, please, add item to inventory and start quest in normal way: .additem %u', NULL, NULL, 'Quest %u wird von einem Item gestartet. Damit dieser korrekt funktioniert, startet ihn bitte, indem Ihr das Item zu Eurem Inventar hinzufügt und den Quest auf dem normalen Weg startet: .additem %u', '任务 %u 由物品触发. 为正确工作, 请, 添加物品到库里并且开始这个任务的正常方式: .additem %u', NULL, NULL, NULL, NULL),
-	(473, 'Quest removed.', NULL, NULL, 'Quest entfernt.', '任务清除.', NULL, NULL, NULL, NULL),
-	(474, ' [rewarded]', NULL, NULL, ' [belohnt]', '[奖赏]', NULL, NULL, NULL, NULL),
-	(475, ' [complete]', NULL, NULL, ' [fertig]', '[完成]', NULL, NULL, NULL, NULL),
-	(476, ' [active]', NULL, NULL, ' [aktiv]', '[活跃]', NULL, NULL, NULL, NULL),
+	(473, 'Quest %s (%u) removed.', NULL, NULL, '', '', NULL, NULL, NULL, NULL),
+	(474, 'Quest %s (%u) rewarded.', NULL, NULL, '', '', NULL, NULL, NULL, NULL),
+	(475, 'Quest %s (%u) completed.', NULL, NULL, '', '', NULL, NULL, NULL, NULL),
+	(476, 'Quest %s (%u) is already active.', NULL, NULL, '', '', NULL, NULL, NULL, NULL),
 	(477, '%s\'s Fly Mode %s', NULL, NULL, '%s\'s Flugmodus %s', '%s 的飞行模式为 %s', NULL, NULL, NULL, NULL),
 	(478, 'Opcode %u sent to %s', NULL, NULL, 'Opcode %u gesendet an %s', '操作代码Opcode %u 发送到(sent to) %s', NULL, NULL, NULL, NULL),
 	(479, 'Character loaded successfully!', NULL, NULL, 'Charakter erfolgreich geladen!', '角色加载成功!', NULL, NULL, NULL, NULL),
@@ -502,7 +508,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(536, '   Home movement used for player?!?', NULL, NULL, '   Bewegung zum Startpunkt für Spieler?!?', '家运动对於玩家是二手的?!?', NULL, NULL, NULL, NULL),
 	(537, '   Taxi flight', NULL, NULL, '   Flugroute', '飞行坐骑', NULL, NULL, NULL, NULL),
 	(538, '   Unknown movement generator (%u)', NULL, NULL, '   Unbekannter Bewegungsgenerator (%u)', '未知者运动产生器 (%u)', NULL, NULL, NULL, NULL),
-	(539, 'Player selected NPC\nDB GUID: %u, current GUID: %u.\nFaction: %u.\nnpcFlags: %u.\nEntry: %u.\nDisplayID: %u (Native: %u).', NULL, NULL, 'Spieler hat folgenden NPC angewählt\nDB GUID: %u, aktuelle GUID: %u.\nFaction: %u.\nnpcFlags: %u.\nEntry: %u.\nDisplayID: %u (Native: %u).', '当前选择NPC属性\nDB GUID: %u,目前 GUID: %u.\n阵营: %u.\nNPC标识: %u.\n编号: %u.\n外观ID: %u (Native: %u).', NULL, NULL, NULL, NULL),
+	(539, 'Player selected NPC\nDB GUID: %u, current GUID: %u.\nCurrent Entry: %u of (%u, %u, %u).\nDisplayID: %u (Native: %u).\nFaction: %u.\nnpcFlags: %u.', NULL, 'PNJ sélectionné par le joueur\nGUID en base: %u, GUID actuel: %u.\nEntry actuel: %u de (%u, %u, %u).\nDisplayID: %u (Natif: %u).\nFaction: %u.\nnpcFlags: %u.', 'Vom Spieler gewählter NPC\nDB GUID: %u, aktuelle GUID: %u.\nAktueller Entry: %u von (%u, %u, %u).\nDisplayID: %u (Ursprünglich: %u).\nFraktion: %u.\nnpcFlags: %u.', '当前选择NPC属性\nDB GUID: %u,目前 GUID: %u.\n阵营: %u 的  (%u, %u, %u).\n外观ID: %u (Native: %u).\n编号: %u.\nNPC标识: %u.', NULL, NULL, NULL, NULL),
 	(540, 'Level: %u.', NULL, NULL, 'Level: %u.', '等级: %u.', NULL, NULL, NULL, NULL),
 	(541, 'Health (base): %u. (max): %u. (current): %u.', NULL, NULL, 'Leben (Basis): %u. (max): %u. (aktuell): %u.', '健康 (基础): %u。 (最大): %u。 (涌流): %u。', NULL, NULL, NULL, NULL),
 	(542, 'Unit Flags: %u.\nUnit Flags 2: %u.\nDynamic Flags: %u.\nFaction Template: %u.', NULL, NULL, 'Field Flags: %u.\nDynamic Flags: %u.\nFaction Template: %u.', '"单位旗子: %u。电动旗子: %u。阵营型板: %u。"', NULL, NULL, NULL, NULL),
@@ -995,12 +1001,11 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(5027, 'Name: %s', NULL, NULL, 'Name: %s', '名称: %s', NULL, NULL, NULL, NULL),
 	(5028, 'Lootid: %u', NULL, NULL, 'Lootid: %u', '战利品ID: %u', NULL, NULL, NULL, NULL),
 	(5029, 'Result limit reached (max results: %d)', NULL, NULL, 'Zu viele Ergebnisse. (max: %d Ergebnisse)', '结果达到了极限(最大结果数:%d）', NULL, NULL, NULL, NULL),
-	(5030, '%s attempts to run away in fear!', NULL, NULL, '%s versucht vor Angst davon zu rennen!', '%s充满恐惧地想要转身逃跑！', NULL, '¡%s intenta huir despavorido!', '¡%s intenta huir despavorido!', NULL),
+	(1500, 'Either:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(5031, 'AIName: %s ScriptName: %s', NULL, NULL, NULL, 'AI名称: %s 脚本名称: %s', NULL, NULL, NULL, NULL),
 	(5032, 'No battleground found!', NULL, NULL, NULL, '没有战场被找到！', NULL, NULL, NULL, NULL),
 	(5033, 'No achievement criteria found!', NULL, NULL, NULL, '没有达到符合成就的条件。', NULL, NULL, NULL, NULL),
 	(5034, 'No outdoor PvP found!', NULL, NULL, NULL, '没有找到可用的野外PVP战场。', NULL, NULL, NULL, NULL),
-	(5035, '%s calls for help!', NULL, NULL, NULL, '没有理由', NULL, NULL, NULL, NULL),
 	(5036, 'EquipmentId: %u (Original: %u).', NULL, NULL, NULL, '装备ID: %u (原价l: %u)。', NULL, NULL, NULL, NULL),
 	(5037, 'MechanicImmuneMask: %u', NULL, NULL, NULL, 'MechanicImmuneMask: %u', NULL, NULL, NULL, NULL),
 	(5038, 'Unit Flags: %u', NULL, NULL, NULL, '单位标志： ％u', NULL, NULL, NULL, NULL),
@@ -1143,7 +1148,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(11005, 'Server: %s has banned character %s permanetly, reason: %s', NULL, NULL, NULL, '系统公告: %s has banned character %s permanetly, 原因: %s', NULL, NULL, NULL, 'Server: %s забанил персонажа %s permanetly, reason: %s'),
 	(11006, 'Server: %s has banned account %s for %s, reason: %s', NULL, NULL, NULL, '系统公告: %s has banned %s for %s, 原因: %s', NULL, NULL, NULL, 'Server: %s забанил аккаунт %s на %s, причина: %s'),
 	(11007, 'Server: %s has banned account %s permanetly, reason: %s', NULL, NULL, NULL, '系统公告: %s has banned %s permanetly, 原因: %s', NULL, NULL, NULL, 'Server: %s забанил аккаунт %s навсегда, причина: %s'),
-	(11008, 'InhabitType: %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(11008, 'Movement type: %s', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(11009, 'Flags Extra: %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(11010, 'You didn\'t get kicked out of the instance even if Player::CheckInstanceLoginValid() returned false and without .gm on flag', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(11011, 'VisualizeBoundary warning: No interior point of the creature\'s boundary could be found - check if you have mutually exclusive boundaries!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -1233,7 +1238,45 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(190, 'Successfully enabled two-factor authentication for \'%s\' with the specified secret.', NULL, NULL, NULL, NULL, NULL, 'Se ha activado con éxito la autenticación de dos factores para \'%s\' con el secreto especificado.', 'Se ha activado con éxito la autenticación de dos factores para \'%s\' con el secreto especificado.', NULL),
 	(5062, 'SpellSchoolImmuneMask: %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(30096, 'LFG is set to 1 player queue for debugging.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-	(30097, 'LFG is set to normal queue.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	(30097, 'LFG is set to normal queue.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1501, 'Or:    ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1502, 'Value \'%.*s\' is not valid for type %s.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1503, 'Invalid UTF-8 sequences found in string.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1504, 'Provided link has invalid link data.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1505, 'Account \'%.*s\' does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1506, 'Account ID %u does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1507, '%s does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1508, 'Character \'%.*s\' does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1509, '\'%.*s\' is not a valid character name.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1510, 'Achievement ID %u does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1511, 'Teleport location %u does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1512, 'Teleport location \'%.*s\' does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1513, 'Item ID %u does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1514, 'Spell ID %u does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1515, 'Expected \'%.*s\', got \'%.*s\' instead.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5063, 'Displaying cached info for character: \n|- Name: %s (Guid: %u) \n|- Account: %u \n|- Class: %u \n|- Race: %u \n|- Gender: %u \n|- Level: %u \n|- Mail Count: %u \n|- Guild: %u \n|- Group ID: %u \n|- ArenaTeam 2x2: %u \n|- ArenaTeam 3x3: %u \n|- ArenaTeam 5x5: %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5064, 'Cached data for character %s (%u) has been cleared.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5065, 'Cached data for character %s (%u) has been refreshed.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5066, 'Cache not found for character %s', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(1516, 'Quest ID %u does not exist', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5067, 'Quest %s (%u) added.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5068, 'Quest %s (%u) not found in quest log.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5069, 'The quest must be active and complete before rewarding', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5070, 'The command is disabled by config', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(197, 'Recover id: %u | Item: %s (%u) | Count: %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(198, 'Player has no recoverable items', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(199, 'Player has no recoverable item with id %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5071, 'The extendedcost entry provided does not exist.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5072, 'Refunding %s (%u) would send the target over the honor points limit (limit: %u, current honor: %u, honor to be refunded: %u).', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5073, 'An attempt of refunding your item %s has failed because it would put you over the honor points limit.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5074, 'Item %s (%u) was refunded, restoring %u honor points.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5075, 'Refunding %s (%u) would send the target over the arena points limit (limit: %u, current arena points: %u, arena points to be refunded: %u).', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5076, 'An attempt of refunding your item %s has failed because it would put you over the arena points limit.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5077, 'Item %s (%u) was refunded, restoring %u arena points.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5078, 'Item not found in the character\'s inventory (bank included)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5079, 'You must be at least level %u to disable autobroadcast messages.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5080, 'You are now receiving global %s messages.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5081, 'You will no longer receive global %s messages.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `acore_string` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

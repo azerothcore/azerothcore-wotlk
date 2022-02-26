@@ -24,7 +24,6 @@
 #include "WorldModel.h"
 #include <G3D/Vector3.h>
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -125,7 +124,7 @@ namespace VMAP
                 instanceTree = iInstanceMapTrees.insert(InstanceTreeMap::value_type(mapId, nullptr)).first;
             }
             else
-                ASSERT(false, "Invalid mapId %u tile [%u, %u] passed to VMapMgr2 after startup in thread unsafe environment",
+                ABORT("Invalid mapId {} tile [{}, {}] passed to VMapMgr2 after startup in thread unsafe environment",
                        mapId, tileX, tileY);
         }
 
@@ -349,11 +348,11 @@ namespace VMAP
             WorldModel* worldmodel = new WorldModel();
             if (!worldmodel->readFile(basepath + filename + ".vmo"))
             {
-                LOG_ERROR("maps", "VMapMgr2: could not load '%s%s.vmo'", basepath.c_str(), filename.c_str());
+                LOG_ERROR("maps", "VMapMgr2: could not load '{}{}.vmo'", basepath, filename);
                 delete worldmodel;
                 return nullptr;
             }
-            LOG_DEBUG("maps", "VMapMgr2: loading file '%s%s'", basepath.c_str(), filename.c_str());
+            LOG_DEBUG("maps", "VMapMgr2: loading file '{}{}'", basepath, filename);
             model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(filename, ManagedModel())).first;
             model->second.setModel(worldmodel);
         }
@@ -369,12 +368,12 @@ namespace VMAP
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
         {
-            LOG_ERROR("maps", "VMapMgr2: trying to unload non-loaded file '%s'", filename.c_str());
+            LOG_ERROR("maps", "VMapMgr2: trying to unload non-loaded file '{}'", filename);
             return;
         }
         if (model->second.decRefCount() == 0)
         {
-            LOG_DEBUG("maps", "VMapMgr2: unloading file '%s'", filename.c_str());
+            LOG_DEBUG("maps", "VMapMgr2: unloading file '{}'", filename);
             delete model->second.getModel();
             iLoadedModelFiles.erase(model);
         }

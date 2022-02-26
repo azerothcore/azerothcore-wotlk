@@ -46,7 +46,7 @@ void GroupMgr::InitGroupIds()
     QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM `groups`");
     if (result)
     {
-        uint32 maxId = (*result)[0].GetUInt32();
+        uint32 maxId = (*result)[0].Get<uint32>();
         _groupIds.resize(maxId + 1);
     }
 }
@@ -143,7 +143,7 @@ void GroupMgr::LoadGroups()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server.loading", ">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Loaded {} group definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
         }
     }
@@ -170,15 +170,15 @@ void GroupMgr::LoadGroups()
             do
             {
                 Field* fields = result->Fetch();
-                Group* group = GetGroupByGUID(fields[0].GetUInt32());
+                Group* group = GetGroupByGUID(fields[0].Get<uint32>());
 
                 if (group)
-                    group->LoadMemberFromDB(fields[1].GetUInt32(), fields[2].GetUInt8(), fields[3].GetUInt8(), fields[4].GetUInt8());
+                    group->LoadMemberFromDB(fields[1].Get<uint32>(), fields[2].Get<uint8>(), fields[3].Get<uint8>(), fields[4].Get<uint8>());
 
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server.loading", ">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Loaded {} group members in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
         }
     }

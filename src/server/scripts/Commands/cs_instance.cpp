@@ -23,6 +23,7 @@
  EndScriptData */
 
 #include "Chat.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
@@ -73,7 +74,7 @@ public:
             {
                 InstanceSave const* save = bind.save;
                 uint32 resetTime = bind.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-                uint32 ttr = (resetTime >= time(nullptr) ? resetTime - time(nullptr) : 0);
+                uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
                 std::string timeleft = secsToTimeString(ttr);
                 handler->PSendSysMessage("map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s",
                     mapId, save->GetInstanceId(), bind.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (bind.extended ? " (extended)" : ""));
@@ -111,7 +112,7 @@ public:
                 if (itr->first != player->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-                    uint32 ttr = (resetTime >= time(nullptr) ? resetTime - time(nullptr) : 0);
+                    uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
                     std::string timeleft = secsToTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);

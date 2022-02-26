@@ -24,6 +24,7 @@
 #include "Errors.h"
 #include "ObjectMgr.h"
 #include "World.h"
+#include <fmt/core.h>
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #include "Chat.h"
@@ -37,7 +38,7 @@ static constexpr char CLI_PREFIX[] = "AC> ";
 
 static inline void PrintCliPrefix()
 {
-    printf("%s", CLI_PREFIX);
+    fmt::print(CLI_PREFIX);
 }
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
@@ -74,14 +75,10 @@ namespace Acore::Impl::Readline
 void utf8print(void* /*arg*/, std::string_view str)
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    std::wstring wbuf;
-    if (!Utf8toWStr(str, wbuf))
-        return;
-
-    wprintf(L"%s", wbuf.c_str());
+    fmt::print(str);
 #else
 {
-    printf(STRING_VIEW_FMT, STRING_VIEW_FMT_ARG(str));
+    fmt::print(str);
     fflush(stdout);
 }
 #endif

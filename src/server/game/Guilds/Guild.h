@@ -20,8 +20,8 @@
 
 #include "Item.h"
 #include "ObjectMgr.h"
-#include "Player.h"
 #include "Optional.h"
+#include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include <set>
@@ -279,9 +279,9 @@ public:
     void SetSlots(uint32 _slots) { slots = _slots; }
     void SetRights(uint8 _rights) { rights = _rights; }
 
-    int8 GetTabId() const { return tabId; }
-    int32 GetSlots() const { return slots; }
-    int8 GetRights() const { return rights; }
+    uint8 GetTabId() const { return tabId; }
+    uint32 GetSlots() const { return slots; }
+    uint8 GetRights() const { return rights; }
 
 private:
     uint8  tabId;
@@ -305,7 +305,6 @@ public: // pussywizard: public class Member
             m_level(0),
             m_class(0),
             m_flags(GUILDMEMBER_STATUS_NONE),
-            m_logoutTime(::time(nullptr)),
             m_accountId(0),
             m_rankId(rankId)
         {
@@ -343,7 +342,7 @@ public: // pussywizard: public class Member
 
         void ChangeRank(uint8 newRank);
 
-        inline void UpdateLogoutTime() { m_logoutTime = ::time(nullptr); }
+        void UpdateLogoutTime();
         inline bool IsRank(uint8 rankId) const { return m_rankId == rankId; }
         inline bool IsRankNotLower(uint8 rankId) const { return m_rankId <= rankId; }
         inline bool IsSamePlayer(ObjectGuid guid) const { return m_guid == guid; }
@@ -399,7 +398,7 @@ private:
     class LogEntry
     {
     public:
-        LogEntry(uint32 guildId, ObjectGuid::LowType guid) : m_guildId(guildId), m_guid(guid), m_timestamp(::time(nullptr)) { }
+        LogEntry(uint32 guildId, ObjectGuid::LowType guid);
         LogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp) : m_guildId(guildId), m_guid(guid), m_timestamp(timestamp) { }
         virtual ~LogEntry() { }
 
@@ -686,6 +685,8 @@ public:
     std::string const& GetMOTD() const { return m_motd; }
     std::string const& GetInfo() const { return m_info; }
 
+    bool SetName(std::string_view const& name);
+
     // Handle client commands
     void HandleRoster(WorldSession* session);
     void HandleQuery(WorldSession* session);
@@ -815,7 +816,7 @@ private:
     inline void _DeleteMemberFromDB(ObjectGuid::LowType lowguid) const
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBER);
-        stmt->setUInt32(0, lowguid);
+        stmt->SetData(0, lowguid);
         CharacterDatabase.Execute(stmt);
     }
 

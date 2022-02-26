@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_characters.calendar_events
+-- Дамп структуры для таблица acore_characters.calendar_events
 DROP TABLE IF EXISTS `calendar_events`;
 CREATE TABLE IF NOT EXISTS `calendar_events` (
   `id` BIGINT unsigned NOT NULL DEFAULT 0,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `calendar_events` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_characters.calendar_events: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_characters.calendar_events: ~0 rows (приблизительно)
 DELETE FROM `calendar_events`;
 /*!40000 ALTER TABLE `calendar_events` DISABLE KEYS */;
 /*!40000 ALTER TABLE `calendar_events` ENABLE KEYS */;

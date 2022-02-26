@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.pet_levelstats
+-- Дамп структуры для таблица acore_world.pet_levelstats
 DROP TABLE IF EXISTS `pet_levelstats`;
 CREATE TABLE IF NOT EXISTS `pet_levelstats` (
-  `creature_entry` mediumint(8) unsigned NOT NULL,
+  `creature_entry` MEDIUMINT unsigned NOT NULL,
   `level` TINYINT unsigned NOT NULL,
   `hp` SMALLINT unsigned NOT NULL,
   `mana` SMALLINT unsigned NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `pet_levelstats` (
   PRIMARY KEY (`creature_entry`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 
--- Дамп данных таблицы _acore_world.pet_levelstats: 2 720 rows
+-- Дамп данных таблицы acore_world.pet_levelstats: 2 720 rows
 DELETE FROM `pet_levelstats`;
 /*!40000 ALTER TABLE `pet_levelstats` DISABLE KEYS */;
 INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `str`, `agi`, `sta`, `inte`, `spi`, `min_dmg`, `max_dmg`) VALUES

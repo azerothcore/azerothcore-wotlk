@@ -78,11 +78,11 @@ class spell_pri_shadowfiend_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: shadowfiend inherits 30% of intellect / stamina (guessed)
+        // xinef: shadowfiend inherits 30% of intellect and 65% of stamina (guessed)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), stat == STAT_STAMINA ? 65 : 30);
         }
     }
 
@@ -462,7 +462,7 @@ class spell_pri_pain_and_suffering_proc : public SpellScript
         if (Unit* unitTarget = GetHitUnit())
             if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0, 0, GetCaster()->GetGUID()))
             {
-                aur->GetBase()->RefreshTimers();
+                aur->GetBase()->RefreshTimersWithMods();
                 aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
             }
     }
@@ -546,7 +546,7 @@ class spell_pri_penance : public SpellScript
 };
 
 // -17 - Power Word: Shield
-static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
 {
     // +80.68% from sp bonus
     float bonus = 0.8068f;

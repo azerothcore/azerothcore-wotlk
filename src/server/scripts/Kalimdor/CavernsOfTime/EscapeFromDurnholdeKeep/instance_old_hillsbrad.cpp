@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "EventMap.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptMgr.h"

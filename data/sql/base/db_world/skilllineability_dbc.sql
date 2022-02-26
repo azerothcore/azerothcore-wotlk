@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.skilllineability_dbc
+-- Дамп структуры для таблица acore_world.skilllineability_dbc
 DROP TABLE IF EXISTS `skilllineability_dbc`;
 CREATE TABLE IF NOT EXISTS `skilllineability_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `skilllineability_dbc` (
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.skilllineability_dbc: 0 rows
+-- Дамп данных таблицы acore_world.skilllineability_dbc: 0 rows
 DELETE FROM `skilllineability_dbc`;
 /*!40000 ALTER TABLE `skilllineability_dbc` DISABLE KEYS */;
 /*!40000 ALTER TABLE `skilllineability_dbc` ENABLE KEYS */;

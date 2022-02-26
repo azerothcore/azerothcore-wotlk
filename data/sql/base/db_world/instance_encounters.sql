@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.instance_encounters
+-- Дамп структуры для таблица acore_world.instance_encounters
 DROP TABLE IF EXISTS `instance_encounters`;
 CREATE TABLE IF NOT EXISTS `instance_encounters` (
   `entry` INT unsigned NOT NULL COMMENT 'Unique entry from DungeonEncounter.dbc',
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `instance_encounters` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.instance_encounters: 612 rows
+-- Дамп данных таблицы acore_world.instance_encounters: 612 rows
 DELETE FROM `instance_encounters`;
 /*!40000 ALTER TABLE `instance_encounters` DISABLE KEYS */;
 INSERT INTO `instance_encounters` (`entry`, `creditType`, `creditEntry`, `lastEncounterDungeon`, `comment`) VALUES

@@ -226,22 +226,10 @@ public:
     /// Get the path where data (dbc, maps) are stored on disk
     [[nodiscard]] std::string const& GetDataPath() const override { return m_dataPath; }
 
-    /// When server started?
-    [[nodiscard]] time_t const& GetStartTime() const override { return m_startTime; }
-    /// What time is it?
-    [[nodiscard]] time_t const& GetGameTime() const override { return m_gameTime; }
-    /// What time is it? in ms
-    static uint32 GetGameTimeMS() { return m_gameMSTime; }
-    /// Uptime (in secs)
-    [[nodiscard]] uint32 GetUptime() const override { return uint32(m_gameTime - m_startTime); }
-    /// Update time
-    [[nodiscard]] uint32 GetUpdateTime() const override { return m_updateTime; }
-    void SetRecordDiffInterval(int32 t) override { if (t >= 0) m_int_configs[CONFIG_INTERVAL_LOG_UPDATE] = (uint32)t; }
-
     /// Next daily quests and random bg reset time
-    [[nodiscard]] time_t GetNextDailyQuestsResetTime() const override { return m_NextDailyQuestReset; }
-    [[nodiscard]] time_t GetNextWeeklyQuestsResetTime() const override { return m_NextWeeklyQuestReset; }
-    [[nodiscard]] time_t GetNextRandomBGResetTime() const override { return m_NextRandomBGReset; }
+    [[nodiscard]] Seconds GetNextDailyQuestsResetTime() const override { return m_NextDailyQuestReset; }
+    [[nodiscard]] Seconds GetNextWeeklyQuestsResetTime() const override { return m_NextWeeklyQuestReset; }
+    [[nodiscard]] Seconds GetNextRandomBGResetTime() const override { return m_NextRandomBGReset; }
 
     /// Get the maximum skill level a player can reach
     [[nodiscard]] uint16 GetConfigMaxSkillValue() const override
@@ -365,9 +353,6 @@ public:
     void   SetCleaningFlags(uint32 flags) override { m_CleaningFlags = flags; }
     void   ResetEventSeasonalQuests(uint16 event_id) override;
 
-    time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour) override; // pussywizard
-    time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) override; // pussywizard
-
     [[nodiscard]] std::string const& GetRealmName() const override { return _realmName; } // pussywizard
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard
 
@@ -400,12 +385,8 @@ private:
 
     bool m_isClosed;
 
-    time_t m_startTime;
-    time_t m_gameTime;
     IntervalTimer m_timers[WUPDATE_COUNT];
-    time_t mail_expire_check_timer;
-    uint32 m_updateTime, m_updateTimeSum;
-    static uint32 m_gameMSTime;
+    Seconds mail_expire_check_timer;
 
     SessionMap m_sessions;
     SessionMap m_offlineSessions;
@@ -443,12 +424,12 @@ private:
     LockedQueue<CliCommandHolder*> cliCmdQueue;
 
     // next daily quests and random bg reset time
-    time_t m_NextDailyQuestReset;
-    time_t m_NextWeeklyQuestReset;
-    time_t m_NextMonthlyQuestReset;
-    time_t m_NextRandomBGReset;
-    time_t m_NextCalendarOldEventsDeletionTime;
-    time_t m_NextGuildReset;
+    Seconds m_NextDailyQuestReset;
+    Seconds m_NextWeeklyQuestReset;
+    Seconds m_NextMonthlyQuestReset;
+    Seconds m_NextRandomBGReset;
+    Seconds m_NextCalendarOldEventsDeletionTime;
+    Seconds m_NextGuildReset;
 
     //Player Queue
     Queue m_QueuedPlayer;

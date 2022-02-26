@@ -485,8 +485,7 @@ struct VendorItemData
 
 struct VendorItemCount
 {
-    explicit VendorItemCount(uint32 _item, uint32 _count)
-        : itemId(_item), count(_count), lastIncrementTime(time(nullptr)) {}
+    explicit VendorItemCount(uint32 _item, uint32 _count);
 
     uint32 itemId;
     uint32 count;

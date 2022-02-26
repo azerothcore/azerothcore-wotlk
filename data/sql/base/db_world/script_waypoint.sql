@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.script_waypoint
+-- Дамп структуры для таблица acore_world.script_waypoint
 DROP TABLE IF EXISTS `script_waypoint`;
 CREATE TABLE IF NOT EXISTS `script_waypoint` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'creature_template entry',
-  `pointid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'creature_template entry',
+  `pointid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `location_x` float NOT NULL DEFAULT 0,
   `location_y` float NOT NULL DEFAULT 0,
   `location_z` float NOT NULL DEFAULT 0,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `script_waypoint` (
   PRIMARY KEY (`entry`,`pointid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Script Creature waypoints';
 
--- Дамп данных таблицы _acore_world.script_waypoint: 2 373 rows
+-- Дамп данных таблицы acore_world.script_waypoint: 2 373 rows
 DELETE FROM `script_waypoint`;
 /*!40000 ALTER TABLE `script_waypoint` DISABLE KEYS */;
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES

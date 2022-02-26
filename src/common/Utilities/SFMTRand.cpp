@@ -16,9 +16,8 @@
  */
 
 #include "SFMTRand.h"
-#include <algorithm>
+#include "Timer.h"
 #include <array>
-#include <ctime>
 #include <functional>
 #include <random>
 
@@ -70,7 +69,7 @@ SFMTRand::SFMTRand()
     }
     else
     {
-        sfmt_init_gen_rand(&_state, uint32(time(nullptr)));
+        sfmt_init_gen_rand(&_state, uint32(GetEpochTime().count()));
     }
 }
 

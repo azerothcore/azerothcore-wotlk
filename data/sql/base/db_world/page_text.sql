@@ -12,17 +12,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.page_text
+-- Дамп структуры для таблица acore_world.page_text
 DROP TABLE IF EXISTS `page_text`;
 CREATE TABLE IF NOT EXISTS `page_text` (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Text` longtext NOT NULL,
-  `NextPageID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `NextPageID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='Item System';
 
--- Дамп данных таблицы _acore_world.page_text: 1 946 rows
+-- Дамп данных таблицы acore_world.page_text: 1 946 rows
 DELETE FROM `page_text`;
 /*!40000 ALTER TABLE `page_text` DISABLE KEYS */;
 INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES

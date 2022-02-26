@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_auth.realmcharacters
+-- Дамп структуры для таблица acore_auth.realmcharacters
 DROP TABLE IF EXISTS `realmcharacters`;
 CREATE TABLE IF NOT EXISTS `realmcharacters` (
   `realmid` INT unsigned NOT NULL DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `realmcharacters` (
   KEY `acctid` (`acctid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Realm Character Tracker';
 
--- Дамп данных таблицы _acore_auth.realmcharacters: ~0 rows (приблизительно)
+-- Дамп данных таблицы acore_auth.realmcharacters: ~0 rows (приблизительно)
 DELETE FROM `realmcharacters`;
 /*!40000 ALTER TABLE `realmcharacters` DISABLE KEYS */;
 /*!40000 ALTER TABLE `realmcharacters` ENABLE KEYS */;

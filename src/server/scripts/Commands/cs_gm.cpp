@@ -157,8 +157,8 @@ public:
     {
         ///- Get the accounts with GM Level >0
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_GM_ACCOUNTS);
-        stmt->setUInt8(0, uint8(SEC_MODERATOR));
-        stmt->setInt32(1, int32(realm.Id.Realm));
+        stmt->SetData(0, uint8(SEC_MODERATOR));
+        stmt->SetData(1, int32(realm.Id.Realm));
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
         if (result)
@@ -169,16 +169,16 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                char const* name = fields[0].GetCString();
-                uint8 security = fields[1].GetUInt8();
-                uint8 max = (16 - strlen(name)) / 2;
+                std::string name = fields[0].Get<std::string>();
+                uint8 security = fields[1].Get<uint8>();
+                uint8 max = (16 - name.length()) / 2;
                 uint8 max2 = max;
-                if ((max + max2 + strlen(name)) == 16)
+                if ((max + max2 + name.length()) == 16)
                     max2 = max - 1;
                 if (handler->GetSession())
-                    handler->PSendSysMessage("|    %s GMLevel %u", name, security);
+                    handler->PSendSysMessage("|    %s GMLevel %u", name.c_str(), security);
                 else
-                    handler->PSendSysMessage("|%*s%s%*s|   %u  |", max, " ", name, max2, " ", security);
+                    handler->PSendSysMessage("|%*s%s%*s|   %u  |", max, " ", name.c_str(), max2, " ", security);
             } while (result->NextRow());
             handler->SendSysMessage("========================");
         }

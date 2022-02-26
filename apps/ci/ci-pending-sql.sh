@@ -13,15 +13,16 @@ function import() {
     folder="db_"$db
     pendingPath="$AC_PATH_ROOT/data/sql/updates/pending_$folder"
     updPath="$UPDATES_PATH/$folder"
+    archivedPath="$AC_PATH_ROOT/data/sql/archive/$folder/5.x"
 
-    latestUpd=`ls -1 $updPath/ | tail -n 1`
+    latestUpd=$(ls -1 $updPath/ | tail -n 1)
 
     if [ -z $latestUpd ]; then
-        echo "FIRST UPDATE FILE MISSING!! DID YOU ARCHIVED IT?";
-        exit;
+        latestUpd=$(ls -1 $archivedPath/ | tail -n 1)
+        echo "> Last update file for db $db is missing! Using archived file" $latestUpd
     fi
 
-    dateToday=`date +%Y_%m_%d`
+    dateToday=$(date +%Y_%m_%d)
     counter=0
 
     dateLast=$latestUpd

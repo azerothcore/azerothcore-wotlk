@@ -16,6 +16,7 @@
  */
 
 #include "blackrock_depths.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -154,7 +155,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            time_t now = time(nullptr);
+            time_t now = GameTime::GetGameTime().count();
             if (instance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || instance->GetData(TYPE_RING_OF_LAW) == DONE)
             {
                 return false;

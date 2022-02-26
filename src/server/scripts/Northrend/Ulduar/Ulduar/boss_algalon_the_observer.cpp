@@ -283,7 +283,7 @@ public:
         bool _fedOnTears;
         bool _heraldOfTheTitans;
 
-        bool IsValidHeraldItem(const ItemTemplate* item)
+        bool IsValidHeraldItem(ItemTemplate const* item)
         {
             if (!item) // should not happen, but checked in GetAverageItemLevel()
                 return true;

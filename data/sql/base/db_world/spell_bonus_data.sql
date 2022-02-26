@@ -12,10 +12,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Дамп структуры для таблица _acore_world.spell_bonus_data
+-- Дамп структуры для таблица acore_world.spell_bonus_data
 DROP TABLE IF EXISTS `spell_bonus_data`;
 CREATE TABLE IF NOT EXISTS `spell_bonus_data` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `direct_bonus` float NOT NULL DEFAULT 0,
   `dot_bonus` float NOT NULL DEFAULT 0,
   `ap_bonus` float NOT NULL DEFAULT 0,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `spell_bonus_data` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
--- Дамп данных таблицы _acore_world.spell_bonus_data: 1 268 rows
+-- Дамп данных таблицы acore_world.spell_bonus_data: 1 268 rows
 DELETE FROM `spell_bonus_data`;
 /*!40000 ALTER TABLE `spell_bonus_data` DISABLE KEYS */;
 INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES
