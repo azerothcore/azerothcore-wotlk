@@ -369,7 +369,7 @@ public:
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 					TurnGates(true, false);
-					me->MonsterMoveWithSpeed(homePos.GetPositionX(),homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
+					me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
 					me->UpdatePosition(homePos);
                     _speakTimer = 60000;
                 }
