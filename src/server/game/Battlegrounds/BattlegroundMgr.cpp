@@ -259,7 +259,7 @@ uint32 BattlegroundMgr::GetNextClientVisibleInstanceId()
 // create a new battleground that will really be used to play
 Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId originalBgTypeId, uint32 minLevel, uint32 maxLevel, uint8 arenaType, bool isRated)
 {
-    BattlegroundTypeId bgTypeId = GetRandomBG(originalBgTypeId);
+    BattlegroundTypeId bgTypeId = GetRandomBG(originalBgTypeId, minLevel);
 
     if (originalBgTypeId == BATTLEGROUND_AA)
         originalBgTypeId = bgTypeId;
@@ -769,7 +769,7 @@ bool BattlegroundMgr::IsBGWeekend(BattlegroundTypeId bgTypeId)
     return IsHolidayActive(BGTypeToWeekendHolidayId(bgTypeId));
 }
 
-BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId)
+BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId, uint32 minLevel)
 {
     if (GetBattlegroundTemplateByTypeId(bgTypeId))
     {
@@ -786,8 +786,11 @@ BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId)
 
             if (CreateBattlegroundData const* bg = GetBattlegroundTemplateByMapId(mapId))
             {
-                ids.push_back(bg->bgTypeId);
-                weights.push_back(bg->Weight);
+                if (bg->LevelMin <= minLevel)
+                {
+                    ids.push_back(bg->bgTypeId);
+                    weights.push_back(bg->Weight);
+                }
             }
         }
 
