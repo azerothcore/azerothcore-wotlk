@@ -30,6 +30,20 @@ INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, 
 (22675, 0, 469, -7486.36, -1194.32, 476.800, 0),
 (22676, 0, 469, -7469.93, -1227.93, 476.777, 0);
 
+DELETE FROM `waypoint_data` WHERE `id` = 11583;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(11583, 1, -7348.85, -1495.13, 552.515, 2.190162, 0, 2, 0, 100, 0),
+(11583, 2, -7348.54, -1494.18, 552.515, 2.190162, 0, 2, 0, 100, 0),
+(11583, 3, -7392.87, -1475.70, 544.619, 2.190162, 0, 2, 0, 100, 0),
+(11583, 4, -7423.42, -1437.66, 535.314, 2.190162, 0, 2, 0, 100, 0),
+(11583, 5, -7445.25, -1402.11, 523.842, 2.190162, 0, 2, 0, 100, 0),
+(11583, 6, -7460.38, -1372.60, 513.092, 2.190162, 0, 2, 0, 100, 0),
+(11583, 7, -7479.81, -1331.76, 498.759, 2.190162, 0, 2, 0, 100, 0),
+(11583, 8, -7492.58, -1295.35, 488.091, 2.190162, 0, 2, 0, 100, 0),
+(11583, 9, -7502.00, -1256.50, 476.758, 2.174731, 0, 2, 0, 100, 0);
+
+UPDATE `creature_template_movement` SET `Flight` = 2 WHERE `CreatureID` = 11583;
+
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|2|256|131072|33554432, `flags_extra` = `flags_extra`|128|256 WHERE `entry` = 14667;
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|131072, `flags_extra` = `flags_extra`|1|256|16384|4194304, `mechanic_immune_mask`=`mechanic_immune_mask`|1|2|4|8|16|128|256|512|1024|2048|4096|8192|16384|65536|131072|4194304|8388608|33554432|67108864|536870912 , `ScriptName` = 'npc_corrupted_totem' WHERE `entry` IN (14662, 14663, 14664, 14666);
