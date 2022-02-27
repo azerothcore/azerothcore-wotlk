@@ -841,7 +841,6 @@ public:
     }
 
     [[nodiscard]] GossipText const* GetGossipText(uint32 Text_ID) const;
-    [[nodiscard]] QuestGreeting const* GetQuestGreeting(ObjectGuid guid) const;
 
     [[nodiscard]] AreaTrigger const* GetAreaTrigger(uint32 trigger) const
     {
