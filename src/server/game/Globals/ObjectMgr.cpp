@@ -6161,7 +6161,7 @@ void ObjectMgr::LoadQuestGreetings()
         Field* fields = result->Fetch();
 
         uint32 id = fields[0].Get<uint32>();
-        uint8 type = fields[1].Get<uint32>();
+        uint8 type = fields[1].Get<uint8>();
         switch (type)
         {
         case 0: // Creature
@@ -6170,6 +6170,7 @@ void ObjectMgr::LoadQuestGreetings()
                 LOG_ERROR("sql.sql", "Table `quest_greeting`: creature template entry {} does not exist.", id);
                 continue;
             }
+            type = TYPEID_UNIT;
             break;
         case 1: // GameObject
             if (!sObjectMgr->GetGameObjectTemplate(id))
@@ -6177,6 +6178,7 @@ void ObjectMgr::LoadQuestGreetings()
                 LOG_ERROR("sql.sql", "Table `quest_greeting`: gameobject template entry {} does not exist.", id);
                 continue;
             }
+            type = TYPEID_GAMEOBJECT;
             break;
         default:
             continue;

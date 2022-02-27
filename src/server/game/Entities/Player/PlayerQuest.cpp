@@ -172,23 +172,24 @@ void Player::SendPreparedQuest(ObjectGuid guid)
             else
             {
                 qe = gossiptext->Options[0].Emotes[0];
-                LocaleConstant localeConstant = GetSession()->GetSessionDbLocaleIndex();
 
                 if (!gossiptext->Options[0].Text_0.empty())
                 {
                     title = gossiptext->Options[0].Text_0;
 
-                    if (localeConstant != LOCALE_enUS)
+                    int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                    if (loc_idx >= 0)
                         if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(npcTextLocale->Text_0[0], localeConstant, title);
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_0[0], loc_idx, title);
                 }
                 else
                 {
                     title = gossiptext->Options[0].Text_1;
 
-                    if (localeConstant != LOCALE_enUS)
+                    int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                    if (loc_idx >= 0)
                         if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(npcTextLocale->Text_1[0], localeConstant, title);
+                            ObjectMgr::GetLocaleString(npcTextLocale->Text_1[0], loc_idx, title);
                 }
             }
         }
