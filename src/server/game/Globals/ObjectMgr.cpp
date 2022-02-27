@@ -6210,6 +6210,8 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         return;
     }
 
+    uint32 count = 0;
+
     do
     {
         Field* fields = result->Fetch();
@@ -6244,9 +6246,11 @@ void ObjectMgr::LoadQuestGreetingsLocales()
 
         QuestGreetingLocale& data = _questGreetingLocaleStore[type][id];
         AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
+
+        ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", uint32(_questGreetingLocaleStore.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadQuestOfferRewardLocale()
