@@ -135,7 +135,7 @@ public:
         instance->SetBossState(DATA_LORD_MARROWGAR, IN_PROGRESS);
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (target && (spell->Id == 69055 || spell->Id == 70814)) // Bone Slice (Saber Lash)
             for (uint8 i = 0; i < 3; ++i)

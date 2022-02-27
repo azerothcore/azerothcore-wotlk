@@ -319,7 +319,7 @@ public:
         void DoCastProtection()
         {
             // lets get spell info
-            const SpellInfo* info = sSpellMgr->GetSpellInfo(SPELL_PROTECTION_OF_ELUNE);
+            SpellInfo const* info = sSpellMgr->GetSpellInfo(SPELL_PROTECTION_OF_ELUNE);
 
             if (!info)
                 return;

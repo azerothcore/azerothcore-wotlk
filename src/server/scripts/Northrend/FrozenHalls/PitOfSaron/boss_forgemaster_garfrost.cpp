@@ -169,7 +169,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
+        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
             if (spell->Id == uint32(SPELL_SARONITE_TRIGGERED))
             {

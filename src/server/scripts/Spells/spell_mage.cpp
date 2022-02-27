@@ -133,7 +133,7 @@ class spell_mage_molten_armor : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
             return true;
 
@@ -345,7 +345,7 @@ class spell_mage_brain_freeze : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
             return false;
 
@@ -591,7 +591,7 @@ class spell_mage_ice_barrier_aura : public spell_mage_incanters_absorbtion_base_
     PrepareAuraScript(spell_mage_ice_barrier_aura);
 
     // TODO: Rework
-    static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
         float bonus = 0.8068f;
@@ -627,7 +627,7 @@ class spell_mage_ice_barrier : public SpellScript
     PrepareSpellScript(spell_mage_ice_barrier);
 
     // TODO: Rework
-    static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
         float bonus = 0.8068f;
@@ -919,7 +919,7 @@ class spell_mage_summon_water_elemental : public SpellScript
             if (pet->GetCharmInfo() && caster->ToPlayer())
             {
                 pet->m_CreatureSpellCooldowns.clear();
-                const SpellInfo* spellEntry = sSpellMgr->GetSpellInfo(31707);
+                SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(31707);
                 pet->GetCharmInfo()->ToggleCreatureAutocast(spellEntry, true);
                 pet->GetCharmInfo()->SetSpellAutocast(spellEntry, true);
                 caster->ToPlayer()->CharmSpellInitialize();

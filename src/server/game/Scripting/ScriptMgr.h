@@ -434,7 +434,7 @@ public:
     //Called when Damage is Dealt
     virtual uint32 DealDamage(Unit* /*AttackerUnit*/, Unit* /*pVictim*/, uint32 damage, DamageEffectType /*damagetype*/) { return damage; }
 
-    virtual void OnBeforeRollMeleeOutcomeAgainst(const Unit* /*attacker*/, const Unit* /*victim*/, WeaponAttackType /*attType*/, int32& /*attackerMaxSkillValueForLevel*/, int32& /*victimMaxSkillValueForLevel*/, int32& /*attackerWeaponSkill*/, int32& /*victimDefenseSkill*/, int32& /*crit_chance*/, int32& /*miss_chance*/, int32& /*dodge_chance*/, int32& /*parry_chance*/, int32& /*block_chance*/ ) {   };
+    virtual void OnBeforeRollMeleeOutcomeAgainst(Unit const* /*attacker*/, Unit const* /*victim*/, WeaponAttackType /*attType*/, int32& /*attackerMaxSkillValueForLevel*/, int32& /*victimMaxSkillValueForLevel*/, int32& /*attackerWeaponSkill*/, int32& /*victimDefenseSkill*/, int32& /*crit_chance*/, int32& /*miss_chance*/, int32& /*dodge_chance*/, int32& /*parry_chance*/, int32& /*block_chance*/ ) {   };
 
     virtual void OnAuraRemove(Unit* /*unit*/, AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
 
@@ -1137,13 +1137,13 @@ public:
     virtual void OnPlayerJoinArena(Player* /*player*/) { }
 
     //Called when trying to get a team ID of a slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomGetArenaTeamId(const Player* /*player*/, uint8 /*slot*/, uint32& /*teamID*/) const { }
+    virtual void GetCustomGetArenaTeamId(Player const* /*player*/, uint8 /*slot*/, uint32& /*teamID*/) const { }
 
     //Called when trying to get players personal rating of an arena slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomArenaPersonalRating(const Player* /*player*/, uint8 /*slot*/, uint32& /*rating*/) const { }
+    virtual void GetCustomArenaPersonalRating(Player const* /*player*/, uint8 /*slot*/, uint32& /*rating*/) const { }
 
     //Called after the normal slots (0..2) for arena have been evaluated so that custom arena teams could modify it if nececasry
-    virtual void OnGetMaxPersonalArenaRatingRequirement(const Player* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
+    virtual void OnGetMaxPersonalArenaRatingRequirement(Player const* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
@@ -1507,7 +1507,7 @@ protected:
 public:
     // items
     virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
-    virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
+    virtual void OnMirrorImageDisplayItem(Item const* /*item*/, uint32& /*display*/) { }
 
     // loot
     virtual void OnAfterRefCount(Player const* /*player*/, LootStoreItem* /*LootStoreItem*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, uint32& /*maxcount*/, LootStore const& /*store*/) { }
@@ -1717,6 +1717,9 @@ public:
 
     // Runs on stop event
     virtual void OnStop(uint16 /*EventID*/) { }
+
+    // Runs on event check
+    virtual void OnEventCheck(uint16 /*EventID*/) { }
 };
 
 class MailScript : public ScriptObject
@@ -2213,9 +2216,9 @@ public: /* PlayerScript */
     void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
-    void GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const;
-    void GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const;
-    void OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const;
+    void GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const;
+    void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
+    void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
@@ -2341,7 +2344,7 @@ public: /* GroupScript */
 
 public: /* GlobalScript */
     void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
-    void OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display);
+    void OnGlobalMirrorImageDisplayItem(Item const* item, uint32& display);
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
     void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
@@ -2369,7 +2372,7 @@ public: /* UnitScript */
     void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage);
     void ModifyHealRecieved(Unit* target, Unit* attacker, uint32& addHealth);
     uint32 DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, DamageEffectType damagetype);
-    void OnBeforeRollMeleeOutcomeAgainst(const Unit* attacker, const Unit* victim, WeaponAttackType attType, int32& attackerMaxSkillValueForLevel, int32& victimMaxSkillValueForLevel, int32& attackerWeaponSkill, int32& victimDefenseSkill, int32& crit_chance, int32& miss_chance, int32& dodge_chance, int32& parry_chance, int32& block_chance);
+    void OnBeforeRollMeleeOutcomeAgainst(Unit const* attacker, Unit const* victim, WeaponAttackType attType, int32& attackerMaxSkillValueForLevel, int32& victimMaxSkillValueForLevel, int32& attackerWeaponSkill, int32& victimDefenseSkill, int32& crit_chance, int32& miss_chance, int32& dodge_chance, int32& parry_chance, int32& block_chance);
     void OnAuraRemove(Unit* unit, AuraApplication* aurApp, AuraRemoveMode mode);
     bool IfNormalReaction(Unit const* unit, Unit const* target, ReputationRank& repRank);
     bool IsNeedModSpellDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
@@ -2437,6 +2440,7 @@ public: /* SpellSC */
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);
     void OnGameEventStop(uint16 EventID);
+    void OnGameEventCheck(uint16 EventID);
 
 public: /* MailScript */
     void OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver const& receiver, MailSender const& sender, MailCheckMask& checked, uint32& deliver_delay, uint32& custom_expiration, bool& deleteMailItemsFromDB, bool& sendMail);
