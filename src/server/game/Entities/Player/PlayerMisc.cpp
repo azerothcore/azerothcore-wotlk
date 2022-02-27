@@ -196,7 +196,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
                 InstanceSave* instanceSave = itr->second.save;
-                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() || !instanceSave->CanReset())
                     continue;
 
@@ -223,7 +223,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
                 InstanceSave* instanceSave = itr->second.save;
-                const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                MapEntry const* entry = sMapStore.LookupEntry(itr->first);
                 if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
                     continue;
 

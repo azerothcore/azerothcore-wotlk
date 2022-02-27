@@ -24,6 +24,7 @@
 #include "CreatureAIImpl.h"
 #include "DBCEnums.h"
 #include <unordered_map>
+#include <functional>
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::unordered_map<uint32, BattlegroundTypeId> BattleMastersMap;
@@ -42,15 +43,8 @@ struct CreateBattlegroundData
     uint32 LevelMax;
     char const* BattlegroundName;
     uint32 MapID;
-    float Team1StartLocX;
-    float Team1StartLocY;
-    float Team1StartLocZ;
-    float Team1StartLocO;
-    float Team2StartLocX;
-    float Team2StartLocY;
-    float Team2StartLocZ;
-    float Team2StartLocO;
     float StartMaxDist;
+    std::array<Position, PVP_TEAMS_COUNT> StartLocation;
     uint32 scriptId;
     uint8 Weight;
 };
@@ -73,9 +67,7 @@ public:
     void BuildPlayerLeftBattlegroundPacket(WorldPacket* data, ObjectGuid guid);
     void BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere);
     void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, GroupJoinBattlegroundResult result);
-    void BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg);
     void BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, TeamId teamId, bool isRated = false, BattlegroundTypeId forceBgTypeId = BATTLEGROUND_TYPE_NONE);
-    void BuildPlaySoundPacket(WorldPacket* data, uint32 soundid);
     void SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, ObjectGuid guid);
 
     /* Battlegrounds */
@@ -95,8 +87,6 @@ public:
     BattlegroundQueue& GetBattlegroundQueue(BattlegroundQueueTypeId bgQueueTypeId) { return m_BattlegroundQueues[bgQueueTypeId]; }
     void ScheduleArenaQueueUpdate(uint32 arenaRatedTeamId, BattlegroundQueueTypeId bgQueueTypeId, BattlegroundBracketId bracket_id);
     uint32 GetPrematureFinishTime() const;
-
-    static void InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, TeamId teamId);
 
     void ToggleArenaTesting();
     void ToggleTesting();
@@ -138,10 +128,12 @@ public:
     static std::unordered_map<uint32, BattlegroundQueueTypeId> ArenaTypeToQueue;    // ArenaType -> BattlegroundQueueTypeId
     static std::unordered_map<uint32, ArenaType> QueueToArenaType;                  // BattlegroundQueueTypeId -> ArenaType
 
+    void DoForAllBattlegrounds(std::function<void(Battleground*)> const& worker);
+
 private:
     bool CreateBattleground(CreateBattlegroundData& data);
     uint32 GetNextClientVisibleInstanceId();
-    BattlegroundTypeId GetRandomBG(BattlegroundTypeId id);
+    BattlegroundTypeId GetRandomBG(BattlegroundTypeId id, uint32 minLevel);
 
     typedef std::map<BattlegroundTypeId, Battleground*> BattlegroundTemplateContainer;
     BattlegroundTemplateContainer m_BattlegroundTemplates;

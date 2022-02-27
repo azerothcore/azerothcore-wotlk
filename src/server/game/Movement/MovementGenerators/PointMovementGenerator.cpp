@@ -162,9 +162,12 @@ void PointMovementGenerator<T>::DoFinalize(T* unit)
     {
         unit->ClearUnitState(UNIT_STATE_CHARGING);
 
-        if (Unit* target = ObjectAccessor::GetUnit(*unit, _chargeTargetGUID))
+        if (_chargeTargetGUID && _chargeTargetGUID == unit->GetTarget())
         {
-            unit->Attack(target, true);
+            if (Unit* target = ObjectAccessor::GetUnit(*unit, _chargeTargetGUID))
+            {
+                unit->Attack(target, true);
+            }
         }
     }
 

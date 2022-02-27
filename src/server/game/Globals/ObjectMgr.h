@@ -180,7 +180,7 @@ enum eScriptFlags
     SF_CASTSPELL_SEARCH_CREATURE  = 4,
     SF_CASTSPELL_TRIGGERED      = 0x1,
 
-    // PlaySound flags
+    // Playsound flags
     SF_PLAYSOUND_TARGET_PLAYER  = 0x1,
     SF_PLAYSOUND_DISTANCE_SOUND = 0x2,
 
@@ -310,7 +310,7 @@ struct ScriptInfo
         {
             uint32 SoundID;         // datalong
             uint32 Flags;           // datalong2
-        } PlaySound;
+        } Playsound;
 
         struct                      // SCRIPT_COMMAND_CREATE_ITEM (17)
         {

@@ -533,7 +533,7 @@ public:
             me->SetCorpseDelay(1);
         }
 
-        bool CanAIAttack(const Unit* who) const override
+        bool CanAIAttack(Unit const* who) const override
         {
             return who->GetEntry() == NPC_INJURED_7TH_LEGION_SOLDER;
         }
@@ -1145,7 +1145,7 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        bool CanAIAttack(const Unit* target) const override
+        bool CanAIAttack(Unit const* target) const override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
                 return false;
@@ -1893,7 +1893,7 @@ public:
                 Talk (SAY_AGGRO, player);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id != SPELL_HIGH_EXECUTORS_BRANDING_IRON)
                 return;

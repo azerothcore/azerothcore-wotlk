@@ -1758,7 +1758,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         float sqrt1 = b * b + 4 * a * height;
         if (sqrt1 > 0)
         {
-            sqrt1 = sqrt(sqrt1);
+            sqrt1 = std::sqrt(sqrt1);
             dist = (sqrt1 - b) / (2 * a);
             CHECK_DIST;
         }
@@ -1767,7 +1767,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         float sqrt2 = b * b + 4 * a * height;
         if (sqrt2 > 0)
         {
-            sqrt2 = sqrt(sqrt2);
+            sqrt2 = std::sqrt(sqrt2);
             dist = (sqrt2 - b) / (2 * a);
             CHECK_DIST;
 
@@ -1796,7 +1796,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
             LOG_ERROR("spells", "Initial {} {} {} {} {}", x, y, z, distSq, sizeSq);
             if (distSq > sizeSq)
             {
-                float factor = 1 - sqrt(sizeSq / distSq);
+                float factor = 1 - std::sqrt(sizeSq / distSq);
                 x += factor * ((*itr)->GetPositionX() - x);
                 y += factor * ((*itr)->GetPositionY() - y);
                 z += factor * ((*itr)->GetPositionZ() - z);
@@ -5334,7 +5334,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
     // Spectator check
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        if (((const Player*)m_caster)->IsSpectator() && m_spellInfo->Id != SPECTATOR_SPELL_BINDSIGHT)
+        if (((Player const*)m_caster)->IsSpectator() && m_spellInfo->Id != SPECTATOR_SPELL_BINDSIGHT)
             return SPELL_FAILED_NOT_HERE;
 
     SpellCastResult res = SPELL_CAST_OK;
