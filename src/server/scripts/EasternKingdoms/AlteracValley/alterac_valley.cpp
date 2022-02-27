@@ -110,8 +110,10 @@ public:
             Reset();
         }
 
-        void EnterCombat(Unit* victim) override
+        void AttackStart(Unit* victim) override
         {
+            ScriptedAI::AttackStart(victim);
+
             // Boss should attack as well
             if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
             {
@@ -119,9 +121,9 @@ public:
                 {
                     if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
                     {
-                        if (mainBoss->IsAIEnabled)
+                        if (mainBoss->IsAIEnabled && !mainBoss->IsInCombat())
                         {
-                            mainBoss->AI()->EnterCombat(victim);
+                            mainBoss->AI()->AttackStart(victim);
                         }
                     }
                 }
@@ -130,6 +132,8 @@ public:
 
         void EnterEvadeMode() override
         {
+            ScriptedAI::EnterEvadeMode();
+
             // Evade boss
             if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
             {
@@ -137,7 +141,7 @@ public:
                 {
                     if (Creature* mainBoss = bg->GetBGCreature((me->GetFaction() == FACTION_AV_ALLIANCE ? AV_CPLACE_A_BOSS : AV_CPLACE_H_BOSS)))
                     {
-                        if (mainBoss->IsAIEnabled)
+                        if (mainBoss->IsAIEnabled && !mainBoss->IsInEvadeMode())
                         {
                             mainBoss->AI()->EnterEvadeMode();
                         }

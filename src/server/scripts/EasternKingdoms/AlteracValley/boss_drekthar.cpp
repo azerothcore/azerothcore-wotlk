@@ -68,6 +68,17 @@ public:
         void EnterCombat(Unit* victim) override
         {
             Talk(YELL_AGGRO);
+        }
+
+        void JustRespawned() override
+        {
+            Reset();
+            Talk(YELL_RESPAWN);
+        }
+
+        void AttackStart(Unit* victim) override
+        {
+            ScriptedAI::AttackStart(victim);
 
             // Mini bosses should attack as well
             if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
@@ -78,9 +89,9 @@ public:
                     {
                         if (Creature* marshall = bg->GetBGCreature(i))
                         {
-                            if (marshall->IsAIEnabled)
+                            if (marshall->IsAIEnabled && !marshall->IsInCombat())
                             {
-                                marshall->AI()->EnterCombat(victim);
+                                marshall->AI()->AttackStart(victim);
                             }
                         }
                     }
@@ -88,14 +99,10 @@ public:
             }
         }
 
-        void JustRespawned() override
-        {
-            Reset();
-            Talk(YELL_RESPAWN);
-        }
-
         void EnterEvadeMode() override
         {
+            ScriptedAI::EnterEvadeMode();
+
             // Evade mini bosses
             if (BattlegroundMap* bgMap = me->GetMap()->ToBattlegroundMap())
             {
@@ -105,7 +112,7 @@ public:
                     {
                         if (Creature* marshall = bg->GetBGCreature(i))
                         {
-                            if (marshall->IsAIEnabled)
+                            if (marshall->IsAIEnabled && !marshall->IsInEvadeMode())
                             {
                                 marshall->AI()->EnterEvadeMode();
                             }
