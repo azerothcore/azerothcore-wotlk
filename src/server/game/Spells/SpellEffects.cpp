@@ -36,6 +36,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -6278,9 +6279,7 @@ void Spell::EffectPlayMusic(SpellEffIndex effIndex)
         return;
     }
 
-    WorldPacket data(SMSG_PLAY_MUSIC, 4);
-    data << uint32(soundid);
-    player->GetSession()->SendPacket(&data);
+    unitTarget->ToPlayer()->SendDirectMessage(WorldPackets::Misc::PlayMusic(soundid).Write());
 }
 
 void Spell::EffectSpecCount(SpellEffIndex /*effIndex*/)
