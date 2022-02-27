@@ -237,7 +237,7 @@ public:
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0, 200.f, true));
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
-            //events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
             events.ScheduleEvent(EVENT_SHADOWBLINK, 40000);
         }
@@ -377,7 +377,7 @@ public:
                                     dragon->AI()->AttackStart(me->GetVictim());
                                 }
 
-                                if (KilledAdds >= 10)
+                                if (KilledAdds >= 42)
                                 {
                                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianSpawn))
                                     {
