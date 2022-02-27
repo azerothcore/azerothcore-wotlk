@@ -22,6 +22,6 @@ CREATE TABLE `quest_greeting_locale` (
   `Type` TINYINT UNSIGNED NOT NULL DEFAULT '0',
   `locale` VARCHAR(4) NOT NULL,
   `Greeting` TEXT,
-  `VerifiedBuild` SMALLINT DEFAULT '0',
+  `VerifiedBuild` SMALLINT NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`Type`)
 ) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4;
