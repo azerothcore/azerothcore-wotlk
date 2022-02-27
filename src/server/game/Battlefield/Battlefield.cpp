@@ -27,6 +27,7 @@
 #include "GroupMgr.h"
 #include "Map.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
@@ -374,14 +375,7 @@ void Battlefield::EndBattle(bool endByTimer)
 
 void Battlefield::DoPlaySoundToAll(uint32 SoundID)
 {
-    WorldPacket data;
-    data.Initialize(SMSG_PLAY_SOUND, 4);
-    data << uint32(SoundID);
-
-    for (int team = 0; team < PVP_TEAMS_COUNT; team++)
-        for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
-            if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(&data);
+    BroadcastPacketToWar(WorldPackets::Misc::Playsound(SoundID).Write());
 }
 
 bool Battlefield::HasPlayer(Player* player) const
@@ -447,42 +441,34 @@ void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
     }
 }
 
-void Battlefield::BroadcastPacketToZone(WorldPacket& data) const
+void Battlefield::BroadcastPacketToZone(WorldPacket const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(&data);
+                player->GetSession()->SendPacket(data);
 }
 
-void Battlefield::BroadcastPacketToQueue(WorldPacket& data) const
+void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInQueue[team].begin(); itr != m_PlayersInQueue[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(&data);
+                player->GetSession()->SendPacket(data);
 }
 
-void Battlefield::BroadcastPacketToWar(WorldPacket& data) const
+void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(&data);
+                player->GetSession()->SendPacket(data);
 }
 
-void Battlefield::SendWarningToAllInZone(uint32 entry)
+void Battlefield::SendWarning(uint8 id, WorldObject const* target /*= nullptr*/)
 {
     if (Creature* stalker = GetCreature(StalkerGuid))
-        sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
-}
-
-void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
-{
-    if (player)
-        if (Unit* unit = ObjectAccessor::GetCreature(*player, StalkerGuid))
-            if (Creature* stalker = unit->ToCreature())
-                sCreatureTextMgr->SendChat(stalker, (uint8)entry, player);
+        sCreatureTextMgr->SendChat(stalker, id, target);
 }
 
 void Battlefield::SendUpdateWorldState(uint32 field, uint32 value)

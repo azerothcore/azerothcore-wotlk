@@ -2563,12 +2563,6 @@ bool Creature::LoadCreaturesAddon(bool reload)
         SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
     }
 
-    // Check if Creature is Large
-    if (cainfo->isLarge)
-    {
-        SetVisibilityDistanceOverride(cainfo->visibilityDistanceType);
-    }
-
     SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
 
     // Check if visibility distance different
@@ -3522,4 +3516,13 @@ bool Creature::CanGeneratePickPocketLoot() const
 void Creature::SetRespawnTime(uint32 respawn)
 {
     m_respawnTime = respawn ? GameTime::GetGameTime().count() + respawn : 0;
+}
+
+void Creature::SaveRespawnTimeToDB()
+{
+    if (Map* map = GetMap())
+    {
+        time_t respawnTimer = GetRespawnTime();
+        map->SaveCreatureRespawnTime(GetSpawnId(), respawnTimer);
+    }
 }
