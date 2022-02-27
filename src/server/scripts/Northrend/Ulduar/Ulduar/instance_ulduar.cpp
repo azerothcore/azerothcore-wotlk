@@ -214,13 +214,13 @@ public:
                 SetData(eventId, 0);
         }
 
-        void SpawnHodirChests(int rd)
+        void SpawnHodirChests(Difficulty diff)
         {
             if (Creature* cr = instance->GetCreature(m_uiHodirGUID))
             {
-                switch (rd)
+                switch (diff)
                 {
-                    case 0: // 10 man chest
+                    case RAID_DIFFICULTY_10MAN_NORMAL: // 10 man chest
                     {
                         if (!m_hodirNormalChest)
                         {
@@ -251,7 +251,7 @@ public:
                         }
                         break;
                     }
-                    case 1: // 25 man chest
+                    case RAID_DIFFICULTY_25MAN_NORMAL: // 25 man chest
                     {
                         if (!m_hodirNormalChest)
                         {
@@ -692,8 +692,7 @@ public:
                     break;
 
                 case TYPE_SPAWN_HODIR_CACHE:
-                    // Is the difficulty 10 man(0) ? return 10 man : return 25 man;
-                    SpawnHodirChests(m_difficulty == 0 ? 0 : 1);
+                    SpawnHodirChests(instance->GetDifficulty());
                     break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
