@@ -6170,7 +6170,6 @@ void ObjectMgr::LoadQuestGreetings()
                 LOG_ERROR("sql.sql", "Table `quest_greeting`: creature template entry {} does not exist.", id);
                 continue;
             }
-            type = TYPEID_UNIT;
             break;
         case 1: // GameObject
             if (!sObjectMgr->GetGameObjectTemplate(id))
@@ -6178,7 +6177,6 @@ void ObjectMgr::LoadQuestGreetings()
                 LOG_ERROR("sql.sql", "Table `quest_greeting`: gameobject template entry {} does not exist.", id);
                 continue;
             }
-            type = TYPEID_GAMEOBJECT;
             break;
         default:
             continue;
@@ -6226,7 +6224,6 @@ void ObjectMgr::LoadQuestGreetingsLocales()
                 LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: creature template entry {} does not exist.", id);
                 continue;
             }
-            type = TYPEID_UNIT;
             break;
         case 1: // GameObject
             if (!sObjectMgr->GetGameObjectTemplate(id))
@@ -6234,7 +6231,6 @@ void ObjectMgr::LoadQuestGreetingsLocales()
                 LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: gameobject template entry {} does not exist.", id);
                 continue;
             }
-            type = TYPEID_GAMEOBJECT;
             break;
         default:
             break;
