@@ -41,6 +41,42 @@ namespace WorldPackets
             WeatherState WeatherID = WeatherState(0);
         };
 
+        class AC_GAME_API PlayMusic final : public ServerPacket
+        {
+        public:
+            PlayMusic() : ServerPacket(SMSG_PLAY_MUSIC, 4) { }
+            PlayMusic(uint32 soundKitID) : ServerPacket(SMSG_PLAY_MUSIC, 4), SoundKitID(soundKitID) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 SoundKitID = 0;
+        };
+
+        class AC_GAME_API PlayObjectSound final : public ServerPacket
+        {
+        public:
+            PlayObjectSound() : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8) { }
+            PlayObjectSound(ObjectGuid const& sourceObjectGUID, uint32 soundKitID)
+                : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8), SourceObjectGUID(sourceObjectGUID), SoundKitID(soundKitID) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid SourceObjectGUID;
+            uint32 SoundKitID = 0;
+
+        };
+
+        class AC_GAME_API Playsound final : public ServerPacket
+        {
+        public:
+            Playsound() : ServerPacket(SMSG_PLAY_SOUND, 4) { }
+            Playsound(uint32 soundKitID) : ServerPacket(SMSG_PLAY_SOUND, 4), SoundKitID(soundKitID) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 SoundKitID = 0;
+        };
+
         class RandomRollClient final : public ClientPacket
         {
         public:
