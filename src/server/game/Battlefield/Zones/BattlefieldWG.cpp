@@ -278,7 +278,7 @@ void BattlefieldWG::OnBattleStart()
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
     // Send start warning to all players
-    SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_START);
+    SendWarning(BATTLEFIELD_WG_TEXT_START);
 
     // Xinef: reset tenacity counter
     m_tenacityStack = 0;
@@ -476,9 +476,9 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     m_PlayersInWar[TEAM_HORDE].clear();
 
     if (!endByTimer) // win alli/horde
-        SendWarningToAllInZone((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_WIN_KEEP : (BATTLEFIELD_WG_TEXT_WIN_KEEP + 2));
+        SendWarning((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_WIN_KEEP : (BATTLEFIELD_WG_TEXT_WIN_KEEP + 2));
     else // defend alli/horde
-        SendWarningToAllInZone((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_DEFEND_KEEP : (BATTLEFIELD_WG_TEXT_DEFEND_KEEP + 2));
+        SendWarning((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_DEFEND_KEEP : (BATTLEFIELD_WG_TEXT_DEFEND_KEEP + 2));
 }
 
 // *******************************************************
@@ -488,7 +488,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 void BattlefieldWG::OnStartGrouping()
 {
     if (!IsWarTime())
-        SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_WILL_START);
+        SendWarning(BATTLEFIELD_WG_TEXT_WILL_START);
 }
 
 uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
@@ -757,7 +757,7 @@ void BattlefieldWG::PromotePlayer(Player* killer)
         {
             killer->RemoveAura(SPELL_RECRUIT);
             killer->CastSpell(killer, SPELL_CORPORAL, true);
-            SendWarningToPlayer(killer, BATTLEFIELD_WG_TEXT_FIRSTRANK);
+            SendWarning(BATTLEFIELD_WG_TEXT_FIRSTRANK, killer);
         }
         else
         {
@@ -770,7 +770,7 @@ void BattlefieldWG::PromotePlayer(Player* killer)
         {
             killer->RemoveAura(SPELL_CORPORAL);
             killer->CastSpell(killer, SPELL_LIEUTENANT, true);
-            SendWarningToPlayer(killer, BATTLEFIELD_WG_TEXT_SECONDRANK);
+            SendWarning(BATTLEFIELD_WG_TEXT_SECONDRANK, killer);
         }
         else
         {
