@@ -346,11 +346,6 @@ struct PointOfInterestLocale
     std::vector<std::string> Name;
 };
 
-struct QuestGreetingLocale
-{
-    std::vector<std::string> Greeting;
-};
-
 struct EquipmentInfo
 {
     uint32  ItemEntry[MAX_EQUIPMENT_ITEMS];

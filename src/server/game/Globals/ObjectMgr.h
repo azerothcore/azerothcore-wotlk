@@ -597,6 +597,11 @@ struct QuestGreeting
         : EmoteType(emoteType), EmoteDelay(emoteDelay), Text(std::move(text)) { }
 };
 
+struct QuestGreetingLocale
+{
+    std::vector<std::string> Greeting;
+};
+
 struct GossipMenuItems
 {
     uint32          MenuID;
