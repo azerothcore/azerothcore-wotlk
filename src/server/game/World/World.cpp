@@ -1734,7 +1734,7 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Quest Greetings...");
     sObjectMgr->LoadQuestGreetings();                               // must be loaded after creature_template, gameobject_template tables
-    LOG_INFO("server.loading", "Loading Quest Greeting Locales...")
+    LOG_INFO("server.loading", "Loading Quest Greeting Locales...");
     sObjectMgr->LoadQuestGreetingsLocales();                        // must be loaded after creature_template, gameobject_template tables
 
     LOG_INFO("server.loading", "Loading Quest Money Rewards...");
