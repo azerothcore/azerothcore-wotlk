@@ -1833,7 +1833,7 @@ void Guild::SendMoneyInfo(WorldSession* session) const
     LOG_DEBUG("guild", "MSG_GUILD_BANK_MONEY_WITHDRAWN [%s] Money: %u", session->GetPlayerInfo().c_str(), amount);
 }
 
-void Guild::SendLoginInfo(WorldSession* session)
+void Guild::SendInfo(WorldSession* session)
 {
     WorldPackets::Guild::GuildEvent motd;
     motd.Type = GE_MOTD;
