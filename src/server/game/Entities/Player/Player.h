@@ -880,7 +880,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 37,
     MAX_PLAYER_LOGIN_QUERY
 };
-
+//     PLAYER_LOGIN_QUERY_LOAD_CUSTOM_DATA             = 38, insert above if client communication issue figured out
 enum PlayerDelayedOperations
 {
     DELAYED_SAVE_PLAYER         = 0x01,
@@ -1346,7 +1346,6 @@ public:
     void SendItemDurations();
     void LoadCorpse(PreparedQueryResult result);
     void LoadPet();
-
     bool AddItem(uint32 itemId, uint32 count);
 
     /*********************************************************/
@@ -2113,6 +2112,13 @@ public:
     [[nodiscard]] bool CanTitanGrip() const { return m_canTitanGrip; }
     void SetCanTitanGrip(bool value);
     [[nodiscard]] bool CanTameExoticPets() const { return IsGameMaster() || HasAuraType(SPELL_AURA_ALLOW_TAME_PET_TYPE); }
+    
+    // Secondary stats system code //
+    [[nodiscard]] uint32 GetSecStat(SecStats secstat) const;
+    bool UpdateSecStats(SecStats secstat);
+    bool UpdateAllSecStats();
+    uint32 secval;
+    uint32 bonus;
 
     void SetRegularAttackTime();
     void SetBaseModValue(BaseModGroup modGroup, BaseModType modType, float value) { m_auraBaseMod[modGroup][modType] = value; }
@@ -2681,6 +2687,7 @@ public:
     void _SaveGlyphs(CharacterDatabaseTransaction trans);
     void _SaveTalents(CharacterDatabaseTransaction trans);
     void _SaveStats(CharacterDatabaseTransaction trans);
+    void _SaveCustomData(CharacterDatabaseTransaction trans);
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
     void _SavePlayerSettings(CharacterDatabaseTransaction trans);

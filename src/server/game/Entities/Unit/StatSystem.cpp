@@ -21,6 +21,8 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Unit.h"
 
@@ -87,7 +89,98 @@ void Unit::UpdateDamagePhysical(WeaponAttackType attType)
 ########                         ########
 #######################################*/
 
-bool Player::UpdateStats(Stats stat)
+/*#######################################
+######## PLAYERS SECONDARY STATS ########
+########################################*/
+
+float Unit::GetBaseStat(Stats stat) const
+{
+   float BaseValue = GetCreateStat(stat) * m_auraModifiersGroup[UNIT_MOD_STAT_START + static_cast<uint16>(stat)][BASE_PCT];
+   
+   return BaseValue;
+}
+
+float Unit::GetBonusStat(Stats stat) const
+{
+    float BonusValue = GetStat(stat) - GetBaseStat(stat);
+
+    return BonusValue;
+}
+
+uint32 Player::GetSecStat(SecStats secstat) const
+{
+    uint32 secval = 0;
+    switch(secstat)
+    {
+        case SECSTAT_DEXTERITY:
+            secval = GetBaseStat(STAT_AGILITY) + GetBaseStat(STAT_INTELLECT) + GetAuraCount(7468) + GetAuraCount(7471); 
+            break;
+        case SECSTAT_FORTITUDE:
+            secval = GetBaseStat(STAT_STRENGTH) + GetBaseStat(STAT_STAMINA) + GetAuraCount(7464) + GetAuraCount(7477);
+            return secval;
+            break;
+        case SECSTAT_CONSTITUTION:
+            secval = GetBaseStat(STAT_SPIRIT) + GetBaseStat(STAT_STRENGTH) + GetAuraCount(7474) + GetAuraCount(7464);
+            return secval;
+            break;
+        case SECSTAT_WISDOM:
+            secval = GetBaseStat(STAT_INTELLECT) + GetBaseStat(STAT_SPIRIT) + GetAuraCount(7468) + GetAuraCount(7474);
+            return secval;
+            break;
+        case SECSTAT_VIGOR:
+            secval = GetBaseStat(STAT_STAMINA) + GetBaseStat(STAT_AGILITY) + GetAuraCount(7477) + GetAuraCount(7471);
+            return secval;
+            break;
+    }
+}
+
+bool Player::UpdateSecStats(SecStats secstat)
+{
+    if (secstat > SECSTAT_VIGOR)
+        return false;
+    
+    SetUInt32Value(PLAYER_SEC_STAT_DEX + secstat, GetSecStat(secstat));
+
+        switch (secstat)
+    {
+        case SECSTAT_DEXTERITY:
+            UpdateDodgePercentage();
+            UpdateArmor();
+            UpdateAllCritPercentages();
+            UpdateMaxPower(POWER_MANA);
+            UpdateAllSpellCritChances();
+            break;
+        case SECSTAT_FORTITUDE:
+            UpdateShieldBlockValue();
+            break;
+        case SECSTAT_CONSTITUTION:
+            UpdateMaxHealth();
+            UpdateShieldBlockValue();
+            break;
+        case SECSTAT_WISDOM:
+            UpdateMaxPower(POWER_MANA);
+            UpdateAllSpellCritChances();
+            UpdateArmor();                                  //SPELL_AURA_MOD_RESISTANCE_OF_INTELLECT_PERCENT, only armor currently
+            break;
+        case SECSTAT_VIGOR:
+            UpdateDodgePercentage();
+            UpdateArmor();
+            UpdateAllCritPercentages();
+            break;
+    }
+    return true;
+}
+
+bool Player::UpdateAllSecStats()
+{
+    for (uint8 i = SECSTAT_DEXTERITY; i < MAX_SECSTATS; ++i)
+       
+    UpdateSecStats(SecStats(i)); 
+
+    return true; 
+}
+
+bool Player::UpdateStats(Stats stat) 
 {
     if (stat > STAT_SPIRIT)
         return false;
@@ -96,26 +189,36 @@ bool Player::UpdateStats(Stats stat)
     float value  = GetTotalStatValue(stat);
 
     SetStat(stat, int32(value));
-
+    
     switch (stat)
     {
         case STAT_STRENGTH:
+            UpdateSecStats(SECSTAT_CONSTITUTION);
+            UpdateSecStats(SECSTAT_FORTITUDE);
             UpdateShieldBlockValue();
             break;
         case STAT_AGILITY:
+            UpdateSecStats(SECSTAT_DEXTERITY);
+            UpdateSecStats(SECSTAT_VIGOR);
             UpdateArmor();
             UpdateAllCritPercentages();
             UpdateDodgePercentage();
             break;
         case STAT_STAMINA:
+            UpdateSecStats(SECSTAT_FORTITUDE);
+            UpdateSecStats(SECSTAT_VIGOR);
             UpdateMaxHealth();
             break;
         case STAT_INTELLECT:
+            UpdateSecStats(SECSTAT_WISDOM);
+            UpdateSecStats(SECSTAT_DEXTERITY);
             UpdateMaxPower(POWER_MANA);
             UpdateAllSpellCritChances();
             UpdateArmor();                                  //SPELL_AURA_MOD_RESISTANCE_OF_INTELLECT_PERCENT, only armor currently
             break;
-        default:
+        case STAT_SPIRIT:
+            UpdateSecStats(SECSTAT_CONSTITUTION);
+            UpdateSecStats(SECSTAT_WISDOM);
             break;
     }
 
@@ -185,7 +288,7 @@ bool Player::UpdateAllStats()
         float value = GetTotalStatValue(Stats(i));
         SetStat(Stats(i), int32(value));
     }
-
+    UpdateAllSecStats();
     UpdateArmor();
     // calls UpdateAttackPowerAndDamage() in UpdateArmor for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR
     UpdateAttackPowerAndDamage(true);
@@ -268,12 +371,9 @@ void Player::UpdateArmor()
 
 float Player::GetHealthBonusFromStamina()
 {
-    float stamina = GetStat(STAT_STAMINA);
-
-    float baseStam = stamina < 20 ? stamina : 20;
-    float moreStam = stamina - baseStam;
-
-    return baseStam + (moreStam * 10.0f);
+    uint32 bonus = GetSecStat(SECSTAT_CONSTITUTION); 
+   
+    return (bonus * 5);
 }
 
 float Player::GetManaBonusFromIntellect()

@@ -236,6 +236,17 @@ enum Stats
 
 #define MAX_STATS                        5
 
+enum SecStats
+{
+    SECSTAT_DEXTERITY                  = 0,
+    SECSTAT_FORTITUDE                  = 1,
+    SECSTAT_CONSTITUTION               = 2,
+    SECSTAT_WISDOM                     = 3,
+    SECSTAT_VIGOR                      = 4
+};
+
+#define MAX_SECSTATS                     5
+
 enum Powers
 {
     POWER_MANA                          = 0,

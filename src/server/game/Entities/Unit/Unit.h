@@ -27,6 +27,7 @@
 #include "SpellAuraDefines.h"
 #include "SpellDefines.h"
 #include "ThreatMgr.h"
+#include "SharedDefines.h"
 #include <functional>
 #include <utility>
 
@@ -1381,12 +1382,18 @@ public:
     [[nodiscard]] uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
     [[nodiscard]] uint32 getClassMask() const { return 1 << (getClass() - 1); }
     [[nodiscard]] uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
-
+// findkeyone
     [[nodiscard]] float GetStat(Stats stat) const { return float(GetUInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat)); }
     void SetStat(Stats stat, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, val); }
     [[nodiscard]] uint32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL); }
     void SetArmor(int32 val) { SetResistance(SPELL_SCHOOL_NORMAL, val); }
 
+    [[nodiscard]] float GetBaseStat(Stats stat) const;
+    [[nodiscard]] float GetBonusStat(Stats stat) const;
+
+    float BaseValue = 0.0f;
+    float BonusValue = 0.0f; 
+  // findspot banana
     [[nodiscard]] uint32 GetResistance(SpellSchools school) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school); }
     [[nodiscard]] uint32 GetResistance(SpellSchoolMask mask) const;
     void SetResistance(SpellSchools school, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school, val); }
@@ -2022,7 +2029,7 @@ public:
     bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
     void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
     [[nodiscard]] float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
-    [[nodiscard]] float GetTotalStatValue(Stats stat, float additionalValue = 0.0f) const;
+    [[nodiscard]] float GetTotalStatValue(Stats stat, float additionalValue = 0.0f) const;;
     [[nodiscard]] float GetTotalAuraModValue(UnitMods unitMod) const;
     [[nodiscard]] SpellSchools GetSpellSchoolByAuraGroup(UnitMods unitMod) const;
     [[nodiscard]] Stats GetStatByAuraGroup(UnitMods unitMod) const;
@@ -2047,8 +2054,8 @@ public:
 
     bool isInFrontInMap(Unit const* target, float distance, float arc = M_PI) const;
     bool isInBackInMap(Unit const* target, float distance, float arc = M_PI) const;
-
-    // Visibility system
+   
+     // Visibility system
     [[nodiscard]] bool IsVisible() const { return m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM) <= SEC_PLAYER; }
     void SetVisible(bool x);
     void SetModelVisible(bool on);
@@ -2398,6 +2405,8 @@ protected:
     int32 m_attackTimer[MAX_ATTACK];
 
     float m_createStats[MAX_STATS];
+
+    uint32 m_createSecStats[MAX_SECSTATS];
 
     AttackerSet m_attackers;
     Unit* m_attacking;

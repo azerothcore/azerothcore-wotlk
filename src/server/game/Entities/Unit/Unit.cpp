@@ -53,6 +53,7 @@
 #include "PetAI.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -5196,7 +5197,6 @@ uint32 Unit::GetAuraCount(uint32 spellId) const
         else
             count += (uint32)itr->second->GetBase()->GetStackAmount();
     }
-
     return count;
 }
 
@@ -18199,6 +18199,9 @@ void Unit::GetPartyMembers(std::list<Unit*>& TagUnitMap)
 
 Aura* Unit::AddAura(uint32 spellId, Unit* target)
 {
+    if (spellId == 18209)
+        UpdateAllStats();    //get aura updates to trigger updates for skills
+  
     if (!target)
         return nullptr;
 

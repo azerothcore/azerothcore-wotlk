@@ -21,7 +21,7 @@
 void CharacterDatabaseConnection::DoPrepareStatements()
 {
     if (!m_reconnecting)
-        m_stmts.resize(MAX_CHARACTERDATABASE_STATEMENTS);
+        m_stmts.resize(MAX_CHARACTERDATABASE_STATEMENTS); 
 
     PrepareStatement(CHAR_DEL_QUEST_POOL_SAVE, "DELETE FROM pool_quest_save WHERE pool_id = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_QUEST_POOL_SAVE, "INSERT INTO pool_quest_save (pool_id, quest_id) VALUES (?, ?)", CONNECTION_ASYNC);
@@ -597,6 +597,12 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_CHAR_SETTINGS, "SELECT source, data FROM character_settings WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_REP_CHAR_SETTINGS, "REPLACE INTO character_settings (guid, source, data) VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHAR_SETTINGS, "DELETE FROM character_settings WHERE guid = ?", CONNECTION_ASYNC);
+
+    // Character custom data test
+   // PrepareStatement(CHAR_SEL_CHAR_CUSTOM_DATA, "SELECT guid, adnl_agility, adnl_strength, adnl_stamina, adnl_intellect, adnl_spirit FROM character_custom_data WHERE guid = ?", CONNECTION_SYNCH);
+   // PrepareStatement(CHAR_DEL_CHAR_CUSTOM_DATA, "DELETE FROM character_custom_data WHERE guid = ?", CONNECTION_ASYNC);
+   // PrepareStatement(CHAR_INS_CHAR_CUSTOM_DATA, "INSERT INTO character_custom_data (guid, adnl_agility, adnl_strength, adnl_stamina, adnl_intellect, adnl_spirit) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
