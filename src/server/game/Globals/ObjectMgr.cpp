@@ -6126,19 +6126,6 @@ QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
     return Acore::Containers::MapGetValuePtr(_questGreetingStore[typeIndex], id);
 }
 
-QuestGreetingLocale const* ObjectMgr::GetQuestGreetingLocale(TypeID type, uint32 id) const
-{
-    uint32 typeIndex;
-    if (type == TYPEID_UNIT)
-        typeIndex = 0;
-    else if (type == TYPEID_GAMEOBJECT)
-        typeIndex = 1;
-    else
-        return nullptr;
-
-    return Acore::Containers::MapGetValuePtr(_questGreetingLocaleStore[typeIndex], id);
-}
-
 void ObjectMgr::LoadQuestGreetings()
 {
     uint32 oldMSTime = getMSTime();
@@ -6199,8 +6186,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (std::size_t i = 0; i < _questGreetingLocaleStore.size(); ++i)
-        _questGreetingLocaleStore[i].clear();
+    _questGreetingLocaleStore.clear();
 
     //                                               0     1      2       3
     QueryResult result = WorldDatabase.Query("SELECT ID, Type, Locale, Greeting FROM quest_greeting_locale");
@@ -6244,13 +6230,13 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         if (locale == LOCALE_enUS)
             continue;
 
-        QuestGreetingLocale& data = _questGreetingLocaleStore[type][id];
+        QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(type, id)];
         AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
 
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} quest greeting locale strings in {} ms", (uint32)_questGreetingLocaleStore.count(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadQuestOfferRewardLocale()

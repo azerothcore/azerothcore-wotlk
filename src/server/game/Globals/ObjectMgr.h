@@ -1247,6 +1247,12 @@ public:
         if (itr == _pointOfInterestLocaleStore.end()) return nullptr;
         return &itr->second;
     }
+    [[nodiscard]] QuestGreetingLocale const* GetQuestGreetingLocale(TypeID type, uint32 id) const
+    {
+        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(type, id));
+        if (itr == _questGreetingLocaleStore.end()) return nullptr;
+        return &itr->second;
+    }
     [[nodiscard]] QuestOfferRewardLocale const* GetQuestOfferRewardLocale(uint32 entry) const
     {
         auto itr = _questOfferRewardLocaleStore.find(entry);
@@ -1266,7 +1272,6 @@ public:
         return &itr->second;
     }
     QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
-    QuestGreetingLocale const* GetQuestGreetingLocale(TypeID type, uint32 id) const;
 
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
     void DeleteGOData(ObjectGuid::LowType guid);
