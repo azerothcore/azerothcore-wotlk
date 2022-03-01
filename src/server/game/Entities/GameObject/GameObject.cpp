@@ -329,7 +329,30 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     // GAMEOBJECT_BYTES_1, index at 0, 1, 2 and 3
     SetGoType(GameobjectTypes(goinfo->type));
-    SetGoState(go_state);
+
+    if (IsInstanceGameobject())
+    {
+        switch (GetStateSavedOnInstance())
+        {
+            case 0:
+                SetGoState(GO_STATE_ACTIVE);
+                break;
+            case 1:
+                SetGoState(GO_STATE_READY);
+                break;
+            case 2:
+                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                break;
+            default:
+                SetGoState(go_state);
+                break;
+        }
+    }
+    else
+    {
+        SetGoState(go_state);
+    }
+
     SetGoArtKit(artKit);
 
     SetDisplayId(goinfo->displayId);
@@ -2429,6 +2452,122 @@ void GameObject::SetGoState(GOState state)
         else if (state == GO_STATE_READY)
             EnableCollision(!startOpen);*/
     }
+    /* Whenever a gameobject inside an instance changes
+     * save it's state on the database to be loaded properly
+     * on server restart or crash.
+     */
+    if (IsInstanceGameobject())
+    {
+        // Save the gameobject state on the Database
+        if (!FindStateSavedOnInstance())
+        {
+            SaveInstanceData(GetGameobjectStateAsShort(&state));
+        }
+        else
+        {
+            UpdateInstanceData(GetGameobjectStateAsShort(&state));
+        }
+    }
+}
+
+bool GameObject::IsInstanceGameobject()
+{
+    // Avoid checking for unecessary gameobjects whose
+    // states don't matter for the dungeon progression
+    if (!ValidateGameobjectType())
+    {
+        return false;
+    }
+
+    if (auto* map = FindMap())
+    {
+        if (map->IsDungeon() || map->IsRaid())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool GameObject::ValidateGameobjectType()
+{
+    switch (m_goInfo->type)
+    {
+        case GAMEOBJECT_TYPE_DOOR:
+        case GAMEOBJECT_TYPE_BUTTON:
+        case GAMEOBJECT_TYPE_TRAP:
+        case GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING:
+        case GAMEOBJECT_TYPE_TRAPDOOR:
+            return true;
+        default:
+            return false;
+    }
+}
+
+uint8 GameObject::GetGameobjectStateAsShort(GOState* state)
+{
+    uint8 m_state = 3;
+
+    if (state)
+    {
+        switch (*state)
+        {
+            case GO_STATE_ACTIVE:
+                m_state = 0;
+                return m_state;
+                break;
+            case GO_STATE_READY:
+                m_state = 1;
+                return m_state;
+                break;
+            case GO_STATE_ACTIVE_ALTERNATIVE:
+                m_state = 2;
+                return m_state;
+                break;
+        }
+    }
+
+    // Returning any value that is not one of the specified ones
+    // Which will default into the invalid part of the switch
+    return m_state;
+}
+
+void GameObject::SaveInstanceData(uint8 state)
+{
+    uint32 id       = GetInstanceId();
+    uint32 guid     = GetSpawnId();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
+    stmt->SetData(0, id);
+    stmt->SetData(1, guid);
+    stmt->SetData(2, state);
+    CharacterDatabase.Execute(stmt);
+
+    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
+}
+
+void GameObject::UpdateInstanceData(uint8 state)
+{
+    uint32 id       = GetInstanceId();
+    uint32 guid     = GetSpawnId();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
+    stmt->SetData(0, state);
+    stmt->SetData(1, guid);
+    stmt->SetData(2, id);
+    CharacterDatabase.Execute(stmt);
+
+    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
+}
+
+uint8 GameObject::GetStateSavedOnInstance()
+{
+    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
+}
+
+bool GameObject::FindStateSavedOnInstance()
+{
+    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)
