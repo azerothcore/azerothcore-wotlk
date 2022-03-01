@@ -16,6 +16,7 @@
  */
 
 #include "Formulas.h"
+#include "Battleground.h"
 #include "Creature.h"
 #include "Log.h"
 #include "Player.h"
@@ -97,22 +98,22 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
         {
             switch (player->GetMapId())
             {
-                case 30:  // AV
+                case MAP_BG_ALTERAC_VALLEY:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AV);
                     break;
-                case 489: // WSG
+                case MAP_BG_WARSONG_GULCH:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_WSG);
                     break;
-                case 529: // AB
+                case MAP_BG_ARATHI_BASIN:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AB);
                     break;
-                case 566: // EOTS
+                case MAP_BG_EYE_OF_THE_STORM:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_EOTS);
                     break;
-                case 607: // SOTA
+                case MAP_BG_STRAND_OF_THE_ANCIENTS:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_SOTA);
                     break;
-                case 628: // IC
+                case MAP_BG_ISLE_OF_CONQUEST:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_IC);
                     break;
             }
