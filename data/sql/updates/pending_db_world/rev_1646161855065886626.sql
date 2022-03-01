@@ -1,4 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1646161855065886626');
+
 -- Riverpaw Outrunner
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 478);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -455,6 +456,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19201, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 3391, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountain Gronn - In Combat - Cast \'3391\'');
 
 -- Murkblood Scavenger
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 18207) AND (`source_type` = 0) AND (`id` IN (0));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 18207);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (18207, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 0, 11, 3391, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Murkblood Scavenger - Between 20-80% Health - Cast \'3391\' (No Repeat)');
