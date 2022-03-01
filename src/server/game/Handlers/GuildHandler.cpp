@@ -26,12 +26,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-// Cleanup bad characters
-void cleanStr(std::string& str)
-{
-    str.erase(remove(str.begin(), str.end(), '|'), str.end());
-}
-
 void WorldSession::HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query)
 {
     LOG_DEBUG("guild", "CMSG_GUILD_QUERY [{}]: Guild: {}", GetPlayerInfo(), query.GuildId);
@@ -186,10 +180,22 @@ void WorldSession::HandleGuildRankOpcode(WorldPackets::Guild::GuildSetRankPermis
 
     for (uint8 tabId = 0; tabId < GUILD_BANK_MAX_TABS; ++tabId)
     {
+        // For some reason the client is sending - 1 for guildmaster tab withdraw item limit, that's ilegal for us because we expect unsigned int.
+        // Probably core handling for this should be changed.
+        if (packet.TabWithdrawItemLimit[tabId] <= 0)
+        {
+            packet.TabWithdrawItemLimit[tabId] = uint32(GUILD_WITHDRAW_SLOT_UNLIMITED);
+        }
         rightsAndSlots[tabId] = GuildBankRightsAndSlots(tabId, uint8(packet.TabFlags[tabId]), packet.TabWithdrawItemLimit[tabId]);
     }
 
     LOG_DEBUG("guild", "CMSG_GUILD_RANK [{}]: Rank: {} ({})", GetPlayerInfo(), packet.RankName, packet.RankID);
+
+    // Same as the issue above but this time with rights.
+    if (packet.Flags <= 0)
+    {
+        packet.Flags = GUILD_BANK_RIGHT_FULL;
+    }
 
     guild->HandleSetRankInfo(this, packet.RankID, packet.RankName, packet.Flags, packet.WithdrawGoldLimit, rightsAndSlots);
 }

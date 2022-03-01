@@ -133,7 +133,7 @@ public:
                         // Teleports a random player and spawns 9 Sacrificed Trolls to attack player
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         {
-                            DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.m_orientation);
+                            DoTeleportPlayer(target, TeleportLoc.m_positionX, TeleportLoc.m_positionY, TeleportLoc.m_positionZ, TeleportLoc.GetOrientation());
                             if (DoGetThreat(me->GetVictim()))
                                 DoModifyThreatPercent(target, -100);
                             Creature* SacrificedTroll;

@@ -761,8 +761,8 @@ void OpcodeTable::Initialize()
     /*0x276*/ DEFINE_HANDLER(MSG_QUEST_PUSH_RESULT,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleQuestPushResult                    );
     /*0x277*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PLAY_MUSIC,                                         STATUS_NEVER);
     /*0x278*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PLAY_OBJECT_SOUND,                                  STATUS_NEVER);
-    /*0x279*/ DEFINE_HANDLER(CMSG_REQUEST_PET_INFO,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleRequestPetInfoOpcode               );
-    /*0x27A*/ DEFINE_HANDLER(CMSG_FAR_SIGHT,                                                        STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,     &WorldSession::HandleFarSightOpcode                     );
+    /*0x279*/ DEFINE_HANDLER(CMSG_REQUEST_PET_INFO,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleRequestPetInfo                     );
+    /*0x27A*/ DEFINE_HANDLER(CMSG_FAR_SIGHT,                                                        STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleFarSightOpcode                     );
     /*0x27B*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPELLDISPELLOG,                                     STATUS_NEVER);
     /*0x27C*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_DAMAGE_CALC_LOG,                                    STATUS_NEVER);
     /*0x27D*/ DEFINE_HANDLER(CMSG_ENABLE_DAMAGE_LOG,                                                STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
@@ -1306,7 +1306,7 @@ void OpcodeTable::Initialize()
     /*0x497*/ DEFINE_HANDLER(CMSG_FLOOD_GRACE_CHEAT,                                                STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x498*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SERVER_FIRST_ACHIEVEMENT,                           STATUS_NEVER);
     /*0x499*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PET_LEARNED_SPELL,                                  STATUS_NEVER);
-    /*0x49A*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PET_REMOVED_SPELL,                                  STATUS_NEVER);
+    /*0x49A*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PET_UNLEARNED_SPELL,                                STATUS_NEVER);
     /*0x49B*/ DEFINE_HANDLER(CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE,                               STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleChangeSeatsOnControlledVehicle     );
     /*0x49C*/ DEFINE_HANDLER(CMSG_HEARTH_AND_RESURRECT,                                             STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleHearthAndResurrect                 );
     /*0x49D*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA,               STATUS_NEVER);

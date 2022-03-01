@@ -97,7 +97,7 @@ public:
         else
         {
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
-            QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM character_queststatus WHERE guid = %u AND quest = %u", guid, entry);
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (result)
             {
@@ -109,23 +109,23 @@ public:
             uint8 index = 0;
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_QUESTSTATUS);
-            stmt->setUInt32(index++, guid);
-            stmt->setUInt32(index++, entry);
-            stmt->setUInt8(index++, 1);
-            stmt->setBool(index++, false);
-            stmt->setUInt32(index++, 0);
+            stmt->SetData(index++, guid);
+            stmt->SetData(index++, entry);
+            stmt->SetData(index++, 1);
+            stmt->SetData(index++, false);
+            stmt->SetData(index++, 0);
 
             for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
             {
-                stmt->setUInt16(index++, 0);
+                stmt->SetData(index++, 0);
             }
 
             for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
             {
-                stmt->setUInt16(index++, 0);
+                stmt->SetData(index++, 0);
             }
 
-            stmt->setUInt16(index, 0);
+            stmt->SetData(index, 0);
 
             CharacterDatabase.Execute(stmt);
         }
@@ -188,20 +188,20 @@ public:
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
-            stmt->setUInt32(0, guid);
-            stmt->setUInt32(1, entry);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
-            stmt->setUInt32(0, guid);
-            stmt->setUInt32(1, entry);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
             trans->Append(stmt);
 
             for (uint32 const& requiredItem : quest->RequiredItemId)
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
-                stmt->setUInt32(0, requiredItem);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, requiredItem);
+                stmt->SetData(1, guid);
 
                 PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -210,11 +210,11 @@ public:
                     Field* fields = result->Fetch();
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    stmt->SetData(0, fields[0].Get<uint32>());
                     trans->Append(stmt);
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    stmt->SetData(0, fields[0].Get<uint32>());
                     trans->Append(stmt);
                 }
             }
@@ -317,7 +317,7 @@ public:
                 {
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
-                        player->GetReputationMgr().SetReputation(factionEntry, repValue);
+                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue));
                     }
                 }
             }
@@ -331,7 +331,7 @@ public:
                 {
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
-                        player->GetReputationMgr().SetReputation(factionEntry, repValue2);
+                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue2));
                     }
                 }
             }
@@ -348,7 +348,7 @@ public:
         else
         {
             ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
-            QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM character_queststatus WHERE guid = %u AND quest = %u", guid, entry);
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (!result)
             {
@@ -395,24 +395,24 @@ public:
             uint8 index = 0;
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_QUESTSTATUS);
-            stmt->setUInt32(index++, guid);
-            stmt->setUInt32(index++, entry);
-            stmt->setUInt8(index++, 1);
-            stmt->setBool(index++, quest->HasFlag(QUEST_FLAGS_EXPLORATION));
-            stmt->setUInt32(index++, 0);
+            stmt->SetData(index++, guid);
+            stmt->SetData(index++, entry);
+            stmt->SetData(index++, 1);
+            stmt->SetData(index++, quest->HasFlag(QUEST_FLAGS_EXPLORATION));
+            stmt->SetData(index++, 0);
 
             for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
             {
-                stmt->setUInt16(index++, quest->RequiredNpcOrGoCount[i]);
+                stmt->SetData(index++, quest->RequiredNpcOrGoCount[i]);
             }
 
             for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
             {
                 // Will be updated once they loot the items from the mailbox.
-                stmt->setUInt16(index++, 0);
+                stmt->SetData(index++, 0);
             }
 
-            stmt->setUInt16(index, 0);
+            stmt->SetData(index, 0);
 
             trans->Append(stmt);
 
@@ -422,24 +422,24 @@ public:
                 uint32 repValue = quest->GetRepObjectiveValue();
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_REP_BY_FACTION);
-                stmt->setUInt32(0, repFaction);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, repFaction);
+                stmt->SetData(1, guid);
                 PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
                 if (result)
                 {
                     Field* fields = result->Fetch();
-                    uint32 curRep = fields[0].GetUInt32();
+                    uint32 curRep = fields[0].Get<uint32>();
 
                     if (curRep < repValue)
                     {
                         if (sFactionStore.LookupEntry(repFaction))
                         {
                             stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_REP_FACTION_CHANGE);
-                            stmt->setUInt32(0, repFaction);
-                            stmt->setUInt32(1, repValue);
-                            stmt->setUInt32(2, repFaction);
-                            stmt->setUInt32(3, guid);
+                            stmt->SetData(0, repFaction);
+                            stmt->SetData(1, repValue);
+                            stmt->SetData(2, repFaction);
+                            stmt->SetData(3, guid);
                             trans->Append(stmt);
                         }
                     }
@@ -452,24 +452,24 @@ public:
                 uint32 repValue = quest->GetRepObjectiveValue();
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_REP_BY_FACTION);
-                stmt->setUInt32(0, repFaction);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, repFaction);
+                stmt->SetData(1, guid);
                 PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
                 if (result)
                 {
                     Field* fields = result->Fetch();
-                    uint32 curRep = fields[0].GetUInt32();
+                    uint32 curRep = fields[0].Get<uint32>();
 
                     if (curRep < repValue)
                     {
                         if (sFactionStore.LookupEntry(repFaction))
                         {
                             stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_REP_FACTION_CHANGE);
-                            stmt->setUInt32(0, repFaction);
-                            stmt->setUInt32(1, repValue);
-                            stmt->setUInt32(2, repFaction);
-                            stmt->setUInt32(3, guid);
+                            stmt->SetData(0, repFaction);
+                            stmt->SetData(1, repValue);
+                            stmt->SetData(2, repFaction);
+                            stmt->SetData(3, guid);
                             trans->Append(stmt);
                         }
                     }
@@ -484,8 +484,8 @@ public:
         {
             // prepare Quest Tracker datas
             auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
-            stmt->setUInt32(0, entry);
-            stmt->setUInt32(1, playerTarget->GetGUID().GetCounter());
+            stmt->SetData(0, entry);
+            stmt->SetData(1, playerTarget->GetGUID().GetCounter());
 
             // add to Quest Tracker
             CharacterDatabase.Execute(stmt);
@@ -536,7 +536,7 @@ public:
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             CharacterDatabasePreparedStatement* stmt;
 
-            QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM character_queststatus WHERE guid = %u AND quest = %u AND status = 1", guid, entry);
+            QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {} AND status = 1", guid, entry);
 
             if (!result)
             {
@@ -548,8 +548,8 @@ public:
             for (uint32 const& requiredItem : quest->RequiredItemId)
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
-                stmt->setUInt32(0, requiredItem);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, requiredItem);
+                stmt->SetData(1, guid);
 
                 PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -558,11 +558,11 @@ public:
                     Field* fields = result->Fetch();
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    stmt->SetData(0, fields[0].Get<uint32>());
                     trans->Append(stmt);
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    stmt->SetData(0, fields[0].Get<uint32>());
                     trans->Append(stmt);
                 }
             }
@@ -570,8 +570,8 @@ public:
             for (uint32 const& sourceItem : quest->ItemDrop)
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
-                stmt->setUInt32(0, sourceItem);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, sourceItem);
+                stmt->SetData(1, guid);
 
                 PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -580,11 +580,11 @@ public:
                     Field* fields = result->Fetch();
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    stmt->SetData(0, fields[0].Get<uint32>());
                     trans->Append(stmt);
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->setUInt32(0, fields[0].GetUInt32());
+                    stmt->SetData(0, fields[0].Get<uint32>());
                     trans->Append(stmt);
                 }
             }
@@ -651,48 +651,48 @@ public:
             if (quest->IsDaily() || quest->IsDFQuest())
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
-                stmt->setUInt32(0, guid);
-                stmt->setUInt32(1, entry);
-                stmt->setUInt64(2, GameTime::GetGameTime().count());
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
+                stmt->SetData(2, GameTime::GetGameTime().count());
                 trans->Append(stmt);
             }
             else if (quest->IsWeekly())
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_WEEKLYQUESTSTATUS);
-                stmt->setUInt32(0, guid);
-                stmt->setUInt32(1, entry);
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
                 trans->Append(stmt);
             }
             else if (quest->IsMonthly())
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_MONTHLYQUESTSTATUS);
-                stmt->setUInt32(0, guid);
-                stmt->setUInt32(1, entry);
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
                 trans->Append(stmt);
             }
             else if (quest->IsSeasonal())
             {
                 // We can't know which event is the quest linked to, so we can't do anything about this.
                 /* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SEASONALQUESTSTATUS);
-                stmt->setUInt32(0, guid);
-                stmt->setUInt32(1, entry);
-                stmt->setUInt32(2, event_id);
+                stmt->SetData(0, guid);
+                stmt->SetData(1, entry);
+                stmt->SetData(2, event_id);
                 trans->Append(stmt);*/
             }
 
             if (uint32 honor = quest->CalculateHonorGain(charLevel))
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE);
-                stmt->setUInt32(0, honor);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, honor);
+                stmt->SetData(1, guid);
                 trans->Append(stmt);
             }
 
             if (quest->GetRewArenaPoints())
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS_ACCUMULATIVE);
-                stmt->setUInt32(0, quest->GetRewArenaPoints());
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, quest->GetRewArenaPoints());
+                stmt->SetData(1, guid);
                 trans->Append(stmt);
             }
 
@@ -707,8 +707,8 @@ public:
                 // Some experience might get lost on level up.
                 uint32 xp = uint32(quest->XPValue(charLevel) * sWorld->getRate(RATE_XP_QUEST));
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_XP_ACCUMULATIVE);
-                stmt->setUInt32(0, xp);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, xp);
+                stmt->SetData(1, guid);
                 trans->Append(stmt);
             }
 
@@ -721,19 +721,19 @@ public:
             if (rewMoney > 0)
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_MONEY_ACCUMULATIVE);
-                stmt->setUInt32(0, rewMoney);
-                stmt->setUInt32(1, guid);
+                stmt->SetData(0, rewMoney);
+                stmt->SetData(1, guid);
                 trans->Append(stmt);
             }
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_QUESTSTATUS_REWARDED);
-            stmt->setUInt32(0, guid);
-            stmt->setUInt32(1, entry);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
-            stmt->setUInt32(0, guid);
-            stmt->setUInt32(1, entry);
+            stmt->SetData(0, guid);
+            stmt->SetData(1, entry);
             trans->Append(stmt);
 
             CharacterDatabase.CommitTransaction(trans);

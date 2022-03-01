@@ -611,7 +611,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SANITY)
                 if (Aura* aur = target->GetAura(SPELL_SANITY))
@@ -1163,7 +1163,7 @@ public:
             return 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
                 me->AddLootMode(32);
@@ -1827,7 +1827,7 @@ public:
                 damage = me->GetHealth() - 1;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHADOW_BEACON)
                 caster->GetAI()->DoAction(ACTION_YOGG_SARON_SHADOW_BEACON);
@@ -1932,10 +1932,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2046,10 +2046,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2080,7 +2080,7 @@ public:
                         NextStep(2000);
                         break;
                     case 2:
-                        PlaySound(GAR_2);
+                        Playsound(GAR_2);
                         NextStep(6500);
                         break;
                     case 3:
@@ -2092,7 +2092,7 @@ public:
                         NextStep(2500);
                         break;
                     case 5:
-                        PlaySound(YS_V1_2);
+                        Playsound(YS_V1_2);
                         NextStep(2500);
                         break;
                     case 6:
@@ -2166,10 +2166,10 @@ public:
             else
                 return;
 
-            PlaySound(soundId);
+            Playsound(soundId);
         }
 
-        void PlaySound(uint32 soundId)
+        void Playsound(uint32 soundId)
         {
             WorldPacket data(SMSG_PLAY_SOUND, 4);
             data << uint32(soundId);
@@ -2247,7 +2247,7 @@ public:
             me->CastSpell(me, SPELL_INSANE_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_INSANE1)
             {

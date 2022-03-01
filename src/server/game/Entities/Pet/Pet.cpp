@@ -25,6 +25,7 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectMgr.h"
+#include "PetPackets.h"
 #include "Player.h"
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
@@ -87,7 +88,7 @@ void Pet::AddToWorld()
                 SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAreaMapBounds(4812);
                 for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
                     if ((itr->second->raceMask & plr->getRaceMask()) && !HasAura(itr->second->spellId))
-                        if (const SpellInfo* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
+                        if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
                             if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
                                 AddAura(itr->second->spellId, this);
             }
@@ -140,20 +141,20 @@ public:
         CharacterDatabasePreparedStatement* stmt = nullptr;
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_DECLINED_NAME);
-        stmt->setUInt32(0, ownerGuid);
-        stmt->setUInt32(1, petNumber);
+        stmt->SetData(0, ownerGuid);
+        stmt->SetData(1, petNumber);
         SetPreparedQuery(DECLINED_NAMES, stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURA);
-        stmt->setUInt32(0, petNumber);
+        stmt->SetData(0, petNumber);
         SetPreparedQuery(AURAS, stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL);
-        stmt->setUInt32(0, petNumber);
+        stmt->SetData(0, petNumber);
         SetPreparedQuery(SPELLS, stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL_COOLDOWN);
-        stmt->setUInt32(0, petNumber);
+        stmt->SetData(0, petNumber);
         SetPreparedQuery(COOLDOWNS, stmt);
     }
 };
@@ -455,7 +456,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
                 m_declinedname = std::make_unique<DeclinedName>();
                 Field* fields = result->Fetch();
                 for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-                    m_declinedname->name[i] = fields[i].GetString();
+                    m_declinedname->name[i] = fields[i].Get<std::string>();
             }
         }
 
@@ -536,16 +537,16 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // remove current data
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
-        stmt->setUInt32(0, m_charmInfo->GetPetNumber());
+        stmt->SetData(0, m_charmInfo->GetPetNumber());
         trans->Append(stmt);
 
         // prevent existence another hunter pet in PET_SAVE_AS_CURRENT and PET_SAVE_NOT_IN_SLOT
         if (getPetType() == HUNTER_PET && (mode == PET_SAVE_AS_CURRENT || mode > PET_SAVE_LAST_STABLE_SLOT))
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_SLOT);
-            stmt->setUInt32(0, ownerLowGUID);
-            stmt->setUInt8(1, uint8(PET_SAVE_AS_CURRENT));
-            stmt->setUInt8(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
+            stmt->SetData(0, ownerLowGUID);
+            stmt->SetData(1, uint8(PET_SAVE_AS_CURRENT));
+            stmt->SetData(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
             trans->Append(stmt);
         }
 
@@ -556,23 +557,23 @@ void Pet::SavePetToDB(PetSaveMode mode)
         FillPetInfo(&owner->GetPetStable()->CurrentPet.value());
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_PET);
-        stmt->setUInt32(0, m_charmInfo->GetPetNumber());
-        stmt->setUInt32(1, GetEntry());
-        stmt->setUInt32(2, ownerLowGUID);
-        stmt->setUInt32(3, GetNativeDisplayId());
-        stmt->setUInt32(4, GetUInt32Value(UNIT_CREATED_BY_SPELL));
-        stmt->setUInt8(5, uint8(getPetType()));
-        stmt->setUInt8(6, getLevel());
-        stmt->setUInt32(7, GetUInt32Value(UNIT_FIELD_PETEXPERIENCE));
-        stmt->setUInt8(8, uint8(GetReactState()));
-        stmt->setString(9, GetName());
-        stmt->setUInt8(10, uint8(HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ? 0 : 1));
-        stmt->setUInt8(11, uint8(mode));
-        stmt->setUInt32(12, curhealth);
-        stmt->setUInt32(13, curmana);
-        stmt->setUInt32(14, GetPower(POWER_HAPPINESS));
-        stmt->setUInt32(15, GameTime::GetGameTime().count());
-        stmt->setString(16, actionBar);
+        stmt->SetData(0, m_charmInfo->GetPetNumber());
+        stmt->SetData(1, GetEntry());
+        stmt->SetData(2, ownerLowGUID);
+        stmt->SetData(3, GetNativeDisplayId());
+        stmt->SetData(4, GetUInt32Value(UNIT_CREATED_BY_SPELL));
+        stmt->SetData(5, uint8(getPetType()));
+        stmt->SetData(6, getLevel());
+        stmt->SetData(7, GetUInt32Value(UNIT_FIELD_PETEXPERIENCE));
+        stmt->SetData(8, uint8(GetReactState()));
+        stmt->SetData(9, GetName());
+        stmt->SetData(10, uint8(HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ? 0 : 1));
+        stmt->SetData(11, uint8(mode));
+        stmt->SetData(12, curhealth);
+        stmt->SetData(13, curmana);
+        stmt->SetData(14, GetPower(POWER_HAPPINESS));
+        stmt->SetData(15, GameTime::GetGameTime().count());
+        stmt->SetData(16, actionBar);
 
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);
@@ -590,23 +591,23 @@ void Pet::DeleteFromDB(ObjectGuid::LowType guidlow)
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
-    stmt->setUInt32(0, guidlow);
+    stmt->SetData(0, guidlow);
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME);
-    stmt->setUInt32(0, guidlow);
+    stmt->SetData(0, guidlow);
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
-    stmt->setUInt32(0, guidlow);
+    stmt->SetData(0, guidlow);
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELLS);
-    stmt->setUInt32(0, guidlow);
+    stmt->SetData(0, guidlow);
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_COOLDOWNS);
-    stmt->setUInt32(0, guidlow);
+    stmt->SetData(0, guidlow);
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
@@ -723,7 +724,7 @@ void Pet::Update(uint32 diff)
                         if (!spellInfo)
                             return;
                         float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
-                        if (spellInfo->RangeEntry->type == SPELL_RANGE_MELEE)
+                        if (spellInfo->RangeEntry->Flags == SPELL_RANGE_MELEE)
                             max_range -= 2 * MIN_MELEE_REACH;
 
                         if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
@@ -1431,9 +1432,9 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
 
-            uint32 spell_id = fields[0].GetUInt32();
-            uint16 category = fields[1].GetUInt16();
-            time_t db_time  = time_t(fields[2].GetUInt32());
+            uint32 spell_id = fields[0].Get<uint32>();
+            uint16 category = fields[1].Get<uint16>();
+            time_t db_time  = time_t(fields[2].Get<uint32>());
 
             if (!sSpellMgr->GetSpellInfo(spell_id))
             {
@@ -1463,7 +1464,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
 void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_COOLDOWNS);
-    stmt->setUInt32(0, m_charmInfo->GetPetNumber());
+    stmt->SetData(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
     time_t curTime = GameTime::GetGameTime().count();
@@ -1485,10 +1486,10 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
         {
             uint32 cooldown = ((itr2->second.end - curMSTime) / IN_MILLISECONDS) + curTime;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);
-            stmt->setUInt32(0, m_charmInfo->GetPetNumber());
-            stmt->setUInt32(1, itr2->first);
-            stmt->setUInt16(2, itr2->second.category);
-            stmt->setUInt32(3, cooldown);
+            stmt->SetData(0, m_charmInfo->GetPetNumber());
+            stmt->SetData(1, itr2->first);
+            stmt->SetData(2, itr2->second.category);
+            stmt->SetData(3, cooldown);
             trans->Append(stmt);
         }
     }
@@ -1502,7 +1503,7 @@ void Pet::_LoadSpells(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
 
-            addSpell(fields[0].GetUInt32(), ActiveStates(fields[1].GetUInt8()), PETSPELL_UNCHANGED);
+            addSpell(fields[0].Get<uint32>(), ActiveStates(fields[1].Get<uint8>()), PETSPELL_UNCHANGED);
         } while (result->NextRow());
     }
 }
@@ -1523,30 +1524,30 @@ void Pet::_SaveSpells(CharacterDatabaseTransaction trans)
         {
             case PETSPELL_REMOVED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
-                stmt->setUInt32(0, m_charmInfo->GetPetNumber());
-                stmt->setUInt32(1, itr->first);
+                stmt->SetData(0, m_charmInfo->GetPetNumber());
+                stmt->SetData(1, itr->first);
                 trans->Append(stmt);
 
                 m_spells.erase(itr);
                 continue;
             case PETSPELL_CHANGED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
-                stmt->setUInt32(0, m_charmInfo->GetPetNumber());
-                stmt->setUInt32(1, itr->first);
+                stmt->SetData(0, m_charmInfo->GetPetNumber());
+                stmt->SetData(1, itr->first);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
-                stmt->setUInt32(0, m_charmInfo->GetPetNumber());
-                stmt->setUInt32(1, itr->first);
-                stmt->setUInt8(2, itr->second.active);
+                stmt->SetData(0, m_charmInfo->GetPetNumber());
+                stmt->SetData(1, itr->first);
+                stmt->SetData(2, itr->second.active);
                 trans->Append(stmt);
 
                 break;
             case PETSPELL_NEW:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
-                stmt->setUInt32(0, m_charmInfo->GetPetNumber());
-                stmt->setUInt32(1, itr->first);
-                stmt->setUInt8(2, itr->second.active);
+                stmt->SetData(0, m_charmInfo->GetPetNumber());
+                stmt->SetData(1, itr->first);
+                stmt->SetData(2, itr->second.active);
                 trans->Append(stmt);
                 break;
             case PETSPELL_UNCHANGED:
@@ -1567,23 +1568,23 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 damage[3];
             int32 baseDamage[3];
             Field* fields = result->Fetch();
-            ObjectGuid caster_guid = ObjectGuid(fields[0].GetUInt64());
+            ObjectGuid caster_guid = ObjectGuid(fields[0].Get<uint64>());
             // nullptr guid stored - pet is the caster of the spell - see Pet::_SaveAuras
             if (!caster_guid)
                 caster_guid = GetGUID();
-            uint32 spellid = fields[1].GetUInt32();
-            uint8 effmask = fields[2].GetUInt8();
-            uint8 recalculatemask = fields[3].GetUInt8();
-            uint8 stackcount = fields[4].GetUInt8();
-            damage[0] = fields[5].GetInt32();
-            damage[1] = fields[6].GetInt32();
-            damage[2] = fields[7].GetInt32();
-            baseDamage[0] = fields[8].GetInt32();
-            baseDamage[1] = fields[9].GetInt32();
-            baseDamage[2] = fields[10].GetInt32();
-            int32 maxduration = fields[11].GetInt32();
-            int32 remaintime = fields[12].GetInt32();
-            uint8 remaincharges = fields[13].GetUInt8();
+            uint32 spellid = fields[1].Get<uint32>();
+            uint8 effmask = fields[2].Get<uint8>();
+            uint8 recalculatemask = fields[3].Get<uint8>();
+            uint8 stackcount = fields[4].Get<uint8>();
+            damage[0] = fields[5].Get<int32>();
+            damage[1] = fields[6].Get<int32>();
+            damage[2] = fields[7].Get<int32>();
+            baseDamage[0] = fields[8].Get<int32>();
+            baseDamage[1] = fields[9].Get<int32>();
+            baseDamage[2] = fields[10].Get<int32>();
+            int32 maxduration = fields[11].Get<int32>();
+            int32 remaintime = fields[12].Get<int32>();
+            uint8 remaincharges = fields[13].Get<uint8>();
 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
             if (!spellInfo)
@@ -1639,7 +1640,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
-    stmt->setUInt32(0, m_charmInfo->GetPetNumber());
+    stmt->SetData(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
     for (AuraMap::const_iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
@@ -1699,21 +1700,21 @@ void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
         uint8 index = 0;
 
         CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
-        stmt2->setUInt32(index++, m_charmInfo->GetPetNumber());
-        stmt2->setUInt64(index++, casterGUID.GetRawValue());
-        stmt2->setUInt32(index++, itr->second->GetId());
-        stmt2->setUInt8(index++, effMask);
-        stmt2->setUInt8(index++, recalculateMask);
-        stmt2->setUInt8(index++, itr->second->GetStackAmount());
-        stmt2->setInt32(index++, damage[0]);
-        stmt2->setInt32(index++, damage[1]);
-        stmt2->setInt32(index++, damage[2]);
-        stmt2->setInt32(index++, baseDamage[0]);
-        stmt2->setInt32(index++, baseDamage[1]);
-        stmt2->setInt32(index++, baseDamage[2]);
-        stmt2->setInt32(index++, itr->second->GetMaxDuration());
-        stmt2->setInt32(index++, itr->second->GetDuration());
-        stmt2->setUInt8(index++, itr->second->GetCharges());
+        stmt2->SetData(index++, m_charmInfo->GetPetNumber());
+        stmt2->SetData(index++, casterGUID.GetRawValue());
+        stmt2->SetData(index++, itr->second->GetId());
+        stmt2->SetData(index++, effMask);
+        stmt2->SetData(index++, recalculateMask);
+        stmt2->SetData(index++, itr->second->GetStackAmount());
+        stmt2->SetData(index++, damage[0]);
+        stmt2->SetData(index++, damage[1]);
+        stmt2->SetData(index++, damage[2]);
+        stmt2->SetData(index++, baseDamage[0]);
+        stmt2->SetData(index++, baseDamage[1]);
+        stmt2->SetData(index++, baseDamage[2]);
+        stmt2->SetData(index++, itr->second->GetMaxDuration());
+        stmt2->SetData(index++, itr->second->GetDuration());
+        stmt2->SetData(index++, itr->second->GetCharges());
         trans->Append(stmt2);
     }
 }
@@ -1729,7 +1730,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
             LOG_ERROR("entities.pet", "Pet::addSpell: Non-existed in SpellStore spell #{} request, deleting for all pets in `pet_spell`.", spellId);
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_PET_SPELL);
-            stmt->setUInt32(0, spellId);
+            stmt->SetData(0, spellId);
             CharacterDatabase.Execute(stmt);
         }
         else
@@ -1863,10 +1864,10 @@ bool Pet::learnSpell(uint32 spell_id)
 
     if (!m_loading)
     {
-        WorldPacket data(SMSG_PET_LEARNED_SPELL, 4);
-        data << uint32(spell_id);
-        GetOwner()->GetSession()->SendPacket(&data);
-        GetOwner()->PetSpellInitialize();
+        WorldPackets::Pet::PetLearnedSpell packet;
+        packet.SpellID = spell_id;
+        m_owner->SendDirectMessage(packet.Write());
+        m_owner->PetSpellInitialize();
     }
 
     return true;
@@ -1917,9 +1918,9 @@ bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
     {
         if (!m_loading)
         {
-            WorldPacket data(SMSG_PET_REMOVED_SPELL, 4);
-            data << uint32(spell_id);
-            GetOwner()->GetSession()->SendPacket(&data);
+            WorldPackets::Pet::PetUnlearnedSpell packet;
+            packet.SpellID = spell_id;
+            m_owner->SendDirectMessage(packet.Write());
         }
 
         return true;
@@ -2179,25 +2180,22 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
 
 void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)
 {
+    ASSERT(spellInfo);
+
     if (!spellInfo->IsAutocastable())
         return;
 
-    uint32 spellid = spellInfo->Id;
-
-    PetSpellMap::iterator itr = m_spells.find(spellid);
+    PetSpellMap::iterator itr = m_spells.find(spellInfo->Id);
     if (itr == m_spells.end())
         return;
 
-    uint32 i;
+    auto autospellItr = std::find(m_autospells.begin(), m_autospells.end(), spellInfo->Id);
 
     if (apply)
     {
-        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; ++i)
-            ;                                               // just search
-
-        if (i == m_autospells.size())
+        if (autospellItr == m_autospells.end())
         {
-            m_autospells.push_back(spellid);
+            m_autospells.push_back(spellInfo->Id);
 
             if (itr->second.active != ACT_ENABLED)
             {
@@ -2209,13 +2207,9 @@ void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)
     }
     else
     {
-        AutoSpellList::iterator itr2 = m_autospells.begin();
-        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; ++i, ++itr2)
-            ;                                               // just search
-
-        if (i < m_autospells.size())
+        if (autospellItr != m_autospells.end())
         {
-            m_autospells.erase(itr2);
+            m_autospells.erase(autospellItr);
             if (itr->second.active != ACT_DISABLED)
             {
                 itr->second.active = ACT_DISABLED;

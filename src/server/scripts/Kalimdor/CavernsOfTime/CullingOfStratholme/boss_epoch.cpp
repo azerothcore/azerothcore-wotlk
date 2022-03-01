@@ -85,7 +85,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_TIME_STOP, 20000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TIME_STEP_H || spellInfo->Id == SPELL_TIME_STEP_N)
             {

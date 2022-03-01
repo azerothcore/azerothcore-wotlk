@@ -463,7 +463,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_POOL_QUEST_SAVE);
 
-        stmt->setUInt32(0, poolId);
+        stmt->SetData(0, poolId);
 
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -471,7 +471,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
         {
             do
             {
-                uint32 questId = result->Fetch()[0].GetUInt32();
+                uint32 questId = result->Fetch()[0].Get<uint32>();
                 spawns.ActivateObject<Quest>(questId, poolId);
                 PoolObject tempObj(questId, 0.0f);
                 Spawn1Object(&tempObj);
@@ -591,10 +591,10 @@ void PoolMgr::LoadFromDB()
         {
             Field* fields = result->Fetch();
 
-            uint32 pool_id = fields[0].GetUInt32();
+            uint32 pool_id = fields[0].Get<uint32>();
 
             PoolTemplateData& pPoolTemplate = mPoolTemplate[pool_id];
-            pPoolTemplate.MaxLimit  = fields[1].GetUInt32();
+            pPoolTemplate.MaxLimit  = fields[1].Get<uint32>();
 
             ++count;
         } while (result->NextRow());
@@ -624,9 +624,9 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].GetUInt32();
-                uint32 pool_id = fields[1].GetUInt32();
-                float chance = fields[2].GetFloat();
+                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                uint32 pool_id = fields[1].Get<uint32>();
+                float chance = fields[2].Get<float>();
 
                 CreatureData const* data = sObjectMgr->GetCreatureData(guid);
                 if (!data)
@@ -682,9 +682,9 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].GetUInt32();
-                uint32 pool_id = fields[1].GetUInt32();
-                float chance = fields[2].GetFloat();
+                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                uint32 pool_id = fields[1].Get<uint32>();
+                float chance = fields[2].Get<float>();
 
                 GameObjectData const* data = sObjectMgr->GetGOData(guid);
                 if (!data)
@@ -752,9 +752,9 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 child_pool_id  = fields[0].GetUInt32();
-                uint32 mother_pool_id = fields[1].GetUInt32();
-                float chance          = fields[2].GetFloat();
+                uint32 child_pool_id  = fields[0].Get<uint32>();
+                uint32 mother_pool_id = fields[1].Get<uint32>();
+                float chance          = fields[2].Get<float>();
 
                 {
                     auto it = mPoolTemplate.find(mother_pool_id);
@@ -853,8 +853,8 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 entry   = fields[0].GetUInt32();
-                uint32 pool_id = fields[1].GetUInt32();
+                uint32 entry   = fields[0].Get<uint32>();
+                uint32 pool_id = fields[1].Get<uint32>();
 
                 Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
                 if (!quest)
@@ -933,15 +933,15 @@ void PoolMgr::LoadFromDB()
             do
             {
                 Field* fields = result->Fetch();
-                uint32 pool_entry = fields[0].GetUInt32();
-                uint32 pool_pool_id = fields[1].GetUInt32();
+                uint32 pool_entry = fields[0].Get<uint32>();
+                uint32 pool_pool_id = fields[1].Get<uint32>();
 
                 if (!CheckPool(pool_entry))
                 {
                     if (pool_pool_id)
                         // The pool is a child pool in pool_pool table. Ideally we should remove it from the pool handler to ensure it never gets spawned,
                         // however that could recursively invalidate entire chain of mother pools. It can be done in the future but for now we'll do nothing.
-                        LOG_ERROR("sql.sql", "Pool Id {} has no equal chance pooled entites defined and explicit chance sum is not 100. This broken pool is a child pool of Id {} and cannot be safely removed.", pool_entry, fields[2].GetUInt32());
+                        LOG_ERROR("sql.sql", "Pool Id {} has no equal chance pooled entites defined and explicit chance sum is not 100. This broken pool is a child pool of Id {} and cannot be safely removed.", pool_entry, fields[2].Get<uint32>());
                     else
                         LOG_ERROR("sql.sql", "Pool Id {} has no equal chance pooled entites defined and explicit chance sum is not 100. The pool will not be spawned.", pool_entry);
                     continue;
@@ -985,7 +985,7 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
                 continue;
         }
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_POOL_SAVE);
-        stmt->setUInt32(0, itr->second.GetPoolId());
+        stmt->SetData(0, itr->second.GetPoolId());
         trans->Append(stmt);
         deletedPools.insert(itr->second.GetPoolId());
     }
@@ -995,8 +995,8 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
             if (IsSpawnedObject<Quest>(itr->first))
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
-                stmt->setUInt32(0, itr->second);
-                stmt->setUInt32(1, itr->first);
+                stmt->SetData(0, itr->second);
+                stmt->SetData(1, itr->first);
                 trans->Append(stmt);
             }
 
