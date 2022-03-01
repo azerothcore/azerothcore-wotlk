@@ -109,3 +109,31 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 98, -11729.4, 662.957, 49.7512, 100, 0),
 (@PATH, 99, -11729.5, 658.851, 49.8954, 100, 0),
 (@PATH, 100, -11729.5, 655.439, 49.9182, 100, 0);
+
+SET @NPC := 994;
+SET @PATH := @NPC * 10;
+
+UPDATE `creature` SET `position_x` = -11617.5, `position_y` = 606.901, `position_z` = 49.6096, `orientation` = 3.47745 WHERE `guid` = @NPC;
+
+DELETE FROM `creature_addon` WHERE `guid` = @NPC;
+INSERT INTO `creature_addon` (`guid`, `path_id`) VALUES (@NPC, @PATH);
+UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = @NPC;
+
+DELETE FROM `waypoint_data` WHERE `id` = @PATH;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
+(@PATH, 1, -11617.5, 606.901, 49.6096, 100, 0),
+(@PATH, 2, -11615.1, 614.486, 50.0947, 100, 0),
+(@PATH, 3, -11607.7, 621.967, 50.8413, 100, 0),
+(@PATH, 4, -11611, 619.628, 50.6383, 100, 0),
+(@PATH, 5, -11615.6, 613.314, 49.9656, 100, 0),
+(@PATH, 6, -11618.6, 596.542, 49.0794, 100, 0),
+(@PATH, 7, -11623.8, 592.278, 49.5931, 100, 0),
+(@PATH, 8, -11631.5, 590.479, 50.5395, 100, 0),
+(@PATH, 9, -11643.6, 589.637, 50.2152, 100, 0),
+(@PATH, 10, -11650.2, 608.574, 50.1644, 100, 0),
+(@PATH, 11, -11645.5, 639.376, 50.6489, 100, 0),
+(@PATH, 12, -11644.4, 663.842, 50.2059, 100, 0),
+(@PATH, 13, -11644.4, 647.661, 50.7059, 100, 0),
+(@PATH, 14, -11650.4, 615.773, 50.1792, 100, 0),
+(@PATH, 15, -11648, 589.458, 50.1729, 100, 0),
+(@PATH, 16, -11624.7, 591.707, 49.6399, 100, 0);
