@@ -18,7 +18,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 1202);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1202, 0, 0, 0, 4, 0, 10, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tunnel Rat Kobold - On Aggro - Say Line 0'),
 (1202, 0, 1, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 8876, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tunnel Rat Kobold - In Combat - Cast \'Thrash\''),
-(1202, 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Tunnel Rat Kobold - Between 0-15% Health - Flee For Assist'),
+(1202, 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tunnel Rat Kobold - Between 0-15% Health - Flee For Assist'),
 (1202, 0, 3, 0, 4, 0, 100, 1, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tunnel Rat Kobold - On Aggro - Say Line 2');
 
 -- Skeletal Flayer
@@ -87,7 +87,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3746);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (3746, 0, 0, 0, 25, 0, 100, 1, 0, 0, 0, 0, 0, 11, 6822, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Foulweald Den Watcher - On Reset - Cast \'Corrupted Stamina Passive\' (No Repeat)'),
 (3746, 0, 1, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 8876, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Foulweald Den Watcher - In Combat - Cast \'Thrash\' (No Repeat)'),
-(3746, 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Foulweald Den Watcher - Between 0-15% Health - Flee For Assist (No Repeat)'),
+(3746, 0, 2, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Foulweald Den Watcher - Between 0-15% Health - Flee For Assist (No Repeat)'),
 (3746, 2, 0, 0, 46, 0, 100, 0, 3746, 0, 0, 0, 0, 70, 7200, 0, 0, 0, 0, 0, 14, 5639, 180024, 0, 0, 0, 0, 0, 0, 'Area Trigger 3746 - On Trigger - Respawn Mysterious Deadmines Chest');
 
 -- Bloodfury Roguefeather
@@ -106,7 +106,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 4493);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (4493, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 8876, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Avenger - In Combat - Cast \'Thrash\''),
-(4493, 0, 1, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Avenger - Between 0-15% Health - Flee For Assist');
+(4493, 0, 1, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Avenger - Between 0-15% Health - Flee For Assist');
 
 -- Scarlet Monk
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 4540);
@@ -163,7 +163,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 5458);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (5458, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 8876, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Centipaar Worker - In Combat - Cast \'Thrash\''),
-(5458, 0, 1, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Centipaar Worker - Between 0-30% Health - Flee For Assist');
+(5458, 0, 1, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Centipaar Worker - Between 0-30% Health - Flee For Assist');
 
 -- Centipaar Sandreaver
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 5460);
@@ -225,8 +225,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 7320);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (7320, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 3417, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stonevault Mauler - On Reset - Cast Thrash'),
-(7320, 0, 1, 0, 2, 0, 100, 0, 0, 30, 120000, 130000, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stonevault Mauler - Between 0-30% Health - Cast Frenzy'),
-(7320, 0, 2, 0, 61, 0, 100, 0, 0, 30, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stonevault Mauler - Between 0-30% Health - Say Line 0 (No Repeat)');
+(7320, 0, 1, 2, 2, 0, 100, 1, 0, 30, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stonevault Mauler - Between 0-30% Health - Cast Frenzy'),
+(7320, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stonevault Mauler - Between 0-30% Health - Say Line 0 (No Repeat)');
 
 -- Sul'lithuz Broodling
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 8138;
@@ -393,7 +393,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14821, 0, 0, 0, 0, 0, 100, 0, 6500, 6500, 8000, 8000, 0, 11, 24339, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Raptor - In Combat - Cast \'Infected Bite\' (No Repeat)'),
 (14821, 0, 1, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 8876, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Raptor - In Combat - Cast \'Thrash\' (No Repeat)'),
 (14821, 0, 2, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 11, 8599, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Raptor - Between 0-30% Health - Cast \'Enrage\' (No Repeat)'),
-(14821, 0, 3, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Raptor - Between 0-30% Health - Say Line 0 (No Repeat)');
+(14821, 0, 3, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Razzashi Raptor - Between 0-30% Health - Say Line 0 (No Repeat)');
 
 -- Atal'ai Mistress
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 14882);
