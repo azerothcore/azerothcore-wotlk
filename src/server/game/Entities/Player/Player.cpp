@@ -591,8 +591,6 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitTalentForLevel();
     InitPrimaryProfessions();                               // to max set before any spell added
 
-    UpdatePositionData();
-
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
     UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)
     SetFullHealth();
