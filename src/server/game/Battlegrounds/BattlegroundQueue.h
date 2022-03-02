@@ -171,7 +171,7 @@ class BGQueueRemoveEvent : public BasicEvent
 {
 public:
     BGQueueRemoveEvent(ObjectGuid pl_guid, uint32 bgInstanceGUID, BattlegroundTypeId BgTypeId, BattlegroundQueueTypeId bgQueueTypeId, uint32 removeTime) :
-        m_PlayerGuid(pl_guid), m_BgInstanceGUID(bgInstanceGUID), m_BgTypeId(BgTypeId), m_RemoveTime(removeTime), m_BgQueueTypeId(bgQueueTypeId) { }
+        m_PlayerGuid(pl_guid), m_BgInstanceGUID(bgInstanceGUID), m_RemoveTime(removeTime), m_BgTypeId(BgTypeId), m_BgQueueTypeId(bgQueueTypeId) { }
 
     ~BGQueueRemoveEvent() override = default;
 
