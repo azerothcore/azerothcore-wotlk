@@ -2053,9 +2053,9 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         toUnbind.push_back(instanceSave);
                     }
                     else
-					{
+                    {
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
-					}
+                    }
                     ResetInstanceSavedGameobjects(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
@@ -2080,9 +2080,9 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         toUnbind.push_back(instanceSave);
                     }
                     else
-					{
+                    {
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
-					}
+                    }
                     ResetInstanceSavedGameobjects(instanceSave->GetInstanceId());				
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
