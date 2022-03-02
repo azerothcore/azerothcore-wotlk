@@ -223,6 +223,12 @@ bool InstanceSave::RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism)
     return ism->DeleteInstanceSaveIfNeeded(this->GetInstanceId(), false);
 }
 
+void InstanceSaveMgr::SanitizeInstanceSavedData()
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SANITIZE_INSTANCE_SAVED_DATA);
+    CharacterDatabase.Execute(stmt);
+}
+
 void InstanceSaveMgr::LoadInstances()
 {
     uint32 oldMSTime = getMSTime();
@@ -254,6 +260,9 @@ void InstanceSaveMgr::LoadInstances()
     // pussywizard
     LoadInstanceSaves();
     LoadCharacterBinds();
+
+    // Sanitize pending rows on Instance_saved_data for data that wasn't deleted properly
+    SanitizeInstanceSavedData();
 
     LOG_INFO("server.loading", ">> Loaded instances and binds in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");

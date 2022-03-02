@@ -798,15 +798,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsGameObject(*itr))
                     {
                         GameObject* go = (*itr)->ToGameObject();
-
-                        // Activate
-                        if (go->GetGoType() != GAMEOBJECT_TYPE_DOOR)
                         {
+                            // Activate
                             go->SetLootState(GO_READY);
+                            go->UseDoorOrButton(0, e.action.activateObject.alternative ? true : false, unit);
+                            LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject {} activated", go->GetGUID().ToString());
                         }
-
-                        go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
-                        LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject {} activated", go->GetGUID().ToString());
                     }
                 }
 
