@@ -145,6 +145,15 @@ namespace WorldPackets
     {
         class RandomRollClient;
     }
+
+    namespace Pet
+    {
+        class DismissCritter;
+        class PetAbandon;
+        class PetStopAttack;
+        class PetSpellAutocast;
+        class RequestPetInfo;
+    }
 }
 
 enum AccountDataType
@@ -864,14 +873,14 @@ public:                                                 // opcodes handlers
 
     //Pet
     void HandlePetAction(WorldPacket& recvData);
-    void HandlePetStopAttack(WorldPacket& recvData);
+    void HandlePetStopAttack(WorldPackets::Pet::PetStopAttack& packet);
     void HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2);
     void HandlePetNameQuery(WorldPacket& recvData);
     void HandlePetSetAction(WorldPacket& recvData);
-    void HandlePetAbandon(WorldPacket& recvData);
+    void HandlePetAbandon(WorldPackets::Pet::PetAbandon& packet);
     void HandlePetRename(WorldPacket& recvData);
     void HandlePetCancelAuraOpcode(WorldPacket& recvPacket);
-    void HandlePetSpellAutocastOpcode(WorldPacket& recvPacket);
+    void HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutocast& packet);
     void HandlePetCastSpellOpcode(WorldPacket& recvPacket);
     void HandlePetLearnTalent(WorldPacket& recvPacket);
     void HandleLearnPreviewTalentsPet(WorldPacket& recvPacket);
@@ -883,7 +892,7 @@ public:                                                 // opcodes handlers
     void HandleSetPlayerDeclinedNames(WorldPacket& recvData);
 
     void HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestroyed);
-    void HandleDismissCritter(WorldPacket& recvData);
+    void HandleDismissCritter(WorldPackets::Pet::DismissCritter& dismissCritter);
 
     //Battleground
     void HandleBattlemasterHelloOpcode(WorldPacket& recvData);
@@ -968,7 +977,7 @@ public:                                                 // opcodes handlers
     void HandleCancelMountAuraOpcode(WorldPacket& recvData);
     void HandleSelfResOpcode(WorldPacket& recvData);
     void HandleComplainOpcode(WorldPacket& recvData);
-    void HandleRequestPetInfoOpcode(WorldPacket& recvData);
+    void HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& packet);
 
     // Socket gem
     void HandleSocketOpcode(WorldPacket& recvData);
