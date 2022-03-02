@@ -626,7 +626,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
         }
 
         // skip deleted or not delivered (deliver delay not expired) mails
-        if (mail->state == MAIL_STATE_DELETED || cur_time < mail->deliver_time)
+        if (mail->state == MAIL_STATE_DELETED || cur_time < mail->deliver_time || cur_time > mail->expire_time)
         {
             continue;
         }
@@ -811,8 +811,8 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
             if (mail->checked & MAIL_CHECK_MASK_READ)
                 continue;
 
-            // and already delivered
-            if (now < mail->deliver_time)
+            // and already delivered or expired
+            if (now < mail->deliver_time || now > mail->expire_time)
                 continue;
 
             // only send each mail sender once
