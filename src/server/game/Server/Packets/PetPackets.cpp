@@ -15,17 +15,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
-
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
 #include "PetPackets.h"
-#include "CombatLogPackets.h"
-#include "GuildPackets.h"
-#include "MiscPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
 
-#endif // AllPackets_h__
+void WorldPackets::Pet::DismissCritter::Read()
+{
+    _worldPacket >> CritterGUID;
+}
+
+void WorldPackets::Pet::PetAbandon::Read()
+{
+    _worldPacket >> PetGUID;
+}
+
+void WorldPackets::Pet::PetStopAttack::Read()
+{
+    _worldPacket >> PetGUID;
+}
+
+void WorldPackets::Pet::PetSpellAutocast::Read()
+{
+    _worldPacket >> PetGUID;
+    _worldPacket >> SpellID;
+    _worldPacket >> AutocastEnabled;
+}
+
+WorldPacket const* WorldPackets::Pet::PetLearnedSpell::Write()
+{
+    _worldPacket << uint32(SpellID);
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Pet::PetUnlearnedSpell::Write()
+{
+    _worldPacket << uint32(SpellID);
+    return &_worldPacket;
+}
