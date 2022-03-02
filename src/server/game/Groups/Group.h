@@ -215,6 +215,7 @@ public:
     bool isBGGroup()   const;
     bool IsCreated()   const;
     ObjectGuid GetLeaderGUID() const;
+    Player* GetLeader();
     ObjectGuid GetGUID() const;
     const char* GetLeaderName() const;
     LootMethod GetLootMethod() const;

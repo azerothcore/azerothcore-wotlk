@@ -168,6 +168,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         {
             err = ERR_IN_RANDOM_BG;
         }
+        else if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId)) // queued for this bg
+        {
+            err = ERR_BATTLEGROUND_NONE;
+        }
         else if (_player->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB) // already in queue, so can't queue for random
         {
             err = ERR_IN_NON_RANDOM_BG;
@@ -232,18 +236,15 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             avgWaitTime = bgQueue.GetAverageQueueWaitTime(ginfo);
         }
 
-        WorldPacket data;
-        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr++)
+        grp->DoForAllMembers([bg, err, bgQueueTypeId, avgWaitTime](Player* member)
         {
-            Player* member = itr->GetSource();
-            if (!member)
-                continue;
+            WorldPacket data;
 
             if (err <= 0)
             {
                 sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
                 member->GetSession()->SendPacket(&data);
-                continue;
+                return;
             }
 
             uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
@@ -256,7 +257,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             member->GetSession()->SendPacket(&data);
 
             sScriptMgr->OnPlayerJoinBG(member);
-        }
+        });
     }
 
     sBattlegroundMgr->ScheduleQueueUpdate(0, 0, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());

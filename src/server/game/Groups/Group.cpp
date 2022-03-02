@@ -2189,6 +2189,11 @@ ObjectGuid Group::GetLeaderGUID() const
     return m_leaderGuid;
 }
 
+Player* Group::GetLeader()
+{
+    return ObjectAccessor::FindConnectedPlayer(m_leaderGuid);
+}
+
 ObjectGuid Group::GetGUID() const
 {
     return m_guid;
