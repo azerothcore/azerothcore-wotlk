@@ -1,3 +1,19 @@
+-- DB update 2022_03_02_02 -> 2022_03_02_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2022_03_02_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2022_03_02_02 2022_03_02_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1645638398139044400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1645638398139044400');
 
 UPDATE `creature` SET `position_x`=7131.1055, `position_y`=-788.2168, `position_z`=68.10991, `orientation`=4.823452 WHERE `id1`=3662;
@@ -50,3 +66,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3662, 0, 4, 0, 40, 0, 100, 0, 38, 0, 0, 0, 0, 80, 366200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, "Delmanis the Hated - On Waypoint 38 Reached - Run Script"),
 (366200, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 89, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, "Delmanis the Hated - On Script - Set Random Move (5 Yards)"),
 (366200, 9, 1, 0, 0, 0, 100, 0, 20000, 20000, 0, 0, 0, 53, 0, 3662, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, "Delmanis the Hated - On Script - Start Waypoint");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2022_03_02_03' WHERE sql_rev = '1645638398139044400';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
