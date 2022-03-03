@@ -102,6 +102,7 @@ public:
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
+            { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
             { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
@@ -1244,6 +1245,84 @@ public:
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
         return true;
+    }
+
+    static bool HandleDebugObjectCountCommand(ChatHandler* handler, Optional<uint32> mapId)
+    {
+        if (mapId)
+        {
+            sMapMgr->DoForAllMapsWithMapId(mapId.value(),
+               [handler](Map* map) -> void
+                {
+                   HandleDebugObjectCountMap(handler, map);
+                }
+            );
+        }
+        else
+        {
+            sMapMgr->DoForAllMaps(
+                [handler](Map* map) -> void
+                {
+                    HandleDebugObjectCountMap(handler, map);
+                }
+            );
+        }
+
+        return true;
+    }
+
+    class CreatureCountWorker
+    {
+    public:
+        CreatureCountWorker() { }
+
+        void Visit(std::unordered_map<ObjectGuid, Creature*>& creatureMap)
+        {
+            for (auto const& p : creatureMap)
+            {
+                uint32& count = creatureIds[p.second->GetEntry()];
+                ++count;
+            }
+        }
+
+        template<class T>
+        void Visit(std::unordered_map<ObjectGuid, T*>&) { }
+
+        std::vector<std::pair<uint32, uint32>> GetTopCreatureCount(uint32 count)
+        {
+            auto comp = [](std::pair<uint32, uint32> const& a, std::pair<uint32, uint32> const& b)
+            {
+                return a.second > b.second;
+            };
+            std::set<std::pair<uint32, uint32>, decltype(comp)> set(creatureIds.begin(), creatureIds.end(), comp);
+
+            count = std::min(count, uint32(set.size()));
+            std::vector<std::pair<uint32, uint32>> result(count);
+            std::copy_n(set.begin(), count, result.begin());
+
+            return result;
+        }
+
+    private:
+        std::unordered_map<uint32, uint32> creatureIds;
+    };
+
+    static void HandleDebugObjectCountMap(ChatHandler* handler, Map* map)
+    {
+        handler->PSendSysMessage("Map Id: %u Name: '%s' Instance Id: %u Creatures: %u GameObjects: %u SetActive Objects: %u",
+                map->GetId(), map->GetMapName(), map->GetInstanceId(),
+                uint64(map->GetObjectsStore().Size<Creature>()),
+                uint64(map->GetObjectsStore().Size<GameObject>()),
+                uint64(map->GetActiveNonPlayersCount()));
+
+        CreatureCountWorker worker;
+        TypeContainerVisitor<CreatureCountWorker, MapStoredObjectTypesContainer> visitor(worker);
+        visitor.Visit(map->GetObjectsStore());
+
+        handler->PSendSysMessage("Top Creatures count:");
+
+        for (auto&& p : worker.GetTopCreatureCount(5))
+            handler->PSendSysMessage("Entry: %u Count: %u", p.first, p.second);
     }
 
     static bool HandleDebugDummyCommand(ChatHandler* handler)
