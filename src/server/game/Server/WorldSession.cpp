@@ -614,12 +614,12 @@ void WorldSession::LogoutPlayer(bool save)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
         _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
-        ///- If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
-        if (!_player->GetGroup() && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
+        ///- If the player is not in a group (invited), remove him.
+        if (!_player->GetGroup())
             _player->UninviteFromGroup();
 
         // remove player from the group if he is:
-        // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected)
+        // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected) d) LeaveGroupOnLogout is enabled
         if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
             _player->RemoveFromGroup();
 
