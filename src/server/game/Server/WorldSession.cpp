@@ -615,7 +615,7 @@ void WorldSession::LogoutPlayer(bool save)
         _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
         ///- If the player is not in a group (invited), remove him.
-        if (!_player->GetGroup())
+        if (sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
             _player->UninviteFromGroup();
 
         // remove player from the group if he is:
