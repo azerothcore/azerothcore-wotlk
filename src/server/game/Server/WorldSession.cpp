@@ -615,11 +615,12 @@ void WorldSession::LogoutPlayer(bool save)
         _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
         ///- If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
-        _player->UninviteFromGroup();
+        if (sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
+            _player->UninviteFromGroup();
 
         // remove player from the group if he is:
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected)
-        if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket)
+        if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
             _player->RemoveFromGroup();
 
         // pussywizard: checked second time after being removed from a group

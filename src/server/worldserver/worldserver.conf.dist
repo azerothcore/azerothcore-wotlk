@@ -3691,6 +3691,17 @@ EnablePlayerSettings = 0
 JoinBGAndLFG.Enable = 0
 
 #
+#   LeaveGroupOnLogout.Enabled
+#        Description: Should the player leave their group when they log out?
+#                     (It does not affect raids or dungeon finder groups)
+#
+#        Default:     1 - (Enabled)
+#
+#
+
+LeaveGroupOnLogout.Enabled = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
