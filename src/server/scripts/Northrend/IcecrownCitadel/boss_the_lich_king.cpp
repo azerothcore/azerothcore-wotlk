@@ -812,12 +812,13 @@ public:
 
             if (_phase == PHASE_OUTRO)
             {
-                if (!me->IsLevitating())
+                if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER))
                     damage = me->GetHealth() > 1 ? 1 : 0;
                 else if (damage >= me->GetHealth()) // dying...
                 {
                     damage = me->GetHealth() - 1;
                     me->SetDisableGravity(false);
+                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                     me->SendMonsterMove(me->GetPositionX() + 0.25f, me->GetPositionY(), 840.86f, 300, SPLINEFLAG_FALLING);
                     me->m_positionZ = 840.86f;
                     me->SetOrientation(0.0f);
@@ -1559,6 +1560,7 @@ public:
                         theLichKing->CastSpell((Unit*)nullptr, SPELL_SOUL_BARRAGE, TRIGGERED_IGNORE_CAST_IN_PROGRESS);
                         sCreatureTextMgr->SendSound(theLichKing, SOUND_PAIN, CHAT_MSG_MONSTER_YELL, 0, TEXT_RANGE_NORMAL, TEAM_NEUTRAL, false);
                         theLichKing->SetDisableGravity(true);
+                        theLichKing->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                         theLichKing->GetMotionMaster()->MovePoint(0, OutroFlying);
 
                         _events.ScheduleEvent(EVENT_OUTRO_AFTER_SOUL_BARRAGE, 3000);
@@ -2673,8 +2675,9 @@ public:
                     break;
                 case EVENT_MOVE_TO_DROP_POS:
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                    me->SetCanFly(false);
                     me->SetDisableGravity(false);
+                    me->SetHover(false);
+                    me->SetCanFly(false);
                     me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, false);
                     me->SetDisableGravity(true, true);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -2682,8 +2685,9 @@ public:
                 case EVENT_MOVE_TO_SIPHON_POS:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); // just in case if passenger disappears so quickly that EVENT_MOVE_TO_DROP_POS is never executed
                     { int32 bp0 = 80; me->CastCustomSpell(me, 1557, &bp0, nullptr, nullptr, true); }
-                    me->SetCanFly(true);
                     me->SetDisableGravity(true);
+                    me->SetHover(true);
+                    me->SetCanFly(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MovePoint(POINT_START_SIPHON, _destPoint);
                     break;
